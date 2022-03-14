@@ -65,8 +65,9 @@ public:
   }
 
   /**
-   *
-   *
+   * Exports a batch of span recordables asynchronously.
+   * @param spans a span of unique pointers to span recordables
+   * @param result_callback callback function accepting ExportResult as argument
    */
   void Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,

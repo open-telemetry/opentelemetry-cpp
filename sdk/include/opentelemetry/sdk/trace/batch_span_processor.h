@@ -135,6 +135,19 @@ private:
    */
   void DrainQueue();
 
+  /**
+   * Should be called from Export to notify the main thread on Force Flush Completion
+   * @param was_force_flush_called - A flag to check if the current export is the result
+   *                                 of a call to ForceFlush method. If true, then we have to
+   *                                 notify the main thread to wake it up in the ForceFlush
+   *                                 method.
+   */
+  void NotifyForceFlushCompletion(const bool was_for_flush_called);
+
+  /* In case of async export, wait and notify for shutdown to be completed.*/
+  void WaitForShutdownCompletion();
+  void NotifyShutdownCompletion();
+
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
 
@@ -145,8 +158,8 @@ private:
   const bool is_export_async_;
 
   /* Synchronization primitives */
-  std::condition_variable cv_, force_flush_cv_;
-  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_;
+  std::condition_variable cv_, force_flush_cv_, async_shutdown_cv_;
+  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_, async_shutdown_m_;
 
   /* The buffer/queue to which the ended spans are added */
   common::CircularBuffer<Recordable> buffer_;
@@ -155,6 +168,7 @@ private:
   std::atomic<bool> is_shutdown_{false};
   std::atomic<bool> is_force_flush_{false};
   std::atomic<bool> is_force_flush_notified_{false};
+  std::atomic<bool> is_async_shutdown_notified_{false};
 
   /* The background worker thread */
   std::thread worker_thread_;

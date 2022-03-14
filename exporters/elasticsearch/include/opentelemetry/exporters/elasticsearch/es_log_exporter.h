@@ -90,8 +90,9 @@ public:
           &records) noexcept override;
 
   /**
-   *
-   *
+   * Exports a vector of log records to the Elasticsearch instance asynchronously.
+   * @param records A list of log records to send to Elasticsearch.
+   * @param result_callback callback function accepting ExportResult as argument
    */
   void Export(
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records,

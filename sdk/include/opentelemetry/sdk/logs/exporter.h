@@ -48,10 +48,9 @@ public:
 
 
   /**
-   * Exports the batch of log records to their export destination
-   *
-   *
-   *
+   * Exports asynchronously the batch of log records to their export destination
+   * @param records a span of unique pointers to log records
+   * @param result_callback callback function accepting ExportResult as argument
    */
   virtual void Export(
       const nostd::span<std::unique_ptr<Recordable>> &records,

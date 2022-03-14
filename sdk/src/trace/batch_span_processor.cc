@@ -164,22 +164,53 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
   if (is_export_async_ == false || was_force_flush_called == true) {
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
-    // Notify the main thread in case this export was the result of a force flush.
-    if (was_force_flush_called == true)
-    {
-      is_force_flush_notified_ = true;
-      while (is_force_flush_notified_.load() == true)
-      {
-        force_flush_cv_.notify_one();
-      }
-    }
+    NotifyForceFlushCompletion(was_force_flush_called);
   }
   else {
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
-      [](sdk::common::ExportResult result) {
+      [this, was_force_flush_called](sdk::common::ExportResult result) {
         // TODO: Print result
+        NotifyForceFlushCompletion(was_force_flush_called);
+        // If export was called due to shutdown, notify the worker thread
+        NotifyShutdownCompletion();
         return true;
       });
+  }
+}
+
+void BatchSpanProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
+{
+  // Notify the main thread in case this export was the result of a force flush.
+  if (was_force_flush_called == true)
+  {
+    is_force_flush_notified_ = true;
+    while (is_force_flush_notified_.load() == true)
+    {
+      force_flush_cv_.notify_one();
+    }
+  }
+}
+
+void BatchSpanProcessor::WaitForShutdownCompletion()
+{
+  // Since async export is invoked due to shutdown, need to wait
+  // for async thread to complete.
+  if (is_export_async_)
+  {
+    std::unique_lock<std::mutex> lk(async_shutdown_m_);
+    while (is_async_shutdown_notified_.load() == false)
+    {
+      async_shutdown_cv_.wait(lk);
+    }
+  }
+}
+
+void BatchSpanProcessor::NotifyShutdownCompletion()
+{
+  // Notify the thread which is waiting on shutdown to complete.
+  if (is_shutdown_.load() == true) {
+    is_async_shutdown_notified_.store(true);
+    async_shutdown_cv_.notify_one();
   }
 }
 
@@ -188,6 +219,7 @@ void BatchSpanProcessor::DrainQueue()
   while (buffer_.empty() == false)
   {
     Export(false);
+    WaitForShutdownCompletion();
   }
 }
 

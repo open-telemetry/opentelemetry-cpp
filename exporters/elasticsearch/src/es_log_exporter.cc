@@ -175,6 +175,8 @@ public:
       case http_client::SessionState::NetworkError:
         OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
         break;
+      default:
+        break;
     }
     result_callback_(sdk::common::ExportResult::kFailure);
   }
