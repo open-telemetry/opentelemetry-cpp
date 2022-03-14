@@ -60,8 +60,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
 }
 
 void OtlpHttpLogExporter::Export(
-  const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
-  nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
+    nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
 {
   OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
   auto status = Export(logs);

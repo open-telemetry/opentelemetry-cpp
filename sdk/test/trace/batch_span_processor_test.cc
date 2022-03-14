@@ -60,7 +60,7 @@ public:
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
       nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept override
   {
-    auto th = std::thread([this, spans, result_callback](){
+    auto th = std::thread([this, spans, result_callback]() {
       auto result = Export(spans);
       result_callback(result);
     });

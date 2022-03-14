@@ -46,7 +46,6 @@ public:
   virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
-
   /**
    * Exports asynchronously the batch of log records to their export destination
    * @param records a span of unique pointers to log records

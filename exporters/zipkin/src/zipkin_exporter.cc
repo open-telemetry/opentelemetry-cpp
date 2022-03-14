@@ -94,9 +94,8 @@ sdk::common::ExportResult ZipkinExporter::Export(
 }
 
 void ZipkinExporter::Export(
-  const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-  nostd::function_ref<bool(sdk::common::ExportResult)> result_callback)
-  noexcept
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+    nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept
 {
   OTEL_INTERNAL_LOG_WARN("[ZIPKIN EXPORTER] async not supported. Making sync interface call");
   auto status = Export(spans);

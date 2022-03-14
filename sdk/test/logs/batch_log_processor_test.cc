@@ -55,10 +55,11 @@ public:
     return ExportResult::kSuccess;
   }
 
-  void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
-    opentelemetry::nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+  void Export(
+      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
+      opentelemetry::nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
   {
-    auto th = std::thread([this, records, result_callback](){
+    auto th = std::thread([this, records, result_callback]() {
       auto result = Export(records);
       result_callback(result);
     });
@@ -99,11 +100,10 @@ public:
       const size_t max_export_batch_size                     = 512,
       const bool is_export_async                             = false)
   {
-    return std::shared_ptr<LogProcessor>(
-        new BatchLogProcessor(std::unique_ptr<LogExporter>(new MockLogExporter(
-                                  logs_received, is_shutdown, is_export_completed, export_delay)),
-                              max_queue_size, scheduled_delay_millis, max_export_batch_size,
-                              is_export_async));
+    return std::shared_ptr<LogProcessor>(new BatchLogProcessor(
+        std::unique_ptr<LogExporter>(
+            new MockLogExporter(logs_received, is_shutdown, is_export_completed, export_delay)),
+        max_queue_size, scheduled_delay_millis, max_export_batch_size, is_export_async));
   }
 };
 
@@ -156,12 +156,12 @@ TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds scheduled_delay_millis(5000);
   const size_t max_export_batch_size = 512;
-  const size_t max_queue_size = 2048;
-  const bool is_export_async = true;
+  const size_t max_queue_size        = 2048;
+  const bool is_export_async         = true;
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
-      export_delay, scheduled_delay_millis, max_queue_size, max_export_batch_size,
-      is_export_async);
+                                          export_delay, scheduled_delay_millis, max_queue_size,
+                                          max_export_batch_size, is_export_async);
 
   // Create a few test log records and send them to the processor
   const int num_logs = 3;
@@ -243,14 +243,14 @@ TEST_F(BatchLogProcessorTest, TestAsyncForceFlush)
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds scheduled_delay_millis(5000);
   const size_t max_export_batch_size = 512;
-  const size_t max_queue_size = 2048;
-  const bool is_export_async = true;
+  const size_t max_queue_size        = 2048;
+  const bool is_export_async         = true;
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
-      export_delay, scheduled_delay_millis, max_queue_size, max_export_batch_size,
-      is_export_async);
+                                          export_delay, scheduled_delay_millis, max_queue_size,
+                                          max_export_batch_size, is_export_async);
 
-  const int num_logs   = 2048;
+  const int num_logs = 2048;
 
   for (int i = 0; i < num_logs; ++i)
   {

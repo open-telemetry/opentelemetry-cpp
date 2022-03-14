@@ -181,9 +181,9 @@ sdk::common::ExportResult OStreamLogExporter::Export(
 }
 
 void OStreamLogExporter::Export(
-  const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records,
-  opentelemetry::nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback)
-  noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records,
+    opentelemetry::nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)>
+        result_callback) noexcept
 {
   // Do not have async support
   auto result = Export(records);

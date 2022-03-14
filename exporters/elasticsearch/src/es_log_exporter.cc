@@ -110,7 +110,6 @@ private:
   bool console_debug_ = false;
 };
 
-
 /**
  * This class handles the async response message from the Elasticsearch request
  */
@@ -121,20 +120,18 @@ public:
    * Creates a response handler, that by default doesn't display to console
    */
   AsyncResponseHandler(
-    std::shared_ptr<ext::http::client::Session> session,
-    nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback,
-    bool console_debug = false)
-    : console_debug_{console_debug}
-    , session_{std::move(session)}
-    , result_callback_{result_callback} {}
+      std::shared_ptr<ext::http::client::Session> session,
+      nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback,
+      bool console_debug = false)
+      : console_debug_{console_debug},
+        session_{std::move(session)},
+        result_callback_{result_callback}
+  {}
 
   /**
    * Cleans up the session in the destructor.
    */
-  ~AsyncResponseHandler()
-  {
-    session_->FinishSession();
-  }
+  ~AsyncResponseHandler() { session_->FinishSession(); }
 
   /**
    * Automatically called when the response is received
@@ -147,10 +144,12 @@ public:
     if (body_.find("\"failed\" : 0") == std::string::npos)
     {
       OTEL_INTERNAL_LOG_ERROR(
-        "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
-        << body_);
+          "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
+          << body_);
       result_callback_(sdk::common::ExportResult::kFailure);
-    } else {
+    }
+    else
+    {
       result_callback_(sdk::common::ExportResult::kSuccess);
     }
   }
@@ -193,7 +192,6 @@ private:
   // Whether to print the results from the callback
   bool console_debug_ = false;
 };
-
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
@@ -284,8 +282,9 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
 }
 
 void ElasticsearchLogExporter::Export(
-      const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records,
-      nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
+        &records,
+    nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
 {
   // Return failure if this exporter has been shutdown
   if (isShutdown())
@@ -322,8 +321,8 @@ void ElasticsearchLogExporter::Export(
   request->SetBody(body_vec);
 
   // Send the request
-  auto handler = std::make_shared<AsyncResponseHandler>(
-    session, result_callback, options_.console_debug_);
+  auto handler =
+      std::make_shared<AsyncResponseHandler>(session, result_callback, options_.console_debug_);
   session->SendRequest(handler);
 }
 

@@ -138,8 +138,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   auto mock_session =
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
-      .WillOnce([&mock_session,
-                 report_trace_id](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+      .WillOnce([&mock_session, report_trace_id](
+                    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
         auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
         auto resource_span                = *check_json["resource_spans"].begin();
         auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
@@ -217,8 +217,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   auto mock_session =
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
-      .WillOnce([&mock_session,
-                 report_trace_id](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+      .WillOnce([&mock_session, report_trace_id](
+                    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
         opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
         request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                     static_cast<int>(mock_session->GetRequest()->body_.size()));

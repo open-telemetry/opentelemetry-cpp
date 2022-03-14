@@ -226,7 +226,6 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
-
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)

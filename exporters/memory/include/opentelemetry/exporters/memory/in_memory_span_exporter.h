@@ -71,8 +71,7 @@ public:
    */
   void Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback)
-      noexcept override
+      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept override
   {
     OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
     auto status = Export(spans);

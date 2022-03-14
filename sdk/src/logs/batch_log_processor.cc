@@ -154,12 +154,14 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
                     });
                   });
 
-  if (is_export_async_ == false) {
+  if (is_export_async_ == false)
+  {
     exporter_->Export(
         nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
     NotifyForceFlushCompletion(was_force_flush_called);
   }
-  else {
+  else
+  {
     exporter_->Export(
         nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
         [this, was_force_flush_called](sdk::common::ExportResult result) {
@@ -203,7 +205,8 @@ void BatchLogProcessor::WaitForShutdownCompletion()
 void BatchLogProcessor::NotifyShutdownCompletion()
 {
   // Notify the thread which is waiting on shutdown to complete.
-  if (is_shutdown_.load() == true) {
+  if (is_shutdown_.load() == true)
+  {
     is_async_shutdown_notified_.store(true);
     async_shutdown_cv_.notify_one();
   }

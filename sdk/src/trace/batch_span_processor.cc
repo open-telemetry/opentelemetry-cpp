@@ -161,20 +161,22 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
   /* Call the sync Export when force flush was called, even if
      is_export_async_ is true.
   */
-  if (is_export_async_ == false || was_force_flush_called == true) {
+  if (is_export_async_ == false || was_force_flush_called == true)
+  {
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
     NotifyForceFlushCompletion(was_force_flush_called);
   }
-  else {
+  else
+  {
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
-      [this, was_force_flush_called](sdk::common::ExportResult result) {
-        // TODO: Print result
-        NotifyForceFlushCompletion(was_force_flush_called);
-        // If export was called due to shutdown, notify the worker thread
-        NotifyShutdownCompletion();
-        return true;
-      });
+                      [this, was_force_flush_called](sdk::common::ExportResult result) {
+                        // TODO: Print result
+                        NotifyForceFlushCompletion(was_force_flush_called);
+                        // If export was called due to shutdown, notify the worker thread
+                        NotifyShutdownCompletion();
+                        return true;
+                      });
   }
 }
 
@@ -208,7 +210,8 @@ void BatchSpanProcessor::WaitForShutdownCompletion()
 void BatchSpanProcessor::NotifyShutdownCompletion()
 {
   // Notify the thread which is waiting on shutdown to complete.
-  if (is_shutdown_.load() == true) {
+  if (is_shutdown_.load() == true)
+  {
     is_async_shutdown_notified_.store(true);
     async_shutdown_cv_.notify_one();
   }
