@@ -131,12 +131,11 @@ public:
   bool Shutdown() noexcept;
 
 private:
-  std::vector<std::shared_ptr<Meter>> meters_;
+  opentelemetry::common::SystemTimestamp sdk_start_ts_;
   opentelemetry::sdk::resource::Resource resource_;
-  std::vector<std::unique_ptr<MetricExporter>> exporters_;
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
-  opentelemetry::common::SystemTimestamp sdk_start_ts_;
+  std::vector<std::shared_ptr<Meter>> meters_;
 };
 
 }  // namespace metrics

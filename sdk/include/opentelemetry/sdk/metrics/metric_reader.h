@@ -3,12 +3,14 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+
 #  include "opentelemetry/version.h"
 
+#  include <chrono>
 #  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -47,6 +49,8 @@ public:
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+  virtual ~MetricReader() = default;
+
 private:
   virtual bool OnForceFlush() noexcept = 0;
 
@@ -54,9 +58,12 @@ private:
 
   virtual void OnInitialized() noexcept {}
 
+  bool IsShutdown() const noexcept;
+
 private:
   MetricProducer *metric_producer_;
   AggregationTemporarily aggregation_temporarily_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
   bool shutdown_;
 };
 }  // namespace metrics
