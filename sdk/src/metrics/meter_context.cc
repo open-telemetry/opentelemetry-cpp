@@ -18,9 +18,9 @@ namespace metrics
 MeterContext::MeterContext(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
                            std::unique_ptr<ViewRegistry> views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
-    : exporters_(std::move(exporters)),
+    : resource_{resource},
+      exporters_(std::move(exporters)),
       views_(std::move(views)),
-      resource_{resource},
       sdk_start_ts_{std::chrono::system_clock::now()}
 {}
 
