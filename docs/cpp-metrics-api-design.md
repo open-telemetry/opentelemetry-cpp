@@ -139,7 +139,6 @@ private:
 };
 ```
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 # meter_provider.h
 class MeterProvider
@@ -170,7 +169,7 @@ function.
 This interface consists of a set of **instrument constructors**, and a
 **facility for capturing batches of measurements.**
 
-```cpp
+``` cpp
 # meter.h
 class Meter {
 public:
@@ -258,7 +257,6 @@ private:
   InstrumentationInfo instrumentationInfo_;
 }
 ```
-<!-- markdownlint-enable MD013 -->
 
 ### Meter API Class Design Considerations
 
