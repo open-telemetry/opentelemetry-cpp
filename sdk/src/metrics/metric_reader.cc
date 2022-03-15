@@ -51,10 +51,10 @@ bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
   }
-  if (!OnShutDown())
+  if (!OnShutDown(timeout))
   {
     status = false;
-    OTEL_INTERNAL_LOG_ERROR("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
+    OTEL_INTERNAL_LOG_WARN("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
   }
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   shutdown_ = true;
@@ -69,7 +69,7 @@ bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown Cannot invoke Force flush on shutdown reader!");
   }
-  if (!OnForceFlush())
+  if (!OnForceFlush(timeout))
   {
     status = false;
     OTEL_INTERNAL_LOG_ERROR("MetricReader::OnForceFlush failed!");

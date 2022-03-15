@@ -52,9 +52,9 @@ public:
   virtual ~MetricReader() = default;
 
 private:
-  virtual bool OnForceFlush() noexcept = 0;
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept = 0;
 
-  virtual bool OnShutDown() noexcept = 0;
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept = 0;
 
   virtual void OnInitialized() noexcept {}
 

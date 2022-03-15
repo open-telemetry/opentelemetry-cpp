@@ -75,34 +75,40 @@ void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 
 bool MeterContext::Shutdown() noexcept
 {
-  bool result_exporter  = true;
-  bool result_reader    = true;
-  bool result_collector = true;
+  bool return_status = true;
+  if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
+  {
+    bool result_exporter  = true;
+    bool result_reader    = true;
+    bool result_collector = true;
 
-  for (auto &exporter : exporters_)
-  {
-    bool status     = exporter->Shutdown();
-    result_exporter = result_exporter && status;
+    for (auto &exporter : exporters_)
+    {
+      bool status     = exporter->Shutdown();
+      result_exporter = result_exporter && status;
+    }
+    if (!result_exporter)
+    {
+      OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric exporters");
+    }
+    for (auto &collector : collectors_)
+    {
+      bool status      = std::static_pointer_cast<MetricCollector>(collector)->Shutdown();
+      result_collector = result_reader && status;
+    }
+    if (!result_collector)
+    {
+      OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
+    }
+    return_status = result_exporter && result_collector;
   }
-  if (!result_exporter)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric exporters");
-  }
-  for (auto &collector : collectors_)
-  {
-    bool status      = std::static_pointer_cast<MetricCollector>(collector)->Shutdown();
-    result_collector = result_reader && status;
-  }
-  if (!result_collector)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
-  }
-  return result_exporter && result_reader;
+  return return_status;
 }
 
 bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   // TODO - Implement timeout logic.
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
   bool result_exporter = true;
   for (auto &exporter : exporters_)
   {

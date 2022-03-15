@@ -39,9 +39,9 @@ public:
 class MockMetricReader : public MetricReader
 {
 public:
-  virtual bool OnForceFlush() noexcept override { return true; }
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
 
-  virtual bool OnShutDown() noexcept override { return true; }
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
 
   virtual void OnInitialized() noexcept override {}
 };

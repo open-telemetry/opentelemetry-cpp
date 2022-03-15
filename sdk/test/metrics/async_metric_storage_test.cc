@@ -23,9 +23,9 @@ class MockMetricReader : public MetricReader
 public:
   MockMetricReader(AggregationTemporarily aggr_temporarily) : MetricReader(aggr_temporarily) {}
 
-  virtual bool OnForceFlush() noexcept override { return true; }
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
 
-  virtual bool OnShutDown() noexcept override { return true; }
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
 
   virtual void OnInitialized() noexcept override {}
 };
@@ -46,13 +46,14 @@ TEST(AsyncMetricStorageTest, BasicTests)
   std::shared_ptr<MeterContext> meter_context(new MeterContext(std::move(exporters)));
   std::unique_ptr<MetricReader> metric_reader(new MockMetricReader(AggregationTemporarily::kDelta));
 
-  CollectorHandle *collector =
-      new MetricCollector(std::move(meter_context), std::move(metric_reader));
-  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  std::shared_ptr<CollectorHandle> collector = std::shared_ptr<CollectorHandle>(
+      new MetricCollector(std::move(meter_context), std::move(metric_reader)));
+
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
 
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(
       instr_desc, AggregationType::kSum, &measurement_fetch, new DefaultAttributesProcessor());
-  storage.Collect(collector, collectors, std::chrono::system_clock::now(),
+  storage.Collect(collector.get(), collectors, std::chrono::system_clock::now(),
                   std::chrono::system_clock::now(), metric_callback);
 }
 #endif

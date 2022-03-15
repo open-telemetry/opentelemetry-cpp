@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
@@ -136,6 +137,9 @@ private:
   std::unique_ptr<ViewRegistry> views_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
   std::vector<std::shared_ptr<Meter>> meters_;
+
+  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+  opentelemetry::common::SpinLockMutex forceflush_lock_;
 };
 
 }  // namespace metrics
