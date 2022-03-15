@@ -37,12 +37,11 @@ public:
         active_attributes_hashmap_(new AttributesHashMap())
   {}
 
-  bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-      opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData &)> metric_collection_callback) noexcept override
+  bool Collect(CollectorHandle *collector,
+               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData &)> metric_collection_callback) noexcept override
   {
     opentelemetry::sdk::metrics::ObserverResult<T> ob_res(attributes_processor_);
 

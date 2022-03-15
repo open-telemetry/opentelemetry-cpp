@@ -20,8 +20,8 @@ class MetricStorage
 {
 public:
   /* collect the metrics from this storage */
-  virtual bool Collect(MetricCollector *collector,
-                       nostd::span<MetricCollector *> collectors,
+  virtual bool Collect(CollectorHandle *collector,
+                       nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                        opentelemetry::common::SystemTimestamp sdk_start_ts,
                        opentelemetry::common::SystemTimestamp collection_ts,
                        nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
@@ -44,8 +44,8 @@ public:
 class NoopMetricStorage : public MetricStorage
 {
 public:
-  bool Collect(MetricCollector *collector,
-               nostd::span<MetricCollector *> collectors,
+  bool Collect(CollectorHandle *collector,
+               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData &)> callback) noexcept override

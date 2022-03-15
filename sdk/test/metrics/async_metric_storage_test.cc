@@ -5,17 +5,30 @@
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/meter_context.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
-
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
-#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 
 #  include <gtest/gtest.h>
-#  include <map>
+#  include <vector>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using namespace opentelemetry::sdk::resource;
+
+class MockMetricReader : public MetricReader
+{
+public:
+  MockMetricReader(AggregationTemporarily aggr_temporarily) : MetricReader(aggr_temporarily) {}
+
+  virtual bool OnForceFlush() noexcept override { return true; }
+
+  virtual bool OnShutDown() noexcept override { return true; }
+
+  virtual void OnInitialized() noexcept override {}
+};
 
 void measurement_fetch(opentelemetry::metrics::ObserverResult<long> &observer_result)
 {
@@ -28,14 +41,18 @@ TEST(AsyncMetricStorageTest, BasicTests)
   auto metric_callback            = [](MetricData &metric_data) { return true; };
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
-  auto instrumentation_library    = InstrumentationLibrary::Create("instr_lib");
-  auto resource                   = Resource::Create({});
-  MetricCollector collector;
-  std::vector<MetricCollector *> collectors;
+
+  std::vector<std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>> exporters;
+  std::shared_ptr<MeterContext> meter_context(new MeterContext(std::move(exporters)));
+  std::unique_ptr<MetricReader> metric_reader(new MockMetricReader(AggregationTemporarily::kDelta));
+
+  CollectorHandle *collector =
+      new MetricCollector(std::move(meter_context), std::move(metric_reader));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
 
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(
       instr_desc, AggregationType::kSum, &measurement_fetch, new DefaultAttributesProcessor());
-  EXPECT_NO_THROW(storage.Collect(&collector, collectors, instrumentation_library.get(), &resource,
-                                  metric_callback));
+  storage.Collect(collector, collectors, std::chrono::system_clock::now(),
+                  std::chrono::system_clock::now(), metric_callback);
 }
 #endif

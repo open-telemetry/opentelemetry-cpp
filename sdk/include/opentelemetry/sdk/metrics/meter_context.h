@@ -111,8 +111,7 @@ public:
   /**
    * Adds a meter to the list of configured meters.
    *
-   * Note: This method is not thread safe, and should ideally be called from main thread in
-   * thread-safe manner.
+   * Note: This method is INTERNAL to sdk not thread safe.
    *
    * @param meter
    */

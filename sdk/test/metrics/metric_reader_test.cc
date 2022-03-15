@@ -11,8 +11,6 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using namespace opentelemetry::sdk::metrics;
 
-#  include <iostream>
-
 class MockMetricReader : public MetricReader
 {
 public:
