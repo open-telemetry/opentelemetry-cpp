@@ -352,7 +352,6 @@ call: `instrument.Add(x, labels)`.
 MUST support `RecordBatch` calling (where a single set of labels is applied to
 several metric instruments).
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 # metric.h
 
@@ -514,7 +513,6 @@ private:
     void (*callback_)(ObserverResult<T>);
 };
 ```
-<!-- markdownlint-enable MD013 -->
 
 The Counter below is an example of one Metric instrument.  It is important to
 note that in the Counter’s add function, it binds the labels to the instrument
@@ -522,7 +520,6 @@ before calling add, then unbinds.  Therefore all interactions with the
 aggregator take place through bound instruments and by extension, the
 BaseBoundInstrument Class.
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 template <class T>
 class BoundCounter: public BoundSynchronousInstrument{ //override bind?
@@ -597,7 +594,6 @@ class BoundUpDownSumObserver: public AsynchronousInstrument;
 class ValueObserver: public AsynchronousInstrument;
 class BoundValueObserver: public AsynchronousInstrument;
 ```
-<!-- markdownlint-enable MD013 -->
 
 ### Metric Class Design Considerations
 
