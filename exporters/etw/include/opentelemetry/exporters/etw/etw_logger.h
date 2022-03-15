@@ -221,31 +221,49 @@ public:
     config_.encoding = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view logger_name,
+      nostd::string_view options,
+      nostd::string_view library_name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") override
+  {
+    UNREFERENCED_PARAMETER(options);
+    UNREFERENCED_PARAMETER(library_name);
+    UNREFERENCED_PARAMETER(version);
+    UNREFERENCED_PARAMETER(schema_url);
+    ETWProvider::EventFormat evtFmt = config_.encoding;
+    return nostd::shared_ptr<opentelemetry::logs::Logger>{
+        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
+  }
+
   /**
    * @brief Obtain ETW Tracer.
    * @param name ProviderId (instrumentation name) - Name or GUID
-   *
    * @param args Additional arguments that controls `codec` of the provider.
    * Possible values are:
    * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
    * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
    * - "XML"            - XML events (reserved for future use)
+   * @param library_name Library name
+   * @param version Library version
+   * @param schema_url schema URL
    * @return
    */
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view name,
-                                                           nostd::string_view args = "") override
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view logger_name,
+      nostd::span<nostd::string_view> args,
+      nostd::string_view library_name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") override
   {
     UNREFERENCED_PARAMETER(args);
+    UNREFERENCED_PARAMETER(library_name);
+    UNREFERENCED_PARAMETER(version);
+    UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
-                                                              etw::Logger(*this, name, evtFmt)};
-  }
-
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view name,
-      nostd::span<nostd::string_view> args) override
-  {
-    return GetLogger(name, args[0]);
+    return nostd::shared_ptr<opentelemetry::logs::Logger>{
+        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
   }
 };
 

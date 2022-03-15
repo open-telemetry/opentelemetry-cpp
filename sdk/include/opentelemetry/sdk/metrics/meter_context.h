@@ -47,6 +47,18 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
+   * Obtain the reference of measurement_processor.
+   *
+   */
+  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
+
+  /**
+   * Obtain the View Registry configured
+   * @return The reference to view registry
+   */
+  ViewRegistry *GetViewRegistry() const noexcept;
+
+  /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.
    * @param exporter The metric exporter for this meter context. This
    * must not be a nullptr.
@@ -95,6 +107,7 @@ private:
   std::vector<std::unique_ptr<MetricExporter>> exporters_;
   std::vector<std::unique_ptr<MetricReader>> readers_;
   std::unique_ptr<ViewRegistry> views_;
+  std::unique_ptr<MeasurementProcessor> measurement_processor_;
 };
 
 }  // namespace metrics

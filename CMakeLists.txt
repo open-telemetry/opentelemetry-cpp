@@ -62,6 +62,8 @@ else()
     set(ARCH mips)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
     set(ARCH riscv)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(s390x.*|S390X.*)")
+    set(ARCH s390x)
   else()
     message(
       FATAL_ERROR
@@ -102,7 +104,9 @@ else()
   )
 endif()
 
-option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+option(WITH_GSL
+       "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
@@ -137,18 +141,6 @@ if(WITH_STL)
   # (absl::variant or std::variant) in variant unit test code is consistent with
   # the global project build definitions.
   add_definitions(-DHAVE_CPP_STDLIB)
-  add_definitions(-DHAVE_GSL)
-
-  # Guidelines Support Library path. Used if we are not on not get C++20.
-  #
-  # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  find_package(Microsoft.GSL QUIET)
-  if(TARGET Microsoft.GSL::GSL)
-    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
-  else()
-    set(GSL_DIR third_party/ms-gsl)
-    include_directories(${GSL_DIR}/include)
-  endif()
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -162,6 +154,20 @@ if(WITH_STL)
       endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
+  endif()
+endif()
+
+if(WITH_GSL)
+  add_definitions(-DHAVE_GSL)
+
+  # Guidelines Support Library path. Used if we are not on not get C++20.
+  #
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    include_directories(${GSL_DIR}/include)
   endif()
 endif()
 
@@ -239,7 +245,10 @@ endfunction()
 
 if(WITH_JAEGER)
   find_package(Thrift QUIET)
-  if(NOT Thrift_FOUND)
+  if(Thrift_FOUND)
+    find_package(Boost REQUIRED)
+    include_directories(${Boost_INCLUDE_DIR})
+  else()
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
@@ -383,6 +392,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
+  add_definitions(-DENABLE_TEST)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
@@ -419,6 +429,7 @@ include_directories(api/include)
 add_subdirectory(api)
 
 if(NOT WITH_API_ONLY)
+  set(BUILD_TESTING ${BUILD_TESTING})
   include_directories(sdk/include)
   include_directories(sdk)
   include_directories(ext/include)

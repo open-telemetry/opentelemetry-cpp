@@ -6,6 +6,7 @@ foreach(
   circular_buffer_range_test
   circular_buffer_test
   attribute_utils_test
+  attributemap_hash_test
   global_log_handle_test)
 
   add_executable(${testname} "${testname}.cc")
@@ -30,3 +31,7 @@ target_link_libraries(random_benchmark benchmark::benchmark
 add_executable(circular_buffer_benchmark circular_buffer_benchmark.cc)
 target_link_libraries(circular_buffer_benchmark benchmark::benchmark
                       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+
+add_executable(attributemap_hash_benchmark attributemap_hash_benchmark.cc)
+target_link_libraries(attributemap_hash_benchmark benchmark::benchmark
+                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)

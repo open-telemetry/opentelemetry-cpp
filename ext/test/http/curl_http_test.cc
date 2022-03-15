@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext//http/client/curl//http_client_curl.h"
+#include "opentelemetry/ext//http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 
@@ -198,7 +198,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
   session->SendRequest(*handler);
-  ASSERT_TRUE(waitForRequests(1, 1));
+  ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
   delete handler;
@@ -221,7 +221,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   request->AddHeader("Content-Type", "text/plain");
   PostEventHandler *handler = new PostEventHandler();
   session->SendRequest(*handler);
-  ASSERT_TRUE(waitForRequests(1, 1));
+  ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
 
@@ -291,7 +291,9 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   auto result             = http_client.Get("http://222.222.222.200:19000/get/", m1);
   EXPECT_EQ(result, false);
 
-  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
+  // When network is under proxy, it may connect success but closed by peer when send data
+  EXPECT_TRUE(result.GetSessionState() == http_client::SessionState::ConnectFailed ||
+              result.GetSessionState() == http_client::SessionState::SendFailed);
 }
 
 TEST_F(BasicCurlHttpTests, SendPostRequestSync)

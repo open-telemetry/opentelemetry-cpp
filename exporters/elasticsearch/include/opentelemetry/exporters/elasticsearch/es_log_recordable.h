@@ -111,9 +111,8 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
     // Convert the severity enum to a string
-    int severity_index = static_cast<int>(severity);
-    if (severity_index < 0 ||
-        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    std::uint32_t severity_index = static_cast<std::uint32_t>(severity);
+    if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
     {
       std::stringstream sout;
       sout << "Invalid severity(" << severity_index << ")";
@@ -205,7 +204,29 @@ public:
   /**
    * Returns a JSON object contain the log information
    */
-  nlohmann::json GetJSON() noexcept { return json_; };
+  nlohmann::json GetJSON() noexcept { return json_; }
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept
+  {
+    return *instrumentation_library_;
+  }
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace exporter

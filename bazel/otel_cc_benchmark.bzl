@@ -24,16 +24,17 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         srcs = srcs,
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         tags = tags + ["manual"],
+        defines = ["BAZEL_BUILD"],
     )
 
     # The result of running the benchmark, captured into a text file.
     native.genrule(
         name = name + "_result",
-        outs = [name + "_result.txt"],
+        outs = [name + "_result.json"],
         tools = [":" + name],
         tags = tags + ["benchmark_result", "manual"],
         testonly = True,
-        cmd = "$(location :" + name + (") --benchmark_color=false --benchmark_min_time=.1 &> $@"),
+        cmd = "$(location :" + name + (") --benchmark_format=json --benchmark_color=false --benchmark_min_time=.1 &> $@"),
     )
 
     # This is run as part of "bazel test ..." to smoke-test benchmarks. It's
@@ -44,4 +45,5 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         args = ["--benchmark_min_time=0"],
         tags = tags + ["benchmark"],
+        defines = ["BAZEL_BUILD"],
     )

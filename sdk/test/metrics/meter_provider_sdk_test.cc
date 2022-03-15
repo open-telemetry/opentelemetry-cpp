@@ -16,7 +16,7 @@ class MockMetricExporter : public MetricExporter
 public:
   MockMetricExporter() = default;
   opentelemetry::sdk::common::ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
+      const opentelemetry::nostd::span<std::unique_ptr<MetricData>> &records) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
@@ -27,13 +27,16 @@ public:
     return true;
   }
 
-  bool Shutdown() noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    return true;
+  }
 };
 
 class MockMetricReader : public MetricReader
 {
 public:
-  bool Collect() noexcept override { return true; }
+  bool ProcessReceivedMetrics(MetricData &metric_data) noexcept override { return true; }
 
   bool Shutdown() noexcept override { return true; }
 };

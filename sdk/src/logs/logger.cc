@@ -16,8 +16,13 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name, std::shared_ptr<LoggerContext> context) noexcept
-    : logger_name_(std::string(name)), context_(context)
+Logger::Logger(nostd::string_view name,
+               std::shared_ptr<LoggerContext> context,
+               std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
+                   instrumentation_library) noexcept
+    : logger_name_(std::string(name)),
+      instrumentation_library_(std::move(instrumentation_library)),
+      context_(context)
 {}
 
 const nostd::string_view Logger::GetName() noexcept
@@ -40,12 +45,11 @@ void Logger::Log(opentelemetry::logs::Severity severity,
                  common::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
-  auto context = context_.lock();
-  if (!context)
+  if (!context_)
   {
     return;
   }
-  auto &processor = context->GetProcessor();
+  auto &processor = context_->GetProcessor();
 
   // TODO: Sampler (should include check for minSeverity)
 
@@ -61,8 +65,9 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetSeverity(severity);
   recordable->SetName(name);
   recordable->SetBody(body);
+  recordable->SetInstrumentationLibrary(GetInstrumentationLibrary());
 
-  recordable->SetResource(context->GetResource());
+  recordable->SetResource(context_->GetResource());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable->SetAttribute(key, value);
@@ -109,6 +114,12 @@ void Logger::Log(opentelemetry::logs::Severity severity,
 
   // Send the log record to the processor
   processor.OnReceive(std::move(recordable));
+}
+
+const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+Logger::GetInstrumentationLibrary() const noexcept
+{
+  return *instrumentation_library_;
 }
 
 }  // namespace logs

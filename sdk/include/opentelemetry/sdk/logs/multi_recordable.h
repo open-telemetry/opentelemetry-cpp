@@ -85,8 +85,22 @@ public:
    */
   void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override;
 
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept;
+
 private:
   std::unordered_map<std::size_t, std::unique_ptr<Recordable>> recordables_;
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

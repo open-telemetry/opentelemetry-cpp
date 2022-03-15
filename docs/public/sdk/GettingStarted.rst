@@ -107,8 +107,8 @@ The OpenTelemetry C++ SDK allow for creation of Resources and for associating th
 
     auto resource_attributes = opentelemetry::sdk::resource::ResourceAttributes
         {
-            {"service.name": "shoppingcart"},
-            {"service.instance.id": "instance-12"}
+            {"service.name", "shoppingcart"},
+            {"service.instance.id", "instance-12"}
         };
     auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
     auto received_attributes = resource.GetAttributes();
@@ -136,18 +136,21 @@ OpenTelemetry C++ SDK  offers four samplers out of the box:
 .. code:: cpp
 
     //AlwaysOnSampler
-    opentelemetry::sdk::trace::AlwaysOnSampler always_on_sampler;
+    auto always_on_sampler = std::unique_ptr<sdktrace::AlwaysOnSampler>
+        (new sdktrace::AlwaysOnSampler);
 
     //AlwaysOffSampler
-    opentelemetry::sdk::trace::AlwaysOffSampler always_off_sampler;
+    auto always_off_sampler = std::unique_ptr<sdktrace::AlwaysOffSampler>
+        (new sdktrace::AlwaysOffSampler);
 
     //ParentBasedSampler
-    opentelemetry::sdk::trace::ParentBasedSampler sampler_off(std::make_shared<AlwaysOffSampler>());
+    auto parent_based_sampler = std::unique_ptr<sdktrace::ParentBasedSampler>
+        (new sdktrace::ParentBasedSampler);
 
     //TraceIdRatioBasedSampler - Sample 50% generated spans
     double ratio       = 0.5;
-    opentelemetry::sdk::trace::TraceIdRatioBasedSampler s(ratio);
-
+    auto always_off_sampler = std::unique_ptr<sdktrace::TraceIdRatioBasedSampler>
+        (new sdktrace::TraceIdRatioBasedSampler(ratio));
 
 TracerContext
 ^^^^^^^^^^^^^
@@ -172,14 +175,15 @@ There are two different mechanisms to create TraceProvider instance
 .. code:: cpp
 
     // Created using `TracerContext` instance
-    auto tracer_provider = sdktrace::TracerProvider(tracer_context);
+    auto tracer_provider = nostd::shared_ptr<sdktrace::TracerProvider>
+        (new sdktrace::TracerProvider(tracer_context));
 
     // Create using SDK configurations as parameter
-    auto tracer_provider =
-        sdktrace::TracerProvider(std::move(simple_processor), resource, std::move(always_on_sampler));
+    auto tracer_provider = nostd::shared_ptr<sdktrace::TracerProvider>
+        (std::move(simple_processor), resource, std::move(always_on_sampler));
 
     // set the global tracer TraceProvider
-    opentelemetry::trace::Provider::SetTracerProvider(provider);
+    opentelemetry::trace::Provider::SetTracerProvider(tracer_provider);
 
 
 Logging and Error Handling

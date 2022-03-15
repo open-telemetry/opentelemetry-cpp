@@ -129,10 +129,8 @@ bool MultiLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   }
   for (auto &processor : processors_)
   {
-    if (!processor->Shutdown(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
-    {
-      result = false;
-    }
+    result |=
+        processor->Shutdown(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns));
     start_time = std::chrono::system_clock::now();
     if (expire_time > start_time)
     {
