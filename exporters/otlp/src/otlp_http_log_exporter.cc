@@ -48,6 +48,10 @@ std::unique_ptr<opentelemetry::sdk::logs::Recordable> OtlpHttpLogExporter::MakeR
 opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
+  if (logs.empty())
+  {
+    return opentelemetry::sdk::common::ExportResult::kSuccess;
+  }
   proto::collector::logs::v1::ExportLogsServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(logs, &service_request);
   return http_client_->Export(service_request);

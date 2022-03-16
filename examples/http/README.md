@@ -2,7 +2,8 @@
 
 ## HTTP
 
-This is a simple example that demonstrates tracing an HTTP request from client to server. The example shows several aspects of tracing such as:
+This is a simple example that demonstrates tracing an HTTP request from client
+to server. The example shows several aspects of tracing such as:
 
 * Using the `TracerProvider`
 * Using the `GlobalPropagator`
@@ -15,10 +16,13 @@ This is a simple example that demonstrates tracing an HTTP request from client t
 ### Running the example
 
 1. The example uses HTTP server and client provided as part of this repo:
-    * [HTTP Client](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/client)
-    * [HTTP Server](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/server)
+    * [HTTP
+      Client](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/client)
+    * [HTTP
+      Server](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/server)
 
-2. Build and Deploy the opentelementry-cpp as described in [INSTALL.md](../../INSTALL.md)
+2. Build and Deploy the opentelementry-cpp as described in
+   [INSTALL.md](../../INSTALL.md)
 
 3. Start the server from the `examples/http` directory
 
@@ -35,7 +39,8 @@ This is a simple example that demonstrates tracing an HTTP request from client t
     ...
     ```
 
-5. You should see console exporter output for both the client and server sessions.
+5. You should see console exporter output for both the client and server
+   sessions.
    * Client console
 
    ```console
@@ -103,4 +108,5 @@ This is a simple example that demonstrates tracing an HTTP request from client t
    }
    ```
 
-   As seen from example above, `trace_id` and `parent_span_id` is propagated from client to server.
+   As seen from example above, `trace_id` and `parent_span_id` is propagated
+   from client to server.

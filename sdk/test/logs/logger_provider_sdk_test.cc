@@ -10,6 +10,7 @@
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/simple_log_processor.h"
 
 #  include <gtest/gtest.h>
 
@@ -103,4 +104,30 @@ TEST(LoggerProviderSDK, GetResource)
   LoggerProvider lp{nullptr, resource};
   ASSERT_EQ(nostd::get<std::string>(lp.GetResource().GetAttributes().at("key")), "value");
 }
+
+TEST(LoggerProviderSDK, Shutdown)
+{
+  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
+  std::vector<std::unique_ptr<LogProcessor>> processors;
+  processors.push_back(std::move(processor));
+
+  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+
+  EXPECT_TRUE(lp.Shutdown());
+
+  // It's safe to shutdown again
+  EXPECT_TRUE(lp.Shutdown());
+}
+
+TEST(LoggerProviderSDK, ForceFlush)
+{
+  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
+  std::vector<std::unique_ptr<LogProcessor>> processors;
+  processors.push_back(std::move(processor));
+
+  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+
+  EXPECT_TRUE(lp.ForceFlush());
+}
+
 #endif

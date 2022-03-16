@@ -5,7 +5,10 @@ build systems for opentelemetry-cpp.
 
 ## Dependencies
 
-You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
+You can link OpenTelemetry C++ SDK with libraries provided in
+[dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md)
+(complete list of libraries with versions used in our CI can be found
+[here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
 
 ## Build instructions using CMake
 
@@ -23,14 +26,17 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
   unittests. We use CMake version 3.15.2 in our build system. To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
-  the unittests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L5)
-  for version of GoogleTest used in CI. To
-  install GoogleTest, consult the [GoogleTest Build
+  the unittests. Refer to
+  [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L5)
+  for version of GoogleTest used in CI. To install GoogleTest, consult the
+  [GoogleTest Build
   Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
-- [Google Benchmark](https://github.com/google/benchmark) framework to build and run
-  benchmark tests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L4)
-  for version of Benchmark used in CI. To install Benchmark,
-  consult the [GoogleBenchmark Build Instructions](https://github.com/google/benchmark#installation).
+- [Google Benchmark](https://github.com/google/benchmark) framework to build and
+  run benchmark tests. Refer to
+  [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L4)
+  for version of Benchmark used in CI. To install Benchmark, consult the
+  [GoogleBenchmark Build
+  Instructions](https://github.com/google/benchmark#installation).
 - Apart from above core requirements, the Exporters and Propagators have their
   build dependencies which are not covered here. E.g, Otlp Exporter needs
   grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW
@@ -75,9 +81,9 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
      configuration, the code is compiled without `-fpic` option, so it is not
      suitable for inclusion in shared libraries. To enable the code for
      inclusion in shared libraries, this variable is used.
-   - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets. Please
-      refer to note [below](#building-shared-libs-for-windows) for Windows DLL
-      support
+   - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
+      Please refer to note [below](#building-shared-libs-for-windows) for
+      Windows DLL support
    - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
@@ -145,23 +151,25 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 ## Build instructions using Bazel
 
 NOTE: Experimental, and not supported for all the components. Make sure the
-[GoogleTest](https://github.com/google/googletest) installation may fail if there is a different version of googletest already installed in system-defined path.
+[GoogleTest](https://github.com/google/googletest) installation may fail if
+there is a different version of googletest already installed in system-defined
+path.
 
 ### Prerequisites for Bazel
 
-- A supported platform (e.g. Windows, macOS or Linux).
-Refer to [Platforms Supported](./README.md#supported-development-platforms)
-for more information.
-- A compatible C++ compiler supporting at least C++11.
-Major compilers are supported.
-Refer to [Supported Compilers](./README.md#supported-c-versions) for more information.
-- [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from repository.
-To install Git, consult the [Set up Git](https://help.github.com/articles/set-up-git/)
-guide on GitHub.
-- [Bazel](https://www.bazel.build/) for building opentelemetry-cpp API,
-SDK with their unittests. We use 3.7.2 in our build system.
+- A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
+Supported](./README.md#supported-development-platforms) for more information.
+- A compatible C++ compiler supporting at least C++11. Major compilers are
+supported. Refer to [Supported Compilers](./README.md#supported-c-versions) for
+more information.
+- [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from
+repository. To install Git, consult the [Set up
+Git](https://help.github.com/articles/set-up-git/) guide on GitHub.
+- [Bazel](https://www.bazel.build/) for building opentelemetry-cpp API, SDK with
+their unittests. We use 3.7.2 in our build system.
 
-To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
+To install Bazel, consult the [Installing
+Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
 
 ### Building as standalone Bazel Project
 
@@ -178,7 +186,8 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
    $
    ```
 
-2. Navigate to the repository cloned above, download the dependencies and build the source code:
+2. Navigate to the repository cloned above, download the dependencies and build
+   the source code:
 
    ```console
    $ cd opentelemtry-cpp
@@ -252,23 +261,26 @@ cc_library(
 
 ## Building shared libs for Windows
 
-Windows DLL build is not supported. There are some constraints on how C++ DLLs work on
-Windows, specifically we can't safely allocate memory in one DLL and free it in another.
-For now, OpenTelemetry C++ targets need to be statically linked into the Windows applications.
+Windows DLL build is not supported. There are some constraints on how C++ DLLs
+work on Windows, specifically we can't safely allocate memory in one DLL and
+free it in another. For now, OpenTelemetry C++ targets need to be statically
+linked into the Windows applications.
 
 ## Using Package Managers
 
-If you are using [Conan](https://www.conan.io/) to manage your dependencies,
-add [`opentelemetry-cpp/x.y.z`](https://conan.io/center/opentelemetry-cpp) to
-your `conanfile`'s requires, where `x.y.z` is the release version you want to use.
+If you are using [Conan](https://www.conan.io/) to manage your dependencies, add
+[`opentelemetry-cpp/x.y.z`](https://conan.io/center/opentelemetry-cpp) to your
+`conanfile`'s requires, where `x.y.z` is the release version you want to use.
 Please file issues [here](https://github.com/conan-io/conan-center-index/issues)
 if you experience problems with the packages.
 
 If you are using [vcpkg](https://github.com/Microsoft/vcpkg/) on your project
-for external dependencies, then you can install the
-[opentelemetry-cpp package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
-with `vcpkg install opentelemetry-cpp` and follow the then displayed descriptions.
-Please see the vcpkg project for any issues regarding the packaging.
+for external dependencies, then you can install the [opentelemetry-cpp
+package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
+with `vcpkg install opentelemetry-cpp` and follow the then displayed
+descriptions. Please see the vcpkg project for any issues regarding the
+packaging.
 
-Please note, these packages are not officially provided and maintained by OpenTelemetry C++ project,
-and are just listed here to consolidate all such efforts for ease of developers.
+Please note, these packages are not officially provided and maintained by
+OpenTelemetry C++ project, and are just listed here to consolidate all such
+efforts for ease of developers.
