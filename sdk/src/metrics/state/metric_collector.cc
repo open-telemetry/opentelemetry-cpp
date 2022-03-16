@@ -34,7 +34,7 @@ bool MetricCollector::Collect(nostd::function_ref<bool(MetricData)> callback) no
   for (auto &meter : meter_context_->GetMeters())
   {
     auto collection_ts = std::chrono::system_clock::now();
-    meter->collect(this, collection_ts, callback);
+    meter->Collect(this, collection_ts, callback);
   }
   return true;
 }

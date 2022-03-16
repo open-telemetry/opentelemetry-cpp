@@ -65,7 +65,7 @@ DoubleHistogramAggregation::DoubleHistogramAggregation()
       std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<double>>(point_data_.boundaries_).size() + 1, 0);
-  point_data_.sum_   = 0l;
+  point_data_.sum_   = 0.0;
   point_data_.count_ = 0;
 }
 

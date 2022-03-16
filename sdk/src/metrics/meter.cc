@@ -209,7 +209,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
 }
 
 /** collect metrics across all the meters **/
-bool Meter::collect(CollectorHandle *collector,
+bool Meter::Collect(CollectorHandle *collector,
                     opentelemetry::common::SystemTimestamp collect_ts,
                     nostd::function_ref<bool(MetricData &)> callback) noexcept
 {
@@ -218,7 +218,6 @@ bool Meter::collect(CollectorHandle *collector,
   {
     // TBD - this needs to be asynchronous
     metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
-                                   *instrumentation_library_, meter_context_->GetResource(),
                                    meter_context_->GetSDKStartTime(), collect_ts,
                                    [&callback](MetricData &metric_data) {
                                      callback(metric_data);

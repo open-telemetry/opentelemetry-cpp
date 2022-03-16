@@ -103,7 +103,7 @@ public:
       const noexcept;
 
   /** collect metrics across all the meters **/
-  bool collect(CollectorHandle *collector,
+  bool Collect(CollectorHandle *collector,
                opentelemetry::common::SystemTimestamp collect_ts,
                nostd::function_ref<bool(MetricData &)> callback) noexcept;
 

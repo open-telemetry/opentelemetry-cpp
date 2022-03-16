@@ -97,14 +97,12 @@ public:
 
   bool Collect(CollectorHandle *collector,
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,
-               const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                   &instrumentation_library,
-               const opentelemetry::sdk::resource::Resource &resource,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
+    auto aggregation_temporarily = collector->GetAggregationTemporarily();
     // add delta metrics to unreported metrics
     std::shared_ptr<AttributesHashMap> delta_metrics = std::move(attributes_hashmap_);
     for (auto &col : collectors)
@@ -144,7 +142,7 @@ public:
     {
       last_collection_ts     = last_reported_metrics_[collector].collection_ts;
       auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
-      if (collector->GetAggregationTemporarily() == AggregationTemporarily::kCummulative)
+      if (aggregation_temporarily == AggregationTemporarily::kCummulative)
       {
         // merge current delta to pervious cummulative
         last_aggr_hashmap->GetAllEnteries(
@@ -173,9 +171,20 @@ public:
     }
 
     AttributesHashMap *result_to_export = (last_reported_metrics_[collector]).attributes_map.get();
+    MetricData metric_data;
+    metric_data.instrument_descriptor = instrument_descriptor_;
+    metric_data.start_ts              = last_collection_ts;
+    metric_data.end_ts                = collection_ts;
+    result_to_export->GetAllEnteries(
+        [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+          PointDataAttributes point_data_attr;
+          point_data_attr.point_data = aggregation.ToPoint();
+          point_data_attr.attributes = attributes;
+          metric_data.point_data_attr_.push_back(point_data_attr);
+          return true;
+        });
 
-    MetricData data;
-    if (callback(data))
+    if (callback(metric_data))
     {
       return true;
     }

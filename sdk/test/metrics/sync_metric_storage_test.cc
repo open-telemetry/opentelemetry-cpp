@@ -12,6 +12,15 @@
 using namespace opentelemetry::sdk::metrics;
 using M = std::map<std::string, std::string>;
 
+class MockCollectorHandle : public CollectorHandle
+{
+public:
+  AggregationTemporarily GetAggregationTemporarily() noexcept override
+  {
+    return AggregationTemporarily::kCummulative;
+  }
+};
+
 TEST(WritableMetricStorageTest, BasicTests)
 {
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
@@ -24,5 +33,15 @@ TEST(WritableMetricStorageTest, BasicTests)
       10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}})));
 
   EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::common::KeyValueIterableView<M>({})));
+  opentelemetry::common::SystemTimestamp sdk_start_time = std::chrono::system_clock::now();
+  MockCollectorHandle collector;
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  // Some computation here
+  auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
+
+  storage.Collect(&collector, collectors, sdk_start_ts, collection_ts,
+                  [](const MetricData data) { return true; });
 }
 #endif
