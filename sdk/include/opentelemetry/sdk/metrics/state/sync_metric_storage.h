@@ -127,7 +127,8 @@ public:
             }
             else
             {
-              merged_attributes->Set(attributes, create_aggregation());
+              merged_attributes->Set(attributes,
+                                     DefaultAggregation::CreateAggregation(instrument_descriptor_));
             }
             return true;
           });
@@ -151,7 +152,8 @@ public:
               }
               else
               {
-                merged_attributes->Set(attributes, create_aggregation());
+                merged_attributes->Set(
+                    attributes, DefaultAggregation::CreateAggregation(instrument_descriptor_));
               }
               return true;
             });

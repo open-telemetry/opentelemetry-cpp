@@ -79,11 +79,11 @@ public:
       case AggregationType::kSum:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return std::unique_ptr<Aggregation>(new LongSumAggregation(true));
+          return std::unique_ptr<Aggregation>(new LongSumAggregation());
         }
         else
         {
-          return std::unique_ptr<Aggregation>(new DoubleSumAggregation(true));
+          return std::unique_ptr<Aggregation>(new DoubleSumAggregation());
         }
         break;
       default:
