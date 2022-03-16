@@ -141,7 +141,7 @@ public:
       auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
       if (aggregation_temporarily == AggregationTemporarily::kCummulative)
       {
-        // merge current delta to pervious cummulative
+        // merge current delta to previous cummulative
         last_aggr_hashmap->GetAllEnteries(
             [&merged_attributes, this](const MetricAttributes &attributes,
                                        Aggregation &aggregation) {
