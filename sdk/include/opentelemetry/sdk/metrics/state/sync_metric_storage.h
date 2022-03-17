@@ -158,14 +158,13 @@ public:
               return true;
             });
       }
-      last_reported_metrics_[collector] = {.attributes_map = std::move(merged_attributes),
-                                           .collection_ts  = collection_ts};
+      last_reported_metrics_[collector] =
+          LastReportedMetrics{std::move(merged_attributes), collection_ts};
     }
     else
     {
       last_reported_metrics_.insert(std::make_pair(
-          collector, LastReportedMetrics{.attributes_map = std::move(merged_attributes),
-                                         .collection_ts  = collection_ts}));
+          collector, LastReportedMetrics{std::move(merged_attributes), collection_ts}));
     }
 
     AttributesHashMap *result_to_export = (last_reported_metrics_[collector]).attributes_map.get();
