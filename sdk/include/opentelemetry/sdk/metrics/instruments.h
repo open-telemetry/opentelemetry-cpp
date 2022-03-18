@@ -54,13 +54,6 @@ struct InstrumentDescriptor
 
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
-// TBD -> Remove once MetricCollector is imoplemeted
-class MetricCollector
-{
-public:
-  AggregationTemporarily aggregation_temporarily_;
-};
-
 /*class InstrumentSelector {
 public:
 InstrumentSelector(opentelemetry::nostd::string_view name,

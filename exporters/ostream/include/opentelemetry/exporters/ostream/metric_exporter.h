@@ -8,6 +8,7 @@
 #  include <string>
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/recordable.h"
