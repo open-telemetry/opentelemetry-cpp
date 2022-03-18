@@ -5,6 +5,8 @@
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
+#  include <mutex>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -33,7 +35,7 @@ bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexc
         "MetricReader::Collect Cannot invoke Collect(). No MetricProducer registered for "
         "collection!")
   }
-  if (shutdown_)
+  if (IsShutdown())
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Collect Cannot invoke Collect(). Shutdown in progress!");
   }
@@ -41,18 +43,20 @@ bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexc
   return metric_producer_->Collect(callback);
 }
 
-bool MetricReader::Shutdown() noexcept
+bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   bool status = true;
-  if (shutdown_)
+
+  if (IsShutdown())
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown Cannot invoke shutown twice!");
+    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
   }
-  if (!OnShutDown())
+  if (!OnShutDown(timeout))
   {
     status = false;
-    OTEL_INTERNAL_LOG_ERROR("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
+    OTEL_INTERNAL_LOG_WARN("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
   }
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   shutdown_ = true;
   return status;
 }
@@ -65,13 +69,20 @@ bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown Cannot invoke Force flush on shutdown reader!");
   }
-  if (!OnForceFlush())
+  if (!OnForceFlush(timeout))
   {
     status = false;
     OTEL_INTERNAL_LOG_ERROR("MetricReader::OnForceFlush failed!");
   }
   return status;
 }
+
+bool MetricReader::IsShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return shutdown_;
+}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

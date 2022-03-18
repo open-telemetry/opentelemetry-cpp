@@ -43,9 +43,8 @@ public:
    */
   bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept override;
 
-  bool ForceFlush(std::chrono::microseconds timeout) noexcept;
-
-  bool Shutdown() noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
 private:
   std::shared_ptr<MeterContext> meter_context_;

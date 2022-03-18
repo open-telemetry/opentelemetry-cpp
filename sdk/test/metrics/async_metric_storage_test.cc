@@ -5,13 +5,14 @@
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/meter_context.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
-
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
-#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 
 #  include <gtest/gtest.h>
-#  include <map>
+#  include <vector>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationlibrary;

@@ -11,17 +11,13 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using namespace opentelemetry::sdk::metrics;
 
-#  include <iostream>
-
 class MockMetricReader : public MetricReader
 {
 public:
   MockMetricReader(AggregationTemporarily aggr_temporarily) : MetricReader(aggr_temporarily) {}
 
-  virtual bool OnForceFlush() noexcept override { return true; }
-
-  virtual bool OnShutDown() noexcept override { return true; }
-
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual void OnInitialized() noexcept override {}
 };
 
@@ -39,7 +35,6 @@ TEST(MetricReaderTest, BasicTests)
   std::shared_ptr<MeterContext> meter_context2(new MeterContext(std::move(exporters)));
   MetricProducer *metric_producer =
       new MetricCollector(std::move(meter_context2), std::move(metric_reader2));
-  std::cout << metric_producer << "\n";
   EXPECT_NO_THROW(metric_producer->Collect([](MetricData data) { return true; }));
 }
 #endif
