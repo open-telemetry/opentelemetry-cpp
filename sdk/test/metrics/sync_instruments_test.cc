@@ -4,6 +4,7 @@
 #include "opentelemetry/context/context.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 
@@ -21,7 +22,8 @@ TEST(SyncInstruments, LongCounter)
 {
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   LongCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
@@ -37,7 +39,8 @@ TEST(SyncInstruments, DoubleCounter)
 {
   InstrumentDescriptor instrument_descriptor = {
       "double_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   DoubleCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
@@ -54,7 +57,8 @@ TEST(SyncInstruments, LongUpDownCounter)
   InstrumentDescriptor instrument_descriptor = {"long_updowncounter", "description", "1",
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   LongUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
@@ -71,7 +75,8 @@ TEST(SyncInstruments, DoubleUpDownCounter)
   InstrumentDescriptor instrument_descriptor = {"double_updowncounter", "description", "1",
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   DoubleUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
@@ -87,7 +92,8 @@ TEST(SyncInstruments, LongHistogram)
 {
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   LongHistogram counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Record(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Record(10l, opentelemetry::context::Context{}));
@@ -104,7 +110,8 @@ TEST(SyncInstruments, DoubleHistogram)
   InstrumentDescriptor instrument_descriptor = {"double_histogram", "description", "1",
                                                 InstrumentType::kHistogram,
                                                 InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> metric_storage(
+      NoExemplarReservoir::GetNoExemplarReservoir());
   DoubleHistogram counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Record(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Record(10.10, opentelemetry::context::Context{}));
