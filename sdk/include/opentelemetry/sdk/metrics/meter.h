@@ -7,7 +7,6 @@
 #  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/measurement_processor.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
@@ -17,6 +16,10 @@ namespace sdk
 {
 namespace metrics
 {
+
+class MetricStorage;
+class WritableMetricStorage;
+
 class Meter final : public opentelemetry::metrics::Meter
 {
 public:
@@ -99,8 +102,10 @@ public:
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
 
-  /** Returns the associated measurement processor */
-  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
+  /** collect metrics across all the meters **/
+  bool collect(CollectorHandle *collector,
+               opentelemetry::common::SystemTimestamp collect_ts,
+               nostd::function_ref<bool(MetricData &)> callback) noexcept;
 
 private:
   // order of declaration is important here - instrumentation library should destroy after

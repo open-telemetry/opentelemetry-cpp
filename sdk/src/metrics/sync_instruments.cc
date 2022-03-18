@@ -3,6 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

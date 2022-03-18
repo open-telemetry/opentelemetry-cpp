@@ -133,7 +133,6 @@ error.**
 
 **Implementation:**
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 # meter.h / meter.cc
 class Meter : public API::Meter {
@@ -271,9 +270,7 @@ private:
   InstrumentationInfo instrumentationInfo_;
 };
 ```
-<!-- markdownlint-enable MD013 -->
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 # record.h
 /*
@@ -316,7 +313,6 @@ private:
   nostd::variant<Aggregator<short>, Aggregator<int>, Aggregator<float>, Aggregator<Double>> aggregator_;
 };
 ```
-<!-- markdownlint-enable MD013 -->
 
 Metric instruments created from this Meter class will be stored in a map (or
 another, similar container [needs to be nostd]) called “metrics.” This is
