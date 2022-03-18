@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 
 #  include <gtest/gtest.h>
@@ -47,7 +48,7 @@ TEST(MultiMetricStorageTest, BasicTests)
 {
   std::shared_ptr<opentelemetry::sdk::metrics::WritableMetricStorage> storage(
       new TestMetricStorage());
-  MultiMetricStorage storages;
+  MultiMetricStorage storages{NoExemplarReservoir::GetNoExemplarReservoir()};
   storages.AddStorage(storage);
   EXPECT_NO_THROW(storages.RecordLong(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(storages.RecordLong(20l, opentelemetry::context::Context{}));

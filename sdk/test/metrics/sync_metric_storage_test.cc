@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
@@ -18,8 +19,9 @@ TEST(WritableMetricStorageTest, BasicTests)
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
 
-  opentelemetry::sdk::metrics::SyncMetricStorage storage(instr_desc, AggregationType::kSum,
-                                                         new DefaultAttributesProcessor());
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      NoExemplarReservoir::GetNoExemplarReservoir());
   EXPECT_NO_THROW(storage.RecordLong(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(storage.RecordLong(

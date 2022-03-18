@@ -6,6 +6,7 @@
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
@@ -183,7 +184,8 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
   auto view_registry = meter_context_->GetViewRegistry();
-  std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
+  std::unique_ptr<WritableMetricStorage> storages(
+      new MultiMetricStorage(NoExemplarReservoir::GetNoExemplarReservoir()));
 
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
@@ -192,7 +194,8 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         view_instr_desc.name_        = view.GetName();
         view_instr_desc.description_ = view.GetDescription();
         auto storage                 = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+            NoExemplarReservoir::GetNoExemplarReservoir()));
         storage_registry_[instrument_descriptor.name_] = storage;
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);

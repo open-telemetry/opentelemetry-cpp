@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <memory>
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include <map>
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -53,7 +55,8 @@ public:
     InstrumentDescriptor instr_desc   = {"name", "desc", "1unit", InstrumentType::kCounter,
                                        InstrumentValueType::kLong};
     metric_storages_[MakeKey(reader)] = std::unique_ptr<SyncMetricStorage>(
-        new SyncMetricStorage(instr_desc, AggregationType::kSum, new DefaultAttributesProcessor()));
+        new SyncMetricStorage(instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+                              NoExemplarReservoir::GetNoExemplarReservoir()));
     return true;
   }
 
