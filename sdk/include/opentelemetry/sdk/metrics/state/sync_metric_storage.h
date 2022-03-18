@@ -99,13 +99,18 @@ public:
   {
     opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
     auto aggregation_temporarily = collector->GetAggregationTemporarily();
-    // add delta metrics to unreported metrics
+
+    // Add the current delta metrics to unreported metrics for all the collectors,
+    // this will also empty the delta metrics hashmap, and make it available for
+    // recordings
     std::shared_ptr<AttributesHashMap> delta_metrics = std::move(attributes_hashmap_);
     for (auto &col : collectors)
     {
       unreported_metrics_[col.get()].push_back(delta_metrics);
     }
-    // Get the unreported_metrics_ data for `collector` since last poll
+
+    // Get the unreported metrics for the `collector` since last collection, this will
+    // also cleanup the unreported metrics. Return early if there is no unreported metrics
     auto present = unreported_metrics_.find(collector);
     if (present == unreported_metrics_.end())
     {
@@ -115,12 +120,12 @@ public:
     auto unreported_list = std::move(unreported_metrics_[collector]);
 
     // Iterate over the unreporter metrics for `collector` and do merge
-    std::unique_ptr<AttributesHashMap> merged_attributes;
+    std::unique_ptr<AttributesHashMap> merged_metrics;
     for (auto &agg_hashmap : unreported_list)
     {
       agg_hashmap->GetAllEnteries(
-          [&merged_attributes, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto agg = merged_attributes->Get(attributes);
+          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
+            auto agg = merged_metrics->Get(attributes);
             if (agg)
             {
               merged_attributes->Set(attributes, agg->Merge(aggregation));

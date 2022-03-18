@@ -14,6 +14,10 @@ namespace sdk
 namespace metrics
 {
 
+/**
+ * A null Aggregation which denotes no aggregation should occur.
+ */
+
 class DropAggregation : public Aggregation
 {
 public:
