@@ -24,6 +24,8 @@ public:
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::resource::Resource *resource,
       nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
+
+  virtual ~MetricStorage() = default;
 };
 
 class WritableMetricStorage
@@ -38,6 +40,7 @@ public:
 
   virtual void RecordDouble(double value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+  virtual ~WritableMetricStorage() = default;
 };
 
 class NoopMetricStorage : public MetricStorage
