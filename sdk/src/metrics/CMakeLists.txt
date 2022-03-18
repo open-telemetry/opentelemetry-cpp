@@ -3,6 +3,8 @@ add_library(
   meter_provider.cc
   meter.cc
   meter_context.cc
+  metric_reader.cc
+  state/metric_collector.cc
   aggregation/histogram_aggregation.cc
   aggregation/lastvalue_aggregation.cc
   aggregation/sum_aggregation.cc

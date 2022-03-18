@@ -7,7 +7,6 @@
 #  include "opentelemetry/metrics/sync_instruments.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/measurement_processor.h"
 
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 
@@ -16,6 +15,10 @@ namespace sdk
 {
 namespace metrics
 {
+
+// forward declaration
+class WritableMetricStorage;
+
 class Synchronous
 {
 public:

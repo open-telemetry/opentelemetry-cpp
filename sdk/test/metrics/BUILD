@@ -17,6 +17,22 @@ cc_test(
 )
 
 cc_test(
+    name = "metric_reader_test",
+    srcs = [
+        "metric_reader_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "view_registry_test",
     srcs = [
         "view_registry_test.cc",
