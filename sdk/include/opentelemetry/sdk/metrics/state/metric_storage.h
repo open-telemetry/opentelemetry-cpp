@@ -39,6 +39,7 @@ public:
 
   virtual void RecordDouble(double value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+  virtual ~WritableMetricStorage() = default;
 };
 
 class NoopMetricStorage : public MetricStorage
