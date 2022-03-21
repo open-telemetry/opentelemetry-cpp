@@ -79,6 +79,15 @@ public:
       override;
 
   /**
+   * Export asynchronosly a batch of span recordables in JSON format
+   * @param spans a span of unique pointers to span recordables
+   * @param result_callback callback function accepting ExportResult as argument
+   */
+  void Export(const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
+              nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)>
+                  result_callback) noexcept override;
+
+  /**
    * Shut down the exporter.
    * @param timeout an optional timeout, default to max.
    */

@@ -16,17 +16,20 @@ namespace logs
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                      const size_t max_queue_size,
                                      const std::chrono::milliseconds scheduled_delay_millis,
-                                     const size_t max_export_batch_size)
+                                     const size_t max_export_batch_size,
+                                     const bool is_export_async)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
+      is_export_async_(is_export_async),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {
   is_shutdown_.store(false);
   is_force_flush_.store(false);
   is_force_flush_notified_.store(false);
+  is_async_shutdown_notified_.store(false);
 }
 
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
@@ -171,10 +174,34 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
                       });
                     });
 
-    exporter_->Export(
-        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+    if (is_export_async_ == false)
+    {
+      exporter_->Export(
+          nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+    }
+    else
+    {
+      exporter_->Export(
+          nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
+          [this, was_force_flush_called](sdk::common::ExportResult result) {
+            // TODO: Print result
+            NotifyForceFlushCompletion(was_force_flush_called);
+
+            // Notify the thread which is waiting on shutdown to complete.
+            NotifyShutdownCompletion();
+            return true;
+          });
+    }
   } while (was_force_flush_called);
 
+  if (is_export_async_ == false)
+  {
+    NotifyForceFlushCompletion(was_force_flush_called);
+  }
+}
+
+void BatchLogProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
+{
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)
   {
@@ -185,11 +212,39 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   }
 }
 
+void BatchLogProcessor::WaitForShutdownCompletion()
+{
+  // Since async export is invoked due to shutdown, need to wait
+  // for async thread to complete.
+  if (is_export_async_)
+  {
+    std::unique_lock<std::mutex> lk(async_shutdown_m_);
+    while (is_async_shutdown_notified_.load() == false)
+    {
+      async_shutdown_cv_.wait(lk);
+    }
+  }
+}
+
+void BatchLogProcessor::NotifyShutdownCompletion()
+{
+  // Notify the thread which is waiting on shutdown to complete.
+  if (is_shutdown_.load() == true)
+  {
+    is_async_shutdown_notified_.store(true);
+    async_shutdown_cv_.notify_one();
+  }
+}
+
 void BatchLogProcessor::DrainQueue()
 {
   while (buffer_.empty() == false)
   {
     Export(false);
+
+    // Since async export is invoked due to shutdown, need to wait
+    // for async thread to complete.
+    WaitForShutdownCompletion();
   }
 }
 

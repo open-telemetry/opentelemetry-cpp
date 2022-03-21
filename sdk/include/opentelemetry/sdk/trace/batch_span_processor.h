@@ -37,6 +37,12 @@ struct BatchSpanProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
+
+  /**
+   * Determines whether the export happens asynchronously.
+   * Default implementation is synchronous.
+   */
+  bool is_export_async = false;
 };
 
 /**
@@ -129,6 +135,19 @@ private:
    */
   void DrainQueue();
 
+  /**
+   * Should be called from Export to notify the main thread on Force Flush Completion
+   * @param was_force_flush_called - A flag to check if the current export is the result
+   *                                 of a call to ForceFlush method. If true, then we have to
+   *                                 notify the main thread to wake it up in the ForceFlush
+   *                                 method.
+   */
+  void NotifyForceFlushCompletion(const bool was_for_flush_called);
+
+  /* In case of async export, wait and notify for shutdown to be completed.*/
+  void WaitForShutdownCompletion();
+  void NotifyShutdownCompletion();
+
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
 
@@ -136,10 +155,11 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_export_batch_size_;
+  const bool is_export_async_;
 
   /* Synchronization primitives */
-  std::condition_variable cv_, force_flush_cv_;
-  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_;
+  std::condition_variable cv_, force_flush_cv_, async_shutdown_cv_;
+  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_, async_shutdown_m_;
 
   /* The buffer/queue to which the ended spans are added */
   common::CircularBuffer<Recordable> buffer_;
@@ -148,6 +168,7 @@ private:
   std::atomic<bool> is_shutdown_;
   std::atomic<bool> is_force_flush_;
   std::atomic<bool> is_force_flush_notified_;
+  std::atomic<bool> is_async_shutdown_notified_;
 
   /* The background worker thread */
   std::thread worker_thread_;

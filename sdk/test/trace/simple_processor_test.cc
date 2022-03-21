@@ -51,6 +51,13 @@ public:
     return ExportResult::kSuccess;
   }
 
+  void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans,
+              opentelemetry::nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)>
+                  result_callback) noexcept override
+  {
+    result_callback(ExportResult::kSuccess);
+  }
+
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {

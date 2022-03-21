@@ -100,7 +100,7 @@ public:
 // Sends an HTTP POST request to the given url, with the given body.
 void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
 {
-  static std::unique_ptr<http_client::EventHandler> handler(new NoopEventHandler());
+  static std::shared_ptr<http_client::EventHandler> handler(new NoopEventHandler());
 
   auto request_span = get_tracer()->StartSpan(__func__);
   trace_api::Scope scope(request_span);
@@ -126,7 +126,7 @@ void send_request(curl::HttpClient &client, const std::string &url, const std::s
     request->AddHeader(hdr.first, hdr.second);
   }
 
-  session->SendRequest(*handler);
+  session->SendRequest(handler);
   session->FinishSession();
 }
 

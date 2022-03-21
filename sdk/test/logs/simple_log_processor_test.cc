@@ -53,6 +53,14 @@ public:
     return ExportResult::kSuccess;
   }
 
+  // Dummy Async Export implementation
+  void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
+              nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+  {
+    auto result = Export(records);
+    result_callback(result);
+  }
+
   // Increment the shutdown counter everytime this method is called
   bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
@@ -135,6 +143,12 @@ public:
   ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
     return ExportResult::kSuccess;
+  }
+
+  void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
+              nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+  {
+    result_callback(ExportResult::kSuccess);
   }
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override { return false; }

@@ -13,6 +13,8 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+
 namespace nostd = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,6 +58,15 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
   proto::collector::logs::v1::ExportLogsServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(logs, &service_request);
   return http_client_->Export(service_request);
+}
+
+void OtlpHttpLogExporter::Export(
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
+    nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+{
+  OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
+  auto status = Export(logs);
+  result_callback(status);
 }
 
 bool OtlpHttpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

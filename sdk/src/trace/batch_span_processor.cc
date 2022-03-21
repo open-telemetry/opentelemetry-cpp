@@ -21,11 +21,13 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(max_queue_size_),
+      is_export_async_(options.is_export_async),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {
   is_shutdown_.store(false);
   is_force_flush_.store(false);
   is_force_flush_notified_.store(false);
+  is_async_shutdown_notified_.store(false);
 }
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
@@ -175,9 +177,36 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
                       });
                     });
 
-    exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
+    /* Call the sync Export when force flush was called, even if
+       is_export_async_ is true.
+    */
+    if (is_export_async_ == false)
+    {
+      exporter_->Export(
+          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
+    }
+    else
+    {
+      exporter_->Export(
+          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
+          [this, was_force_flush_called](sdk::common::ExportResult result) {
+            // TODO: Print result
+            NotifyForceFlushCompletion(was_force_flush_called);
+            // If export was called due to shutdown, notify the worker thread
+            NotifyShutdownCompletion();
+            return true;
+          });
+    }
   } while (was_force_flush_called);
 
+  if (is_export_async_ == false)
+  {
+    NotifyForceFlushCompletion(was_force_flush_called);
+  }
+}
+
+void BatchSpanProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
+{
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)
   {
@@ -188,11 +217,36 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
   }
 }
 
+void BatchSpanProcessor::WaitForShutdownCompletion()
+{
+  // Since async export is invoked due to shutdown, need to wait
+  // for async thread to complete.
+  if (is_export_async_)
+  {
+    std::unique_lock<std::mutex> lk(async_shutdown_m_);
+    while (is_async_shutdown_notified_.load() == false)
+    {
+      async_shutdown_cv_.wait(lk);
+    }
+  }
+}
+
+void BatchSpanProcessor::NotifyShutdownCompletion()
+{
+  // Notify the thread which is waiting on shutdown to complete.
+  if (is_shutdown_.load() == true)
+  {
+    is_async_shutdown_notified_.store(true);
+    async_shutdown_cv_.notify_one();
+  }
+}
+
 void BatchSpanProcessor::DrainQueue()
 {
   while (buffer_.empty() == false)
   {
     Export(false);
+    WaitForShutdownCompletion();
   }
 }
 

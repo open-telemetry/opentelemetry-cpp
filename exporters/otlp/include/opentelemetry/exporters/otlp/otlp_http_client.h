@@ -141,7 +141,7 @@ private:
    */
   void addSession(
       std::shared_ptr<opentelemetry::ext::http::client::Session> session,
-      std::unique_ptr<opentelemetry::ext::http::client::EventHandler> &&event_handle) noexcept;
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle) noexcept;
 
   /**
    * @brief Real delete all sessions and event handles.
@@ -168,13 +168,13 @@ private:
   struct HttpSessionData
   {
     std::shared_ptr<opentelemetry::ext::http::client::Session> session;
-    std::unique_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
+    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
 
     inline HttpSessionData() = default;
 
     inline explicit HttpSessionData(
         std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
-        std::unique_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
+        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
     {
       session.swap(input_session);
       event_handle.swap(input_handle);

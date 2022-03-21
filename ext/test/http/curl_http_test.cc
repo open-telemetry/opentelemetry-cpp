@@ -196,12 +196,11 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  GetEventHandler *handler = new GetEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
-  delete handler;
 }
 
 TEST_F(BasicCurlHttpTests, SendPostRequest)
@@ -219,16 +218,14 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   http_client::Body body = {b, b + strlen(b)};
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
-  PostEventHandler *handler = new PostEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<PostEventHandler>();
+  session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
-
-  delete handler;
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)
@@ -240,11 +237,10 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session = session_manager->CreateSession("222.222.222.200:19000");  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  GetEventHandler *handler = new GetEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
   session->FinishSession();
   ASSERT_FALSE(handler->is_called_);
-  delete handler;
 }
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)

@@ -70,6 +70,15 @@ sdk_common::ExportResult JaegerExporter::Export(
   return sdk_common::ExportResult::kSuccess;
 }
 
+void JaegerExporter::Export(
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+    nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept
+{
+  OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
+  auto status = Export(spans);
+  result_callback(status);
+}
+
 void JaegerExporter::InitializeEndpoint()
 {
   if (options_.transport_format == TransportFormat::kThriftUdpCompact)

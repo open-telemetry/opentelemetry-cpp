@@ -764,7 +764,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     request->ReplaceHeader("Content-Type", content_type);
 
     // Send the request
-    addSession(std::move(session), std::unique_ptr<opentelemetry::ext::http::client::EventHandler>{
+    addSession(std::move(session), std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
                                        new ResponseHandler(options_.console_debug)});
   }
 
@@ -861,7 +861,7 @@ void OtlpHttpClient::ReleaseSession(
 
 void OtlpHttpClient::addSession(
     std::shared_ptr<opentelemetry::ext::http::client::Session> session,
-    std::unique_ptr<opentelemetry::ext::http::client::EventHandler> &&event_handle) noexcept
+    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle) noexcept
 {
   if (!session || !event_handle)
   {
@@ -878,7 +878,7 @@ void OtlpHttpClient::addSession(
   session_data.event_handle.swap(event_handle);
 
   // Send request after the session is added
-  key->SendRequest(*handle);
+  key->SendRequest(session_data.event_handle);
 }
 
 bool OtlpHttpClient::cleanupGCSessions() noexcept

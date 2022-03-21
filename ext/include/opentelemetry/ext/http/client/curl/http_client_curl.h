@@ -143,19 +143,19 @@ public:
   }
 
   virtual void SendRequest(
-      opentelemetry::ext::http::client::EventHandler &callback) noexcept override
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept override
   {
     is_session_active_ = true;
     std::string url    = host_ + std::string(http_request_->uri_);
-    auto callback_ptr  = &callback;
+    auto callback_ptr  = callback.get();
     curl_operation_.reset(new HttpOperation(
         http_request_->method_, url, callback_ptr, RequestMode::Async, http_request_->headers_,
         http_request_->body_, false, http_request_->timeout_ms_));
-    curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
+    curl_operation_->SendAsync([this, callback](HttpOperation &operation) {
       if (operation.WasAborted())
       {
         // Manually cancelled
-        callback_ptr->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
       }
 
       if (operation.GetResponseCode() >= CURL_LAST)
@@ -165,7 +165,7 @@ public:
         response->headers_     = operation.GetResponseHeaders();
         response->body_        = operation.GetResponseBody();
         response->status_code_ = operation.GetResponseCode();
-        callback_ptr->OnResponse(*response);
+        callback->OnResponse(*response);
       }
       is_session_active_ = false;
     });
