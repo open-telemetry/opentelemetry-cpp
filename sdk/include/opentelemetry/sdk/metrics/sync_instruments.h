@@ -38,10 +38,12 @@ public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
               std::unique_ptr<WritableMetricStorage> storage);
 
+  void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
   void Add(long value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
+  void Add(long value) noexcept override;
   void Add(long value, const opentelemetry::context::Context &context) noexcept override;
 };
 
@@ -53,9 +55,12 @@ public:
                 std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(double value,
+           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+  void Add(double value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
+  void Add(double value) noexcept override;
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
@@ -65,10 +70,12 @@ public:
   LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
                     std::unique_ptr<WritableMetricStorage> storage);
 
+  void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
   void Add(long value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
+  void Add(long value) noexcept override;
   void Add(long value, const opentelemetry::context::Context &context) noexcept override;
 };
 
@@ -79,9 +86,12 @@ public:
                       std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(double value,
+           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+  void Add(double value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
+  void Add(double value) noexcept override;
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 

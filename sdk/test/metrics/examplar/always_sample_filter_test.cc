@@ -11,9 +11,9 @@ TEST(AlwaysSampleFilter, SampleMeasurement)
 {
   auto filter = opentelemetry::sdk::metrics::AlwaysSampleFilter::GetAlwaysSampleFilter();
   ASSERT_TRUE(
-      filter->shouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
+      filter->ShouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
   ASSERT_TRUE(
-      filter->shouldSampleMeasurement(1l, MetricAttributes{}, opentelemetry::context::Context{}));
+      filter->ShouldSampleMeasurement(1l, MetricAttributes{}, opentelemetry::context::Context{}));
 }
 
 #endif

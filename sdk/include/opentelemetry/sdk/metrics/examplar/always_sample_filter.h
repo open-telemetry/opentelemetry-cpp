@@ -16,17 +16,18 @@ class AlwaysSampleFilter final : public ExemplarFilter
 public:
   static nostd::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter()
   {
-    return nostd::shared_ptr<ExemplarFilter>{new AlwaysSampleFilter{}};
+    static nostd::shared_ptr<ExemplarFilter> alwaysSampleFilter{new AlwaysSampleFilter{}};
+    return alwaysSampleFilter;
   }
 
-  bool shouldSampleMeasurement(long value,
+  bool ShouldSampleMeasurement(long value,
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context) noexcept override
   {
     return true;
   }
 
-  bool shouldSampleMeasurement(double value,
+  bool ShouldSampleMeasurement(double value,
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context) noexcept override
   {
