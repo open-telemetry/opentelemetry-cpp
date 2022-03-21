@@ -15,10 +15,15 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
+#include <atomic>
 #include <chrono>
+#include <condition_variable>
+#include <cstddef>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -71,20 +76,25 @@ struct OtlpHttpClientOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 
+  // Concurrent sessions
+  std::size_t concurrent_sessions = 8;
+
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
                                bool input_use_json_name,
                                bool input_console_debug,
                                std::chrono::system_clock::duration input_timeout,
-                               const OtlpHeaders &input_http_headers)
+                               const OtlpHeaders &input_http_headers,
+                               std::size_t input_concurrent_sessions = 8)
       : url(input_url),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),
         console_debug(input_console_debug),
         timeout(input_timeout),
-        http_headers(input_http_headers)
+        http_headers(input_http_headers),
+        concurrent_sessions(input_concurrent_sessions)
   {}
 };
 
@@ -98,6 +108,8 @@ public:
    * Create an OtlpHttpClient using the given options.
    */
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
+
+  ~OtlpHttpClient();
 
   /**
    * Export
@@ -114,19 +126,33 @@ public:
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
 
+  /**
+   * @brief Release the lifetime of specify session.
+   *
+   * @param session the session to release
+   */
+  void ReleaseSession(const opentelemetry::ext::http::client::Session &session) noexcept;
+
 private:
-  // Stores if this HTTP client had its Shutdown() method called
-  bool is_shutdown_ = false;
+  /**
+   * Add http session and hold it's lifetime.
+   * @param session the session to add
+   * @param event_handle the event handle of this session
+   */
+  void addSession(
+      std::shared_ptr<opentelemetry::ext::http::client::Session> session,
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle) noexcept;
 
-  // The configuration options associated with this HTTP client.
-  const OtlpHttpClientOptions options_;
+  /**
+   * @brief Real delete all sessions and event handles.
+   * @note This function is called in the same thread where we create sessions and handles
+   *
+   * @return return true if there are more sessions to delete
+   */
+  bool cleanupGCSessions() noexcept;
 
-  // Object that stores the HTTP sessions that have been created
-  std::shared_ptr<ext::http::client::HttpClient> http_client_;
-  // Cached parsed URI
-  std::string http_uri_;
-  mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
+
   // For testing
   friend class OtlpHttpExporterTestPeer;
   friend class OtlpHttpLogExporterTestPeer;
@@ -138,6 +164,51 @@ private:
    */
   OtlpHttpClient(OtlpHttpClientOptions &&options,
                  std::shared_ptr<ext::http::client::HttpClient> http_client);
+
+  struct HttpSessionData
+  {
+    std::shared_ptr<opentelemetry::ext::http::client::Session> session;
+    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
+
+    inline HttpSessionData() = default;
+
+    inline explicit HttpSessionData(
+        std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
+        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
+    {
+      session.swap(input_session);
+      event_handle.swap(input_handle);
+    }
+
+    inline explicit HttpSessionData(HttpSessionData &&other)
+    {
+      session.swap(other.session);
+      event_handle.swap(other.event_handle);
+    }
+  };
+
+  // Stores if this HTTP client had its Shutdown() method called
+  bool is_shutdown_;
+
+  // The configuration options associated with this HTTP client.
+  const OtlpHttpClientOptions options_;
+
+  // Object that stores the HTTP sessions that have been created
+  std::shared_ptr<ext::http::client::HttpClient> http_client_;
+
+  // Cached parsed URI
+  std::string http_uri_;
+
+  // Running sessions and event handles
+  std::unordered_map<const opentelemetry::ext::http::client::Session *, HttpSessionData>
+      running_sessions_;
+  // Sessions and event handles that are waiting to be deleted
+  std::list<HttpSessionData> gc_sessions_;
+  // Lock for running_sessions_, gc_sessions_ and http_client_
+  std::recursive_mutex session_manager_lock_;
+  // Condition variable and mutex to control the concurrency count of running sessions
+  std::mutex session_waker_lock_;
+  std::condition_variable session_waker_;
 };
 }  // namespace otlp
 }  // namespace exporter

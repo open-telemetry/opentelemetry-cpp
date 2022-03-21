@@ -160,6 +160,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 
   child_span->End();
   parent_span->End();
+
+  static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
 }
 
 // Create spans, let processor call Export()
@@ -232,13 +234,17 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
         {
           EXPECT_EQ("Custom-Header-Value", custom_header->second);
         }
+
         // let the otlp_http_client to continue
         http_client::nosend::Response response;
-        callback->OnResponse(response);
+
+        response.Finish(*callback.get());
       });
 
   child_span->End();
   parent_span->End();
+
+  static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
 }
 
 // Test exporter configuration options

@@ -190,7 +190,7 @@ void OStreamLogExporter::Export(
   result_callback(result);
 }
 
-bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamLogExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

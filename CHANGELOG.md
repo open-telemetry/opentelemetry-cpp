@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [EXPORTER] Jaeger Exporter - Populate Span Links ([#1251](https://github.com/open-telemetry/opentelemetry-cpp/pull/1251))
+* [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
 
 ## [1.2.0] 2022-01-31
 
