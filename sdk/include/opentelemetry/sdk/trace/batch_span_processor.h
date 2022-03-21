@@ -145,9 +145,9 @@ private:
   common::CircularBuffer<Recordable> buffer_;
 
   /* Important boolean flags to handle the workflow of the processor */
-  std::atomic<bool> is_shutdown_{false};
-  std::atomic<bool> is_force_flush_{false};
-  std::atomic<bool> is_force_flush_notified_{false};
+  std::atomic<bool> is_shutdown_;
+  std::atomic<bool> is_force_flush_;
+  std::atomic<bool> is_force_flush_notified_;
 
   /* The background worker thread */
   std::thread worker_thread_;

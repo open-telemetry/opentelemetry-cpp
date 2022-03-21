@@ -23,7 +23,11 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
-{}
+{
+  is_shutdown_.store(false);
+  is_force_flush_.store(false);
+  is_force_flush_notified_.store(false);
+}
 
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
 {
@@ -44,7 +48,8 @@ void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
 
   // If the queue gets at least half full a preemptive notification is
   // sent to the worker thread to start a new export cycle.
-  if (buffer_.size() >= max_queue_size_ / 2)
+  size_t buffer_size = buffer_.size();
+  if (buffer_size >= max_queue_size_ / 2 || buffer_size >= max_export_batch_size_)
   {
     // signal the worker thread
     cv_.notify_one();
@@ -58,25 +63,37 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
     return false;
   }
 
-  is_force_flush_ = true;
-
-  // Keep attempting to wake up the worker thread
-  while (is_force_flush_.load() == true)
-  {
-    cv_.notify_one();
-  }
-
   // Now wait for the worker thread to signal back from the Export method
   std::unique_lock<std::mutex> lk(force_flush_cv_m_);
-  while (is_force_flush_notified_.load() == false)
+
+  is_force_flush_notified_.store(false, std::memory_order_release);
+  auto break_condition = [this]() {
+    if (is_shutdown_.load() == true)
+    {
+      return true;
+    }
+
+    // Wake up the worker thread once.
+    if (is_force_flush_.exchange(true) == false)
+    {
+      cv_.notify_one();
+    }
+
+    return is_force_flush_notified_.load(std::memory_order_acquire);
+  };
+
+  // Fix timeout to meet requirement of wait_for
+  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+  if (timeout <= std::chrono::microseconds::zero())
   {
-    force_flush_cv_.wait(lk);
+    force_flush_cv_.wait(lk, break_condition);
+    return true;
   }
-
-  // Notify the worker thread
-  is_force_flush_notified_ = false;
-
-  return true;
+  else
+  {
+    return force_flush_cv_.wait_for(lk, timeout, break_condition);
+  }
 }
 
 void BatchLogProcessor::DoBackgroundWork()
@@ -91,20 +108,16 @@ void BatchLogProcessor::DoBackgroundWork()
 
     if (is_shutdown_.load() == true)
     {
+      // Break loop if another thread call ForceFlush
+      is_force_flush_ = false;
       DrainQueue();
       return;
     }
 
-    bool was_force_flush_called = is_force_flush_.load();
+    bool was_force_flush_called = is_force_flush_.exchange(false);
 
     // Check if this export was the result of a force flush.
-    if (was_force_flush_called == true)
-    {
-      // Since this export was the result of a force flush, signal the
-      // main thread that the worker thread has been notified
-      is_force_flush_ = false;
-    }
-    else
+    if (!was_force_flush_called)
     {
       // If the buffer was empty during the entire `timeout` time interval,
       // go back to waiting. If this was a spurious wake-up, we export only if
@@ -128,40 +141,46 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export(const bool was_force_flush_called)
 {
-  std::vector<std::unique_ptr<Recordable>> records_arr;
-
-  size_t num_records_to_export;
-
-  if (was_force_flush_called == true)
+  do
   {
-    num_records_to_export = buffer_.size();
-  }
-  else
-  {
-    num_records_to_export =
-        buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
-  }
+    std::vector<std::unique_ptr<Recordable>> records_arr;
+    size_t num_records_to_export;
 
-  buffer_.Consume(num_records_to_export,
-                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
-                    range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
-                      std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
-                      ptr.Swap(swap_ptr);
-                      records_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
-                      return true;
+    if (was_force_flush_called == true)
+    {
+      num_records_to_export = buffer_.size();
+    }
+    else
+    {
+      num_records_to_export =
+          buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
+    }
+
+    if (num_records_to_export == 0)
+    {
+      break;
+    }
+
+    buffer_.Consume(num_records_to_export,
+                    [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+                      range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
+                        std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+                        ptr.Swap(swap_ptr);
+                        records_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+                        return true;
+                      });
                     });
-                  });
 
-  exporter_->Export(
-      nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+    exporter_->Export(
+        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+  } while (was_force_flush_called);
 
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)
   {
-    is_force_flush_notified_ = true;
-    while (is_force_flush_notified_.load() == true)
+    if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
     {
-      force_flush_cv_.notify_one();
+      force_flush_cv_.notify_all();
     }
   }
 }
@@ -176,6 +195,8 @@ void BatchLogProcessor::DrainQueue()
 
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  auto start_time = std::chrono::system_clock::now();
+
   std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
   bool already_shutdown = is_shutdown_.exchange(true);
 
@@ -185,10 +206,25 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     worker_thread_.join();
   }
 
+  auto worker_end_time = std::chrono::system_clock::now();
+  auto offset = std::chrono::duration_cast<std::chrono::microseconds>(worker_end_time - start_time);
+
+  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+  if (timeout > offset && timeout > std::chrono::microseconds::zero())
+  {
+    timeout -= offset;
+  }
+  else
+  {
+    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
+    timeout = std::chrono::microseconds(1);
+  }
+
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)
   {
-    return exporter_->Shutdown();
+    return exporter_->Shutdown(timeout);
   }
 
   return true;
