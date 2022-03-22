@@ -63,9 +63,14 @@ void OtlpHttpExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
-  auto status = Export(spans);
-  result_callback(status);
+  if (spans.empty())
+  {
+    return;
+  }
+
+  proto::collector::trace::v1::ExportTraceServiceRequest service_request;
+  OtlpRecordableUtils::PopulateRequest(spans, &service_request);
+  http_client_->Export(service_request, result_callback);
 }
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept

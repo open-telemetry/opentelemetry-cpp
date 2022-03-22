@@ -11,6 +11,7 @@
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
@@ -19,6 +20,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <functional>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -112,11 +114,21 @@ public:
   ~OtlpHttpClient();
 
   /**
-   * Export
+   * Sync export
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
   sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
+
+  /**
+   * Async export
+   * @param message message to export, it should be ExportTraceServiceRequest,
+   * ExportMetricsServiceRequest or ExportLogsServiceRequest
+   * @param result_callback callback to call when the exporting is done
+   */
+  void Export(
+      const google::protobuf::Message &message,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
 
   /**
    * Shut down the HTTP client.
@@ -134,14 +146,49 @@ public:
   void ReleaseSession(const opentelemetry::ext::http::client::Session &session) noexcept;
 
 private:
+  struct HttpSessionData
+  {
+    std::shared_ptr<opentelemetry::ext::http::client::Session> session;
+    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
+
+    inline HttpSessionData() = default;
+
+    inline explicit HttpSessionData(
+        std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
+        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
+    {
+      session.swap(input_session);
+      event_handle.swap(input_handle);
+    }
+
+    inline explicit HttpSessionData(HttpSessionData &&other)
+    {
+      session.swap(other.session);
+      event_handle.swap(other.event_handle);
+    }
+
+    inline HttpSessionData &operator=(HttpSessionData &&other) noexcept
+    {
+      session.swap(other.session);
+      event_handle.swap(other.event_handle);
+      return *this;
+    }
+  };
+
+  /**
+   * @brief Create a Session object or return a error result
+   *
+   * @param message The message to send
+   */
+  nostd::variant<sdk::common::ExportResult, HttpSessionData> createSession(
+      const google::protobuf::Message &message,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
+
   /**
    * Add http session and hold it's lifetime.
-   * @param session the session to add
-   * @param event_handle the event handle of this session
+   * @param session_data the session to add
    */
-  void addSession(
-      std::shared_ptr<opentelemetry::ext::http::client::Session> session,
-      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle) noexcept;
+  void addSession(HttpSessionData &&session_data) noexcept;
 
   /**
    * @brief Real delete all sessions and event handles.
@@ -164,28 +211,6 @@ private:
    */
   OtlpHttpClient(OtlpHttpClientOptions &&options,
                  std::shared_ptr<ext::http::client::HttpClient> http_client);
-
-  struct HttpSessionData
-  {
-    std::shared_ptr<opentelemetry::ext::http::client::Session> session;
-    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> event_handle;
-
-    inline HttpSessionData() = default;
-
-    inline explicit HttpSessionData(
-        std::shared_ptr<opentelemetry::ext::http::client::Session> &&input_session,
-        std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &&input_handle)
-    {
-      session.swap(input_session);
-      event_handle.swap(input_handle);
-    }
-
-    inline explicit HttpSessionData(HttpSessionData &&other)
-    {
-      session.swap(other.session);
-      event_handle.swap(other.event_handle);
-    }
-  };
 
   // Stores if this HTTP client had its Shutdown() method called
   bool is_shutdown_;
