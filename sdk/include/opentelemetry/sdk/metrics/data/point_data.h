@@ -19,6 +19,10 @@ namespace metrics
 using ValueType = nostd::variant<long, double>;
 using ListType  = nostd::variant<std::list<long>, std::list<double>>;
 
+// TODO -
+// Remove default constructor, and list initialization from
+// classes below once gcc 48 support is removed.
+
 class SumPointData
 {
 public:
