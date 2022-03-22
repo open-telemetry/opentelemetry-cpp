@@ -1,7 +1,7 @@
 cc_test(
-    name = "no_examplar_reservoir_test",
+    name = "no_exemplar_reservoir_test",
     srcs = [
-        "no_examplar_reservoir_test.cc",
+        "no_exemplar_reservoir_test.cc",
     ],
     tags = [
         "metrics",

@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/examplar/filter.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -11,31 +11,31 @@ namespace sdk
 namespace metrics
 {
 
-class NeverSampleFilter final : public ExemplarFilter
+class AlwaysSampleFilter final : public ExemplarFilter
 {
 public:
-  static nostd::shared_ptr<ExemplarFilter> GetNeverSampleFilter()
+  static nostd::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter()
   {
-    nostd::shared_ptr<ExemplarFilter> neverSampleFilter{new NeverSampleFilter{}};
-    return neverSampleFilter;
+    static nostd::shared_ptr<ExemplarFilter> alwaysSampleFilter{new AlwaysSampleFilter{}};
+    return alwaysSampleFilter;
   }
 
   bool ShouldSampleMeasurement(long value,
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context) noexcept override
   {
-    return false;
+    return true;
   }
 
   bool ShouldSampleMeasurement(double value,
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context) noexcept override
   {
-    return false;
+    return true;
   }
 
 private:
-  explicit NeverSampleFilter() = default;
+  explicit AlwaysSampleFilter() = default;
 };
 }  // namespace metrics
 }  // namespace sdk

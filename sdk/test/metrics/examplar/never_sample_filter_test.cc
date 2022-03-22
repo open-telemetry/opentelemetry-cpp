@@ -4,7 +4,7 @@
 #include "opentelemetry/context/context.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/examplar/never_sample_filter.h"
+#  include "opentelemetry/sdk/metrics/exemplar/never_sample_filter.h"
 
 using namespace opentelemetry::sdk::metrics;
 

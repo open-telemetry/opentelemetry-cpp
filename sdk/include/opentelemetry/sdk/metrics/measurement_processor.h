@@ -7,7 +7,7 @@
 
 #  include <map>
 #  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"

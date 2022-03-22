@@ -3,6 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 
@@ -29,7 +30,7 @@ public:
   MetricAttributes GetFilteredAttributes();
 
   /** Returns the timestamp in nanos when measurement was collected. */
-  long GetEpochNanos();
+  opentelemetry::common::SystemTimestamp GetEpochNanos();
 
   /**
    * Returns the SpanContext associated with this exemplar. If the exemplar was not recorded

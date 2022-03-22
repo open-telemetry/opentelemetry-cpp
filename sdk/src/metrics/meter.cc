@@ -6,7 +6,7 @@
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
-#  include "opentelemetry/sdk/metrics/examplar/no_examplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
@@ -184,8 +184,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
   auto view_registry = meter_context_->GetViewRegistry();
-  std::unique_ptr<WritableMetricStorage> storages(
-      new MultiMetricStorage(NoExemplarReservoir::GetNoExemplarReservoir()));
+  std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
 
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,

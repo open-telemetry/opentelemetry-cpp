@@ -4,7 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <vector>
-#  include "opentelemetry/sdk/metrics/examplar/data.h"
+#  include "opentelemetry/sdk/metrics/exemplar/data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -22,14 +22,18 @@ public:
   virtual ~ExemplarReservoir() = default;
 
   /** Offers a long measurement to be sampled. */
-  virtual void OfferMeasurement(long value,
-                                const MetricAttributes &attributes,
-                                const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void OfferMeasurement(
+      long value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp &timestamp) noexcept = 0;
 
   /** Offers a double measurement to be sampled. */
-  virtual void OfferMeasurement(double value,
-                                const MetricAttributes &attributes,
-                                const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void OfferMeasurement(
+      double value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp &timestamp) noexcept = 0;
 
   /**
    * Builds vector of Exemplars for exporting from the current reservoir.

@@ -30,4 +30,4 @@ add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
 target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
                       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
-add_subdirectory(examplar)
+add_subdirectory(exemplar)
