@@ -141,7 +141,7 @@ public:
     }
 
     // Get the last reported metrics for the `collector` from `last reported metrics` stash
-    //   - If the aggregation_temporarily for the collector is cummulative
+    //   - If the aggregation_temporarily for the collector is cumulative
     //       - Merge the last reported metrics with unreported metrics (which is in merged_metrics),
     //           Final result of merge would be in merged_metrics.
     //       - Move the final merge to the `last reported metrics` stash.
@@ -154,9 +154,9 @@ public:
     {
       last_collection_ts     = last_reported_metrics_[collector].collection_ts;
       auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
-      if (aggregation_temporarily == AggregationTemporarily::kCummulative)
+      if (aggregation_temporarily == AggregationTemporarily::kCumulative)
       {
-        // merge current delta to previous cummulative
+        // merge current delta to previous cumulative
         last_aggr_hashmap->GetAllEnteries(
             [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
               auto agg = merged_metrics->Get(attributes);

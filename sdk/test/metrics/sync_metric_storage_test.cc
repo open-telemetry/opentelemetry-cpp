@@ -18,7 +18,7 @@ class MockCollectorHandle : public CollectorHandle
 public:
   AggregationTemporarily GetAggregationTemporarily() noexcept override
   {
-    return AggregationTemporarily::kCummulative;
+    return AggregationTemporarily::kCumulative;
   }
 };
 

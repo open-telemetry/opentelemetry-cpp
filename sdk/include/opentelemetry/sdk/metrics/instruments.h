@@ -40,7 +40,7 @@ enum class AggregationTemporarily
 {
   kUnspecified,
   kDelta,
-  kCummulative
+  kCumulative
 };
 
 struct InstrumentDescriptor
