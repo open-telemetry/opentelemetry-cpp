@@ -19,28 +19,31 @@ namespace metrics
 using ValueType = nostd::variant<long, double>;
 using ListType  = nostd::variant<std::list<long>, std::list<double>>;
 
-// TODO -
-// Remove default constructor, and list initialization from
-// classes below once gcc 48 support is removed.
+// TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
+// refer error:
+// https://github.com/open-telemetry/opentelemetry-cpp/runs/5577740472?check_suite_focus=true#step:6:522
 
 class SumPointData
 {
 public:
+  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
   SumPointData(SumPointData &&)      = default;
   SumPointData(const SumPointData &) = default;
   SumPointData &operator=(SumPointData &&) = default;
   SumPointData()                           = default;
-  ValueType value_                         = {};
+
+  ValueType value_ = {};
 };
 
 class LastValuePointData
 {
 public:
+  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
   LastValuePointData(LastValuePointData &&)      = default;
   LastValuePointData(const LastValuePointData &) = default;
   LastValuePointData &operator=(LastValuePointData &&) = default;
+  LastValuePointData()                                 = default;
 
-  LastValuePointData()                              = default;
   ValueType value_                                  = {};
   bool is_lastvalue_valid_                          = {};
   opentelemetry::common::SystemTimestamp sample_ts_ = {};
@@ -49,19 +52,22 @@ public:
 class HistogramPointData
 {
 public:
+  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
   HistogramPointData(HistogramPointData &&) = default;
   HistogramPointData &operator=(HistogramPointData &&) = default;
   HistogramPointData(const HistogramPointData &)       = default;
   HistogramPointData()                                 = default;
-  ListType boundaries_                                 = {};
-  ValueType sum_                                       = {};
-  std::vector<uint64_t> counts_                        = {};
-  uint64_t count_                                      = {};
+
+  ListType boundaries_          = {};
+  ValueType sum_                = {};
+  std::vector<uint64_t> counts_ = {};
+  uint64_t count_               = {};
 };
 
 class DropPointData
 {
 public:
+  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
   DropPointData(DropPointData &&)      = default;
   DropPointData(const DropPointData &) = default;
   DropPointData()                      = default;
