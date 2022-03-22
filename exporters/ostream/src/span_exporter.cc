@@ -98,8 +98,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 
 void OStreamSpanExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
-    opentelemetry::nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)>
-        result_callback) noexcept
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
 {
   auto result = Export(spans);
   result_callback(result);

@@ -57,9 +57,9 @@ public:
    * @param spans a span of unique pointers to span recordables
    * @param result_callback callback function accepting ExportResult as argument
    */
-  virtual void Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept override;
+  virtual void Export(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+                      std::function<bool(opentelemetry::sdk::common::ExportResult)>
+                          &&result_callback) noexcept override;
 
   /**
    * Shut down the exporter.

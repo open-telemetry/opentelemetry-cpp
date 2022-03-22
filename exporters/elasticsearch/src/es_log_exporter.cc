@@ -121,11 +121,11 @@ public:
    */
   AsyncResponseHandler(
       std::shared_ptr<ext::http::client::Session> session,
-      nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
       bool console_debug = false)
       : console_debug_{console_debug},
         session_{std::move(session)},
-        result_callback_{result_callback}
+        result_callback_{std::move(result_callback)}
   {}
 
   /**
@@ -184,7 +184,7 @@ private:
   // Stores the session object for the request
   std::shared_ptr<ext::http::client::Session> session_;
   // Callback to call to on receiving events
-  nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
+  std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
   // A string to store the response body
   std::string body_ = "";
@@ -284,7 +284,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
 void ElasticsearchLogExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
         &records,
-    nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
 {
   // Return failure if this exporter has been shutdown
   if (isShutdown())
@@ -321,8 +321,8 @@ void ElasticsearchLogExporter::Export(
   request->SetBody(body_vec);
 
   // Send the request
-  auto handler =
-      std::make_shared<AsyncResponseHandler>(session, result_callback, options_.console_debug_);
+  auto handler = std::make_shared<AsyncResponseHandler>(session, std::move(result_callback),
+                                                        options_.console_debug_);
   session->SendRequest(handler);
 }
 

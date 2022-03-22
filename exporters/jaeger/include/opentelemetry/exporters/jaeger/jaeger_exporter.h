@@ -67,8 +67,8 @@ public:
    * @param result_callback callback function accepting ExportResult as argument
    */
   void Export(const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
-              nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)>
-                  result_callback) noexcept override;
+              std::function<bool(opentelemetry::sdk::common::ExportResult)>
+                  &&result_callback) noexcept override;
 
   /**
    * Shutdown the exporter.

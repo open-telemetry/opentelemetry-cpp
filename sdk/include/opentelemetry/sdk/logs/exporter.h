@@ -53,7 +53,7 @@ public:
    */
   virtual void Export(
       const nostd::span<std::unique_ptr<Recordable>> &records,
-      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept = 0;
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
