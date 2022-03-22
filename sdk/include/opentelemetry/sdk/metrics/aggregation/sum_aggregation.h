@@ -55,6 +55,7 @@ public:
 private:
   opentelemetry::common::SpinLockMutex lock_;
   SumPointData point_data_;
+  long sum_;
 };
 
 }  // namespace metrics
