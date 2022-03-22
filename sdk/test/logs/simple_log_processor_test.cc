@@ -55,7 +55,8 @@ public:
 
   // Dummy Async Export implementation
   void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
-              nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+              std::function<bool(opentelemetry::sdk::common::ExportResult)>
+                  &&result_callback) noexcept override
   {
     auto result = Export(records);
     result_callback(result);
@@ -146,7 +147,8 @@ public:
   }
 
   void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
-              nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+              std::function<bool(opentelemetry::sdk::common::ExportResult)>
+                  &&result_callback) noexcept override
   {
     result_callback(ExportResult::kSuccess);
   }

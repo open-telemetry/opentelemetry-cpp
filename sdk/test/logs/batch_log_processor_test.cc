@@ -55,9 +55,9 @@ public:
     return ExportResult::kSuccess;
   }
 
-  void Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
-      opentelemetry::nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+  void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
+              std::function<bool(opentelemetry::sdk::common::ExportResult)>
+                  &&result_callback) noexcept override
   {
     auto th = std::thread([this, records, result_callback]() {
       auto result = Export(records);

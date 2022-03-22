@@ -49,7 +49,7 @@ public:
    */
   virtual void Export(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
-      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept = 0;
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept = 0;
 
   /**
    * Shut down the exporter.
