@@ -94,7 +94,10 @@ Span::~Span()
 void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
   recordable_->SetAttribute(key, value);
 }
 

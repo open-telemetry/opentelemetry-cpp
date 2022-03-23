@@ -383,6 +383,24 @@ TEST(Tracer, SpanSetAttribute)
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
 }
 
+TEST(Tracer, SpanSetAttributeAfterEnd)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto span                                   = tracer->StartSpan("span 1");
+  span->SetAttribute("abc", 3.1);
+
+  span->End();
+
+  span->SetAttribute("testing null recordable", 3.1);
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
+}
+
 TEST(Tracer, SpanSetEvents)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
