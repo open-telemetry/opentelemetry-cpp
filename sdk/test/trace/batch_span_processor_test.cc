@@ -60,19 +60,13 @@ public:
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
-    std::vector<std::unique_ptr<sdk::trace::Recordable>> records_to_export;
-    records_to_export.reserve(records.size());
-    for (auto &record : records)
-    {
-      records_to_export.emplace_back(std::move(record));
-    }
-    auto th = std::thread(
-        [this](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
-               std::vector<std::unique_ptr<sdk::trace::Recordable>> &&records) {
-          auto result = Export(records);
+    // We should keep the order of test records
+    auto result = Export(records);
+    auto th     = std::thread(
+            [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
           result_callback(result);
-        },
-        std::move(result_callback), std::move(records_to_export));
+            },
+            std::move(result_callback));
     th.detach();
   }
 

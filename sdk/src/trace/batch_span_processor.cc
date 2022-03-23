@@ -14,6 +14,7 @@ namespace sdk
 {
 namespace trace
 {
+
 BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
                                        const BatchSpanProcessorOptions &options)
     : exporter_(std::move(exporter)),
@@ -22,12 +23,13 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_export_batch_size_(options.max_export_batch_size),
       is_export_async_(options.is_export_async),
       buffer_(max_queue_size_),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {
-  is_shutdown_.store(false);
-  is_force_flush_.store(false);
-  is_force_flush_notified_.store(false);
-  is_async_shutdown_notified_.store(false);
+  synchronization_data_->is_shutdown_.store(false);
+  synchronization_data_->is_force_flush_.store(false);
+  synchronization_data_->is_force_flush_notified_.store(false);
+  synchronization_data_->is_async_shutdown_notified_.store(false);
 }
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
@@ -42,7 +44,7 @@ void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
 
 void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 {
-  if (is_shutdown_.load() == true)
+  if (synchronization_data_->is_shutdown_.load() == true)
   {
     return;
   }
@@ -58,34 +60,34 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   if (buffer_size >= max_queue_size_ / 2 || buffer_size >= max_export_batch_size_)
   {
     // signal the worker thread
-    cv_.notify_one();
+    synchronization_data_->cv_.notify_one();
   }
 }
 
 bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  if (is_shutdown_.load() == true)
+  if (synchronization_data_->is_shutdown_.load() == true)
   {
     return false;
   }
 
   // Now wait for the worker thread to signal back from the Export method
-  std::unique_lock<std::mutex> lk(force_flush_cv_m_);
+  std::unique_lock<std::mutex> lk(synchronization_data_->force_flush_cv_m_);
 
-  is_force_flush_notified_.store(false, std::memory_order_release);
+  synchronization_data_->is_force_flush_notified_.store(false, std::memory_order_release);
   auto break_condition = [this]() {
-    if (is_shutdown_.load() == true)
+    if (synchronization_data_->is_shutdown_.load() == true)
     {
       return true;
     }
 
     // Wake up the worker thread once.
-    if (is_force_flush_.exchange(true) == false)
+    if (synchronization_data_->is_force_flush_.exchange(true) == false)
     {
-      cv_.notify_one();
+      synchronization_data_->cv_.notify_one();
     }
 
-    return is_force_flush_notified_.load(std::memory_order_acquire);
+    return synchronization_data_->is_force_flush_notified_.load(std::memory_order_acquire);
   };
 
   // Fix timeout to meet requirement of wait_for
@@ -93,12 +95,12 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
       timeout, std::chrono::microseconds::zero());
   if (timeout <= std::chrono::microseconds::zero())
   {
-    force_flush_cv_.wait(lk, break_condition);
+    synchronization_data_->force_flush_cv_.wait(lk, break_condition);
     return true;
   }
   else
   {
-    return force_flush_cv_.wait_for(lk, timeout, break_condition);
+    return synchronization_data_->force_flush_cv_.wait_for(lk, timeout, break_condition);
   }
 }
 
@@ -109,17 +111,17 @@ void BatchSpanProcessor::DoBackgroundWork()
   while (true)
   {
     // Wait for `timeout` milliseconds
-    std::unique_lock<std::mutex> lk(cv_m_);
-    cv_.wait_for(lk, timeout);
+    std::unique_lock<std::mutex> lk(synchronization_data_->cv_m_);
+    synchronization_data_->cv_.wait_for(lk, timeout);
 
-    if (is_shutdown_.load() == true)
+    if (synchronization_data_->is_shutdown_.load() == true)
     {
       // Break loop if another thread call ForceFlush
       DrainQueue();
       return;
     }
 
-    bool was_force_flush_called = is_force_flush_.exchange(false);
+    bool was_force_flush_called = synchronization_data_->is_force_flush_.exchange(false);
 
     // Check if this export was the result of a force flush.
     if (!was_force_flush_called)
@@ -187,17 +189,18 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
     }
     else
     {
-      notify_force_completion = false;
+      notify_force_completion                                         = false;
+      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
-          [this, was_force_flush_called](sdk::common::ExportResult result) {
+          [was_force_flush_called, synchronization_data_watcher](sdk::common::ExportResult result) {
             // TODO: Print result
-            if (was_force_flush_called)
+            if (synchronization_data_watcher.expired())
             {
-              NotifyForceFlushCompletion();
+              return true;
             }
-            // If export was called due to shutdown, notify the worker thread
-            NotifyShutdownCompletion();
+
+            NotifyCompletion(was_force_flush_called, synchronization_data_watcher.lock());
             return true;
           });
     }
@@ -205,21 +208,7 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
 
   if (notify_force_completion)
   {
-    if (was_force_flush_called)
-    {
-      NotifyForceFlushCompletion();
-    }
-    // If export was called due to shutdown, notify the worker thread
-    NotifyShutdownCompletion();
-  }
-}
-
-void BatchSpanProcessor::NotifyForceFlushCompletion()
-{
-  // Notify the main thread in case this export was the result of a force flush.
-  if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
-  {
-    force_flush_cv_.notify_all();
+    NotifyCompletion(was_force_flush_called, synchronization_data_);
   }
 }
 
@@ -229,21 +218,34 @@ void BatchSpanProcessor::WaitForShutdownCompletion()
   // for async thread to complete.
   if (is_export_async_)
   {
-    std::unique_lock<std::mutex> lk(async_shutdown_m_);
-    while (is_async_shutdown_notified_.load() == false)
+    std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m_);
+    while (synchronization_data_->is_async_shutdown_notified_.load() == false)
     {
-      async_shutdown_cv_.wait(lk);
+      synchronization_data_->async_shutdown_cv_.wait(lk);
     }
   }
 }
 
-void BatchSpanProcessor::NotifyShutdownCompletion()
+void BatchSpanProcessor::NotifyCompletion(
+    bool notify_force_flush,
+    const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
-  // Notify the thread which is waiting on shutdown to complete.
-  if (is_shutdown_.load() == true)
+  if (!synchronization_data)
   {
-    is_async_shutdown_notified_.store(true);
-    async_shutdown_cv_.notify_all();
+    return;
+  }
+
+  if (notify_force_flush && synchronization_data->is_force_flush_notified_.exchange(
+                                true, std::memory_order_acq_rel) == false)
+  {
+    synchronization_data->force_flush_cv_.notify_all();
+  }
+
+  // Notify the thread which is waiting on shutdown to complete.
+  if (synchronization_data->is_shutdown_.load() == true)
+  {
+    synchronization_data->is_async_shutdown_notified_.store(true);
+    synchronization_data->async_shutdown_cv_.notify_all();
   }
 }
 
@@ -251,7 +253,7 @@ void BatchSpanProcessor::DrainQueue()
 {
   while (true)
   {
-    bool was_force_flush_called = is_force_flush_.exchange(false);
+    bool was_force_flush_called = synchronization_data_->is_force_flush_.exchange(false);
     if (buffer_.empty() && !was_force_flush_called)
     {
       break;
@@ -265,12 +267,12 @@ void BatchSpanProcessor::DrainQueue()
 bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
-  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
-  bool already_shutdown = is_shutdown_.exchange(true);
+  std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m_};
+  bool already_shutdown = synchronization_data_->is_shutdown_.exchange(true);
 
   if (worker_thread_.joinable())
   {
-    cv_.notify_one();
+    synchronization_data_->cv_.notify_one();
     worker_thread_.join();
   }
 
@@ -301,7 +303,7 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 
 BatchSpanProcessor::~BatchSpanProcessor()
 {
-  if (is_shutdown_.load() == false)
+  if (synchronization_data_->is_shutdown_.load() == false)
   {
     Shutdown();
   }
