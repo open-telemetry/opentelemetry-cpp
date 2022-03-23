@@ -20,8 +20,8 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-      buffer_(max_queue_size_),
       is_export_async_(options.is_export_async),
+      buffer_(max_queue_size_),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {
   is_shutdown_.store(false);
@@ -147,7 +147,7 @@ void BatchSpanProcessor::DoBackgroundWork()
 
 void BatchSpanProcessor::Export(const bool was_force_flush_called)
 {
-  bool notify_force_flush = was_force_flush_called;
+  bool notify_force_completion = true;
   do
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
@@ -187,7 +187,7 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
     }
     else
     {
-      notify_force_flush = false;
+      notify_force_completion = false;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
           [this, was_force_flush_called](sdk::common::ExportResult result) {
@@ -203,9 +203,14 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
     }
   } while (was_force_flush_called);
 
-  if (notify_force_flush)
+  if (notify_force_completion)
   {
-    NotifyForceFlushCompletion(was_force_flush_called);
+    if (was_force_flush_called)
+    {
+      NotifyForceFlushCompletion();
+    }
+    // If export was called due to shutdown, notify the worker thread
+    NotifyShutdownCompletion();
   }
 }
 

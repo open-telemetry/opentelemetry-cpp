@@ -159,7 +159,7 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export(const bool was_force_flush_called)
 {
-  bool notify_force_flush = was_force_flush_called;
+  bool notify_force_completion = true;
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
@@ -197,7 +197,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
     }
     else
     {
-      notify_force_flush = false;
+      notify_force_completion = false;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
           [this, was_force_flush_called](sdk::common::ExportResult result) {
@@ -214,21 +214,23 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
     }
   } while (was_force_flush_called);
 
-  if (notify_force_flush)
+  if (notify_force_completion)
   {
-    NotifyForceFlushCompletion();
+    if (was_force_flush_called)
+    {
+      NotifyForceFlushCompletion();
+    }
+    // Notify the thread which is waiting on shutdown to complete.
+    NotifyShutdownCompletion();
   }
 }
 
 void BatchLogProcessor::NotifyForceFlushCompletion()
 {
   // Notify the main thread in case this export was the result of a force flush.
-  if (was_force_flush_called == true)
+  if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
   {
-    if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
-    {
-      force_flush_cv_.notify_all();
-    }
+    force_flush_cv_.notify_all();
   }
 }
 
