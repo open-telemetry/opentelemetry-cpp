@@ -138,12 +138,8 @@ private:
 
   /**
    * Should be called from Export to notify the main thread on Force Flush Completion
-   * @param was_force_flush_called - A flag to check if the current export is the result
-   *                                 of a call to ForceFlush method. If true, then we have to
-   *                                 notify the main thread to wake it up in the ForceFlush
-   *                                 method.
    */
-  void NotifyForceFlushCompletion(const bool was_for_flush_called);
+  void NotifyForceFlushCompletion();
 
   /* In case of async export, wait and notify for shutdown to be completed.*/
   void WaitForShutdownCompletion();

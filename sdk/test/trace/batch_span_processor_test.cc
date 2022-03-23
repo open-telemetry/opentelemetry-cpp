@@ -60,11 +60,14 @@ public:
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
-    auto th = std::thread([this, spans, result_callback]() {
-      auto result = Export(spans);
-      result_callback(result);
-    });
-    th.join();
+    auto th = std::thread(
+        [this, spans, result_callback](
+            std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          auto result = Export(spans);
+          result_callback(result);
+        },
+        std::move(result_callback));
+    th.detach();
   }
 
   bool Shutdown(
@@ -177,7 +180,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
   EXPECT_TRUE(is_shutdown->load());
 }
 
-TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
+TEST_F(BatchSpanProcessorTestPeer, TestAsyncForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
@@ -230,7 +233,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   }
 }
 
-TEST_F(BatchSpanProcessorTestPeer, TestAsyncForceFlush)
+TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(

@@ -59,11 +59,14 @@ public:
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
-    auto th = std::thread([this, records, result_callback]() {
-      auto result = Export(records);
-      result_callback(result);
-    });
-    th.join();
+    auto th = std::thread(
+        [this,
+         records](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          auto result = Export(records);
+          result_callback(result);
+        },
+        std::move(result_callback));
+    th.detach();
   }
 
   // toggles the boolean flag marking this exporter as shut down

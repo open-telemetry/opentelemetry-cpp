@@ -22,8 +22,8 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
-      buffer_(max_queue_size_),
       is_export_async_(is_export_async),
+      buffer_(max_queue_size_),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {
   is_shutdown_.store(false);
@@ -38,8 +38,8 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-      buffer_(options.max_queue_size),
       is_export_async_(options.is_export_async),
+      buffer_(options.max_queue_size),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {
   is_shutdown_.store(false);
@@ -128,7 +128,6 @@ void BatchLogProcessor::DoBackgroundWork()
     if (is_shutdown_.load() == true)
     {
       // Break loop if another thread call ForceFlush
-      is_force_flush_ = false;
       DrainQueue();
       return;
     }
@@ -160,6 +159,7 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export(const bool was_force_flush_called)
 {
+  bool notify_force_flush = was_force_flush_called;
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
@@ -197,11 +197,15 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
     }
     else
     {
+      notify_force_flush = false;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
           [this, was_force_flush_called](sdk::common::ExportResult result) {
             // TODO: Print result
-            NotifyForceFlushCompletion(was_force_flush_called);
+            if (was_force_flush_called)
+            {
+              NotifyForceFlushCompletion();
+            }
 
             // Notify the thread which is waiting on shutdown to complete.
             NotifyShutdownCompletion();
@@ -210,13 +214,13 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
     }
   } while (was_force_flush_called);
 
-  if (is_export_async_ == false)
+  if (notify_force_flush)
   {
-    NotifyForceFlushCompletion(was_force_flush_called);
+    NotifyForceFlushCompletion();
   }
 }
 
-void BatchLogProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
+void BatchLogProcessor::NotifyForceFlushCompletion()
 {
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)

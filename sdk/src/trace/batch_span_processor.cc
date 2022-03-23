@@ -115,7 +115,6 @@ void BatchSpanProcessor::DoBackgroundWork()
     if (is_shutdown_.load() == true)
     {
       // Break loop if another thread call ForceFlush
-      is_force_flush_ = false;
       DrainQueue();
       return;
     }
@@ -148,6 +147,7 @@ void BatchSpanProcessor::DoBackgroundWork()
 
 void BatchSpanProcessor::Export(const bool was_force_flush_called)
 {
+  bool notify_force_flush = was_force_flush_called;
   do
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
@@ -187,11 +187,15 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
     }
     else
     {
+      notify_force_flush = false;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
           [this, was_force_flush_called](sdk::common::ExportResult result) {
             // TODO: Print result
-            NotifyForceFlushCompletion(was_force_flush_called);
+            if (was_force_flush_called)
+            {
+              NotifyForceFlushCompletion();
+            }
             // If export was called due to shutdown, notify the worker thread
             NotifyShutdownCompletion();
             return true;
@@ -199,21 +203,18 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
     }
   } while (was_force_flush_called);
 
-  if (is_export_async_ == false)
+  if (notify_force_flush)
   {
     NotifyForceFlushCompletion(was_force_flush_called);
   }
 }
 
-void BatchSpanProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
+void BatchSpanProcessor::NotifyForceFlushCompletion()
 {
   // Notify the main thread in case this export was the result of a force flush.
-  if (was_force_flush_called == true)
+  if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
   {
-    if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
-    {
-      force_flush_cv_.notify_all();
-    }
+    force_flush_cv_.notify_all();
   }
 }
 
