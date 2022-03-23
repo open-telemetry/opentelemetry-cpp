@@ -20,6 +20,33 @@ namespace logs
 {
 
 /**
+ * Struct to hold batch SpanProcessor options.
+ */
+struct BatchLogProcessorOptions
+{
+  /**
+   * The maximum buffer/queue size. After the size is reached, spans are
+   * dropped.
+   */
+  size_t max_queue_size = 2048;
+
+  /* The time interval between two consecutive exports. */
+  std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000);
+
+  /**
+   * The maximum batch size of every export. It must be smaller or
+   * equal to max_queue_size.
+   */
+  size_t max_export_batch_size = 512;
+
+  /**
+   * Determines whether the export happens asynchronously.
+   * Default implementation is synchronous.
+   */
+  bool is_export_async = false;
+};
+
+/**
  * This is an implementation of the LogProcessor which creates batches of finished logs and passes
  * the export-friendly log data representations to the configured LogExporter.
  */
@@ -43,6 +70,16 @@ public:
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
       const size_t max_export_batch_size                     = 512,
       const bool is_export_async                             = false);
+
+  /**
+   * Creates a batch log processor by configuring the specified exporter and other parameters
+   * as per the official, language-agnostic opentelemetry specs.
+   *
+   * @param exporter - The backend exporter to pass the logs to
+   * @param options - The batch SpanProcessor options.
+   */
+  explicit BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+                             const BatchLogProcessorOptions &options);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;

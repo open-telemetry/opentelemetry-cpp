@@ -32,6 +32,22 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   is_async_shutdown_notified_.store(false);
 }
 
+BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+                                     const BatchLogProcessorOptions &options)
+    : exporter_(std::move(exporter)),
+      max_queue_size_(options.max_queue_size),
+      scheduled_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
+      buffer_(options.max_queue_size),
+      is_export_async_(options.is_export_async),
+      worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
+{
+  is_shutdown_.store(false);
+  is_force_flush_.store(false);
+  is_force_flush_notified_.store(false);
+  is_async_shutdown_notified_.store(false);
+}
+
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();

@@ -3,6 +3,9 @@
 
 #ifndef HAVE_CPP_STDLIB
 
+#  include <chrono>
+#  include <thread>
+
 #  include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
@@ -81,170 +84,218 @@ public:
     auto http_client = http_client::HttpClientFactory::CreateNoSend();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
   }
+
+  void ExportJsonIntegrationTest(bool is_async)
+  {
+    auto mock_otlp_client =
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+    auto mock_otlp_http_client = mock_otlp_client.first;
+    auto client                = mock_otlp_client.second;
+    auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
+
+    resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                        {"tenant.id", "test_user"}};
+    resource_attributes["bool_value"]                = true;
+    resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+    resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+    resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+    resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+    resource_attributes["double_value"]              = static_cast<double>(3.1);
+    resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+    resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+    resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+    resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+    resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+    resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+    resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+    auto resource = resource::Resource::Create(resource_attributes);
+
+    auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
+    processor_opts.max_export_batch_size = 5;
+    processor_opts.max_queue_size        = 5;
+    processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
+    processor_opts.is_export_async       = is_async;
+    auto processor                       = std::unique_ptr<sdk::trace::SpanProcessor>(
+        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+        new sdk::trace::TracerProvider(std::move(processor), resource));
+
+    std::string report_trace_id;
+
+    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+    auto tracer                                      = provider->GetTracer("test");
+    auto parent_span                                 = tracer->StartSpan("Test parent span");
+
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
+
+    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+        .trace_id()
+        .ToLowerBase16(MakeSpan(trace_id_hex));
+    report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+
+    auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+    auto mock_session =
+        std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    EXPECT_CALL(*mock_session, SendRequest)
+        .WillOnce([&mock_session, report_trace_id, is_async](
+                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+          auto check_json =
+              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+          auto resource_span = *check_json["resource_spans"].begin();
+          auto instrumentation_library_span =
+              *resource_span["instrumentation_library_spans"].begin();
+          auto span              = *instrumentation_library_span["spans"].begin();
+          auto received_trace_id = span["trace_id"].get<std::string>();
+          EXPECT_EQ(received_trace_id, report_trace_id);
+
+          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+          if (custom_header != mock_session->GetRequest()->headers_.end())
+          {
+            EXPECT_EQ("Custom-Header-Value", custom_header->second);
+          }
+
+          // let the otlp_http_client to continue
+          if (is_async)
+          {
+            std::thread async_finish{[callback]() {
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            }};
+            async_finish.detach();
+          }
+          else
+          {
+            http_client::nosend::Response response;
+            response.Finish(*callback.get());
+          }
+        });
+
+    child_span->End();
+    parent_span->End();
+
+    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+  }
+
+  void ExportBinaryIntegrationTest(bool is_async)
+  {
+    auto mock_otlp_client =
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+    auto mock_otlp_http_client = mock_otlp_client.first;
+    auto client                = mock_otlp_client.second;
+    auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
+
+    resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                        {"tenant.id", "test_user"}};
+    resource_attributes["bool_value"]                = true;
+    resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+    resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+    resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+    resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+    resource_attributes["double_value"]              = static_cast<double>(3.1);
+    resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+    resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+    resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+    resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+    resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+    resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+    resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+    auto resource = resource::Resource::Create(resource_attributes);
+
+    auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
+    processor_opts.max_export_batch_size = 5;
+    processor_opts.max_queue_size        = 5;
+    processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
+    processor_opts.is_export_async       = is_async;
+
+    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
+        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+        new sdk::trace::TracerProvider(std::move(processor), resource));
+
+    std::string report_trace_id;
+
+    uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
+    auto tracer                                        = provider->GetTracer("test");
+    auto parent_span                                   = tracer->StartSpan("Test parent span");
+
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
+
+    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+        .trace_id()
+        .CopyBytesTo(MakeSpan(trace_id_binary));
+    report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
+
+    auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+    auto mock_session =
+        std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+    EXPECT_CALL(*mock_session, SendRequest)
+        .WillOnce([&mock_session, report_trace_id, is_async](
+                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+          opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
+          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
+                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
+          auto received_trace_id =
+              request_body.resource_spans(0).instrumentation_library_spans(0).spans(0).trace_id();
+          EXPECT_EQ(received_trace_id, report_trace_id);
+
+          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+          if (custom_header != mock_session->GetRequest()->headers_.end())
+          {
+            EXPECT_EQ("Custom-Header-Value", custom_header->second);
+          }
+
+          // let the otlp_http_client to continue
+          if (is_async)
+          {
+            std::thread async_finish{[callback]() {
+              std::this_thread::sleep_for(std::chrono::milliseconds(100));
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            }};
+            async_finish.detach();
+          }
+          else
+          {
+            http_client::nosend::Response response;
+            response.Finish(*callback.get());
+          }
+        });
+
+    child_span->End();
+    parent_span->End();
+
+    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+  }
 };
 
 // Create spans, let processor call Export()
-TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
+TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 {
-  auto mock_otlp_client =
-      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
-  auto mock_otlp_http_client = mock_otlp_client.first;
-  auto client                = mock_otlp_client.second;
-  auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
+  ExportJsonIntegrationTest(false);
+}
 
-  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
-                                                      {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]                = true;
-  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]              = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
-  auto resource = resource::Resource::Create(resource_attributes);
-
-  auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
-  processor_opts.max_export_batch_size = 5;
-  processor_opts.max_queue_size        = 5;
-  processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
-  auto processor                       = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(
-      new sdk::trace::TracerProvider(std::move(processor), resource));
-
-  std::string report_trace_id;
-
-  char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-  auto tracer                                      = provider->GetTracer("test");
-  auto parent_span                                 = tracer->StartSpan("Test parent span");
-
-  trace_api::StartSpanOptions child_span_opts = {};
-  child_span_opts.parent                      = parent_span->GetContext();
-
-  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-
-  nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-      .trace_id()
-      .ToLowerBase16(MakeSpan(trace_id_hex));
-  report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
-
-  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
-  auto mock_session =
-      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
-  EXPECT_CALL(*mock_session, SendRequest)
-      .WillOnce([&mock_session, report_trace_id](
-                    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-        auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-        auto resource_span                = *check_json["resource_spans"].begin();
-        auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
-        auto span                         = *instrumentation_library_span["spans"].begin();
-        auto received_trace_id            = span["trace_id"].get<std::string>();
-        EXPECT_EQ(received_trace_id, report_trace_id);
-
-        auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-        ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-        if (custom_header != mock_session->GetRequest()->headers_.end())
-        {
-          EXPECT_EQ("Custom-Header-Value", custom_header->second);
-        }
-        // let the otlp_http_client to continue
-        http_client::nosend::Response response;
-        callback->OnResponse(response);
-      });
-
-  child_span->End();
-  parent_span->End();
-
-  static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
+{
+  ExportJsonIntegrationTest(true);
 }
 
 // Create spans, let processor call Export()
-TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
+TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestSync)
 {
-  auto mock_otlp_client =
-      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
-  auto mock_otlp_http_client = mock_otlp_client.first;
-  auto client                = mock_otlp_client.second;
-  auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
+  ExportBinaryIntegrationTest(false);
+}
 
-  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
-                                                      {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]                = true;
-  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]              = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
-  auto resource = resource::Resource::Create(resource_attributes);
-
-  auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
-  processor_opts.max_export_batch_size = 5;
-  processor_opts.max_queue_size        = 5;
-  processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
-
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(
-      new sdk::trace::TracerProvider(std::move(processor), resource));
-
-  std::string report_trace_id;
-
-  uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
-  auto tracer                                        = provider->GetTracer("test");
-  auto parent_span                                   = tracer->StartSpan("Test parent span");
-
-  trace_api::StartSpanOptions child_span_opts = {};
-  child_span_opts.parent                      = parent_span->GetContext();
-
-  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-  nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-      .trace_id()
-      .CopyBytesTo(MakeSpan(trace_id_binary));
-  report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
-
-  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
-  auto mock_session =
-      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
-  EXPECT_CALL(*mock_session, SendRequest)
-      .WillOnce([&mock_session, report_trace_id](
-                    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-        opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-        request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                    static_cast<int>(mock_session->GetRequest()->body_.size()));
-        auto received_trace_id =
-            request_body.resource_spans(0).instrumentation_library_spans(0).spans(0).trace_id();
-        EXPECT_EQ(received_trace_id, report_trace_id);
-
-        auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-        ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-        if (custom_header != mock_session->GetRequest()->headers_.end())
-        {
-          EXPECT_EQ("Custom-Header-Value", custom_header->second);
-        }
-
-        // let the otlp_http_client to continue
-        http_client::nosend::Response response;
-
-        response.Finish(*callback.get());
-      });
-
-  child_span->End();
-  parent_span->End();
-
-  static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestAsync)
+{
+  ExportBinaryIntegrationTest(true);
 }
 
 // Test exporter configuration options

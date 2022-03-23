@@ -70,7 +70,7 @@ void OtlpHttpExporter::Export(
 
   proto::collector::trace::v1::ExportTraceServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);
-  http_client_->Export(service_request, result_callback);
+  http_client_->Export(service_request, std::move(result_callback));
 }
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
