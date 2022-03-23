@@ -248,15 +248,21 @@ void BatchLogProcessor::NotifyShutdownCompletion()
   if (is_shutdown_.load() == true)
   {
     is_async_shutdown_notified_.store(true);
-    async_shutdown_cv_.notify_one();
+    async_shutdown_cv_.notify_all();
   }
 }
 
 void BatchLogProcessor::DrainQueue()
 {
-  while (buffer_.empty() == false)
+  while (true)
   {
-    Export(false);
+    bool was_force_flush_called = is_force_flush_.exchange(false);
+    if (buffer_.empty() && !was_force_flush_called)
+    {
+      break;
+    }
+
+    Export(was_force_flush_called);
 
     // Since async export is invoked due to shutdown, need to wait
     // for async thread to complete.
