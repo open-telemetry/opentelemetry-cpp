@@ -64,7 +64,6 @@ public:
     {
       return;
     }
-
     auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
@@ -75,7 +74,6 @@ public:
     {
       return;
     }
-
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -86,7 +84,6 @@ public:
     {
       return;
     }
-
     auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
@@ -104,6 +101,7 @@ public:
     // this will also empty the delta metrics hashmap, and make it available for
     // recordings
     std::shared_ptr<AttributesHashMap> delta_metrics = std::move(attributes_hashmap_);
+    attributes_hashmap_.reset(new AttributesHashMap);
     for (auto &col : collectors)
     {
       unreported_metrics_[col.get()].push_back(delta_metrics);
@@ -121,25 +119,27 @@ public:
     auto unreported_list = std::move(unreported_metrics_[collector]);
 
     // Iterate over the unreporter metrics for `collector` and store result in `merged_metrics`
-    std::unique_ptr<AttributesHashMap> merged_metrics;
+    std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap);
     for (auto &agg_hashmap : unreported_list)
     {
-      agg_hashmap->GetAllEnteries(
-          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto agg = merged_metrics->Get(attributes);
-            if (agg)
-            {
-              merged_metrics->Set(attributes, agg->Merge(aggregation));
-            }
-            else
-            {
-              merged_metrics->Set(attributes,
-                                  DefaultAggregation::CreateAggregation(instrument_descriptor_));
-            }
-            return true;
-          });
+      agg_hashmap->GetAllEnteries([&merged_metrics, this](const MetricAttributes &attributes,
+                                                          Aggregation &aggregation) {
+        auto agg = merged_metrics->Get(attributes);
+        if (agg)
+        {
+          merged_metrics->Set(attributes, std::move(agg->Merge(aggregation)));
+        }
+        else
+        {
+          merged_metrics->Set(
+              attributes, std::move(DefaultAggregation::CreateAggregation(instrument_descriptor_)
+                                        ->Merge(aggregation)));
+          merged_metrics->GetAllEnteries(
+              [](const MetricAttributes &attr, Aggregation &aggr) { return true; });
+        }
+        return true;
+      });
     }
-
     // Get the last reported metrics for the `collector` from `last reported metrics` stash
     //   - If the aggregation_temporarily for the collector is cumulative
     //       - Merge the last reported metrics with unreported metrics (which is in merged_metrics),
@@ -177,6 +177,8 @@ public:
     }
     else
     {
+      merged_metrics->GetAllEnteries(
+          [](const MetricAttributes &attr, Aggregation &aggr) { return true; });
       last_reported_metrics_.insert(
           std::make_pair(collector, LastReportedMetrics{std::move(merged_metrics), collection_ts}));
     }
@@ -196,6 +198,7 @@ public:
           metric_data.point_data_attr_.push_back(point_data_attr);
           return true;
         });
+
     if (callback(metric_data))
     {
       return true;

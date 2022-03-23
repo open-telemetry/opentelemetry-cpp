@@ -6,6 +6,7 @@
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/version.h"
 
+#  include <iostream>
 #  include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -34,7 +35,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Merge(Aggregation &delta) noexc
           nostd::get<SumPointData>((static_cast<LongSumAggregation &>(delta).ToPoint())).value_) +
       nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
-  static_cast<LongSumAggregation *>(aggr.get())->sum_ = merge_value;
+  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
 
@@ -46,7 +47,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Diff(Aggregation &next) noexcep
           nostd::get<SumPointData>((static_cast<LongSumAggregation &>(next).ToPoint())).value_) -
       nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
-  static_cast<LongSumAggregation *>(aggr.get())->sum_ = diff_value;
+  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }
 
@@ -75,7 +76,7 @@ std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(Aggregation &delta) noe
           nostd::get<SumPointData>((static_cast<DoubleSumAggregation &>(delta).ToPoint())).value_) +
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
-  static_cast<DoubleSumAggregation *>(aggr.get())->sum_ = merge_value;
+  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
 
@@ -87,7 +88,7 @@ std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(Aggregation &next) noexc
           nostd::get<SumPointData>((static_cast<DoubleSumAggregation &>(next).ToPoint())).value_) -
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
-  static_cast<DoubleSumAggregation *>(aggr.get())->sum_ = diff_value;
+  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }
 
