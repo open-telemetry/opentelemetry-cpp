@@ -7,6 +7,7 @@
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -27,11 +28,13 @@ class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
 public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
-                    const AttributesProcessor *attributes_processor)
+                    const AttributesProcessor *attributes_processor,
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
-        attributes_processor_{attributes_processor}
+        attributes_processor_{attributes_processor},
+        exemplar_reservoir_(exemplar_reservoir)
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
       return std::move(
@@ -39,45 +42,55 @@ public:
     };
   }
 
-  void RecordLong(long value) noexcept override
+  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
       return;
     }
+    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordLong(long value,
-                  const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+                  const opentelemetry::common::KeyValueIterable &attributes,
+                  const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
       return;
     }
 
+    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                          std::chrono::system_clock::now());
     auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
-  void RecordDouble(double value) noexcept override
+  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }
 
+    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value,
-                    const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+                    const opentelemetry::common::KeyValueIterable &attributes,
+                    const opentelemetry::context::Context &context) noexcept override
   {
+    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                          std::chrono::system_clock::now());
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }
 
+    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                          std::chrono::system_clock::now());
     auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
@@ -102,6 +115,7 @@ private:
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   const AttributesProcessor *attributes_processor_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
+  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 };
 
 }  // namespace metrics
