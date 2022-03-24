@@ -32,9 +32,7 @@ public:
    * concurrently for the same exporter instance.
    * @param spans a span of unique pointers to metrics data
    */
-  virtual opentelemetry::sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::MetricData>>
-          &records) noexcept = 0;
+  virtual opentelemetry::sdk::common::ExportResult Export(const MetricData &records) noexcept = 0;
 
   /**
    * Force flush the exporter.

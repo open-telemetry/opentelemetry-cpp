@@ -20,6 +20,7 @@ MetricReader::MetricReader(AggregationTemporarily aggregation_temporarily)
 void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
 {
   metric_producer_ = metric_producer;
+  OnInitialized();
 }
 
 AggregationTemporarily MetricReader::GetAggregationTemporarily() const noexcept
