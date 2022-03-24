@@ -23,7 +23,7 @@ class MetricExporter;
  * Struct to hold batch PeriodicExortingMetricReader options.
  */
 
-struct PeriodicExortingMetricReaderOptions
+struct PeriodicExportingMetricReaderOptions
 {
 
   /* The time interval between two consecutive exports. */
@@ -33,12 +33,12 @@ struct PeriodicExortingMetricReaderOptions
   std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(30000);
 };
 
-class PeriodicExortingMetricReader : public MetricReader
+class PeriodicExportingMetricReader : public MetricReader
 {
 
 public:
-  PeriodicExortingMetricReader(std::unique_ptr<MetricExporter> exporter,
-                               const PeriodicExortingMetricReaderOptions &option);
+  PeriodicExportingMetricReader(std::unique_ptr<MetricExporter> exporter,
+                                const PeriodicExportingMetricReaderOptions &option);
 
 private:
   bool OnForceFlush(std::chrono::microseconds timeout) noexcept override;

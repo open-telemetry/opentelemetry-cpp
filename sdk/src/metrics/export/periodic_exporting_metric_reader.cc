@@ -14,20 +14,20 @@ namespace sdk
 namespace metrics
 {
 
-PeriodicExortingMetricReader::PeriodicExortingMetricReader(
+PeriodicExportingMetricReader::PeriodicExportingMetricReader(
     std::unique_ptr<MetricExporter> exporter,
-    const PeriodicExortingMetricReaderOptions &option)
+    const PeriodicExportingMetricReaderOptions &option)
     : exporter_{std::move(exporter)},
       schedule_delay_millis_{option.schedule_delay_millis},
       export_timeout_millis_{option.export_timeout_millis}
 {}
 
-void PeriodicExortingMetricReader::OnInitialized() noexcept
+void PeriodicExportingMetricReader::OnInitialized() noexcept
 {
-  worker_thread_ = std::thread(&PeriodicExortingMetricReader::DoBackgroundWork, this);
+  worker_thread_ = std::thread(&PeriodicExportingMetricReader::DoBackgroundWork, this);
 }
 
-void PeriodicExortingMetricReader::DoBackgroundWork()
+void PeriodicExportingMetricReader::DoBackgroundWork()
 {
   auto timeout = schedule_delay_millis_;
   std::unique_lock<std::mutex> lk(cv_m_);
