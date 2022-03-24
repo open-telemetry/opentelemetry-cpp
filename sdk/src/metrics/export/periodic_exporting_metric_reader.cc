@@ -52,7 +52,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     {
       stop = true;
     }
-  } while (status != std::future_status::ready());
+  } while (status != std::future_status::ready);
 }
 }  // namespace metrics
 }  // namespace sdk
