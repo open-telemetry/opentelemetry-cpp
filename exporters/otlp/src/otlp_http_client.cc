@@ -659,10 +659,19 @@ OtlpHttpClient::~OtlpHttpClient()
 
   // Wait for all the sessions to finish
   std::unique_lock<std::mutex> lock(session_waker_lock_);
-  session_waker_.wait(lock, [this] {
-    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    return running_sessions_.empty();
-  });
+  while (true)
+  {
+    {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      if (running_sessions_.empty())
+      {
+        break;
+      }
+    }
+    // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+    // checking and waiting, we should not wait forever.
+    session_waker_.wait_for(lock, options_.timeout);
+  }
 
   // And then remove all session datas
   while (cleanupGCSessions())
@@ -707,7 +716,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   std::unique_lock<std::mutex> lock(session_waker_lock_);
   bool wait_successful = session_waker_.wait_for(lock, options_.timeout, [this] {
     std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    return running_sessions_.size() <= 0;
+    return running_sessions_.empty();
   });
 
   cleanupGCSessions();
@@ -777,10 +786,19 @@ bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
   std::unique_lock<std::mutex> lock(session_waker_lock_);
   if (timeout <= std::chrono::microseconds::zero())
   {
-    session_waker_.wait(lock, [this] {
-      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-      return running_sessions_.empty();
-    });
+    while (true)
+    {
+      {
+        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+        if (running_sessions_.empty())
+        {
+          break;
+        }
+      }
+      // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+      // checking and waiting, we should not wait forever.
+      session_waker_.wait_for(lock, options_.timeout);
+    }
   }
   else
   {

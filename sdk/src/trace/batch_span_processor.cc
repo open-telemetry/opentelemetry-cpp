@@ -100,7 +100,15 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   bool result;
   if (timeout <= std::chrono::microseconds::zero())
   {
-    synchronization_data_->force_flush_cv.wait(lk_cv, break_condition);
+    bool wait_result = false;
+    while (!wait_result)
+    {
+      // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
+      // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
+      // for ever
+      wait_result = synchronization_data_->force_flush_cv.wait_for(lk_cv, schedule_delay_millis_,
+                                                                   break_condition);
+    }
     result = true;
   }
   else
@@ -232,9 +240,17 @@ void BatchSpanProcessor::WaitForShutdownCompletion()
   if (is_export_async_)
   {
     std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m);
-    while (synchronization_data_->is_async_shutdown_notified.load() == false)
+    while (true)
     {
-      synchronization_data_->async_shutdown_cv.wait(lk);
+      if (synchronization_data_->is_async_shutdown_notified.load())
+      {
+        break;
+      }
+
+      // When is_async_shutdown_notified.store(true) and async_shutdown_cv.notify_all() is called
+      // between is_async_shutdown_notified.load() and async_shutdown_cv.wait(). We must not wait
+      // for ever
+      synchronization_data_->async_shutdown_cv.wait_for(lk, schedule_delay_millis_);
     }
   }
 }
