@@ -51,7 +51,7 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 
 private:
-  AggregationTemporarily aggregation_temporarily;
+  AggregationTemporality aggregation_temporality;
 };
 }  // namespace metrics
 }  // namespace sdk
