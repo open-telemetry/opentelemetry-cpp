@@ -21,7 +21,7 @@ using namespace opentelemetry::sdk::resource;
 class MockMetricReader : public MetricReader
 {
 public:
-  MockMetricReader(AggregationTemporarily aggr_temporarily) : MetricReader(aggr_temporarily) {}
+  MockMetricReader(AggregationTemporality aggr_temporality) : MetricReader(aggr_temporality) {}
 
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
 
@@ -44,7 +44,7 @@ TEST(AsyncMetricStorageTest, BasicTests)
 
   std::vector<std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>> exporters;
   std::shared_ptr<MeterContext> meter_context(new MeterContext(std::move(exporters)));
-  std::unique_ptr<MetricReader> metric_reader(new MockMetricReader(AggregationTemporarily::kDelta));
+  std::unique_ptr<MetricReader> metric_reader(new MockMetricReader(AggregationTemporality::kDelta));
 
   std::shared_ptr<CollectorHandle> collector = std::shared_ptr<CollectorHandle>(
       new MetricCollector(std::move(meter_context), std::move(metric_reader)));
