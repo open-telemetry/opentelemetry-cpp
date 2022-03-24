@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Bugfix: span SetAttribute crash ([#1283](https://github.com/open-telemetry/opentelemetry-cpp/pull/1283))
 * [EXPORTER] Jaeger Exporter - Populate Span Links ([#1251](https://github.com/open-telemetry/opentelemetry-cpp/pull/1251))
 
 ## [1.2.0] 2022-01-31

@@ -98,6 +98,7 @@ void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &va
   {
     return;
   }
+
   recordable_->SetAttribute(key, value);
 }
 
