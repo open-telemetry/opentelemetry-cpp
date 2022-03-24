@@ -13,8 +13,8 @@ namespace sdk
 namespace metrics
 {
 
-MetricReader::MetricReader(AggregationTemporarily aggregation_temporarily)
-    : aggregation_temporarily_(aggregation_temporarily)
+MetricReader::MetricReader(AggregationTemporality aggregation_temporality)
+    : aggregation_temporality_(aggregation_temporality)
 {}
 
 void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
@@ -23,9 +23,9 @@ void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
   OnInitialized();
 }
 
-AggregationTemporarily MetricReader::GetAggregationTemporarily() const noexcept
+AggregationTemporality MetricReader::GetAggregationTemporality() const noexcept
 {
-  return aggregation_temporarily_;
+  return aggregation_temporality_;
 }
 
 bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexcept
