@@ -34,7 +34,7 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
                                                             options.console_debug,
                                                             options.timeout,
                                                             options.http_headers,
-                                                            options.concurrent_sessions)))
+                                                            options.max_concurrent_requests)))
 {}
 
 OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client)

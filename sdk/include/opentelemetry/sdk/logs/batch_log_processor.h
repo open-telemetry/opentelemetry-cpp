@@ -10,6 +10,7 @@
 
 #  include <atomic>
 #  include <condition_variable>
+#  include <cstdint>
 #  include <memory>
 #  include <thread>
 
@@ -124,12 +125,8 @@ private:
   /**
    * Exports all logs to the configured exporter.
    *
-   * @param was_force_flush_called - A flag to check if the current export is the result
-   *                                 of a call to ForceFlush method. If true, then we have to
-   *                                 notify the main thread to wake it up in the ForceFlush
-   *                                 method.
    */
-  void Export(const bool was_for_flush_called);
+  void Export();
 
   /**
    * Called when Shutdown() is invoked. Completely drains the queue of all log records and
@@ -143,14 +140,15 @@ private:
   struct SynchronizationData
   {
     /* Synchronization primitives */
-    std::condition_variable cv_, force_flush_cv_, async_shutdown_cv_;
-    std::mutex cv_m_, force_flush_cv_m_, shutdown_m_, async_shutdown_m_;
+    std::condition_variable cv, force_flush_cv, async_shutdown_cv;
+    std::mutex cv_m, force_flush_cv_m, shutdown_m, async_shutdown_m;
 
     /* Important boolean flags to handle the workflow of the processor */
-    std::atomic<bool> is_shutdown_;
-    std::atomic<bool> is_force_flush_;
-    std::atomic<bool> is_force_flush_notified_;
-    std::atomic<bool> is_async_shutdown_notified_;
+    std::atomic<bool> is_force_wakeup_background_worker;
+    std::atomic<bool> is_force_flush_pending;
+    std::atomic<bool> is_force_flush_notified;
+    std::atomic<bool> is_shutdown;
+    std::atomic<bool> is_async_shutdown_notified;
   };
 
   /**

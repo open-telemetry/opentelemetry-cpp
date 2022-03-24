@@ -751,7 +751,7 @@ void OtlpHttpClient::Export(
   std::unique_lock<std::mutex> lock(session_waker_lock_);
   session_waker_.wait_for(lock, options_.timeout, [this] {
     std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    return running_sessions_.size() <= options_.concurrent_sessions;
+    return running_sessions_.size() <= options_.max_concurrent_requests;
   });
 
   cleanupGCSessions();

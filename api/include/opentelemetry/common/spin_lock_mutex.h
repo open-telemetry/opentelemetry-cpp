@@ -59,6 +59,26 @@ public:
   SpinLockMutex &operator=(const SpinLockMutex &) = delete;
   SpinLockMutex &operator=(const SpinLockMutex &) volatile = delete;
 
+  static inline void fast_yield() noexcept
+  {
+// Issue a Pause/Yield instruction while spinning.
+#if defined(_MSC_VER)
+    YieldProcessor();
+#elif defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__)
+    _mm_pause();
+#  else
+    __builtin_ia32_pause();
+#  endif
+#elif defined(__arm__)
+    // This intrinsic should fail to be found if YIELD is not supported on the current
+    // processor.
+    __yield();
+#else
+    // TODO: Issue PAGE/YIELD on other architectures.
+#endif
+  }
+
   /**
    * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
    */
@@ -91,22 +111,7 @@ public:
         {
           return;
         }
-// Issue a Pause/Yield instruction while spinning.
-#if defined(_MSC_VER)
-        YieldProcessor();
-#elif defined(__i386__) || defined(__x86_64__)
-#  if defined(__clang__)
-        _mm_pause();
-#  else
-        __builtin_ia32_pause();
-#  endif
-#elif defined(__arm__)
-        // This intrinsic should fail to be found if YIELD is not supported on the current
-        // processor.
-        __yield();
-#else
-        // TODO: Issue PAGE/YIELD on other architectures.
-#endif
+        fast_yield();
       }
       // Yield then try again (goal ~100ns)
       std::this_thread::yield();

@@ -52,8 +52,9 @@ struct OtlpHttpLogExporterOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
 
-  // Concurrent sessions
-  std::size_t concurrent_sessions = 8;
+  // Concurrent requests
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
+  std::size_t max_concurrent_requests = 8;
 };
 
 /**

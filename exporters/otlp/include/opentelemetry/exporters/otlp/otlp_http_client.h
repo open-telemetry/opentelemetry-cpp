@@ -78,8 +78,8 @@ struct OtlpHttpClientOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 
-  // Concurrent sessions
-  std::size_t concurrent_sessions = 8;
+  // Concurrent requests
+  std::size_t max_concurrent_requests = 8;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
@@ -96,7 +96,7 @@ struct OtlpHttpClientOptions
         console_debug(input_console_debug),
         timeout(input_timeout),
         http_headers(input_http_headers),
-        concurrent_sessions(input_concurrent_sessions)
+        max_concurrent_requests(input_concurrent_sessions)
   {}
 };
 

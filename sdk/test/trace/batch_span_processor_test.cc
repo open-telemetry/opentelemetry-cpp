@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
+#include <list>
+#include <memory>
 #include <thread>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -62,17 +64,28 @@ public:
   {
     // We should keep the order of test records
     auto result = Export(records);
-    auto th     = std::thread(
-            [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+    async_threads_.emplace_back(std::make_shared<std::thread>(
+        [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
           result_callback(result);
-            },
-            std::move(result_callback));
-    th.detach();
+        },
+        std::move(result_callback)));
   }
 
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    while (!async_threads_.empty())
+    {
+      std::list<std::shared_ptr<std::thread>> async_threads;
+      async_threads.swap(async_threads_);
+      for (auto &async_thread : async_threads)
+      {
+        if (async_thread && async_thread->joinable())
+        {
+          async_thread->join();
+        }
+      }
+    }
     *is_shutdown_ = true;
     return true;
   }
@@ -85,6 +98,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
   const std::chrono::milliseconds export_delay_;
+  std::list<std::shared_ptr<std::thread>> async_threads_;
 };
 
 /**
