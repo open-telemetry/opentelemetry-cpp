@@ -67,6 +67,6 @@ jobs:
           # Show alert with commit comment on detecting possible performance regression
           alert-threshold: '200%'
           comment-on-alert: true
-          fail-on-alert: true
+          fail-on-alert: false
           gh-pages-branch: gh-pages
           benchmark-data-dir-path: benchmarks
