@@ -81,6 +81,22 @@ cc_test(
 )
 
 cc_test(
+    name = "sync_instruments_test",
+    srcs = [
+        "sync_instruments_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "async_metric_storage_test",
     srcs = [
         "async_metric_storage_test.cc",
