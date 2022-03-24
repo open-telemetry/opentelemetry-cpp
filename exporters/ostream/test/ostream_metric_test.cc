@@ -35,11 +35,11 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
   record->instrumentation_library_ = instrumentation_library.get();
   record->point_data_              = metric_sdk::SumPointData{
       opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{}, 10.0,
-      metric_sdk::AggregationTemporarily::kUnspecified, false};
+      metric_sdk::AggregationTemporality::kUnspecified, false};
   auto record2 = std::unique_ptr<metric_sdk::MetricData>(new metric_sdk::MetricData(*record));
   record2->point_data_ = metric_sdk::SumPointData{
       opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{}, 20l,
-      metric_sdk::AggregationTemporarily::kUnspecified, false};
+      metric_sdk::AggregationTemporality::kUnspecified, false};
   std::vector<std::unique_ptr<metric_sdk::MetricData>> records;
   records.push_back(std::move(record));
   records.push_back(std::move(record2));

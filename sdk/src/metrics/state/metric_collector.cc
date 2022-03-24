@@ -24,9 +24,9 @@ MetricCollector::MetricCollector(
   metric_reader_->SetMetricProducer(this);
 }
 
-AggregationTemporarily MetricCollector::GetAggregationTemporarily() noexcept
+AggregationTemporality MetricCollector::GetAggregationTemporality() noexcept
 {
-  return metric_reader_->GetAggregationTemporarily();
+  return metric_reader_->GetAggregationTemporality();
 }
 
 bool MetricCollector::Collect(nostd::function_ref<bool(MetricData)> callback) noexcept
