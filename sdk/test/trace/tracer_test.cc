@@ -383,7 +383,7 @@ TEST(Tracer, SpanSetAttribute)
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
 }
 
-TEST(Tracer, SpanSetAttributeAfterEnd)
+TEST(Tracer, TestAfterEnd)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
@@ -393,7 +393,17 @@ TEST(Tracer, SpanSetAttributeAfterEnd)
 
   span->End();
 
-  span->SetAttribute("testing null recordable", 3.1);
+  // test after end
+  EXPECT_NO_THROW(span->SetAttribute("testing null recordable", 3.1));
+  EXPECT_NO_THROW(span->AddEvent("event 1"));
+  EXPECT_NO_THROW(span->AddEvent("event 2", std::chrono::system_clock::now()));
+  EXPECT_NO_THROW(span->AddEvent("event 3", std::chrono::system_clock::now(), {{"attr1", 1}}));
+  std::string new_name{"new name"};
+  EXPECT_NO_THROW(span->UpdateName(new_name));
+  EXPECT_NO_THROW(span->SetAttribute("attr1", 3.1));
+  std::string description{"description"};
+  EXPECT_NO_THROW(span->SetStatus(opentelemetry::trace::StatusCode::kError, description));
+  EXPECT_NO_THROW(span->End());
 
   auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
