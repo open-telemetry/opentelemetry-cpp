@@ -43,15 +43,15 @@ class MockMetricProducer : public MetricProducer
 {
 public:
   MockMetricProducer(std::chrono::microseconds sleep_ms = std::chrono::microseconds::zero())
-      : sleep_ms_{sleep_ms}
+      : sleep_ms_{sleep_ms}, data_sent_size_(0)
   {}
 
   bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
+    data_sent_size_++;
     MetricData data;
     callback(data);
-    data_sent_size_++;
     return true;
   }
 
@@ -66,11 +66,13 @@ TEST(PeriodicExporingMetricReader, BasicTests)
 {
   std::unique_ptr<MetricExporter> exporter(new MockPushMetricExporter());
   PeriodicExportingMetricReaderOptions options;
-  auto exporter_ptr = exporter.get();
+  options.export_timeout_millis = std::chrono::milliseconds(2000);
+  options.schedule_delay_millis = std::chrono::milliseconds(500);
+  auto exporter_ptr             = exporter.get();
   PeriodicExportingMetricReader reader(std::move(exporter), options);
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
   reader.Shutdown();
   EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());

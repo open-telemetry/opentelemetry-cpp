@@ -37,12 +37,10 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
   do
   {
     cv_.wait_for(lk, timeout);
-
     if (IsShutdown())
     {
       break;
     }
-
     std::atomic<bool> cancel_export_for_timeout{false};
     auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
       Collect([this, &cancel_export_for_timeout](MetricData data) {
@@ -64,11 +62,28 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       if (status == std::future_status::timeout)
       {
         cancel_export_for_timeout = true;
+        break;
       }
     } while (status != std::future_status::ready);
 
   } while (true);
 }
+
+bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return exporter_->ForceFlush(timeout);
+}
+
+bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept
+{
+  if (worker_thread_.joinable())
+  {
+    cv_.notify_one();
+    worker_thread_.join();
+  }
+  return exporter_->Shutdown(timeout);
+}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
