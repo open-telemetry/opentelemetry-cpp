@@ -53,7 +53,7 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
 
-inline const bool GetOtlpDefaultIsSslEnable()
+inline bool GetOtlpDefaultIsSslEnable()
 {
   constexpr char kOtlpTracesIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
   constexpr char kOtlpIsSslEnableEnv[]       = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
