@@ -26,8 +26,7 @@ class MetricProducer;
 class MetricReader
 {
 public:
-  MetricReader(
-      AggregationTemporality aggregation_temporality = AggregationTemporality::kCummulative);
+  MetricReader(AggregationTemporality aggr_temp = AggregationTemporality::kCummulative);
 
   void SetMetricProducer(MetricProducer *metric_producer);
 
@@ -58,6 +57,7 @@ private:
 
   virtual void OnInitialized() noexcept {}
 
+protected:
   bool IsShutdown() const noexcept;
 
 private:
