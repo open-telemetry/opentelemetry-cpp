@@ -20,17 +20,21 @@ namespace metrics
 
 class MetricExporter;
 /**
- * Struct to hold batch PeriodicExortingMetricReader options.
+ * Struct to hold PeriodicExortingMetricReader options.
  */
 
+constexpr std::chrono::milliseconds kExportIntervalMillis = std::chrono::milliseconds(60000);
+;
+constexpr std::chrono::milliseconds kExportTimeOutMillis = std::chrono::milliseconds(30000);
 struct PeriodicExportingMetricReaderOptions
 {
 
   /* The time interval between two consecutive exports. */
-  std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(60000);
+  std::chrono::milliseconds export_interval_millis =
+      std::chrono::milliseconds(kExportIntervalMillis);
 
   /*  how long the export can run before it is cancelled. */
-  std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(30000);
+  std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(kExportTimeOutMillis);
 };
 
 class PeriodicExportingMetricReader : public MetricReader
@@ -50,7 +54,7 @@ private:
   void OnInitialized() noexcept override;
 
   std::unique_ptr<MetricExporter> exporter_;
-  std::chrono::milliseconds schedule_delay_millis_;
+  std::chrono::milliseconds export_interval_millis_;
   std::chrono::milliseconds export_timeout_millis_;
 
   void DoBackgroundWork();

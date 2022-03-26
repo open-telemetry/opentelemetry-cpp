@@ -66,9 +66,9 @@ TEST(PeriodicExporingMetricReader, BasicTests)
 {
   std::unique_ptr<MetricExporter> exporter(new MockPushMetricExporter());
   PeriodicExportingMetricReaderOptions options;
-  options.export_timeout_millis = std::chrono::milliseconds(2000);
-  options.schedule_delay_millis = std::chrono::milliseconds(500);
-  auto exporter_ptr             = exporter.get();
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(500);
+  auto exporter_ptr              = exporter.get();
   PeriodicExportingMetricReader reader(std::move(exporter), options);
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);

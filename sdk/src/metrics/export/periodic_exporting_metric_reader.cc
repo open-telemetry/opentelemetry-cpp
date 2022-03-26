@@ -21,9 +21,18 @@ PeriodicExportingMetricReader::PeriodicExportingMetricReader(
     AggregationTemporality aggregation_temporality)
     : MetricReader(aggregation_temporality),
       exporter_{std::move(exporter)},
-      schedule_delay_millis_{option.schedule_delay_millis},
+      export_interval_millis_{option.export_interval_millis},
       export_timeout_millis_{option.export_timeout_millis}
-{}
+{
+  if (export_interval_millis_ <= export_timeout_millis_)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Periodic Exporting Metric Reader] Invalid configuration: "
+        "export_interval_millis_ should be less than export_timeout_millis_, using default values");
+    export_interval_millis_ = kExportIntervalMillis;
+    export_timeout_millis_  = kExportTimeOutMillis;
+  }
+}
 
 void PeriodicExportingMetricReader::OnInitialized() noexcept
 {
@@ -32,16 +41,15 @@ void PeriodicExportingMetricReader::OnInitialized() noexcept
 
 void PeriodicExportingMetricReader::DoBackgroundWork()
 {
-  auto timeout = schedule_delay_millis_;
   std::unique_lock<std::mutex> lk(cv_m_);
   do
   {
-    cv_.wait_for(lk, timeout);
     if (IsShutdown())
     {
       break;
     }
     std::atomic<bool> cancel_export_for_timeout{false};
+    auto start          = std::chrono::steady_clock::now();
     auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
       Collect([this, &cancel_export_for_timeout](MetricData data) {
         if (cancel_export_for_timeout)
@@ -65,7 +73,10 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
         break;
       }
     } while (status != std::future_status::ready);
-
+    auto end            = std::chrono::steady_clock::now();
+    auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
+    cv_.wait_for(lk, remaining_wait_interval_ms);
   } while (true);
 }
 
