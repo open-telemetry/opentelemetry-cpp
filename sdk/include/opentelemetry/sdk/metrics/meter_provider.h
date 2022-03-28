@@ -6,9 +6,9 @@
 #  include <memory>
 #  include <mutex>
 #  include <vector>
+#  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/metrics/meter_provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/measurement_processor.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/resource/resource.h"
@@ -19,19 +19,23 @@ namespace sdk
 {
 namespace metrics
 {
+
+// forward declaration
+class MetricCollector;
+class MetricExporter;
+class MetricReader;
+
 class MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**
    * Initialize a new meter provider
    * @param exporters The span exporters for this meter provider
-   * @param readers The readers for this meter provider.
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
    */
   MeterProvider(
       std::vector<std::unique_ptr<MetricExporter>> &&exporters,
-      std::vector<std::unique_ptr<MetricReader>> &&readers,
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       sdk::resource::Resource resource    = sdk::resource::Resource::Create({})) noexcept;
 
@@ -51,12 +55,6 @@ public:
    * @return The resource for this meter provider.
    */
   const sdk::resource::Resource &GetResource() const noexcept;
-
-  /**
-   * Obtain the reference of measurement processor.
-   *
-   */
-  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter provider.
@@ -101,8 +99,6 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
-  // // order of declaration is important here - meter should destroy only after resource.
-  std::vector<std::shared_ptr<sdk::metrics::Meter>> meters_;
   std::shared_ptr<sdk::metrics::MeterContext> context_;
   std::mutex lock_;
 };

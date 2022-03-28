@@ -84,6 +84,9 @@ TEST(TracerProvider, Shutdown)
   TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors)));
 
   EXPECT_TRUE(tp1.Shutdown());
+
+  // It's safe to shutdown again
+  EXPECT_TRUE(tp1.Shutdown());
 }
 
 TEST(TracerProvider, ForceFlush)

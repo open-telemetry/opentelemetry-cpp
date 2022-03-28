@@ -2,7 +2,10 @@
 
 ## gRPC
 
-This is a simple example that demonstrates tracing a gRPC request from client to server. There is an experimental directory in this example - the code within has been commented out to prevent any conflicts. The example shows several aspects of tracing such as:
+This is a simple example that demonstrates tracing a gRPC request from client to
+server. There is an experimental directory in this example - the code within has
+been commented out to prevent any conflicts. The example shows several aspects
+of tracing such as:
 
 * Using the `TracerProvider`
 * Implementing the TextMapCarrier
@@ -15,16 +18,20 @@ This is a simple example that demonstrates tracing a gRPC request from client to
 
 ### Running the example
 
-1. The example uses gRPC C++ as well as Google's protocol buffers. Make sure you have installed both
-   of these packages on your system, in such a way that CMake would know how to find them with this command:
+1. The example uses gRPC C++ as well as Google's protocol buffers. Make sure you
+   have installed both of these packages on your system, in such a way that
+   CMake would know how to find them with this command:
 
     ``find_package(gRPC)``
 
-2. Build and Deploy the opentelementry-cpp as described in [INSTALL.md](../../INSTALL.md). Building the project will build all of the examples
-   and create new folders containing their executables within the 'build' directory NOT the 'examples' directory.
+2. Build and Deploy the opentelementry-cpp as described in
+   [INSTALL.md](../../INSTALL.md). Building the project will build all of the
+   examples and create new folders containing their executables within the
+   'build' directory NOT the 'examples' directory.
 
-3. Start the server from your `build/examples/grpc` directory. Both the server and client are configured to use 8800 as the default port,
-   but if you would like to use another port, you can specify that as an argument.
+3. Start the server from your `build/examples/grpc` directory. Both the server
+   and client are configured to use 8800 as the default port, but if you would
+   like to use another port, you can specify that as an argument.
 
    ```console
    $ ./server [port_num]
@@ -38,7 +45,8 @@ This is a simple example that demonstrates tracing a gRPC request from client to
     ...
     ```
 
-5. You should see console exporter output for both the client and server sessions.
+5. You should see console exporter output for both the client and server
+   sessions.
    * Client console
 
    ```console

@@ -25,7 +25,7 @@ static inline void PopulateSumPointData(SumPointData &sum,
   sum.end_epoch_nanos_         = end_ts;
   sum.value_                   = value;
   sum.is_monotonic_            = is_monotonic;
-  sum.aggregation_temporarily_ = AggregationTemporarily::kDelta;
+  sum.aggregation_temporality_ = AggregationTemporality::kDelta;
 }
 
 class LongSumAggregation : public Aggregation, InstrumentMonotonicityAwareAggregation

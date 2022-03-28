@@ -62,6 +62,8 @@ else()
     set(ARCH mips)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
     set(ARCH riscv)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(s390x.*|S390X.*)")
+    set(ARCH s390x)
   else()
     message(
       FATAL_ERROR
@@ -390,6 +392,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
+  add_definitions(-DENABLE_TEST)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
@@ -426,6 +429,7 @@ include_directories(api/include)
 add_subdirectory(api)
 
 if(NOT WITH_API_ONLY)
+  set(BUILD_TESTING ${BUILD_TESTING})
   include_directories(sdk/include)
   include_directories(sdk)
   include_directories(ext/include)

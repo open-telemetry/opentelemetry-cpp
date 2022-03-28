@@ -136,7 +136,8 @@ instructions that detail how to [run build build tools in a docker container](ht
 build tooling. This script installs all build tools and builds all 3rd party
 dependencies from source using [vcpkg package manager](https://vcpkg.io/en/index.html).
 - Launch Visual Studio 2019 IDE.
-- Use `Open a local folder` option to open the folder where you cloned the source code.
+- Use `Open a local folder` option to open the folder where you cloned the
+  source code.
 - Right-click on `CMakeLists.txt` and choose `Generate Cache for opentelemetry-cpp`.
 - In the top bar menu - select `Build -> Build All` to build SDK, Exporters and Tests.
 - You can use [Google Test Adapter](https://marketplace.visualstudio.com/items?itemName=ChristianSoltenborn.GoogleTestAdapter)

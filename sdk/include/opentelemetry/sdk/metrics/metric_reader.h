@@ -3,11 +3,15 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+
 #  include "opentelemetry/version.h"
+
+#  include <chrono>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -15,6 +19,7 @@ namespace sdk
 namespace metrics
 {
 
+class MetricProducer;
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
@@ -22,56 +27,44 @@ class MetricReader
 {
 public:
   MetricReader(
-      AggregationTemporarily aggregation_temporarily = AggregationTemporarily::kCummulative)
-      : aggregation_temporarily_(aggregation_temporarily), measurement_processor_callback_({})
-  {}
+      AggregationTemporality aggregation_temporality = AggregationTemporality::kCummulative);
 
-  virtual ~MetricReader() = default;
+  void SetMetricProducer(MetricProducer *metric_producer);
 
   /**
    * Collect the metrics from SDK.
    * @return return the status of the operation.
    */
-  bool Collect() noexcept
-  {
-    if (!measurement_processor_callback_)
-    {
-      OTEL_INTERNAL_LOG_WARN(
-          "Cannot invoke Collect() for MetricReader. No collection callback registered!")
-    }
-    return measurement_processor_callback_(
-        *this, aggregation_temporarily_,
-        [&](MetricData metric_data) noexcept { return ProcessReceivedMetrics(metric_data); });
-  }
+  bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept;
+
+  AggregationTemporality GetAggregationTemporality() const noexcept;
 
   /**
-   * Register the callback to Measurement Processor
-   * This function is internal to SDK.
+   * Shutdown the meter reader.
    */
-  void RegisterCollectorCallback(
-      std::function<bool(MetricReader &,
-                         AggregationTemporarily,
-                         nostd::function_ref<bool(MetricData)>)> measurement_processor_callback)
-  {
-    measurement_processor_callback_ = measurement_processor_callback;
-  }
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
   /**
-   * Process the metrics received through Measurement Processor.
+   * Force flush the metric read by the reader.
    */
-  virtual bool ProcessReceivedMetrics(MetricData &metric_data) noexcept = 0;
+  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
-  /**
-   * Shut down the metric reader.
-   * @param timeout an optional timeout.
-   * @return return the status of the operation.
-   */
-  virtual bool Shutdown() noexcept = 0;
+  virtual ~MetricReader() = default;
 
 private:
-  std::function<bool(MetricReader &, AggregationTemporarily, nostd::function_ref<bool(MetricData)>)>
-      measurement_processor_callback_;
-  AggregationTemporarily aggregation_temporarily_;
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept = 0;
+
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept = 0;
+
+  virtual void OnInitialized() noexcept {}
+
+  bool IsShutdown() const noexcept;
+
+private:
+  MetricProducer *metric_producer_;
+  AggregationTemporality aggregation_temporality_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool shutdown_;
 };
 }  // namespace metrics
 }  // namespace sdk

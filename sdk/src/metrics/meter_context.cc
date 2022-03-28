@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
 
@@ -14,13 +16,12 @@ namespace metrics
 {
 
 MeterContext::MeterContext(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
-                           std::vector<std::unique_ptr<MetricReader>> &&readers,
                            std::unique_ptr<ViewRegistry> views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
-    : exporters_(std::move(exporters)),
-      readers_(std::move(readers)),
+    : resource_{resource},
+      exporters_(std::move(exporters)),
       views_(std::move(views)),
-      resource_{resource}
+      sdk_start_ts_{std::chrono::system_clock::now()}
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept
@@ -28,9 +29,24 @@ const resource::Resource &MeterContext::GetResource() const noexcept
   return resource_;
 }
 
-MeasurementProcessor *MeterContext::GetMeasurementProcessor() const noexcept
+ViewRegistry *MeterContext::GetViewRegistry() const noexcept
 {
-  return measurement_processor_.get();
+  return views_.get();
+}
+
+nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
+{
+  return nostd::span<std::shared_ptr<Meter>>{meters_};
+}
+
+nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept
+{
+  return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_);
+}
+
+opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
+{
+  return sdk_start_ts_;
 }
 
 void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
@@ -40,7 +56,9 @@ void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) n
 
 void MeterContext::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept
 {
-  readers_.push_back(std::move(reader));
+  auto collector =
+      std::shared_ptr<MetricCollector>{new MetricCollector(shared_from_this(), std::move(reader))};
+  collectors_.push_back(collector);
 }
 
 void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
@@ -50,34 +68,47 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
   views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
+void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
+{
+  meters_.push_back(meter);
+}
+
 bool MeterContext::Shutdown() noexcept
 {
-  bool result_exporter = true;
-  bool result_reader   = true;
-  for (auto &exporter : exporters_)
+  bool return_status = true;
+  if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
   {
-    bool status     = exporter->Shutdown();
-    result_exporter = result_exporter && status;
+    bool result_exporter  = true;
+    bool result_reader    = true;
+    bool result_collector = true;
+
+    for (auto &exporter : exporters_)
+    {
+      bool status     = exporter->Shutdown();
+      result_exporter = result_exporter && status;
+    }
+    if (!result_exporter)
+    {
+      OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric exporters");
+    }
+    for (auto &collector : collectors_)
+    {
+      bool status      = std::static_pointer_cast<MetricCollector>(collector)->Shutdown();
+      result_collector = result_reader && status;
+    }
+    if (!result_collector)
+    {
+      OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
+    }
+    return_status = result_exporter && result_collector;
   }
-  if (!result_exporter)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric exporters");
-  }
-  for (auto &reader : readers_)
-  {
-    bool status   = reader->Shutdown();
-    result_reader = result_reader && status;
-  }
-  if (!result_reader)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
-  }
-  return result_exporter && result_reader;
+  return return_status;
 }
 
 bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   // TODO - Implement timeout logic.
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
   bool result_exporter = true;
   for (auto &exporter : exporters_)
   {

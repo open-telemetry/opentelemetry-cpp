@@ -12,14 +12,14 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 
-#include "nlohmann/json.hpp"
-
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include <mutex>
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/stringpiece.h"
+#include "nlohmann/json.hpp"
 
 #if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
 #  include "google/protobuf/stubs/strutil.h"
@@ -362,7 +362,7 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   }
 }
 
-static bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
+bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
 {
   auto body_size = message.ByteSizeLong();
   if (body_size > 0)
@@ -564,6 +564,11 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : options_(options), http_client_(http_client::HttpClientFactory::Create())
+{}
+
+OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
+                               std::shared_ptr<ext::http::client::HttpClient> http_client)
+    : options_(options), http_client_(http_client)
 {}
 
 // ----------------------------- HTTP Client methods ------------------------------

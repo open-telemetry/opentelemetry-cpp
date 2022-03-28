@@ -91,14 +91,19 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
-  // For testing
-  friend class OtlpHttpExporterTestPeer;
-
   // The configuration options associated with this exporter.
   const OtlpHttpExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
-  OtlpHttpClient http_client_;
+  std::unique_ptr<OtlpHttpClient> http_client_;
+  // For testing
+  friend class OtlpHttpExporterTestPeer;
+  /**
+   * Create an OtlpHttpExporter using the specified http client.
+   * Only tests can call this constructor directly.
+   * @param http_client the http client to be used for exporting
+   */
+  OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client);
 };
 }  // namespace otlp
 }  // namespace exporter

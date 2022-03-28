@@ -3,27 +3,35 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
+
+#  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #  include "opentelemetry/sdk/metrics/view/view_registry.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
+#  include <chrono>
+#  include <memory>
+#  include <vector>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+
+// forward declaration
+class Meter;
+class MetricExporter;
+class MetricReader;
+
 /**
  * A class which stores the MeterProvider context.
 
  */
-class MeterContext
+class MeterContext : public std::enable_shared_from_this<MeterContext>
 {
 public:
   /**
@@ -35,7 +43,6 @@ public:
    */
   MeterContext(
       std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
-      std::vector<std::unique_ptr<MetricReader>> &&readers,
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       opentelemetry::sdk::resource::Resource resource =
           opentelemetry::sdk::resource::Resource::Create({})) noexcept;
@@ -47,10 +54,28 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
-   * Obtain the reference of measurement_processor.
+   * Obtain the View Registry configured
+   * @return The reference to view registry
+   */
+  ViewRegistry *GetViewRegistry() const noexcept;
+
+  /**
+   * Obtain the  configured meters.
    *
    */
-  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
+  nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
+
+  /**
+   * Obtain the configured collectors.
+   *
+   */
+  nostd::span<std::shared_ptr<CollectorHandle>> GetCollectors() noexcept;
+
+  /**
+   * GET SDK Start time
+   *
+   */
+  opentelemetry::common::SystemTimestamp GetSDKStartTime() noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.
@@ -85,23 +110,36 @@ public:
                std::unique_ptr<View> view) noexcept;
 
   /**
-   * Force all active Exporters and Readers to flush any buffered meter data
+   * Adds a meter to the list of configured meters.
+   *
+   * Note: This method is INTERNAL to sdk not thread safe.
+   *
+   * @param meter
+   */
+  void AddMeter(std::shared_ptr<Meter> meter);
+
+  /**
+   * Force all active Exporters and Collectors to flush any buffered meter data
    * within the given timeout.
    */
 
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
-   * Shutdown the Exporters and Readers associated with this meter provider.
+   * Shutdown the Exporters and Collectors associated with this meter provider.
    */
   bool Shutdown() noexcept;
 
 private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::unique_ptr<MetricExporter>> exporters_;
-  std::vector<std::unique_ptr<MetricReader>> readers_;
+  std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
-  std::unique_ptr<MeasurementProcessor> measurement_processor_;
+  opentelemetry::common::SystemTimestamp sdk_start_ts_;
+  std::vector<std::shared_ptr<Meter>> meters_;
+
+  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+  opentelemetry::common::SpinLockMutex forceflush_lock_;
 };
 
 }  // namespace metrics

@@ -43,6 +43,17 @@ LoggerProvider::LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context
     : context_{context}
 {}
 
+LoggerProvider::~LoggerProvider()
+{
+  // Logger hold the shared pointer to the context. So we can not use destructor of LoggerContext to
+  // Shutdown and flush all pending recordables when we hasve more than one loggers.These
+  // recordables may use the raw pointer of instrumentation_library_ in Logger
+  if (context_)
+  {
+    context_->Shutdown();
+  }
+}
+
 nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view logger_name,
     nostd::string_view options,
@@ -103,6 +114,16 @@ void LoggerProvider::AddProcessor(std::unique_ptr<LogProcessor> processor) noexc
 const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() const noexcept
 {
   return context_->GetResource();
+}
+
+bool LoggerProvider::Shutdown() noexcept
+{
+  return context_->Shutdown();
+}
+
+bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return context_->ForceFlush(timeout);
 }
 
 }  // namespace logs

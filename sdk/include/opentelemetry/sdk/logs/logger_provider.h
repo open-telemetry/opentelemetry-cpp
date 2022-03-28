@@ -61,6 +61,8 @@ public:
    */
   explicit LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept;
 
+  ~LoggerProvider();
+
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
@@ -107,14 +109,20 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
+  /**
+   * Shutdown the log processor associated with this log provider.
+   */
+  bool Shutdown() noexcept;
+
+  /**
+   * Force flush the log processor associated with this log provider.
+   */
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
 private:
-  // A pointer to the processor stored by this logger provider
-  std::shared_ptr<sdk::logs::LoggerContext> context_;
-
-  // A vector of pointers to all the loggers that have been created
+  // order of declaration is important here - loggers should destroy only after context.
   std::vector<std::shared_ptr<opentelemetry::sdk::logs::Logger>> loggers_;
-
-  // A mutex that ensures only one thread is using the map of loggers
+  std::shared_ptr<sdk::logs::LoggerContext> context_;
   std::mutex lock_;
 };
 }  // namespace logs

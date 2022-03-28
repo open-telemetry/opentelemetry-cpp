@@ -383,6 +383,34 @@ TEST(Tracer, SpanSetAttribute)
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
 }
 
+TEST(Tracer, TestAfterEnd)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto span                                   = tracer->StartSpan("span 1");
+  span->SetAttribute("abc", 3.1);
+
+  span->End();
+
+  // test after end
+  span->SetAttribute("testing null recordable", 3.1);
+  span->AddEvent("event 1");
+  span->AddEvent("event 2", std::chrono::system_clock::now());
+  span->AddEvent("event 3", std::chrono::system_clock::now(), {{"attr1", 1}});
+  std::string new_name{"new name"};
+  span->UpdateName(new_name);
+  span->SetAttribute("attr1", 3.1);
+  std::string description{"description"};
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, description);
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
+}
+
 TEST(Tracer, SpanSetEvents)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());

@@ -16,8 +16,16 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | Metrics | Development  [1]       | N/A                                                                      |
 | Logs    | Experimental [2]       | N/A                                                                      |
 
-* [1]: The development of the metrics API and SDK based on new stable specification is ongoing. The timelines would be available in release milestone. The earlier implementation (based on old specification) can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro, and is included under `*/_metrics/*` directory. This would be eventually removed once the ongoing implemetation is stable.
-* [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `ENABLE_LOGS_PREVIEW` preprocessor macro.
+* [1]: The development of the metrics API and SDK based on new stable
+      specification is ongoing. The timelines would be available in release
+      milestone. The earlier implementation (based on old specification) can be
+      included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro,
+      and is included under `*/_metrics/*` directory. This would be eventually
+      removed once the ongoing implemetation is stable.
+* [2]: The current Log Signal Implementation is Experimental, and will change as
+      the current OpenTelemetry Log specification matures. The current
+      implementation can be included in build by setting `ENABLE_LOGS_PREVIEW`
+      preprocessor macro.
 
 ## OpenTelemetry Specification Compatibility Matrix
 
@@ -26,7 +34,8 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | 1.0.0       | 1.0.0-rc4    | N/A [1]                 |
 | 1.0.0       | 1.0.0        | N/A                     |
 
-* [1]: We don't have releases for opentelemetry-cpp contrib repo. This may change in future.
+* [1]: We don't have releases for opentelemetry-cpp contrib repo. This may
+      change in future.
 
 ## Supported C++ Versions
 
@@ -66,7 +75,8 @@ having C++ compiler with [supported C++ standards](#supported-c-versions).
 
 ## Dependencies
 
-Please refer to [Dependencies.md](docs/dependencies.md) for OSS Dependencies and license requirements.
+Please refer to [Dependencies.md](docs/dependencies.md) for OSS Dependencies and
+license requirements.
 
 ## Installation
 
@@ -74,7 +84,9 @@ Please refer to [INSTALL.md](./INSTALL.md).
 
 ## Getting Started
 
-As an application owner or the library author, you can find the getting started guide and reference documentation on [opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
+As an application owner or the library author, you can find the getting started
+guide and reference documentation on
+[opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
 
 The `examples/simple` directory contains a minimal program demonstrating how to
 instrument a small library using a simple `processor` and console `exporter`,
@@ -98,15 +110,16 @@ For edit access, get in touch on
 [Maintainers](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer)
 ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-telemetry/teams/cpp-maintainers)):
 
+* [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
-* [Reiley Yang](https://github.com/reyang), Microsoft
 * [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 [Approvers](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-* [Ehsan Saei](https://github.com/esigo)
 * [Josh Suereth](https://github.com/jsuereth), Google
+* [Reiley Yang](https://github.com/reyang), Microsoft
+* [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
 Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager):

@@ -19,20 +19,20 @@ buy may not work in applications using `opentelemetry 2.0.0`.
 
 Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
 
-* The API is header only, and uses ABI compliant interfaces. However, ABI stability
-  is not guaranteed for SDK.
-* In case of ABI breaking changes, a new `inline namespace` version will
-  be introduced, and the existing linked applications can continue using the older version
-  unless they relink with newer version.
+* The API is header only, and uses ABI compliant interfaces. However, ABI
+  stability is not guaranteed for SDK.
+* In case of ABI breaking changes, a new `inline namespace` version will be
+  introduced, and the existing linked applications can continue using the older
+  version unless they relink with newer version.
 
 ## Release Policy
 
 * Release versions will follow [SemVer 2.0](https://semver.org/).
 * Only a single source package containing the API, SDK, and exporters which are
   required by the specification would be released. All these components are
-  always versioned and released together. For example, any changes in one of the exporter
-  would result in version update of the entire source package even though there is
-  no changes in API, SDK and other exporters.
+  always versioned and released together. For example, any changes in one of the
+  exporter would result in version update of the entire source package even
+  though there is no changes in API, SDK and other exporters.
 * Experimental releases: New (unstable) telemetry signals and features will be
   introduced behind feature flag protected by a preprocessor macro.
 
@@ -65,16 +65,19 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   allowed to break existing stable interfaces. Feature flags will be removed
   once we have a stable implementation for the signal.
 
-* As an exception, small experimental features in otherwise stable signals/components
-  mayn't necessarily be released under feature flag. These would be flagged as experimental
-  by adding a `NOTE` in it's header file - either at the beginning of file, or as the comment for
-  the experimental API methods. Also, if the complete header is experimental, it would be prefixed
-  as `experimental_`. As an example, the semantic conventions for
-  trace signal is experimental at the time of the writing and is within `experimental_semantic_conventions.h`
+* As an exception, small experimental features in otherwise stable
+  signals/components mayn't necessarily be released under feature flag. These
+  would be flagged as experimental by adding a `NOTE` in it's header file -
+  either at the beginning of file, or as the comment for the experimental API
+  methods. Also, if the complete header is experimental, it would be prefixed as
+  `experimental_`. As an example, the semantic conventions for trace signal is
+  experimental at the time of the writing and is within
+  `experimental_semantic_conventions.h`
 
-* Code under the "*::detail" namespace implements internal details,
-  and is NOT part of public interface. Also, any API not documented in the [public
-  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of the public interface.
+* Code under the "*::detail" namespace implements internal details, and is NOT
+  part of public interface. Also, any API not documented in the [public
+  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT
+  part of the public interface.
 
 * GitHub releases will be made for all released versions.
 

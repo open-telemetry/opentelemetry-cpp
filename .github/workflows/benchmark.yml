@@ -13,11 +13,11 @@ jobs:
     name: Run OpenTelemetry-cpp benchmarks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
       - name: Mount Bazel Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: bazel_cache
         with:
@@ -47,7 +47,7 @@ jobs:
     name: Store benchmark result
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/download-artifact@master
         with:
           name: benchmark_results
@@ -67,6 +67,6 @@ jobs:
           # Show alert with commit comment on detecting possible performance regression
           alert-threshold: '200%'
           comment-on-alert: true
-          fail-on-alert: true
+          fail-on-alert: false
           gh-pages-branch: gh-pages
           benchmark-data-dir-path: benchmarks
