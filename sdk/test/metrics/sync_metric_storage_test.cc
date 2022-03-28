@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
@@ -42,7 +43,8 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
   opentelemetry::sdk::metrics::SyncMetricStorage storage(instr_desc, AggregationType::kSum,
-                                                         new DefaultAttributesProcessor());
+                                                         new DefaultAttributesProcessor(),
+                                                          NoExemplarReservoir::GetNoExemplarReservoir());
 
   storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get));
   expected_total_get_requests += 10;
