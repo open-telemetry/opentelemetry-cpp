@@ -58,6 +58,7 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
+#ifdef ENABLE_ASYNC_EXPORT
   void Export(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &records,
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
@@ -70,6 +71,7 @@ public:
         },
         std::move(result_callback)));
   }
+#endif
 
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
@@ -159,6 +161,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
   EXPECT_TRUE(is_shutdown->load());
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
@@ -246,6 +249,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestAsyncForceFlush)
               spans_received->at(num_spans + i)->GetName());
   }
 }
+#endif
 
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 {

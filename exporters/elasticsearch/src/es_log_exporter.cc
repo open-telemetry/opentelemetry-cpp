@@ -110,6 +110,7 @@ private:
   bool console_debug_ = false;
 };
 
+#  ifdef ENABLE_ASYNC_EXPORT
 /**
  * This class handles the async response message from the Elasticsearch request
  */
@@ -192,6 +193,7 @@ private:
   // Whether to print the results from the callback
   bool console_debug_ = false;
 };
+#  endif
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
@@ -281,6 +283,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 void ElasticsearchLogExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
         &records,
@@ -325,6 +328,7 @@ void ElasticsearchLogExporter::Export(
                                                         options_.console_debug_);
   session->SendRequest(handler);
 }
+#  endif
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

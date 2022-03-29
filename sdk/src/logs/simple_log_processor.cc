@@ -18,7 +18,14 @@ namespace logs
  */
 SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                        bool is_export_async)
-    : exporter_(std::move(exporter)), is_export_async_(is_export_async)
+    : exporter_(std::move(exporter))
+#  ifdef ENABLE_ASYNC_EXPORT
+      ,
+      is_export_async_(is_export_async)
+#  else
+      ,
+      is_export_async_(false)
+#  endif
 {}
 
 std::unique_ptr<Recordable> SimpleLogProcessor::MakeRecordable() noexcept
@@ -43,6 +50,7 @@ void SimpleLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcep
       /* Alert user of the failed export */
     }
   }
+#  ifdef ENABLE_ASYNC_EXPORT
   else
   {
     exporter_->Export(batch, [](sdk::common::ExportResult result) {
@@ -51,6 +59,7 @@ void SimpleLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcep
       return true;
     });
   }
+#  endif
 }
 /**
  *  The simple processor does not have any log records to flush so this method is not used

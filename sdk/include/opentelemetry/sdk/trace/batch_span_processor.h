@@ -38,11 +38,13 @@ struct BatchSpanProcessorOptions
    */
   size_t max_export_batch_size = 512;
 
+#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Determines whether the export happens asynchronously.
    * Default implementation is synchronous.
    */
   bool is_export_async = false;
+#endif
 };
 
 /**

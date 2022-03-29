@@ -38,11 +38,13 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans) noexcept override;
 
+#ifdef ENABLE_ASYNC_EXPORT
   void Export(
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
       override;
+#endif
 
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;

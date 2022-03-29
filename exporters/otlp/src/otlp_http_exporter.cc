@@ -59,6 +59,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   return http_client_->Export(service_request);
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void OtlpHttpExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -72,6 +73,7 @@ void OtlpHttpExporter::Export(
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);
   http_client_->Export(service_request, std::move(result_callback));
 }
+#endif
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

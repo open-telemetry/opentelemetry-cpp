@@ -70,6 +70,7 @@ sdk_common::ExportResult JaegerExporter::Export(
   return sdk_common::ExportResult::kSuccess;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void JaegerExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -78,6 +79,7 @@ void JaegerExporter::Export(
   auto status = Export(spans);
   result_callback(status);
 }
+#endif
 
 void JaegerExporter::InitializeEndpoint()
 {

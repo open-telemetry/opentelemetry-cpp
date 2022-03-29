@@ -22,7 +22,11 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
+#ifdef ENABLE_ASYNC_EXPORT
       is_export_async_(options.is_export_async),
+#else
+      is_export_async_(false),
+#endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
@@ -214,6 +218,7 @@ void BatchSpanProcessor::Export()
           nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
       NotifyCompletion(notify_force_flush, synchronization_data_);
     }
+#ifdef ENABLE_ASYNC_EXPORT
     else
     {
       std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
@@ -230,6 +235,7 @@ void BatchSpanProcessor::Export()
             return true;
           });
     }
+#endif
   } while (true);
 }
 

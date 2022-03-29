@@ -57,6 +57,7 @@ public:
     return ExportResult::kSuccess;
   }
 
+#  ifdef ENABLE_ASYNC_EXPORT
   void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
@@ -69,6 +70,7 @@ public:
         },
         std::move(result_callback)));
   }
+#  endif
 
   // toggles the boolean flag marking this exporter as shut down
   bool Shutdown(
@@ -162,6 +164,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   EXPECT_TRUE(is_shutdown->load());
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
 {
   // initialize a batch log processor with the test exporter
@@ -208,6 +211,7 @@ TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
   // Also check that the processor is shut down at the end
   EXPECT_TRUE(is_shutdown->load());
 }
+#  endif
 
 TEST_F(BatchLogProcessorTest, TestForceFlush)
 {
@@ -250,6 +254,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   }
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(BatchLogProcessorTest, TestAsyncForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
@@ -300,6 +305,7 @@ TEST_F(BatchLogProcessorTest, TestAsyncForceFlush)
     EXPECT_EQ("Log" + std::to_string(i % num_logs), logs_received->at(i)->GetName());
   }
 }
+#  endif
 
 TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
 {

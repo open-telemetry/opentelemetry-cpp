@@ -33,7 +33,12 @@ public:
    */
   explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
                                bool is_export_async = false) noexcept
-      : exporter_(std::move(exporter)), is_export_async_(is_export_async)
+      : exporter_(std::move(exporter)),
+#ifdef ENABLE_ASYNC_EXPORT
+        is_export_async_(is_export_async)
+#else
+        is_export_async_(false)
+#endif
   {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
@@ -57,6 +62,7 @@ public:
          * logged in this case. */
       }
     }
+#ifdef ENABLE_ASYNC_EXPORT
     else
     {
       exporter_->Export(batch, [](sdk::common::ExportResult result) {
@@ -65,6 +71,7 @@ public:
         return true;
       });
     }
+#endif
   }
 
   bool ForceFlush(

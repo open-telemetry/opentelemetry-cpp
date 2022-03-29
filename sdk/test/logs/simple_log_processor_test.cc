@@ -53,6 +53,7 @@ public:
     return ExportResult::kSuccess;
   }
 
+#  ifdef ENABLE_ASYNC_EXPORT
   // Dummy Async Export implementation
   void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
@@ -61,6 +62,7 @@ public:
     auto result = Export(records);
     result_callback(result);
   }
+#  endif
 
   // Increment the shutdown counter everytime this method is called
   bool Shutdown(std::chrono::microseconds timeout) noexcept override
@@ -146,13 +148,14 @@ public:
     return ExportResult::kSuccess;
   }
 
+#  ifdef ENABLE_ASYNC_EXPORT
   void Export(const nostd::span<std::unique_ptr<Recordable>> &records,
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
     result_callback(ExportResult::kSuccess);
   }
-
+#  endif
   bool Shutdown(std::chrono::microseconds timeout) noexcept override { return false; }
 };
 

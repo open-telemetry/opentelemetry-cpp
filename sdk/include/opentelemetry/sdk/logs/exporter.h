@@ -46,6 +46,7 @@ public:
   virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
+#  ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports asynchronously the batch of log records to their export destination
    * @param records a span of unique pointers to log records
@@ -54,6 +55,7 @@ public:
   virtual void Export(
       const nostd::span<std::unique_ptr<Recordable>> &records,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept = 0;
+#  endif
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

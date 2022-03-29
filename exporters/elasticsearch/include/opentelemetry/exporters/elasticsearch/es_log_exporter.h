@@ -89,6 +89,7 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
           &records) noexcept override;
 
+#  ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports a vector of log records to the Elasticsearch instance asynchronously.
    * @param records A list of log records to send to Elasticsearch.
@@ -99,6 +100,7 @@ public:
           &records,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
       override;
+#  endif
 
   /**
    * Shutdown this exporter.
