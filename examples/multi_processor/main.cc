@@ -34,7 +34,7 @@ void initTracer()
   auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(new InMemorySpanExporter());
 
   // fetch the exporter for dumping data later
-  memory_span_exporter = dynamic_cast<InMemorySpanExporter *>(exporter2.get());
+  memory_span_exporter = static_cast<InMemorySpanExporter *>(exporter2.get());
 
   auto processor2 = std::unique_ptr<trace_sdk::SpanProcessor>(
       new trace_sdk::SimpleSpanProcessor(std::move(exporter2)));

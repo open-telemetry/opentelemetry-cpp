@@ -110,7 +110,7 @@ public:
            common::SystemTimestamp timestamp) noexcept override
   {
 
-#  ifdef RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     // Properties *res                   = dynamic_cast<Properties *>(&resr);
