@@ -43,7 +43,7 @@ public:
 private:
   static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
-    static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
+    static nostd::shared_ptr<MeterProvider> provider{};
     return provider;
   }
 
