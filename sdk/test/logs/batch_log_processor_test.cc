@@ -9,6 +9,8 @@
 
 #  include <gtest/gtest.h>
 #  include <chrono>
+#  include <list>
+#  include <memory>
 #  include <thread>
 
 using namespace opentelemetry::sdk::logs;
@@ -59,17 +61,31 @@ public:
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
-    auto th = std::thread([this, records, result_callback]() {
-      auto result = Export(records);
-      result_callback(result);
-    });
-    th.join();
+    // We should keep the order of test records
+    auto result = Export(records);
+    async_threads_.emplace_back(std::make_shared<std::thread>(
+        [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          result_callback(result);
+        },
+        std::move(result_callback)));
   }
 
   // toggles the boolean flag marking this exporter as shut down
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    while (!async_threads_.empty())
+    {
+      std::list<std::shared_ptr<std::thread>> async_threads;
+      async_threads.swap(async_threads_);
+      for (auto &async_thread : async_threads)
+      {
+        if (async_thread && async_thread->joinable())
+        {
+          async_thread->join();
+        }
+      }
+    }
     *is_shutdown_ = true;
     return true;
   }
@@ -79,6 +95,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   const std::chrono::milliseconds export_delay_;
+  std::list<std::shared_ptr<std::thread>> async_threads_;
 };
 
 /**

@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/batch_log_processor.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
 
 #  include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
@@ -22,14 +23,34 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
-      buffer_(max_queue_size_),
       is_export_async_(is_export_async),
+      buffer_(max_queue_size_),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {
-  is_shutdown_.store(false);
-  is_force_flush_.store(false);
-  is_force_flush_notified_.store(false);
-  is_async_shutdown_notified_.store(false);
+  synchronization_data_->is_force_wakeup_background_worker.store(false);
+  synchronization_data_->is_force_flush_pending.store(false);
+  synchronization_data_->is_force_flush_notified.store(false);
+  synchronization_data_->is_shutdown.store(false);
+  synchronization_data_->is_async_shutdown_notified.store(false);
+}
+
+BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+                                     const BatchLogProcessorOptions &options)
+    : exporter_(std::move(exporter)),
+      max_queue_size_(options.max_queue_size),
+      scheduled_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
+      is_export_async_(options.is_export_async),
+      buffer_(options.max_queue_size),
+      synchronization_data_(std::make_shared<SynchronizationData>()),
+      worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
+{
+  synchronization_data_->is_force_wakeup_background_worker.store(false);
+  synchronization_data_->is_force_flush_pending.store(false);
+  synchronization_data_->is_force_flush_notified.store(false);
+  synchronization_data_->is_shutdown.store(false);
+  synchronization_data_->is_async_shutdown_notified.store(false);
 }
 
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
@@ -39,7 +60,7 @@ std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
 
 void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
 {
-  if (is_shutdown_.load() == true)
+  if (synchronization_data_->is_shutdown.load() == true)
   {
     return;
   }
@@ -55,48 +76,78 @@ void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
   if (buffer_size >= max_queue_size_ / 2 || buffer_size >= max_export_batch_size_)
   {
     // signal the worker thread
-    cv_.notify_one();
+    synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
+    synchronization_data_->cv.notify_one();
   }
 }
 
 bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  if (is_shutdown_.load() == true)
+  if (synchronization_data_->is_shutdown.load() == true)
   {
     return false;
   }
 
   // Now wait for the worker thread to signal back from the Export method
-  std::unique_lock<std::mutex> lk(force_flush_cv_m_);
+  std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
 
-  is_force_flush_notified_.store(false, std::memory_order_release);
+  synchronization_data_->is_force_flush_pending.store(true, std::memory_order_release);
   auto break_condition = [this]() {
-    if (is_shutdown_.load() == true)
+    if (synchronization_data_->is_shutdown.load() == true)
     {
       return true;
     }
 
     // Wake up the worker thread once.
-    if (is_force_flush_.exchange(true) == false)
+    if (synchronization_data_->is_force_flush_pending.load(std::memory_order_acquire))
     {
-      cv_.notify_one();
+      synchronization_data_->cv.notify_one();
     }
 
-    return is_force_flush_notified_.load(std::memory_order_acquire);
+    return synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
   };
 
   // Fix timeout to meet requirement of wait_for
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
+  bool result;
   if (timeout <= std::chrono::microseconds::zero())
   {
-    force_flush_cv_.wait(lk, break_condition);
-    return true;
+    bool wait_result = false;
+    while (!wait_result)
+    {
+      // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
+      // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
+      // for ever
+      wait_result = synchronization_data_->force_flush_cv.wait_for(lk_cv, scheduled_delay_millis_,
+                                                                   break_condition);
+    }
+    result = true;
   }
   else
   {
-    return force_flush_cv_.wait_for(lk, timeout, break_condition);
+    result = synchronization_data_->force_flush_cv.wait_for(lk_cv, timeout, break_condition);
   }
+
+  // If it's already signaled, we must wait util notified.
+  // We use a spin lock here
+  if (false ==
+      synchronization_data_->is_force_flush_pending.exchange(false, std::memory_order_acq_rel))
+  {
+    for (int retry_waiting_times = 0;
+         false == synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
+         ++retry_waiting_times)
+    {
+      opentelemetry::common::SpinLockMutex::fast_yield();
+      if ((retry_waiting_times & 127) == 127)
+      {
+        std::this_thread::yield();
+      }
+    }
+  }
+  synchronization_data_->is_force_flush_notified.store(false, std::memory_order_release);
+
+  return result;
 }
 
 void BatchLogProcessor::DoBackgroundWork()
@@ -106,34 +157,26 @@ void BatchLogProcessor::DoBackgroundWork()
   while (true)
   {
     // Wait for `timeout` milliseconds
-    std::unique_lock<std::mutex> lk(cv_m_);
-    cv_.wait_for(lk, timeout);
+    std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
+    synchronization_data_->cv.wait_for(lk, timeout, [this] {
+      if (synchronization_data_->is_force_wakeup_background_worker.load(std::memory_order_acquire))
+      {
+        return true;
+      }
 
-    if (is_shutdown_.load() == true)
+      return !buffer_.empty();
+    });
+    synchronization_data_->is_force_wakeup_background_worker.store(false,
+                                                                   std::memory_order_release);
+
+    if (synchronization_data_->is_shutdown.load() == true)
     {
-      // Break loop if another thread call ForceFlush
-      is_force_flush_ = false;
       DrainQueue();
       return;
     }
 
-    bool was_force_flush_called = is_force_flush_.exchange(false);
-
-    // Check if this export was the result of a force flush.
-    if (!was_force_flush_called)
-    {
-      // If the buffer was empty during the entire `timeout` time interval,
-      // go back to waiting. If this was a spurious wake-up, we export only if
-      // `buffer_` is not empty. This is acceptable because batching is a best
-      // mechanism effort here.
-      if (buffer_.empty() == true)
-      {
-        continue;
-      }
-    }
-
     auto start = std::chrono::steady_clock::now();
-    Export(was_force_flush_called);
+    Export();
     auto end      = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
@@ -142,14 +185,17 @@ void BatchLogProcessor::DoBackgroundWork()
   }
 }
 
-void BatchLogProcessor::Export(const bool was_force_flush_called)
+void BatchLogProcessor::Export()
 {
+  uint64_t current_pending;
+  uint64_t current_notified;
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
     size_t num_records_to_export;
-
-    if (was_force_flush_called == true)
+    bool notify_force_flush =
+        synchronization_data_->is_force_flush_pending.exchange(false, std::memory_order_acq_rel);
+    if (notify_force_flush)
     {
       num_records_to_export = buffer_.size();
     }
@@ -161,6 +207,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
 
     if (num_records_to_export == 0)
     {
+      NotifyCompletion(notify_force_flush, synchronization_data_);
       break;
     }
 
@@ -178,38 +225,25 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
     {
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+      NotifyCompletion(notify_force_flush, synchronization_data_);
     }
     else
     {
+      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
-          [this, was_force_flush_called](sdk::common::ExportResult result) {
+          [notify_force_flush, synchronization_data_watcher](sdk::common::ExportResult result) {
             // TODO: Print result
-            NotifyForceFlushCompletion(was_force_flush_called);
+            if (synchronization_data_watcher.expired())
+            {
+              return true;
+            }
 
-            // Notify the thread which is waiting on shutdown to complete.
-            NotifyShutdownCompletion();
+            NotifyCompletion(notify_force_flush, synchronization_data_watcher.lock());
             return true;
           });
     }
-  } while (was_force_flush_called);
-
-  if (is_export_async_ == false)
-  {
-    NotifyForceFlushCompletion(was_force_flush_called);
-  }
-}
-
-void BatchLogProcessor::NotifyForceFlushCompletion(const bool was_force_flush_called)
-{
-  // Notify the main thread in case this export was the result of a force flush.
-  if (was_force_flush_called == true)
-  {
-    if (is_force_flush_notified_.exchange(true, std::memory_order_acq_rel) == false)
-    {
-      force_flush_cv_.notify_all();
-    }
-  }
+  } while (true);
 }
 
 void BatchLogProcessor::WaitForShutdownCompletion()
@@ -218,29 +252,56 @@ void BatchLogProcessor::WaitForShutdownCompletion()
   // for async thread to complete.
   if (is_export_async_)
   {
-    std::unique_lock<std::mutex> lk(async_shutdown_m_);
-    while (is_async_shutdown_notified_.load() == false)
+    std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m);
+    while (true)
     {
-      async_shutdown_cv_.wait(lk);
+      if (synchronization_data_->is_async_shutdown_notified.load())
+      {
+        break;
+      }
+
+      // When is_async_shutdown_notified.store(true) and async_shutdown_cv.notify_all() is called
+      // between is_async_shutdown_notified.load() and async_shutdown_cv.wait(). We must not wait
+      // for ever
+      synchronization_data_->async_shutdown_cv.wait_for(lk, scheduled_delay_millis_);
     }
   }
 }
 
-void BatchLogProcessor::NotifyShutdownCompletion()
+void BatchLogProcessor::NotifyCompletion(
+    bool notify_force_flush,
+    const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
-  // Notify the thread which is waiting on shutdown to complete.
-  if (is_shutdown_.load() == true)
+  if (!synchronization_data)
   {
-    is_async_shutdown_notified_.store(true);
-    async_shutdown_cv_.notify_one();
+    return;
+  }
+
+  if (notify_force_flush)
+  {
+    synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
+    synchronization_data->force_flush_cv.notify_one();
+  }
+
+  // Notify the thread which is waiting on shutdown to complete.
+  if (synchronization_data->is_shutdown.load() == true)
+  {
+    synchronization_data->is_async_shutdown_notified.store(true);
+    synchronization_data->async_shutdown_cv.notify_all();
   }
 }
 
 void BatchLogProcessor::DrainQueue()
 {
-  while (buffer_.empty() == false)
+  while (true)
   {
-    Export(false);
+    if (buffer_.empty() &&
+        false == synchronization_data_->is_force_flush_pending.load(std::memory_order_acquire))
+    {
+      break;
+    }
+
+    Export();
 
     // Since async export is invoked due to shutdown, need to wait
     // for async thread to complete.
@@ -252,12 +313,13 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
 
-  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
-  bool already_shutdown = is_shutdown_.exchange(true);
+  std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
+  bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
 
   if (worker_thread_.joinable())
   {
-    cv_.notify_one();
+    synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
+    synchronization_data_->cv.notify_one();
     worker_thread_.join();
   }
 
@@ -287,7 +349,7 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 
 BatchLogProcessor::~BatchLogProcessor()
 {
-  if (is_shutdown_.load() == false)
+  if (synchronization_data_->is_shutdown.load() == false)
   {
     Shutdown();
   }

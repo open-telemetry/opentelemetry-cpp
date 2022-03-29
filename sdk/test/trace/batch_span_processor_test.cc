@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
+#include <list>
+#include <memory>
 #include <thread>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,20 +58,34 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
-  void Export(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+  void Export(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &records,
               std::function<bool(opentelemetry::sdk::common::ExportResult)>
                   &&result_callback) noexcept override
   {
-    auto th = std::thread([this, spans, result_callback]() {
-      auto result = Export(spans);
-      result_callback(result);
-    });
-    th.join();
+    // We should keep the order of test records
+    auto result = Export(records);
+    async_threads_.emplace_back(std::make_shared<std::thread>(
+        [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          result_callback(result);
+        },
+        std::move(result_callback)));
   }
 
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    while (!async_threads_.empty())
+    {
+      std::list<std::shared_ptr<std::thread>> async_threads;
+      async_threads.swap(async_threads_);
+      for (auto &async_thread : async_threads)
+      {
+        if (async_thread && async_thread->joinable())
+        {
+          async_thread->join();
+        }
+      }
+    }
     *is_shutdown_ = true;
     return true;
   }
@@ -82,6 +98,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
   const std::chrono::milliseconds export_delay_;
+  std::list<std::shared_ptr<std::thread>> async_threads_;
 };
 
 /**
@@ -177,7 +194,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
   EXPECT_TRUE(is_shutdown->load());
 }
 
-TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
+TEST_F(BatchSpanProcessorTestPeer, TestAsyncForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
@@ -230,7 +247,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   }
 }
 
-TEST_F(BatchSpanProcessorTestPeer, TestAsyncForceFlush)
+TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(

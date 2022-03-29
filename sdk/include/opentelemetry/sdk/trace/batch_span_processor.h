@@ -122,12 +122,8 @@ private:
   /**
    * Exports all ended spans to the configured exporter.
    *
-   * @param was_force_flush_called - A flag to check if the current export is the result
-   *                                 of a call to ForceFlush method. If true, then we have to
-   *                                 notify the main thread to wake it up in the ForceFlush
-   *                                 method.
    */
-  void Export(const bool was_for_flush_called);
+  void Export();
 
   /**
    * Called when Shutdown() is invoked. Completely drains the queue of all its ended spans and
@@ -135,18 +131,32 @@ private:
    */
   void DrainQueue();
 
-  /**
-   * Should be called from Export to notify the main thread on Force Flush Completion
-   * @param was_force_flush_called - A flag to check if the current export is the result
-   *                                 of a call to ForceFlush method. If true, then we have to
-   *                                 notify the main thread to wake it up in the ForceFlush
-   *                                 method.
-   */
-  void NotifyForceFlushCompletion(const bool was_for_flush_called);
-
   /* In case of async export, wait and notify for shutdown to be completed.*/
   void WaitForShutdownCompletion();
-  void NotifyShutdownCompletion();
+
+  struct SynchronizationData
+  {
+    /* Synchronization primitives */
+    std::condition_variable cv, force_flush_cv, async_shutdown_cv;
+    std::mutex cv_m, force_flush_cv_m, shutdown_m, async_shutdown_m;
+
+    /* Important boolean flags to handle the workflow of the processor */
+    std::atomic<bool> is_force_wakeup_background_worker;
+    std::atomic<bool> is_force_flush_pending;
+    std::atomic<bool> is_force_flush_notified;
+    std::atomic<bool> is_shutdown;
+    std::atomic<bool> is_async_shutdown_notified;
+  };
+
+  /**
+   * @brief Notify completion of shutdown and force flush. This may be called from the any thread at
+   * any time
+   *
+   * @param notify_force_flush Flag to indicate whether to notify force flush completion.
+   * @param synchronization_data Synchronization data to be notified.
+   */
+  static void NotifyCompletion(bool notify_force_flush,
+                               const std::shared_ptr<SynchronizationData> &synchronization_data);
 
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
@@ -157,18 +167,10 @@ private:
   const size_t max_export_batch_size_;
   const bool is_export_async_;
 
-  /* Synchronization primitives */
-  std::condition_variable cv_, force_flush_cv_, async_shutdown_cv_;
-  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_, async_shutdown_m_;
-
   /* The buffer/queue to which the ended spans are added */
   common::CircularBuffer<Recordable> buffer_;
 
-  /* Important boolean flags to handle the workflow of the processor */
-  std::atomic<bool> is_shutdown_;
-  std::atomic<bool> is_force_flush_;
-  std::atomic<bool> is_force_flush_notified_;
-  std::atomic<bool> is_async_shutdown_notified_;
+  std::shared_ptr<SynchronizationData> synchronization_data_;
 
   /* The background worker thread */
   std::thread worker_thread_;

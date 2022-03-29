@@ -34,7 +34,7 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
                                                             options.console_debug,
                                                             options.timeout,
                                                             options.http_headers,
-                                                            options.concurrent_sessions)))
+                                                            options.max_concurrent_requests)))
 {}
 
 OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client)
@@ -64,9 +64,13 @@ void OtlpHttpLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
-  auto status = Export(logs);
-  result_callback(status);
+  if (logs.empty())
+  {
+    return;
+  }
+  proto::collector::logs::v1::ExportLogsServiceRequest service_request;
+  OtlpRecordableUtils::PopulateRequest(logs, &service_request);
+  http_client_->Export(service_request, std::move(result_callback));
 }
 
 bool OtlpHttpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

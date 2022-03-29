@@ -13,6 +13,12 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+install(
+  DIRECTORY include/opentelemetry/
+  DESTINATION include/opentelemetry/
+  FILES_MATCHING
+  PATTERN "*config.h")
+
 set(LOGS_EXCLUDE_PATTERN "")
 if(NOT WITH_LOGS_PREVIEW)
   set(LOGS_EXCLUDE_PATTERN "logs")

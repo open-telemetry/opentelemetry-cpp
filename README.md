@@ -119,6 +119,7 @@ For edit access, get in touch on
 
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Reiley Yang](https://github.com/reyang), Microsoft
+* [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
 Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager):

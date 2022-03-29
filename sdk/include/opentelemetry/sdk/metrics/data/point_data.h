@@ -25,7 +25,7 @@ public:
   opentelemetry::common::SystemTimestamp start_epoch_nanos_;
   opentelemetry::common::SystemTimestamp end_epoch_nanos_;
   ValueType value_;
-  AggregationTemporarily aggregation_temporarily_;
+  AggregationTemporality aggregation_temporality_;
   bool is_monotonic_;
 };
 
