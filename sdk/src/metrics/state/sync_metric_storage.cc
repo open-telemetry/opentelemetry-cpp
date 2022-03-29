@@ -70,7 +70,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   //           Final result of merge would be in merged_metrics.
   //       - Move the final merge to the `last reported metrics` stash.
   //   - If the aggregation_temporarily is delta
-  //       - Store the unreported metrics for `collector`(which is in merged_mtrics) to
+  //       - Store the unreported metrics for `collector` (which is in merged_mtrics) to
   //          `last reported metrics` stash.
 
   auto reported = last_reported_metrics_.find(collector);
