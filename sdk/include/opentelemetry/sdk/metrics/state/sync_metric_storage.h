@@ -109,7 +109,7 @@ public:
                nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
-    auto aggregation_temporarily = collector->GetAggregationTemporarily();
+    auto aggregation_temporarily = collector->GetAggregationTemporality();
 
     // Add the current delta metrics to `unreported metrics stash` for all the collectors,
     // this will also empty the delta metrics hashmap, and make it available for
@@ -168,7 +168,7 @@ public:
     {
       last_collection_ts     = last_reported_metrics_[collector].collection_ts;
       auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
-      if (aggregation_temporarily == AggregationTemporarily::kCumulative)
+      if (aggregation_temporarily == AggregationTemporality::kCumulative)
       {
         // merge current delta to previous cumulative
         last_aggr_hashmap->GetAllEnteries(

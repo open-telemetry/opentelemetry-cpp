@@ -26,7 +26,7 @@ class MetricReader
 {
 public:
   MetricReader(
-      AggregationTemporality aggregation_temporality = AggregationTemporality::kCummulative);
+      AggregationTemporality aggregation_temporality = AggregationTemporality::kCumulative);
 
   void SetMetricProducer(MetricProducer *metric_producer);
 

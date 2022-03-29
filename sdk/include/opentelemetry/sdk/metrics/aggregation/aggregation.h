@@ -31,7 +31,7 @@ public:
   virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept = 0;
 
   /**
-   * Returns a new DELTA aggregation by comparing two cumulative measurements.
+   * Returns a new delta aggregation by comparing two cumulative measurements.
    *
    * @param next the newly captured (cumulative) aggregation.
    * @return The resulting delta aggregation.

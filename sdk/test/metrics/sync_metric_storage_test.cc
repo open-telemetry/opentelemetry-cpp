@@ -20,20 +20,20 @@ using M = std::map<std::string, std::string>;
 class MockCollectorHandle : public CollectorHandle
 {
 public:
-  MockCollectorHandle(AggregationTemporarily temp) : temporarily(temp) {}
+  MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
-  AggregationTemporarily GetAggregationTemporarily() noexcept override { return temporarily; }
+  AggregationTemporality GetAggregationTemporality() noexcept override { return temporality; }
 
 private:
-  AggregationTemporarily temporarily;
+  AggregationTemporality temporality;
 };
 
-class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporarily>
+class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
 
 TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
 {
-  AggregationTemporarily temporarily = GetParam();
+  AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
   long expected_total_get_requests   = 0;
   long expected_total_put_requests   = 0;
@@ -42,25 +42,29 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
-  opentelemetry::sdk::metrics::SyncMetricStorage storage(instr_desc, AggregationType::kSum,
-                                                         new DefaultAttributesProcessor(),
-                                                          NoExemplarReservoir::GetNoExemplarReservoir());
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      NoExemplarReservoir::GetNoExemplarReservoir());
 
-  storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get));
+  storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                     opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
   EXPECT_NO_THROW(storage.RecordLong(
-      30l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      30l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 30;
 
-  storage.RecordLong(20l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get));
+  storage.RecordLong(20l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                     opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
   EXPECT_NO_THROW(storage.RecordLong(
-      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 40;
 
-  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporarily));
+  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
@@ -90,17 +94,19 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
 
   // In case of delta temporarily, subsequent collection would contain new data points, so resetting
   // the counts
-  if (temporarily == AggregationTemporarily::kDelta)
+  if (temporality == AggregationTemporality::kDelta)
   {
     expected_total_get_requests = 0;
     expected_total_put_requests = 0;
   }
 
   EXPECT_NO_THROW(storage.RecordLong(
-      50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get)));
+      50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+      opentelemetry::context::Context{}));
   expected_total_get_requests += 50;
   EXPECT_NO_THROW(storage.RecordLong(
-      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 40;
 
   collection_ts    = std::chrono::system_clock::now();
@@ -128,12 +134,12 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
 }
 INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestLong,
                         WritableMetricStorageTestFixture,
-                        ::testing::Values(AggregationTemporarily::kCumulative,
-                                          AggregationTemporarily::kDelta));
+                        ::testing::Values(AggregationTemporality::kCumulative,
+                                          AggregationTemporality::kDelta));
 
 TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 {
-  AggregationTemporarily temporarily = GetParam();
+  AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
@@ -142,26 +148,31 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
-  opentelemetry::sdk::metrics::SyncMetricStorage storage(instr_desc, AggregationType::kSum,
-                                                         new DefaultAttributesProcessor());
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      NoExemplarReservoir::GetNoExemplarReservoir());
 
   storage.RecordDouble(10.0,
-                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_get));
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                       opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
   EXPECT_NO_THROW(storage.RecordDouble(
-      30.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      30.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 30;
 
   storage.RecordDouble(20.0,
-                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_get));
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                       opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
   EXPECT_NO_THROW(storage.RecordDouble(
-      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 40;
 
-  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporarily));
+  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
@@ -191,17 +202,19 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 
   // In case of delta temporarily, subsequent collection would contain new data points, so resetting
   // the counts
-  if (temporarily == AggregationTemporarily::kDelta)
+  if (temporality == AggregationTemporality::kDelta)
   {
     expected_total_get_requests = 0;
     expected_total_put_requests = 0;
   }
 
   EXPECT_NO_THROW(storage.RecordDouble(
-      50.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get)));
+      50.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+      opentelemetry::context::Context{}));
   expected_total_get_requests += 50;
   EXPECT_NO_THROW(storage.RecordDouble(
-      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put)));
+      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+      opentelemetry::context::Context{}));
   expected_total_put_requests += 40;
 
   collection_ts    = std::chrono::system_clock::now();
@@ -229,7 +242,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 }
 INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestDouble,
                         WritableMetricStorageTestFixture,
-                        ::testing::Values(AggregationTemporarily::kCumulative,
-                                          AggregationTemporarily::kDelta));
+                        ::testing::Values(AggregationTemporality::kCumulative,
+                                          AggregationTemporality::kDelta));
 
 #endif
