@@ -31,15 +31,16 @@ void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attr
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
   point_data_.sum_ = nostd::get<long>(point_data_.sum_) + value;
+  size_t index     = 0;
   for (auto it = nostd::get<std::list<long>>(point_data_.boundaries_).begin();
        it != nostd::get<std::list<long>>(point_data_.boundaries_).end(); ++it)
   {
     if (value < *it)
     {
-      point_data_.counts_[std::distance(
-          nostd::get<std::list<long>>(point_data_.boundaries_).begin(), it)] += 1;
+      point_data_.counts_[index] += 1;
       return;
     }
+    index++;
   }
 }
 
@@ -78,30 +79,34 @@ void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
   point_data_.sum_ = nostd::get<double>(point_data_.sum_) + value;
+  size_t index     = 0;
   for (auto it = nostd::get<std::list<double>>(point_data_.boundaries_).begin();
        it != nostd::get<std::list<double>>(point_data_.boundaries_).end(); ++it)
   {
     if (value < *it)
     {
-      point_data_.counts_[std::distance(
-          nostd::get<std::list<double>>(point_data_.boundaries_).begin(), it)] += 1;
+      point_data_.counts_[index] += 1;
       return;
     }
+    index++;
   }
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(Aggregation &delta) noexcept
 {
+  // TODO - Implement me
   return nullptr;
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(Aggregation &next) noexcept
 {
+  // TODO - Implement me
   return nullptr;
 }
 
 PointType DoubleHistogramAggregation::ToPoint() noexcept
 {
+  // TODO Implement me
   return point_data_;
 }
 
