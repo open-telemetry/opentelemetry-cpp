@@ -28,7 +28,7 @@ public:
    * @return the result of the merge of the given aggregation.
    */
 
-  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept = 0;
+  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept = 0;
 
   /**
    * Returns a new delta aggregation by comparing two cumulative measurements.
@@ -36,7 +36,7 @@ public:
    * @param next the newly captured (cumulative) aggregation.
    * @return The resulting delta aggregation.
    */
-  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept = 0;
+  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept = 0;
 
   /**
    * Returns the point data that the aggregation will produce.
@@ -44,7 +44,7 @@ public:
    * @return PointType
    */
 
-  virtual PointType ToPoint() noexcept = 0;
+  virtual PointType ToPoint() const noexcept = 0;
 
   virtual ~Aggregation() = default;
 };

@@ -24,11 +24,11 @@ public:
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
-  PointType ToPoint() noexcept override;
+  PointType ToPoint() const noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
@@ -45,15 +45,15 @@ public:
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
-  PointType ToPoint() noexcept override;
+  PointType ToPoint() const noexcept override;
 
 private:
-  opentelemetry::common::SpinLockMutex lock_;
-  HistogramPointData point_data_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable HistogramPointData point_data_;
 };
 
 }  // namespace metrics

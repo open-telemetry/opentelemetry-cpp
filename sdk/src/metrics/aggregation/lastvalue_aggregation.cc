@@ -30,29 +30,38 @@ void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attr
   point_data_.value_              = value;
 }
 
-std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
-  Aggregation &agg_to_merge =
-      nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-              nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch()
-          ? *this
-          : delta;
-  LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(agg_to_merge.ToPoint()));
-  return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
+  else
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
 }
 
-std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &next) const noexcept
 {
-  Aggregation &agg_to_merge =
-      nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-              nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch()
-          ? *this
-          : next;
-  LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(agg_to_merge.ToPoint()));
-  return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+  else
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
 }
 
-PointType LongLastValueAggregation::ToPoint() noexcept
+PointType LongLastValueAggregation::ToPoint() const noexcept
 {
   return point_data_;
 }
@@ -73,29 +82,39 @@ void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &
   point_data_.value_              = value;
 }
 
-std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
-  Aggregation &agg_to_merge =
-      nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-              nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch()
-          ? *this
-          : delta;
-  LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(agg_to_merge.ToPoint()));
-  return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(merge_data)));
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
+  else
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
 }
 
-std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
+    const Aggregation &next) const noexcept
 {
-  Aggregation &agg_to_merge =
-      nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-              nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch()
-          ? *this
-          : next;
-  LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(agg_to_merge.ToPoint()));
-  return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(diff_data)));
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+  else
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
 }
 
-PointType DoubleLastValueAggregation::ToPoint() noexcept
+PointType DoubleLastValueAggregation::ToPoint() const noexcept
 {
   return point_data_;
 }

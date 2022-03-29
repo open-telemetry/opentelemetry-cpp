@@ -27,17 +27,17 @@ public:
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override
+  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override
   {
     return std::unique_ptr<Aggregation>(new DropAggregation());
   }
 
-  std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override
+  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override
   {
     return std::unique_ptr<Aggregation>(new DropAggregation());
   }
 
-  PointType ToPoint() noexcept override
+  PointType ToPoint() const noexcept override
   {
     static DropPointData point_data;
     return point_data;

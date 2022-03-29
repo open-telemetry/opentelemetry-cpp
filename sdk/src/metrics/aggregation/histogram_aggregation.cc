@@ -44,17 +44,18 @@ void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attr
   }
 }
 
-std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
   return nullptr;
 }
 
-std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(const Aggregation &next) const noexcept
 {
   return nullptr;
 }
 
-PointType LongHistogramAggregation::ToPoint() noexcept
+PointType LongHistogramAggregation::ToPoint() const noexcept
 {
   return point_data_;
 }
@@ -92,19 +93,21 @@ void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &
   }
 }
 
-std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
   // TODO - Implement me
   return nullptr;
 }
 
-std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(
+    const Aggregation &next) const noexcept
 {
   // TODO - Implement me
   return nullptr;
 }
 
-PointType DoubleHistogramAggregation::ToPoint() noexcept
+PointType DoubleHistogramAggregation::ToPoint() const noexcept
 {
   // TODO Implement me
   return point_data_;

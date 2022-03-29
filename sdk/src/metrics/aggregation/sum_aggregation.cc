@@ -28,30 +28,31 @@ void LongSumAggregation::Aggregate(long value, const PointAttributes &attributes
   point_data_.value_ = nostd::get<long>(point_data_.value_) + value;
 }
 
-std::unique_ptr<Aggregation> LongSumAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
   long merge_value =
       nostd::get<long>(
-          nostd::get<SumPointData>((static_cast<LongSumAggregation &>(delta).ToPoint())).value_) +
+          nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
+              .value_) +
       nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
 
-std::unique_ptr<Aggregation> LongSumAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) const noexcept
 {
 
-  long diff_value =
-      nostd::get<long>(
-          nostd::get<SumPointData>((static_cast<LongSumAggregation &>(next).ToPoint())).value_) -
-      nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
+  long diff_value = nostd::get<long>(nostd::get<SumPointData>(
+                                         (static_cast<const LongSumAggregation &>(next).ToPoint()))
+                                         .value_) -
+                    nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }
 
-PointType LongSumAggregation::ToPoint() noexcept
+PointType LongSumAggregation::ToPoint() const noexcept
 {
   return point_data_;
 }
@@ -69,30 +70,32 @@ void DoubleSumAggregation::Aggregate(double value, const PointAttributes &attrib
   point_data_.value_ = nostd::get<double>(point_data_.value_) + value;
 }
 
-std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(Aggregation &delta) noexcept
+std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
   double merge_value =
       nostd::get<double>(
-          nostd::get<SumPointData>((static_cast<DoubleSumAggregation &>(delta).ToPoint())).value_) +
+          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(delta).ToPoint()))
+              .value_) +
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
   static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
 
-std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(Aggregation &next) noexcept
+std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(const Aggregation &next) const noexcept
 {
 
   double diff_value =
       nostd::get<double>(
-          nostd::get<SumPointData>((static_cast<DoubleSumAggregation &>(next).ToPoint())).value_) -
+          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(next).ToPoint()))
+              .value_) -
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
   static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }
 
-PointType DoubleSumAggregation::ToPoint() noexcept
+PointType DoubleSumAggregation::ToPoint() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
