@@ -20,39 +20,41 @@ class MultiMetricStorage : public WritableMetricStorage
 public:
   void AddStorage(std::shared_ptr<WritableMetricStorage> storage) { storages_.push_back(storage); }
 
-  virtual void RecordLong(long value) noexcept override
+  virtual void RecordLong(long value,
+                          const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
-      s->RecordLong(value);
+      s->RecordLong(value, context);
     }
   }
 
-  virtual void RecordLong(
-      long value,
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  virtual void RecordLong(long value,
+                          const opentelemetry::common::KeyValueIterable &attributes,
+                          const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
-      s->RecordLong(value, attributes);
+      s->RecordLong(value, attributes, context);
     }
   }
 
-  virtual void RecordDouble(double value) noexcept override
+  virtual void RecordDouble(double value,
+                            const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
-      s->RecordDouble(value);
+      s->RecordDouble(value, context);
     }
   }
 
-  virtual void RecordDouble(
-      double value,
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  virtual void RecordDouble(double value,
+                            const opentelemetry::common::KeyValueIterable &attributes,
+                            const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
     {
-      s->RecordDouble(value, attributes);
+      s->RecordDouble(value, attributes, context);
     }
   }
 

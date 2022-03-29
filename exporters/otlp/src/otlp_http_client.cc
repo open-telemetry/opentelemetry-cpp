@@ -17,6 +17,7 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
+#include "google/protobuf/stubs/stringpiece.h"
 #include "nlohmann/json.hpp"
 
 #if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
