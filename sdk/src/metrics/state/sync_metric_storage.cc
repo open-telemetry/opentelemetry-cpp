@@ -122,12 +122,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
         metric_data.point_data_attr_.push_back(point_data_attr);
         return true;
       });
-
-  if (callback(metric_data))
-  {
-    return true;
-  }
-  return false;
+  return callback(metric_data);
 }
 
 }  // namespace metrics
