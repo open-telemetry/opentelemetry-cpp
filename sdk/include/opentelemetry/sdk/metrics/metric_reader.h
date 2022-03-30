@@ -26,7 +26,7 @@ class MetricReader
 {
 public:
   MetricReader(
-      AggregationTemporarily aggregation_temporarily = AggregationTemporarily::kCummulative);
+      AggregationTemporality aggregation_temporality = AggregationTemporality::kCumulative);
 
   void SetMetricProducer(MetricProducer *metric_producer);
 
@@ -36,7 +36,7 @@ public:
    */
   bool Collect(nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept;
 
-  AggregationTemporarily GetAggregationTemporarily() const noexcept;
+  AggregationTemporality GetAggregationTemporality() const noexcept;
 
   /**
    * Shutdown the meter reader.
@@ -61,7 +61,7 @@ private:
 
 private:
   MetricProducer *metric_producer_;
-  AggregationTemporarily aggregation_temporarily_;
+  AggregationTemporality aggregation_temporality_;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool shutdown_;
 };

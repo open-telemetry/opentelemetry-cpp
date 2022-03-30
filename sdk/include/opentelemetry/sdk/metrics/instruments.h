@@ -36,11 +36,11 @@ enum class AggregationType
   kDefault
 };
 
-enum class AggregationTemporarily
+enum class AggregationTemporality
 {
   kUnspecified,
   kDelta,
-  kCummulative
+  kCumulative
 };
 
 struct InstrumentDescriptor
