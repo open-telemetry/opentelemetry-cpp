@@ -16,15 +16,16 @@ namespace logs
  * Initialize a simple log processor.
  * @param exporter the configured exporter where log records are sent
  */
-SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter,
-                                       bool is_export_async)
+SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter
+#  ifdef ENABLE_ASYNC_EXPORT
+                                       ,
+                                       bool is_export_async
+#  endif
+                                       )
     : exporter_(std::move(exporter))
 #  ifdef ENABLE_ASYNC_EXPORT
       ,
       is_export_async_(is_export_async)
-#  else
-      ,
-      is_export_async_(false)
 #  endif
 {}
 
@@ -43,14 +44,16 @@ void SimpleLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcep
   // Get lock to ensure Export() is never called concurrently
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
+#  ifdef ENABLE_ASYNC_EXPORT
   if (is_export_async_ == false)
   {
+#  endif
     if (exporter_->Export(batch) != sdk::common::ExportResult::kSuccess)
     {
       /* Alert user of the failed export */
     }
-  }
 #  ifdef ENABLE_ASYNC_EXPORT
+  }
   else
   {
     exporter_->Export(batch, [](sdk::common::ExportResult result) {

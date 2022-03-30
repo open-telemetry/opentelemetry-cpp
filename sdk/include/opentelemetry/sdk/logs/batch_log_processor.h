@@ -136,9 +136,10 @@ private:
    */
   void DrainQueue();
 
+#  ifdef ENABLE_ASYNC_EXPORT
   /* In case of async export, wait and notify for shutdown to be completed.*/
   void WaitForShutdownCompletion();
-
+#  endif
   struct SynchronizationData
   {
     /* Synchronization primitives */
@@ -170,8 +171,9 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds scheduled_delay_millis_;
   const size_t max_export_batch_size_;
+#  ifdef ENABLE_ASYNC_EXPORT
   const bool is_export_async_;
-
+#  endif
   /* The buffer/queue to which the ended logs are added */
   common::CircularBuffer<Recordable> buffer_;
 

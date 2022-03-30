@@ -24,8 +24,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_export_batch_size_(options.max_export_batch_size),
 #ifdef ENABLE_ASYNC_EXPORT
       is_export_async_(options.is_export_async),
-#else
-      is_export_async_(false),
 #endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
@@ -209,16 +207,15 @@ void BatchSpanProcessor::Export()
                       });
                     });
 
-    /* Call the sync Export when force flush was called, even if
-       is_export_async_ is true.
-    */
+#ifdef ENABLE_ASYNC_EXPORT
     if (is_export_async_ == false)
     {
+#endif
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
       NotifyCompletion(notify_force_flush, synchronization_data_);
-    }
 #ifdef ENABLE_ASYNC_EXPORT
+    }
     else
     {
       std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
@@ -239,6 +236,7 @@ void BatchSpanProcessor::Export()
   } while (true);
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void BatchSpanProcessor::WaitForShutdownCompletion()
 {
   // Since async export is invoked due to shutdown, need to wait
@@ -260,6 +258,7 @@ void BatchSpanProcessor::WaitForShutdownCompletion()
     }
   }
 }
+#endif
 
 void BatchSpanProcessor::NotifyCompletion(
     bool notify_force_flush,
@@ -295,7 +294,9 @@ void BatchSpanProcessor::DrainQueue()
     }
 
     Export();
+#ifdef ENABLE_ASYNC_EXPORT
     WaitForShutdownCompletion();
+#endif
   }
 }
 

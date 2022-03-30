@@ -52,9 +52,11 @@ struct OtlpHttpExporterOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 
+#ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
   std::size_t max_concurrent_requests = 8;
+#endif
 };
 
 /**

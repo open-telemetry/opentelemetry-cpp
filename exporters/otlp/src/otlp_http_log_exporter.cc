@@ -33,8 +33,12 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers,
-                                                            options.max_concurrent_requests)))
+                                                            options.http_headers
+#  ifdef ENABLE_ASYNC_EXPORT
+                                                            ,
+                                                            options.max_concurrent_requests
+#  endif
+                                                            )))
 {}
 
 OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client)
