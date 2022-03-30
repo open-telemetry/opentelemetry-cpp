@@ -30,9 +30,9 @@ public:
   /**
    * Exports a batch of metrics recordables. This method must not be called
    * concurrently for the same exporter instance.
-   * @param spans a span of unique pointers to metrics data
+   * @param data metrics data
    */
-  virtual opentelemetry::sdk::common::ExportResult Export(const MetricData &records) noexcept = 0;
+  virtual opentelemetry::sdk::common::ExportResult Export(const MetricData &data) noexcept = 0;
 
   /**
    * Force flush the exporter.
