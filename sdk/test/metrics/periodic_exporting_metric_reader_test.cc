@@ -18,7 +18,7 @@ class MockPushMetricExporter : public MetricExporter
 public:
   opentelemetry::sdk::common::ExportResult Export(const MetricData &record) noexcept override
   {
-    records.push_back(record);
+    records_.push_back(record);
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
@@ -33,10 +33,10 @@ public:
     return true;
   }
 
-  size_t GetDataCount() { return records.size(); }
+  size_t GetDataCount() { return records_.size(); }
 
 private:
-  std::vector<MetricData> records;
+  std::vector<MetricData> records_;
 };
 
 class MockMetricProducer : public MetricProducer

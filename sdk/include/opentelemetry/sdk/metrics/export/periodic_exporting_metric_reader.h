@@ -63,8 +63,8 @@ private:
   std::thread worker_thread_;
 
   /* Synchronization primitives */
-  std::condition_variable cv_, force_flush_cv_;
-  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_;
+  std::condition_variable cv_;
+  std::mutex cv_m_;
 };
 
 }  // namespace metrics
