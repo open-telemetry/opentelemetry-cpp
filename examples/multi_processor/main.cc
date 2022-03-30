@@ -20,21 +20,19 @@ namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace nostd     = opentelemetry::nostd;
 
-InMemorySpanExporter *memory_span_exporter;
-
 namespace
 {
-void initTracer()
+InMemorySpanExporter *initTracer()
 {
   auto exporter1 = std::unique_ptr<trace_sdk::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor1 = std::unique_ptr<trace_sdk::SpanProcessor>(
       new trace_sdk::SimpleSpanProcessor(std::move(exporter1)));
 
-  auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(new InMemorySpanExporter());
+  InMemorySpanExporter *memory_span_exporter = new InMemorySpanExporter();
+  auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(memory_span_exporter);
 
   // fetch the exporter for dumping data later
-  memory_span_exporter = static_cast<InMemorySpanExporter *>(exporter2.get());
 
   auto processor2 = std::unique_ptr<trace_sdk::SpanProcessor>(
       new trace_sdk::SimpleSpanProcessor(std::move(exporter2)));
@@ -44,6 +42,8 @@ void initTracer()
   provider->AddProcessor(std::move(processor2));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(std::move(provider));
+
+  return memory_span_exporter;
 }
 
 void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
@@ -81,7 +81,7 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  initTracer();
+  InMemorySpanExporter *memory_span_exporter = initTracer();
 
   foo_library();
   auto memory_spans = memory_span_exporter->GetData()->GetSpans();
