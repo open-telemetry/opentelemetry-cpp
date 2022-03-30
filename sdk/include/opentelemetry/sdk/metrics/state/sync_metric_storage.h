@@ -107,7 +107,7 @@ public:
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData &&)> callback) noexcept override;
-  
+
 private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;

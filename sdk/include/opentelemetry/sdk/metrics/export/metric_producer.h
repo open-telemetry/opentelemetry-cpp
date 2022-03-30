@@ -3,9 +3,9 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
-# include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,9 +16,9 @@ namespace metrics
 /**
  * Metric Data to be exported along wih resources and
  * Instrumentation library.
- * 
+ *
  */
-struct ResourceMetrics 
+struct ResourceMetrics
 {
   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library;
   const opentelemetry::sdk::resource::Resource *resource;
@@ -42,7 +42,8 @@ public:
    *
    * @return a status of completion of method.
    */
-  virtual bool Collect(nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept = 0;
+  virtual bool Collect(
+      nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept = 0;
 };
 
 }  // namespace metrics
