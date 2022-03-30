@@ -14,9 +14,8 @@ namespace metrics
 {
 
 /**
- * Metric Data to be exported along wih resources and
+ * Metric Data to be exported along with resources and
  * Instrumentation library.
- *
  */
 struct ResourceMetrics
 {
