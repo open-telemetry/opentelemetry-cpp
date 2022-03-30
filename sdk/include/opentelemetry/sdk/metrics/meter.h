@@ -105,7 +105,7 @@ public:
   /** collect metrics across all the meters **/
   bool collect(CollectorHandle *collector,
                opentelemetry::common::SystemTimestamp collect_ts,
-               nostd::function_ref<bool(MetricData &)> callback) noexcept;
+               nostd::function_ref<bool(MetricData &&)> callback) noexcept;
 
 private:
   // order of declaration is important here - instrumentation library should destroy after

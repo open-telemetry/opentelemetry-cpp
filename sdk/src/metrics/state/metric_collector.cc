@@ -29,12 +29,15 @@ AggregationTemporarily MetricCollector::GetAggregationTemporarily() noexcept
   return metric_reader_->GetAggregationTemporarily();
 }
 
-bool MetricCollector::Collect(nostd::function_ref<bool(MetricData)> callback) noexcept
+bool MetricCollector::Collect(nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept
 {
   for (auto &meter : meter_context_->GetMeters())
   {
     auto collection_ts = std::chrono::system_clock::now();
-    meter->collect(this, collection_ts, callback);
+    meter->collect(this, collection_ts, [&](MetricData &&metric_data){
+      ResourceMetrics resource_metrics{meter->GetInstrumentationLibrary(), &meter_context_->GetResource(), std::move(metric_data)};
+      return callback(std::move(resource_metrics));
+    });
   }
   return true;
 }
