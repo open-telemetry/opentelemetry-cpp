@@ -20,8 +20,6 @@ using ValueType = nostd::variant<long, double>;
 using ListType  = nostd::variant<std::list<long>, std::list<double>>;
 
 // TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
-// refer error:
-// https://github.com/open-telemetry/opentelemetry-cpp/runs/5577740472?check_suite_focus=true#step:6:522
 
 class SumPointData
 {

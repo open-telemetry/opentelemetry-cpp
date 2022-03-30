@@ -11,8 +11,6 @@
 #  include <gtest/gtest.h>
 #  include <map>
 
-#  include <iostream>
-
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 using M = std::map<std::string, std::string>;
