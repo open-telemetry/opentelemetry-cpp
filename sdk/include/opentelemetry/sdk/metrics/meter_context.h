@@ -111,7 +111,6 @@ public:
 
   /**
    * Adds a meter to the list of configured meters.
-   *
    * Note: This method is INTERNAL to sdk not thread safe.
    *
    * @param meter

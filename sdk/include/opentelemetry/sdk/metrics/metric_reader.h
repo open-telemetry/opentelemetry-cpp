@@ -7,7 +7,6 @@
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
-
 #  include "opentelemetry/version.h"
 
 #  include <chrono>
@@ -27,7 +26,7 @@ class MetricReader
 {
 public:
   MetricReader(
-      AggregationTemporality aggregation_temporality = AggregationTemporality::kCummulative);
+      AggregationTemporality aggregation_temporality = AggregationTemporality::kCumulative);
 
   void SetMetricProducer(MetricProducer *metric_producer);
 
