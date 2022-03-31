@@ -24,7 +24,7 @@ class MetricExporter;
  */
 
 constexpr std::chrono::milliseconds kExportIntervalMillis = std::chrono::milliseconds(60000);
-constexpr std::chrono::milliseconds kExportTimeOutMillis = std::chrono::milliseconds(30000);
+constexpr std::chrono::milliseconds kExportTimeOutMillis  = std::chrono::milliseconds(30000);
 struct PeriodicExportingMetricReaderOptions
 {
 
