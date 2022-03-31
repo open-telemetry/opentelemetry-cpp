@@ -10,10 +10,11 @@ else()
   add_executable(http_server server.cc)
 
   target_link_libraries(
-    http_client ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace http_client_curl
-    opentelemetry_exporter_ostream_span ${CURL_LIBRARIES})
+    http_client ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace
+    opentelemetry_http_client_curl opentelemetry_exporter_ostream_span
+    ${CURL_LIBRARIES})
 
   target_link_libraries(
-    http_server ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace http_client_curl
-    opentelemetry_exporter_ostream_span)
+    http_server ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace
+    opentelemetry_http_client_curl opentelemetry_exporter_ostream_span)
 endif()
