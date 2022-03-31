@@ -211,7 +211,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
 }
 
 /** collect metrics across all the meters **/
-bool Meter::collect(CollectorHandle *collector,
+bool Meter::Collect(CollectorHandle *collector,
                     opentelemetry::common::SystemTimestamp collect_ts,
                     nostd::function_ref<bool(MetricData &)> callback) noexcept
 {

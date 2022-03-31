@@ -6,12 +6,11 @@
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#  include "opentelemetry/sdk/resource/resource.h"
 
 #  include <memory>
 #  include "opentelemetry/sdk/metrics/observer_result.h"
