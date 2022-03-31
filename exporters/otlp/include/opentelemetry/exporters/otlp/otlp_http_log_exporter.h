@@ -52,9 +52,11 @@ struct OtlpHttpLogExporterOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
 
+#  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
   std::size_t max_concurrent_requests = 8;
+#  endif
 };
 
 /**
@@ -88,6 +90,7 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records) noexcept
       override;
 
+#  ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports a vector of log records asynchronously.
    * @param records A list of log records.
@@ -97,6 +100,7 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
       override;
+#  endif
 
   /**
    * Shutdown this exporter.

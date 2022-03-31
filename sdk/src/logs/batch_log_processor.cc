@@ -23,7 +23,9 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
+#  ifdef ENABLE_ASYNC_EXPORT
       is_export_async_(is_export_async),
+#  endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -41,7 +43,9 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
+#  ifdef ENABLE_ASYNC_EXPORT
       is_export_async_(options.is_export_async),
+#  endif
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -221,11 +225,14 @@ void BatchLogProcessor::Export()
                       });
                     });
 
+#  ifdef ENABLE_ASYNC_EXPORT
     if (is_export_async_ == false)
     {
+#  endif
       exporter_->Export(
           nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
       NotifyCompletion(notify_force_flush, synchronization_data_);
+#  ifdef ENABLE_ASYNC_EXPORT
     }
     else
     {
@@ -243,9 +250,11 @@ void BatchLogProcessor::Export()
             return true;
           });
     }
+#  endif
   } while (true);
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 void BatchLogProcessor::WaitForShutdownCompletion()
 {
   // Since async export is invoked due to shutdown, need to wait
@@ -267,6 +276,7 @@ void BatchLogProcessor::WaitForShutdownCompletion()
     }
   }
 }
+#  endif
 
 void BatchLogProcessor::NotifyCompletion(
     bool notify_force_flush,
@@ -303,9 +313,11 @@ void BatchLogProcessor::DrainQueue()
 
     Export();
 
+#  ifdef ENABLE_ASYNC_EXPORT
     // Since async export is invoked due to shutdown, need to wait
     // for async thread to complete.
     WaitForShutdownCompletion();
+#  endif
   }
 }
 

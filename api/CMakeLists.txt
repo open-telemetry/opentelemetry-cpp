@@ -63,3 +63,7 @@ endif()
 if(CORE_RUNTIME_LIBS)
   target_link_libraries(opentelemetry_api INTERFACE ${CORE_RUNTIME_LIBS})
 endif()
+
+if(WITH_ASYNC_EXPORT_PREVIEW)
+  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
+endif()

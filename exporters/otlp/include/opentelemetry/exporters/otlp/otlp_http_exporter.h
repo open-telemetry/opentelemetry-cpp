@@ -52,9 +52,11 @@ struct OtlpHttpExporterOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 
+#ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
   std::size_t max_concurrent_requests = 8;
+#endif
 };
 
 /**
@@ -87,6 +89,7 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
       override;
 
+#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports a batch of span recordables asynchronously.
    * @param spans a span of unique pointers to span recordables
@@ -96,6 +99,7 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
       override;
+#endif
 
   /**
    * Shut down the exporter.

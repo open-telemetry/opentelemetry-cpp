@@ -93,6 +93,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void ZipkinExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -101,6 +102,7 @@ void ZipkinExporter::Export(
   auto status = Export(spans);
   result_callback(status);
 }
+#endif
 
 void ZipkinExporter::InitializeLocalEndpoint()
 {

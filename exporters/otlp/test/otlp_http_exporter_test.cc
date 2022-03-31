@@ -114,8 +114,10 @@ public:
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
-    processor_opts.is_export_async       = is_async;
-    auto processor                       = std::unique_ptr<sdk::trace::SpanProcessor>(
+#  ifdef ENABLE_ASYNC_EXPORT
+    processor_opts.is_export_async = is_async;
+#  endif
+    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
     auto provider = nostd::shared_ptr<trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
@@ -210,8 +212,9 @@ public:
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
-    processor_opts.is_export_async       = is_async;
-
+#  ifdef ENABLE_ASYNC_EXPORT
+    processor_opts.is_export_async = is_async;
+#  endif
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
     auto provider = nostd::shared_ptr<trace::TracerProvider>(
@@ -282,10 +285,12 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest(false);
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTest(true);
 }
+#  endif
 
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -293,10 +298,12 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest(false);
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTest(true);
 }
+#  endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpExporterTestPeer, ConfigTest)

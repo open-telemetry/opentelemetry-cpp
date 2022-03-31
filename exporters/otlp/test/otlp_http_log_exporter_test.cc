@@ -213,7 +213,9 @@ public:
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-    processor_options.is_export_async       = is_async;
+#    ifdef ENABLE_ASYNC_EXPORT
+    processor_options.is_export_async = is_async;
+#    endif
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
         new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
@@ -306,10 +308,12 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest(false);
 }
 
+#    ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTest(true);
 }
+#    endif
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -317,10 +321,12 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest(false);
 }
 
+#    ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTest(true);
 }
+#    endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigTest)

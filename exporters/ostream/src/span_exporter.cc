@@ -96,6 +96,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void OStreamSpanExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -103,6 +104,7 @@ void OStreamSpanExporter::Export(
   auto result = Export(spans);
   result_callback(result);
 }
+#endif
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

@@ -33,8 +33,12 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers,
-                                                            options.max_concurrent_requests)))
+                                                            options.http_headers
+#  ifdef ENABLE_ASYNC_EXPORT
+                                                            ,
+                                                            options.max_concurrent_requests
+#  endif
+                                                            )))
 {}
 
 OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client)
@@ -60,6 +64,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
   return http_client_->Export(service_request);
 }
 
+#  ifdef ENABLE_ASYNC_EXPORT
 void OtlpHttpLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -72,6 +77,7 @@ void OtlpHttpLogExporter::Export(
   OtlpRecordableUtils::PopulateRequest(logs, &service_request);
   http_client_->Export(service_request, std::move(result_callback));
 }
+#  endif
 
 bool OtlpHttpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

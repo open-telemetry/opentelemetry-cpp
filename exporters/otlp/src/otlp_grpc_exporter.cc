@@ -143,6 +143,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 void OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
     std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
@@ -152,6 +153,7 @@ void OtlpGrpcExporter::Export(
   auto status = Export(spans);
   result_callback(status);
 }
+#endif
 
 bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

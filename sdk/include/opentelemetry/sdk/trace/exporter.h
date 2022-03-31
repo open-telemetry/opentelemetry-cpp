@@ -42,6 +42,7 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans) noexcept = 0;
 
+#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports a batch of span recordables asynchronously.
    * @param spans a span of unique pointers to span recordables
@@ -50,6 +51,7 @@ public:
   virtual void Export(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept = 0;
+#endif
 
   /**
    * Shut down the exporter.

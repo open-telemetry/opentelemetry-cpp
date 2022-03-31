@@ -64,6 +64,7 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
+#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Exports a batch of span recordables asynchronously.
    * @param spans a span of unique pointers to span recordables
@@ -77,6 +78,7 @@ public:
     auto status = Export(spans);
     result_callback(status);
   }
+#endif
 
   /**
    * @param timeout an optional value containing the timeout of the exporter
