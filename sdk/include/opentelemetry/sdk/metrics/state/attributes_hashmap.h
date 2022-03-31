@@ -37,7 +37,7 @@ class AttributesHashMap
 public:
   Aggregation *Get(const MetricAttributes &attributes) const
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
     {
@@ -52,7 +52,7 @@ public:
    */
   bool Has(const MetricAttributes &attributes) const
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     return (hash_map_.find(attributes) == hash_map_.end()) ? false : true;
   }
 
@@ -64,7 +64,8 @@ public:
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
+
     auto it = hash_map_.find(attributes);
     if (it != hash_map_.end())
     {
@@ -80,7 +81,7 @@ public:
    */
   void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> value)
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     hash_map_[attributes] = std::move(value);
   }
 
@@ -90,7 +91,7 @@ public:
   bool GetAllEnteries(
       nostd::function_ref<bool(const MetricAttributes &, Aggregation &)> callback) const
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     for (auto &kv : hash_map_)
     {
       if (!callback(kv.first, *(kv.second.get())))
@@ -106,7 +107,7 @@ public:
    */
   size_t Size()
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     return hash_map_.size();
   }
 
@@ -114,11 +115,7 @@ private:
   std::unordered_map<MetricAttributes, std::unique_ptr<Aggregation>, AttributeHashGenerator>
       hash_map_;
 
-  static opentelemetry::common::SpinLockMutex &GetLock() noexcept
-  {
-    static opentelemetry::common::SpinLockMutex lock;
-    return lock;
-  }
+  mutable opentelemetry::common::SpinLockMutex lock_;
 };
 }  // namespace metrics
 

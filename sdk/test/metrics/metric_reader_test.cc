@@ -17,9 +17,7 @@ public:
   MockMetricReader(AggregationTemporality aggr_temporality) : MetricReader(aggr_temporality) {}
 
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
-
   virtual void OnInitialized() noexcept override {}
 };
 
