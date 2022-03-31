@@ -30,7 +30,10 @@ public:
   virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
   /* Returns the new delta aggregation by comparing existing aggregation with next aggregation with
-   * same boundaries */
+   * same boundaries. Data points for `next` aggregation (sum , bucket-counts) should be more than
+   * the current aggregation - which is the normal scenario as measurements values are monotonic
+   * increasing.
+   */
   virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
@@ -50,8 +53,15 @@ public:
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
+  /* Returns the result of merge of the existing aggregation with delta aggregation with same
+   * boundaries */
   virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
+  /* Returns the new delta aggregation by comparing existing aggregation with next aggregation with
+   * same boundaries. Data points for `next` aggregation (sum , bucket-counts) should be more than
+   * the current aggregation - which is the normal scenario as measurements values are monotonic
+   * increasing.
+   */
   virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
