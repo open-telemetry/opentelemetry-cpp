@@ -24,6 +24,8 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_export_batch_size_(options.max_export_batch_size),
 #ifdef ENABLE_ASYNC_EXPORT
       is_export_async_(options.is_export_async),
+      max_export_async_(options.max_export_async),
+      export_data_storage_(std::make_shared<ExportDataStorage>()),
 #endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
@@ -33,7 +35,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-  synchronization_data_->is_async_shutdown_notified.store(false);
 }
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
@@ -218,45 +219,64 @@ void BatchSpanProcessor::Export()
     }
     else
     {
-      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
-          [notify_force_flush, synchronization_data_watcher](sdk::common::ExportResult result) {
-            // TODO: Print result
-            if (synchronization_data_watcher.expired())
-            {
-              return true;
-            }
+      std::unique_ptr<AsyncExportData> export_data(new AsyncExportData());
+      export_data->recordables =
+          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size());
+      auto ptr = export_data.get();
 
-            NotifyCompletion(notify_force_flush, synchronization_data_watcher.lock());
-            return true;
-          });
+      {
+        std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
+        export_data_storage_->running_async_exports[ptr] = std::move(export_data);
+      }
+      std::weak_ptr<ExportDataStorage> export_data_watcher = export_data_storage_;
+
+      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
+      exporter_->Export(ptr->recordables, [notify_force_flush, synchronization_data_watcher, ptr,
+                                           export_data_watcher](sdk::common::ExportResult result) {
+        // TODO: Print result
+        if (synchronization_data_watcher.expired())
+        {
+          return true;
+        }
+
+        if (export_data_watcher.expired())
+        {
+          return true;
+        }
+        auto synchronization_data = synchronization_data_watcher.lock();
+        auto export_data          = export_data_watcher.lock();
+        {
+          std::lock_guard<std::mutex> lk(synchronization_data->async_export_data_m);
+          export_data->garbage_async_exports.emplace_back(
+              std::move(export_data->running_async_exports[ptr]));
+          export_data->running_async_exports.erase(ptr);
+        }
+        NotifyCompletion(notify_force_flush, synchronization_data);
+        return true;
+      });
     }
+
+    // wait for running async exports < max async export allowed
+    std::unique_lock<std::mutex> lock(synchronization_data_->async_export_waker_m);
+    synchronization_data_->async_export_waker.wait_for(lock, schedule_delay_millis_, [this] {
+      std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
+      return export_data_storage_->running_async_exports.size() <= max_export_async_;
+    });
+
+    // Clean up garbage exports
+    CleanUpGarbageAsyncData();
 #endif
   } while (true);
 }
 
 #ifdef ENABLE_ASYNC_EXPORT
-void BatchSpanProcessor::WaitForShutdownCompletion()
+bool BatchSpanProcessor::CleanUpGarbageAsyncData()
 {
-  // Since async export is invoked due to shutdown, need to wait
-  // for async thread to complete.
-  if (is_export_async_)
-  {
-    std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m);
-    while (true)
-    {
-      if (synchronization_data_->is_async_shutdown_notified.load())
-      {
-        break;
-      }
+  std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
+  std::list<std::unique_ptr<AsyncExportData>> garbage;
+  garbage.swap(export_data_storage_->garbage_async_exports);
 
-      // When is_async_shutdown_notified.store(true) and async_shutdown_cv.notify_all() is called
-      // between is_async_shutdown_notified.load() and async_shutdown_cv.wait(). We must not wait
-      // for ever
-      synchronization_data_->async_shutdown_cv.wait_for(lk, schedule_delay_millis_);
-    }
-  }
+  return export_data_storage_->garbage_async_exports.empty() == true;
 }
 #endif
 
@@ -274,13 +294,6 @@ void BatchSpanProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
-
-  // Notify the thread which is waiting on shutdown to complete.
-  if (synchronization_data->is_shutdown.load() == true)
-  {
-    synchronization_data->is_async_shutdown_notified.store(true);
-    synchronization_data->async_shutdown_cv.notify_all();
-  }
 }
 
 void BatchSpanProcessor::DrainQueue()
@@ -294,9 +307,6 @@ void BatchSpanProcessor::DrainQueue()
     }
 
     Export();
-#ifdef ENABLE_ASYNC_EXPORT
-    WaitForShutdownCompletion();
-#endif
   }
 }
 
@@ -312,6 +322,18 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     synchronization_data_->cv.notify_one();
     worker_thread_.join();
   }
+
+#ifdef ENABLE_ASYNC_EXPORT
+  // wait for running async exports <= 0
+  std::unique_lock<std::mutex> lock(synchronization_data_->async_export_waker_m);
+  synchronization_data_->async_export_waker.wait_for(lock, timeout, [this] {
+    std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
+    return export_data_storage_->running_async_exports.size() <= 0;
+  });
+
+  while (CleanUpGarbageAsyncData() == false)
+    ;
+#endif
 
   auto worker_end_time = std::chrono::system_clock::now();
   auto offset = std::chrono::duration_cast<std::chrono::microseconds>(worker_end_time - start_time);

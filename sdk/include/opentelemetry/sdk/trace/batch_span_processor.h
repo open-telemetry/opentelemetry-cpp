@@ -10,6 +10,9 @@
 #include <atomic>
 #include <condition_variable>
 #include <thread>
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <list>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -44,6 +47,10 @@ struct BatchSpanProcessorOptions
    * Default implementation is synchronous.
    */
   bool is_export_async = false;
+
+  /* Denotes the maximum number of async exports to continue
+   */
+  size_t max_export_async = 8;
 #endif
 };
 
@@ -134,22 +141,41 @@ private:
   void DrainQueue();
 
 #ifdef ENABLE_ASYNC_EXPORT
-  /* In case of async export, wait and notify for shutdown to be completed.*/
-  void WaitForShutdownCompletion();
+  struct AsyncExportData
+  {
+    nostd::span<std::unique_ptr<Recordable>> recordables;
+  };
+
+  struct ExportDataStorage
+  {
+    std::unordered_map<AsyncExportData *, std::unique_ptr<AsyncExportData>> running_async_exports;
+    std::list<std::unique_ptr<AsyncExportData>> garbage_async_exports;
+  };
+  std::shared_ptr<ExportDataStorage> export_data_storage_;
+
+  bool CleanUpGarbageAsyncData();
+
+  const bool is_export_async_;
+  const size_t max_export_async_;
 #endif
 
   struct SynchronizationData
   {
     /* Synchronization primitives */
-    std::condition_variable cv, force_flush_cv, async_shutdown_cv;
-    std::mutex cv_m, force_flush_cv_m, shutdown_m, async_shutdown_m;
+    std::condition_variable cv, force_flush_cv;
+    std::mutex cv_m, force_flush_cv_m, shutdown_m;
 
     /* Important boolean flags to handle the workflow of the processor */
     std::atomic<bool> is_force_wakeup_background_worker;
     std::atomic<bool> is_force_flush_pending;
     std::atomic<bool> is_force_flush_notified;
     std::atomic<bool> is_shutdown;
-    std::atomic<bool> is_async_shutdown_notified;
+#ifdef ENABLE_ASYNC_EXPORT
+    std::mutex async_export_waker_m;
+    std::condition_variable async_export_waker;
+
+    std::mutex async_export_data_m;
+#endif
   };
 
   /**
@@ -169,9 +195,6 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_export_batch_size_;
-#ifdef ENABLE_ASYNC_EXPORT
-  const bool is_export_async_;
-#endif
 
   /* The buffer/queue to which the ended spans are added */
   common::CircularBuffer<Recordable> buffer_;

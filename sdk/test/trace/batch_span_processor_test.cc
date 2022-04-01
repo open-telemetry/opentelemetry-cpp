@@ -67,6 +67,7 @@ public:
     auto result = Export(records);
     async_threads_.emplace_back(std::make_shared<std::thread>(
         [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
           result_callback(result);
         },
         std::move(result_callback)));
@@ -164,23 +165,31 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 #ifdef ENABLE_ASYNC_EXPORT
 TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
 {
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
   sdk::trace::BatchSpanProcessorOptions options{};
-  options.is_export_async = true;
+  options.is_export_async       = true;
+  options.max_export_async      = 5;
+  options.max_queue_size        = 20;
+  options.schedule_delay_millis = std::chrono::milliseconds(500);
 
   auto batch_processor =
       std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
           std::unique_ptr<MockSpanExporter>(new MockSpanExporter(spans_received, is_shutdown)),
           options));
-  const int num_spans = 3;
+  const int num_spans = 500;
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
 
   for (int i = 0; i < num_spans; ++i)
   {
+    if (i % 20 == 0)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
