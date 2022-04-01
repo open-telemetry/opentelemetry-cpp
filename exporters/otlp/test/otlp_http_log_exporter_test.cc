@@ -103,9 +103,13 @@ public:
     std::string attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogProcessor>(new sdk::logs::BatchLogProcessor(
-            std::move(exporter), 5, std::chrono::milliseconds(256), 5, is_async)));
+    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+        new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 5
+#    ifdef ENABLE_ASYNC_EXPORT
+                                         ,
+                                         is_async
+#    endif
+                                         )));
 
     std::string report_trace_id;
     std::string report_span_id;
