@@ -14,54 +14,46 @@ namespace exporter
 namespace metrics
 {
 
+template <typename Container>
+inline void printVec(std::ostream &os, Container &vec)
+{
+  using T = typename std::decay<decltype(*vec.begin())>::type;
+  os << '[';
+  if (vec.size() > 1)
+  {
+    std::copy(vec.begin(), vec.end(), std::ostream_iterator<T>(os, ", "));
+  }
+  os << ']';
+}
+
 OStreamMetricExporter::OStreamMetricExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 sdk::common::ExportResult OStreamMetricExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::MetricData>> &records) noexcept
+    const sdk::metrics::MetricData &data) noexcept
 {
   if (isShutdown())
   {
     OTEL_INTERNAL_LOG_ERROR("[OStream Metric] Exporting "
-                            << records.size() << " records(s) failed, exporter is shutdown");
+                            << data.point_data_attr_.size()
+                            << " records(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
-  for (auto &record : records)
+  for (auto &record : data.point_data_attr_)
   {
-    sout_ << "{"
-          << "\n  name        : " << record->instrumentation_library_->GetName()
-          << "\n  version     : " << record->instrumentation_library_->GetVersion();
-    printPointData(record->point_data_);
+    sout_ << "{";
+    printPointData(record.point_data);
     sout_ << "\n}\n";
   }
   return sdk::common::ExportResult::kSuccess;
 }
 
-template <typename T>
-inline void printVec(std::ostream &os, std::vector<T> &vec)
-{
-  os << '[';
-  if (vec.size() > 1)
-  {
-    std::copy(vec.begin(), vec.end() - 1, std::ostream_iterator<T>(os, ", "));
-  }
-  if (!vec.empty())
-  {
-    os << vec.back();
-  }
-  os << ']';
-}
-
-void OStreamMetricExporter::printPointData(opentelemetry::sdk::metrics::PointType &point_data)
+void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::PointType &point_data)
 {
   if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data))
   {
     auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data);
     sout_ << "\n  type     : SumPointData";
-    sout_ << "\n  start timestamp     : "
-          << std::to_string(sum_point_data.start_epoch_nanos_.time_since_epoch().count());
-    sout_ << "\n  end timestamp     : "
-          << std::to_string(sum_point_data.end_epoch_nanos_.time_since_epoch().count());
     sout_ << "\n  value     : ";
     if (nostd::holds_alternative<double>(sum_point_data.value_))
     {
@@ -76,8 +68,6 @@ void OStreamMetricExporter::printPointData(opentelemetry::sdk::metrics::PointTyp
   {
     auto histogram_point_data = nostd::get<sdk::metrics::HistogramPointData>(point_data);
     sout_ << "\n  type     : HistogramPointData";
-    sout_ << "\n  timestamp     : "
-          << std::to_string(histogram_point_data.epoch_nanos_.time_since_epoch().count());
     sout_ << "\n  count     : " << histogram_point_data.count_;
     sout_ << "\n  sum     : ";
     if (nostd::holds_alternative<double>(histogram_point_data.sum_))
@@ -90,14 +80,14 @@ void OStreamMetricExporter::printPointData(opentelemetry::sdk::metrics::PointTyp
     }
 
     sout_ << "\n  buckets     : ";
-    if (nostd::holds_alternative<std::vector<double>>(histogram_point_data.boundaries_))
+    if (nostd::holds_alternative<std::list<double>>(histogram_point_data.boundaries_))
     {
-      auto &double_boundaries = nostd::get<std::vector<double>>(histogram_point_data.boundaries_);
+      auto &double_boundaries = nostd::get<std::list<double>>(histogram_point_data.boundaries_);
       printVec(sout_, double_boundaries);
     }
-    else if (nostd::holds_alternative<std::vector<long>>(histogram_point_data.boundaries_))
+    else if (nostd::holds_alternative<std::list<long>>(histogram_point_data.boundaries_))
     {
-      auto &long_boundaries = nostd::get<std::vector<long>>(histogram_point_data.boundaries_);
+      auto &long_boundaries = nostd::get<std::list<long>>(histogram_point_data.boundaries_);
       printVec(sout_, long_boundaries);
     }
 
@@ -109,8 +99,8 @@ void OStreamMetricExporter::printPointData(opentelemetry::sdk::metrics::PointTyp
     auto last_point_data = nostd::get<sdk::metrics::LastValuePointData>(point_data);
     sout_ << "\n  type     : LastValuePointData";
     sout_ << "\n  timestamp     : "
-          << std::to_string(last_point_data.epoch_nanos_.time_since_epoch().count())
-          << std::boolalpha << "\n  valid     : " << last_point_data.is_lastvalue_valid_;
+          << std::to_string(last_point_data.sample_ts_.time_since_epoch().count()) << std::boolalpha
+          << "\n  valid     : " << last_point_data.is_lastvalue_valid_;
     sout_ << "\n  value     : ";
     if (nostd::holds_alternative<double>(last_point_data.value_))
     {
