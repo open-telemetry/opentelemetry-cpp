@@ -66,6 +66,9 @@ BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 BAZEL_MACOS_OPTIONS="$BAZEL_OPTIONS --features=-supports_dynamic_linker --build_tag_filters=-jaeger"
 BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
 
+BAZEL_OPTIONS_ASYNC="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_ASYNC_EXPORT_PREVIEW"
+BAZEL_TEST_OPTIONS_ASYNC="$BAZEL_OPTIONS_ASYNC --test_output=errors"
+
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
 export CTEST_OUTPUT_ON_FAILURE=1
@@ -201,6 +204,10 @@ EOF
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
+  exit 0
+elif [[ "$1" == "bazel.with_async_export" ]]; then
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.benchmark" ]]; then
   run_benchmarks

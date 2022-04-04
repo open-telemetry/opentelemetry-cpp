@@ -11,7 +11,7 @@
 #include <condition_variable>
 #include <thread>
 #ifdef ENABLE_ASYNC_EXPORT
-#  include <list>
+#  include <queue>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -141,22 +141,16 @@ private:
   void DrainQueue();
 
 #ifdef ENABLE_ASYNC_EXPORT
-  struct AsyncExportData
-  {
-    nostd::span<std::unique_ptr<Recordable>> recordables;
-  };
-
   struct ExportDataStorage
   {
-    std::unordered_map<AsyncExportData *, std::unique_ptr<AsyncExportData>> running_async_exports;
-    std::list<std::unique_ptr<AsyncExportData>> garbage_async_exports;
+    std::queue<size_t> export_ids;
+    std::vector<bool> export_ids_flag;
   };
   std::shared_ptr<ExportDataStorage> export_data_storage_;
 
-  bool CleanUpGarbageAsyncData();
-
   const bool is_export_async_;
   const size_t max_export_async_;
+  static constexpr int kInvalidExportId = 0;
 #endif
 
   struct SynchronizationData
@@ -171,9 +165,7 @@ private:
     std::atomic<bool> is_force_flush_notified;
     std::atomic<bool> is_shutdown;
 #ifdef ENABLE_ASYNC_EXPORT
-    std::mutex async_export_waker_m;
     std::condition_variable async_export_waker;
-
     std::mutex async_export_data_m;
 #endif
   };
@@ -188,6 +180,8 @@ private:
   static void NotifyCompletion(bool notify_force_flush,
                                const std::shared_ptr<SynchronizationData> &synchronization_data);
 
+  void GetWaitAdjustedTime(std::chrono::microseconds &timeout,
+                           std::chrono::time_point<std::chrono::system_clock> &start_time);
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
 

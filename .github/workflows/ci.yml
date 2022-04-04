@@ -150,6 +150,28 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
+  bazel_test_async:
+    name: Bazel with async export
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.with_async_export
+
   bazel_with_abseil:
     name: Bazel with external abseil
     runs-on: ubuntu-latest

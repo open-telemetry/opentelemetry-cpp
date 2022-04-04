@@ -35,6 +35,15 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
+
+#ifdef ENABLE_ASYNC_EXPORT
+  export_data_storage_->export_ids_flag.reserve(max_export_async_);
+  for (size_t i = 1; i <= max_export_async_; i++)
+  {
+    export_data_storage_->export_ids.push(i);
+    export_data_storage_->export_ids_flag[i - 1] = true;
+  }
+#endif
 }
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
@@ -219,66 +228,57 @@ void BatchSpanProcessor::Export()
     }
     else
     {
-      std::unique_ptr<AsyncExportData> export_data(new AsyncExportData());
-      export_data->recordables =
-          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size());
-      auto ptr = export_data.get();
-
+      size_t id = kInvalidExportId;
       {
-        std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
-        export_data_storage_->running_async_exports[ptr] = std::move(export_data);
+        std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
+        synchronization_data_->async_export_waker.wait_for(lock, schedule_delay_millis_, [this] {
+          return export_data_storage_->export_ids.size() > 0;
+        });
+        if (export_data_storage_->export_ids.size() > 0)
+        {
+          id = export_data_storage_->export_ids.front();
+          export_data_storage_->export_ids.pop();
+          export_data_storage_->export_ids_flag[id - 1] = false;
+        }
       }
-      std::weak_ptr<ExportDataStorage> export_data_watcher = export_data_storage_;
+      if (id != kInvalidExportId)
+      {
+        std::weak_ptr<ExportDataStorage> export_data_watcher = export_data_storage_;
 
-      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
-      exporter_->Export(ptr->recordables, [notify_force_flush, synchronization_data_watcher, ptr,
-                                           export_data_watcher](sdk::common::ExportResult result) {
-        // TODO: Print result
-        if (synchronization_data_watcher.expired())
-        {
-          return true;
-        }
+        std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
+        exporter_->Export(
+            nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
+            [notify_force_flush, synchronization_data_watcher, export_data_watcher,
+             id](sdk::common::ExportResult result) {
+              // TODO: Print result
+              if (synchronization_data_watcher.expired())
+              {
+                return true;
+              }
 
-        if (export_data_watcher.expired())
-        {
-          return true;
-        }
-        auto synchronization_data = synchronization_data_watcher.lock();
-        auto export_data          = export_data_watcher.lock();
-        {
-          std::lock_guard<std::mutex> lk(synchronization_data->async_export_data_m);
-          export_data->garbage_async_exports.emplace_back(
-              std::move(export_data->running_async_exports[ptr]));
-          export_data->running_async_exports.erase(ptr);
-        }
-        NotifyCompletion(notify_force_flush, synchronization_data);
-        return true;
-      });
+              if (export_data_watcher.expired())
+              {
+                return true;
+              }
+
+              auto synchronization_data = synchronization_data_watcher.lock();
+              auto export_data          = export_data_watcher.lock();
+              {
+                std::unique_lock<std::mutex> lk(synchronization_data->async_export_data_m);
+                if (export_data->export_ids_flag[id - 1] == false)
+                {
+                  export_data->export_ids.push(id);
+                  export_data->export_ids_flag[id - 1] = true;
+                }
+              }
+              NotifyCompletion(notify_force_flush, synchronization_data);
+              return true;
+            });
+      }
     }
-
-    // wait for running async exports < max async export allowed
-    std::unique_lock<std::mutex> lock(synchronization_data_->async_export_waker_m);
-    synchronization_data_->async_export_waker.wait_for(lock, schedule_delay_millis_, [this] {
-      std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
-      return export_data_storage_->running_async_exports.size() <= max_export_async_;
-    });
-
-    // Clean up garbage exports
-    CleanUpGarbageAsyncData();
 #endif
   } while (true);
 }
-
-#ifdef ENABLE_ASYNC_EXPORT
-bool BatchSpanProcessor::CleanUpGarbageAsyncData()
-{
-  std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
-  std::list<std::unique_ptr<AsyncExportData>> garbage;
-  garbage.swap(export_data_storage_->garbage_async_exports);
-
-  return export_data_storage_->garbage_async_exports.empty() == true;
-}
-#endif
 
 void BatchSpanProcessor::NotifyCompletion(
     bool notify_force_flush,
@@ -294,6 +294,9 @@ void BatchSpanProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
+#ifdef ENABLE_ASYNC_EXPORT
+  synchronization_data->async_export_waker.notify_all();
+#endif
 }
 
 void BatchSpanProcessor::DrainQueue()
@@ -307,6 +310,26 @@ void BatchSpanProcessor::DrainQueue()
     }
 
     Export();
+  }
+}
+
+void BatchSpanProcessor::GetWaitAdjustedTime(
+    std::chrono::microseconds &timeout,
+    std::chrono::time_point<std::chrono::system_clock> &start_time)
+{
+  auto end_time = std::chrono::system_clock::now();
+  auto offset   = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+  start_time    = end_time;
+  timeout       = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+  if (timeout > offset && timeout > std::chrono::microseconds::zero())
+  {
+    timeout -= offset;
+  }
+  else
+  {
+    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
+    timeout = std::chrono::microseconds(1);
   }
 }
 
@@ -324,33 +347,17 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   }
 
 #ifdef ENABLE_ASYNC_EXPORT
-  // wait for running async exports <= 0
-  std::unique_lock<std::mutex> lock(synchronization_data_->async_export_waker_m);
-  synchronization_data_->async_export_waker.wait_for(lock, timeout, [this] {
-    std::lock_guard<std::mutex> lk(synchronization_data_->async_export_data_m);
-    return export_data_storage_->running_async_exports.size() <= 0;
-  });
-
-  while (CleanUpGarbageAsyncData() == false)
-    ;
+  GetWaitAdjustedTime(timeout, start_time);
+  // wait for  all async exports to complete and return if timeout reached.
+  {
+    std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
+    synchronization_data_->async_export_waker.wait_for(lock, timeout, [this] {
+      return export_data_storage_->export_ids.size() == max_export_async_;
+    });
+  }
 #endif
 
-  auto worker_end_time = std::chrono::system_clock::now();
-  auto offset = std::chrono::duration_cast<std::chrono::microseconds>(worker_end_time - start_time);
-
-  // Fix timeout to meet requirement of wait_for
-  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
-      timeout, std::chrono::microseconds::zero());
-  if (timeout > offset && timeout > std::chrono::microseconds::zero())
-  {
-    timeout -= offset;
-  }
-  else
-  {
-    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
-    timeout = std::chrono::microseconds(1);
-  }
-
+  GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)
   {

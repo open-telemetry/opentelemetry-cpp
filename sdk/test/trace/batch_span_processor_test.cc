@@ -24,11 +24,20 @@ public:
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
-      const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
+      const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)
+#ifdef ENABLE_ASYNC_EXPORT
+          ,
+      int callback_count = 1
+#endif
+      ) noexcept
       : spans_received_(spans_received),
         is_shutdown_(is_shutdown),
         is_export_completed_(is_export_completed),
         export_delay_(export_delay)
+#ifdef ENABLE_ASYNC_EXPORT
+        ,
+        callback_count_(callback_count)
+#endif
   {}
 
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
@@ -66,9 +75,12 @@ public:
     // We should keep the order of test records
     auto result = Export(records);
     async_threads_.emplace_back(std::make_shared<std::thread>(
-        [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(1));
-          result_callback(result);
+        [this,
+         result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          for (int i = 0; i < callback_count_; i++)
+          {
+            result_callback(result);
+          }
         },
         std::move(result_callback)));
   }
@@ -102,6 +114,9 @@ private:
   // Meant exclusively to test force flush timeout
   const std::chrono::milliseconds export_delay_;
   std::list<std::shared_ptr<std::thread>> async_threads_;
+#ifdef ENABLE_ASYNC_EXPORT
+  int callback_count_;
+#endif
 };
 
 /**
@@ -165,35 +180,28 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 #ifdef ENABLE_ASYNC_EXPORT
 TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
 {
-  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
-  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
 
   sdk::trace::BatchSpanProcessorOptions options{};
-  options.is_export_async       = true;
-  options.max_export_async      = 5;
-  options.max_queue_size        = 20;
-  options.schedule_delay_millis = std::chrono::milliseconds(500);
+  options.is_export_async  = true;
+  options.max_export_async = 5;
 
   auto batch_processor =
       std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
           std::unique_ptr<MockSpanExporter>(new MockSpanExporter(spans_received, is_shutdown)),
           options));
-  const int num_spans = 500;
+  const int num_spans = 2048;
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
 
   for (int i = 0; i < num_spans; ++i)
   {
-    if (i % 20 == 0)
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  EXPECT_TRUE(batch_processor->Shutdown());
+  EXPECT_TRUE(batch_processor->Shutdown(std::chrono::milliseconds(5000)));
   // It's safe to shutdown again
   EXPECT_TRUE(batch_processor->Shutdown());
 
@@ -202,6 +210,40 @@ TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdown)
   {
     EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
   }
+
+  EXPECT_TRUE(is_shutdown->load());
+}
+
+TEST_F(BatchSpanProcessorTestPeer, TestAsyncShutdownNoCallback)
+{
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
+  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  const std::chrono::milliseconds export_delay(0);
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+
+  sdk::trace::BatchSpanProcessorOptions options{};
+  options.is_export_async  = true;
+  options.max_export_async = 8;
+
+  auto batch_processor =
+      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
+          std::unique_ptr<MockSpanExporter>(new MockSpanExporter(
+              spans_received, is_shutdown, is_export_completed, export_delay, 0)),
+          options));
+  const int num_spans = 2048;
+
+  auto test_spans = GetTestSpans(batch_processor, num_spans);
+
+  for (int i = 0; i < num_spans; ++i)
+  {
+    batch_processor->OnEnd(std::move(test_spans->at(i)));
+  }
+
+  // Shutdown should never block for ever and return on timeout
+  EXPECT_TRUE(batch_processor->Shutdown(std::chrono::milliseconds(5000)));
+  // It's safe to shutdown again
+  EXPECT_TRUE(batch_processor->Shutdown());
 
   EXPECT_TRUE(is_shutdown->load());
 }

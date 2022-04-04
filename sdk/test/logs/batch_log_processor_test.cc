@@ -26,11 +26,20 @@ public:
   MockLogExporter(std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
-                  const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
+                  const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)
+#  ifdef ENABLE_ASYNC_EXPORT
+                      ,
+                  int callback_count = 1
+#  endif
+                  )
       : logs_received_(logs_received),
         is_shutdown_(is_shutdown),
         is_export_completed_(is_export_completed),
         export_delay_(export_delay)
+#  ifdef ENABLE_ASYNC_EXPORT
+        ,
+        callback_count_(callback_count)
+#  endif
   {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept
@@ -65,9 +74,12 @@ public:
     // We should keep the order of test records
     auto result = Export(records);
     async_threads_.emplace_back(std::make_shared<std::thread>(
-        [result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(1));
-          result_callback(result);
+        [this,
+         result](std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) {
+          for (int i = 0; i < callback_count_; i++)
+          {
+            result_callback(result);
+          }
         },
         std::move(result_callback)));
   }
@@ -99,6 +111,9 @@ private:
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   const std::chrono::milliseconds export_delay_;
   std::list<std::shared_ptr<std::thread>> async_threads_;
+#  ifdef ENABLE_ASYNC_EXPORT
+  int callback_count_;
+#  endif
 };
 
 /**
@@ -121,13 +136,19 @@ public:
 #  ifdef ENABLE_ASYNC_EXPORT
       ,
       const bool is_export_async    = false,
-      const size_t max_export_async = 8
+      const size_t max_export_async = 8,
+      int callback_count            = 1
 #  endif
   )
   {
     return std::shared_ptr<LogProcessor>(new BatchLogProcessor(
-        std::unique_ptr<LogExporter>(
-            new MockLogExporter(logs_received, is_shutdown, is_export_completed, export_delay)),
+        std::unique_ptr<LogExporter>(new MockLogExporter(logs_received, is_shutdown,
+                                                         is_export_completed, export_delay
+#  ifdef ENABLE_ASYNC_EXPORT
+                                                         ,
+                                                         callback_count
+#  endif
+                                                         )),
         max_queue_size, scheduled_delay_millis, max_export_batch_size
 #  ifdef ENABLE_ASYNC_EXPORT
         ,
@@ -187,7 +208,7 @@ TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds scheduled_delay_millis(5000);
   const size_t max_export_batch_size = 512;
-  const size_t max_queue_size        = 20;
+  const size_t max_queue_size        = 2048;
   const bool is_export_async         = true;
   const size_t max_export_async      = 5;
 
@@ -196,15 +217,10 @@ TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
                                           max_export_batch_size, is_export_async, max_export_async);
 
   // Create a few test log records and send them to the processor
-  const int num_logs = 500;
+  const int num_logs = 2048;
 
   for (int i = 0; i < num_logs; ++i)
   {
-    if (i % 20 == 0)
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
-
     auto log = batch_processor->MakeRecordable();
     log->SetName("Log" + std::to_string(i));
     batch_processor->OnReceive(std::move(log));
@@ -224,6 +240,43 @@ TEST_F(BatchLogProcessorTest, TestAsyncShutdown)
   {
     EXPECT_EQ("Log" + std::to_string(i), logs_received->at(i)->GetName());
   }
+
+  // Also check that the processor is shut down at the end
+  EXPECT_TRUE(is_shutdown->load());
+}
+
+TEST_F(BatchLogProcessorTest, TestAsyncShutdownNoCallback)
+{
+  // initialize a batch log processor with the test exporter
+  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
+      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
+
+  const std::chrono::milliseconds export_delay(0);
+  const std::chrono::milliseconds scheduled_delay_millis(5000);
+  const size_t max_export_batch_size = 512;
+  const size_t max_queue_size        = 2048;
+  const bool is_export_async         = true;
+  const size_t max_export_async      = 5;
+
+  auto batch_processor = GetMockProcessor(
+      logs_received, is_shutdown, is_export_completed, export_delay, scheduled_delay_millis,
+      max_queue_size, max_export_batch_size, is_export_async, max_export_async, 0);
+
+  // Create a few test log records and send them to the processor
+  const int num_logs = 2048;
+
+  for (int i = 0; i < num_logs; ++i)
+  {
+    auto log = batch_processor->MakeRecordable();
+    log->SetName("Log" + std::to_string(i));
+    batch_processor->OnReceive(std::move(log));
+  }
+
+  EXPECT_EQ(true, batch_processor->Shutdown(std::chrono::milliseconds(5000)));
+  // It's safe to shutdown again
+  EXPECT_TRUE(batch_processor->Shutdown());
 
   // Also check that the processor is shut down at the end
   EXPECT_TRUE(is_shutdown->load());
