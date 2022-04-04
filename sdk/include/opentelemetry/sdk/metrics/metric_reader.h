@@ -34,7 +34,7 @@ public:
    * Collect the metrics from SDK.
    * @return return the status of the operation.
    */
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept;
+  bool Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept;
 
   AggregationTemporality GetAggregationTemporality() const noexcept;
 

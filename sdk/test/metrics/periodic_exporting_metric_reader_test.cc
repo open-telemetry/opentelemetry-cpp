@@ -16,7 +16,7 @@ using namespace opentelemetry::sdk::metrics;
 class MockPushMetricExporter : public MetricExporter
 {
 public:
-  opentelemetry::sdk::common::ExportResult Export(const MetricData &record) noexcept override
+  opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &record) noexcept override
   {
     records_.push_back(record);
     return opentelemetry::sdk::common::ExportResult::kSuccess;
@@ -36,7 +36,7 @@ public:
   size_t GetDataCount() { return records_.size(); }
 
 private:
-  std::vector<MetricData> records_;
+  std::vector<ResourceMetrics> records_;
 };
 
 class MockMetricProducer : public MetricProducer
@@ -46,11 +46,11 @@ public:
       : sleep_ms_{sleep_ms}, data_sent_size_(0)
   {}
 
-  bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept override
+  bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
-    MetricData data;
+    ResourceMetrics data;
     callback(data);
     return true;
   }

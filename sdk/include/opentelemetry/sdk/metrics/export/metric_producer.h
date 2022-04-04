@@ -48,7 +48,7 @@ public:
    * @return a status of completion of method.
    */
   virtual bool Collect(
-      nostd::function_ref<bool(ResourceMetrics metric_data)> callback) noexcept = 0;
+      nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept = 0;
 };
 
 }  // namespace metrics

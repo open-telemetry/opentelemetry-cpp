@@ -29,7 +29,7 @@ AggregationTemporality MetricReader::GetAggregationTemporality() const noexcept
 }
 
 bool MetricReader::Collect(
-    nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept
+    nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
   if (!metric_producer_)
   {
