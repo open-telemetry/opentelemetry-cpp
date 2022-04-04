@@ -57,6 +57,7 @@ private:
 
   virtual void OnInitialized() noexcept {}
 
+protected:
   bool IsShutdown() const noexcept;
 
 private:

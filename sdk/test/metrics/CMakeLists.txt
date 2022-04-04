@@ -11,7 +11,8 @@ foreach(
   observer_result_test
   sync_instruments_test
   async_instruments_test
-  metric_reader_test)
+  metric_reader_test
+  periodic_exporting_metric_reader_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}

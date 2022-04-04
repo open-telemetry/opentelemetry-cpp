@@ -43,7 +43,9 @@ cc_library(
     ],
 )
 
-#TODO MetricData is still changing, uncomment once it is final
+# TODO - Uncomment once MetricData interface is finalised
+#cc_library(
+#    name = "ostream_metric_exporter",
 #    srcs = [
 #        "src/metric_exporter.cc",
 #    ],
@@ -70,7 +72,7 @@ cc_library(
 #    deps = [
 #        ":ostream_metric_exporter",
 #        "@com_google_googletest//:gtest_main",
-#],
+#    ],
 #)
 
 cc_test(
