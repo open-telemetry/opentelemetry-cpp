@@ -17,11 +17,17 @@ namespace metrics
  * Metric Data to be exported along with resources and
  * Instrumentation library.
  */
+struct InstrumentationInfoMetrics
+{
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_;
+  std::vector<MetricData> metric_data_;
+};
+
 struct ResourceMetrics
 {
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library;
-  const opentelemetry::sdk::resource::Resource *resource;
-  MetricData metric_data;
+  const opentelemetry::sdk::resource::Resource *resource_;
+  std::vector<InstrumentationInfoMetrics> instrumentation_info_metric_data_;
 };
 
 /**
@@ -42,7 +48,7 @@ public:
    * @return a status of completion of method.
    */
   virtual bool Collect(
-      nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept = 0;
+      nostd::function_ref<bool(ResourceMetrics metric_data)> callback) noexcept = 0;
 };
 
 }  // namespace metrics

@@ -25,7 +25,7 @@ public:
                        nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                        opentelemetry::common::SystemTimestamp sdk_start_ts,
                        opentelemetry::common::SystemTimestamp collection_ts,
-                       nostd::function_ref<bool(MetricData &&)> callback) noexcept = 0;
+                       nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
 };
 
 class WritableMetricStorage
@@ -54,7 +54,7 @@ public:
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
-               nostd::function_ref<bool(MetricData &&)> callback) noexcept override
+               nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
     MetricData metric_data;
     return callback(std::move(metric_data));

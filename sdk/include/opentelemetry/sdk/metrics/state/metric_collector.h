@@ -41,7 +41,7 @@ public:
    *
    * @return a status of completion of method.
    */
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &&metric_data)> callback) noexcept override;
+  bool Collect(nostd::function_ref<bool(ResourceMetrics metric_data)> callback) noexcept override;
 
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 

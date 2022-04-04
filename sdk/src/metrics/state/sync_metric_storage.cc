@@ -15,7 +15,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
                                 nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                                 opentelemetry::common::SystemTimestamp sdk_start_ts,
                                 opentelemetry::common::SystemTimestamp collection_ts,
-                                nostd::function_ref<bool(MetricData &&)> callback) noexcept
+                                nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
   auto aggregation_temporarily = collector->GetAggregationTemporality();
@@ -122,7 +122,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
         metric_data.point_data_attr_.push_back(point_data_attr);
         return true;
       });
-  return callback(std::move(metric_data));
+  return callback(metric_data);
 }
 
 }  // namespace metrics
