@@ -32,7 +32,7 @@ public:
    * concurrently for the same exporter instance.
    * @param data metrics data
    */
-  virtual opentelemetry::sdk::common::ExportResult Export(const MetricData &data) noexcept = 0;
+  virtual opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &data) noexcept = 0;
 
   /**
    * Force flush the exporter.

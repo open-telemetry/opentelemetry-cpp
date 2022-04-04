@@ -6,6 +6,7 @@
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/version.h"
 
@@ -18,7 +19,6 @@ namespace sdk
 namespace metrics
 {
 
-class MetricProducer;
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
@@ -34,7 +34,7 @@ public:
    * Collect the metrics from SDK.
    * @return return the status of the operation.
    */
-  bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept;
+  bool Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept;
 
   AggregationTemporality GetAggregationTemporality() const noexcept;
 

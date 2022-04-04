@@ -38,7 +38,7 @@ void measurement_fetch(opentelemetry::metrics::ObserverResult<long> &observer_re
 
 TEST(AsyncMetricStorageTest, BasicTests)
 {
-  auto metric_callback            = [](MetricData &metric_data) { return true; };
+  auto metric_callback            = [](MetricData &&metric_data) { return true; };
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
 
