@@ -51,7 +51,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     std::atomic<bool> cancel_export_for_timeout{false};
     auto start          = std::chrono::steady_clock::now();
     auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
-      Collect([this, &cancel_export_for_timeout](MetricData data) {
+      Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
         if (cancel_export_for_timeout)
         {
           OTEL_INTERNAL_LOG_ERROR(
@@ -59,7 +59,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
               << export_timeout_millis_.count() << " ms, and timed out");
           return false;
         }
-        this->exporter_->Export(data);
+        this->exporter_->Export(metric_data);
         return true;
       });
     });

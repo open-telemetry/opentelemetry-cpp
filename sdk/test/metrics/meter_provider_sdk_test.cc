@@ -18,7 +18,7 @@ class MockMetricExporter : public MetricExporter
 
 public:
   MockMetricExporter() = default;
-  opentelemetry::sdk::common::ExportResult Export(const MetricData &records) noexcept override
+  opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &records) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
