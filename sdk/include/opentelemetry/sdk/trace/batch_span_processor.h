@@ -150,7 +150,7 @@ private:
 
   const bool is_export_async_;
   const size_t max_export_async_;
-  static constexpr int kInvalidExportId = 0;
+  static constexpr size_t kInvalidExportId = static_cast<size_t>(-1);
 #endif
 
   struct SynchronizationData

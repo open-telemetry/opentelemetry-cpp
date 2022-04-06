@@ -42,11 +42,10 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
 #  ifdef ENABLE_ASYNC_EXPORT
-  export_data_storage_->export_ids_flag.reserve(max_export_async_);
+  export_data_storage_->export_ids_flag.resize(max_export_async_, true);
   for (size_t i = 1; i <= max_export_async_; i++)
   {
     export_data_storage_->export_ids.push(i);
-    export_data_storage_->export_ids_flag[i - 1] = true;
   }
 #  endif
 }
@@ -71,11 +70,10 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
 #  ifdef ENABLE_ASYNC_EXPORT
-  export_data_storage_->export_ids_flag.reserve(max_export_async_);
+  export_data_storage_->export_ids_flag.resize(max_export_async_, true);
   for (int i = 1; i <= max_export_async_; i++)
   {
     export_data_storage_->export_ids.push(i);
-    export_data_storage_->export_ids_flag[i - 1] = true;
   }
 #  endif
 }
