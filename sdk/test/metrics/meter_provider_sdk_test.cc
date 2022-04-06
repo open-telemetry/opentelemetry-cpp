@@ -18,8 +18,7 @@ class MockMetricExporter : public MetricExporter
 
 public:
   MockMetricExporter() = default;
-  opentelemetry::sdk::common::ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<MetricData>> &records) noexcept override
+  opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &records) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
@@ -40,9 +39,7 @@ class MockMetricReader : public MetricReader
 {
 public:
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
-
   virtual void OnInitialized() noexcept override {}
 };
 
