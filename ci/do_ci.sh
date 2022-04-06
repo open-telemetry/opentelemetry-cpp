@@ -62,7 +62,7 @@ mkdir -p "${PLUGIN_DIR}"
 BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
-BAZEL_OPTIONS_ASYNC="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_ASYNC_EXPORT_PREVIEW"
+BAZEL_OPTIONS_ASYNC="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_ASYNC_EXPORT"
 BAZEL_TEST_OPTIONS_ASYNC="$BAZEL_OPTIONS_ASYNC --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
@@ -246,7 +246,7 @@ elif [[ "$1" == "bazel.valgrind" ]]; then
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
