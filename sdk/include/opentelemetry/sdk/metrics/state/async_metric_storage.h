@@ -4,17 +4,15 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/observer_result.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#  include "opentelemetry/sdk/resource/resource.h"
 
 #  include <memory>
-#  include "opentelemetry/sdk/metrics/observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -41,7 +39,7 @@ public:
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
-               nostd::function_ref<bool(MetricData &)> metric_collection_callback) noexcept override
+               nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
     opentelemetry::sdk::metrics::ObserverResult<T> ob_res(attributes_processor_);
 
@@ -58,7 +56,7 @@ public:
 
     // TBD -> read aggregation from hashmap, and perform metric collection
     MetricData metric_data;
-    if (metric_collection_callback(metric_data))
+    if (metric_collection_callback(std::move(metric_data)))
     {
       return true;
     }
