@@ -375,7 +375,7 @@ jobs:
     - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v3
       with:
         file: /home/runner/build/coverage.info
 
