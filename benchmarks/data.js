@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1649347876972,
+  "lastUpdate": 1649347878989,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -21022,6 +21022,54 @@ window.BENCHMARK_DATA = {
             "value": 1808343.5385974485,
             "unit": "ns/iter",
             "extra": "iterations: 536\ncpu: 286455.59701492544 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "admin@owent.net",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6b87300b5a354cf377f164eecd914e80171a69e6",
+          "message": "Add building test without RTTI (#1294)",
+          "timestamp": "2022-04-07T08:56:44-07:00",
+          "tree_id": "52e8a0059af0fce5645e312e7435d156a955ccf8",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/6b87300b5a354cf377f164eecd914e80171a69e6"
+        },
+        "date": 1649347875280,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 35.07732572350318,
+            "unit": "ns/iter",
+            "extra": "iterations: 3857000\ncpu: 34.90352605652062 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 105.95664833531235,
+            "unit": "ns/iter",
+            "extra": "iterations: 1320000\ncpu: 105.57265151515152 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 872.8877607598362,
+            "unit": "ns/iter",
+            "extra": "iterations: 166000\ncpu: 845.0560240963855 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2485380.6964234808,
+            "unit": "ns/iter",
+            "extra": "iterations: 346\ncpu: 409679.1907514451 ns\nthreads: 1"
           }
         ]
       }
