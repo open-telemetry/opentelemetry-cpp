@@ -14,52 +14,46 @@ namespace sdk
 namespace metrics
 {
 
-template <class T>
-static inline void PopulateSumPointData(SumPointData &sum,
-                                        opentelemetry::common::SystemTimestamp start_ts,
-                                        opentelemetry::common::SystemTimestamp end_ts,
-                                        T value,
-                                        bool is_monotonic)
-{
-  sum.start_epoch_nanos_       = start_ts;
-  sum.end_epoch_nanos_         = end_ts;
-  sum.value_                   = value;
-  sum.is_monotonic_            = is_monotonic;
-  sum.aggregation_temporarily_ = AggregationTemporarily::kDelta;
-}
-
-class LongSumAggregation : public Aggregation, InstrumentMonotonicityAwareAggregation
+class LongSumAggregation : public Aggregation
 {
 public:
-  LongSumAggregation(bool is_monotonic);
+  LongSumAggregation();
+  LongSumAggregation(SumPointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
+
+  PointType ToPoint() const noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
-  opentelemetry::common::SystemTimestamp start_epoch_nanos_;
-  long sum_;
+  SumPointData point_data_;
 };
 
-class DoubleSumAggregation : public Aggregation, InstrumentMonotonicityAwareAggregation
+class DoubleSumAggregation : public Aggregation
 {
 public:
-  DoubleSumAggregation(bool is_monotonic);
+  DoubleSumAggregation();
+  DoubleSumAggregation(SumPointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
+
+  PointType ToPoint() const noexcept override;
 
 private:
-  opentelemetry::common::SpinLockMutex lock_;
-  opentelemetry::common::SystemTimestamp start_epoch_nanos_;
-  double sum_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  SumPointData point_data_;
 };
 
 }  // namespace metrics

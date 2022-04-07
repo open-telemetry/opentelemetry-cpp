@@ -36,11 +36,11 @@ enum class AggregationType
   kDefault
 };
 
-enum class AggregationTemporarily
+enum class AggregationTemporality
 {
   kUnspecified,
   kDelta,
-  kCummulative
+  kCumulative
 };
 
 struct InstrumentDescriptor
@@ -53,13 +53,6 @@ struct InstrumentDescriptor
 };
 
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
-
-// TBD -> Remove once MetricCollector is imoplemeted
-class MetricCollector
-{
-public:
-  AggregationTemporarily aggregation_temporarily_;
-};
 
 /*class InstrumentSelector {
 public:

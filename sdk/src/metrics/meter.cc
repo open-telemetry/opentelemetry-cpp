@@ -6,7 +6,9 @@
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/sdk_config.h"
 
@@ -61,8 +63,8 @@ nostd::shared_ptr<metrics::ObservableCounter<long>> Meter::CreateLongObservableC
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableCounter<long>>{new LongObservableCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableCounter<long>>{
+      new LongObservableCounter(name, callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableCounter<double>> Meter::CreateDoubleObservableCounter(
@@ -71,8 +73,8 @@ nostd::shared_ptr<metrics::ObservableCounter<double>> Meter::CreateDoubleObserva
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableCounter<double>>{new DoubleObservableCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableCounter<double>>{
+      new DoubleObservableCounter(name, callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -109,8 +111,8 @@ nostd::shared_ptr<metrics::ObservableGauge<long>> Meter::CreateLongObservableGau
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableGauge<long>>{new LongObservableGauge(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableGauge<long>>{
+      new LongObservableGauge(name, callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableGauge<double>> Meter::CreateDoubleObservableGauge(
@@ -119,8 +121,8 @@ nostd::shared_ptr<metrics::ObservableGauge<double>> Meter::CreateDoubleObservabl
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableGauge<double>>{new DoubleObservableGauge(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableGauge<double>>{
+      new DoubleObservableGauge(name, callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -157,8 +159,8 @@ nostd::shared_ptr<metrics::ObservableUpDownCounter<long>> Meter::CreateLongObser
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableUpDownCounter<long>>{new LongObservableUpDownCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableUpDownCounter<long>>{
+      new LongObservableUpDownCounter(name, callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>
@@ -168,19 +170,13 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
                                            nostd::string_view unit) noexcept
 {
   return nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>{
-      new DoubleObservableUpDownCounter(name, GetInstrumentationLibrary(),
-                                        GetMeasurementProcessor(), callback, description, unit)};
+      new DoubleObservableUpDownCounter(name, callback, description, unit)};
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
     const noexcept
 {
   return instrumentation_library_.get();
-}
-
-MeasurementProcessor *Meter::GetMeasurementProcessor() const noexcept
-{
-  return meter_context_->GetMeasurementProcessor();
 }
 
 std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
@@ -196,7 +192,8 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         view_instr_desc.name_        = view.GetName();
         view_instr_desc.description_ = view.GetDescription();
         auto storage                 = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+            NoExemplarReservoir::GetNoExemplarReservoir()));
         storage_registry_[instrument_descriptor.name_] = storage;
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);
@@ -210,6 +207,23 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         << "Some of the matching view configurations mayn't be used for metric collection");
   }
   return std::move(storages);
+}
+
+/** collect metrics across all the meters **/
+std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
+                                       opentelemetry::common::SystemTimestamp collect_ts) noexcept
+{
+  std::vector<MetricData> metric_data_list;
+  for (auto &metric_storage : storage_registry_)
+  {
+    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
+                                   meter_context_->GetSDKStartTime(), collect_ts,
+                                   [&metric_data_list](MetricData metric_data) {
+                                     metric_data_list.push_back(metric_data);
+                                     return true;
+                                   });
+  }
+  return metric_data_list;
 }
 
 }  // namespace metrics

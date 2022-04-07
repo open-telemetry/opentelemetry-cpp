@@ -3,12 +3,13 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include <memory>
+
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/version.h"
+
+#  include <chrono>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,6 +17,7 @@ namespace sdk
 namespace metrics
 {
 
+class MetricData;
 /**
  * MetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.
@@ -28,11 +30,9 @@ public:
   /**
    * Exports a batch of metrics recordables. This method must not be called
    * concurrently for the same exporter instance.
-   * @param spans a span of unique pointers to metrics data
+   * @param data metrics data
    */
-  virtual opentelemetry::sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::MetricData>>
-          &records) noexcept = 0;
+  virtual opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &data) noexcept = 0;
 
   /**
    * Force flush the exporter.
@@ -47,9 +47,6 @@ public:
    */
   virtual bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
-
-private:
-  AggregationTemporarily aggregation_temporarily;
 };
 }  // namespace metrics
 }  // namespace sdk
