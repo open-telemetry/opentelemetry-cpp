@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1649351806962,
+  "lastUpdate": 1649351808105,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -21244,6 +21244,54 @@ window.BENCHMARK_DATA = {
             "value": 2485380.6964234808,
             "unit": "ns/iter",
             "extra": "iterations: 346\ncpu: 409679.1907514451 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "71329856+benlandrum@users.noreply.github.com",
+            "name": "Ben Landrum",
+            "username": "benlandrum"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3122254e8238738d74f78130817b090a8fdc0a9a",
+          "message": "Remove implicitly deleted default constructor (#1267)\n\nCo-authored-by: Tom Tan <Tom.Tan@microsoft.com>\r\nCo-authored-by: Lalit Kumar Bhasin <lalit_fin@yahoo.com>",
+          "timestamp": "2022-04-07T10:02:11-07:00",
+          "tree_id": "46ac29c32e449bf28f39f4ff841d32efae30ce24",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/3122254e8238738d74f78130817b090a8fdc0a9a"
+        },
+        "date": 1649351806772,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 38.16839990297349,
+            "unit": "ns/iter",
+            "extra": "iterations: 3683000\ncpu: 38.04322563127885 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 111.77233965748334,
+            "unit": "ns/iter",
+            "extra": "iterations: 1255000\ncpu: 111.57976095617532 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 890.8577685086233,
+            "unit": "ns/iter",
+            "extra": "iterations: 159000\ncpu: 884.9584905660378 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2418572.4556446075,
+            "unit": "ns/iter",
+            "extra": "iterations: 320\ncpu: 436052.5000000001 ns\nthreads: 1"
           }
         ]
       }
