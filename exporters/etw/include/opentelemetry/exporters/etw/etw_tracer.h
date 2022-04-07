@@ -377,7 +377,7 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override
   {
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
@@ -531,7 +531,7 @@ public:
                 common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)

@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
+
 #  include "opentelemetry/sdk/_metrics/meter.h"
+#  include "opentelemetry/common/macros.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -664,7 +666,11 @@ void Meter::CollectSingleSyncInstrument(
     i++;
     return;
   }
-  auto cast_ptr                   = std::dynamic_pointer_cast<SynchronousInstrument<T>>(i->second);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<T>>(i->second);
+#  else
+  auto cast_ptr = std::static_pointer_cast<SynchronousInstrument<T>>(i->second);
+#  endif
   std::vector<Record> new_records = cast_ptr->GetRecords();
   records.insert(records.begin(), new_records.begin(), new_records.end());
 }
@@ -734,7 +740,11 @@ void Meter::CollectSingleAsyncInstrument(
     i++;
     return;
   }
-  auto cast_ptr                   = std::dynamic_pointer_cast<AsynchronousInstrument<T>>(i->second);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<T>>(i->second);
+#  else
+  auto cast_ptr = std::static_pointer_cast<AsynchronousInstrument<T>>(i->second);
+#  endif
   std::vector<Record> new_records = cast_ptr->GetRecords();
   records.insert(records.begin(), new_records.begin(), new_records.end());
 }

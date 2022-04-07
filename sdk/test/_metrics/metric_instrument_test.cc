@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
+
 #  include <gtest/gtest.h>
 #  include <cstring>
 #  include <iostream>
@@ -9,10 +10,18 @@
 #  include <memory>
 #  include <string>
 #  include <thread>
+
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/_metrics/async_instruments.h"
 #  include "opentelemetry/sdk/_metrics/sync_instruments.h"
 
 namespace metrics_api = opentelemetry::metrics;
+
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+#    define METRICS_TEST_TYPE_CAST(TO, FROM) dynamic_cast<TO>(FROM)
+#  else
+#    define METRICS_TEST_TYPE_CAST(TO, FROM) static_cast<TO>(FROM)
+#  endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -37,12 +46,15 @@ TEST(ApiSdkConversion, async)
   auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   alpha->observe(123456, labelkv);
-  EXPECT_EQ(dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetLabels(),
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(AsynchronousInstrument<int> *, alpha.get())
+                ->GetRecords()[0]
+                .GetLabels(),
             "{key587:value264}");
 
   alpha->observe(123456, labelkv);
-  AggregatorVariant canCollect =
-      dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetAggregator();
+  AggregatorVariant canCollect = METRICS_TEST_TYPE_CAST(AsynchronousInstrument<int> *, alpha.get())
+                                     ->GetRecords()[0]
+                                     .GetAggregator();
   EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<short>>>(canCollect), false);
   EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<int>>>(canCollect), true);
   EXPECT_EQ(nostd::get<std::shared_ptr<Aggregator<int>>>(canCollect)->get_checkpoint()[0], 123456);
@@ -292,11 +304,13 @@ TEST(Counter, StressAdd)
   second.join();
   third.join();
 
-  EXPECT_EQ(dynamic_cast<BoundCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundCounter<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
                 ->GetAggregator()
                 ->get_values()[0],
             2000);
-  EXPECT_EQ(dynamic_cast<BoundCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundCounter<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
                 ->GetAggregator()
                 ->get_values()[0],
             3000);
@@ -343,16 +357,16 @@ TEST(IntUpDownCounter, StressAdd)
   third.join();
   fourth.join();
 
-  EXPECT_EQ(
-      dynamic_cast<BoundUpDownCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
-          ->GetAggregator()
-          ->get_values()[0],
-      12340 * 2);
-  EXPECT_EQ(
-      dynamic_cast<BoundUpDownCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
-          ->GetAggregator()
-          ->get_values()[0],
-      56780 - 12340);
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundUpDownCounter<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
+                ->GetAggregator()
+                ->get_values()[0],
+            12340 * 2);
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundUpDownCounter<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
+                ->GetAggregator()
+                ->get_values()[0],
+            56780 - 12340);
 }
 
 void RecorderCallback(std::shared_ptr<ValueRecorder<int>> in,
@@ -396,47 +410,47 @@ TEST(IntValueRecorder, StressRecord)
   third.join();
   fourth.join();
 
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
-          ->GetAggregator()
-          ->get_values()[0],
-      0);  // min
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
-          ->GetAggregator()
-          ->get_values()[1],
-      49);  // max
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
-          ->GetAggregator()
-          ->get_values()[2],
-      1525);  // sum
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
-          ->GetAggregator()
-          ->get_values()[3],
-      75);  // count
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
+                ->GetAggregator()
+                ->get_values()[0],
+            0);  // min
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
+                ->GetAggregator()
+                ->get_values()[1],
+            49);  // max
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
+                ->GetAggregator()
+                ->get_values()[2],
+            1525);  // sum
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv)].get())
+                ->GetAggregator()
+                ->get_values()[3],
+            75);  // count
 
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
-          ->GetAggregator()
-          ->get_values()[0],
-      -99);  // min
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
-          ->GetAggregator()
-          ->get_values()[1],
-      24);  // max
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
-          ->GetAggregator()
-          ->get_values()[2],
-      -4650);  // sum
-  EXPECT_EQ(
-      dynamic_cast<BoundValueRecorder<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
-          ->GetAggregator()
-          ->get_values()[3],
-      125);  // count
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
+                ->GetAggregator()
+                ->get_values()[0],
+            -99);  // min
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
+                ->GetAggregator()
+                ->get_values()[1],
+            24);  // max
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
+                ->GetAggregator()
+                ->get_values()[2],
+            -4650);  // sum
+  EXPECT_EQ(METRICS_TEST_TYPE_CAST(BoundValueRecorder<int> *,
+                                   alpha->boundInstruments_[KvToString(labelkv1)].get())
+                ->GetAggregator()
+                ->get_values()[3],
+            125);  // count
 }
 
 TEST(Instruments, NoUpdateNoRecord)
