@@ -37,7 +37,7 @@ public:
    * Export
    * @param data metrics data
    */
-  sdk::common::ExportResult Export(const sdk::metrics::MetricData &data) noexcept override;
+  sdk::common::ExportResult Export(const sdk::metrics::ResourceMetrics &data) noexcept override;
 
   /**
    * Force flush the exporter.
@@ -58,6 +58,8 @@ private:
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
+  void printInstrumentationInfoMetricData(
+      const sdk::metrics::InstrumentationInfoMetrics &info_metrics);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
 };
 }  // namespace metrics

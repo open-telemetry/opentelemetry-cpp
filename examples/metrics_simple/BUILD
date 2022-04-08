@@ -12,17 +12,16 @@ cc_binary(
     ],
 )
 
-# TODO - Uncomment once MetricData interface is finalised
-# cc_binary(
-#     name = "metrics_ostream_example",
-#     srcs = [
-#         "metrics_ostream.cc",
-#     ],
-#     linkopts = ["-pthread"],
-#     tags = ["ostream"],
-#     deps = [
-#         "//api",
-#         "//exporters/ostream:ostream_metric_exporter",
-#         "//sdk/src/metrics",
-#     ],
-# )
+cc_binary(
+    name = "metrics_ostream_example",
+    srcs = [
+        "metrics_ostream.cc",
+    ],
+    linkopts = ["-pthread"],
+    tags = ["ostream"],
+    deps = [
+        "//api",
+        "//exporters/ostream:ostream_metric_exporter",
+        "//sdk/src/metrics",
+    ],
+)

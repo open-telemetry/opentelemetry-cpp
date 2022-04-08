@@ -1,12 +1,27 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include <algorithm>
+#  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #  include "opentelemetry/sdk_config.h"
+
+namespace
+{
+std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
+{
+  auto duration = time_stamp.time_since_epoch().count();
+
+  std::chrono::nanoseconds dur(duration);
+  std::chrono::time_point<std::chrono::system_clock> dt(dur);
+  std::time_t epoch_time = std::chrono::system_clock::to_time_t(dt);
+
+  return std::ctime(&epoch_time);
+}
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -29,23 +44,43 @@ inline void printVec(std::ostream &os, Container &vec)
 OStreamMetricExporter::OStreamMetricExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 sdk::common::ExportResult OStreamMetricExporter::Export(
-    const sdk::metrics::MetricData &data) noexcept
+    const sdk::metrics::ResourceMetrics &data) noexcept
 {
   if (isShutdown())
   {
     OTEL_INTERNAL_LOG_ERROR("[OStream Metric] Exporting "
-                            << data.point_data_attr_.size()
+                            << data.instrumentation_info_metric_data_.size()
                             << " records(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
-  for (auto &record : data.point_data_attr_)
+  for (auto &record : data.instrumentation_info_metric_data_)
   {
-    sout_ << "{";
-    printPointData(record.point_data);
-    sout_ << "\n}\n";
+    printInstrumentationInfoMetricData(record);
   }
   return sdk::common::ExportResult::kSuccess;
+}
+
+void OStreamMetricExporter::printInstrumentationInfoMetricData(
+    const sdk::metrics::InstrumentationInfoMetrics &info_metric)
+{
+  sout_ << "{";
+  sout_ << "\n  name\t\t: " << info_metric.instrumentation_library_->GetName()
+        << "\n  schema url\t: " << info_metric.instrumentation_library_->GetSchemaURL()
+        << "\n  version\t: " << info_metric.instrumentation_library_->GetVersion();
+  for (const auto &record : info_metric.metric_data_)
+  {
+    sout_ << "\n  start time\t: " << timeToString(record.start_ts)
+          << "  end time\t: " << timeToString(record.end_ts)
+          << "  description\t: " << record.instrument_descriptor.description_
+          << "\n  unit\t\t: " << record.instrument_descriptor.unit_;
+
+    for (const auto &pd : record.point_data_attr_)
+    {
+      printPointData(pd.point_data);
+    }
+  }
+  sout_ << "\n}\n";
 }
 
 void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::PointType &point_data)
@@ -53,8 +88,8 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
   if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data))
   {
     auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data);
-    sout_ << "\n  type     : SumPointData";
-    sout_ << "\n  value     : ";
+    sout_ << "\n  type\t\t: SumPointData";
+    sout_ << "\n  value\t\t: ";
     if (nostd::holds_alternative<double>(sum_point_data.value_))
     {
       sout_ << nostd::get<double>(sum_point_data.value_);

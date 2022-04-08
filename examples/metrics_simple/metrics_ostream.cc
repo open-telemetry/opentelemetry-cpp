@@ -28,7 +28,7 @@ void sync_sum()
 
   std::string name{"ostream_metric_example"};
   std::string version{"1.2.0"};
-  std::string schema{"ostream_metric_example"};
+  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
   // Initialize and set the global MeterProvider
   metric_sdk::PeriodicExportingMetricReaderOptions options;
