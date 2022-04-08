@@ -85,10 +85,16 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   auto exporter =
       std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
 
-  metric_sdk::HistogramPointData histogram_point_data{
-      std::list<double>{10.1, 20.2, 30.2}, 900.5, {200, 300, 400, 500}, 3};
-  metric_sdk::HistogramPointData histogram_point_data2{
-      std::list<long>{10, 20, 30}, 900l, {200, 300, 400, 500}, 3};
+  metric_sdk::HistogramPointData histogram_point_data{};
+  histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
+  histogram_point_data.count_      = 3;
+  histogram_point_data.counts_     = {200, 300, 400, 500};
+  histogram_point_data.sum_        = 900.5;
+  metric_sdk::HistogramPointData histogram_point_data2{};
+  histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
+  histogram_point_data2.count_      = 3;
+  histogram_point_data2.counts_     = {200, 300, 400, 500};
+  histogram_point_data2.sum_        = 900l;
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
@@ -143,10 +149,6 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   auto exporter =
       std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
 
-  metric_sdk::HistogramPointData histogram_point_data{
-      std::list<double>{10.1, 20.2, 30.2}, 900.5, {200, 300, 400, 500}, 3};
-  metric_sdk::HistogramPointData histogram_point_data2{
-      std::list<long>{10, 20, 30}, 900l, {200, 300, 400, 500}, 3};
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
@@ -154,10 +156,14 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   auto instrumentation_library =
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
                                                                                  "1.2.0");
-  metric_sdk::LastValuePointData last_value_point_data{10.0, true,
-                                                       opentelemetry::common::SystemTimestamp{}};
-  metric_sdk::LastValuePointData last_value_point_data2{20l, true,
-                                                        opentelemetry::common::SystemTimestamp{}};
+  metric_sdk::LastValuePointData last_value_point_data{};
+  last_value_point_data.value_              = 10.0;
+  last_value_point_data.is_lastvalue_valid_ = true;
+  last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
+  metric_sdk::LastValuePointData last_value_point_data2{};
+  last_value_point_data2.value_              = 20l;
+  last_value_point_data2.is_lastvalue_valid_ = true;
+  last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -203,10 +209,6 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
   auto exporter =
       std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
 
-  metric_sdk::HistogramPointData histogram_point_data{
-      std::list<double>{10.1, 20.2, 30.2}, 900.5, {200, 300, 400, 500}, 3};
-  metric_sdk::HistogramPointData histogram_point_data2{
-      std::list<long>{10, 20, 30}, 900l, {200, 300, 400, 500}, 3};
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
