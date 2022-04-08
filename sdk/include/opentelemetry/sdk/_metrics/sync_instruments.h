@@ -9,7 +9,9 @@
 #  include <sstream>
 #  include <stdexcept>
 #  include <vector>
+
 #  include "opentelemetry/_metrics/sync_instruments.h"
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
 #  include "opentelemetry/sdk/_metrics/instrument.h"
@@ -156,7 +158,11 @@ public:
       {
         toDelete.push_back(x.first);
       }
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+#  else
+      auto agg_ptr = static_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+#  endif
       if (agg_ptr->is_updated())
       {
         agg_ptr->checkpoint();
@@ -287,7 +293,11 @@ public:
       {
         toDelete.push_back(x.first);
       }
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       auto agg_ptr = dynamic_cast<BoundUpDownCounter<T> *>(x.second.get())->GetAggregator();
+#  else
+      auto agg_ptr = static_cast<BoundUpDownCounter<T> *>(x.second.get())->GetAggregator();
+#  endif
       if (agg_ptr->is_updated())
       {
         agg_ptr->checkpoint();
@@ -417,7 +427,11 @@ public:
       {
         toDelete.push_back(x.first);
       }
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       auto agg_ptr = dynamic_cast<BoundValueRecorder<T> *>(x.second.get())->GetAggregator();
+#  else
+      auto agg_ptr = static_cast<BoundValueRecorder<T> *>(x.second.get())->GetAggregator();
+#  endif
       if (agg_ptr->is_updated())
       {
         agg_ptr->checkpoint();
