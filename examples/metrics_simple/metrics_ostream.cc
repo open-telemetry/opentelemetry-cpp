@@ -65,4 +65,6 @@ int main()
 {
   sync_sum();
 }
+#else
+int main() {}
 #endif
