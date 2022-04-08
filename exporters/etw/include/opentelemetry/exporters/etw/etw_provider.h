@@ -229,7 +229,10 @@ public:
           }
 
           it->second.providerHandle = INVALID_HANDLE;
-          m.erase(it);
+          if (result == STATUS_OK)
+          {
+            m.erase(it);
+          }
         }
         return result;
       }
