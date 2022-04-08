@@ -203,6 +203,7 @@ public:
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
 
+    // use reference to provider list, NOT it' copy.
     auto &m = providers();
     auto it = m.begin();
     while (it != m.end())
