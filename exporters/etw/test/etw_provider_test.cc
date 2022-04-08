@@ -57,7 +57,7 @@ TEST(ETWProvider, CheckCloseSuccess)
 
   auto result = etw.close(handle);
   ASSERT_NE(result, etw.STATUS_ERROR);
-  ASSERT_FALSE(etw.is_registered(providerName););
+  ASSERT_FALSE(etw.is_registered(providerName));
 }
 
 #endif
