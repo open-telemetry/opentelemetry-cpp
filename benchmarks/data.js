@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1649663867020,
+  "lastUpdate": 1649663868420,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -21616,6 +21616,54 @@ window.BENCHMARK_DATA = {
             "value": 2418572.4556446075,
             "unit": "ns/iter",
             "extra": "iterations: 320\ncpu: 436052.5000000001 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d72dcb69b07ffe773e490ee797126357480b9cb0",
+          "message": "[ETW Exporter] - ETW provider handle cleanup (#1322)",
+          "timestamp": "2022-04-11T00:45:36-07:00",
+          "tree_id": "75feeddd4fd22f74bedd9796d4dfee51734f4a4c",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/d72dcb69b07ffe773e490ee797126357480b9cb0"
+        },
+        "date": 1649663865463,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 31.840346902338432,
+            "unit": "ns/iter",
+            "extra": "iterations: 4408000\ncpu: 31.7641333938294 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 93.44340482606323,
+            "unit": "ns/iter",
+            "extra": "iterations: 1501000\ncpu: 93.27768154563623 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 747.8850228445871,
+            "unit": "ns/iter",
+            "extra": "iterations: 189000\ncpu: 743.631216931217 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2176853.230125026,
+            "unit": "ns/iter",
+            "extra": "iterations: 380\ncpu: 370566.84210526326 ns\nthreads: 1"
           }
         ]
       }
