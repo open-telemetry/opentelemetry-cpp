@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
@@ -23,22 +24,6 @@
 #  pragma comment(lib, "Rpcrt4.lib")
 #  include <Objbase.h>
 #  pragma comment(lib, "Ole32.Lib")
-#endif
-
-#ifndef RTTI_ENABLED
-#  if defined(__clang__)
-#    if __has_feature(cxx_rtti)
-#      define RTTI_ENABLED
-#    endif
-#  elif defined(__GNUG__)
-#    if defined(__GXX_RTTI)
-#      define RTTI_ENABLED
-#    endif
-#  elif defined(_MSC_VER)
-#    if defined(_CPPRTTI)
-#      define RTTI_ENABLED
-#    endif
-#  endif
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE

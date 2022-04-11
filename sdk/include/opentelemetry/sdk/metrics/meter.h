@@ -102,10 +102,9 @@ public:
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
 
-  /** collect metrics across all the meters **/
-  bool Collect(CollectorHandle *collector,
-               opentelemetry::common::SystemTimestamp collect_ts,
-               nostd::function_ref<bool(MetricData &)> callback) noexcept;
+  /** collect metrics across all the instruments configured for the meter **/
+  std::vector<MetricData> Collect(CollectorHandle *collector,
+                                  opentelemetry::common::SystemTimestamp collect_ts) noexcept;
 
 private:
   // order of declaration is important here - instrumentation library should destroy after

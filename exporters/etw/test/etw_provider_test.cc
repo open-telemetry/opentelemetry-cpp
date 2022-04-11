@@ -18,6 +18,7 @@ TEST(ETWProvider, ProviderIsRegisteredSuccessfully)
 
   bool registered = etw.is_registered(providerName);
   ASSERT_TRUE(registered);
+  etw.close(handle);
 }
 
 TEST(ETWProvider, ProviderIsNotRegisteredSuccessfully)
@@ -46,6 +47,7 @@ TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
   auto guidStrName = uuid_name.to_string();
 
   ASSERT_STREQ(guidStrHandle.c_str(), guidStrName.c_str());
+  etw.close(handle);
 }
 
 TEST(ETWProvider, CheckCloseSuccess)
@@ -53,10 +55,10 @@ TEST(ETWProvider, CheckCloseSuccess)
   std::string providerName = "OpenTelemetry-ETW-Provider";
 
   static ETWProvider etw;
-  auto handle = etw.open(providerName.c_str());
-
+  auto handle = etw.open(providerName.c_str(), ETWProvider::EventFormat::ETW_MANIFEST);
   auto result = etw.close(handle);
   ASSERT_NE(result, etw.STATUS_ERROR);
+  ASSERT_FALSE(etw.is_registered(providerName));
 }
 
 #endif
