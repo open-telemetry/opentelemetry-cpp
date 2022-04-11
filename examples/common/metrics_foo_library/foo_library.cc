@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#ifndef ENABLE_METRICS_PREVIEW
 #include <chrono>
 #include <thread>
 #include "opentelemetry/metrics/provider.h"
@@ -29,3 +30,4 @@ void foo_library(const std::string &name)
   double_counter->Add(23.5);
   std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 }
+#endif
