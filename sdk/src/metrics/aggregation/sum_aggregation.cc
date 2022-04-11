@@ -3,8 +3,10 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/version.h"
 
+#  include <iostream>
 #  include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -13,54 +15,90 @@ namespace sdk
 namespace metrics
 {
 
-LongSumAggregation::LongSumAggregation(bool is_monotonic)
-    : InstrumentMonotonicityAwareAggregation(is_monotonic),
-      start_epoch_nanos_(opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now())),
-      sum_(0l)
-{}
+LongSumAggregation::LongSumAggregation()
+{
+  point_data_.value_ = 0l;
+}
+
+LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
 
 void LongSumAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  sum_ += value;
+  point_data_.value_ = nostd::get<long>(point_data_.value_) + value;
 }
 
-PointType LongSumAggregation::Collect() noexcept
+std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
-  opentelemetry::common::SystemTimestamp current_ts(std::chrono::system_clock::now());
-  SumPointData sum;
-  {
-    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    PopulateSumPointData<long>(sum, start_epoch_nanos_, current_ts, sum_, IsMonotonic());
-    start_epoch_nanos_ = current_ts;
-    sum_               = 0;
-  }
-  return sum;
+  long merge_value =
+      nostd::get<long>(
+          nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
+              .value_) +
+      nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
+  std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
+  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
+  return aggr;
 }
 
-DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
-    : InstrumentMonotonicityAwareAggregation(is_monotonic),
-      start_epoch_nanos_(opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now())),
-      sum_(0L)
-{}
+std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) const noexcept
+{
+
+  long diff_value = nostd::get<long>(nostd::get<SumPointData>(
+                                         (static_cast<const LongSumAggregation &>(next).ToPoint()))
+                                         .value_) -
+                    nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
+  std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
+  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
+  return aggr;
+}
+
+PointType LongSumAggregation::ToPoint() const noexcept
+{
+  return point_data_;
+}
+
+DoubleSumAggregation::DoubleSumAggregation()
+{
+  point_data_.value_ = 0.0;
+}
+
+DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data)) {}
 
 void DoubleSumAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  sum_ += value;
+  point_data_.value_ = nostd::get<double>(point_data_.value_) + value;
 }
 
-PointType DoubleSumAggregation::Collect() noexcept
+std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
-  opentelemetry::common::SystemTimestamp current_ts(std::chrono::system_clock::now());
-  SumPointData sum;
-  {
-    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    PopulateSumPointData<double>(sum, start_epoch_nanos_, current_ts, sum_, IsMonotonic());
-    start_epoch_nanos_ = current_ts;
-    sum_               = 0;
-  }
-  return sum;
+  double merge_value =
+      nostd::get<double>(
+          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(delta).ToPoint()))
+              .value_) +
+      nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
+  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
+  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
+  return aggr;
+}
+
+std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(const Aggregation &next) const noexcept
+{
+
+  double diff_value =
+      nostd::get<double>(
+          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(next).ToPoint()))
+              .value_) -
+      nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
+  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
+  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
+  return aggr;
+}
+
+PointType DoubleSumAggregation::ToPoint() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return point_data_;
 }
 
 }  // namespace metrics

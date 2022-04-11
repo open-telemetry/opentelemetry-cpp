@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, async-changes ]
 
 jobs:
   cmake_test:
@@ -216,6 +216,28 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
 
+  bazel_nortti:
+    name: Bazel nortti
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_nortti
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.nortti
+
   bazel_asan:
     name: Bazel asan config
     runs-on: ubuntu-latest
@@ -375,7 +397,7 @@ jobs:
     - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v3
       with:
         file: /home/runner/build/coverage.info
 

@@ -14,46 +14,109 @@ namespace sdk
 namespace metrics
 {
 
-LongLastValueAggregation::LongLastValueAggregation() : is_lastvalue_valid_(false) {}
+LongLastValueAggregation::LongLastValueAggregation()
+{
+  point_data_.is_lastvalue_valid_ = false;
+  point_data_.value_              = 0l;
+}
+LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)
+    : point_data_{std::move(data)}
+{}
 
 void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  is_lastvalue_valid_ = true;
-  value_              = value;
+  point_data_.is_lastvalue_valid_ = true;
+  point_data_.value_              = value;
 }
 
-PointType LongLastValueAggregation::Collect() noexcept
+std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  if (!is_lastvalue_valid_)
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
   {
-    return LastValuePointData{
-        opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()), false, 0l};
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
   }
-  return LastValuePointData{
-      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()), true, value_};
+  else
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
 }
 
-DoubleLastValueAggregation::DoubleLastValueAggregation() : is_lastvalue_valid_(false) {}
+std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &next) const noexcept
+{
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+  else
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+}
+
+PointType LongLastValueAggregation::ToPoint() const noexcept
+{
+  return point_data_;
+}
+
+DoubleLastValueAggregation::DoubleLastValueAggregation()
+{
+  point_data_.is_lastvalue_valid_ = false;
+  point_data_.value_              = 0.0;
+}
+DoubleLastValueAggregation::DoubleLastValueAggregation(LastValuePointData &&data)
+    : point_data_{std::move(data)}
+{}
 
 void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  is_lastvalue_valid_ = true;
-  value_              = value;
+  point_data_.is_lastvalue_valid_ = true;
+  point_data_.value_              = value;
 }
 
-PointType DoubleLastValueAggregation::Collect() noexcept
+std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
+    const Aggregation &delta) const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  if (!is_lastvalue_valid_)
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
   {
-    return LastValuePointData{
-        opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()), false, 0.0};
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
   }
-  return LastValuePointData{
-      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()), true, value_};
+  else
+  {
+    LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+  }
+}
+
+std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
+    const Aggregation &next) const noexcept
+{
+  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
+      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+  else
+  {
+    LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+  }
+}
+
+PointType DoubleLastValueAggregation::ToPoint() const noexcept
+{
+  return point_data_;
 }
 }  // namespace metrics
 }  // namespace sdk
