@@ -1,10 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <memory>
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include <thread>
+#  include <memory>
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -13,7 +11,11 @@
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
 
-#  include <iostream>
+#  ifdef BAZEL_BUILD
+#    include "examples/common/metrics_foo_library/foo_library.h"
+#  else
+#    include "metrics_foo_library/foo_library.h"
+#  endif
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -21,12 +23,14 @@ namespace common          = opentelemetry::common;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 namespace metrics_api     = opentelemetry::metrics;
 
-void sync_sum()
+namespace
+{
+
+void initMetrics(const std::string &name)
 {
   std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
   std::vector<std::unique_ptr<metric_sdk::MetricExporter>> exporters;
 
-  std::string name{"ostream_metric_example"};
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
@@ -48,22 +52,13 @@ void sync_sum()
       new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
   metrics_api::Provider::SetMeterProvider(provider);
-
-  // Get the Meter from the MeterProvider
-  nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto double_counter                         = meter->CreateDoubleCounter(name);
-  double_counter->Add(28.5);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  double_counter->Add(3.14);
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  double_counter->Add(23.5);
-  std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-  p->ForceFlush();
 }
-
+}  // namespace
 int main()
 {
-  sync_sum();
+  std::string name{"ostream_metric_example"};
+  initMetrics(name);
+  foo_library(name);
 }
 #else
 int main() {}
