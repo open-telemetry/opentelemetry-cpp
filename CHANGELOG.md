@@ -52,7 +52,7 @@ Notes:
 `opentelemetry_` as prefix to http_client_curl library for resolving potential
 naming conflict, this could break existing cmake build if http_client_curl is
 listed as explicit dependency in user's cmake file.
-    
+
 ## [1.2.0] 2022-01-31
 
 * [CI] Continuous benchmark tests as part of the CI ([#1174](https://github.com/open-telemetry/opentelemetry-cpp/pull/1174))
