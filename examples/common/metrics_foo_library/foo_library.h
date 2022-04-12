@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#include <string>
+#  include <string>
 
 void foo_library(const std::string &name);
 #endif

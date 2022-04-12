@@ -13,12 +13,7 @@ namespace
 {
 std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
 {
-  auto duration = time_stamp.time_since_epoch().count();
-
-  std::chrono::nanoseconds dur(duration);
-  std::chrono::time_point<std::chrono::system_clock> dt(dur);
-  std::time_t epoch_time = std::chrono::system_clock::to_time_t(dt);
-
+  std::time_t epoch_time = std::chrono::system_clock::to_time_t(time_stamp);
   return std::ctime(&epoch_time);
 }
 }  // namespace

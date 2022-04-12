@@ -2,19 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
-#include <chrono>
-#include <thread>
-#include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/version/version.h"
+#  include <chrono>
+#  include <thread>
+#  include "opentelemetry/metrics/provider.h"
 
-namespace metric_sdk  = opentelemetry::sdk::metrics;
 namespace nostd       = opentelemetry::nostd;
-namespace common      = opentelemetry::common;
 namespace metrics_api = opentelemetry::metrics;
 
 void foo_library(const std::string &name)
