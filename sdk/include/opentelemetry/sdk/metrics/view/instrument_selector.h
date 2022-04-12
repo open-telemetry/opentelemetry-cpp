@@ -27,8 +27,8 @@ public:
   InstrumentType GetInstrumentType() { return instrument_type_; }
 
 private:
-  opentelemetry::sdk::metrics::InstrumentType instrument_type_;
   std::unique_ptr<opentelemetry::sdk::metrics::Predicate> name_filter_;
+  opentelemetry::sdk::metrics::InstrumentType instrument_type_;
 };
 }  // namespace metrics
 }  // namespace sdk
