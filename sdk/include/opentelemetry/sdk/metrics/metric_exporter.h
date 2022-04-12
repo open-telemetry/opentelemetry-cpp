@@ -6,6 +6,7 @@
 
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #  include "opentelemetry/version.h"
 
 #  include <chrono>
