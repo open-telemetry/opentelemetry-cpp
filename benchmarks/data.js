@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1649793489023,
+  "lastUpdate": 1649799943984,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -22930,6 +22930,54 @@ window.BENCHMARK_DATA = {
             "value": 1978786.3372877715,
             "unit": "ns/iter",
             "extra": "iterations: 407\ncpu: 326630.9582309583 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "75c2a8f7a6bf81d9799e76804473609cc236b7be",
+          "message": "Update yield logic for ARM processor (#1325)",
+          "timestamp": "2022-04-12T14:33:39-07:00",
+          "tree_id": "c26515fdd5b5debb2af48f98dd0d92d81ceded34",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/75c2a8f7a6bf81d9799e76804473609cc236b7be"
+        },
+        "date": 1649799942547,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 31.722037465494054,
+            "unit": "ns/iter",
+            "extra": "iterations: 4415000\ncpu: 31.67392978482447 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 93.63699466624159,
+            "unit": "ns/iter",
+            "extra": "iterations: 1504000\ncpu: 93.12699468085107 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 736.3539091579577,
+            "unit": "ns/iter",
+            "extra": "iterations: 191000\ncpu: 734.944502617801 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1773641.9554679624,
+            "unit": "ns/iter",
+            "extra": "iterations: 403\ncpu: 332937.2208436726 ns\nthreads: 1"
           }
         ]
       }
