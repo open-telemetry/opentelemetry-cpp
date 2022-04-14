@@ -1,10 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
+#ifdef ENABLE_ASYNC_EXPORT
 
-#include "opentelemetry/sdk/trace/batch_span_processor.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/sdk/trace/async_batch_span_processor.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
 
-#include <vector>
+#  include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -16,33 +17,41 @@ namespace sdk
 namespace trace
 {
 
-BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
-                                       const BatchSpanProcessorOptions &options)
+AsyncBatchSpanProcessor::AsyncBatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
+                                                 const AsyncBatchSpanProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
+      max_export_async_(options.max_export_async),
+      export_data_storage_(std::make_shared<ExportDataStorage>()),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
+      worker_thread_(&AsyncBatchSpanProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
+
+  export_data_storage_->export_ids_flag.resize(max_export_async_, true);
+  for (size_t i = 1; i <= max_export_async_; i++)
+  {
+    export_data_storage_->export_ids.push(i);
+  }
 }
 
-std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> AsyncBatchSpanProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
+void AsyncBatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
 {
   // no-op
 }
 
-void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
+void AsyncBatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -64,7 +73,7 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   }
 }
 
-bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool AsyncBatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -135,7 +144,7 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   return result;
 }
 
-void BatchSpanProcessor::DoBackgroundWork()
+void AsyncBatchSpanProcessor::DoBackgroundWork()
 {
   auto timeout = schedule_delay_millis_;
 
@@ -170,7 +179,7 @@ void BatchSpanProcessor::DoBackgroundWork()
   }
 }
 
-void BatchSpanProcessor::Export()
+void AsyncBatchSpanProcessor::Export()
 {
   do
   {
@@ -203,12 +212,57 @@ void BatchSpanProcessor::Export()
                       });
                     });
 
-    exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
-    NotifyCompletion(notify_force_flush, synchronization_data_);
+    size_t id = kInvalidExportId;
+    {
+      std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
+      synchronization_data_->async_export_waker.wait_for(lock, schedule_delay_millis_, [this] {
+        return export_data_storage_->export_ids.size() > 0;
+      });
+      if (export_data_storage_->export_ids.size() > 0)
+      {
+        id = export_data_storage_->export_ids.front();
+        export_data_storage_->export_ids.pop();
+        export_data_storage_->export_ids_flag[id - 1] = false;
+      }
+    }
+    if (id != kInvalidExportId)
+    {
+      std::weak_ptr<ExportDataStorage> export_data_watcher = export_data_storage_;
+
+      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
+      exporter_->Export(
+          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
+          [notify_force_flush, synchronization_data_watcher, export_data_watcher,
+           id](sdk::common::ExportResult result) {
+            // TODO: Print result
+            if (synchronization_data_watcher.expired())
+            {
+              return true;
+            }
+
+            if (export_data_watcher.expired())
+            {
+              return true;
+            }
+
+            auto synchronization_data = synchronization_data_watcher.lock();
+            auto export_data          = export_data_watcher.lock();
+            {
+              std::unique_lock<std::mutex> lk(synchronization_data->async_export_data_m);
+              if (export_data->export_ids_flag[id - 1] == false)
+              {
+                export_data->export_ids.push(id);
+                export_data->export_ids_flag[id - 1] = true;
+              }
+            }
+            NotifyCompletion(notify_force_flush, synchronization_data);
+            return true;
+          });
+    }
   } while (true);
 }
 
-void BatchSpanProcessor::NotifyCompletion(
+void AsyncBatchSpanProcessor::NotifyCompletion(
     bool notify_force_flush,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
@@ -222,9 +276,11 @@ void BatchSpanProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
+
+  synchronization_data->async_export_waker.notify_all();
 }
 
-void BatchSpanProcessor::DrainQueue()
+void AsyncBatchSpanProcessor::DrainQueue()
 {
   while (true)
   {
@@ -238,7 +294,7 @@ void BatchSpanProcessor::DrainQueue()
   }
 }
 
-void BatchSpanProcessor::GetWaitAdjustedTime(
+void AsyncBatchSpanProcessor::GetWaitAdjustedTime(
     std::chrono::microseconds &timeout,
     std::chrono::time_point<std::chrono::system_clock> &start_time)
 {
@@ -258,7 +314,7 @@ void BatchSpanProcessor::GetWaitAdjustedTime(
   }
 }
 
-bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool AsyncBatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
@@ -272,6 +328,15 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   }
 
   GetWaitAdjustedTime(timeout, start_time);
+  // wait for  all async exports to complete and return if timeout reached.
+  {
+    std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
+    synchronization_data_->async_export_waker.wait_for(lock, timeout, [this] {
+      return export_data_storage_->export_ids.size() == max_export_async_;
+    });
+  }
+
+  GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)
   {
@@ -281,7 +346,7 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-BatchSpanProcessor::~BatchSpanProcessor()
+AsyncBatchSpanProcessor::~AsyncBatchSpanProcessor()
 {
   if (synchronization_data_->is_shutdown.load() == false)
   {
@@ -292,3 +357,4 @@ BatchSpanProcessor::~BatchSpanProcessor()
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

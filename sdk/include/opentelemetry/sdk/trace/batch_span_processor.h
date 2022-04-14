@@ -10,9 +10,6 @@
 #include <atomic>
 #include <condition_variable>
 #include <thread>
-#ifdef ENABLE_ASYNC_EXPORT
-#  include <queue>
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -40,18 +37,6 @@ struct BatchSpanProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
-
-#ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Determines whether the export happens asynchronously.
-   * Default implementation is synchronous.
-   */
-  bool is_export_async = false;
-
-  /* Denotes the maximum number of async exports to continue
-   */
-  size_t max_export_async = 8;
-#endif
 };
 
 /**
@@ -140,19 +125,6 @@ private:
    */
   void DrainQueue();
 
-#ifdef ENABLE_ASYNC_EXPORT
-  struct ExportDataStorage
-  {
-    std::queue<size_t> export_ids;
-    std::vector<bool> export_ids_flag;
-  };
-  std::shared_ptr<ExportDataStorage> export_data_storage_;
-
-  const bool is_export_async_;
-  const size_t max_export_async_;
-  static constexpr size_t kInvalidExportId = static_cast<size_t>(-1);
-#endif
-
   struct SynchronizationData
   {
     /* Synchronization primitives */
@@ -164,10 +136,6 @@ private:
     std::atomic<bool> is_force_flush_pending;
     std::atomic<bool> is_force_flush_notified;
     std::atomic<bool> is_shutdown;
-#ifdef ENABLE_ASYNC_EXPORT
-    std::condition_variable async_export_waker;
-    std::mutex async_export_data_m;
-#endif
   };
 
   /**

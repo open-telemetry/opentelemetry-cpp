@@ -17,22 +17,11 @@ namespace logs
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                      const size_t max_queue_size,
                                      const std::chrono::milliseconds scheduled_delay_millis,
-                                     const size_t max_export_batch_size
-#  ifdef ENABLE_ASYNC_EXPORT
-                                     ,
-                                     const bool is_export_async,
-                                     const size_t max_export_async
-#  endif
-                                     )
+                                     const size_t max_export_batch_size)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
-#  ifdef ENABLE_ASYNC_EXPORT
-      is_export_async_(is_export_async),
-      max_export_async_(max_export_async),
-      export_data_storage_(std::make_shared<ExportDataStorage>()),
-#  endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -41,13 +30,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-#  ifdef ENABLE_ASYNC_EXPORT
-  export_data_storage_->export_ids_flag.resize(max_export_async_, true);
-  for (size_t i = 1; i <= max_export_async_; i++)
-  {
-    export_data_storage_->export_ids.push(i);
-  }
-#  endif
 }
 
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
@@ -56,11 +38,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-#  ifdef ENABLE_ASYNC_EXPORT
-      is_export_async_(options.is_export_async),
-      max_export_async_(options.max_export_async),
-      export_data_storage_(std::make_shared<ExportDataStorage>()),
-#  endif
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -69,13 +46,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-#  ifdef ENABLE_ASYNC_EXPORT
-  export_data_storage_->export_ids_flag.resize(max_export_async_, true);
-  for (int i = 1; i <= max_export_async_; i++)
-  {
-    export_data_storage_->export_ids.push(i);
-  }
-#  endif
 }
 
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
@@ -247,73 +217,9 @@ void BatchLogProcessor::Export()
                       });
                     });
 
-#  ifdef ENABLE_ASYNC_EXPORT
-    if (is_export_async_ == false)
-    {
-#  endif
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
-      NotifyCompletion(notify_force_flush, synchronization_data_);
-#  ifdef ENABLE_ASYNC_EXPORT
-    }
-    else
-    {
-      size_t id = kInvalidExportId;
-      {
-        std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
-        synchronization_data_->async_export_waker.wait_for(lock, scheduled_delay_millis_, [this] {
-          return export_data_storage_->export_ids.size() > 0;
-        });
-        if (export_data_storage_->export_ids.size() > 0)
-        {
-          id = export_data_storage_->export_ids.front();
-          export_data_storage_->export_ids.pop();
-          export_data_storage_->export_ids_flag[id - 1] = false;
-        }
-      }
-      if (id != kInvalidExportId)
-      {
-        std::weak_ptr<ExportDataStorage> export_data_watcher            = export_data_storage_;
-        std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
-        exporter_->Export(
-            nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
-            [notify_force_flush, synchronization_data_watcher, export_data_watcher,
-             id](sdk::common::ExportResult result) {
-              // TODO: Print result
-              if (synchronization_data_watcher.expired())
-              {
-                return true;
-              }
-              if (export_data_watcher.expired())
-              {
-                return true;
-              }
-              bool is_already_notified  = false;
-              auto synchronization_data = synchronization_data_watcher.lock();
-              auto export_data          = export_data_watcher.lock();
-              {
-                std::unique_lock<std::mutex> lk(synchronization_data->async_export_data_m);
-                // In case callback is called more than once due to some bug in exporter
-                // we need to ensure export_ids do not contain duplicate.
-                if (export_data->export_ids_flag[id - 1] == false)
-                {
-                  export_data->export_ids.push(id);
-                  export_data->export_ids_flag[id - 1] = true;
-                }
-                else
-                {
-                  is_already_notified = true;
-                }
-              }
-              if (is_already_notified == false)
-              {
-                NotifyCompletion(notify_force_flush, synchronization_data);
-              }
-              return true;
-            });
-      }
-    }
-#  endif
+    exporter_->Export(
+        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+    NotifyCompletion(notify_force_flush, synchronization_data_);
   } while (true);
 }
 
@@ -331,9 +237,6 @@ void BatchLogProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
-#  ifdef ENABLE_ASYNC_EXPORT
-  synchronization_data->async_export_waker.notify_all();
-#  endif
 }
 
 void BatchLogProcessor::DrainQueue()
@@ -383,16 +286,7 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     synchronization_data_->cv.notify_one();
     worker_thread_.join();
   }
-#  ifdef ENABLE_ASYNC_EXPORT
-  GetWaitAdjustedTime(timeout, start_time);
-  // wait for  all async exports to complete and return if timeout reached.
-  {
-    std::unique_lock<std::mutex> lock(synchronization_data_->async_export_data_m);
-    synchronization_data_->async_export_waker.wait_for(lock, timeout, [this] {
-      return export_data_storage_->export_ids.size() == max_export_async_;
-    });
-  }
-#  endif
+
   GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)

@@ -20,6 +20,7 @@
 #    include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #    include "opentelemetry/ext/http/server/http_server.h"
 #    include "opentelemetry/logs/provider.h"
+#    include "opentelemetry/sdk/logs/async_batch_log_processor.h"
 #    include "opentelemetry/sdk/logs/batch_log_processor.h"
 #    include "opentelemetry/sdk/logs/exporter.h"
 #    include "opentelemetry/sdk/logs/log_record.h"
@@ -103,13 +104,15 @@ public:
     std::string attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
-        new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 5
 #    ifdef ENABLE_ASYNC_EXPORT
-                                         ,
-                                         is_async
+    provider->AddProcessor(
+        std::unique_ptr<sdk::logs::LogProcessor>(new sdk::logs::AsyncBatchLogProcessor(
+            std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
+#    else
+    provider->AddProcessor(
+        std::unique_ptr<sdk::logs::LogProcessor>(new sdk::logs::BatchLogProcessor(
+            std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 #    endif
-                                         )));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -213,16 +216,22 @@ public:
     double attribute_storage_double_value[]      = {3.2, 3.3};
     std::string attribute_storage_string_value[] = {"vector", "string"};
 
+    auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
+#    ifdef ENABLE_ASYNC_EXPORT
+    sdk::logs::AsyncBatchLogProcessorOptions processor_options;
+    processor_options.max_export_batch_size = 5;
+    processor_options.max_queue_size        = 5;
+    processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
+    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+        new sdk::logs::AsyncBatchLogProcessor(std::move(exporter), processor_options)));
+#    else
     sdk::logs::BatchLogProcessorOptions processor_options;
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-#    ifdef ENABLE_ASYNC_EXPORT
-    processor_options.is_export_async = is_async;
-#    endif
-    auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
         new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
+#    endif
 
     std::string report_trace_id;
     std::string report_span_id;

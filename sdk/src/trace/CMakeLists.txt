@@ -5,6 +5,7 @@ add_library(
   tracer.cc
   span.cc
   batch_span_processor.cc
+  async_batch_span_processor.cc
   samplers/parent.cc
   samplers/trace_id_ratio.cc
   random_id_generator.cc)

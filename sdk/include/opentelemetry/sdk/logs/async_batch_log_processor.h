@@ -3,16 +3,20 @@
 
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
+#  ifdef ENABLE_ASYNC_EXPORT
 
-#  include "opentelemetry/sdk/common/circular_buffer.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#    include "opentelemetry/sdk/common/circular_buffer.h"
+#    include "opentelemetry/sdk/logs/exporter.h"
+#    include "opentelemetry/sdk/logs/processor.h"
 
-#  include <atomic>
-#  include <condition_variable>
-#  include <cstdint>
-#  include <memory>
-#  include <thread>
+#    include <atomic>
+#    include <condition_variable>
+#    include <cstdint>
+#    include <memory>
+#    include <thread>
+#    ifdef ENABLE_ASYNC_EXPORT
+#      include <queue>
+#    endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -24,7 +28,7 @@ namespace logs
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct BatchLogProcessorOptions
+struct AsyncBatchLogProcessorOptions
 {
   /**
    * The maximum buffer/queue size. After the size is reached, spans are
@@ -40,13 +44,17 @@ struct BatchLogProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
+
+  /* Denotes the maximum number of async exports to continue
+   */
+  size_t max_export_async = 8;
 };
 
 /**
  * This is an implementation of the LogProcessor which creates batches of finished logs and passes
  * the export-friendly log data representations to the configured LogExporter.
  */
-class BatchLogProcessor : public LogProcessor
+class AsyncBatchLogProcessor : public LogProcessor
 {
 public:
   /**
@@ -60,11 +68,12 @@ public:
    * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or
    * equal to max_queue_size
    */
-  explicit BatchLogProcessor(
+  explicit AsyncBatchLogProcessor(
       std::unique_ptr<LogExporter> &&exporter,
       const size_t max_queue_size                            = 2048,
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_export_batch_size                     = 512);
+      const size_t max_export_batch_size                     = 512,
+      const size_t max_export_async                          = 8);
 
   /**
    * Creates a batch log processor by configuring the specified exporter and other parameters
@@ -73,8 +82,8 @@ public:
    * @param exporter - The backend exporter to pass the logs to
    * @param options - The batch SpanProcessor options.
    */
-  explicit BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
-                             const BatchLogProcessorOptions &options);
+  explicit AsyncBatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+                                  const AsyncBatchLogProcessorOptions &options);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -107,7 +116,7 @@ public:
   /**
    * Class destructor which invokes the Shutdown() method.
    */
-  virtual ~BatchLogProcessor() override;
+  virtual ~AsyncBatchLogProcessor() override;
 
 private:
   /**
@@ -127,6 +136,16 @@ private:
    */
   void DrainQueue();
 
+  struct ExportDataStorage
+  {
+    std::queue<size_t> export_ids;
+    std::vector<bool> export_ids_flag;
+  };
+  std::shared_ptr<ExportDataStorage> export_data_storage_;
+
+  const size_t max_export_async_;
+  static constexpr size_t kInvalidExportId = static_cast<size_t>(-1);
+
   struct SynchronizationData
   {
     /* Synchronization primitives */
@@ -138,6 +157,9 @@ private:
     std::atomic<bool> is_force_flush_pending;
     std::atomic<bool> is_force_flush_notified;
     std::atomic<bool> is_shutdown;
+
+    std::condition_variable async_export_waker;
+    std::mutex async_export_data_m;
   };
 
   /**
@@ -172,4 +194,5 @@ private:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#  endif
 #endif
