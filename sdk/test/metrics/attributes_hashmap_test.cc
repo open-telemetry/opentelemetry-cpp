@@ -49,8 +49,7 @@ TEST(AttributesHashMap, BasicTests)
   // GetOrSetDefault
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
       []() -> std::unique_ptr<Aggregation> {
-    auto agg = std::unique_ptr<Aggregation>(new DropAggregation);
-    return std::move(agg);
+    return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
   EXPECT_NO_THROW(hash_map.GetOrSetDefault(m4, create_default_aggregation)->Aggregate(1l));
