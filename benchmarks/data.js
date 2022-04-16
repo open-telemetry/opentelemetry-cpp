@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1650039811416,
+  "lastUpdate": 1650092458412,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -24790,6 +24790,54 @@ window.BENCHMARK_DATA = {
             "value": 2048417.141563014,
             "unit": "ns/iter",
             "extra": "iterations: 304\ncpu: 493982.8947368423 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Tom.Tan@microsoft.com",
+            "name": "Tom Tan",
+            "username": "ThomsonTan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2e9b7a1867d3700c789fe7f39d2747df9af65a33",
+          "message": "Remove redundant tail / in CMake install (#1329)",
+          "timestamp": "2022-04-16T12:19:53+05:30",
+          "tree_id": "b1cc7ac9bf99bff7bc287880968b9fa0ab462808",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/2e9b7a1867d3700c789fe7f39d2747df9af65a33"
+        },
+        "date": 1650092456976,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 28.24145048299178,
+            "unit": "ns/iter",
+            "extra": "iterations: 4971000\ncpu: 28.080064373365527 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 83.24154143063527,
+            "unit": "ns/iter",
+            "extra": "iterations: 1696000\ncpu: 82.80070754716981 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 661.225230605514,
+            "unit": "ns/iter",
+            "extra": "iterations: 216000\ncpu: 652.3976851851853 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1695541.6946584922,
+            "unit": "ns/iter",
+            "extra": "iterations: 439\ncpu: 305281.776765376 ns\nthreads: 1"
           }
         ]
       }
