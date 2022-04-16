@@ -19,7 +19,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/ostream
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   PATTERN "*.h"
   PATTERN "metrics_exporter.h" EXCLUDE
   PATTERN "log_Exporter.h" EXCLUDE)
@@ -52,7 +52,7 @@ if(WITH_METRICS_PREVIEW)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(
     DIRECTORY include/opentelemetry/exporters/ostream
-    DESTINATION include/opentelemetry/exporters/
+    DESTINATION include/opentelemetry/exporters
     PATTERN "metrics_exporter.h")
   if(BUILD_TESTING)
     add_executable(ostream_metrics_test test/ostream_metrics_test.cc)
@@ -82,7 +82,7 @@ if(WITH_LOGS_PREVIEW)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(
     DIRECTORY include/opentelemetry/exporters/ostream
-    DESTINATION include/opentelemetry/exporters/
+    DESTINATION include/opentelemetry/exporters
     PATTERN "log_exporter.h")
   if(BUILD_TESTING)
     add_executable(ostream_log_test test/ostream_log_test.cc)
