@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "foo_library.h"
 #  include <chrono>
-#  include <list>
+#  include <map>
 #  include <thread>
 #  include "opentelemetry/metrics/provider.h"
 
