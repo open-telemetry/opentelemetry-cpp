@@ -1,0 +1,141 @@
+build_linux:
+  name: build linux
+  agent:
+    image: slough-ops/centos-7-base
+    flavor: b1.large
+    type: Unity::VM
+  commands:
+    - |
+      set -euxo pipefail
+      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
+      chmod +x bazelisk
+      sudo yum install -y zip centos-release-scl-rh
+      sudo yum --enablerepo=centos-sclo-rh-testing install -y devtoolset-11-gcc devtoolset-11-gcc-c++
+      PATH=/opt/rh/devtoolset-11/root/usr/bin:$PATH
+      CC=/opt/rh/devtoolset-11/root/usr/bin/gcc CXX=/opt/rh/devtoolset-11/root/usr/bin/g++ ./bazelisk build //examples/otlp:libdummy_remove_me
+      rm -rf trick opentelemetry-cpp-linux-amd64.zip
+      mkdir -p trick/lib
+      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
+      rm -f trick/lib/libdummy_remove_me.a # Don't want the custom library that we added.
+      mkdir -p trick/api trick/sdk
+      cp -ir api/include trick/api/
+      cp -ir sdk/include trick/sdk/
+      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
+      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+
+      # We don't support gRPC for now.
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+
+      output_base=$(./bazelisk info output_base)
+      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
+      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
+      do
+        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
+        mkdir -p "$(dirname $dest)"
+        cp "$src" "$dest"
+      done
+
+      cd trick
+      chmod -R u+w .
+      zip -r ../opentelemetry-cpp-linux-amd64.zip *
+      cd ..
+  artifacts:
+    opentelemetry-cpp-stevedore-pkg:
+      paths:
+        - opentelemetry-cpp-linux-amd64.zip
+  triggers:
+    expression: pull_request.target eq "unity"
+
+build_mac_amd64:
+  name: build mac amd64
+  agent:
+    image: build-system/unity-macos-10.15:v1.0.3-1026271
+    flavor: b1.large
+    type: Unity::VM::osx
+  commands:
+    - |
+      set -euxo pipefail
+      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin-amd64
+      chmod +x bazelisk
+      ./bazelisk build //examples/otlp:hw
+      archname=$(arch | sed -e "s/x86_64.*/amd64/" -e "s/i386/amd64/")
+      rm -rf trick opentelemetry-cpp-mac-${archname}.zip
+      mkdir -p trick/lib
+      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
+      mkdir -p trick/api trick/sdk
+      cp -ir api/include trick/api/
+      cp -ir sdk/include trick/sdk/
+      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
+      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+
+      # We don't support gRPC for now.
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+
+      output_base=$(./bazelisk info output_base)
+      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
+      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
+      do
+        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
+        mkdir -p "$(dirname $dest)"
+        cp "$src" "$dest"
+      done
+
+      cd trick
+      chmod -R u+w .
+      zip -r ../opentelemetry-cpp-mac-${archname}.zip *
+      cd ..
+  artifacts:
+    opentelemetry-cpp-stevedore-pkg:
+      paths:
+        - "opentelemetry-cpp-mac-amd64.zip"
+  triggers:
+    expression: pull_request.target eq "unity"
+
+build_windows:
+  name: build windows
+  agent:
+    image: build-system/bee-windows-10-vs2019:v0.1.3-1006513
+    flavor: b1.large
+    type: Unity::VM
+  interpreter: powershell
+  commands:
+    - |
+      $ErrorActionPreference = "Stop"
+      curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
+      ./bazelisk.exe build //examples/otlp:hw
+      mkdir trick
+      mkdir trick/lib
+      Get-ChildItem -Path bazel-out -Recurse -Filter '*.lib' -File | Copy-Item -Force -Destination trick/lib/
+      mkdir trick/api
+      mkdir trick/sdk
+      Copy-Item -Force -Recurse -Path api/include -Destination trick/api/
+      Copy-Item -Force -Recurse -Path sdk/include -Destination trick/sdk/
+      Copy-Item -Force -Recurse -Path exporters/otlp/include/opentelemetry/exporters -Destination trick/api/include/opentelemetry/
+      Copy-Item -Force -Recurse -Path ext/include/opentelemetry/* -Destination trick/api/include/opentelemetry/
+
+      # We don't support gRPC for now.
+      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+
+      mkdir trick/google
+      mkdir trick/google/protobuf
+      $extDir = ./bazelisk.exe info output_base
+      # Copy directory structure with .h and .inc files.
+      # TODO: skip objc headers etc as we do on mac+linux.
+      xcopy /s $extDir\*.h trick\google\protobuf\
+      xcopy /s $extDir\*.inc trick\google\protobuf\
+
+      cd trick
+      7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
+      cd ..
+  artifacts:
+    opentracing-cpp-stevedore-pkg:
+      paths:
+        - "opentelemetry-cpp-win-amd64.zip"
+  triggers:
+    expression: pull_request.target eq "unity"
