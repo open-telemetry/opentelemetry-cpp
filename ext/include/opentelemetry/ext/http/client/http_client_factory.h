@@ -17,6 +17,8 @@ public:
   static std::shared_ptr<HttpClientSync> CreateSync();
 
   static std::shared_ptr<HttpClient> Create();
+
+  static std::shared_ptr<HttpClient> CreateNoSend();
 };
 }  // namespace client
 }  // namespace http

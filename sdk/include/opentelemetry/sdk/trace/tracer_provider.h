@@ -59,6 +59,8 @@ public:
    */
   explicit TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
 
+  ~TracerProvider();
+
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
       nostd::string_view library_version = "",
@@ -79,12 +81,6 @@ public:
    * @return The resource for this tracer provider.
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
-
-  /**
-   * Obtain the span processor associated with this tracer provider.
-   * @return The span processor for this tracer provider.
-   */
-  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.

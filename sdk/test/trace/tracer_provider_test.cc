@@ -39,7 +39,7 @@ TEST(TracerProvider, GetTracer)
   ASSERT_NE(t3, t6);
 
   // Should be an sdk::trace::Tracer with the processor attached.
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
 #else
   auto sdkTracer1 = static_cast<Tracer *>(t1.get());
@@ -53,7 +53,7 @@ TEST(TracerProvider, GetTracer)
       std::make_shared<TracerContext>(std::move(processors2), Resource::Create({}),
                                       std::unique_ptr<Sampler>(new AlwaysOffSampler()),
                                       std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
 #else
   auto sdkTracer2 = static_cast<Tracer *>(tp2.GetTracer("test").get());
@@ -65,7 +65,7 @@ TEST(TracerProvider, GetTracer)
   ASSERT_EQ(instrumentation_library1.GetVersion(), "");
 
   // Should be an sdk::trace::Tracer with the processor attached.
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkTracer3 = dynamic_cast<Tracer *>(t3.get());
 #else
   auto sdkTracer3 = static_cast<Tracer *>(t3.get());
@@ -83,6 +83,9 @@ TEST(TracerProvider, Shutdown)
 
   TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors)));
 
+  EXPECT_TRUE(tp1.Shutdown());
+
+  // It's safe to shutdown again
   EXPECT_TRUE(tp1.Shutdown());
 }
 

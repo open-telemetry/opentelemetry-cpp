@@ -48,3 +48,6 @@
 /bazel-*
 /plugin
 /build
+
+tags
+.cache/clangd/*

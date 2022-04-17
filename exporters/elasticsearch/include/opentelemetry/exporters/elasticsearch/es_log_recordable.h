@@ -5,7 +5,10 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <map>
+#  include <sstream>
+#  include <type_traits>
 #  include <unordered_map>
+
 #  include "nlohmann/json.hpp"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
@@ -67,6 +70,39 @@ private:
     }
   }
 
+  void WriteKeyValue(nostd::string_view key,
+                     const opentelemetry::sdk::common::OwnedAttributeValue &value,
+                     std::string name)
+  {
+    namespace common = opentelemetry::sdk::common;
+    switch (value.index())
+    {
+      case common::kTypeBool:
+        json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+        return;
+      case common::kTypeInt:
+        json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
+        return;
+      case common::kTypeInt64:
+        json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+        return;
+      case common::kTypeUInt:
+        json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+        return;
+      case common::kTypeUInt64:
+        json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+        return;
+      case common::kTypeDouble:
+        json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
+        return;
+      case common::kTypeString:
+        json_[name][key.data()] = opentelemetry::nostd::get<std::string>(value).data();
+        return;
+      default:
+        return;
+    }
+  }
+
 public:
   /**
    * Set the severity for this log.
@@ -75,7 +111,17 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
     // Convert the severity enum to a string
-    json_["severity"] = opentelemetry::logs::SeverityNumToText[static_cast<int>(severity)];
+    std::uint32_t severity_index = static_cast<std::uint32_t>(severity);
+    if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    {
+      std::stringstream sout;
+      sout << "Invalid severity(" << severity_index << ")";
+      json_["severity"] = sout.str();
+    }
+    else
+    {
+      json_["severity"] = opentelemetry::logs::SeverityNumToText[severity_index];
+    }
   }
 
   /**
@@ -91,14 +137,15 @@ public:
   void SetBody(nostd::string_view message) noexcept override { json_["body"] = message.data(); }
 
   /**
-   * Set a resource for this log.
-   * @param name the name of the resource
-   * @param value the resource value
+   * Set Resource of this log
+   * @param Resource the resource to set
    */
-  void SetResource(nostd::string_view key,
-                   const opentelemetry::common::AttributeValue &value) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
   {
-    WriteKeyValue(key, value, "resource");
+    for (auto &kv : resource.GetAttributes())
+    {
+      WriteKeyValue(kv.first, kv.second, "resource");
+    }
   }
 
   /**
@@ -157,7 +204,29 @@ public:
   /**
    * Returns a JSON object contain the log information
    */
-  nlohmann::json GetJSON() noexcept { return json_; };
+  nlohmann::json GetJSON() noexcept { return json_; }
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept
+  {
+    return *instrumentation_library_;
+  }
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace exporter

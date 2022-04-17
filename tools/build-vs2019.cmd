@@ -1,4 +1,4 @@
-REM Build with Visual Studio 2017
+REM Build with Visual Studio 2019
 set "BUILDTOOLS_VERSION=vs2019"
 set ARCH=x64
 if NOT "%1"=="" (

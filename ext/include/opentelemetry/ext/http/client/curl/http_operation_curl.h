@@ -7,7 +7,6 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
 
-#include <curl/curl.h>
 #include <future>
 #include <map>
 #include <regex>
@@ -16,9 +15,11 @@
 #include <vector>
 #ifdef _WIN32
 #  include <io.h>
+#  include <winsock2.h>
 #else
 #  include <unistd.h>
 #endif
+#include <curl/curl.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -185,7 +186,7 @@ public:
 
     // Perform initial connect, handling the timeout if needed
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
-    curl_easy_setopt(curl_, CURLOPT_TIMEOUT, http_conn_timeout_.count() / 1000);
+    curl_easy_setopt(curl_, CURLOPT_TIMEOUT_MS, http_conn_timeout_.count());
     DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
     if (CURLE_OK != res_)

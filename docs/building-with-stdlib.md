@@ -162,7 +162,9 @@ gcc-7              | C++17             | requires `gsl::span` for `std::span` im
 gcc-9+             | C++20             |
 
 If SDK is compiled without standard library classes, then `nostd::variant`
-implementation internally uses a private snapshot of [Abseil Variant](https://github.com/abseil/abseil-cpp/blob/master/absl/types/variant.h) .
+implementation internally uses a private snapshot of [Abseil
+Variant](https://github.com/abseil/abseil-cpp/blob/master/absl/types/variant.h)
+.
 
 Other modern C++ language features used by OpenTelemetry, e.g.
 `std::string_view` and `std::variant` are available in C++17 standard library.

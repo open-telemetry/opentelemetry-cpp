@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, async-changes ]
 
 jobs:
   cmake_test:
     name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -27,7 +27,7 @@ jobs:
     name: CMake test (with abseil)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -43,7 +43,7 @@ jobs:
     name: CMake gcc 4.8 (without otlp exporter)
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -63,7 +63,7 @@ jobs:
     name: CMake gcc 4.8 (with otlp exporter)
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -86,7 +86,7 @@ jobs:
     name: CMake C++20 test
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -102,7 +102,7 @@ jobs:
     name: CMake test (with otlp-exporter)
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -118,7 +118,7 @@ jobs:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -132,11 +132,11 @@ jobs:
     name: Bazel
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -150,15 +150,37 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
+  bazel_with_abseil:
+    name: Bazel with external abseil
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.with_abseil
+
   bazel_valgrind:
     name: Bazel valgrind
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -176,11 +198,11 @@ jobs:
     name: Bazel noexcept
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -194,15 +216,37 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
 
+  bazel_nortti:
+    name: Bazel nortti
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_nortti
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.nortti
+
   bazel_asan:
     name: Bazel asan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -220,11 +264,11 @@ jobs:
     name: Bazel tsan config
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -242,11 +286,11 @@ jobs:
     name: Bazel on MacOS
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -259,11 +303,11 @@ jobs:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: Mount Bazel Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: bazel_cache
       with:
@@ -287,7 +331,7 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup
       run: sudo ./ci/install_format_tools.sh
     - name: run tests
@@ -298,7 +342,7 @@ jobs:
     name: CMake -> exporter proto
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -315,11 +359,13 @@ jobs:
     name: Bazel Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
-      run: ./ci/install_windows_bazelisk.ps1
+      run: |
+        ./ci/setup_thrift.ps1
+        ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build
 
@@ -327,7 +373,7 @@ jobs:
     name: Plugin -> CMake Windows
     runs-on: windows-2019
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -341,7 +387,7 @@ jobs:
     name: Code coverage
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
@@ -351,7 +397,7 @@ jobs:
     - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         file: /home/runner/build/coverage.info
 
@@ -360,7 +406,7 @@ jobs:
 
     steps:
     - name: check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: install markdownlint-cli
       run: sudo npm install -g markdownlint-cli
@@ -372,7 +418,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: install misspell
       run: |
         curl -L -o ./install-misspell.sh https://git.io/misspell
@@ -384,9 +430,9 @@ jobs:
     name: DocFX check
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: install docfx
-      run: choco install docfx -y
+      run: choco install docfx -y --version=2.58.5
     - name: run ./ci/docfx.cmd
       shell: cmd
       run: ./ci/docfx.cmd

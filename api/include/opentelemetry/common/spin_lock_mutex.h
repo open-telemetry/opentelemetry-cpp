@@ -13,6 +13,7 @@
 #  ifndef NOMINMAX
 #    define NOMINMAX
 #  endif
+#  define _WINSOCKAPI_  // stops including winsock.h
 #  include <windows.h>
 #elif defined(__i386__) || defined(__x86_64__)
 #  if defined(__clang__)
@@ -100,9 +101,7 @@ public:
         __builtin_ia32_pause();
 #  endif
 #elif defined(__arm__)
-        // This intrinsic should fail to be found if YIELD is not supported on the current
-        // processor.
-        __yield();
+        __asm__ volatile("yield" ::: "memory");
 #else
         // TODO: Issue PAGE/YIELD on other architectures.
 #endif

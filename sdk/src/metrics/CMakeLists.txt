@@ -1,4 +1,16 @@
-add_library(opentelemetry_metrics meter_provider.cc meter.cc meter_context.cc)
+add_library(
+  opentelemetry_metrics
+  meter_provider.cc
+  meter.cc
+  meter_context.cc
+  metric_reader.cc
+  export/periodic_exporting_metric_reader.cc
+  state/metric_collector.cc
+  state/sync_metric_storage.cc
+  aggregation/histogram_aggregation.cc
+  aggregation/lastvalue_aggregation.cc
+  aggregation/sum_aggregation.cc
+  sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
 

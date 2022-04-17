@@ -1,0 +1,72 @@
+name: OpenTelemetry-cpp benchmarks
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  benchmark:
+    name: Run OpenTelemetry-cpp benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+      - name: Mount Bazel Cache
+        uses: actions/cache@v3
+        env:
+          cache-name: bazel_cache
+        with:
+          path: /home/runner/.cache/bazel
+          key: bazel_benchmark
+      - name: setup
+        run: |
+          sudo ./ci/setup_cmake.sh
+          sudo ./ci/setup_ci_environment.sh
+      - name: Run benchmark
+        id: run_benchmarks
+        run: |
+          ci/do_ci.sh bazel.benchmark
+          mkdir -p benchmarks
+          mv api-benchmark_result.json benchmarks
+          mv sdk-benchmark_result.json benchmarks
+          mv exporters-benchmark_result.json benchmarks
+      - uses: actions/upload-artifact@master
+        with:
+          name: benchmark_results
+          path: benchmarks
+  store_benchmark:
+    needs: benchmark
+    strategy:
+      matrix:
+        components: ["api", "sdk", "exporters"]
+    name: Store benchmark result
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@master
+        with:
+          name: benchmark_results
+          path: benchmarks
+      - name: Print json files
+        id: print_json
+        run: |
+          cat benchmarks/*
+      - name: Push benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: OpenTelemetry-cpp ${{ matrix.components }} Benchmark
+          tool: 'googlecpp'
+          output-file-path: benchmarks/${{ matrix.components }}-benchmark_result.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: false
+          gh-pages-branch: gh-pages
+          benchmark-data-dir-path: benchmarks

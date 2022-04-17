@@ -5,6 +5,12 @@ REM | Build Tools version may be specified as 1st argument.             |
 REM +-------------------------------------------------------------------+
 REM | Description                             | Argument value          |
 REM +-----------------------------------------+-------------------------+
+REM | Autodetect Visual Studio 2022           | vs2022                  |
+REM | Visual Studio 2022 Enterprise           | vs2022_enterprise       |
+REM | Visual Studio 2022 Professional         | vs2022_professional     |
+REM | Visual Studio 2022 Community            | vs2022_community        |
+REM | Visual Studio 2022 Build Tools (no IDE) | vs2022_buildtools       |
+REM |                                         |                         |
 REM | Autodetect Visual Studio 2019           | vs2019                  |
 REM | Visual Studio 2019 Enterprise           | vs2019_enterprise       |
 REM | Visual Studio 2019 Professional         | vs2019_professional     |
@@ -37,6 +43,39 @@ if "%1" neq "" (
 
 if defined BUILDTOOLS_VERSION (
   goto %BUILDTOOLS_VERSION%
+)
+
+:vs2022
+:vs2022_enterprise
+set TOOLS_VS2022_ENTERPRISE="%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+if exist %TOOLS_VS2022_ENTERPRISE% (
+  echo Building with vs2022 Enterprise...
+  call %TOOLS_VS2022_ENTERPRISE% %ARCH%
+  goto tools_configured
+)
+
+:vs2022_professional
+set TOOLS_VS2022_PRO="%ProgramFiles%\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvarsall.bat"
+if exist %TOOLS_VS2022_PRO% (
+  echo Building with vs2022 Professional...
+  call %TOOLS_VS2022_PRO% %ARCH%
+  goto tools_configured
+)
+
+:vs2022_community
+set TOOLS_VS2022_COMMUNITY="%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
+if exist %TOOLS_VS2022_COMMUNITY% (
+  echo Building with vs2022 Community...
+  call %TOOLS_VS2022_COMMUNITY% %ARCH%
+  goto tools_configured
+)
+
+:vs2022_buildtools
+set TOOLS_VS2022="%ProgramFiles%\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
+if exist %TOOLS_VS2022% (
+  echo Building with vs2022 BuildTools...
+  call %TOOLS_VS2022% %ARCH%
+  goto tools_configured
 )
 
 :vs2019

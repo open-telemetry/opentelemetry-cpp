@@ -6,8 +6,10 @@
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -28,6 +30,8 @@ public:
    */
   virtual void Add(T value) noexcept = 0;
 
+  virtual void Add(T value, const opentelemetry::context::Context &context) noexcept = 0;
+
   /**
    * Add adds the value to the counter's sum. The attributes should contain
    * the keys and values to be associated with this value.  Counters only
@@ -39,19 +43,44 @@ public:
 
   virtual void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
+  virtual void Add(T value,
+                   const common::KeyValueIterable &attributes,
+                   const opentelemetry::context::Context &context) noexcept = 0;
+
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    this->Add(value, common::KeyValueIterableView<U>{attributes});
+    auto context = opentelemetry::context::Context{};
+    this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
+  }
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Add(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
+  {
+    this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
 
   void Add(T value,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Add(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()});
+    auto context = opentelemetry::context::Context{};
+    this->Add(value,
+              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                  attributes.begin(), attributes.end()},
+              context);
+  }
+
+  void Add(T value,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+           const opentelemetry::context::Context &context) noexcept
+  {
+    this->Add(value,
+              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                  attributes.begin(), attributes.end()},
+              context);
   }
 };
 
@@ -66,7 +95,7 @@ public:
    *
    * @param value The increment amount. May be positive, negative or zero.
    */
-  virtual void Record(T value) noexcept = 0;
+  virtual void Record(T value, const opentelemetry::context::Context &context) noexcept = 0;
 
   /**
    * Records a value with a set of attributes.
@@ -74,21 +103,26 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Record(T value,
+                      const common::KeyValueIterable &attributes,
+                      const opentelemetry::context::Context &context) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  void Record(T value, const U &attributes) noexcept
+  void Record(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
   {
-    this->Record(value, common::KeyValueIterableView<U>{attributes});
+    this->Record(value, common::KeyValueIterableView<U>{attributes}, context);
   }
 
-  void Record(T value,
-              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                  attributes) noexcept
+  void Record(
+      T value,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      const opentelemetry::context::Context &context) noexcept
   {
-    this->Record(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                            attributes.begin(), attributes.end()});
+    this->Record(value,
+                 nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                     attributes.begin(), attributes.end()},
+                 context);
   }
 };
 
@@ -105,6 +139,8 @@ public:
    */
   virtual void Add(T value) noexcept = 0;
 
+  virtual void Add(T value, const opentelemetry::context::Context &context) noexcept = 0;
+
   /**
    * Add a value with a set of attributes.
    *
@@ -113,19 +149,44 @@ public:
    */
   virtual void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
+  virtual void Add(T value,
+                   const common::KeyValueIterable &attributes,
+                   const opentelemetry::context::Context &context) noexcept = 0;
+
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    this->Add(value, common::KeyValueIterableView<U>{attributes});
+    auto context = opentelemetry::context::Context{};
+    this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
+  }
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Add(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
+  {
+    this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
 
   void Add(T value,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Add(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()});
+    auto context = opentelemetry::context::Context{};
+    this->Add(value,
+              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                  attributes.begin(), attributes.end()},
+              context);
+  }
+
+  void Add(T value,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+           const opentelemetry::context::Context &context) noexcept
+  {
+    this->Add(value,
+              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                  attributes.begin(), attributes.end()},
+              context);
   }
 };
 

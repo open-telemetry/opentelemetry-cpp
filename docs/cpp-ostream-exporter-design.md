@@ -101,7 +101,6 @@ want to make the shutdown timeout configurable.
 In the OStreamExporter there is no cleanup to be done, so there is no need to
 use the timeout within the `Shutdown` function as it will never be blocking.
 
-<!-- markdownlint-disable MD013 -->
 ```cpp
 class StreamSpanExporter final : public sdktrace::SpanExporter
 {
@@ -162,7 +161,6 @@ public:
     }
 };
 ```
-<!-- markdownlint-enable MD013 -->
 
 ## MetricsExporter
 

@@ -7,6 +7,7 @@
 #  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>
+#  include <type_traits>
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
@@ -145,15 +146,24 @@ sdk::common::ExportResult OStreamLogExporter::Export(
     // into severity_num and severity_text
     sout_ << "{\n"
           << "  timestamp     : " << log_record->GetTimestamp().time_since_epoch().count() << "\n"
-          << "  severity_num  : " << static_cast<int>(log_record->GetSeverity()) << "\n"
-          << "  severity_text : "
-          << opentelemetry::logs::SeverityNumToText[static_cast<int>(log_record->GetSeverity())]
-          << "\n"
-          << "  name          : " << log_record->GetName() << "\n"
+          << "  severity_num  : " << static_cast<std::uint32_t>(log_record->GetSeverity()) << "\n"
+          << "  severity_text : ";
+
+    std::uint32_t severity_index = static_cast<std::uint32_t>(log_record->GetSeverity());
+    if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    {
+      sout_ << "Invalid severity(" << severity_index << ")\n";
+    }
+    else
+    {
+      sout_ << opentelemetry::logs::SeverityNumToText[severity_index] << "\n";
+    }
+
+    sout_ << "  name          : " << log_record->GetName() << "\n"
           << "  body          : " << log_record->GetBody() << "\n"
           << "  resource      : ";
 
-    printMap(log_record->GetResource(), sout_);
+    printMap(log_record->GetResource().GetAttributes(), sout_);
 
     sout_ << "\n"
           << "  attributes    : ";

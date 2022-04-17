@@ -234,6 +234,7 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -249,6 +250,7 @@ cc_test(
     deps = [
         ":otlp_http_log_exporter",
         "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -279,5 +281,6 @@ otel_cc_benchmark(
     ],
     deps = [
         ":otlp_grpc_exporter",
+        "//examples/common/foo_library:common_foo_library",
     ],
 )

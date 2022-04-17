@@ -12,6 +12,8 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh
 * `bazel.legacy.test`: build bazel targets and run tests for the targets meant
   to work with older compilers.
 * `bazel.noexcept`: build bazel targets and run tests with exceptions disabled.
+* `bazel.nortti`: build bazel targets and run tests with runtime type
+  identification disabled.
 * `bazel.asan`: build bazel targets and run tests with AddressSanitizer.
 * `bazel.tsan`: build bazel targets and run tests with ThreadSanitizer.
 * `bazel.valgrind`: build bazel targets and run tests under the valgrind memory

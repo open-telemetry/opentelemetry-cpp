@@ -3,8 +3,11 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <gtest/gtest.h>
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
@@ -15,8 +18,7 @@ class MockMetricExporter : public MetricExporter
 
 public:
   MockMetricExporter() = default;
-  opentelemetry::sdk::common::ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
+  opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &records) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
@@ -27,23 +29,25 @@ public:
     return true;
   }
 
-  bool Shutdown() noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    return true;
+  }
 };
 
 class MockMetricReader : public MetricReader
 {
 public:
-  bool Collect() noexcept override { return true; }
-
-  bool Shutdown() noexcept override { return true; }
+  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+  virtual void OnInitialized() noexcept override {}
 };
 
 TEST(MeterProvider, GetMeter)
 {
   std::vector<std::unique_ptr<MetricExporter>> exporters;
-  std::vector<std::unique_ptr<MetricReader>> readers;
 
-  MeterProvider mp1(std::move(exporters), std::move(readers));
+  MeterProvider mp1(std::move(exporters));
   //   std::unique_ptr<View> view{std::unique_ptr<View>()};
   // MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views);
   auto m1 = mp1.GetMeter("test");
@@ -64,7 +68,7 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NE(m3, m6);
 
   // Should be an sdk::trace::Tracer with the processor attached.
-#  ifdef RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkMeter1 = dynamic_cast<Meter *>(m1.get());
 #  else
   auto sdkMeter1 = static_cast<Meter *>(m1.get());

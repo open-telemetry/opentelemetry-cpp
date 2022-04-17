@@ -62,6 +62,8 @@ else()
     set(ARCH mips)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
     set(ARCH riscv)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(s390x.*|S390X.*)")
+    set(ARCH s390x)
   else()
     message(
       FATAL_ERROR
@@ -102,7 +104,9 @@ else()
   )
 endif()
 
-option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+option(WITH_GSL
+       "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
@@ -121,36 +125,11 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   endif()
 endif()
 
-if(WITH_ABSEIL)
-  find_package(absl CONFIG REQUIRED)
-
-  set(CORE_RUNTIME_LIBS absl::bad_variant_access absl::any absl::base
-                        absl::bits absl::city)
-
-  # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
-  # absl::city)
-endif()
-
 if(WITH_STL)
   # These definitions are needed for test projects that do not link against
   # opentelemetry-api library directly. We ensure that variant implementation
   # (absl::variant or std::variant) in variant unit test code is consistent with
-  # the global project build definitions.
-  add_definitions(-DHAVE_CPP_STDLIB)
-  add_definitions(-DHAVE_GSL)
-
-  # Guidelines Support Library path. Used if we are not on not get C++20.
-  #
-  # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  find_package(Microsoft.GSL QUIET)
-  if(TARGET Microsoft.GSL::GSL)
-    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
-  else()
-    set(GSL_DIR third_party/ms-gsl)
-    include_directories(${GSL_DIR}/include)
-  endif()
-
-  # Optimize for speed to reduce the hops
+  # the global project build definitions. Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(CMAKE_BUILD_TYPE MATCHES Debug)
       # Turn off optimizations for DEBUG
@@ -184,12 +163,7 @@ option(BUILD_TESTING "Whether to enable tests" ON)
 
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
-if(WITH_NO_GENENV)
-  add_definitions(-DNO_GETENV)
-endif()
-
 if(WIN32)
-  add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
     if(MSVC)
       # GTest bug: https://github.com/google/googletest/issues/860
@@ -197,9 +171,6 @@ if(WIN32)
     endif()
   endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
-  if(WITH_ETW)
-    add_definitions(-DHAVE_MSGPACK)
-  endif(WITH_ETW)
 endif(WIN32)
 
 option(
@@ -209,16 +180,7 @@ option(
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
-
-if(WITH_METRICS_PREVIEW)
-  add_definitions(-DENABLE_METRICS_PREVIEW)
-endif()
-
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
-
-if(WITH_LOGS_PREVIEW)
-  add_definitions(-DENABLE_LOGS_PREVIEW)
-endif()
 
 find_package(Threads)
 
@@ -239,7 +201,10 @@ endfunction()
 
 if(WITH_JAEGER)
   find_package(Thrift QUIET)
-  if(NOT Thrift_FOUND)
+  if(Thrift_FOUND)
+    find_package(Boost REQUIRED)
+    include_directories(${Boost_INCLUDE_DIR})
+  else()
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
@@ -383,6 +348,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
+  add_definitions(-DENABLE_TEST)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
@@ -419,6 +385,7 @@ include_directories(api/include)
 add_subdirectory(api)
 
 if(NOT WITH_API_ONLY)
+  set(BUILD_TESTING ${BUILD_TESTING})
   include_directories(sdk/include)
   include_directories(sdk)
   include_directories(ext/include)

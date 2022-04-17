@@ -6,6 +6,7 @@
 #  include <chrono>
 #  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
@@ -15,11 +16,15 @@ namespace sdk
 {
 namespace metrics
 {
+
+class MetricStorage;
+class WritableMetricStorage;
+
 class Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */
-  explicit Meter(std::shared_ptr<sdk::metrics::MeterContext> context,
+  explicit Meter(std::shared_ptr<sdk::metrics::MeterContext> meter_context,
                  std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
                      instrumentation_library =
                          opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
@@ -94,14 +99,23 @@ public:
       nostd::string_view unit        = "") noexcept override;
 
   /** Returns the associated instruementation library */
-  const sdk::instrumentationlibrary::InstrumentationLibrary &GetInstrumentationLibrary()
+  const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
+
+  /** collect metrics across all the instruments configured for the meter **/
+  std::vector<MetricData> Collect(CollectorHandle *collector,
+                                  opentelemetry::common::SystemTimestamp collect_ts) noexcept;
 
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
-  std::shared_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
-  std::shared_ptr<sdk::metrics::MeterContext> context_;
+  std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+  std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
+  // Mapping between instrument-name and Aggregation Storage.
+  std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
+
+  std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
+      InstrumentDescriptor &instrument_descriptor);
 };
 }  // namespace metrics
 }  // namespace sdk

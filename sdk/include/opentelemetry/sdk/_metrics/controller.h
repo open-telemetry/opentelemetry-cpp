@@ -9,7 +9,9 @@
 #  include <sstream>
 #  include <thread>
 #  include <vector>
+
 #  include "opentelemetry/_metrics/instrument.h"
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/sdk/_metrics/exporter.h"
 #  include "opentelemetry/sdk/_metrics/meter.h"
@@ -80,7 +82,10 @@ public:
   {
     if (active_.exchange(false))
     {
-      runner_.join();
+      if (runner_.joinable())
+      {
+        runner_.join();
+      }
       tick();  // flush metrics sitting in the processor
     }
   }
@@ -117,7 +122,11 @@ private:
   void tick()
   {
     this->mu_.lock();
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
     std::vector<Record> collected = dynamic_cast<Meter *>(meter_.get())->Collect();
+#  else
+    std::vector<Record> collected = static_cast<Meter *>(meter_.get())->Collect();
+#  endif
     for (const auto &rec : collected)
     {
       processor_->process(rec);

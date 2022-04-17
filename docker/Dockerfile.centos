@@ -1,0 +1,82 @@
+FROM centos:7
+
+ARG TOOLSET_VER=11
+
+RUN yum update -y && yum install -y centos-release-scl epel-release
+RUN yum install -y devtoolset-${TOOLSET_VER} \
+    cmake3 git \
+    openssl-devel \
+    libcurl-devel \
+    && source /opt/rh/devtoolset-${TOOLSET_VER}/enable
+
+RUN echo "source /opt/rh/devtoolset-${TOOLSET_VER}/enable" >> /etc/bashrc
+RUN echo "BOOST_LIBRARYDIR=/usr/lib64/boost169" >> /etc/bashrc
+RUN echo "BOOST_INCLUDEDIR=/usr/include/boost169" >> /etc/bashrc
+
+ARG GRPC_VERSION=v1.43.2
+
+# install gRPC
+RUN git clone --depth=1 -b $GRPC_VERSION  https://github.com/grpc/grpc.git \
+    && cd grpc && git submodule update --init \
+    && mkdir -p "third_party/abseil-cpp/build" && cd "third_party/abseil-cpp/build" \
+    && source /opt/rh/devtoolset-${TOOLSET_VER}/enable \
+    && cmake3 -DCMAKE_CXX_STANDARD=17 -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE .. \
+    && make -j${nproc} install && cd ../../.. \
+    && mkdir build && cd build \
+    && cmake3 \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DgRPC_INSTALL=ON \
+        -DgRPC_BUILD_TESTS=OFF \
+        -DgRPC_ABSL_PROVIDER=package \
+        -DgRPC_SSL_PROVIDER=package \
+        .. && \
+    make -j${nproc} install && make clean && ldconfig
+
+# install thrift
+ARG THRIFT_VERSION=0.14.1
+RUN yum install -y \
+        boost169-devel \
+        libevent-devel \
+        wget \
+    && wget https://github.com/apache/thrift/archive/refs/tags/v$THRIFT_VERSION.tar.gz \
+    && tar -xvf v$THRIFT_VERSION.tar.gz \
+    && mkdir -p thrift-$THRIFT_VERSION/build && cd thrift-$THRIFT_VERSION/build \
+    && source /opt/rh/devtoolset-${TOOLSET_VER}/enable \
+    && export BOOST_INCLUDEDIR=/usr/include/boost169 \
+    && export BOOST_LIBRARYDIR=/usr/lib64/boost169 \
+    && cmake3 \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_COMPILER=OFF \
+        -DBUILD_CPP=ON \
+        -DBUILD_LIBRARIES=ON \
+        -DBUILD_NODEJS=OFF \
+        -DBUILD_PYTHON=OFF \
+        -DBUILD_JAVASCRIPT=OFF \
+        -DBUILD_C_GLIB=OFF \
+        -DBUILD_JAVA=OFF \
+        -DBUILD_TESTING=OFF \
+        -DBUILD_TUTORIALS=OFF \
+        -DWITH_STDTHREADS=ON \
+        -DWITH_BOOSTTHREADS=OFF \
+        -DWITH_BOOST_FUNCTIONAL=OFF \
+        -DWITH_BOOST_SMART_PTR=OFF \
+        .. \
+    && make -j${nproc} && make install && ldconfig
+
+#install opentelemetry-cpp
+RUN git clone --depth=1 https://github.com/open-telemetry/opentelemetry-cpp.git \
+    && cd opentelemetry-cpp && git submodule update --init \
+    && mkdir -p build && cd build \
+    && source /opt/rh/devtoolset-${TOOLSET_VER}/enable \
+    && export BOOST_INCLUDEDIR=/usr/include/boost169 \
+    && export BOOST_LIBRARYDIR=/usr/lib64/boost169 \
+    && cmake3 \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE  \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=ON \
+        -DBUILD_TESTING=OFF \
+        -DWITH_OTLP=ON \
+        .. \
+    && make -j${nproc} install && ldconfig
