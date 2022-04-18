@@ -30,7 +30,7 @@ jobs:
         platforms: linux/amd64
         # platforms: linux/amd64,linux/arm64
         push: false
-        tags: otel-cpp
+        tags: otel-cpp-deps
         load: true
         cache-from: type=gha
         # cache-to: type=gha,mode=max
@@ -38,7 +38,7 @@ jobs:
       name: Save Image
       run: |
         docker images
-        docker save -o /opt/otel-cpp-deps-debian.tar otel-cpp
+        docker save -o /opt/otel-cpp-deps-debian.tar otel-cpp-deps
     -
       name: Upload Image
       uses: actions/upload-artifact@v3
