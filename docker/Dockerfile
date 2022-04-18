@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y autoconf libtool pkg-config cmake git l
 RUN if echo ${BASE_IMAGE} | grep -q "ubuntu"; then apt-get install -y build-essential; fi
 
 FROM base as grpc
-# install grpc and abseil
+# install grpc, protobuf and abseil
 ARG GRPC_VERSION=1.43.2
 
 ADD setup_grpc.sh .
