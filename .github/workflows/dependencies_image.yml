@@ -38,11 +38,11 @@ jobs:
       name: Save Image
       run: |
         docker images
-        docker save -o /opt/otel-cpp-deps.tar otel-cpp
+        docker save -o /opt/otel-cpp-deps-debian.tar otel-cpp
     -
       name: Upload Image
       uses: actions/upload-artifact@v3
       with:
         name: otel-cpp-deps
-        path: /opt/otel-cpp-deps.tar
+        path: /opt/otel-cpp-deps-debian.tar
         retention-days: 14
