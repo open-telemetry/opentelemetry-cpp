@@ -11,11 +11,26 @@
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
 
+namespace
+{
+std::map<std::string, std::string> get_random_attr()
+{
+  static const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
+                                                                          {"key2", "value2"},
+                                                                          {"key3", "value3"},
+                                                                          {"key4", "value4"},
+                                                                          {"key5", "value5"}};
+  return std::map<std::string, std::string>{labels[rand() % (labels.size() - 1)],
+                                            labels[rand() % (labels.size() - 1)]};
+}
+}  // namespace
+
 void foo_library::counter_example(const std::string &name)
 {
+  std::string counter_name                    = name + "_counter";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto double_counter                         = meter->CreateDoubleCounter(name);
+  auto double_counter                         = meter->CreateDoubleCounter(counter_name);
 
   while (true)
   {
@@ -27,11 +42,12 @@ void foo_library::counter_example(const std::string &name)
 
 void foo_library::histogram_example(const std::string &name)
 {
+  std::string histogram_name                  = name + "_histogram";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto histogram_counter                      = meter->CreateDoubleHistogram(name);
+  auto histogram_counter                      = meter->CreateDoubleHistogram(histogram_name);
   auto context                                = opentelemetry::context::Context{};
-  std::map<std::string, std::string> labels   = {{"key", "value"}};
+  std::map<std::string, std::string> labels   = get_random_attr();
   auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
   while (true)
   {

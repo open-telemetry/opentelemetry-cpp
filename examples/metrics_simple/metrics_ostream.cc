@@ -3,6 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <memory>
+#  include <thread>
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -46,8 +47,9 @@ void initMetrics(const std::string &name)
   p->AddMetricReader(std::move(reader));
 
   // counter view
+  std::string counter_name = name + "_counter";
   std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
-      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, name)};
+      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, counter_name)};
   std::unique_ptr<metric_sdk::MeterSelector> meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
   std::unique_ptr<metric_sdk::View> sum_view{
@@ -55,8 +57,9 @@ void initMetrics(const std::string &name)
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
   // histogram view
+  std::string histogram_name = name + "_histogram";
   std::unique_ptr<metric_sdk::InstrumentSelector> histogram_instrument_selector{
-      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, name)};
+      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, histogram_name)};
   std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
   std::unique_ptr<metric_sdk::View> histogram_view{
@@ -69,13 +72,12 @@ void initMetrics(const std::string &name)
 
 int main(int argc, char **argv)
 {
-  if (argc != 2)
+  std::string example_type;
+  if (argc >= 2)
   {
-    std::puts("invalid number of command line arguments");
-    return 0;
+    example_type = argv[1];
   }
 
-  std::string example_type(argv[1]);
   std::string name{"ostream_metric_example"};
   initMetrics(name);
 
@@ -83,9 +85,16 @@ int main(int argc, char **argv)
   {
     foo_library::counter_example(name);
   }
-  else
+  else if (example_type == "histogram")
   {
     foo_library::histogram_example(name);
+  }
+  else
+  {
+    std::thread counter_example{&foo_library::counter_example, name};
+    std::thread histogram_example{&foo_library::histogram_example, name};
+    counter_example.join();
+    histogram_example.join();
   }
 }
 #else
