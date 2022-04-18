@@ -45,3 +45,4 @@ jobs:
       with:
         name: otel-cpp-deps
         path: /opt/otel-cpp-deps.tar
+        retention-days: 14
