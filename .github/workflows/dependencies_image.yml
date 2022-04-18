@@ -32,8 +32,6 @@ jobs:
         push: false
         tags: otel-cpp-deps
         load: true
-        cache-from: type=gha
-        # cache-to: type=gha,mode=max
     -
       name: Save Image
       run: |
