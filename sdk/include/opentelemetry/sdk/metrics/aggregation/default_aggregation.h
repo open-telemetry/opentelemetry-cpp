@@ -90,6 +90,57 @@ public:
         return DefaultAggregation::CreateAggregation(instrument_descriptor);
     }
   }
+
+  static std::unique_ptr<Aggregation> CloneAggregation(AggregationType aggregation_type,
+                                                       InstrumentDescriptor instrument_descriptor,
+                                                       const Aggregation &to_copy)
+  {
+    const PointType point_data = to_copy.ToPoint();
+    switch (aggregation_type)
+    {
+      case AggregationType::kDrop:
+        return std::unique_ptr<Aggregation>(new DropAggregation());
+        break;
+      case AggregationType::kHistogram:
+        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::unique_ptr<Aggregation>(
+              new LongHistogramAggregation(nostd::get<HistogramPointData>(point_data)));
+        }
+        else
+        {
+          return std::unique_ptr<Aggregation>(
+              new DoubleHistogramAggregation(nostd::get<HistogramPointData>(point_data)));
+        }
+        break;
+      case AggregationType::kLastValue:
+        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::unique_ptr<Aggregation>(
+              new LongLastValueAggregation(nostd::get<LastValuePointData>(point_data)));
+        }
+        else
+        {
+          return std::unique_ptr<Aggregation>(
+              new DoubleLastValueAggregation(nostd::get<LastValuePointData>(point_data)));
+        }
+        break;
+      case AggregationType::kSum:
+        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::unique_ptr<Aggregation>(
+              new LongSumAggregation(nostd::get<SumPointData>(point_data)));
+        }
+        else
+        {
+          return std::unique_ptr<Aggregation>(
+              new DoubleSumAggregation(nostd::get<SumPointData>(point_data)));
+        }
+        break;
+      default:
+        return DefaultAggregation::CreateAggregation(instrument_descriptor);
+    }
+  }
 };
 
 }  // namespace metrics

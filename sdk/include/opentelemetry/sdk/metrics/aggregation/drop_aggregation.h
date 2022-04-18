@@ -23,6 +23,8 @@ class DropAggregation : public Aggregation
 public:
   DropAggregation() = default;
 
+  DropAggregation(const DropPointData &point_data) {}
+
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
