@@ -59,6 +59,8 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 void OStreamMetricExporter::printInstrumentationInfoMetricData(
     const sdk::metrics::InstrumentationInfoMetrics &info_metric)
 {
+  // sout_ is shared
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   sout_ << "{";
   sout_ << "\n  name\t\t: " << info_metric.instrumentation_library_->GetName()
         << "\n  schema url\t: " << info_metric.instrumentation_library_->GetSchemaURL()
