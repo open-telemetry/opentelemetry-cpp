@@ -14,8 +14,7 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor)
     : instrument_descriptor_(instrument_descriptor)
-{
-}
+{}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::span<std::shared_ptr<CollectorHandle>> collectors,

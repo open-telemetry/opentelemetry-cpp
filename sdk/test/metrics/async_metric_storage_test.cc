@@ -58,8 +58,9 @@ public:
     }
   }
 
-  static void init_values(){
-    fetch_count = 0;
+  static void init_values()
+  {
+    fetch_count   = 0;
     number_of_get = 0;
     number_of_put = 0;
   }
@@ -67,7 +68,7 @@ public:
   static size_t fetch_count;
   static long number_of_get;
   static long number_of_put;
-  static const size_t number_of_attributes = 2; // GET , PUT
+  static const size_t number_of_attributes = 2;  // GET , PUT
 };
 
 size_t MeasurementFetcher::fetch_count;
@@ -106,14 +107,14 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                       if (opentelemetry::nostd::get<std::string>(
                               data_attr.attributes.find("RequestType")->second) == "GET")
                       {
-                      EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                      MeasurementFetcher::number_of_get);
+                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
+                                  MeasurementFetcher::number_of_get);
                       }
                       else if (opentelemetry::nostd::get<std::string>(
                                    data_attr.attributes.find("RequestType")->second) == "PUT")
                       {
                         EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                      MeasurementFetcher::number_of_put); 
+                                  MeasurementFetcher::number_of_put);
                       }
                       count_attributes++;
                     }
@@ -125,6 +126,6 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
-                                          AggregationTemporality::kDelta));
+                                           AggregationTemporality::kDelta));
 
 #endif
