@@ -77,21 +77,21 @@ public:
                              const BatchLogProcessorOptions &options);
 
   /** Makes a new recordable **/
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override;
+  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
   /**
    * Called when the Logger's log method creates a log record
    * @param record the log record
    */
 
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
+  virtual void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Export all log records that have not been exported yet.
    *
    * NOTE: Timeout functionality not supported yet.
    */
-  bool ForceFlush(
+  virtual bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
@@ -101,7 +101,7 @@ public:
    *
    * NOTE: Timeout functionality not supported yet.
    */
-  bool Shutdown(
+  virtual bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
@@ -109,7 +109,7 @@ public:
    */
   virtual ~BatchLogProcessor() override;
 
-private:
+protected:
   /**
    * The background routine performed by the worker thread.
    */
@@ -119,7 +119,7 @@ private:
    * Exports all logs to the configured exporter.
    *
    */
-  void Export();
+  virtual void Export();
 
   /**
    * Called when Shutdown() is invoked. Completely drains the queue of all log records and
