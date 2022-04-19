@@ -52,7 +52,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/jaeger
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   FILES_MATCHING
   PATTERN "*.h"
   PATTERN "recordable.h" EXCLUDE)

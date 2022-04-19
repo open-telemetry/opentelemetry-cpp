@@ -14,8 +14,8 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(
-  DIRECTORY include/opentelemetry/
-  DESTINATION include/opentelemetry/
+  DIRECTORY include/opentelemetry
+  DESTINATION include/opentelemetry
   FILES_MATCHING
   PATTERN "*config.h")
 
@@ -31,16 +31,10 @@ endif()
 
 install(
   DIRECTORY include/opentelemetry/sdk
-  DESTINATION include/opentelemetry/
+  DESTINATION include/opentelemetry
   FILES_MATCHING
   PATTERN "*.h"
-  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE)
-
-install(
-  DIRECTORY include/opentelemetry/sdk
-  DESTINATION include/opentelemetry/
-  FILES_MATCHING
-  PATTERN "*.h"
+  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE
   PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
 
 add_subdirectory(src)
