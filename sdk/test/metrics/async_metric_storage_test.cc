@@ -58,18 +58,26 @@ public:
     }
   }
 
+  static void init_values(){
+    fetch_count = 0;
+    number_of_get = 0;
+    number_of_put = 0;
+  }
+
   static size_t fetch_count;
   static long number_of_get;
   static long number_of_put;
+  static const size_t number_of_attributes = 2; // GET , PUT
 };
 
 size_t MeasurementFetcher::fetch_count;
 long MeasurementFetcher::number_of_get;
 long MeasurementFetcher::number_of_put;
+const size_t MeasurementFetcher::number_of_attributes;
 
 TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 {
-
+  MeasurementFetcher::init_values();
   AggregationTemporality temporality = GetParam();
 
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
@@ -94,28 +102,29 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                   [&](const MetricData data) {
                     for (auto data_attr : data.point_data_attr_)
                     {
-                      /*auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+                      auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
                       if (opentelemetry::nostd::get<std::string>(
                               data_attr.attributes.find("RequestType")->second) == "GET")
                       {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                      MeasurementFetcher::number_of_get); count_attributes++;
+                      EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
+                      MeasurementFetcher::number_of_get);
                       }
                       else if (opentelemetry::nostd::get<std::string>(
                                    data_attr.attributes.find("RequestType")->second) == "PUT")
                       {
                         EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                      MeasurementFetcher::number_of_put); count_attributes++;
-                      }*/
+                      MeasurementFetcher::number_of_put); 
+                      }
                       count_attributes++;
                     }
                     return true;
                   });
-  EXPECT_EQ(2, count_attributes);
+  EXPECT_EQ(MeasurementFetcher::number_of_attributes, count_attributes);
 }
+
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
-                                           AggregationTemporality::kDelta));
+                                          AggregationTemporality::kDelta));
 
 #endif

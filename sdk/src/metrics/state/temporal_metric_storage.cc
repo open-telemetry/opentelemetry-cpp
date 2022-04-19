@@ -14,7 +14,8 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor)
     : instrument_descriptor_(instrument_descriptor)
-{}
+{
+}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::span<std::shared_ptr<CollectorHandle>> collectors,
@@ -40,7 +41,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     return true;
   }
   auto unreported_list = std::move(present->second);
-
   // Iterate over the unreporter metrics for `collector` and store result in `merged_metrics`
   std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap);
   for (auto &agg_hashmap : unreported_list)

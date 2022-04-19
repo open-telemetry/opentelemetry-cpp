@@ -28,6 +28,7 @@ public:
     {
       case InstrumentType::kCounter:
       case InstrumentType::kUpDownCounter:
+      case InstrumentType::kObservableCounter:
       case InstrumentType::kObservableUpDownCounter:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation()))
@@ -116,11 +117,13 @@ public:
       case AggregationType::kLastValue:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
+
           return std::unique_ptr<Aggregation>(
               new LongLastValueAggregation(nostd::get<LastValuePointData>(point_data)));
         }
         else
         {
+
           return std::unique_ptr<Aggregation>(
               new DoubleLastValueAggregation(nostd::get<LastValuePointData>(point_data)));
         }
