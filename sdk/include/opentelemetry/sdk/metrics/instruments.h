@@ -52,28 +52,6 @@ struct InstrumentDescriptor
   InstrumentValueType value_type_;
 };
 
-static inline const char *get_instrument_type(InstrumentType type)
-{
-  switch (type)
-  {
-    case InstrumentType::kCounter:
-      return "kCounter";
-    case InstrumentType::kHistogram:
-      return "khistogram";
-    case InstrumentType::kObservableCounter:
-      return "kObservableCounter";
-    case InstrumentType::kObservableGauge:
-      return "kObservableGauge";
-    case InstrumentType::kObservableUpDownCounter:
-      return "kObservableUpDownCounter";
-    case InstrumentType::kUpDownCounter:
-      return "kUpdownCounter";
-    default:
-      return "Nothing";
-  }
-  return "";
-}
-
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
 /*class InstrumentSelector {
