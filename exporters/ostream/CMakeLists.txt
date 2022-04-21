@@ -85,7 +85,8 @@ else()
   if(BUILD_TESTING)
     add_executable(ostream_metric_test test/ostream_metric_test.cc)
     target_link_libraries(ostream_metric_test ${GTEST_BOTH_LIBRARIES}
-                          opentelemetry_exporter_ostream_metrics)
+                          opentelemetry_exporter_ostream_metrics
+                          opentelemetry_resources)
     gtest_add_tests(
       TARGET ostream_metric_test
       TEST_PREFIX exporter.
