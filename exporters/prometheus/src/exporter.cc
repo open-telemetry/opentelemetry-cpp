@@ -15,9 +15,10 @@ namespace metrics
  * @param address: an address for an exposer that exposes
  *  an HTTP endpoint for the exporter to connect to
  */
-PrometheusExporter::PrometheusExporter(std::string &address) : is_shutdown_(false)
+PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
+    : options_(options), is_shutdown_(false)
 {
-  exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{address});
+  exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
   collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector);
 
   exposer_->RegisterCollectable(collector_);

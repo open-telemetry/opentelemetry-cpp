@@ -2,22 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
+
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include <prometheus/metric_family.h>
 #  include <string>
 #  include <vector>
-
 #  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
 #  include "opentelemetry/version.h"
-#  include "prometheus/metric_family.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

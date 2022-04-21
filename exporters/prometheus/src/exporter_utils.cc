@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <iostream>
 #  include <sstream>
 #  include <utility>
 #  include <vector>
 
+#  include <prometheus/metric_type.h>
 #  include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #  include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#  include "prometheus/metric_type.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;

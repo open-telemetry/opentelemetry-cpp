@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <iostream>
 
 #  include "opentelemetry/exporters/prometheus/collector.h"
 

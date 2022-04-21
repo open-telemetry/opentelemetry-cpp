@@ -7,15 +7,13 @@
 #  include <string>
 #  include <vector>
 
+#  include <prometheus/exposer.h>
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/exporters/prometheus/collector.h"
 #  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/common/env_variables.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/recordable.h"
 #  include "opentelemetry/version.h"
-#  include "prometheus/exposer.h"
 
 /**
  * This class is an implementation of the MetricsExporter interface and
@@ -29,15 +27,34 @@ namespace exporter
 {
 namespace metrics
 {
+
+inline const std::string GetOtlpDefaultHttpEndpoint()
+{
+  constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
+  constexpr char kPrometheusEndpointDefault[] = "http://localhost:8080";
+
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kPrometheusEndpointEnv);
+  return endpoint.size() ? endpoint : kPrometheusEndpointDefault;
+}
+
+/**
+ * Struct to hold Prometheus exporter options.
+ */
+struct PrometheusExporterOptions
+{
+  // The endpoint the Prometheus backend can collect metrics from
+  std::string url = GetOtlpDefaultHttpEndpoint();
+};
+
 class PrometheusExporter : public sdk::metrics::MetricExporter
 {
 public:
   /**
    * Constructor - binds an exposer and collector to the exporter
-   * @param address: an address for an exposer that exposes
+   * @param options: options for an exposer that exposes
    *  an HTTP endpoint for the exporter to connect to
    */
-  PrometheusExporter(std::string &address);
+  PrometheusExporter(const PrometheusExporterOptions &options);
 
   /**
    * Exports a batch of Metric Records.
@@ -73,6 +90,8 @@ public:
   bool IsShutdown() const;
 
 private:
+  // The configuration options associated with this exporter.
+  const PrometheusExporterOptions options_;
   /**
    * exporter shutdown status
    */
