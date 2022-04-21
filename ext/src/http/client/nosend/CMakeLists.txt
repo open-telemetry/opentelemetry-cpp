@@ -25,7 +25,7 @@ if(${BUILD_TESTING})
   endif()
 
   target_link_libraries(http_client_nosend ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB}
-                        opentelemetry_api opentelemetry_ext)
+                        opentelemetry_ext)
 
   install(
     TARGETS http_client_nosend

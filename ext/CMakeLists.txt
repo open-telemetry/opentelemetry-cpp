@@ -5,6 +5,7 @@ target_include_directories(
             "$<INSTALL_INTERFACE:include>")
 
 set_target_properties(opentelemetry_ext PROPERTIES EXPORT_NAME "ext")
+target_link_libraries(opentelemetry_ext INTERFACE opentelemetry_api)
 
 install(
   TARGETS opentelemetry_ext
