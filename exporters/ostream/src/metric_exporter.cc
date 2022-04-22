@@ -14,7 +14,7 @@ namespace
 std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
 {
   std::time_t epoch_time = std::chrono::system_clock::to_time_t(time_stamp);
-  return std::ctime(&epoch_time);
+  return std::string{std::asctime(std::gmtime(&epoch_time))};
 }
 }  // namespace
 
