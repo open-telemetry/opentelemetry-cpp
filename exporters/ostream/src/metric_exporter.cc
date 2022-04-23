@@ -15,32 +15,30 @@ std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
 {
   std::time_t epoch_time = std::chrono::system_clock::to_time_t(time_stamp);
 
-  struct tm * tm_ptr = nullptr;
-#if defined(_MSC_VER)
+  struct tm *tm_ptr = nullptr;
+#  if defined(_MSC_VER)
   struct tm buf_tm;
   if (!gmtime_s(&buf_tm, &epoch_time))
   {
     tm_ptr = &buf_tm;
   }
-#else
+#  else
   tm_ptr = std::gmtime(&epoch_time);
-#endif
+#  endif
 
   char buf[100];
-  char * date_str = nullptr;
+  char *date_str = nullptr;
   if (tm_ptr == nullptr)
   {
-    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] gmtime failed for "
-                            << epoch_time);
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] gmtime failed for " << epoch_time);
   }
-  else if(std::strftime(buf, sizeof(buf), "%c", tm_ptr) > 0)
+  else if (std::strftime(buf, sizeof(buf), "%c", tm_ptr) > 0)
   {
     date_str = buf;
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] strftime failed for "
-                            << epoch_time);
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] strftime failed for " << epoch_time);
   }
 
   return std::string{date_str};
