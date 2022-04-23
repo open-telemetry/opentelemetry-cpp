@@ -14,7 +14,36 @@ namespace
 std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
 {
   std::time_t epoch_time = std::chrono::system_clock::to_time_t(time_stamp);
-  return std::string{std::asctime(std::gmtime(&epoch_time))};
+
+  struct tm * tm_ptr = nullptr;
+#if defined(_MSC_VER)
+  struct tm buf_tm;
+  if (!gmtime_s(&buf_tm, &epoch_time))
+  {
+    tm_ptr = &buf_tm;
+  }
+#else
+  tm_ptr = std::gmtime(&epoch_time);
+#endif
+
+  char buf[100];
+  char * date_str = nullptr;
+  if (tm_ptr == nullptr)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] gmtime failed for "
+                            << epoch_time);
+  }
+  else if(std::strftime(buf, sizeof(buf), "%c", tm_ptr) > 0)
+  {
+    date_str = buf;
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] strftime failed for "
+                            << epoch_time);
+  }
+
+  return std::string{date_str};
 }
 }  // namespace
 
@@ -68,8 +97,8 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
   for (const auto &record : info_metric.metric_data_)
   {
     sout_ << "\n  start time\t: " << timeToString(record.start_ts)
-          << "  end time\t: " << timeToString(record.end_ts)
-          << "  description\t: " << record.instrument_descriptor.description_
+          << "\n  end time\t: " << timeToString(record.end_ts)
+          << "\n  description\t: " << record.instrument_descriptor.description_
           << "\n  unit\t\t: " << record.instrument_descriptor.unit_;
 
     for (const auto &pd : record.point_data_attr_)
