@@ -98,7 +98,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/otlp
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   FILES_MATCHING
   PATTERN "*.h"
   PATTERN "otlp_recordable.h" EXCLUDE)

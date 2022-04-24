@@ -54,9 +54,9 @@ class SpinLockMutex
 {
 public:
   SpinLockMutex() noexcept {}
-  ~SpinLockMutex() noexcept            = default;
-  SpinLockMutex(const SpinLockMutex &) = delete;
-  SpinLockMutex &operator=(const SpinLockMutex &) = delete;
+  ~SpinLockMutex() noexcept                                = default;
+  SpinLockMutex(const SpinLockMutex &)                     = delete;
+  SpinLockMutex &operator=(const SpinLockMutex &)          = delete;
   SpinLockMutex &operator=(const SpinLockMutex &) volatile = delete;
 
   static inline void fast_yield() noexcept
@@ -71,9 +71,7 @@ public:
     __builtin_ia32_pause();
 #  endif
 #elif defined(__arm__)
-    // This intrinsic should fail to be found if YIELD is not supported on the current
-    // processor.
-    __yield();
+    __asm__ volatile("yield" ::: "memory");
 #else
     // TODO: Issue PAGE/YIELD on other architectures.
 #endif
@@ -125,7 +123,10 @@ public:
     return;
   }
   /** Releases the lock held by the execution agent. Throws no exceptions. */
-  void unlock() noexcept { flag_.store(false, std::memory_order_release); }
+  void unlock() noexcept
+  {
+    flag_.store(false, std::memory_order_release);
+  }
 
 private:
   std::atomic<bool> flag_{false};

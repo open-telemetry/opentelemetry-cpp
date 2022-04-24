@@ -203,7 +203,8 @@ public:
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
 
-    auto m  = providers();
+    // use reference to provider list, NOT it' copy.
+    auto &m = providers();
     auto it = m.begin();
     while (it != m.end())
     {
@@ -228,7 +229,10 @@ public:
           }
 
           it->second.providerHandle = INVALID_HANDLE;
-          m.erase(it);
+          if (result == STATUS_OK)
+          {
+            m.erase(it);
+          }
         }
         return result;
       }

@@ -130,10 +130,17 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
         return true;
       });
 }
+<<<<<<< HEAD
 INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestLong,
                         WritableMetricStorageTestFixture,
                         ::testing::Values(AggregationTemporality::kCumulative,
                                           AggregationTemporality::kDelta));
+=======
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
+                         WritableMetricStorageTestFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+>>>>>>> origin/main
 
 TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 {
@@ -238,9 +245,16 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
         return true;
       });
 }
+<<<<<<< HEAD
 INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestDouble,
                         WritableMetricStorageTestFixture,
                         ::testing::Values(AggregationTemporality::kCumulative,
                                           AggregationTemporality::kDelta));
+=======
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
+                         WritableMetricStorageTestFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+>>>>>>> origin/main
 
 #endif

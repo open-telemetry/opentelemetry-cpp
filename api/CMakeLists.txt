@@ -42,7 +42,14 @@ if(BUILD_TESTING)
 endif()
 
 if(WITH_ABSEIL)
+
+  find_package(absl CONFIG REQUIRED)
+
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
+  target_link_libraries(
+    opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
+                                absl::bits absl::city)
+
 endif()
 
 if(WITH_STL)
@@ -50,6 +57,21 @@ if(WITH_STL)
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB)
 else()
   message("Building with nostd types...")
+endif()
+
+if(WITH_GSL)
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_GSL)
+
+  # Guidelines Support Library path. Used if we are not on not get C++20.
+  #
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    target_link_libraries(opentelemetry_api INTERFACE Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    target_include_directories(
+      opentelemetry_api INTERFACE "$<BUILD_INTERFACE:${GSL_DIR}/include>")
+  endif()
 endif()
 
 if(WITH_METRICS_PREVIEW)
@@ -60,8 +82,15 @@ if(WITH_LOGS_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_LOGS_PREVIEW)
 endif()
 
-if(CORE_RUNTIME_LIBS)
-  target_link_libraries(opentelemetry_api INTERFACE ${CORE_RUNTIME_LIBS})
+if(WITH_NO_GENENV)
+  target_compile_definitions(opentelemetry_api INTERFACE NO_GETENV)
+endif()
+
+if(WIN32)
+  target_compile_definitions(opentelemetry_api INTERFACE NOMINMAX)
+  if(WITH_ETW)
+    target_compile_definitions(opentelemetry_api INTERFACE HAVE_MSGPACK)
+  endif()
 endif()
 
 if(WITH_ASYNC_EXPORT_PREVIEW)

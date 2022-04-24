@@ -68,7 +68,7 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NE(m3, m6);
 
   // Should be an sdk::trace::Tracer with the processor attached.
-#  ifdef RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkMeter1 = dynamic_cast<Meter *>(m1.get());
 #  else
   auto sdkMeter1 = static_cast<Meter *>(m1.get());

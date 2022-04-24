@@ -22,8 +22,6 @@ public:
 private:
   friend class RuntimeContextStorage;
 
-  Token() noexcept = default;
-
   // A constructor that sets the token's Context object to the
   // one that was passed in.
   Token(const Context &context) : context_(context) {}
