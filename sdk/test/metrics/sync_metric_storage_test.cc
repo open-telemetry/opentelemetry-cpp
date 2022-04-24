@@ -36,7 +36,7 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   long expected_total_get_requests   = 0;
   long expected_total_put_requests   = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                     InstrumentValueType::kLong};
+                                        InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -130,17 +130,10 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
         return true;
       });
 }
-<<<<<<< HEAD
-INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestLong,
-                        WritableMetricStorageTestFixture,
-                        ::testing::Values(AggregationTemporality::kCumulative,
-                                          AggregationTemporality::kDelta));
-=======
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
->>>>>>> origin/main
 
 TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 {
@@ -149,7 +142,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                     InstrumentValueType::kDouble};
+                                        InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -245,16 +238,9 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
         return true;
       });
 }
-<<<<<<< HEAD
-INSTANTIATE_TEST_CASE_P(WritableMetricStorageTestDouble,
-                        WritableMetricStorageTestFixture,
-                        ::testing::Values(AggregationTemporality::kCumulative,
-                                          AggregationTemporality::kDelta));
-=======
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
->>>>>>> origin/main
 
 #endif
