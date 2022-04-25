@@ -196,7 +196,7 @@ public:
     resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
     auto resource = resource::Resource::Create(resource_attributes);
 
-    auto processor_opts                          = sdk::trace::AsyncBatchSpanProcessorOptions();
+    auto processor_opts                  = sdk::trace::AsyncBatchSpanProcessorOptions();
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
@@ -366,7 +366,7 @@ public:
     resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
     auto resource = resource::Resource::Create(resource_attributes);
 
-    auto processor_opts                          = sdk::trace::AsyncBatchSpanProcessorOptions();
+    auto processor_opts                  = sdk::trace::AsyncBatchSpanProcessorOptions();
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);

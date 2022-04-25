@@ -26,7 +26,7 @@ namespace logs
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct AsyncBatchLogProcessorOptions: public BatchLogProcessorOptions
+struct AsyncBatchLogProcessorOptions : public BatchLogProcessorOptions
 {
   /* Denotes the maximum number of async exports to continue
    */

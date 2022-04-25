@@ -23,7 +23,7 @@ namespace trace
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct AsyncBatchSpanProcessorOptions: public BatchSpanProcessorOptions
+struct AsyncBatchSpanProcessorOptions : public BatchSpanProcessorOptions
 {
   /* Denotes the maximum number of async exports to continue
    */
