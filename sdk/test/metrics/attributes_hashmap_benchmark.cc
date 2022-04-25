@@ -27,13 +27,12 @@ void BM_AttributseHashMap(benchmark::State &state)
 
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
       []() -> std::unique_ptr<Aggregation> {
-    auto agg = std::unique_ptr<Aggregation>(new DropAggregation);
-    return std::move(agg);
+    return std::unique_ptr<Aggregation>(new DropAggregation);
   };
 
   while (state.KeepRunning())
   {
-    for (int i = 0; i < MAX_THREADS; i++)
+    for (size_t i = 0; i < MAX_THREADS; i++)
     {
       workers.push_back(std::thread([&]() {
         hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);

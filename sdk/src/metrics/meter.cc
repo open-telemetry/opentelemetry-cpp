@@ -206,7 +206,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         "[Meter::RegisterMetricStorage] - Error during finding matching views."
         << "Some of the matching view configurations mayn't be used for metric collection");
   }
-  return std::move(storages);
+  return storages;
 }
 
 /** collect metrics across all the meters **/

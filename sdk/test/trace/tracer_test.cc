@@ -347,7 +347,7 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a default AlwaysOnSampler
   auto tracer_on = initTracer(nullptr);
 
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto &t1 = std::dynamic_pointer_cast<Tracer>(tracer_on)->GetSampler();
 #else
   auto &t1 = std::static_pointer_cast<Tracer>(tracer_on)->GetSampler();
@@ -357,7 +357,7 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a AlwaysOffSampler
   auto tracer_off = initTracer(nullptr, new AlwaysOffSampler());
 
-#ifdef RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto &t2 = std::dynamic_pointer_cast<Tracer>(tracer_off)->GetSampler();
 #else
   auto &t2 = std::static_pointer_cast<Tracer>(tracer_off)->GetSampler();

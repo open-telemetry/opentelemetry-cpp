@@ -35,11 +35,9 @@ public:
 
   /**
    * Export
-   * @param records a span of unique pointers to metrics data
+   * @param data metrics data
    */
-  sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::MetricData>> &records) noexcept
-      override;
+  sdk::common::ExportResult Export(const sdk::metrics::ResourceMetrics &data) noexcept override;
 
   /**
    * Force flush the exporter.
@@ -60,7 +58,9 @@ private:
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
-  void printPointData(opentelemetry::sdk::metrics::PointType &point_data);
+  void printInstrumentationInfoMetricData(
+      const sdk::metrics::InstrumentationInfoMetrics &info_metrics);
+  void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
 };
 }  // namespace metrics
 }  // namespace exporter

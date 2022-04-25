@@ -14,7 +14,6 @@ namespace metrics
 
 LongHistogramAggregation::LongHistogramAggregation()
 {
-
   point_data_.boundaries_ = std::list<long>{0l, 5l, 10l, 25l, 50l, 75l, 100l, 250l, 500l, 1000l};
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<long>>(point_data_.boundaries_).size() + 1, 0);
@@ -47,12 +46,22 @@ void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attr
 std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  return nullptr;
+  auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
+  auto delta_value = nostd::get<HistogramPointData>(
+      (static_cast<const LongHistogramAggregation &>(delta).ToPoint()));
+  LongHistogramAggregation *aggr = new LongHistogramAggregation();
+  HistogramMerge<long>(curr_value, delta_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
 }
 
 std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(const Aggregation &next) const noexcept
 {
-  return nullptr;
+  auto curr_value = nostd::get<HistogramPointData>(ToPoint());
+  auto next_value = nostd::get<HistogramPointData>(
+      (static_cast<const LongHistogramAggregation &>(next).ToPoint()));
+  LongHistogramAggregation *aggr = new LongHistogramAggregation();
+  HistogramDiff<long>(curr_value, next_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
 }
 
 PointType LongHistogramAggregation::ToPoint() const noexcept
@@ -62,7 +71,6 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
 
 DoubleHistogramAggregation::DoubleHistogramAggregation()
 {
-
   point_data_.boundaries_ =
       std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
   point_data_.counts_ =
@@ -96,20 +104,27 @@ void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  // TODO - Implement me
-  return nullptr;
+  auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
+  auto delta_value = nostd::get<HistogramPointData>(
+      (static_cast<const DoubleHistogramAggregation &>(delta).ToPoint()));
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation();
+  HistogramMerge<double>(curr_value, delta_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(
     const Aggregation &next) const noexcept
 {
-  // TODO - Implement me
-  return nullptr;
+  auto curr_value = nostd::get<HistogramPointData>(ToPoint());
+  auto next_value = nostd::get<HistogramPointData>(
+      (static_cast<const DoubleHistogramAggregation &>(next).ToPoint()));
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation();
+  HistogramDiff<double>(curr_value, next_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
 }
 
 PointType DoubleHistogramAggregation::ToPoint() const noexcept
 {
-  // TODO Implement me
   return point_data_;
 }
 

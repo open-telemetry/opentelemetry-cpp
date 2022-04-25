@@ -170,5 +170,5 @@ REM
 REM ##########################################################################################
 :build_config_ninja
 cmake -G "Ninja" -DCMAKE_MAKE_PROGRAM="!NINJA!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
-%NINJA%
+"%NINJA%"
 exit /b
