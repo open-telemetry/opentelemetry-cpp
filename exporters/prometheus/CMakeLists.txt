@@ -49,7 +49,9 @@ if(WITH_METRICS_PREVIEW)
     DESTINATION include/opentelemetry/exporters/
     FILES_MATCHING
     PATTERN "*.h")
-
+  if(BUILD_TESTING)
+    add_subdirectory(test)
+  endif()
 else()
 
   add_library(prometheus_exporter src/exporter.cc src/collector.cc
