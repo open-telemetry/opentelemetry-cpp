@@ -30,7 +30,6 @@ namespace
 void initMetrics(const std::string &name)
 {
   std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
-  std::vector<std::unique_ptr<metric_sdk::MetricExporter>> exporters;
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -41,9 +40,8 @@ void initMetrics(const std::string &name)
   options.export_timeout_millis  = std::chrono::milliseconds(500);
   std::unique_ptr<metric_sdk::MetricReader> reader{
       new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(
-      new metric_sdk::MeterProvider(std::move(exporters)));
-  auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
+  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
+  auto p        = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
   p->AddMetricReader(std::move(reader));
 
   // counter view

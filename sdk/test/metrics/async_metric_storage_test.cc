@@ -46,8 +46,7 @@ TEST(AsyncMetricStorageTest, BasicTests)
   // Some computation here
   auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
 
-  std::vector<std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>> exporters;
-  std::shared_ptr<MeterContext> meter_context(new MeterContext(std::move(exporters)));
+  std::shared_ptr<MeterContext> meter_context(new MeterContext());
   std::unique_ptr<MetricReader> metric_reader(new MockMetricReader(AggregationTemporality::kDelta));
 
   std::shared_ptr<CollectorHandle> collector = std::shared_ptr<CollectorHandle>(
