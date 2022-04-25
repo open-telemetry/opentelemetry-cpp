@@ -4,7 +4,6 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
 #  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 
 #  include "opentelemetry/sdk/common/global_log_handler.h"
@@ -23,10 +22,9 @@ namespace metrics_api = opentelemetry::metrics;
 
 MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : context_{context} {}
 
-MeterProvider::MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
-                             std::unique_ptr<ViewRegistry> views,
+MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
-    : context_(std::make_shared<MeterContext>(std::move(exporters), std::move(views), resource))
+    : context_(std::make_shared<MeterContext>(std::move(views), resource))
 {}
 
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
@@ -59,11 +57,6 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
 const resource::Resource &MeterProvider::GetResource() const noexcept
 {
   return context_->GetResource();
-}
-
-void MeterProvider::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
-{
-  return context_->AddMetricExporter(std::move(exporter));
 }
 
 void MeterProvider::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept

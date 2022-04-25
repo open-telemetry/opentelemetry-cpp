@@ -27,12 +27,11 @@ TEST(MetricReaderTest, BasicTests)
   std::unique_ptr<MetricReader> metric_reader1(new MockMetricReader(aggr_temporality));
   EXPECT_EQ(metric_reader1->GetAggregationTemporality(), aggr_temporality);
 
-  std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> exporters;
-  std::shared_ptr<MeterContext> meter_context1(new MeterContext(std::move(exporters)));
+  std::shared_ptr<MeterContext> meter_context1(new MeterContext());
   EXPECT_NO_THROW(meter_context1->AddMetricReader(std::move(metric_reader1)));
 
   std::unique_ptr<MetricReader> metric_reader2(new MockMetricReader(aggr_temporality));
-  std::shared_ptr<MeterContext> meter_context2(new MeterContext(std::move(exporters)));
+  std::shared_ptr<MeterContext> meter_context2(new MeterContext());
   MetricProducer *metric_producer =
       new MetricCollector(std::move(meter_context2), std::move(metric_reader2));
   EXPECT_NO_THROW(metric_producer->Collect([](ResourceMetrics &metric_data) { return true; }));

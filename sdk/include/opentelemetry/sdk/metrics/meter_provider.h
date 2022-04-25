@@ -22,7 +22,6 @@ namespace metrics
 
 // forward declaration
 class MetricCollector;
-class MetricExporter;
 class MetricReader;
 
 class MeterProvider final : public opentelemetry::metrics::MeterProvider
@@ -30,12 +29,10 @@ class MeterProvider final : public opentelemetry::metrics::MeterProvider
 public:
   /**
    * Initialize a new meter provider
-   * @param exporters The span exporters for this meter provider
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
    */
   MeterProvider(
-      std::vector<std::unique_ptr<MetricExporter>> &&exporters,
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       sdk::resource::Resource resource    = sdk::resource::Resource::Create({})) noexcept;
 
@@ -55,16 +52,6 @@ public:
    * @return The resource for this meter provider.
    */
   const sdk::resource::Resource &GetResource() const noexcept;
-
-  /**
-   * Attaches a metric exporter to list of configured exporters for this Meter provider.
-   * @param exporter The metric exporter for this meter provider. This
-   * must not be a nullptr.
-   *
-   * Note: This exporter may not receive any in-flight meter data, but will get newly created meter
-   * data. Note: This method is not thread safe, and should ideally be called from main thread.
-   */
-  void AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept;
 
   /**
    * Attaches a metric reader to list of configured readers for this Meter providers.
