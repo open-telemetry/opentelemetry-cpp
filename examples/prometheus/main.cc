@@ -82,6 +82,11 @@ int main(int argc, char **argv)
 {
   std::string example_type;
   std::string addr{"localhost:8080"};
+  if (argc == 1)
+  {
+    std::puts("usage: $prometheus_example <example type> <url>");
+  }
+
   if (argc >= 2)
   {
     example_type = argv[1];
