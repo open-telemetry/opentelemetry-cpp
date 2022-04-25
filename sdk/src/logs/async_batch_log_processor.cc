@@ -17,7 +17,7 @@ namespace logs
 {
 AsyncBatchLogProcessor::AsyncBatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                                const AsyncBatchLogProcessorOptions &options)
-    : BatchLogProcessor(std::move(exporter), options.options),
+    : BatchLogProcessor(std::move(exporter), options),
       max_export_async_(options.max_export_async),
       export_data_storage_(std::make_shared<ExportDataStorage>())
 {
@@ -161,7 +161,13 @@ bool AsyncBatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcep
   return true;
 }
 
-AsyncBatchLogProcessor::~AsyncBatchLogProcessor() {}
+AsyncBatchLogProcessor::~AsyncBatchLogProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    Shutdown();
+  }
+}
 
 }  // namespace logs
 }  // namespace sdk

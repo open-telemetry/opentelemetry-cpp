@@ -228,10 +228,6 @@ endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
 
-if(WITH_ASYNC_EXPORT_PREVIEW)
-  add_definitions(-DENABLE_ASYNC_EXPORT)
-endif()
-
 find_package(Threads)
 
 function(install_windows_deps)

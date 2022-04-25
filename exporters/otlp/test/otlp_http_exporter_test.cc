@@ -197,9 +197,9 @@ public:
     auto resource = resource::Resource::Create(resource_attributes);
 
     auto processor_opts                          = sdk::trace::AsyncBatchSpanProcessorOptions();
-    processor_opts.options.max_export_batch_size = 5;
-    processor_opts.options.max_queue_size        = 5;
-    processor_opts.options.schedule_delay_millis = std::chrono::milliseconds(256);
+    processor_opts.max_export_batch_size = 5;
+    processor_opts.max_queue_size        = 5;
+    processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::AsyncBatchSpanProcessor(std::move(exporter), processor_opts));
@@ -367,9 +367,9 @@ public:
     auto resource = resource::Resource::Create(resource_attributes);
 
     auto processor_opts                          = sdk::trace::AsyncBatchSpanProcessorOptions();
-    processor_opts.options.max_export_batch_size = 5;
-    processor_opts.options.max_queue_size        = 5;
-    processor_opts.options.schedule_delay_millis = std::chrono::milliseconds(256);
+    processor_opts.max_export_batch_size = 5;
+    processor_opts.max_queue_size        = 5;
+    processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::AsyncBatchSpanProcessor(std::move(exporter), processor_opts));

@@ -134,9 +134,9 @@ public:
       int callback_count                                     = 1)
   {
     AsyncBatchLogProcessorOptions options;
-    options.options.max_queue_size        = max_queue_size;
-    options.options.schedule_delay_millis = scheduled_delay_millis;
-    options.options.max_export_batch_size = max_export_batch_size;
+    options.max_queue_size        = max_queue_size;
+    options.schedule_delay_millis = scheduled_delay_millis;
+    options.max_export_batch_size = max_export_batch_size;
     options.max_export_async              = max_export_async;
     return std::shared_ptr<LogProcessor>(new AsyncBatchLogProcessor(
         std::unique_ptr<LogExporter>(new MockLogExporter(

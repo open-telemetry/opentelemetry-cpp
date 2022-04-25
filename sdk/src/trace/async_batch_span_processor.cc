@@ -19,7 +19,7 @@ namespace trace
 
 AsyncBatchSpanProcessor::AsyncBatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
                                                  const AsyncBatchSpanProcessorOptions &options)
-    : BatchSpanProcessor(std::move(exporter), options.options),
+    : BatchSpanProcessor(std::move(exporter), options),
       max_export_async_(options.max_export_async),
       export_data_storage_(std::make_shared<ExportDataStorage>())
 {
@@ -154,7 +154,13 @@ bool AsyncBatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   return true;
 }
 
-AsyncBatchSpanProcessor::~AsyncBatchSpanProcessor() {}
+AsyncBatchSpanProcessor::~AsyncBatchSpanProcessor()
+{
+  if (synchronization_data_->is_shutdown.load() == false)
+  {
+    Shutdown();
+  }
+}
 
 }  // namespace trace
 }  // namespace sdk

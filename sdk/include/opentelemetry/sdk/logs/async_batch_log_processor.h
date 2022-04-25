@@ -26,10 +26,8 @@ namespace logs
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct AsyncBatchLogProcessorOptions
+struct AsyncBatchLogProcessorOptions: public BatchLogProcessorOptions
 {
-  BatchLogProcessorOptions options;
-
   /* Denotes the maximum number of async exports to continue
    */
   size_t max_export_async = 8;
@@ -65,7 +63,7 @@ public:
   /**
    * Class destructor which invokes the Shutdown() method.
    */
-  virtual ~AsyncBatchLogProcessor() override;
+  virtual ~AsyncBatchLogProcessor();
 
 private:
   /**

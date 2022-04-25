@@ -340,7 +340,7 @@ TEST_F(AsyncBatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   const std::chrono::milliseconds export_delay(0);
   const size_t max_export_batch_size = 512;
   sdk::trace::AsyncBatchSpanProcessorOptions options{};
-  options.options.schedule_delay_millis = std::chrono::milliseconds(2000);
+  options.schedule_delay_millis = std::chrono::milliseconds(2000);
 
   auto batch_processor =
       std::shared_ptr<sdk::trace::AsyncBatchSpanProcessor>(new sdk::trace::AsyncBatchSpanProcessor(
@@ -356,7 +356,7 @@ TEST_F(AsyncBatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   }
 
   // Sleep for schedule_delay_millis milliseconds
-  std::this_thread::sleep_for(options.options.schedule_delay_millis);
+  std::this_thread::sleep_for(options.schedule_delay_millis);
 
   // small delay to give time to export
   std::this_thread::sleep_for(std::chrono::milliseconds(50));

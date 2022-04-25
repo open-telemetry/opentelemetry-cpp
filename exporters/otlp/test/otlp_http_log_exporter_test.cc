@@ -201,9 +201,9 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
     sdk::logs::AsyncBatchLogProcessorOptions options;
-    options.options.max_queue_size        = 5;
-    options.options.schedule_delay_millis = std::chrono::milliseconds(256);
-    options.options.max_export_batch_size = 5;
+    options.max_queue_size        = 5;
+    options.schedule_delay_millis = std::chrono::milliseconds(256);
+    options.max_export_batch_size = 5;
 
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
         new sdk::logs::AsyncBatchLogProcessor(std::move(exporter), options)));
@@ -401,9 +401,9 @@ public:
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
     sdk::logs::AsyncBatchLogProcessorOptions processor_options;
-    processor_options.options.max_export_batch_size = 5;
-    processor_options.options.max_queue_size        = 5;
-    processor_options.options.schedule_delay_millis = std::chrono::milliseconds(256);
+    processor_options.max_export_batch_size = 5;
+    processor_options.max_queue_size        = 5;
+    processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
         new sdk::logs::AsyncBatchLogProcessor(std::move(exporter), processor_options)));
 

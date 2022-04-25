@@ -23,10 +23,8 @@ namespace trace
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct AsyncBatchSpanProcessorOptions
+struct AsyncBatchSpanProcessorOptions: public BatchSpanProcessorOptions
 {
-  BatchSpanProcessorOptions options;
-
   /* Denotes the maximum number of async exports to continue
    */
   size_t max_export_async = 8;
@@ -65,7 +63,7 @@ public:
    * shared ownership of the processor, and thus doesn't call Shutdown (as the processor might be
    * shared with other Tracers).
    */
-  virtual ~AsyncBatchSpanProcessor() override;
+  virtual ~AsyncBatchSpanProcessor();
 
 private:
   /**
