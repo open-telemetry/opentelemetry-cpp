@@ -691,7 +691,7 @@ namespace tld
             }
 
             void AddBytes(
-                _In_bytecount_(cb) void const* p,
+                _In_reads_bytes_(cb) void const* p,
                 unsigned cb)
             {
                 auto pb = static_cast<UINT8 const*>(p);
@@ -2064,7 +2064,7 @@ namespace tld
 
         void AddTrait(
             ProviderTraitType type,
-            _In_bytecount_(cbData) void const* pData,
+            _In_reads_bytes_(cbData) void const* pData,
             unsigned cbData)
         {
             this->AddU16(static_cast<UINT16>(cbData + 3));
@@ -2232,6 +2232,7 @@ namespace tld
             return this->BaseEnd();
         }
 
+        // Note: Do not create structs with 0 fields.
         template<class CharTy>
         EventMetadataBuilder AddStruct(
             _In_z_ CharTy const* szUtfStructName,
@@ -2242,6 +2243,7 @@ namespace tld
             return EventMetadataBuilder(this->GetBuffer(), bookmark);
         }
 
+        // Note: Do not create structs with 0 fields.
         template<class CharTy>
         UINT32 AddStructRaw(
             _In_z_ CharTy const* szUtfStructName,
@@ -2252,6 +2254,7 @@ namespace tld
             return bookmark;
         }
 
+        // Note: Do not create structs with 0 fields.
         template<class CharTy>
         EventMetadataBuilder AddStructArray(
             _In_z_ CharTy const* szUtfStructName,
@@ -2262,6 +2265,8 @@ namespace tld
             return EventMetadataBuilder(this->GetBuffer(), bookmark);
         }
 
+        // Note: Do not use 0 for itemCount.
+        // Note: Do not create structs with 0 fields.
         template<class CharTy>
         EventMetadataBuilder AddStructFixedArray(
             _In_z_ CharTy const* szUtfStructName,
@@ -2294,6 +2299,7 @@ namespace tld
             AddFieldInfo(InMetaVcount, type, fieldTags);
         }
 
+        // Note: Do not use 0 for itemCount.
         template<class CharTy>
         void AddFieldFixedArray(
             _In_z_ CharTy const* szUtfFieldName,
@@ -2400,7 +2406,7 @@ namespace tld
         Note: should only be used for blittable POD types with no padding.
         */
         template<class T>
-        void AddValues(_In_count_(cValues) T const* pValues, unsigned cValues)
+        void AddValues(_In_reads_(cValues) T const* pValues, unsigned cValues)
         {
             AddBytes(pValues, sizeof(T) * cValues);
         }
@@ -2917,6 +2923,7 @@ namespace tld
         of the nested struct.
         Note: do not call any Add methods on this builder object until you are
         done calling Add methods on the nested builder object.
+        Note: Do not create structs with 0 fields.
         */
         template<class CharTy>
         EventBuilder AddStruct(
@@ -2933,6 +2940,7 @@ namespace tld
         of the nested struct.
         Note: do not call any Add methods on this builder object until you are
         done calling Add methods on the nested builder object.
+        Note: Do not create structs with 0 fields.
         */
         template<class CharTy>
         EventBuilder AddStructArray(
@@ -2949,6 +2957,8 @@ namespace tld
         of the nested struct.
         Note: do not call any Add methods on this builder object until you are
         done calling Add methods on the nested builder object.
+        Note: Do not use 0 for itemCount.
+        Note: Do not create structs with 0 fields.
         */
         template<class CharTy>
         EventBuilder AddStructFixedArray(
@@ -2992,6 +3002,7 @@ namespace tld
         Adds a fixed-length array field to the event's metadata.
         The length (item count) is encoded in the metadata, so it does not
         need to be included in the event's payload.
+        Note: Do not use 0 for itemCount.
         */
         template<class CharTy>
         void AddFieldFixedArray(
@@ -3061,7 +3072,7 @@ namespace tld
         e.g. INT32, FILETIME, GUID, not for strings or structs.
         */
         template<class T>
-        void AddValues(_In_count_(cValues) T const* pValues, unsigned cValues)
+        void AddValues(_In_reads_(cValues) T const* pValues, unsigned cValues)
         {
             m_dataBuilder.AddValues(pValues, cValues);
         }
