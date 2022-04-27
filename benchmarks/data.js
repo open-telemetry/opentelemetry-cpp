@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1651059046244,
+  "lastUpdate": 1651059047606,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -29206,6 +29206,54 @@ window.BENCHMARK_DATA = {
             "value": 1696786.732253633,
             "unit": "ns/iter",
             "extra": "iterations: 386\ncpu: 357992.4870466323 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bolony.zsolt@gmail.com",
+            "name": "Zsolt Bölöny",
+            "username": "yzsolt"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "72360b49f6aa44b5b163e48823952e50933b20f9",
+          "message": "Add missing include guard (#1357)",
+          "timestamp": "2022-04-27T16:48:26+05:30",
+          "tree_id": "4108bd4e83c06c7bc7143142f90f9575127c8749",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/72360b49f6aa44b5b163e48823952e50933b20f9"
+        },
+        "date": 1651059045533,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 52.32238596017615,
+            "unit": "ns/iter",
+            "extra": "iterations: 4397000\ncpu: 31.743802592676833 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 135.75803696002504,
+            "unit": "ns/iter",
+            "extra": "iterations: 1508000\ncpu: 92.60285145888597 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 796.5589824475741,
+            "unit": "ns/iter",
+            "extra": "iterations: 190000\ncpu: 735.0884210526315 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1938280.2729910992,
+            "unit": "ns/iter",
+            "extra": "iterations: 376\ncpu: 325494.14893617015 ns\nthreads: 1"
           }
         ]
       }
