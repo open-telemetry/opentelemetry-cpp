@@ -193,8 +193,8 @@ static inline GUID GetProviderGuid(const char *providerName)
   guid.Data4[6] = buffer2[14];
   guid.Data4[7] = buffer2[15];
 
-  delete buffer;
-  delete buffer2;
+  delete[] buffer;
+  delete[] buffer2;
 
   return guid;
 }
