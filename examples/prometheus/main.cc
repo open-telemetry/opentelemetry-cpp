@@ -38,7 +38,6 @@ void initMetrics(const std::string &name, const std::string &addr)
 
   std::unique_ptr<metrics_sdk::MetricExporter> exporter{
       new metrics_exporter::PrometheusExporter(opts)};
-  std::vector<std::unique_ptr<metrics_sdk::MetricExporter>> exporters;
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -49,9 +48,8 @@ void initMetrics(const std::string &name, const std::string &addr)
   options.export_timeout_millis  = std::chrono::milliseconds(500);
   std::unique_ptr<metrics_sdk::MetricReader> reader{
       new metrics_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(
-      new metrics_sdk::MeterProvider(std::move(exporters)));
-  auto p = std::static_pointer_cast<metrics_sdk::MeterProvider>(provider);
+  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metrics_sdk::MeterProvider());
+  auto p        = std::static_pointer_cast<metrics_sdk::MeterProvider>(provider);
   p->AddMetricReader(std::move(reader));
 
   // counter view
