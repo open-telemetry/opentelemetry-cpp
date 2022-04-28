@@ -31,7 +31,7 @@ namespace metrics
 inline const std::string GetOtlpDefaultHttpEndpoint()
 {
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
-  constexpr char kPrometheusEndpointDefault[] = "http://localhost:8080";
+  constexpr char kPrometheusEndpointDefault[] = "localhost:8080";
 
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kPrometheusEndpointEnv);
   return endpoint.size() ? endpoint : kPrometheusEndpointDefault;
