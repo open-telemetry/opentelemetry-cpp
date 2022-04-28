@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma once
+
 #include <initializer_list>
 #include <memory>
 #include <vector>

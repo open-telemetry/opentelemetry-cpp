@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <codecvt>
 #include <ctime>
 #include <iomanip>
 #include <locale>
@@ -24,6 +23,8 @@
 #  pragma comment(lib, "Rpcrt4.lib")
 #  include <Objbase.h>
 #  pragma comment(lib, "Ole32.Lib")
+#else
+#  include <codecvt>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -193,8 +194,8 @@ static inline GUID GetProviderGuid(const char *providerName)
   guid.Data4[6] = buffer2[14];
   guid.Data4[7] = buffer2[15];
 
-  delete buffer;
-  delete buffer2;
+  delete[] buffer;
+  delete[] buffer2;
 
   return guid;
 }
