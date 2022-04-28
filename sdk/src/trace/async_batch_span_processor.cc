@@ -124,6 +124,11 @@ void AsyncBatchSpanProcessor::NotifyCompletion(
 
 bool AsyncBatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  if (synchronization_data_->is_shutdown.load() == true)
+  {
+    return true;
+  }
+
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};
   bool already_shutdown = synchronization_data_->is_shutdown.exchange(true);
@@ -135,13 +140,27 @@ bool AsyncBatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexce
     worker_thread_.join();
   }
 
-  GetWaitAdjustedTime(timeout, start_time);
+  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
   // wait for  all async exports to complete and return if timeout reached.
   {
     std::unique_lock<std::mutex> lock(export_data_storage_->async_export_data_m);
-    export_data_storage_->async_export_waker.wait_for(lock, timeout, [this] {
-      return export_data_storage_->export_ids.size() == max_export_async_;
-    });
+    if (timeout <= std::chrono::microseconds::zero())
+    {
+      auto is_wait = false;
+      while (!is_wait)
+      {
+        is_wait = export_data_storage_->async_export_waker.wait_for(
+            lock, schedule_delay_millis_,
+            [this] { return export_data_storage_->export_ids.size() == max_export_async_; });
+      }
+    }
+    else
+    {
+      export_data_storage_->async_export_waker.wait_for(lock, timeout, [this] {
+        return export_data_storage_->export_ids.size() == max_export_async_;
+      });
+    }
   }
 
   GetWaitAdjustedTime(timeout, start_time);
