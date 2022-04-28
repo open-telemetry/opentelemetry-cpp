@@ -3,13 +3,19 @@
 
 #pragma once
 
-#include "http_operation_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/version.h"
 
-#include <map>
+#include <atomic>
+#include <list>
+#include <mutex>
 #include <string>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,6 +29,23 @@ namespace curl
 {
 
 const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
+
+class HttpCurlGlobalInitializer
+{
+private:
+  HttpCurlGlobalInitializer(const HttpCurlGlobalInitializer &) = delete;
+  HttpCurlGlobalInitializer(HttpCurlGlobalInitializer &&)      = delete;
+
+  HttpCurlGlobalInitializer &operator=(const HttpCurlGlobalInitializer &) = delete;
+  HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&) = delete;
+
+  HttpCurlGlobalInitializer();
+
+public:
+  ~HttpCurlGlobalInitializer();
+
+  static nostd::shared_ptr<HttpCurlGlobalInitializer> GetInstance();
+};
 
 class Request : public opentelemetry::ext::http::client::Request
 {
@@ -124,7 +147,8 @@ public:
 
 class HttpClient;
 
-class Session : public opentelemetry::ext::http::client::Session
+class Session : public opentelemetry::ext::http::client::Session,
+                public std::enable_shared_from_this<Session>
 {
 public:
   Session(HttpClient &http_client,
@@ -143,39 +167,16 @@ public:
   }
 
   virtual void SendRequest(
-      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept override
-  {
-    is_session_active_ = true;
-    std::string url    = host_ + std::string(http_request_->uri_);
-    auto callback_ptr  = callback.get();
-    curl_operation_.reset(new HttpOperation(
-        http_request_->method_, url, callback_ptr, RequestMode::Async, http_request_->headers_,
-        http_request_->body_, false, http_request_->timeout_ms_));
-    curl_operation_->SendAsync([this, callback](HttpOperation &operation) {
-      if (operation.WasAborted())
-      {
-        // Manually cancelled
-        callback->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
-      }
-
-      if (operation.GetResponseCode() >= CURL_LAST)
-      {
-        // we have a http response
-        auto response          = std::unique_ptr<Response>(new Response());
-        response->headers_     = operation.GetResponseHeaders();
-        response->body_        = operation.GetResponseBody();
-        response->status_code_ = operation.GetResponseCode();
-        callback->OnResponse(*response);
-      }
-      is_session_active_ = false;
-    });
-  }
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept override;
 
   virtual bool CancelSession() noexcept override;
 
   virtual bool FinishSession() noexcept override;
 
-  virtual bool IsSessionActive() noexcept override { return is_session_active_; }
+  virtual bool IsSessionActive() noexcept override
+  {
+    return is_session_active_.load(std::memory_order_acquire);
+  }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
@@ -188,19 +189,36 @@ public:
 #ifdef ENABLE_TEST
   std::shared_ptr<Request> GetRequest() { return http_request_; }
 #endif
+
+  inline HttpClient &GetHttpClient() noexcept { return http_client_; }
+  inline const HttpClient &GetHttpClient() const noexcept { return http_client_; }
+
+  inline uint64_t GetSessionId() const noexcept { return session_id_; }
+
+  inline const std::unique_ptr<HttpOperation> &GetOperation() const noexcept
+  {
+    return curl_operation_;
+  }
+  inline std::unique_ptr<HttpOperation> &GetOperation() noexcept { return curl_operation_; }
+
+  /**
+   * Finish and cleanup the operation.It will remove curl easy handle in it from HttpClient
+   */
+  void FinishOperation();
+
 private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
   HttpClient &http_client_;
-  bool is_session_active_;
+  std::atomic<bool> is_session_active_;
 };
 
 class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
-  HttpClientSync() { curl_global_init(CURL_GLOBAL_ALL); }
+  HttpClientSync() : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()) {}
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
@@ -208,7 +226,7 @@ public:
   {
     opentelemetry::ext::http::client::Body body;
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(), nullptr,
-                                 RequestMode::Sync, headers, body);
+                                 headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -233,7 +251,7 @@ public:
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-                                 nullptr, RequestMode::Sync, headers, body);
+                                 nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -253,72 +271,87 @@ public:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
-  ~HttpClientSync() { curl_global_cleanup(); }
+  ~HttpClientSync() {}
+
+private:
+  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
 class HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
-  HttpClient() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
+  HttpClient();
+  ~HttpClient();
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
-      nostd::string_view url) noexcept override
+      nostd::string_view url) noexcept override;
+
+  bool CancelAllSessions() noexcept override;
+
+  bool FinishAllSessions() noexcept override;
+
+  void CleanupSession(uint64_t session_id);
+
+  inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
+
+  inline void SetMaxSessionsPerConnection(uint64_t max_sessions_per_connection) noexcept
   {
-    auto parsedUrl = common::UrlParser(std::string(url));
-    if (!parsedUrl.success_)
+    max_sessions_per_connection_ = max_sessions_per_connection;
+  }
+
+  inline uint64_t GetMaxSessionsPerConnection() const noexcept
+  {
+    return max_sessions_per_connection_;
+  }
+
+  void MaybeSpawnBackgroundThread();
+
+  void ScheduleAddSession(uint64_t session_id);
+  void ScheduleAbortSession(uint64_t session_id);
+  void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
+
+#ifdef ENABLE_TEST
+  void WaitBackgroundThreadExit()
+  {
+    std::unique_ptr<std::thread> background_thread;
     {
-      return std::make_shared<Session>(*this);
+      std::lock_guard<std::mutex> lock_guard{background_thread_m_};
+      background_thread.swap(background_thread_);
     }
-    auto session =
-        std::make_shared<Session>(*this, parsedUrl.scheme_, parsedUrl.host_, parsedUrl.port_);
-    auto session_id = ++next_session_id_;
-    session->SetId(session_id);
-    sessions_.insert({session_id, session});
-    return session;
-  }
 
-  bool CancelAllSessions() noexcept override
-  {
-    // CancelSession may change sessions_, we can not change a container while iterating it.
-    while (!sessions_.empty())
+    if (background_thread && background_thread->joinable())
     {
-      std::map<uint64_t, std::shared_ptr<Session>> sessions;
-      sessions.swap(sessions_);
-      for (auto &session : sessions)
-      {
-        session.second->CancelSession();
-      }
+      background_thread->join();
     }
-    return true;
   }
-
-  bool FinishAllSessions() noexcept override
-  {
-    // FinishSession may change sessions_, we can not change a container while iterating it.
-    while (!sessions_.empty())
-    {
-      std::map<uint64_t, std::shared_ptr<Session>> sessions;
-      sessions.swap(sessions_);
-      for (auto &session : sessions)
-      {
-        session.second->FinishSession();
-      }
-    }
-    return true;
-  }
-
-  void CleanupSession(uint64_t session_id)
-  {
-    // TBD = Need to be thread safe
-    sessions_.erase(session_id);
-  }
-
-  ~HttpClient() { curl_global_cleanup(); }
+#endif
 
 private:
+  void wakeupBackgroundThread();
+  bool doAddSessions();
+  bool doAbortSessions();
+  bool doRemoveSessions();
+  void resetMultiHandle();
+
+  std::mutex multi_handle_m_;
+  CURLM *multi_handle_;
   std::atomic<uint64_t> next_session_id_;
-  std::map<uint64_t, std::shared_ptr<Session>> sessions_;
+  uint64_t max_sessions_per_connection_;
+
+  std::mutex sessions_m_;
+  std::recursive_mutex session_ids_m_;
+  std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions_;
+  std::unordered_set<uint64_t> pending_to_add_session_ids_;
+  std::unordered_set<uint64_t> pending_to_abort_session_ids_;
+  std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles_;
+  std::list<std::shared_ptr<Session>> pending_to_remove_sessions_;
+
+  std::mutex background_thread_m_;
+  std::unique_ptr<std::thread> background_thread_;
+  std::chrono::milliseconds scheduled_delay_milliseconds_;
+
+  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
 }  // namespace curl
