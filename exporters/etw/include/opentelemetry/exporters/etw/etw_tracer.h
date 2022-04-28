@@ -764,7 +764,7 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_(CreateContext()))
+        context_(CreateContext())
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
