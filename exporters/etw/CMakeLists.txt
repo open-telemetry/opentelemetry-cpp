@@ -23,7 +23,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/etw
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   FILES_MATCHING
   PATTERN "*.h")
 

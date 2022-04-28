@@ -31,7 +31,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_jaeger_trace
-  PUBLIC opentelemetry_resources http_client_curl
+  PUBLIC opentelemetry_resources opentelemetry_http_client_curl
   PRIVATE thrift::thrift)
 
 if(MSVC)
@@ -52,7 +52,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/jaeger
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   FILES_MATCHING
   PATTERN "*.h"
   PATTERN "recordable.h" EXCLUDE)

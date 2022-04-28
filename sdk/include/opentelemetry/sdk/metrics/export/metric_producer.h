@@ -3,12 +3,32 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+
+/**
+ * Metric Data to be exported along with resources and
+ * Instrumentation library.
+ */
+struct InstrumentationInfoMetrics
+{
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_;
+  std::vector<MetricData> metric_data_;
+};
+
+struct ResourceMetrics
+{
+  const opentelemetry::sdk::resource::Resource *resource_;
+  std::vector<InstrumentationInfoMetrics> instrumentation_info_metric_data_;
+};
 
 /**
  * MetricProducer is the interface that is used to make metric data available to the
@@ -27,7 +47,8 @@ public:
    *
    * @return a status of completion of method.
    */
-  virtual bool Collect(nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
+  virtual bool Collect(
+      nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept = 0;
 };
 
 }  // namespace metrics

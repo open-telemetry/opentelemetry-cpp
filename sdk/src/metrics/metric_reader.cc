@@ -20,6 +20,7 @@ MetricReader::MetricReader(AggregationTemporality aggregation_temporality)
 void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
 {
   metric_producer_ = metric_producer;
+  OnInitialized();
 }
 
 AggregationTemporality MetricReader::GetAggregationTemporality() const noexcept
@@ -27,7 +28,8 @@ AggregationTemporality MetricReader::GetAggregationTemporality() const noexcept
   return aggregation_temporality_;
 }
 
-bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexcept
+bool MetricReader::Collect(
+    nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
   if (!metric_producer_)
   {
@@ -46,18 +48,21 @@ bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexc
 bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   bool status = true;
-
   if (IsShutdown())
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
   }
+
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    shutdown_ = true;
+  }
+
   if (!OnShutDown(timeout))
   {
     status = false;
     OTEL_INTERNAL_LOG_WARN("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
   }
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  shutdown_ = true;
   return status;
 }
 

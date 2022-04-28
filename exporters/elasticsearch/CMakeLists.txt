@@ -10,7 +10,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_elasticsearch_logs
-  PUBLIC opentelemetry_trace opentelemetry_logs http_client_curl)
+  PUBLIC opentelemetry_trace opentelemetry_logs opentelemetry_http_client_curl)
 
 install(
   TARGETS opentelemetry_exporter_elasticsearch_logs
@@ -21,7 +21,7 @@ install(
 
 install(
   DIRECTORY include/opentelemetry/exporters/elasticsearch
-  DESTINATION include/opentelemetry/exporters/
+  DESTINATION include/opentelemetry/exporters
   FILES_MATCHING
   PATTERN "*.h"
   PATTERN "es_log_recordable.h" EXCLUDE)

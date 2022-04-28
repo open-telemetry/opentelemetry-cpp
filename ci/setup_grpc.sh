@@ -10,12 +10,16 @@ new_grpc_version='v1.43.2'
 gcc_version_for_new_grpc='5.1'
 install_grpc_version=${new_grpc_version}
 grpc_version='v1.39.0'
-usage() { echo "Usage: $0 -v <gcc-version>" 1>&2; exit 1; }
+install_dir='/usr/local/'
+usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
 
-while getopts ":v:" o; do
+while getopts ":v:i:" o; do
     case "${o}" in
         v)
             gcc_version=${OPTARG}
+            ;;
+        i)
+            install_dir=${OPTARG}
             ;;
         *)
             usage
@@ -34,7 +38,7 @@ if ! type cmake > /dev/null; then
     exit 1
 fi
 export BUILD_DIR=/tmp/
-export INSTALL_DIR=/usr/local/
+export INSTALL_DIR=${install_dir}
 pushd $BUILD_DIR
 echo "installing grpc version: ${install_grpc_version}"
 git clone --depth=1 -b ${install_grpc_version} https://github.com/grpc/grpc

@@ -15,10 +15,55 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Bugfix: span SetAttribute crash ([#1283](https://github.com/open-telemetry/opentelemetry-cpp/pull/1283))
-* [EXPORTER] Jaeger Exporter - Populate Span Links ([#1251](https://github.com/open-telemetry/opentelemetry-cpp/pull/1251))
-* [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
 * [SDK] Async Batch Span/Log processor with max async support ([#1306](https://github.com/open-telemetry/opentelemetry-cpp/pull/1306))
+* [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
+
+## [1.3.0] 2022-04-11
+
+* [ETW EXPORTER] ETW provider handle cleanup ([#1322](https://github.com/open-telemetry/opentelemetry-cpp/pull/1322))
+* [BUILD] Move public definitions into `opentelemetry_api`. ([#1314](https://github.com/open-telemetry/opentelemetry-cpp/pull/1314))
+* [METRICS] OStream example ([#1312](https://github.com/open-telemetry/opentelemetry-cpp/pull/1312))
+* [BUILD] Rename `http_client_curl` to `opentelemetry_http_client_curl` ([#1301](https://github.com/open-telemetry/opentelemetry-cpp/pull/1301))
+* [METRICS SDK] Add InstrumentationInfo and Resource to the metrics data to be
+  exported.
+  ([#1299](https://github.com/open-telemetry/opentelemetry-cpp/pull/1299))
+* [TESTS] Add building test without RTTI ([#1294](https://github.com/open-telemetry/opentelemetry-cpp/pull/1294))
+* [METRICS SDK] Implement periodic exporting metric reader ([#1286](https://github.com/open-telemetry/opentelemetry-cpp/pull/1286))
+* [SDK] Bugfix: span SetAttribute crash ([#1283](https://github.com/open-telemetry/opentelemetry-cpp/pull/1283))
+* [BUG] Remove implicitly deleted default constructor ([#1267](https://github.com/open-telemetry/opentelemetry-cpp/pull/1267))
+* [METRICS SDK] Synchronous Metric collection (Delta , Cumulative) ([#1265](https://github.com/open-telemetry/opentelemetry-cpp/pull/1265))
+* [METRICS SDK] Metrics exemplar round 1 ([#1264](https://github.com/open-telemetry/opentelemetry-cpp/pull/1264))
+* [EXPORTER] Fix: use CURLOPT_TIMEOUT_MS to config OtlpHttpExporter's timeout
+  instead of CURLOPT_TIMEOUT
+  ([#1261](https://github.com/open-telemetry/opentelemetry-cpp/pull/1261))
+* [EXPORTER] Jaeger Exporter - Populate Span Links ([#1251](https://github.com/open-telemetry/opentelemetry-cpp/pull/1251))
+* [SDK] Reorder the destructor of members in LoggerProvider and TracerProvider ([#1245](https://github.com/open-telemetry/opentelemetry-cpp/pull/1245))
+* [METRICS SDK] Enable metric collection from MetricReader ([#1241](https://github.com/open-telemetry/opentelemetry-cpp/pull/1241))
+* [METRICS SDK] Asynchronous Aggregation storage ([#1232](https://github.com/open-telemetry/opentelemetry-cpp/pull/1232))
+* [METRICS SDK] Synchronous Instruments - Aggregation Storage(s) creation for
+  configured views
+  ([#1219](https://github.com/open-telemetry/opentelemetry-cpp/pull/1219))
+* [BUILD] Added s390x arch into CMake build. ([#1216](https://github.com/open-telemetry/opentelemetry-cpp/pull/1216))
+* [API] Allow extension of the lifetime of ContextStorage. ([#1214](https://github.com/open-telemetry/opentelemetry-cpp/pull/1214))
+* [METRICS SDK] Add Aggregation storage ([#1213](https://github.com/open-telemetry/opentelemetry-cpp/pull/1213))
+* [TESTS] Fix ostream_log_test Mac ([#1208](https://github.com/open-telemetry/opentelemetry-cpp/pull/1208))
+* [BUILD] Update grpc to v1.43.2 to support VS2022/MSVC 19.30 and bazel 5.0 ([#1207](https://github.com/open-telemetry/opentelemetry-cpp/pull/1207))
+* [DOCS] Benchmark documentation ([#1205](https://github.com/open-telemetry/opentelemetry-cpp/pull/1205))
+* [DOCS] Fix errors in SDK documentation ([#1201](https://github.com/open-telemetry/opentelemetry-cpp/pull/1201))
+* [METRICS EXPORTER] Ostream metric exporter ([#1196](https://github.com/open-telemetry/opentelemetry-cpp/pull/1196))
+* [Metrics SDK] Filtering metrics attributes ([#1191](https://github.com/open-telemetry/opentelemetry-cpp/pull/1191))
+* [Metrics SDK] Sync and Async Instruments SDK ([#1184](https://github.com/open-telemetry/opentelemetry-cpp/pull/1184))
+* [Metrics SDK] Add Aggregation as part of metrics SDK. ([#1178](https://github.com/open-telemetry/opentelemetry-cpp/pull/1178))
+* [BUILD] Cmake: thrift requires boost headers, include them as
+  Boost_INCLUDE_DIRS
+  ([#1100](https://github.com/open-telemetry/opentelemetry-cpp/pull/1100))
+
+Notes:
+
+[#1301](https://github.com/open-telemetry/opentelemetry-cpp/pull/1301) added
+`opentelemetry_` as prefix to http_client_curl library for resolving potential
+naming conflict, this could break existing cmake build if http_client_curl is
+listed as explicit dependency in user's cmake file.
 
 ## [1.2.0] 2022-01-31
 

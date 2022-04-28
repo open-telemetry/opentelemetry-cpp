@@ -5,6 +5,8 @@
 #ifdef ENABLE_METRICS_PREVIEW
 
 #  include <map>
+
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
@@ -216,12 +218,19 @@ private:
     auto agg_kind = batch_agg->get_aggregator_kind();
     if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Counter)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_batch_agg_counter =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(batch_agg);
 
       std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_record_agg_counter =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_batch_agg_counter =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(batch_agg);
 
+      std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_record_agg_counter =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(record_agg);
+#  endif
       auto temp_batch_agg_raw_counter  = temp_batch_agg_counter.get();
       auto temp_record_agg_raw_counter = temp_record_agg_counter.get();
 
@@ -229,6 +238,7 @@ private:
     }
     else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::MinMaxSumCount)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>
           temp_batch_agg_mmsc =
               std::dynamic_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
@@ -238,6 +248,17 @@ private:
           temp_record_agg_mmsc =
               std::dynamic_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
                   record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>
+          temp_batch_agg_mmsc =
+              std::static_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
+                  batch_agg);
+
+      std::shared_ptr<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>
+          temp_record_agg_mmsc =
+              std::static_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
+                  record_agg);
+#  endif
 
       auto temp_batch_agg_raw_mmsc  = temp_batch_agg_mmsc.get();
       auto temp_record_agg_raw_mmsc = temp_record_agg_mmsc.get();
@@ -246,11 +267,19 @@ private:
     }
     else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Gauge)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_batch_agg_gauge =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(batch_agg);
 
       std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_record_agg_gauge =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_batch_agg_gauge =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(batch_agg);
+
+      std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_record_agg_gauge =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(record_agg);
+#  endif
 
       auto temp_batch_agg_raw_gauge  = temp_batch_agg_gauge.get();
       auto temp_record_agg_raw_gauge = temp_record_agg_gauge.get();
@@ -259,12 +288,19 @@ private:
     }
     else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Sketch)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_batch_agg_sketch =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(batch_agg);
 
       std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_record_agg_sketch =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_batch_agg_sketch =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(batch_agg);
 
+      std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_record_agg_sketch =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(record_agg);
+#  endif
       auto temp_batch_agg_raw_sketch  = temp_batch_agg_sketch.get();
       auto temp_record_agg_raw_sketch = temp_record_agg_sketch.get();
 
@@ -272,6 +308,7 @@ private:
     }
     else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Histogram)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>>
           temp_batch_agg_histogram =
               std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
@@ -281,6 +318,17 @@ private:
           temp_record_agg_histogram =
               std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
                   record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>>
+          temp_batch_agg_histogram =
+              std::static_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
+                  batch_agg);
+
+      std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>>
+          temp_record_agg_histogram =
+              std::static_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
+                  record_agg);
+#  endif
 
       auto temp_batch_agg_raw_histogram  = temp_batch_agg_histogram.get();
       auto temp_record_agg_raw_histogram = temp_record_agg_histogram.get();
@@ -289,11 +337,19 @@ private:
     }
     else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Exact)
     {
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
       std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_batch_agg_exact =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(batch_agg);
 
       std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_record_agg_exact =
           std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(record_agg);
+#  else
+      std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_batch_agg_exact =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(batch_agg);
+
+      std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_record_agg_exact =
+          std::static_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(record_agg);
+#  endif
 
       auto temp_batch_agg_raw_exact  = temp_batch_agg_exact.get();
       auto temp_record_agg_raw_exact = temp_record_agg_exact.get();

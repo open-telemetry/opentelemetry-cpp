@@ -93,7 +93,7 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
           __builtin_ia32_pause();
 #  endif
 #elif defined(__arm__)
-          __yield();
+          __asm__ volatile("yield" ::: "memory");
 #endif
         }
       },
