@@ -761,10 +761,10 @@ public:
        const opentelemetry::trace::StartSpanOptions &options,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
+        start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_(CreateContext()),
-        start_time_(std::chrono::system_clock::now())
+        context_(CreateContext()))
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
