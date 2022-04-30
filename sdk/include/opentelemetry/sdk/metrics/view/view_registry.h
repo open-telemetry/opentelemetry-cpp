@@ -64,7 +64,7 @@ public:
     // return default view if none found;
     if (!found)
     {
-      static View view("");
+      static View view("otel-default-view");
       if (!callback(view))
       {
         return false;
