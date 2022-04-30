@@ -23,7 +23,7 @@ class View
 public:
   View(const std::string &name,
        const std::string &description   = "",
-       AggregationType aggregation_type = AggregationType::kDrop,
+       AggregationType aggregation_type = AggregationType::kDefault,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
