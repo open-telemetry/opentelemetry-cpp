@@ -28,7 +28,7 @@ namespace nostd   = opentelemetry::nostd;
 Meter::Meter(std::shared_ptr<MeterContext> meter_context,
              std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
                  instrumentation_library) noexcept
-    : meter_context_{meter_context}, instrumentation_library_{std::move(instrumentation_library)}
+    : instrumentation_library_{std::move(instrumentation_library)}, meter_context_{meter_context}
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
