@@ -19,6 +19,6 @@ for root, dirs, files in os.walk(extDir):
     for file in files:
         if file.endswith(".h") or file.endswith(".inc"):
             dir_sans_prefix = root[len(extDir)+1:]
-            os.makedirs(destDir + "/" | dir_sans_prefix, exist_ok=True)
+            os.makedirs(destDir + "/" + dir_sans_prefix, exist_ok=True)
             dest_file = destDir + "/" + file
             shutil.copyfile(root + "/" + file, dest_file)
