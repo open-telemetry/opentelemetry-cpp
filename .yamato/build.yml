@@ -105,6 +105,8 @@ build_windows:
     type: Unity::VM
   interpreter: powershell
   commands:
+    - choco install -y python --version 3.10.4
+
     - |
       $ErrorActionPreference = "Stop"
       curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
@@ -127,10 +129,7 @@ build_windows:
       mkdir trick/google
       mkdir trick/google/protobuf
       $extDir = ./bazelisk.exe info output_base
-      # Copy directory structure with .h and .inc files.
-      # TODO: skip objc headers etc as we do on mac+linux.
-      xcopy /s $extDir\*.h trick\google\protobuf\
-      xcopy /s $extDir\*.inc trick\google\protobuf\
+      c:\Python310\python.exe .yamato\win-copy-protobuf.py $extDir\external\com_google_protobuf\src\google\protobuf
 
       cd trick
       7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
