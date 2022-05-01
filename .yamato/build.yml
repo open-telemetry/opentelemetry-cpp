@@ -59,6 +59,8 @@ build_mac_amd64:
       set -euxo pipefail
       wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin-amd64
       chmod +x bazelisk
+      # NOTE: when building manually on M1 macs for arm64:
+      #APPLE_SDK_VERSION_OVERRIDE=11 ./bazelisk build --macos_minimum_os 11 --cpu=darwin_arm64 --host_cpu=darwin_arm64 --subcommands //examples/otlp:hw
       ./bazelisk build //examples/otlp:hw
       archname=$(arch | sed -e "s/x86_64.*/amd64/" -e "s/i386/amd64/")
       rm -rf trick opentelemetry-cpp-mac-${archname}.zip
