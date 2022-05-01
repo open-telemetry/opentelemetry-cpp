@@ -20,7 +20,7 @@ for root, dirs, files in os.walk(extDir):
         if file.endswith(".h") or file.endswith(".inc"):
             dir_sans_prefix = root[len(extDir)+1:]
             dd = destDir + "\\" + dir_sans_prefix
-            os.makedirs(dd exist_ok=True)
+            os.makedirs(dd, exist_ok=True)
             dst_file = dd + "\\" + file
             src_file = root + "\\" + file
             shutil.copyfile(src_file, dst_file)
