@@ -9,7 +9,7 @@ upload_to_stevedore_testing:
       set -euxo pipefail
       curl -sSo StevedoreUpload "$STEVEDORE_UPLOAD_TOOL_LINUX_X64_URL"
       chmod +x StevedoreUpload
-      ./StevedoreUpload --version-len=12 --repo=testing --version="$GIT_REVISION" opentelemetry-cpp-linux-amd64.zip opentelemetry-cpp-mac-amd64.zip opentelemetry-cpp-win-amd64.zip
+      ./StevedoreUpload --version-len=12 --repo=testing --version="$GIT_REVISION" opentelemetry-cpp-lin-amd64.zip opentelemetry-cpp-mac-amd64.zip opentelemetry-cpp-win-amd64.zip
   skip_checkout: true
   dependencies:
     - .yamato/build.yml#build_linux

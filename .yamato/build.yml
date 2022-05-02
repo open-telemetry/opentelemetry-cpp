@@ -13,7 +13,7 @@ build_linux:
       sudo yum --enablerepo=centos-sclo-rh-testing install -y devtoolset-11-gcc devtoolset-11-gcc-c++
       PATH=/opt/rh/devtoolset-11/root/usr/bin:$PATH
       CC=/opt/rh/devtoolset-11/root/usr/bin/gcc CXX=/opt/rh/devtoolset-11/root/usr/bin/g++ ./bazelisk build //examples/otlp:libdummy_remove_me
-      rm -rf trick opentelemetry-cpp-linux-amd64.zip
+      rm -rf trick opentelemetry-cpp-lin-amd64.zip
       mkdir -p trick/lib
       find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
       rm -f trick/lib/libdummy_remove_me.a # Don't want the custom library that we added.
@@ -39,12 +39,12 @@ build_linux:
 
       cd trick
       chmod -R u+w .
-      zip -r ../opentelemetry-cpp-linux-amd64.zip *
+      zip -r ../opentelemetry-cpp-lin-amd64.zip *
       cd ..
   artifacts:
     opentelemetry-cpp-stevedore-pkg:
       paths:
-        - opentelemetry-cpp-linux-amd64.zip
+        - opentelemetry-cpp-lin-amd64.zip
   triggers:
     expression: pull_request.target eq "unity"
 
