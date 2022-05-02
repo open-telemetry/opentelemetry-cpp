@@ -40,6 +40,9 @@ private:
       unreported_metrics_;
   // last reported metrics stash for all the collectors.
   std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
+
+  // Lock while building metrics
+  mutable opentelemetry::common::SpinLockMutex lock_;
 };
 }  // namespace metrics
 }  // namespace sdk

@@ -54,7 +54,7 @@ public:
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
       auto prev = cumulative_hash_map_->Get(measurement.first);
-      if (prev != nullptr)
+      if (prev)
       {
         auto delta = prev->Diff(*aggr);
         cumulative_hash_map_->Set(measurement.first,

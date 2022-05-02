@@ -23,6 +23,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          std::shared_ptr<AttributesHashMap> delta_metrics,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
   auto aggregation_temporarily = collector->GetAggregationTemporality();
   for (auto &col : collectors)
