@@ -45,24 +45,23 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap);
   for (auto &agg_hashmap : unreported_list)
   {
-    agg_hashmap->GetAllEnteries([&merged_metrics, this](const MetricAttributes &attributes,
-                                                        Aggregation &aggregation) {
-      auto agg = merged_metrics->Get(attributes);
-      if (agg)
-      {
-        merged_metrics->Set(attributes, std::move(agg->Merge(aggregation)));
-      }
-      else
-      {
-        merged_metrics->Set(
-            attributes,
-            std::move(
-                DefaultAggregation::CreateAggregation(instrument_descriptor_)->Merge(aggregation)));
-        merged_metrics->GetAllEnteries(
-            [](const MetricAttributes &attr, Aggregation &aggr) { return true; });
-      }
-      return true;
-    });
+    agg_hashmap->GetAllEnteries(
+        [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
+          auto agg = merged_metrics->Get(attributes);
+          if (agg)
+          {
+            merged_metrics->Set(attributes, std::move(agg->Merge(aggregation)));
+          }
+          else
+          {
+            merged_metrics->Set(
+                attributes,
+                DefaultAggregation::CreateAggregation(instrument_descriptor_)->Merge(aggregation));
+            merged_metrics->GetAllEnteries(
+                [](const MetricAttributes &attr, Aggregation &aggr) { return true; });
+          }
+          return true;
+        });
   }
   // Get the last reported metrics for the `collector` from `last reported metrics` stash
   //   - If the aggregation_temporarily for the collector is cumulative
@@ -123,8 +122,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
         return true;
       });
   return callback(metric_data);
-
-  return true;
 }
 
 }  // namespace metrics
