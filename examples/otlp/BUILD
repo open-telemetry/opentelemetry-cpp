@@ -73,6 +73,7 @@ cc_static_library(
 # bazel-out directory.
 cc_binary(
     name = "hw",
+    linkstatic = True,
     srcs = [ "hw.cc" ],
     deps = [
         "//api",
