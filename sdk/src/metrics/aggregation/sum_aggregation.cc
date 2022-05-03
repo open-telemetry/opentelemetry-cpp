@@ -22,6 +22,8 @@ LongSumAggregation::LongSumAggregation()
 
 LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
 
+LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data} {}
+
 void LongSumAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
@@ -63,6 +65,8 @@ DoubleSumAggregation::DoubleSumAggregation()
 }
 
 DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data)) {}
+
+DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_data_(data) {}
 
 void DoubleSumAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
 {

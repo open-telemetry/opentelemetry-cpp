@@ -10,6 +10,7 @@
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #  include <memory>
@@ -32,7 +33,8 @@ public:
         aggregation_type_{aggregation_type},
         measurement_collection_callback_{measurement_callback},
         attributes_processor_{attributes_processor},
-        active_attributes_hashmap_(new AttributesHashMap())
+        cumulative_hash_map_(new AttributesHashMap()),
+        temporal_metric_storage_(instrument_descriptor)
   {}
 
   bool Collect(CollectorHandle *collector,
@@ -45,22 +47,33 @@ public:
 
     // read the measurement using configured callback
     measurement_collection_callback_(ob_res);
-
+    std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
     // process the read measurements - aggregate and store in hashmap
     for (auto &measurement : ob_res.GetMeasurements())
     {
-      auto agg = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
-      agg->Aggregate(measurement.second);
-      active_attributes_hashmap_->Set(measurement.first, std::move(agg));
+      auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
+      aggr->Aggregate(measurement.second);
+      auto prev = cumulative_hash_map_->Get(measurement.first);
+      if (prev)
+      {
+        auto delta = prev->Diff(*aggr);
+        cumulative_hash_map_->Set(measurement.first,
+                                  DefaultAggregation::CloneAggregation(
+                                      aggregation_type_, instrument_descriptor_, *delta));
+        delta_hash_map->Set(measurement.first, std::move(delta));
+      }
+      else
+      {
+        cumulative_hash_map_->Set(
+            measurement.first,
+            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
+        delta_hash_map->Set(measurement.first, std::move(aggr));
+      }
     }
 
-    // TBD -> read aggregation from hashmap, and perform metric collection
-    MetricData metric_data;
-    if (metric_collection_callback(std::move(metric_data)))
-    {
-      return true;
-    }
-    return false;
+    return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
+                                                 std::move(delta_hash_map),
+                                                 metric_collection_callback);
   }
 
 private:
@@ -68,7 +81,8 @@ private:
   AggregationType aggregation_type_;
   void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &);
   const AttributesProcessor *attributes_processor_;
-  std::unique_ptr<AttributesHashMap> active_attributes_hashmap_;
+  std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
+  TemporalMetricStorage temporal_metric_storage_;
 };
 
 }  // namespace metrics
