@@ -24,7 +24,6 @@ namespace metrics
 
 // forward declaration
 class Meter;
-class MetricExporter;
 class MetricReader;
 
 /**
@@ -36,13 +35,11 @@ class MeterContext : public std::enable_shared_from_this<MeterContext>
 public:
   /**
    * Initialize a new meter provider
-   * @param exporters The exporters to be configured with meter context
    * @param readers The readers to be configured with meter context.
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
   MeterContext(
-      std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
       opentelemetry::sdk::resource::Resource resource =
           opentelemetry::sdk::resource::Resource::Create({})) noexcept;
@@ -78,16 +75,6 @@ public:
   opentelemetry::common::SystemTimestamp GetSDKStartTime() noexcept;
 
   /**
-   * Attaches a metric exporter to list of configured exporters for this Meter context.
-   * @param exporter The metric exporter for this meter context. This
-   * must not be a nullptr.
-   *
-   * Note: This exporter may not receive any in-flight meter data, but will get newly created meter
-   * data. Note: This method is not thread safe, and should ideally be called from main thread.
-   */
-  void AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept;
-
-  /**
    * Attaches a metric reader to list of configured readers for this Meter context.
    * @param reader The metric reader for this meter context. This
    * must not be a nullptr.
@@ -118,20 +105,19 @@ public:
   void AddMeter(std::shared_ptr<Meter> meter);
 
   /**
-   * Force all active Exporters and Collectors to flush any buffered meter data
+   * Force all active Collectors to flush any buffered meter data
    * within the given timeout.
    */
 
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
-   * Shutdown the Exporters and Collectors associated with this meter provider.
+   * Shutdown the Collectors associated with this meter provider.
    */
   bool Shutdown() noexcept;
 
 private:
   opentelemetry::sdk::resource::Resource resource_;
-  std::vector<std::unique_ptr<MetricExporter>> exporters_;
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;

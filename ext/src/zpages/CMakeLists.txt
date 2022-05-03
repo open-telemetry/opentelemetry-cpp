@@ -10,9 +10,8 @@ add_library(
 
 set_target_properties(opentelemetry_zpages PROPERTIES EXPORT_NAME zpages)
 
-target_link_libraries(
-  opentelemetry_zpages PUBLIC opentelemetry_ext opentelemetry_api
-                              opentelemetry_trace)
+target_link_libraries(opentelemetry_zpages PUBLIC opentelemetry_ext
+                                                  opentelemetry_trace)
 
 install(
   TARGETS opentelemetry_zpages

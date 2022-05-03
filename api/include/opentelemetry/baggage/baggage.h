@@ -249,7 +249,9 @@ private:
     };
 
     auto from_hex = [](char c) -> char {
-      return std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10;
+      // c - '0' produces integer type which could trigger error/warning when casting to char,
+      // but the cast is safe here.
+      return static_cast<char>(std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10);
     };
 
     std::string ret;

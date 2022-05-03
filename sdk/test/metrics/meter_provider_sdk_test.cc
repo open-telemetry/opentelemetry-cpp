@@ -38,16 +38,19 @@ public:
 class MockMetricReader : public MetricReader
 {
 public:
+  MockMetricReader(std::unique_ptr<MetricExporter> exporter) : exporter_(std::move(exporter)) {}
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual void OnInitialized() noexcept override {}
+
+private:
+  std::unique_ptr<MetricExporter> exporter_;
 };
 
 TEST(MeterProvider, GetMeter)
 {
-  std::vector<std::unique_ptr<MetricExporter>> exporters;
 
-  MeterProvider mp1(std::move(exporters));
+  MeterProvider mp1;
   //   std::unique_ptr<View> view{std::unique_ptr<View>()};
   // MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views);
   auto m1 = mp1.GetMeter("test");
@@ -74,11 +77,8 @@ TEST(MeterProvider, GetMeter)
   auto sdkMeter1 = static_cast<Meter *>(m1.get());
 #  endif
   ASSERT_NE(nullptr, sdkMeter1);
-
-  std::unique_ptr<MetricExporter> exporter{new MockMetricExporter()};
-  ASSERT_NO_THROW(mp1.AddMetricExporter(std::move(exporter)));
-
-  std::unique_ptr<MetricReader> reader{new MockMetricReader()};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::unique_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   ASSERT_NO_THROW(mp1.AddMetricReader(std::move(reader)));
 
   std::unique_ptr<View> view{std::unique_ptr<View>()};
