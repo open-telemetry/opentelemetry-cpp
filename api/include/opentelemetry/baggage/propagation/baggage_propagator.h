@@ -40,7 +40,7 @@ public:
     }
     else
     {
-      return context::Context(context);
+      return context;
     }
   }
 
