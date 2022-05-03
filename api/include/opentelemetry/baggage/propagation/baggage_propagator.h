@@ -33,7 +33,15 @@ public:
   {
     nostd::string_view baggage_str = carrier.Get(opentelemetry::baggage::kBaggageHeader);
     auto baggage                   = opentelemetry::baggage::Baggage::FromHeader(baggage_str);
-    return opentelemetry::baggage::SetBaggage(context, baggage);
+
+    if (baggage->ToHeader().size())
+    {
+      return opentelemetry::baggage::SetBaggage(context, baggage);
+    }
+    else
+    {
+      return context::Context(context);
+    }
   }
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
