@@ -101,7 +101,7 @@ TEST(BaggagePropagatorTest, InjectEmptyHeader)
     EXPECT_EQ(carrier.headers_.find(baggage::kBaggageHeader), carrier.headers_.end());
   }
   {
-    // Invali baggage in context
+    // Invalid baggage in context
     BaggageCarrierTest carrier1;
     carrier1.headers_[baggage::kBaggageHeader.data()] = "InvalidBaggageData";
     context::Context ctx1                             = context::Context{};
