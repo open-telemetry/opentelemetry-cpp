@@ -19,8 +19,13 @@ LongLastValueAggregation::LongLastValueAggregation()
   point_data_.is_lastvalue_valid_ = false;
   point_data_.value_              = 0l;
 }
+
 LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)
     : point_data_{std::move(data)}
+{}
+
+LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &data)
+    : point_data_{data}
 {}
 
 void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
@@ -71,8 +76,13 @@ DoubleLastValueAggregation::DoubleLastValueAggregation()
   point_data_.is_lastvalue_valid_ = false;
   point_data_.value_              = 0.0;
 }
+
 DoubleLastValueAggregation::DoubleLastValueAggregation(LastValuePointData &&data)
     : point_data_{std::move(data)}
+{}
+
+DoubleLastValueAggregation::DoubleLastValueAggregation(const LastValuePointData &data)
+    : point_data_{data}
 {}
 
 void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept

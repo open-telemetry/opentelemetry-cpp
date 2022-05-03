@@ -19,14 +19,15 @@ class LongSumAggregation : public Aggregation
 public:
   LongSumAggregation();
   LongSumAggregation(SumPointData &&);
+  LongSumAggregation(const SumPointData &);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
+  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
+  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
 
@@ -40,14 +41,15 @@ class DoubleSumAggregation : public Aggregation
 public:
   DoubleSumAggregation();
   DoubleSumAggregation(SumPointData &&);
+  DoubleSumAggregation(const SumPointData &);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
+  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
-  virtual std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
+  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
 
   PointType ToPoint() const noexcept override;
 

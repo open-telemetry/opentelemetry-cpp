@@ -23,16 +23,18 @@ class DropAggregation : public Aggregation
 public:
   DropAggregation() = default;
 
+  DropAggregation(const DropPointData &) {}
+
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override
+  std::unique_ptr<Aggregation> Merge(const Aggregation &) const noexcept override
   {
     return std::unique_ptr<Aggregation>(new DropAggregation());
   }
 
-  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override
+  std::unique_ptr<Aggregation> Diff(const Aggregation &) const noexcept override
   {
     return std::unique_ptr<Aggregation>(new DropAggregation());
   }
