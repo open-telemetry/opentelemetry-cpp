@@ -50,7 +50,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           auto agg = merged_metrics->Get(attributes);
           if (agg)
           {
-            merged_metrics->Set(attributes, std::move(agg->Merge(aggregation)));
+            merged_metrics->Set(attributes, agg->Merge(aggregation));
           }
           else
           {
