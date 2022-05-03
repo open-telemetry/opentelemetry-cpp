@@ -21,7 +21,11 @@ public:
               const opentelemetry::context::Context &context) noexcept override
   {
     auto baggage = opentelemetry::baggage::GetBaggage(context);
-    carrier.Set(kBaggageHeader, baggage->ToHeader());
+    auto header  = baggage->ToHeader();
+    if (header.size())
+    {
+      carrier.Set(kBaggageHeader, header);
+    }
   }
 
   context::Context Extract(const opentelemetry::context::propagation::TextMapCarrier &carrier,
