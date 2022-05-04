@@ -22,9 +22,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-#ifdef ENABLE_ASYNC_EXPORT
-      is_export_async_(options.is_export_async),
-#endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
@@ -33,7 +30,6 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-  synchronization_data_->is_async_shutdown_notified.store(false);
 }
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
@@ -207,58 +203,10 @@ void BatchSpanProcessor::Export()
                       });
                     });
 
-#ifdef ENABLE_ASYNC_EXPORT
-    if (is_export_async_ == false)
-    {
-#endif
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
-      NotifyCompletion(notify_force_flush, synchronization_data_);
-#ifdef ENABLE_ASYNC_EXPORT
-    }
-    else
-    {
-      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
-          [notify_force_flush, synchronization_data_watcher](sdk::common::ExportResult result) {
-            // TODO: Print result
-            if (synchronization_data_watcher.expired())
-            {
-              return true;
-            }
-
-            NotifyCompletion(notify_force_flush, synchronization_data_watcher.lock());
-            return true;
-          });
-    }
-#endif
+    exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
+    NotifyCompletion(notify_force_flush, synchronization_data_);
   } while (true);
 }
-
-#ifdef ENABLE_ASYNC_EXPORT
-void BatchSpanProcessor::WaitForShutdownCompletion()
-{
-  // Since async export is invoked due to shutdown, need to wait
-  // for async thread to complete.
-  if (is_export_async_)
-  {
-    std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m);
-    while (true)
-    {
-      if (synchronization_data_->is_async_shutdown_notified.load())
-      {
-        break;
-      }
-
-      // When is_async_shutdown_notified.store(true) and async_shutdown_cv.notify_all() is called
-      // between is_async_shutdown_notified.load() and async_shutdown_cv.wait(). We must not wait
-      // for ever
-      synchronization_data_->async_shutdown_cv.wait_for(lk, schedule_delay_millis_);
-    }
-  }
-}
-#endif
 
 void BatchSpanProcessor::NotifyCompletion(
     bool notify_force_flush,
@@ -274,13 +222,6 @@ void BatchSpanProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
-
-  // Notify the thread which is waiting on shutdown to complete.
-  if (synchronization_data->is_shutdown.load() == true)
-  {
-    synchronization_data->is_async_shutdown_notified.store(true);
-    synchronization_data->async_shutdown_cv.notify_all();
-  }
 }
 
 void BatchSpanProcessor::DrainQueue()
@@ -294,9 +235,26 @@ void BatchSpanProcessor::DrainQueue()
     }
 
     Export();
-#ifdef ENABLE_ASYNC_EXPORT
-    WaitForShutdownCompletion();
-#endif
+  }
+}
+
+void BatchSpanProcessor::GetWaitAdjustedTime(
+    std::chrono::microseconds &timeout,
+    std::chrono::time_point<std::chrono::system_clock> &start_time)
+{
+  auto end_time = std::chrono::system_clock::now();
+  auto offset   = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+  start_time    = end_time;
+  timeout       = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+  if (timeout > offset && timeout > std::chrono::microseconds::zero())
+  {
+    timeout -= offset;
+  }
+  else
+  {
+    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
+    timeout = std::chrono::microseconds(1);
   }
 }
 
@@ -313,22 +271,7 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     worker_thread_.join();
   }
 
-  auto worker_end_time = std::chrono::system_clock::now();
-  auto offset = std::chrono::duration_cast<std::chrono::microseconds>(worker_end_time - start_time);
-
-  // Fix timeout to meet requirement of wait_for
-  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
-      timeout, std::chrono::microseconds::zero());
-  if (timeout > offset && timeout > std::chrono::microseconds::zero())
-  {
-    timeout -= offset;
-  }
-  else
-  {
-    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
-    timeout = std::chrono::microseconds(1);
-  }
-
+  GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)
   {

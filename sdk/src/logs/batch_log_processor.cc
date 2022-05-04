@@ -17,15 +17,11 @@ namespace logs
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                      const size_t max_queue_size,
                                      const std::chrono::milliseconds scheduled_delay_millis,
-                                     const size_t max_export_batch_size,
-                                     const bool is_export_async)
+                                     const size_t max_export_batch_size)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
-#  ifdef ENABLE_ASYNC_EXPORT
-      is_export_async_(is_export_async),
-#  endif
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -34,7 +30,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-  synchronization_data_->is_async_shutdown_notified.store(false);
 }
 
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
@@ -43,9 +38,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
-#  ifdef ENABLE_ASYNC_EXPORT
-      is_export_async_(options.is_export_async),
-#  endif
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -54,7 +46,6 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
   synchronization_data_->is_shutdown.store(false);
-  synchronization_data_->is_async_shutdown_notified.store(false);
 }
 
 std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
@@ -149,6 +140,7 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
       }
     }
   }
+
   synchronization_data_->is_force_flush_notified.store(false, std::memory_order_release);
 
   return result;
@@ -225,58 +217,11 @@ void BatchLogProcessor::Export()
                       });
                     });
 
-#  ifdef ENABLE_ASYNC_EXPORT
-    if (is_export_async_ == false)
-    {
-#  endif
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
-      NotifyCompletion(notify_force_flush, synchronization_data_);
-#  ifdef ENABLE_ASYNC_EXPORT
-    }
-    else
-    {
-      std::weak_ptr<SynchronizationData> synchronization_data_watcher = synchronization_data_;
-      exporter_->Export(
-          nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
-          [notify_force_flush, synchronization_data_watcher](sdk::common::ExportResult result) {
-            // TODO: Print result
-            if (synchronization_data_watcher.expired())
-            {
-              return true;
-            }
-
-            NotifyCompletion(notify_force_flush, synchronization_data_watcher.lock());
-            return true;
-          });
-    }
-#  endif
+    exporter_->Export(
+        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
+    NotifyCompletion(notify_force_flush, synchronization_data_);
   } while (true);
 }
-
-#  ifdef ENABLE_ASYNC_EXPORT
-void BatchLogProcessor::WaitForShutdownCompletion()
-{
-  // Since async export is invoked due to shutdown, need to wait
-  // for async thread to complete.
-  if (is_export_async_)
-  {
-    std::unique_lock<std::mutex> lk(synchronization_data_->async_shutdown_m);
-    while (true)
-    {
-      if (synchronization_data_->is_async_shutdown_notified.load())
-      {
-        break;
-      }
-
-      // When is_async_shutdown_notified.store(true) and async_shutdown_cv.notify_all() is called
-      // between is_async_shutdown_notified.load() and async_shutdown_cv.wait(). We must not wait
-      // for ever
-      synchronization_data_->async_shutdown_cv.wait_for(lk, scheduled_delay_millis_);
-    }
-  }
-}
-#  endif
 
 void BatchLogProcessor::NotifyCompletion(
     bool notify_force_flush,
@@ -292,13 +237,6 @@ void BatchLogProcessor::NotifyCompletion(
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }
-
-  // Notify the thread which is waiting on shutdown to complete.
-  if (synchronization_data->is_shutdown.load() == true)
-  {
-    synchronization_data->is_async_shutdown_notified.store(true);
-    synchronization_data->async_shutdown_cv.notify_all();
-  }
 }
 
 void BatchLogProcessor::DrainQueue()
@@ -312,12 +250,26 @@ void BatchLogProcessor::DrainQueue()
     }
 
     Export();
+  }
+}
 
-#  ifdef ENABLE_ASYNC_EXPORT
-    // Since async export is invoked due to shutdown, need to wait
-    // for async thread to complete.
-    WaitForShutdownCompletion();
-#  endif
+void BatchLogProcessor::GetWaitAdjustedTime(
+    std::chrono::microseconds &timeout,
+    std::chrono::time_point<std::chrono::system_clock> &start_time)
+{
+  auto end_time = std::chrono::system_clock::now();
+  auto offset   = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+  start_time    = end_time;
+  timeout       = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+  if (timeout > offset && timeout > std::chrono::microseconds::zero())
+  {
+    timeout -= offset;
+  }
+  else
+  {
+    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
+    timeout = std::chrono::microseconds(1);
   }
 }
 
@@ -335,21 +287,7 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     worker_thread_.join();
   }
 
-  auto worker_end_time = std::chrono::system_clock::now();
-  auto offset = std::chrono::duration_cast<std::chrono::microseconds>(worker_end_time - start_time);
-
-  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
-      timeout, std::chrono::microseconds::zero());
-  if (timeout > offset && timeout > std::chrono::microseconds::zero())
-  {
-    timeout -= offset;
-  }
-  else
-  {
-    // Some module use zero as indefinite timeout.So we can not reset timeout to zero here
-    timeout = std::chrono::microseconds(1);
-  }
-
+  GetWaitAdjustedTime(timeout, start_time);
   // Should only shutdown exporter ONCE.
   if (!already_shutdown && exporter_ != nullptr)
   {

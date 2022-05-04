@@ -40,14 +40,6 @@ struct BatchLogProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
-
-#  ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Determines whether the export happens asynchronously.
-   * Default implementation is synchronous.
-   */
-  bool is_export_async = false;
-#  endif
 };
 
 /**
@@ -72,8 +64,7 @@ public:
       std::unique_ptr<LogExporter> &&exporter,
       const size_t max_queue_size                            = 2048,
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_export_batch_size                     = 512,
-      const bool is_export_async                             = false);
+      const size_t max_export_batch_size                     = 512);
 
   /**
    * Creates a batch log processor by configuring the specified exporter and other parameters
@@ -116,9 +107,9 @@ public:
   /**
    * Class destructor which invokes the Shutdown() method.
    */
-  virtual ~BatchLogProcessor() override;
+  virtual ~BatchLogProcessor();
 
-private:
+protected:
   /**
    * The background routine performed by the worker thread.
    */
@@ -128,7 +119,7 @@ private:
    * Exports all logs to the configured exporter.
    *
    */
-  void Export();
+  virtual void Export();
 
   /**
    * Called when Shutdown() is invoked. Completely drains the queue of all log records and
@@ -136,22 +127,17 @@ private:
    */
   void DrainQueue();
 
-#  ifdef ENABLE_ASYNC_EXPORT
-  /* In case of async export, wait and notify for shutdown to be completed.*/
-  void WaitForShutdownCompletion();
-#  endif
   struct SynchronizationData
   {
     /* Synchronization primitives */
-    std::condition_variable cv, force_flush_cv, async_shutdown_cv;
-    std::mutex cv_m, force_flush_cv_m, shutdown_m, async_shutdown_m;
+    std::condition_variable cv, force_flush_cv;
+    std::mutex cv_m, force_flush_cv_m, shutdown_m;
 
     /* Important boolean flags to handle the workflow of the processor */
     std::atomic<bool> is_force_wakeup_background_worker;
     std::atomic<bool> is_force_flush_pending;
     std::atomic<bool> is_force_flush_notified;
     std::atomic<bool> is_shutdown;
-    std::atomic<bool> is_async_shutdown_notified;
   };
 
   /**
@@ -164,6 +150,9 @@ private:
   static void NotifyCompletion(bool notify_force_flush,
                                const std::shared_ptr<SynchronizationData> &synchronization_data);
 
+  void GetWaitAdjustedTime(std::chrono::microseconds &timeout,
+                           std::chrono::time_point<std::chrono::system_clock> &start_time);
+
   /* The configured backend log exporter */
   std::unique_ptr<LogExporter> exporter_;
 
@@ -171,9 +160,6 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds scheduled_delay_millis_;
   const size_t max_export_batch_size_;
-#  ifdef ENABLE_ASYNC_EXPORT
-  const bool is_export_async_;
-#  endif
   /* The buffer/queue to which the ended logs are added */
   common::CircularBuffer<Recordable> buffer_;
 

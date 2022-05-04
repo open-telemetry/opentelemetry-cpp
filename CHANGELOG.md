@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Async Batch Span/Log processor with max async support ([#1306](https://github.com/open-telemetry/opentelemetry-cpp/pull/1306))
 * [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
 
 ## [1.3.0] 2022-04-11
