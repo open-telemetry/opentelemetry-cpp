@@ -9,10 +9,12 @@ build_linux:
       set -euxo pipefail
       wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
       chmod +x bazelisk
-      sudo yum install -y zip centos-release-scl-rh
-      sudo yum --enablerepo=centos-sclo-rh-testing install -y devtoolset-11-gcc devtoolset-11-gcc-c++
-      PATH=/opt/rh/devtoolset-11/root/usr/bin:$PATH
-      CC=/opt/rh/devtoolset-11/root/usr/bin/gcc CXX=/opt/rh/devtoolset-11/root/usr/bin/g++ ./bazelisk build //examples/otlp:libdummy_remove_me
+      .yamato/bee steve internal-unpack public 7za-linux-x64/904b71ca3f79_0d0f2cf7ea23d00d2ba5d151c735ef9f03ed99a9e451c6dcf3a198cbedf69861.zip 7z
+      export BEE_INTERNAL_STEVEDORE_7ZA=7z/7za
+      .yamato/bee steve internal-unpack public toolchain-llvm-centos-amd64/9.0.1-7.7.1908_9a2f0527b0c16f2524d24e372c7ebb8735e2e85ec99b6914f2a0a00c1e74d34d.7z TC
+      PATH=TC/bin:$PATH
+      sudo yum install -y zip
+      CC=`pwd`/TC/bin/clang CXX=`pwd`/TC/bin/clang++ ./bazelisk build //examples/otlp:libdummy_remove_me
       rm -rf trick opentelemetry-cpp-lin-amd64.zip
       mkdir -p trick/lib
       find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
