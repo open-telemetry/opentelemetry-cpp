@@ -21,7 +21,11 @@ public:
               const opentelemetry::context::Context &context) noexcept override
   {
     auto baggage = opentelemetry::baggage::GetBaggage(context);
-    carrier.Set(kBaggageHeader, baggage->ToHeader());
+    auto header  = baggage->ToHeader();
+    if (header.size())
+    {
+      carrier.Set(kBaggageHeader, header);
+    }
   }
 
   context::Context Extract(const opentelemetry::context::propagation::TextMapCarrier &carrier,
@@ -29,7 +33,15 @@ public:
   {
     nostd::string_view baggage_str = carrier.Get(opentelemetry::baggage::kBaggageHeader);
     auto baggage                   = opentelemetry::baggage::Baggage::FromHeader(baggage_str);
-    return opentelemetry::baggage::SetBaggage(context, baggage);
+
+    if (baggage->ToHeader().size())
+    {
+      return opentelemetry::baggage::SetBaggage(context, baggage);
+    }
+    else
+    {
+      return context;
+    }
   }
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
