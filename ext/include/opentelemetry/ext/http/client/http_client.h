@@ -232,6 +232,8 @@ public:
 
   virtual bool FinishAllSessions() noexcept = 0;
 
+  virtual void SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept = 0;
+
   virtual ~HttpClient() = default;
 };
 

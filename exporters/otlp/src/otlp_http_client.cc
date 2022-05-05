@@ -649,7 +649,9 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : is_shutdown_(false), options_(options), http_client_(http_client::HttpClientFactory::Create())
-{}
+{
+  http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
+}
 
 OtlpHttpClient::~OtlpHttpClient()
 {
@@ -682,7 +684,9 @@ OtlpHttpClient::~OtlpHttpClient()
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
     : is_shutdown_(false), options_(options), http_client_(http_client)
-{}
+{
+  http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
+}
 
 // ----------------------------- HTTP Client methods ------------------------------
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(

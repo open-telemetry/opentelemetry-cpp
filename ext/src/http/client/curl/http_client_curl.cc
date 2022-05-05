@@ -211,6 +211,11 @@ bool HttpClient::FinishAllSessions() noexcept
   return true;
 }
 
+void HttpClient::SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept
+{
+  max_sessions_per_connection_ = max_requests_per_connection;
+}
+
 void HttpClient::CleanupSession(uint64_t session_id)
 {
   std::shared_ptr<Session> session;

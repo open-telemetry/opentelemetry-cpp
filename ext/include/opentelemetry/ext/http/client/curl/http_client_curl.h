@@ -76,10 +76,7 @@ public:
     AddHeader(name, value);
   }
 
-  virtual void SetUri(nostd::string_view uri) noexcept override
-  {
-    uri_ = static_cast<std::string>(uri);
-  }
+  void SetUri(nostd::string_view uri) noexcept override { uri_ = static_cast<std::string>(uri); }
 
   void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept override
   {
@@ -99,14 +96,10 @@ class Response : public opentelemetry::ext::http::client::Response
 public:
   Response() : status_code_(Http_Ok) {}
 
-  virtual const opentelemetry::ext::http::client::Body &GetBody() const noexcept override
-  {
-    return body_;
-  }
+  const opentelemetry::ext::http::client::Body &GetBody() const noexcept override { return body_; }
 
-  virtual bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
-      const noexcept override
+  bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override
   {
     for (const auto &header : headers_)
     {
@@ -118,10 +111,9 @@ public:
     return true;
   }
 
-  virtual bool ForEachHeader(
-      const nostd::string_view &name,
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
-      const noexcept override
+  bool ForEachHeader(const nostd::string_view &name,
+                     nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override
   {
     auto range = headers_.equal_range(static_cast<std::string>(name));
     for (auto it = range.first; it != range.second; ++it)
@@ -134,7 +126,7 @@ public:
     return true;
   }
 
-  virtual opentelemetry::ext::http::client::StatusCode GetStatusCode() const noexcept override
+  opentelemetry::ext::http::client::StatusCode GetStatusCode() const noexcept override
   {
     return status_code_;
   }
@@ -166,14 +158,14 @@ public:
     return http_request_;
   }
 
-  virtual void SendRequest(
+  void SendRequest(
       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept override;
 
-  virtual bool CancelSession() noexcept override;
+  bool CancelSession() noexcept override;
 
-  virtual bool FinishSession() noexcept override;
+  bool FinishSession() noexcept override;
 
-  virtual bool IsSessionActive() noexcept override
+  bool IsSessionActive() noexcept override
   {
     return is_session_active_.load(std::memory_order_acquire);
   }
@@ -291,19 +283,16 @@ public:
 
   bool FinishAllSessions() noexcept override;
 
-  void CleanupSession(uint64_t session_id);
-
-  inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
-
-  inline void SetMaxSessionsPerConnection(uint64_t max_sessions_per_connection) noexcept
-  {
-    max_sessions_per_connection_ = max_sessions_per_connection;
-  }
+  void SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept override;
 
   inline uint64_t GetMaxSessionsPerConnection() const noexcept
   {
     return max_sessions_per_connection_;
   }
+
+  void CleanupSession(uint64_t session_id);
+
+  inline CURLM *GetMultiHandle() noexcept { return multi_handle_; }
 
   void MaybeSpawnBackgroundThread();
 

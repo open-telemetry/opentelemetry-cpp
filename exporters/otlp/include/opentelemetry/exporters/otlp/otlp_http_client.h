@@ -79,7 +79,10 @@ struct OtlpHttpClientOptions
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 
   // Concurrent requests
-  std::size_t max_concurrent_requests = 8;
+  std::size_t max_concurrent_requests = 64;
+
+  // Concurrent requests
+  std::size_t max_requests_per_connection = 8;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
@@ -88,7 +91,8 @@ struct OtlpHttpClientOptions
                                bool input_console_debug,
                                std::chrono::system_clock::duration input_timeout,
                                const OtlpHeaders &input_http_headers,
-                               std::size_t input_concurrent_sessions = 8)
+                               std::size_t input_concurrent_sessions = 64,
+                               std::size_t input_max_requests_per_connection = 8)
       : url(input_url),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
@@ -96,7 +100,8 @@ struct OtlpHttpClientOptions
         console_debug(input_console_debug),
         timeout(input_timeout),
         http_headers(input_http_headers),
-        max_concurrent_requests(input_concurrent_sessions)
+        max_concurrent_requests(input_concurrent_sessions),
+        max_requests_per_connection(input_max_requests_per_connection)
   {}
 };
 
