@@ -100,7 +100,11 @@ private:
         nostd::span<char, 2>{&trace_parent[kTraceIdSize + kSpanIdSize + 5], 2});
 
     carrier.Set(kTraceParent, nostd::string_view(trace_parent, sizeof(trace_parent)));
-    carrier.Set(kTraceState, span_context.trace_state()->ToHeader());
+    const auto trace_state = span_context.trace_state()->ToHeader();
+    if (!trace_state.empty())
+    {
+      carrier.Set(kTraceState, trace_state);
+    }
   }
 
   static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent,
