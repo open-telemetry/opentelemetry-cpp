@@ -12,7 +12,7 @@ namespace trace
 {
 
 // Get Span from explicit context
-inline nostd::shared_ptr<Span> GetSpan(const opentelemetry::context::Context &context)
+inline nostd::shared_ptr<Span> GetSpan(const opentelemetry::context::Context &context) noexcept
 {
   context::ContextValue span = context.GetValue(kSpanKey);
   if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
@@ -24,7 +24,7 @@ inline nostd::shared_ptr<Span> GetSpan(const opentelemetry::context::Context &co
 
 // Set Span into explicit context
 inline context::Context SetSpan(opentelemetry::context::Context &context,
-                                nostd::shared_ptr<Span> span)
+                                nostd::shared_ptr<Span> span) noexcept
 {
   return context.SetValue(kSpanKey, span);
 }
