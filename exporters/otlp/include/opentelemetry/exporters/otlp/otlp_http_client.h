@@ -91,7 +91,7 @@ struct OtlpHttpClientOptions
                                bool input_console_debug,
                                std::chrono::system_clock::duration input_timeout,
                                const OtlpHeaders &input_http_headers,
-                               std::size_t input_concurrent_sessions = 64,
+                               std::size_t input_concurrent_sessions         = 64,
                                std::size_t input_max_requests_per_connection = 8)
       : url(input_url),
         content_type(input_content_type),
