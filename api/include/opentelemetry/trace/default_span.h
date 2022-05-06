@@ -50,13 +50,13 @@ public:
 
   void End(const EndSpanOptions & /* options */ = {}) noexcept {}
 
-  nostd::string_view ToString() { return "DefaultSpan"; }
+  nostd::string_view ToString() const noexcept { return "DefaultSpan"; }
 
-  DefaultSpan(SpanContext span_context) : span_context_(span_context) {}
+  DefaultSpan(SpanContext span_context) noexcept : span_context_(span_context) {}
 
   // movable and copiable
-  DefaultSpan(DefaultSpan &&spn) : span_context_(spn.GetContext()) {}
-  DefaultSpan(const DefaultSpan &spn) : span_context_(spn.GetContext()) {}
+  DefaultSpan(DefaultSpan &&spn) noexcept : span_context_(spn.GetContext()) {}
+  DefaultSpan(const DefaultSpan &spn) noexcept : span_context_(spn.GetContext()) {}
 
 private:
   SpanContext span_context_;
