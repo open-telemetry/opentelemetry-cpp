@@ -34,26 +34,50 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   }
 
   // initialize output vector
-  std::vector<prometheus_client::MetricFamily> output(data.size());
+  std::vector<prometheus_client::MetricFamily> output;
 
   // iterate through the vector and set result data into it
-  int i = 0;
   for (const auto &r : data)
   {
-    SetMetricFamily(*r, &output[i]);
-    i++;
+    for (const auto &instrumentation_info : r->instrumentation_info_metric_data_)
+    {
+      for (const auto &metric_data : instrumentation_info.metric_data_)
+      {
+        auto origin_name = metric_data.instrument_descriptor.name_;
+        auto sanitized   = SanitizeNames(origin_name);
+        std::puts(sanitized.c_str());
+        prometheus_client::MetricFamily metric_family;
+        metric_family.name = sanitized;
+        metric_family.help = metric_data.instrument_descriptor.description_;
+        auto time          = metric_data.start_ts.time_since_epoch();
+        for (const auto &point_data_attr : metric_data.point_data_attr_)
+        {
+          auto kind                                = getAggregationType(point_data_attr.point_data);
+          const prometheus_client::MetricType type = TranslateType(kind);
+          metric_family.type                       = type;
+          if (type == prometheus_client::MetricType::Histogram)  // Histogram
+          {
+            auto histogram_point_data =
+                nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
+            auto boundaries = histogram_point_data.boundaries_;
+            auto counts     = histogram_point_data.counts_;
+            SetData(std::vector<double>{nostd::get<double>(histogram_point_data.sum_),
+                                        (double)histogram_point_data.count_},
+                    boundaries, counts, "", time, &metric_family);
+          }
+          else  // Counter, Untyped
+          {
+            auto sum_point_data =
+                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+            SetData(values, "", type, time, &metric_family);
+          }
+        }
+        output.emplace_back(metric_family);
+      }
+    }
   }
-
   return output;
-}
-
-/**
- * Set value to metric family according to record
- */
-void PrometheusExporterUtils::SetMetricFamily(sdk::metrics::ResourceMetrics &data,
-                                              prometheus_client::MetricFamily *metric_family)
-{
-  SetMetricFamilyByAggregator(data, "", metric_family);
 }
 
 /**
@@ -70,48 +94,6 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   std::replace(name.begin(), name.end(), '-', '_');
 
   return name;
-}
-
-/**
- * Set value to metric family for different aggregator
- */
-void PrometheusExporterUtils::SetMetricFamilyByAggregator(
-    const sdk::metrics::ResourceMetrics &data,
-    std::string labels_str,
-    prometheus_client::MetricFamily *metric_family)
-{
-  for (const auto &instrumentation_info : data.instrumentation_info_metric_data_)
-  {
-    auto origin_name    = instrumentation_info.instrumentation_library_->GetName();
-    auto sanitized      = SanitizeNames(origin_name);
-    metric_family->name = sanitized;
-    for (const auto &metric_data : instrumentation_info.metric_data_)
-    {
-      auto time = metric_data.start_ts.time_since_epoch();
-      for (const auto &point_data_attr : metric_data.point_data_attr_)
-      {
-        auto kind                                = getAggregationType(point_data_attr.point_data);
-        const prometheus_client::MetricType type = TranslateType(kind);
-        metric_family->type                      = type;
-        if (type == prometheus_client::MetricType::Histogram)  // Histogram
-        {
-          auto histogram_point_data =
-              nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
-          auto boundaries = histogram_point_data.boundaries_;
-          auto counts     = histogram_point_data.counts_;
-          SetData(std::vector<double>{nostd::get<double>(histogram_point_data.sum_),
-                                      (double)histogram_point_data.count_},
-                  boundaries, counts, labels_str, time, metric_family);
-        }
-        else  // Counter, Untyped
-        {
-          auto sum_point_data = nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
-          std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-          SetData(values, labels_str, type, time, metric_family);
-        }
-      }
-    }
-  }
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
