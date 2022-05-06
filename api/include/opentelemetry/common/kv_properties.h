@@ -33,7 +33,7 @@ class KeyValueStringTokenizer
 public:
   KeyValueStringTokenizer(
       nostd::string_view str,
-      const KeyValueStringTokenizerOptions &opts = KeyValueStringTokenizerOptions())
+      const KeyValueStringTokenizerOptions &opts = KeyValueStringTokenizerOptions()) noexcept
       : str_(str), opts_(opts), index_(0)
   {}
 
@@ -48,7 +48,7 @@ public:
   // @param key : key in kv pair
   // @param key : value in kv pair
   // @returns true if next kv pair was found, false otherwise.
-  bool next(bool &valid_kv, nostd::string_view &key, nostd::string_view &value)
+  bool next(bool &valid_kv, nostd::string_view &key, nostd::string_view &value) noexcept
   {
     valid_kv = true;
     while (index_ < str_.size())
@@ -170,13 +170,13 @@ public:
     }
 
     // Gets the key associated with this entry.
-    nostd::string_view GetKey() const { return key_.get(); }
+    nostd::string_view GetKey() const noexcept { return key_.get(); }
 
     // Gets the value associated with this entry.
-    nostd::string_view GetValue() const { return value_.get(); }
+    nostd::string_view GetValue() const noexcept { return value_.get(); }
 
     // Sets the value for this entry. This overrides the previous value.
-    void SetValue(nostd::string_view value) { value_ = CopyStringToPointer(value); }
+    void SetValue(nostd::string_view value) noexcept { value_ = CopyStringToPointer(value); }
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
@@ -206,15 +206,15 @@ public:
 public:
   // Create Key-value list of given size
   // @param size : Size of list.
-  KeyValueProperties(size_t size)
+  KeyValueProperties(size_t size) noexcept
       : num_entries_(0), max_num_entries_(size), entries_(new Entry[size])
   {}
 
   // Create Empty Key-Value list
-  KeyValueProperties() : num_entries_(0), max_num_entries_(0), entries_(nullptr) {}
+  KeyValueProperties() noexcept : num_entries_(0), max_num_entries_(0), entries_(nullptr) {}
 
   template <class T, class = typename std::enable_if<detail::is_key_value_iterable<T>::value>::type>
-  KeyValueProperties(const T &keys_and_values)
+  KeyValueProperties(const T &keys_and_values) noexcept
       : num_entries_(0),
         max_num_entries_(keys_and_values.size()),
         entries_(new Entry[max_num_entries_])
@@ -227,7 +227,7 @@ public:
   }
 
   // Adds new kv pair into kv properties
-  void AddEntry(nostd::string_view key, nostd::string_view value)
+  void AddEntry(nostd::string_view key, nostd::string_view value) noexcept
   {
     if (num_entries_ < max_num_entries_)
     {
@@ -238,7 +238,7 @@ public:
 
   // Returns all kv pair entries
   bool GetAllEntries(
-      nostd::function_ref<bool(nostd::string_view, nostd::string_view)> callback) const
+      nostd::function_ref<bool(nostd::string_view, nostd::string_view)> callback) const noexcept
   {
     for (size_t i = 0; i < num_entries_; i++)
     {
@@ -252,7 +252,7 @@ public:
   }
 
   // Return value for key if exists, return false otherwise
-  bool GetValue(nostd::string_view key, std::string &value) const
+  bool GetValue(nostd::string_view key, std::string &value) const noexcept
   {
     for (size_t i = 0; i < num_entries_; i++)
     {

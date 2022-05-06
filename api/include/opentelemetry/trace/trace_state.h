@@ -53,7 +53,7 @@ public:
    * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
    * @return TraceState A new TraceState instance or DEFAULT
    */
-  static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header)
+  static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header) noexcept
   {
 
     common::KeyValueStringTokenizer kv_str_tokenizer(header);
@@ -89,7 +89,7 @@ public:
   /**
    * Creates a w3c tracestate header from TraceState object
    */
-  std::string ToHeader()
+  std::string ToHeader() const noexcept
   {
     std::string header_s;
     bool first = true;
@@ -135,7 +135,8 @@ public:
    *
    * If the existing object has maximum list members, it's copy is returned.
    */
-  nostd::shared_ptr<TraceState> Set(const nostd::string_view &key, const nostd::string_view &value)
+  nostd::shared_ptr<TraceState> Set(const nostd::string_view &key,
+                                    const nostd::string_view &value) noexcept
   {
     auto curr_size = kv_properties_->Size();
     if (!IsValidKey(key) || !IsValidValue(value))
@@ -168,7 +169,7 @@ public:
    * @returns empty TraceState object if key is invalid
    * @returns copy of original TraceState object if key is not present (??)
    */
-  nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key)
+  nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key) noexcept
   {
     if (!IsValidKey(key))
     {
