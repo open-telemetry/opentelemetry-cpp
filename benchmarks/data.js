@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1651847697603,
+  "lastUpdate": 1651847699305,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -34042,6 +34042,54 @@ window.BENCHMARK_DATA = {
             "value": 2478678.40273371,
             "unit": "ns/iter",
             "extra": "iterations: 257\ncpu: 469377.43190661486 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "99a72e1ae06ea97a189e5fa00ef7d1d76af39913",
+          "message": "Add noexcept/const qualifier at missing places for Trace API. (#1374)\n\n* fix noxcept\r\n\r\n* fix etw",
+          "timestamp": "2022-05-06T07:21:22-07:00",
+          "tree_id": "c84b4fdddbfa6817f6775f00e15b2d3ee58687c5",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/99a72e1ae06ea97a189e5fa00ef7d1d76af39913"
+        },
+        "date": 1651847695147,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 31.437713928703463,
+            "unit": "ns/iter",
+            "extra": "iterations: 4443000\ncpu: 31.233310826018457 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 85.11259442283993,
+            "unit": "ns/iter",
+            "extra": "iterations: 1344000\ncpu: 85.00461309523808 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 782.04091034788,
+            "unit": "ns/iter",
+            "extra": "iterations: 179000\ncpu: 779.2541899441339 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2459364.888081298,
+            "unit": "ns/iter",
+            "extra": "iterations: 321\ncpu: 472097.19626168255 ns\nthreads: 1"
           }
         ]
       }
