@@ -26,7 +26,7 @@ namespace common
 class StringUtil
 {
 public:
-  static nostd::string_view Trim(nostd::string_view str, size_t left, size_t right)
+  static nostd::string_view Trim(nostd::string_view str, size_t left, size_t right) noexcept
   {
     while (str[static_cast<std::size_t>(left)] == ' ' && left <= right)
     {
@@ -39,7 +39,7 @@ public:
     return str.substr(left, 1 + right - left);
   }
 
-  static nostd::string_view Trim(nostd::string_view str)
+  static nostd::string_view Trim(nostd::string_view str) noexcept
   {
     if (str.empty())
     {
