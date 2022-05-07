@@ -13,6 +13,15 @@ Help()
    echo "g     gRPC git tag"
    echo "j     Parallel jobs"
    echo
+   echo "how to use:"
+   echo
+   echo "docker create -ti --name otel otel-cpp-<base_image> bash"
+   echo "docker cp otel:/ ./"
+   echo "docker rm -f otel"
+   echo
+   echo "or:"
+   echo
+   echo "COPY --from=otel-cpp-<base_image> /usr"
 }
 
 while getopts ":h:b:o:g:j:" option; do
