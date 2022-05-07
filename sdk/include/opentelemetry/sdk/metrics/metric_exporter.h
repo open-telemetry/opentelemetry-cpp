@@ -29,7 +29,7 @@ public:
   virtual ~MetricExporter() = default;
 
   /**
-   * Exports a batch of metrics recordables. This method must not be called
+   * Exports a batch of metrics data. This method must not be called
    * concurrently for the same exporter instance.
    * @param data metrics data
    */
