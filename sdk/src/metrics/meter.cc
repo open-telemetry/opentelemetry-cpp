@@ -189,19 +189,11 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;
-        if (view.GetName().empty())
-        {
-          view_instr_desc.name_ = instrument_descriptor.name_;
-        }
-        else
+        if (!view.GetName().empty())
         {
           view_instr_desc.name_ = view.GetName();
         }
-        if (view.GetDescription().empty())
-        {
-          view_instr_desc.description_ = instrument_descriptor.description_;
-        }
-        else
+        if (!view.GetDescription().empty())
         {
           view_instr_desc.description_ = view.GetDescription();
         }

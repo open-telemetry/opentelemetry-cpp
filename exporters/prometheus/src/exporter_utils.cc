@@ -45,7 +45,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       {
         auto origin_name = metric_data.instrument_descriptor.name_;
         auto sanitized   = SanitizeNames(origin_name);
-        std::puts(sanitized.c_str());
         prometheus_client::MetricFamily metric_family;
         metric_family.name = sanitized;
         metric_family.help = metric_data.instrument_descriptor.description_;
