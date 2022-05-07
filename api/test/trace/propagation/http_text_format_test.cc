@@ -55,8 +55,8 @@ TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
   context::Context ctx2 = format.Extract(carrier, ctx1);
   TextMapCarrierTest carrier2;
   format.Inject(carrier2, ctx2);
-  EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
-  EXPECT_FALSE(carrier.headers_.count("tracestate") > 0);
+  EXPECT_TRUE(carrier2.headers_.count("traceparent") > 0);
+  EXPECT_FALSE(carrier2.headers_.count("tracestate") > 0);
 }
 
 TEST(TextMapPropagatorTest, PropogateTraceState)
@@ -72,8 +72,8 @@ TEST(TextMapPropagatorTest, PropogateTraceState)
   TextMapCarrierTest carrier2;
   format.Inject(carrier2, ctx2);
 
-  EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
-  EXPECT_TRUE(carrier.headers_.count("tracestate") > 0);
+  EXPECT_TRUE(carrier2.headers_.count("traceparent") > 0);
+  EXPECT_TRUE(carrier2.headers_.count("tracestate") > 0);
   EXPECT_EQ(carrier2.headers_["tracestate"], "congo=t61rcWkgMzE");
 }
 

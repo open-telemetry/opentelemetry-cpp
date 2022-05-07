@@ -16,7 +16,7 @@ class TestProvider : public TracerProvider
 {
   nostd::shared_ptr<Tracer> GetTracer(nostd::string_view library_name,
                                       nostd::string_view library_version,
-                                      nostd::string_view schema_url) override
+                                      nostd::string_view schema_url) noexcept override
   {
     return nostd::shared_ptr<Tracer>(nullptr);
   }

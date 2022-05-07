@@ -980,7 +980,7 @@ public:
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view name,
       nostd::string_view args       = "",
-      nostd::string_view schema_url = "") override
+      nostd::string_view schema_url = "") noexcept override
   {
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
