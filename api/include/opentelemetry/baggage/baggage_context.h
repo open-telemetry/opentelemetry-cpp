@@ -16,7 +16,7 @@ namespace baggage
 static const std::string kBaggageHeader = "baggage";
 
 inline nostd::shared_ptr<opentelemetry::baggage::Baggage> GetBaggage(
-    const opentelemetry::context::Context &context)
+    const opentelemetry::context::Context &context) noexcept
 {
   context::ContextValue context_value = context.GetValue(kBaggageHeader);
   if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::baggage::Baggage>>(context_value))
@@ -28,8 +28,9 @@ inline nostd::shared_ptr<opentelemetry::baggage::Baggage> GetBaggage(
   return empty_baggage;
 }
 
-inline context::Context SetBaggage(opentelemetry::context::Context &context,
-                                   nostd::shared_ptr<opentelemetry::baggage::Baggage> baggage)
+inline context::Context SetBaggage(
+    opentelemetry::context::Context &context,
+    nostd::shared_ptr<opentelemetry::baggage::Baggage> baggage) noexcept
 {
   return context.SetValue(kBaggageHeader, baggage);
 }
