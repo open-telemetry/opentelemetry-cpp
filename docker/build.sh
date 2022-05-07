@@ -56,7 +56,7 @@ docker build --build-arg BASE_IMAGE=base-${base_image}-dev \
     -t grpc-${base_image} -f Dockerfile .
 popd
 
-docker build --build-arg BASE_IMAGE=base-${base_image}-dev \
+docker build --build-arg BASE_IMAGE=${base_image} \
     --build-arg CORES=${cores} \
     --build-arg OTEL_GIT_TAG=${otel_git_tag} \
     -t otel-cpp-${base_image} -f Dockerfile .

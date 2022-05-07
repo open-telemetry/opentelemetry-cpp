@@ -1,11 +1,14 @@
 ARG BASE_IMAGE=ubuntu:latest
-FROM ${BASE_IMAGE} AS otel-cpp
 
-ARG BASE_IMAGE
+ARG GRPC_IMAGE=grpc-${BASE_IMAGE}
+FROM ${GRPC_IMAGE} as grpc
+
+FROM base-${BASE_IMAGE}-dev AS otel-cpp
+
 ARG CORES=${nproc}
 ARG OTEL_GIT_TAG=v1.3.0
 
-COPY --from=grpc-${BASE_IMAGE} / /usr/local
+COPY --from=grpc / /usr/local
 
 #install opentelemetry-cpp
 RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
