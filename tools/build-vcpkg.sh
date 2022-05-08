@@ -1,23 +1,26 @@
 #!/bin/bash
 export PATH=/usr/local/bin:$PATH
-DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+DIR="$(
+  cd "$(dirname "$0")" >/dev/null 2>&1
+  pwd -P
+)"
 WORKSPACE_ROOT=$DIR/..
 
 export VCPKG_ROOT=$WORKSPACE_ROOT/tools/vcpkg
 export PATH=$VCPKG_ROOT:$PATH
 
-if [[ ! -f $DIR/vcpkg/vcpkg ]] ; then
+if [[ ! -f $DIR/vcpkg/vcpkg ]]; then
   pushd $DIR/vcpkg
   ./bootstrap-vcpkg.sh
   popd
 fi
 
-vcpkg install gtest
-vcpkg install benchmark
-vcpkg install ms-gsl
-vcpkg install nlohmann-json
-vcpkg install abseil
-vcpkg install protobuf
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install gtest
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install benchmark
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install ms-gsl
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install nlohmann-json
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install abseil
+vcpkg "--vcpkg-root=$VCPKG_ROOT" install protobuf
 
 cd $WORKSPACE_ROOT
 export USE_VCPKG=1

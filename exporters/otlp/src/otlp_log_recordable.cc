@@ -7,6 +7,14 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
+#  ifndef likely
+#    ifdef __GNUC__
+#      define likely(x) __builtin_expect(!!(x), 1)
+#    else
+#      define likely(x) !!(x)
+#    endif
+#  endif
+
 namespace nostd = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -167,11 +175,6 @@ void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noex
   }
 }
 
-void OtlpLogRecordable::SetName(nostd::string_view name) noexcept
-{
-  log_record_.set_name(name.data(), name.size());
-}
-
 void OtlpLogRecordable::SetBody(nostd::string_view message) noexcept
 {
   log_record_.mutable_body()->set_string_value(message.data(), message.size());
@@ -180,6 +183,16 @@ void OtlpLogRecordable::SetBody(nostd::string_view message) noexcept
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
+}
+
+const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() const noexcept
+{
+  if (likely(nullptr != resource_))
+  {
+    return *resource_;
+  }
+
+  return opentelemetry::sdk::resource::Resource::GetDefault();
 }
 
 void OtlpLogRecordable::SetAttribute(nostd::string_view key,
@@ -215,7 +228,17 @@ void OtlpLogRecordable::SetInstrumentationLibrary(
 const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
 OtlpLogRecordable::GetInstrumentationLibrary() const noexcept
 {
-  return *instrumentation_library_;
+  if (likely(nullptr != instrumentation_library_))
+  {
+    return *instrumentation_library_;
+  }
+
+  static opentelemetry::nostd::unique_ptr<
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+      default_instrumentation =
+          opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+              "default", "1.0.0", "https://opentelemetry.io/schemas/1.11.0");
+  return *default_instrumentation;
 }
 }  // namespace otlp
 }  // namespace exporter

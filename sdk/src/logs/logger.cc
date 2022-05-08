@@ -36,7 +36,6 @@ const nostd::string_view Logger::GetName() noexcept
  * if the user does not specify them.
  */
 void Logger::Log(opentelemetry::logs::Severity severity,
-                 nostd::string_view name,
                  nostd::string_view body,
                  const common::KeyValueIterable &attributes,
                  trace_api::TraceId trace_id,
@@ -63,7 +62,6 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   // Populate recordable fields
   recordable->SetTimestamp(timestamp);
   recordable->SetSeverity(severity);
-  recordable->SetName(name);
   recordable->SetBody(body);
   recordable->SetInstrumentationLibrary(GetInstrumentationLibrary());
 

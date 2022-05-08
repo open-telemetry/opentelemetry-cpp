@@ -125,12 +125,6 @@ public:
   }
 
   /**
-   * Set name for this log
-   * @param name the name to set
-   */
-  void SetName(nostd::string_view name) noexcept override { json_["name"] = name.data(); }
-
-  /**
    * Set body field for this log.
    * @param message the body to set
    */
@@ -214,6 +208,7 @@ public:
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept
   {
+    json_["name"]            = instrumentation_library.GetName();
     instrumentation_library_ = &instrumentation_library;
   }
 

@@ -88,9 +88,20 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   }
   */
 
-  // If no logger with that name exists yet, create it and add it to the map of loggers
-  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
-                                                                    schema_url);
+  // For log sources which define a logger name (e.g. Java Logger Name) the Logger Name SHOULD be
+  // recorded as the Instrumentation Scope name.
+  opentelemetry::nostd::unique_ptr<instrumentationlibrary::InstrumentationLibrary> lib;
+  if (library_name.empty())
+  {
+    lib = instrumentationlibrary::InstrumentationLibrary::Create(logger_name, library_version,
+                                                                 schema_url);
+  }
+  else
+  {
+    lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
+                                                                 schema_url);
+  }
+
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));
   return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};

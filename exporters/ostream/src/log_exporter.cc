@@ -159,8 +159,7 @@ sdk::common::ExportResult OStreamLogExporter::Export(
       sout_ << opentelemetry::logs::SeverityNumToText[severity_index] << "\n";
     }
 
-    sout_ << "  name          : " << log_record->GetName() << "\n"
-          << "  body          : " << log_record->GetBody() << "\n"
+    sout_ << "  body          : " << log_record->GetBody() << "\n"
           << "  resource      : ";
 
     printMap(log_record->GetResource().GetAttributes(), sout_);

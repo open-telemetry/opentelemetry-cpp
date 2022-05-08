@@ -41,7 +41,6 @@ public:
    * creates a log message with the specific parameters passed.
    *
    * @param severity the severity level of the log event.
-   * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
@@ -57,7 +56,6 @@ public:
    * in order to create a log record.
    */
   virtual void Log(Severity severity,
-                   nostd::string_view name,
                    nostd::string_view body,
                    const common::KeyValueIterable &attributes,
                    trace::TraceId trace_id,
@@ -73,7 +71,6 @@ public:
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity,
-           nostd::string_view name,
            nostd::string_view body,
            const T &attributes,
            trace::TraceId trace_id,
@@ -81,12 +78,11 @@ public:
            trace::TraceFlags trace_flags,
            common::SystemTimestamp timestamp) noexcept
   {
-    Log(severity, name, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id,
-        trace_flags, timestamp);
+    Log(severity, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id, trace_flags,
+        timestamp);
   }
 
   void Log(Severity severity,
-           nostd::string_view name,
            nostd::string_view body,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
            trace::TraceId trace_id,
@@ -94,7 +90,7 @@ public:
            trace::TraceFlags trace_flags,
            common::SystemTimestamp timestamp) noexcept
   {
-    return this->Log(severity, name, body,
+    return this->Log(severity, body,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                          attributes.begin(), attributes.end()},
                      trace_id, span_id, trace_flags, timestamp);
@@ -109,18 +105,7 @@ public:
    */
   void Log(Severity severity, nostd::string_view message) noexcept
   {
-    this->Log(severity, "", message, {}, {}, {}, {}, std::chrono::system_clock::now());
-  }
-
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Log(Severity severity, nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(severity, name, message, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, {}, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -132,20 +117,20 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity, const T &attributes) noexcept
   {
-    this->Log(severity, "", "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
    * Writes a log.
    * @param severity The severity of the log
-   * @param name The name of the log
+   * @param message The message to log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
+  void Log(Severity severity, nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(severity, name, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -157,35 +142,46 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, "", "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
    * Writes a log.
    * @param severity The severity of the log
-   * @param name The name of the log
+   * @param message The message to log
    * @param attributes The attributes of the log as an initializer list
    */
   void Log(Severity severity,
-           nostd::string_view name,
+           nostd::string_view message,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, name, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
    * Writes a log.
    * @param severity The severity of the log
-   * @param name The name of the log
+   * @param attributes The attributes, stored as a 2D list of key/value pairs, that are associated
+   * with the log event
+   */
+  void Log(Severity severity, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+  }
+
+  /**
+   * Writes a log.
+   * @param severity The severity of the log
+   * @param message The message to log
    * @param attributes The attributes, stored as a 2D list of key/value pairs, that are associated
    * with the log event
    */
   void Log(Severity severity,
-           nostd::string_view name,
-           common::KeyValueIterable &attributes) noexcept
+           nostd::string_view message,
+           const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, name, {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /** Trace severity overloads **/
@@ -195,16 +191,6 @@ public:
    * @param message The message to log
    */
   void Trace(nostd::string_view message) noexcept { this->Log(Severity::kTrace, message); }
-
-  /**
-   * Writes a log with a severity of trace.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Trace(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kTrace, name, message);
-  }
 
   /**
    * Writes a log with a severity of trace.
@@ -219,14 +205,14 @@ public:
 
   /**
    * Writes a log with a severity of trace.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Trace(nostd::string_view name, const T &attributes) noexcept
+  void Trace(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kTrace, name, attributes);
+    this->Log(Severity::kTrace, message, attributes);
   }
 
   /**
@@ -241,14 +227,14 @@ public:
 
   /**
    * Writes a log with a severity of trace.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Trace(nostd::string_view name,
+  void Trace(nostd::string_view message,
              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                  attributes) noexcept
   {
-    this->Log(Severity::kTrace, name, attributes);
+    this->Log(Severity::kTrace, message, attributes);
   }
 
   /** Debug severity overloads **/
@@ -258,16 +244,6 @@ public:
    * @param message The message to log
    */
   void Debug(nostd::string_view message) noexcept { this->Log(Severity::kDebug, message); }
-
-  /**
-   * Writes a log with a severity of debug.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Debug(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kDebug, name, message);
-  }
 
   /**
    * Writes a log with a severity of debug.
@@ -282,14 +258,14 @@ public:
 
   /**
    * Writes a log with a severity of debug.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Debug(nostd::string_view name, const T &attributes) noexcept
+  void Debug(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kDebug, name, attributes);
+    this->Log(Severity::kDebug, message, attributes);
   }
 
   /**
@@ -304,14 +280,14 @@ public:
 
   /**
    * Writes a log with a severity of debug.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Debug(nostd::string_view name,
+  void Debug(nostd::string_view message,
              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                  attributes) noexcept
   {
-    this->Log(Severity::kDebug, name, attributes);
+    this->Log(Severity::kDebug, message, attributes);
   }
 
   /** Info severity overloads **/
@@ -321,16 +297,6 @@ public:
    * @param message The message to log
    */
   void Info(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
-
-  /**
-   * Writes a log with a severity of info.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Info(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kInfo, name, message);
-  }
 
   /**
    * Writes a log with a severity of info.
@@ -345,14 +311,14 @@ public:
 
   /**
    * Writes a log with a severity of info.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Info(nostd::string_view name, const T &attributes) noexcept
+  void Info(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kInfo, name, attributes);
+    this->Log(Severity::kInfo, message, attributes);
   }
 
   /**
@@ -367,14 +333,14 @@ public:
 
   /**
    * Writes a log with a severity of info.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Info(nostd::string_view name,
+  void Info(nostd::string_view message,
             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                 attributes) noexcept
   {
-    this->Log(Severity::kInfo, name, attributes);
+    this->Log(Severity::kInfo, message, attributes);
   }
 
   /** Warn severity overloads **/
@@ -384,16 +350,6 @@ public:
    * @param message The message to log
    */
   void Warn(nostd::string_view message) noexcept { this->Log(Severity::kWarn, message); }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Warn(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kWarn, name, message);
-  }
 
   /**
    * Writes a log with a severity of warn.
@@ -408,14 +364,14 @@ public:
 
   /**
    * Writes a log with a severity of warn.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Warn(nostd::string_view name, const T &attributes) noexcept
+  void Warn(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kWarn, name, attributes);
+    this->Log(Severity::kWarn, message, attributes);
   }
 
   /**
@@ -430,14 +386,14 @@ public:
 
   /**
    * Writes a log with a severity of warn.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Warn(nostd::string_view name,
+  void Warn(nostd::string_view message,
             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                 attributes) noexcept
   {
-    this->Log(Severity::kWarn, name, attributes);
+    this->Log(Severity::kWarn, message, attributes);
   }
 
   /** Error severity overloads **/
@@ -447,16 +403,6 @@ public:
    * @param message The message to log
    */
   void Error(nostd::string_view message) noexcept { this->Log(Severity::kError, message); }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Error(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kError, name, message);
-  }
 
   /**
    * Writes a log with a severity of error.
@@ -471,14 +417,14 @@ public:
 
   /**
    * Writes a log with a severity of error.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Error(nostd::string_view name, const T &attributes) noexcept
+  void Error(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kError, name, attributes);
+    this->Log(Severity::kError, message, attributes);
   }
 
   /**
@@ -493,14 +439,14 @@ public:
 
   /**
    * Writes a log with a severity of error.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Error(nostd::string_view name,
+  void Error(nostd::string_view message,
              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                  attributes) noexcept
   {
-    this->Log(Severity::kError, name, attributes);
+    this->Log(Severity::kError, message, attributes);
   }
 
   /** Fatal severity overloads **/
@@ -510,16 +456,6 @@ public:
    * @param message The message to log
    */
   void Fatal(nostd::string_view message) noexcept { this->Log(Severity::kFatal, message); }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  void Fatal(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kFatal, name, message);
-  }
 
   /**
    * Writes a log with a severity of fatal.
@@ -534,14 +470,14 @@ public:
 
   /**
    * Writes a log with a severity of fatal.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Fatal(nostd::string_view name, const T &attributes) noexcept
+  void Fatal(nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(Severity::kFatal, name, attributes);
+    this->Log(Severity::kFatal, message, attributes);
   }
 
   /**
@@ -556,14 +492,14 @@ public:
 
   /**
    * Writes a log with a severity of fatal.
-   * @param name The name of the log
+   * @param message The message of the log
    * @param attributes The attributes of the log as an initializer list
    */
-  void Fatal(nostd::string_view name,
+  void Fatal(nostd::string_view message,
              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                  attributes) noexcept
   {
-    this->Log(Severity::kFatal, name, attributes);
+    this->Log(Severity::kFatal, message, attributes);
   }
 };
 }  // namespace logs

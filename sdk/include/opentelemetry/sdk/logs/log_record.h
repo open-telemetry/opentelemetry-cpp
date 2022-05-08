@@ -31,7 +31,6 @@ private:
   opentelemetry::logs::Severity severity_                 = opentelemetry::logs::Severity::kInvalid;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   common::AttributeMap attributes_map_;
-  std::string name_;
   std::string body_;  // Currently a simple string, but should be changed to "Any" type
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
@@ -49,12 +48,6 @@ public:
   {
     severity_ = severity;
   }
-
-  /**
-   * Set name for this log
-   * @param name the name to set
-   */
-  void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
 
   /**
    * Set body field for this log.
@@ -126,12 +119,6 @@ public:
    * @return the severity for this log
    */
   opentelemetry::logs::Severity GetSeverity() const noexcept { return severity_; }
-
-  /**
-   * Get the name of this log
-   * @return the name of  this log
-   */
-  std::string GetName() const noexcept { return name_; }
 
   /**
    * Get the body of this log

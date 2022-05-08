@@ -26,7 +26,7 @@ namespace trace  = opentelemetry::trace;
 TEST(Logger, GetLoggerDefault)
 {
   auto lp = Provider::GetLoggerProvider();
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
   auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
@@ -41,7 +41,7 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   // GetLogger(name, list(args))
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   lp->GetLogger("NoopLoggerWithArgs", args, "opentelelemtry_library", "", schema_url);
 
   // GetLogger(name, string options)
@@ -52,7 +52,7 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
 TEST(Logger, LogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
 
   // Create a map to test the logs with
@@ -60,7 +60,7 @@ TEST(Logger, LogMethodOverloads)
 
   // Log overloads
   logger->Log(Severity::kTrace, "Test log message");
-  logger->Log(Severity::kInfo, "Logging a message", "Test log message");
+  logger->Log(Severity::kInfo, "Test log message");
   logger->Log(Severity::kDebug, m);
   logger->Log(Severity::kWarn, "Logging a map", m);
   logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
@@ -68,11 +68,35 @@ TEST(Logger, LogMethodOverloads)
 
   // Severity methods
   logger->Trace("Test log message");
-  logger->Debug("Logging a message", "Test log message");
+  logger->Trace("Test log message", m);
+  logger->Trace("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Trace(m);
+  logger->Trace({{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug("Test log message");
+  logger->Debug("Test log message", m);
+  logger->Debug("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug(m);
+  logger->Debug({{"key1", "value 1"}, {"key2", 2}});
+  logger->Info("Test log message");
+  logger->Info("Test log message", m);
+  logger->Info("Test log message", {{"key1", "value 1"}, {"key2", 2}});
   logger->Info(m);
-  logger->Warn("Logging a map", m);
+  logger->Info({{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn("Test log message");
+  logger->Warn("Test log message", m);
+  logger->Warn("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn(m);
+  logger->Warn({{"key1", "value 1"}, {"key2", 2}});
+  logger->Error("Test log message");
+  logger->Error("Test log message", m);
+  logger->Error("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Error(m);
   logger->Error({{"key1", "value 1"}, {"key2", 2}});
-  logger->Fatal("Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal("Test log message");
+  logger->Fatal("Test log message", m);
+  logger->Fatal("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal(m);
+  logger->Fatal({{"key1", "value 1"}, {"key2", 2}});
 }
 
 // Define a basic Logger class
@@ -122,7 +146,7 @@ TEST(Logger, PushLoggerImplementation)
   auto lp = Provider::GetLoggerProvider();
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
-  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }

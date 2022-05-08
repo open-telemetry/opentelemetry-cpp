@@ -13,6 +13,8 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
+#include <unordered_map>
+
 namespace nostd = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,6 +22,29 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+struct InstrumentationLibraryPointerHasher
+{
+  std::size_t operator()(const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+                             *instrumentation) const noexcept
+  {
+    return instrumentation->HashCode();
+  }
+};
+
+struct InstrumentationLibraryPointerEqual
+{
+  std::size_t operator()(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *left,
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *right)
+      const noexcept
+  {
+    return *left == *right;
+  }
+};
+}  // namespace
 
 //
 // See `attribute_value.h` for details.
@@ -285,26 +310,48 @@ void OtlpRecordableUtils::PopulateRequest(
     return;
   }
 
+  using logs_index_by_instrumentation_type =
+      std::unordered_map<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *,
+                         std::list<std::unique_ptr<OtlpLogRecordable>>,
+                         InstrumentationLibraryPointerHasher, InstrumentationLibraryPointerEqual>;
+  std::unordered_map<const opentelemetry::sdk::resource::Resource *,
+                     logs_index_by_instrumentation_type>
+      logs_index_by_resource;
+
   for (auto &recordable : logs)
   {
-    auto resource_logs       = request->add_resource_logs();
-    auto instrumentation_lib = resource_logs->add_instrumentation_library_logs();
-
     auto rec =
         std::unique_ptr<OtlpLogRecordable>(static_cast<OtlpLogRecordable *>(recordable.release()));
+    auto instrumentation = &rec->GetInstrumentationLibrary();
+    auto resource        = &rec->GetResource();
 
-    // TODO schema url
-    *resource_logs->mutable_resource() = rec->ProtoResource();
+    logs_index_by_resource[resource][instrumentation].emplace_back(std::move(rec));
+  }
 
-    // TODO schema url
-    // resource_logs->set_schema_url(rec->GetResourceSchemaURL());
+  for (auto &input_resource_log : logs_index_by_resource)
+  {
+    auto output_resource_log = request->add_resource_logs();
+    for (auto &input_scope_log : input_resource_log.second)
+    {
+      auto output_scope_log = output_resource_log->add_scope_logs();
+      for (auto &input_log_record : input_scope_log.second)
+      {
+        if (!output_resource_log->has_resource())
+        {
+          *output_resource_log->mutable_resource() = input_log_record->ProtoResource();
+          output_resource_log->set_schema_url(input_resource_log.first->GetSchemaURL());
+        }
 
-    *instrumentation_lib->add_logs() = std::move(rec->log_record());
-    // TODO instrumentation_library
-    // *instrumentation_lib->mutable_instrumentation_library() =
-    // rec->GetProtoInstrumentationLibrary();
-    // TODO schema data
-    // instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
+        if (!output_scope_log->has_scope())
+        {
+          output_scope_log->mutable_scope()->set_name(input_scope_log.first->GetName());
+          output_scope_log->mutable_scope()->set_version(input_scope_log.first->GetVersion());
+          output_scope_log->set_schema_url(input_scope_log.first->GetSchemaURL());
+        }
+
+        *output_scope_log->add_log_records() = std::move(input_log_record->log_record());
+      }
+    }
   }
 }
 #endif
