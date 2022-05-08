@@ -292,7 +292,10 @@ endif()
 
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
-  find_package(Protobuf)
+  find_package(Protobuf QUIET CONFIG)
+  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND))
+    find_package(Protobuf)
+  endif()
   if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
                                                        CACHE{WITH_OTLP_GRPC}))
     find_package(gRPC)
