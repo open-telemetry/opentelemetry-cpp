@@ -3,7 +3,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
   set(needs_proto_download FALSE)
 else()
   if("${opentelemetry-proto}" STREQUAL "")
-    set(opentelemetry-proto "main")
+    set(opentelemetry-proto "v0.17.0")
   endif()
   include(ExternalProject)
   ExternalProject_Add(

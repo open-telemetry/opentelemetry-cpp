@@ -105,7 +105,6 @@ class TestLogger : public Logger
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
   void Log(Severity severity,
-           string_view name,
            string_view body,
            const common::KeyValueIterable &attributes,
            trace::TraceId trace_id,

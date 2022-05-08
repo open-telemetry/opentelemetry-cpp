@@ -13,6 +13,7 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
+#include <list>
 #include <unordered_map>
 
 namespace nostd = opentelemetry::nostd;
