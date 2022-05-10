@@ -117,14 +117,40 @@ public:
     if (evt != nullptr)
     {
       // Pass as a reference to original modifyable collection without creating a copy
-      return Log(severity, body, *evt, trace_id, span_id, trace_flags, timestamp);
+      return Log(severity, provId, body, *evt, trace_id, span_id, trace_flags, timestamp);
     }
 #  endif
     Properties evtCopy = attributes;
-    return Log(severity, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
+    return Log(severity, provId, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
+  }
+
+  void Log(opentelemetry::logs::Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           const common::KeyValueIterable &attributes,
+           opentelemetry::trace::TraceId trace_id,
+           opentelemetry::trace::SpanId span_id,
+           opentelemetry::trace::TraceFlags trace_flags,
+           common::SystemTimestamp timestamp) noexcept override
+  {
+
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
+    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+    // Properties *res                   = dynamic_cast<Properties *>(&resr);
+
+    if (evt != nullptr)
+    {
+      // Pass as a reference to original modifyable collection without creating a copy
+      return Log(severity, name, body, *evt, trace_id, span_id, trace_flags, timestamp);
+    }
+#  endif
+    Properties evtCopy = attributes;
+    return Log(severity, name, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
   }
 
   virtual void Log(opentelemetry::logs::Severity severity,
+                   nostd::string_view name,
                    nostd::string_view body,
                    Properties &evt,
                    opentelemetry::trace::TraceId trace_id,
@@ -161,7 +187,7 @@ public:
         ActivityIdPtr = &ActivityId;
       }
     }
-    evt[ETW_FIELD_PAYLOAD_NAME]              = std::string(provId.data(), provId.length());
+    evt[ETW_FIELD_PAYLOAD_NAME]              = std::string(name.data(), name.size());
     std::chrono::system_clock::time_point ts = timestamp;
     int64_t tsMs =
         std::chrono::duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();

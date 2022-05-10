@@ -66,6 +66,19 @@ TEST(Logger, LogMethodOverloads)
   logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
   logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
 
+  // Deprecated Log overloads
+  logger->Log(Severity::kTrace, "Log name", "Test log message");
+  logger->Log(Severity::kWarn, "Log name", "Logging a map", m, {}, {}, {},
+              std::chrono::system_clock::now());
+  logger->Log(Severity::kError, "Log name", "Logging a map", {{"key1", "value 1"}, {"key2", 2}}, {},
+              {}, {}, std::chrono::system_clock::now());
+  logger->Trace("Log name", "Test log message");
+  logger->Debug("Log name", "Test log message");
+  logger->Info("Log name", "Test log message");
+  logger->Warn("Log name", "Test log message");
+  logger->Error("Log name", "Test log message");
+  logger->Fatal("Log name", "Test log message");
+
   // Severity methods
   logger->Trace("Test log message");
   logger->Trace("Test log message", m);
