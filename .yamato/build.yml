@@ -51,8 +51,8 @@ build_linux:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - opentelemetry-cpp-lin-amd64.zip
-#  triggers:
-#    expression: pull_request.target eq "unity"
+  triggers:
+    expression: pull_request.target eq "unity"
 
 build_mac_amd64:
   name: build mac amd64
@@ -100,8 +100,8 @@ build_mac_amd64:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - "opentelemetry-cpp-mac-amd64.zip"
-#  triggers:
-#    expression: pull_request.target eq "unity"
+  triggers:
+    expression: pull_request.target eq "unity"
 
 build_windows:
   name: build windows
