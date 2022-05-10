@@ -132,6 +132,9 @@ build_windows:
       cd build
       & 'C:\Program Files\CMake\bin\cmake.exe' --build .
 
+    # If we made it this far, log the contents of the build dir.
+    - Get-ChildItem -Path build -Recurse
+
     #- |
     #  $ErrorActionPreference = "Stop"
     #  curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
