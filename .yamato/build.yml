@@ -51,8 +51,8 @@ build_linux:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - opentelemetry-cpp-lin-amd64.zip
-  triggers:
-    expression: pull_request.target eq "unity"
+#  triggers:
+#    expression: pull_request.target eq "unity"
 
 build_mac_amd64:
   name: build mac amd64
@@ -100,8 +100,8 @@ build_mac_amd64:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - "opentelemetry-cpp-mac-amd64.zip"
-  triggers:
-    expression: pull_request.target eq "unity"
+#  triggers:
+#    expression: pull_request.target eq "unity"
 
 build_windows:
   name: build windows
@@ -113,36 +113,49 @@ build_windows:
   commands:
     - choco install -y python --version 3.10.4
 
+    # Note: ./ci/setup_windows_cmake.ps1 fails on bokken. Let's install it our own way:
+    - choco install -y cmake --version 3.23.1
+
+    - ./ci/setup_windows_ci_environment.ps1
+    - ./ci/install_windows_protobuf.ps1
+
     - |
       $ErrorActionPreference = "Stop"
-      curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
-      ./bazelisk.exe build //examples/otlp:hw
-      mkdir trick
-      mkdir trick/lib
-      Get-ChildItem -Path bazel-out -Recurse -Filter '*.lib' -File | Copy-Item -Force -Destination trick/lib/
-      mkdir trick/api
-      mkdir trick/sdk
-      Copy-Item -Force -Recurse -Path api/include -Destination trick/api/
-      Copy-Item -Force -Recurse -Path sdk/include -Destination trick/sdk/
-      Copy-Item -Force -Recurse -Path exporters/otlp/include/opentelemetry/exporters -Destination trick/api/include/opentelemetry/
-      Copy-Item -Force -Recurse -Path ext/include/opentelemetry/* -Destination trick/api/include/opentelemetry/
+      mkdir build
+      cd build
+      & 'C:\Program Files\CMake\bin\cmake.exe' .. -DWITH_OTLP=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+      & 'C:\Program Files\CMake\bin\cmake.exe' --build .
 
-      # We don't support gRPC for now.
-      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
-      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
-      rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+    #- |
+    #  $ErrorActionPreference = "Stop"
+    #  curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
+    #  ./bazelisk.exe build //examples/otlp:hw
+    #  mkdir trick
+    #  mkdir trick/lib
+    #  Get-ChildItem -Path bazel-out -Recurse -Filter '*.lib' -File | Copy-Item -Force -Destination trick/lib/
+    #  mkdir trick/api
+    #  mkdir trick/sdk
+    #  Copy-Item -Force -Recurse -Path api/include -Destination trick/api/
+    #  Copy-Item -Force -Recurse -Path sdk/include -Destination trick/sdk/
+    #  Copy-Item -Force -Recurse -Path exporters/otlp/include/opentelemetry/exporters -Destination trick/api/include/opentelemetry/
+    #  Copy-Item -Force -Recurse -Path ext/include/opentelemetry/* -Destination trick/api/include/opentelemetry/
 
-      mkdir trick/google
-      mkdir trick/google/protobuf
-      $extDir = ./bazelisk.exe info output_base
-      c:\Python310\python.exe .yamato\win-copy-protobuf.py $extDir\external\com_google_protobuf\src\google\protobuf
+    #  # We don't support gRPC for now.
+    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
 
-      cd trick
-      7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
-      cd ..
-  artifacts:
-    opentracing-cpp-stevedore-pkg:
-      paths:
-        - "opentelemetry-cpp-win-amd64.zip"
+    #  mkdir trick/google
+    #  mkdir trick/google/protobuf
+    #  $extDir = ./bazelisk.exe info output_base
+    #  c:\Python310\python.exe .yamato\win-copy-protobuf.py $extDir\external\com_google_protobuf\src\google\protobuf
+
+    #  cd trick
+    #  7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
+    #  cd ..
+  #artifacts:
+  #  opentracing-cpp-stevedore-pkg:
+  #    paths:
+  #      - "opentelemetry-cpp-win-amd64.zip"
   triggers:
     expression: pull_request.target eq "unity"
