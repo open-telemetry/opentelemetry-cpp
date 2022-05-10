@@ -188,10 +188,16 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
-        auto view_instr_desc         = instrument_descriptor;
-        view_instr_desc.name_        = view.GetName();
-        view_instr_desc.description_ = view.GetDescription();
-        auto storage                 = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+        auto view_instr_desc = instrument_descriptor;
+        if (!view.GetName().empty())
+        {
+          view_instr_desc.name_ = view.GetName();
+        }
+        if (!view.GetDescription().empty())
+        {
+          view_instr_desc.description_ = view.GetDescription();
+        }
+        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
             NoExemplarReservoir::GetNoExemplarReservoir()));
         storage_registry_[instrument_descriptor.name_] = storage;

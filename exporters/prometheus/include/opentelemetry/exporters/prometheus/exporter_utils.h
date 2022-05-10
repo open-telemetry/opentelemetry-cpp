@@ -35,12 +35,6 @@ public:
 
 private:
   /**
-   * Set value to metric family according to record
-   */
-  static void SetMetricFamily(sdk::metrics::ResourceMetrics &data,
-                              ::prometheus::MetricFamily *metric_family);
-
-  /**
    * Sanitize the given metric name or label according to Prometheus rule.
    *
    * This function is needed because names in OpenTelemetry can contain
@@ -48,13 +42,6 @@ private:
    * name should only contain alphanumeric characters and '_'.
    */
   static std::string SanitizeNames(std::string name);
-
-  /**
-   * Set value to metric family for different aggregator
-   */
-  static void SetMetricFamilyByAggregator(const sdk::metrics::ResourceMetrics &data,
-                                          std::string labels_str,
-                                          ::prometheus::MetricFamily *metric_family);
 
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
