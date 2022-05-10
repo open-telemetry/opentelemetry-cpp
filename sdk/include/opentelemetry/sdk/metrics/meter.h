@@ -8,6 +8,8 @@
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
+#  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
@@ -40,17 +42,16 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableCounter<long>> CreateLongObservableCounter(
-      nostd::string_view name,
-      void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+  void CreateLongObservableCounter(nostd::string_view name,
+                                   void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
+                                   nostd::string_view description = "",
+                                   nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableCounter<double>>
-  CreateDoubleObservableCounter(nostd::string_view name,
-                                void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
-                                nostd::string_view description = "",
-                                nostd::string_view unit        = "1") noexcept override;
+  void CreateDoubleObservableCounter(
+      nostd::string_view name,
+      void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
@@ -62,13 +63,12 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableGauge<long>> CreateLongObservableGauge(
-      nostd::string_view name,
-      void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+  void CreateLongObservableGauge(nostd::string_view name,
+                                 void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
+                                 nostd::string_view description = "",
+                                 nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableGauge<double>> CreateDoubleObservableGauge(
+  void CreateDoubleObservableGauge(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
       nostd::string_view description = "",
@@ -84,15 +84,13 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableUpDownCounter<long>>
-  CreateLongObservableUpDownCounter(
+  void CreateLongObservableUpDownCounter(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableUpDownCounter<double>>
-  CreateDoubleObservableUpDownCounter(
+  void CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
       nostd::string_view description = "",
@@ -116,6 +114,25 @@ private:
 
   std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
+
+  template <class T>
+  void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
+                                  void (*callback)(opentelemetry::metrics::ObserverResult<T> &))
+  {
+    auto view_registry = meter_context_->GetViewRegistry();
+    auto success       = view_registry->FindViews(
+        instrument_descriptor, *instrumentation_library_,
+        [this, &instrument_descriptor, callback](const View &view) {
+          auto view_instr_desc         = instrument_descriptor;
+          view_instr_desc.name_        = view.GetName();
+          view_instr_desc.description_ = view.GetDescription();
+          auto storage                 = std::shared_ptr<AsyncMetricStorage<T>>(
+              new AsyncMetricStorage<T>(view_instr_desc, view.GetAggregationType(), callback,
+                                        &view.GetAttributesProcessor()));
+          storage_registry_[instrument_descriptor.name_] = storage;
+          return true;
+        });
+  }
 };
 }  // namespace metrics
 }  // namespace sdk
