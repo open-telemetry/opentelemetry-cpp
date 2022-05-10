@@ -121,9 +121,15 @@ build_windows:
 
     - |
       $ErrorActionPreference = "Stop"
+      trap { $host.SetShouldExit(1) }
       mkdir build
       cd build
-      & 'C:\Program Files\CMake\bin\cmake.exe' .. -DWITH_OTLP=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release
+      & 'C:\Program Files\CMake\bin\cmake.exe' .. -DWITH_OTLP=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/build/output/Unity-Technologies/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+    - |
+      $ErrorActionPreference = "Stop"
+      trap { $host.SetShouldExit(1) }
+      cd build
       & 'C:\Program Files\CMake\bin\cmake.exe' --build .
 
     #- |
