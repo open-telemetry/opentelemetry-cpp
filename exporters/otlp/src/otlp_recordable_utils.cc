@@ -259,25 +259,19 @@ void OtlpRecordableUtils::PopulateRequest(
     return;
   }
 
-  auto resource_span       = request->add_resource_spans();
-  auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
-  bool first_pass          = true;
-
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
+    auto resource_span       = request->add_resource_spans();
+    auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
+
     *instrumentation_lib->add_spans()                       = std::move(rec->span());
     *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
 
-    if (first_pass)
-    {
-      instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
+    instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
 
-      *resource_span->mutable_resource() = rec->ProtoResource();
-      resource_span->set_schema_url(rec->GetResourceSchemaURL());
-
-      first_pass = false;
-    }
+    *resource_span->mutable_resource() = rec->ProtoResource();
+    resource_span->set_schema_url(rec->GetResourceSchemaURL());
   }
 }
 
