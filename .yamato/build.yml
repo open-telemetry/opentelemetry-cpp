@@ -122,15 +122,13 @@ build_windows:
     - |
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
-      mkdir build
-      cd build
-      & 'C:\Program Files\CMake\bin\cmake.exe' .. -DWITH_OTLP=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/build/output/Unity-Technologies/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+      & 'C:\Program Files\CMake\bin\cmake.exe' -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DWITH_OTLP=ON -DWITH_ZIPKIN=OFF -DWITH_JAEGER=OFF -DWITH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=C:/build/output/Unity-Technologies/opentelemetry-cpp/installhere -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=C:/build/output/Unity-Technologies/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
 
     - |
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
       cd build
-      & 'C:\Program Files\CMake\bin\cmake.exe' --build .
+      & 'C:\Program Files\CMake\bin\cmake.exe' --build . --config Release
 
     # If we made it this far, log the contents of the build dir.
     - Get-ChildItem -Path build -Recurse
