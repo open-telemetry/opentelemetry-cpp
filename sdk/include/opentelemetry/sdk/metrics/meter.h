@@ -51,7 +51,7 @@ public:
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
@@ -119,12 +119,10 @@ private:
   void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
                                   void (*callback)(opentelemetry::metrics::ObserverResult<T> &))
   {
-    std::cout << "---LALIT--Register async\n";
     auto view_registry = meter_context_->GetViewRegistry();
     auto success       = view_registry->FindViews(
         instrument_descriptor, *instrumentation_library_,
         [this, &instrument_descriptor, callback](const View &view) {
-          std::cout << "--LALIT  Found view\n";
           auto view_instr_desc         = instrument_descriptor;
           view_instr_desc.name_        = view.GetName();
           view_instr_desc.description_ = view.GetDescription();
