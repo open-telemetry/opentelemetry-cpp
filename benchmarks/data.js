@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1652300165052,
+  "lastUpdate": 1652300167201,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -36274,6 +36274,54 @@ window.BENCHMARK_DATA = {
             "value": 2771921.623918347,
             "unit": "ns/iter",
             "extra": "iterations: 266\ncpu: 495943.2330827068 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Tom.Tan@microsoft.com",
+            "name": "Tom Tan",
+            "username": "ThomsonTan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "88e23ad469c6439226d929c6f949f4af48e1135c",
+          "message": "Fix sharing resource in batched exported spans (#1386)\n\nCo-authored-by: Lalit Kumar Bhasin <lalit_fin@yahoo.com>",
+          "timestamp": "2022-05-11T13:03:11-07:00",
+          "tree_id": "7a1649323b685eb9008fba46a9c4a6ee4377ee1d",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/88e23ad469c6439226d929c6f949f4af48e1135c"
+        },
+        "date": 1652300164720,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 109.39343664995776,
+            "unit": "ns/iter",
+            "extra": "iterations: 1207000\ncpu: 108.8661143330572 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 171.7127152603038,
+            "unit": "ns/iter",
+            "extra": "iterations: 822000\ncpu: 171.0071776155718 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 624.2389172579335,
+            "unit": "ns/iter",
+            "extra": "iterations: 226000\ncpu: 623.7146017699114 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2148086.024868873,
+            "unit": "ns/iter",
+            "extra": "iterations: 372\ncpu: 373858.0645161292 ns\nthreads: 1"
           }
         ]
       }
