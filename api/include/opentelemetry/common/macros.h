@@ -7,6 +7,14 @@
 
 #include "opentelemetry/version.h"
 
+#ifndef likely
+#  ifdef __GNUC__
+#    define likely(x) __builtin_expect(!!(x), 1)
+#  else
+#    define likely(x) !!(x)
+#  endif
+#endif
+
 /// \brief Declare variable as maybe unused
 /// usage:
 ///   OPENTELEMETRY_MAYBE_UNUSED int a;

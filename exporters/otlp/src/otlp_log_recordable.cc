@@ -3,17 +3,11 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include "opentelemetry/common/macros.h"
+
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-
-#  ifndef likely
-#    ifdef __GNUC__
-#      define likely(x) __builtin_expect(!!(x), 1)
-#    else
-#      define likely(x) !!(x)
-#    endif
-#  endif
 
 namespace nostd = opentelemetry::nostd;
 
