@@ -55,7 +55,10 @@ struct OtlpHttpLogExporterOptions
 #  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
-  std::size_t max_concurrent_requests = 8;
+  std::size_t max_concurrent_requests = 64;
+
+  // Concurrent requests
+  std::size_t max_requests_per_connection = 8;
 #  endif
 };
 

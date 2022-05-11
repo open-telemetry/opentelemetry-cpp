@@ -34,7 +34,8 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.http_headers
 #ifdef ENABLE_ASYNC_EXPORT
                                                             ,
-                                                            options.max_concurrent_requests
+                                                            options.max_concurrent_requests,
+                                                            options.max_requests_per_connection
 #endif
                                                             )))
 {}
