@@ -120,9 +120,14 @@ build_windows:
     - ./ci/install_windows_protobuf.ps1
 
     - |
+      echo PWD
+      pwd
+
+    - |
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
-      & 'C:\Program Files\CMake\bin\cmake.exe' -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DWITH_OTLP=ON -DWITH_ZIPKIN=OFF -DWITH_JAEGER=OFF -DWITH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=C:/build/output/Unity-Technologies/opentelemetry-cpp/installhere -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=C:/build/output/Unity-Technologies/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
+      $CWD=(Get-Item -Path ".\").FullName
+      & 'C:\Program Files\CMake\bin\cmake.exe' -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DWITH_OTLP=ON -DWITH_ZIPKIN=OFF -DWITH_JAEGER=OFF -DWITH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=$CWD/installhere -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=$CWD/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
 
     - |
       $ErrorActionPreference = "Stop"
@@ -134,7 +139,8 @@ build_windows:
     #- Get-ChildItem -Path build -Recurse
 
     - |
-      c:\Python310\python.exe .yamato\win-copy-protobuf.py vcpkg\packages\protobuf_x64-windows
+      $CWD=(Get-Item -Path ".\").FullName
+      c:\Python310\python.exe .yamato\win-copy-protobuf.py $CWD\vcpkg\packages\protobuf_x64-windows
 
       cd installhere
       7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
