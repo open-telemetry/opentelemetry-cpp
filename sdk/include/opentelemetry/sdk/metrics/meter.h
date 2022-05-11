@@ -119,10 +119,12 @@ private:
   void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
                                   void (*callback)(opentelemetry::metrics::ObserverResult<T> &))
   {
+    std::cout << "---LALIT--Register async\n";
     auto view_registry = meter_context_->GetViewRegistry();
     auto success       = view_registry->FindViews(
         instrument_descriptor, *instrumentation_library_,
         [this, &instrument_descriptor, callback](const View &view) {
+          std::cout << "--LALIT  Found view\n";
           auto view_instr_desc         = instrument_descriptor;
           view_instr_desc.name_        = view.GetName();
           view_instr_desc.description_ = view.GetDescription();

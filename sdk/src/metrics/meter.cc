@@ -64,7 +64,7 @@ void Meter::CreateLongObservableCounter(nostd::string_view name,
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
-      std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
   RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
 }
@@ -76,7 +76,7 @@ void Meter::CreateDoubleObservableCounter(nostd::string_view name,
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
-      std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
   RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
 }

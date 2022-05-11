@@ -35,7 +35,7 @@ public:
     double val                                = (rand() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
-    observer_result.Observe(val, labelkv);
+    observer_result.Observe(val /*, labelkv*/);
   }
 };
 }  // namespace
@@ -61,6 +61,10 @@ void foo_library::observable_counter_example(const std::string &name)
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
   meter->CreateDoubleObservableCounter(counter_name, MeasurementFetcher::Fetcher);
+  while (true)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
 }
 
 void foo_library::histogram_example(const std::string &name)

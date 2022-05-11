@@ -54,6 +54,18 @@ void initMetrics(const std::string &name)
       new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
+  // observable counter view
+  std::string observable_counter_name = name + "_observable_counter";
+  std::unique_ptr<metric_sdk::InstrumentSelector> observable_instrument_selector{
+      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kObservableCounter,
+                                         observable_counter_name)};
+  std::unique_ptr<metric_sdk::MeterSelector> observable_meter_selector{
+      new metric_sdk::MeterSelector(name, version, schema)};
+  std::unique_ptr<metric_sdk::View> observable_sum_view{
+      new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
+  p->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
+             std::move(observable_sum_view));
+
   // histogram view
   std::string histogram_name = name + "_histogram";
   std::unique_ptr<metric_sdk::InstrumentSelector> histogram_instrument_selector{
@@ -83,6 +95,10 @@ int main(int argc, char **argv)
   {
     foo_library::counter_example(name);
   }
+  else if (example_type == "observable_counter")
+  {
+    foo_library::observable_counter_example(name);
+  }
   else if (example_type == "histogram")
   {
     foo_library::histogram_example(name);
@@ -90,8 +106,11 @@ int main(int argc, char **argv)
   else
   {
     std::thread counter_example{&foo_library::counter_example, name};
+    std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+
     counter_example.join();
+    observable_counter_example.join();
     histogram_example.join();
   }
 }
