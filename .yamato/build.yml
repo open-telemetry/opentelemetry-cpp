@@ -128,10 +128,17 @@ build_windows:
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
       cd build
-      & 'C:\Program Files\CMake\bin\cmake.exe' --build . --config Release
+      & 'C:\Program Files\CMake\bin\cmake.exe' --build . --config Release --target install
 
     # If we made it this far, log the contents of the build dir.
-    - Get-ChildItem -Path build -Recurse
+    #- Get-ChildItem -Path build -Recurse
+
+    - |
+      c:\Python310\python.exe .yamato\win-copy-protobuf.py vcpkg\packages\protobuf_x64-windows
+
+      cd installhere
+      7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
+      cd ..
 
     #- |
     #  $ErrorActionPreference = "Stop"
@@ -160,9 +167,9 @@ build_windows:
     #  cd trick
     #  7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
     #  cd ..
-  #artifacts:
-  #  opentracing-cpp-stevedore-pkg:
-  #    paths:
-  #      - "opentelemetry-cpp-win-amd64.zip"
+  artifacts:
+    opentracing-cpp-stevedore-pkg:
+      paths:
+        - "opentelemetry-cpp-win-amd64.zip"
   triggers:
     expression: pull_request.target eq "unity"

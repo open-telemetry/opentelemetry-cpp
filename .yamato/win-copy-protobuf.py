@@ -3,7 +3,7 @@ import shutil
 import sys
 
 extDir = sys.argv[1]
-destDir = "trick\\google\\protobuf"
+destDir = "installhere\\google\\protobuf"
 
 skipDirs = ["java", "csharp", "objectivec", "ruby", "unittest"]
 
