@@ -107,7 +107,7 @@ build_windows:
   name: build windows
   agent:
     image: build-system/bee-windows-10-vs2019:v0.1.3-1006513
-    flavor: b1.large
+    flavor: b1.xlarge
     type: Unity::VM
   interpreter: powershell
   commands:
@@ -118,6 +118,11 @@ build_windows:
 
     - ./ci/setup_windows_ci_environment.ps1
     - ./ci/install_windows_protobuf.ps1
+
+    - |
+      cd vcpkg
+      $env:VCPKG_DEFAULT_TRIPLET = "x64-windows"
+      ./vcpkg install curl
 
     - |
       $ErrorActionPreference = "Stop"
@@ -135,8 +140,10 @@ build_windows:
     - |
       #c:\Python310\python.exe .yamato\win-copy-protobuf.py C:\build\output\Unity-Technologies\opentelemetry-cpp\vcpkg\packages\protobuf_x64-windows
 
-      Copy-Item -Force -Path vcpkg\packages\protobuf_x64\windows\lib\*.lib -Destination installhere/lib/
+      Copy-Item -Force -Path vcpkg\packages\protobuf_x64-windows\lib\*.lib -Destination installhere/lib/
       Copy-Item -Force -Recurse -Path vcpkg\packages\protobuf_x64-windows\include\google -Destination installhere\google
+
+      Copy-Item -Force -Path vcpkg\packages\curl_x64-windows\lib\*.lib -Destination installhere/lib/curl.lib
 
       cd installhere
       7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
