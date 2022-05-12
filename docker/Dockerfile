@@ -23,9 +23,10 @@ RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
         -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
         -DBUILD_TESTING=OFF \
         -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DBUILD_SHARED_LIBS=ON \
         .. \
-    && cmake --build . --target install
+    && cmake --build . -j ${CORES} --target install
 
 FROM scratch as final
 

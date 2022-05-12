@@ -14,7 +14,6 @@ RUN mkdir build \
     && cd build \
     && cmake -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
     -DGRPC_GIT_TAG=${GRPC_GIT_TAG} /opt/third_party/grpc \
-    && cmake --build . \
     && cmake --build . -j ${CORES} --target install
 
 FROM scratch as final
