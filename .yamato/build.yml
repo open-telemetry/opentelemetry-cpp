@@ -132,6 +132,9 @@ build_windows:
       ./vcpkg install curl:x64-windows-static
 
     - |
+      $ErrorActionPreference = "Stop"
+      trap { $host.SetShouldExit(1) }
+
       mkdir installhere
       mkdir installhere\include
       mkdir installhere\lib
@@ -141,7 +144,7 @@ build_windows:
 
       Copy-Item -Force -Path vcpkg\packages\curl_x64-windows-static\lib\*.lib -Destination installhere/lib/curl.lib
       Copy-Item -Force -Recurse -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\include\opentelemetry -Destination installhere\include\opentelemetry
-      Copy-Item -Force - ath vcpkg\packages\opentelemetry-cpp_x64-windows-static\lib\*.lib -Destination installhere\lib\
+      Copy-Item -Force -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\lib\*.lib -Destination installhere\lib\
 
       cd installhere
       7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
