@@ -88,8 +88,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   }
   */
 
-  // For log sources which define a logger name (e.g. Java Logger Name) the Logger Name SHOULD be
-  // recorded as the Instrumentation Scope name.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
   opentelemetry::nostd::unique_ptr<instrumentationlibrary::InstrumentationLibrary> lib;
   if (library_name.empty())
   {
