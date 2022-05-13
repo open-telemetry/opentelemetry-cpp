@@ -111,7 +111,7 @@ build_windows:
     type: Unity::VM
   interpreter: powershell
   commands:
-    - choco install -y python --version 3.10.4
+    #- choco install -y python --version 3.10.4
 
     # Note: ./ci/setup_windows_cmake.ps1 fails on bokken. Let's install it our own way:
     - choco install -y cmake --version 3.23.1
@@ -177,7 +177,7 @@ build_windows:
     #  7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
     #  cd ..
   artifacts:
-    opentracing-cpp-stevedore-pkg:
+    opentelemetry-cpp-stevedore-pkg:
       paths:
         - "opentelemetry-cpp-win-amd64.zip"
   triggers:
