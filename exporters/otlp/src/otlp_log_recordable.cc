@@ -181,10 +181,7 @@ void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource
 
 const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != resource_)
-  {
-    return *resource_;
-  }
+  OPENTELEMETRY_LIKELY_IF(nullptr != resource_) { return *resource_; }
 
   return opentelemetry::sdk::resource::Resource::GetDefault();
 }
@@ -222,10 +219,7 @@ void OtlpLogRecordable::SetInstrumentationLibrary(
 const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
 OtlpLogRecordable::GetInstrumentationLibrary() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_library_)
-  {
-    return *instrumentation_library_;
-  }
+  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_library_) { return *instrumentation_library_; }
 
   static opentelemetry::nostd::unique_ptr<
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>

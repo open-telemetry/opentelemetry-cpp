@@ -10,14 +10,26 @@
 #ifndef OPENTELEMETRY_LIKELY_IF
 #  if defined(__has_cpp_attribute)
 #    if __has_cpp_attribute(likely)
-#      define OPENTELEMETRY_LIKELY_IF(...) if (__VA_ARGS__) [[likely]]
+#      define OPENTELEMETRY_LIKELY_IF(...) \
+        if (__VA_ARGS__)                   \
+        [[likely]]
+#    endif
+#  elif defined(__clang__)
+#    if __clang_major__ >= 12
+#      define OPENTELEMETRY_LIKELY_IF(...) \
+        if (__VA_ARGS__)                   \
+        [[likely]]
+#    endif
+#  elif defined(__GNUC__)
+#    if __GNUC__ >= 9
+#      define OPENTELEMETRY_LIKELY_IF(...) \
+        if (__VA_ARGS__)                   \
+        [[likely]]
 #    endif
 #  endif
 #endif
 #if !defined(OPENTELEMETRY_LIKELY_IF) && (defined(__clang__) || defined(__GNUC__))
 #  define OPENTELEMETRY_LIKELY_IF(...) if (__builtin_expect(!!(__VA_ARGS__), true))
-#else
-#  define OPENTELEMETRY_LIKELY_IF(...) if (__VA_ARGS__)
 #endif
 #ifndef OPENTELEMETRY_LIKELY_IF
 #  define OPENTELEMETRY_LIKELY_IF(...) if (__VA_ARGS__)
