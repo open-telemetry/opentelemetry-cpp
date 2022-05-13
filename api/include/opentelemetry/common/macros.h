@@ -7,21 +7,10 @@
 
 #include "opentelemetry/version.h"
 
-#ifndef OPENTELEMETRY_LIKELY_IF
-#  if defined(__has_cpp_attribute)
+#if !defined(OPENTELEMETRY_LIKELY_IF) && defined(__cplusplus)
+// GCC 9 has likely attribute but do not support declare it at the beginning of statement
+#  if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
 #    if __has_cpp_attribute(likely)
-#      define OPENTELEMETRY_LIKELY_IF(...) \
-        if (__VA_ARGS__)                   \
-        [[likely]]
-#    endif
-#  elif defined(__clang__)
-#    if __clang_major__ >= 12
-#      define OPENTELEMETRY_LIKELY_IF(...) \
-        if (__VA_ARGS__)                   \
-        [[likely]]
-#    endif
-#  elif defined(__GNUC__)
-#    if __GNUC__ >= 9
 #      define OPENTELEMETRY_LIKELY_IF(...) \
         if (__VA_ARGS__)                   \
         [[likely]]
