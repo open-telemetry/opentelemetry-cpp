@@ -129,7 +129,7 @@ build_windows:
       trap { $host.SetShouldExit(1) }
       mkdir build
       cd build
-      & 'C:\Program Files\CMake\bin\cmake.exe' -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DWITH_OTLP=ON -DWITH_ZIPKIN=OFF -DWITH_JAEGER=OFF -DWITH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=C:\build\output\Unity-Technologies\opentelemetry-cpp\installhere -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=C:\build\output\Unity-Technologies\opentelemetry-cpp\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
+      & 'C:\Program Files\CMake\bin\cmake.exe' -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DWITH_OTLP=ON -DWITH_ZIPKIN=OFF -DWITH_JAEGER=OFF -DWITH_EXAMPLES=OFF -DCMAKE_INSTALL_PREFIX=C:\build\output\Unity-Technologies\opentelemetry-cpp\installhere -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=C:\build\output\Unity-Technologies\opentelemetry-cpp\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded ..
 
     - |
       $ErrorActionPreference = "Stop"
