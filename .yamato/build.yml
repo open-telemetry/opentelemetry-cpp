@@ -132,6 +132,10 @@ build_windows:
       ./vcpkg install curl:x64-windows-static
 
     - |
+      cd vcpkg
+      ./vcpkg install opentelemetry-cpp:x64-windows-static
+
+    - |
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
 
