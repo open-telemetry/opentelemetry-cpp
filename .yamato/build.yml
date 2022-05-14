@@ -112,28 +112,12 @@ build_windows:
   interpreter: powershell
   commands:
     - |
-      #./ci/setup_windows_ci_environment.ps1
       $ErrorActionPreference = "Stop"
       trap { $host.SetShouldExit(1) }
       git clone https://github.com/Microsoft/vcpkg.git
       cd vcpkg
-      #$VCPKG_DIR=(Get-Item -Path ".\").FullName # does this do anything?
       ./bootstrap-vcpkg.bat
-      ./vcpkg install nlohmann-json:x64-windows-static
-
-    - |
-      #./ci/install_windows_protobuf.ps1
-      cd vcpkg
-      #./vcpkg install --overlay-ports="$PSScriptRoot\ports" protobuf:x64-windows-static
-      ./vcpkg install protobuf:x64-windows-static
-
-    - |
-      cd vcpkg
-      ./vcpkg install curl:x64-windows-static
-
-    - |
-      cd vcpkg
-      ./vcpkg install opentelemetry-cpp:x64-windows-static
+      ./vcpkg install opentelemetry-cpp[otlp]:x64-windows-static
 
     - |
       $ErrorActionPreference = "Stop"
