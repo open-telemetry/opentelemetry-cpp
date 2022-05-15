@@ -1,11 +1,11 @@
 # Simple Metrics Example
 
-In this example, the application in `metrics_ostream.cc` initializes the metrics pipeline
-and shows 2 different ways of updating instrument values. Here are more detailed
-explanations of each part.
+In this example, the application in `metrics_ostream.cc` initializes the metrics pipeline and shows 2 different ways of updating instrument values.
+Here are more detailed explanations of each part.
 
 1: Initialize an exporter and a reader. In this case, we initialize an OStream
-Exporter which will print to stdout by default. The reader here will periodically collect metrics from metric collector and passes them to the exporter.
+Exporter which will print to stdout by default.
+The reader here will periodically collect metrics from metric collector and passes them to the exporter.
 
 ```cpp
 std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
@@ -13,8 +13,9 @@ std::unique_ptr<metric_sdk::MetricReader> reader{
     new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
 ```
 
-2: Initialize a MeterProvider and add the reader. We will use this to obtain Meter objects in the
-future.
+2: Initialize a MeterProvider and add the reader.
+We will use this to obtain Meter objects in the future.
+
 ```cpp
 auto provider = std::shared_ptr<metrics_api::MeterProvider>(new opentelemetry::metrics::MeterProvider());
 auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
@@ -22,6 +23,7 @@ p->AddMetricReader(std::move(reader));
 ```
 
 3: Create and add a view to the provider.
+
 ```cpp
 std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
     new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, "name_counter")};
@@ -38,6 +40,7 @@ instrument from it. Every Meter pointer returned by the
 MeterProvider points to the same Meter. This means that the Meter will be able
 to combine metrics captured from different functions without having to
 constantly pass the Meter around the library.
+
 ```cpp
 nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
 auto double_counter = meter->CreateDoubleCounter(counter_name);
@@ -47,7 +50,9 @@ auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 double_counter->Add(val, labelkv);
 ```
 
-5: To use hitogram instrumet, a view with proper `InstrumentType` and `AggregationType` has to be added to the provider.
+5: To use hitogram instrumet, a view with proper `InstrumentType` and `AggregationType`
+has to be added to the provider.
+
 ```cpp
 std::unique_ptr<metric_sdk::InstrumentSelector> histogram_instrument_selector{
     new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, "histogram_name")};
