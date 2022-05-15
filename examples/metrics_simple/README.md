@@ -50,7 +50,7 @@ auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 double_counter->Add(val, labelkv);
 ```
 
-5: To use hitogram instrumet, a view with proper `InstrumentType` and `AggregationType`
+5: To use histogram instrument, a view with proper `InstrumentType` and `AggregationType`
 has to be added to the provider.
 
 ```cpp
