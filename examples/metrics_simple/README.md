@@ -1,11 +1,11 @@
 # Simple Metrics Example
 
-In this example, the application in `metrics_ostream.cc` initializes the metrics pipeline and shows 2 different ways of updating instrument values.
+This example initializes the metrics pipeline with 2 different instrument types.
 Here are more detailed explanations of each part.
 
 1: Initialize an exporter and a reader. In this case, we initialize an OStream
 Exporter which will print to stdout by default.
-The reader here will periodically collect metrics from metric collector and passes them to the exporter.
+The reader periodically collects metrics from the collector and exports them.
 
 ```cpp
 std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
