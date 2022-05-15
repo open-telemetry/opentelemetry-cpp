@@ -11,7 +11,7 @@
 
 ## Export metrics from the application
 
-It is highly recommended to go over the [ostream-metrics](../metric_simple/README.md)
+It is highly recommended to go over the [ostream-metrics](../metrics_simple/README.md)
 doc before following along this document.
 
 Create a new console application and run it:
