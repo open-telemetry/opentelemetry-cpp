@@ -82,7 +82,7 @@ Start the application and keep it running. Now we should be able to see the
 metrics at [http://localhost:8080/metrics](http://localhost:9464/metrics) from a
 web browser:
 
-![Browser UI](metrics.png)
+![Browser UI](https://user-images.githubusercontent.com/71217171/168492500-12bd1c99-33ab-4515-a294-17bc349b5d13.png)
 
 Now, we understand how we can configure `PrometheusExporter` to export metrics.
 Next, we are going to learn about how to use Prometheus to collect the metrics.
@@ -142,7 +142,7 @@ finally, click the execute button.
 
 We should be able to see the following chart from the browser:
 
-![Prometheus UI](histogram.png)
+![Prometheus UI](https://user-images.githubusercontent.com/71217171/168492437-f9769db1-6f9e-49c6-8ef0-85f5e1188ba0.png)
 
 From the legend, we can see that the `instance` name and the `job` name are the
 values we have set in `otel.yml`.
@@ -186,7 +186,7 @@ Feel free to find some handy PromQL
 [here](https://promlabs.com/promql-cheat-sheet/).
 
 ![Grafana
-UI](grafana.png)
+UI](https://user-images.githubusercontent.com/71217171/168492482-047a4429-4854-4b3c-a2dd-4d75362090d5.png)
 
 ```mermaid
 graph TD
