@@ -50,11 +50,11 @@ graph LR
 subgraph SDK
   MeterProvider
   MetricReader[BaseExportingMetricReader]
-  PrometheusExporter["PrometheusExporter<br/>(http://localhost:9464/)"]
+  PrometheusExporter["PrometheusExporter<br/>(http://localhost:8080/)"]
 end
 
 subgraph API
-  Instrument["Meter(#quot;MyCompany.MyProduct.MyLibrary#quot;, #quot;1.0#quot;)<br/>Counter(#quot;MyFruitCounter#quot;)"]
+  Instrument["Meter(#quot;prometheus_metric_example#quot;, #quot;1.0#quot;)<br/>Histogram(#quot;prometheus_metric_example_histogram#quot;)"]
 end
 
 Instrument --> | Measurements | MeterProvider
@@ -105,12 +105,21 @@ entire content below into the `otel.yml` file we have created just now.
 
 ```yaml
 global:
-  scrape_interval: 10s
-  evaluation_interval: 10s
-scrape_configs:
-  - job_name: "otel"
+  scrape_interval: 5s
+  scrape_timeout: 2s
+  evaluation_interval: 5s
+alerting:
+  alertmanagers:
+  - follow_redirects: true
+    scheme: http
+    timeout: 5s
+    api_version: v2
     static_configs:
-      - targets: ["localhost:8080"]
+    - targets: [localhost:8080]
+scrape_configs:
+  - job_name: otel
+    static_configs:
+      - targets: ['localhost:8080']
 ```
 
 ### Start Prometheus
@@ -188,7 +197,7 @@ subgraph Prometheus
   PrometheusDatabase
 end
 
-PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:9464/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:9464/metrics#quot; every 10 seconds)"}}
+PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:8080/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:8080/metrics#quot; every 10 seconds)"}}
 PrometheusScraper --> PrometheusDatabase[("Prometheus TSDB (time series database)")]
 PrometheusDatabase -->|http://localhost:9090/graph| PrometheusUI["Browser<br/>(Prometheus Dashboard)"]
 PrometheusDatabase -->|http://localhost:9090/api/| Grafana[Grafana Server]
