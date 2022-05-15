@@ -136,9 +136,9 @@ docker run -p 9090:9090 -v $(pwd):/etc/prometheus --network="host" prom/promethe
 ### View results in Prometheus
 
 To use the graphical interface for viewing our metrics with Prometheus, navigate
-to [http://localhost:9090/graph](http://localhost:9090/graph), 
-and type `prometheus_metric_example_bucket` in the expression bar of the UI; finally, click the execute
-button.
+to [http://localhost:9090/graph](http://localhost:9090/graph),
+and type `prometheus_metric_example_bucket` in the expression bar of the UI;
+finally, click the execute button.
 
 We should be able to see the following chart from the browser:
 
