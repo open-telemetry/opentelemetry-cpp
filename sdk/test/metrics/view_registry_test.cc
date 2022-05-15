@@ -25,13 +25,15 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       InstrumentationLibrary::Create("default", "1.0.0", "https://opentelemetry.io/schemas/1.7.0");
   int count = 0;
   ViewRegistry registry;
-  auto status = registry.FindViews(default_instrument_descriptor,
-                                   *default_instrumentation_lib.get(), [&count](const View &view) {
-                                     count++;
-                                     EXPECT_EQ(view.GetName(), "");
-                                     EXPECT_EQ(view.GetDescription(), "");
-                                     return true;
-                                   });
+  auto status =
+      registry.FindViews(default_instrument_descriptor, *default_instrumentation_lib.get(),
+                         [&count](const View &view) {
+                           count++;
+                           EXPECT_EQ(view.GetName(), "otel-default-view");
+                           EXPECT_EQ(view.GetDescription(), "");
+                           EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
+                           return true;
+                         });
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
 }

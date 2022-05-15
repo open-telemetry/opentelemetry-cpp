@@ -28,7 +28,7 @@ namespace nostd   = opentelemetry::nostd;
 Meter::Meter(std::shared_ptr<MeterContext> meter_context,
              std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
                  instrumentation_library) noexcept
-    : meter_context_{meter_context}, instrumentation_library_{std::move(instrumentation_library)}
+    : instrumentation_library_{std::move(instrumentation_library)}, meter_context_{meter_context}
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
@@ -188,10 +188,16 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
-        auto view_instr_desc         = instrument_descriptor;
-        view_instr_desc.name_        = view.GetName();
-        view_instr_desc.description_ = view.GetDescription();
-        auto storage                 = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+        auto view_instr_desc = instrument_descriptor;
+        if (!view.GetName().empty())
+        {
+          view_instr_desc.name_ = view.GetName();
+        }
+        if (!view.GetDescription().empty())
+        {
+          view_instr_desc.description_ = view.GetDescription();
+        }
+        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
             NoExemplarReservoir::GetNoExemplarReservoir()));
         storage_registry_[instrument_descriptor.name_] = storage;

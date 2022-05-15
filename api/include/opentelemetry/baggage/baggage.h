@@ -25,11 +25,12 @@ public:
   static constexpr char kMembersSeparator   = ',';
   static constexpr char kMetadataSeparator  = ';';
 
-  Baggage() : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
-  Baggage(size_t size) : kv_properties_(new opentelemetry::common::KeyValueProperties(size)){};
+  Baggage() noexcept : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
+  Baggage(size_t size) noexcept
+      : kv_properties_(new opentelemetry::common::KeyValueProperties(size)){};
 
   template <class T>
-  Baggage(const T &keys_and_values)
+  Baggage(const T &keys_and_values) noexcept
       : kv_properties_(new opentelemetry::common::KeyValueProperties(keys_and_values))
   {}
 
@@ -42,7 +43,7 @@ public:
   /* Get value for key in the baggage
      @returns true if key is found, false otherwise
   */
-  bool GetValue(nostd::string_view key, std::string &value) const
+  bool GetValue(nostd::string_view key, std::string &value) const noexcept
   {
     return kv_properties_->GetValue(key, value);
   }
@@ -50,7 +51,8 @@ public:
   /* Returns shared_ptr of new baggage object which contains new key-value pair. If key or value is
      invalid, copy of current baggage is returned
   */
-  nostd::shared_ptr<Baggage> Set(const nostd::string_view &key, const nostd::string_view &value)
+  nostd::shared_ptr<Baggage> Set(const nostd::string_view &key,
+                                 const nostd::string_view &value) noexcept
   {
 
     nostd::shared_ptr<Baggage> baggage(new Baggage(kv_properties_->Size() + 1));
@@ -89,7 +91,7 @@ public:
   // if key does not exist, copy of current baggage is returned.
   // Validity of key is not checked as invalid keys should never be populated in baggage in the
   // first place.
-  nostd::shared_ptr<Baggage> Delete(nostd::string_view key)
+  nostd::shared_ptr<Baggage> Delete(nostd::string_view key) noexcept
   {
     // keeping size of baggage same as key might not be found in it
     nostd::shared_ptr<Baggage> baggage(new Baggage(kv_properties_->Size()));
@@ -103,7 +105,7 @@ public:
   }
 
   // Returns shared_ptr of baggage after extracting key-value pairs from header
-  static nostd::shared_ptr<Baggage> FromHeader(nostd::string_view header)
+  static nostd::shared_ptr<Baggage> FromHeader(nostd::string_view header) noexcept
   {
     if (header.size() > kMaxSize)
     {
@@ -158,7 +160,7 @@ public:
   }
 
   // Creates string from baggage object.
-  std::string ToHeader() const
+  std::string ToHeader() const noexcept
   {
     std::string header_s;
     bool first = true;
@@ -249,7 +251,9 @@ private:
     };
 
     auto from_hex = [](char c) -> char {
-      return std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10;
+      // c - '0' produces integer type which could trigger error/warning when casting to char,
+      // but the cast is safe here.
+      return static_cast<char>(std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10);
     };
 
     std::string ret;

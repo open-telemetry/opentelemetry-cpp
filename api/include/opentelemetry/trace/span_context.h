@@ -26,7 +26,7 @@ public:
    * sampled
    * @param is_remote true if this context was propagated from a remote parent.
    */
-  SpanContext(bool sampled_flag, bool is_remote)
+  SpanContext(bool sampled_flag, bool is_remote) noexcept
       : trace_id_(),
         span_id_(),
         trace_flags_(opentelemetry::trace::TraceFlags((uint8_t)sampled_flag)),
