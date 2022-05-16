@@ -57,24 +57,28 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
       new DoubleCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<metrics::ObservableCounter<long>> Meter::CreateLongObservableCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &),
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+void Meter::CreateLongObservableCounter(nostd::string_view name,
+                                        void (*callback)(metrics::ObserverResult<long> &),
+                                        nostd::string_view description,
+                                        nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableCounter<long>>{
-      new LongObservableCounter(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
+      InstrumentValueType::kLong};
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
 }
 
-nostd::shared_ptr<metrics::ObservableCounter<double>> Meter::CreateDoubleObservableCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<double> &),
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+void Meter::CreateDoubleObservableCounter(nostd::string_view name,
+                                          void (*callback)(metrics::ObserverResult<double> &),
+                                          nostd::string_view description,
+                                          nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableCounter<double>>{
-      new DoubleObservableCounter(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
+      InstrumentValueType::kDouble};
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -105,24 +109,28 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<metrics::ObservableGauge<long>> Meter::CreateLongObservableGauge(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &),
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+void Meter::CreateLongObservableGauge(nostd::string_view name,
+                                      void (*callback)(metrics::ObserverResult<long> &),
+                                      nostd::string_view description,
+                                      nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableGauge<long>>{
-      new LongObservableGauge(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
+      InstrumentValueType::kLong};
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
 }
 
-nostd::shared_ptr<metrics::ObservableGauge<double>> Meter::CreateDoubleObservableGauge(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<double> &),
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+void Meter::CreateDoubleObservableGauge(nostd::string_view name,
+                                        void (*callback)(metrics::ObserverResult<double> &),
+                                        nostd::string_view description,
+                                        nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableGauge<double>>{
-      new DoubleObservableGauge(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
+      InstrumentValueType::kDouble};
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -153,24 +161,28 @@ nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
       new DoubleUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<metrics::ObservableUpDownCounter<long>> Meter::CreateLongObservableUpDownCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &),
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
+                                              void (*callback)(metrics::ObserverResult<long> &),
+                                              nostd::string_view description,
+                                              nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableUpDownCounter<long>>{
-      new LongObservableUpDownCounter(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
+      InstrumentValueType::kLong};
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
 }
 
-nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>
-Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                           void (*callback)(metrics::ObserverResult<double> &),
-                                           nostd::string_view description,
-                                           nostd::string_view unit) noexcept
+void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
+                                                void (*callback)(metrics::ObserverResult<double> &),
+                                                nostd::string_view description,
+                                                nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>{
-      new DoubleObservableUpDownCounter(name, callback, description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
+      InstrumentValueType::kDouble};
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
