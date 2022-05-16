@@ -33,3 +33,10 @@ comment:
 # to coverage report file paths.
 fixes:
   - "/home/runner/::"
+
+ignore:
+  - "docs/**/*"
+  - "docker/**/*"
+  - "examples/**/*"
+  - "**/test/**/*"
+  - "**.md"

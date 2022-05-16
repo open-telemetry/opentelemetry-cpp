@@ -1,0 +1,1 @@
+docker run -p 9090:9090 -v $(pwd):/etc/prometheus --network="host" prom/prometheus

@@ -5,16 +5,14 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
+#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#  include "opentelemetry/sdk/metrics/view/view.h"
-#  include "opentelemetry/sdk/resource/resource.h"
 
 #  include <list>
 #  include <memory>
@@ -24,13 +22,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-struct LastReportedMetrics
-{
-  std::unique_ptr<AttributesHashMap> attributes_map;
-  opentelemetry::common::SystemTimestamp collection_ts;
-};
-
 class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
 {
 
@@ -43,7 +34,9 @@ public:
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor},
-        exemplar_reservoir_(exemplar_reservoir)
+        exemplar_reservoir_(exemplar_reservoir),
+        temporal_metric_storage_(instrument_descriptor)
+
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
       return std::move(
@@ -122,6 +115,7 @@ private:
   const AttributesProcessor *attributes_processor_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+  TemporalMetricStorage temporal_metric_storage_;
 };
 
 }  // namespace metrics

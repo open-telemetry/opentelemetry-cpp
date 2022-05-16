@@ -173,7 +173,7 @@ private:
   }
 };
 
-inline Token::~Token()
+inline Token::~Token() noexcept
 {
   context::RuntimeContext::Detach(*this);
 }
