@@ -47,30 +47,33 @@ find_package(OpenSSL REQUIRED)
 message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
 message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
-set(GRPC_GIT_TAG
-    "v1.45.2"
-    CACHE STRING "gRPC version")
+set(THRIFT_VERSION
+    "0.14.1"
+    CACHE STRING "thrift version")
 
 include(ExternalProject)
 ExternalProject_Add(
-  grpc
-  GIT_REPOSITORY https://github.com/grpc/grpc.git
-  GIT_TAG ${GRPC_GIT_TAG}
-  GIT_SHALLOW 1
+  thrift
+  URL https://github.com/apache/thrift/archive/refs/tags/v${THRIFT_VERSION}.tar.gz
   UPDATE_COMMAND ""
   CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${STAGED_INSTALL_PREFIX}
              -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
              -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-             -DgRPC_SSL_PROVIDER=package
-             -DOPENSSL_ROOT_DIR=OpenSSL
-             -DgRPC_BUILD_TESTS=OFF
-             -DBUILD_SHARED_LIBS=ON
-             -DgRPC_BUILD_GRPC_NODE_PLUGIN=OFF
-             -DgRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN=OFF
-             -DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF
-             -DgRPC_BUILD_GRPC_PHP_PLUGIN=OFF
-             -DgRPC_BUILD_GRPC_PYTHON_PLUGIN=OFF
-             -DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF
+             -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
+             -DBUILD_COMPILER=OFF
+             -DBUILD_CPP=ON
+             -DBUILD_LIBRARIES=ON
+             -DBUILD_NODEJS=OFF
+             -DBUILD_PYTHON=OFF
+             -DBUILD_JAVASCRIPT=OFF
+             -DBUILD_C_GLIB=OFF
+             -DBUILD_JAVA=OFF
+             -DBUILD_TESTING=OFF
+             -DBUILD_TUTORIALS=OFF
+             -DWITH_STDTHREADS=ON
+             -DWITH_BOOSTTHREADS=OFF
+             -DWITH_BOOST_FUNCTIONAL=OFF
+             -DWITH_BOOST_SMART_PTR=OFF
   CMAKE_CACHE_ARGS -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
   TEST_AFTER_INSTALL 0
   DOWNLOAD_NO_PROGRESS 1

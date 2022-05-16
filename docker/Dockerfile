@@ -1,7 +1,9 @@
 ARG BASE_IMAGE=ubuntu:latest
-
 ARG GRPC_IMAGE=grpc-${BASE_IMAGE}
+ARG THRIFT_IMAGE=thrift-${BASE_IMAGE}
+
 FROM ${GRPC_IMAGE} as grpc
+FROM ${THRIFT_IMAGE} as thrift
 
 FROM base-${BASE_IMAGE}-dev AS otel-cpp
 
@@ -9,6 +11,7 @@ ARG CORES=${nproc}
 ARG OTEL_GIT_TAG=v1.3.0
 
 COPY --from=grpc / /usr/local
+COPY --from=thrift / /usr/local
 
 #install opentelemetry-cpp
 RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
@@ -19,7 +22,7 @@ RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE  \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=OFF \
+        -DWITH_JAEGER=ON \
         -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
         -DBUILD_TESTING=OFF \
         -DWITH_OTLP=ON \
