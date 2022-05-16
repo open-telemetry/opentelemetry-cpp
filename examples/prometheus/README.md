@@ -41,7 +41,7 @@ std::unique_ptr<metrics_sdk::MetricExporter> exporter{
 
 OpenTelemetry `PrometheusExporter` will export
 data via the endpoint defined by
-[metrics_exporter::PrometheusExporterOptions::url],
+`metrics_exporter::PrometheusExporterOptions::url`,
 which is `http://localhost:8080/` by default.
 
 ```mermaid
@@ -49,7 +49,7 @@ graph LR
 
 subgraph SDK
   MeterProvider
-  MetricReader[BaseExportingMetricReader]
+  MetricReader[PeriodicExportingMetricReader]
   PrometheusExporter["PrometheusExporter<br/>(http://localhost:8080/)"]
 end
 
@@ -98,9 +98,9 @@ After finished downloading, extract it to a local location that's easy to
 access. We will find the default Prometheus configuration YAML file in the
 folder, named `prometheus.yml`.
 
-Let's create a new file in the same location as where `prometheus.yml` locates,
-and named the new file as `otel.yml` for this exercise. Then, copy and paste the
-entire content below into the `otel.yml` file we have created just now.
+Let's create a new file in the same location as where `prometheus.yml`. Then,
+copy and paste the entire content below into the `prometheus.yml` file
+we have created just now.
 
 ```yaml
 global:
@@ -127,7 +127,8 @@ Follow the instructions from
 [starting-prometheus](https://prometheus.io/docs/introduction/first_steps/#starting-prometheus)
 to start the Prometheus server and verify it has been started successfully.
 
-Please note that we will need pass in `otel.yml` file as the argument:
+Please note that we will need pass in `prometheus.yml` file as the argument
+or mount as volume:
 
 ```console
 docker run -p 9090:9090 -v $(pwd):/etc/prometheus --network="host" prom/prometheus
@@ -145,7 +146,7 @@ We should be able to see the following chart from the browser:
 ![Prometheus UI](https://user-images.githubusercontent.com/71217171/168492437-f9769db1-6f9e-49c6-8ef0-85f5e1188ba0.png)
 
 From the legend, we can see that the `instance` name and the `job` name are the
-values we have set in `otel.yml`.
+values we have set in `prometheus.yml`.
 
 Congratulations!
 
