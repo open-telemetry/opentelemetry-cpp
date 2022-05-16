@@ -1,83 +1,72 @@
 # Simple Metrics Example
 
-In this example, the application in `main.cc` initializes the metrics pipeline
-and shows 3 different ways of updating instrument values. Here are more detailed
-explanations of each part.
+This example initializes the metrics pipeline with 2 different instrument types.
+Here are more detailed explanations of each part.
 
-1: Initialize a MeterProvider. We will use this to obtain Meter objects in the
-future.
+1: Initialize an exporter and a reader. In this case, we initialize an OStream
+Exporter which will print to stdout by default.
+The reader periodically collects metrics from the collector and exports them.
 
-`auto provider = shared_ptr<MeterProvider>(new MeterProvider);`
+```cpp
+std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
+std::unique_ptr<metric_sdk::MetricReader> reader{
+    new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
+```
 
-2: Set the MeterProvider as the default instance for the library. This ensures
-that we will have access to the same MeterProvider across our application.
+2: Initialize a MeterProvider and add the reader.
+We will use this to obtain Meter objects in the future.
 
-`Provider::SetMeterProvider(provider);`
+```cpp
+auto provider = std::shared_ptr<metrics_api::MeterProvider>(new opentelemetry::metrics::MeterProvider());
+auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
+p->AddMetricReader(std::move(reader));
+```
 
-3: Obtain a meter from this meter provider. Every Meter pointer returned by the
+3: Create and add a view to the provider.
+
+```cpp
+std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
+    new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, "name_counter")};
+std::unique_ptr<metric_sdk::MeterSelector> meter_selector{
+    new metric_sdk::MeterSelector(name, version, schema)};
+std::unique_ptr<metric_sdk::View> sum_view{
+    new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
+p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
+```
+
+4: Then create a
+[Counter](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter)
+instrument from it. Every Meter pointer returned by the
 MeterProvider points to the same Meter. This means that the Meter will be able
 to combine metrics captured from different functions without having to
 constantly pass the Meter around the library.
 
-`shared_ptr<Meter> meter = provider→GetMeter("Test");`
-
-4: Initialize an exporter and processor. In this case, we initialize an OStream
-Exporter which will print to stdout by default. The Processor is an
-UngroupedProcessor which doesn’t filter or group captured metrics in any way.
-The false parameter indicates that this processor will send metric deltas rather
-than metric cumulatives.
-
 ```cpp
-unique_ptr<MetricsExporter> exporter = unique_ptr<MetricsExporter>(new OStreamMetricsExporter);
-shared_ptr<MetricsProcessor> processor = shared_ptr<MetricsProcessor>(new UngroupedMetricsProcessor(false));
-```
-
-5: Pass the meter, exporter, and processor into the controller. Since this is a
-push controller, a collection interval parameter (in seconds) is also taken. At
-each collection interval, the controller will request data from all of the
-instruments in the code and export them. Start the controller to begin the
-metrics pipeline.
-
-`metrics_sdk::PushController controller(meter, std::move(exporter), processor,
-5);` `controller.start();`
-
-6: Instrument code with synchronous and asynchronous instrument. These
-instruments can be placed in areas of interest to collect metrics and are
-created by the meter. Synchronous instruments are updated whenever the user
-desires with a value and label set. Calling add on a counter instrument for
-example will increase its value.  Asynchronous instruments can be updated the
-same way, but are intended to receive updates from a callback function. The
-callback below observes a value of 1. The user never has to call this function
-as it is automatically called by the controller.
-
-```cpp
-// Observer callback function
-void SumObserverCallback(metrics_api::ObserverResult<int> result){
-    std::map<std::string, std::string> labels = {{"key", "value"}};
-    auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
-    result.observe(1,labelkv);
-}
-
-// Create new instruments
-auto ctr= meter->NewIntCounter("Counter","none", "none", true);
-auto obs= meter->NewIntSumObserver("Counter","none", "none", true, &SumObserverCallback);
-
+nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+auto double_counter = meter->CreateDoubleCounter(counter_name);
 // Create a label set which annotates metric values
 std::map<std::string, std::string> labels = {{"key", "value"}};
 auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
-
-// Capture data from instruments.  Note that the asynchronous instrument is updates
-// automatically though its callback at the collection interval.  Additional measurments
-// can be made through calls to its observe function.
-ctr->add(5, labelkv);
-
+double_counter->Add(val, labelkv);
 ```
 
-7: Stop the controller once the program finished. This ensures that any metrics
-inside the pipeline are properly exported. Otherwise, some metrics may be
-destroyed in cleanup.
+5: To use histogram instrument, a view with proper `InstrumentType` and `AggregationType`
+has to be added to the provider.
 
-`controller.stop();`
+```cpp
+std::unique_ptr<metric_sdk::InstrumentSelector> histogram_instrument_selector{
+    new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, "histogram_name")};
+std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
+    new metric_sdk::MeterSelector(name, version, schema)};
+std::unique_ptr<metric_sdk::View> histogram_view{
+    new metric_sdk::View{name, "description", metric_sdk::AggregationType::kHistogram}};
+p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
+            std::move(histogram_view));
+
+auto histogram_counter = meter->CreateDoubleHistogram("histogram_name");
+auto context = opentelemetry::context::Context{};
+histogram_counter->Record(val, labelkv, context);
+```
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and
 running the example.

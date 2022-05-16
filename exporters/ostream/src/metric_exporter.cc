@@ -96,6 +96,7 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
   {
     sout_ << "\n  start time\t: " << timeToString(record.start_ts)
           << "\n  end time\t: " << timeToString(record.end_ts)
+          << "\n  name\t\t: " << record.instrument_descriptor.name_
           << "\n  description\t: " << record.instrument_descriptor.description_
           << "\n  unit\t\t: " << record.instrument_descriptor.unit_;
 
