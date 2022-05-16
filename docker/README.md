@@ -3,7 +3,7 @@
 **How to use this build script:**
 
 The build script `build.sh` can be used to build OpenTelemetry and
-it's dependencies withing the desired base image.
+it's dependencies within the desired base image.
 The final image only contains the necessary files in `/`.
 
 ```sh
