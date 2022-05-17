@@ -20,7 +20,7 @@ Run the application with:
 bazel run //examples/prometheus:prometheus_example
 ```
 
-The main difference between the [ostream-metrics](../metrics_simple/README.md) 
+The main difference between the [ostream-metrics](../metrics_simple/README.md)
 example with this one is that the line below is replaced:
 
 ```cpp
