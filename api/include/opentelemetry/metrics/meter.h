@@ -56,17 +56,15 @@ public:
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable Counter.
    */
-  virtual nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<long> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateLongObservableCounter(nostd::string_view name,
+                                           void (*callback)(ObserverResult<long> &),
+                                           nostd::string_view description = "",
+                                           nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<double> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateDoubleObservableCounter(nostd::string_view name,
+                                             void (*callback)(ObserverResult<double> &),
+                                             nostd::string_view description = "",
+                                             nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates a Histogram with the passed characteristics and returns a shared_ptr to that Histogram.
@@ -96,17 +94,15 @@ public:
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable Gauge.
    */
-  virtual nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<long> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateLongObservableGauge(nostd::string_view name,
+                                         void (*callback)(ObserverResult<long> &),
+                                         nostd::string_view description = "",
+                                         nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<double> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateDoubleObservableGauge(nostd::string_view name,
+                                           void (*callback)(ObserverResult<double> &),
+                                           nostd::string_view description = "",
+                                           nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -137,17 +133,15 @@ public:
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable UpDownCounter.
    */
-  virtual nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<long> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateLongObservableUpDownCounter(nostd::string_view name,
+                                                 void (*callback)(ObserverResult<long> &),
+                                                 nostd::string_view description = "",
+                                                 nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
-      nostd::string_view name,
-      void (*callback)(ObserverResult<double> &),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+  virtual void CreateDoubleObservableUpDownCounter(nostd::string_view name,
+                                                   void (*callback)(ObserverResult<double> &),
+                                                   nostd::string_view description = "",
+                                                   nostd::string_view unit = "") noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
