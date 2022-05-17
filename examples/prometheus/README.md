@@ -14,17 +14,13 @@
 It is highly recommended to go over the [ostream-metrics](../metrics_simple/README.md)
 doc before following along this document.
 
-Create a new console application and run it:
+Run the application with:
 
 ```sh
 bazel run //examples/prometheus:prometheus_example
 ```
 
-Now, we are going to make some small tweaks to the example in the
- ostream-metrics to make the metrics available via
-OpenTelemetry Prometheus Exporter.
-
-And replace the below line:
+The main difference between the [ostream-metrics](../metrics_simple/README.md) example with this one is that the line below is replaced:
 
 ```cpp
 std::unique_ptr<metric_sdk::MetricExporter> exporter{
@@ -62,8 +58,8 @@ Instrument --> | Measurements | MeterProvider
 MeterProvider --> | Metrics | MetricReader --> | Pull | PrometheusExporter
 ```
 
-Also, for our learning purpose, use a while-loop to keep recoring random
-values until the program stopped.
+Also, for our learning purpose, we use a while-loop to keep recoring random
+values until the program stops.
 
 ```cpp
 while (true)
@@ -91,16 +87,13 @@ Next, we are going to learn about how to use Prometheus to collect the metrics.
 
 Follow the [first steps](https://prometheus.io/docs/introduction/first_steps/)
 to download the [latest release](https://prometheus.io/download/) of Prometheus.
+It is also possible to use `prom/prometheus` docker image.
 
 ### Configuration
 
 After finished downloading, extract it to a local location that's easy to
 access. We will find the default Prometheus configuration YAML file in the
 folder, named `prometheus.yml`.
-
-Let's create a new file in the same location as where `prometheus.yml`. Then,
-copy and paste the entire content below into the `prometheus.yml` file
-we have created just now.
 
 ```yaml
 global:
@@ -131,6 +124,8 @@ Please note that we will need pass in `prometheus.yml` file as the argument
 or mount as volume:
 
 ```console
+./prometheus --config.file=prometheus.yml
+# OR:
 docker run -p 9090:9090 -v $(pwd):/etc/prometheus --network="host" prom/prometheus
 ```
 
@@ -161,6 +156,7 @@ called Grafana, which has powerful visualizations for the metrics.
 Start the standalone Grafana server (`grafana-server.exe` or
 `./bin/grafana-server`, depending on the operating system). Then, use the
 browser to navigate to [http://localhost:3000/](http://localhost:3000/).
+It is also possible to run `grafana/grafana` container:
 
 ```sh
 docker run -d -p 3000:3000 --network="host" grafana/grafana
