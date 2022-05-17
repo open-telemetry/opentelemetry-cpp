@@ -17,14 +17,6 @@ namespace otlp
 namespace resource = opentelemetry::sdk::resource;
 namespace proto    = opentelemetry::proto;
 
-TEST(OtlpLogRecordable, SetName)
-{
-  OtlpLogRecordable rec;
-  nostd::string_view name = "Test Log Name";
-  rec.SetName(name);
-  EXPECT_EQ(rec.log_record().name(), name);
-}
-
 TEST(OtlpLogRecordable, SetTimestamp)
 {
   OtlpLogRecordable rec;

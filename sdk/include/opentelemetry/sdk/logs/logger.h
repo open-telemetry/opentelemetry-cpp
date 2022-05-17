@@ -40,7 +40,6 @@ public:
   /**
    * Writes a log record into the processor.
    * @param severity the severity level of the log event.
-   * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
    * with the log event.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
@@ -51,7 +50,6 @@ public:
    * @param timestamp the timestamp the log record was created.
    * @throws No exceptions under any circumstances.   */
   void Log(opentelemetry::logs::Severity severity,
-           nostd::string_view name,
            nostd::string_view body,
            const opentelemetry::common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,

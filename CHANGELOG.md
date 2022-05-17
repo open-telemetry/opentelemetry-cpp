@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [PROTOCOL \& LOGS] Upgrade proto to v0.17.0, update log data model ([#1383](https://github.com/open-telemetry/opentelemetry-cpp/pull/1383))
+
 ## [1.3.0] 2022-04-11
 
 * [ETW EXPORTER] ETW provider handle cleanup ([#1322](https://github.com/open-telemetry/opentelemetry-cpp/pull/1322))
