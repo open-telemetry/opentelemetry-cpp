@@ -409,6 +409,12 @@ endif()
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
+if(NOT VCPKG_TOOLCHAIN)
+  set(VCPKG_TOOLCHAIN OFF)
+endif()
+if(NOT VCPKG_INSTALLED_DIR)
+  set(VCPKG_INSTALLED_DIR "")
+endif()
 configure_package_config_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/opentelemetry-cpp-config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
