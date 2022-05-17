@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include <string>
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
+
+#include <functional>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -34,6 +36,8 @@ public:
     return nostd::unique_ptr<InstrumentationLibrary>(
         new InstrumentationLibrary{name, version, schema_url});
   }
+
+  std::size_t HashCode() const noexcept { return hash_code_; }
 
   /**
    * Compare 2 instrumentation libraries.
@@ -70,12 +74,20 @@ private:
                          nostd::string_view version,
                          nostd::string_view schema_url = "")
       : name_(name), version_(version), schema_url_(schema_url)
-  {}
+  {
+    std::string hash_data;
+    hash_data.reserve(name_.size() + version_.size() + schema_url_.size());
+    hash_data += name_;
+    hash_data += version_;
+    hash_data += schema_url_;
+    hash_code_ = std::hash<std::string>{}(hash_data);
+  }
 
 private:
   std::string name_;
   std::string version_;
   std::string schema_url_;
+  std::size_t hash_code_;
 };
 
 }  // namespace instrumentationlibrary

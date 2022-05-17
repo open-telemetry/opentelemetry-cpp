@@ -72,14 +72,6 @@ void MultiRecordable::SetSeverity(opentelemetry::logs::Severity severity) noexce
   }
 }
 
-void MultiRecordable::SetName(nostd::string_view name) noexcept
-{
-  for (auto &recordable : recordables_)
-  {
-    recordable.second->SetName(name);
-  }
-}
-
 void MultiRecordable::SetBody(nostd::string_view message) noexcept
 {
   for (auto &recordable : recordables_)
