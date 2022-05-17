@@ -20,13 +20,16 @@
 #   OPENTELEMETRY_VERSION           - Version of opentelemetry-cpp.
 #
 # ::
+#   opentelemetry-cpp::proto                          - Imported target of opentelemetry-cpp::proto
 #   opentelemetry-cpp::api                            - Imported target of opentelemetry-cpp::api
 #   opentelemetry-cpp::sdk                            - Imported target of opentelemetry-cpp::sdk
 #   opentelemetry-cpp::ext                            - Imported target of opentelemetry-cpp::ext
 #   opentelemetry-cpp::version                        - Imported target of opentelemetry-cpp::version
 #   opentelemetry-cpp::common                         - Imported target of opentelemetry-cpp::common
+#   opentelemetry-cpp::resources                      - Imported target of opentelemetry-cpp::resources
 #   opentelemetry-cpp::trace                          - Imported target of opentelemetry-cpp::trace
 #   opentelemetry-cpp::metrics                        - Imported target of opentelemetry-cpp::metrics
+#   opentelemetry-cpp::metrics_deprecated             - Imported target of opentelemetry-cpp::metrics_deprecated
 #   opentelemetry-cpp::logs                           - Imported target of opentelemetry-cpp::logs
 #   opentelemetry-cpp::in_memory_span_exporter        - Imported target of opentelemetry-cpp::in_memory_span_exporter
 #   opentelemetry-cpp::otlp_recordable                - Imported target of opentelemetry-cpp::otlp_recordable
@@ -42,6 +45,7 @@
 #   opentelemetry-cpp::elasticsearch_log_exporter     - Imported target of opentelemetry-cpp::elasticsearch_log_exporter
 #   opentelemetry-cpp::etw_exporter                   - Imported target of opentelemetry-cpp::etw_exporter
 #   opentelemetry-cpp::jaeger_trace_exporter          - Imported target of opentelemetry-cpp::jaeger_trace_exporter
+#   opentelemetry-cpp::zipkin_trace_exporter          - Imported target of opentelemetry-cpp::zipkin_trace_exporter
 #   opentelemetry-cpp::zpages                         - Imported target of opentelemetry-cpp::zpages
 #   opentelemetry-cpp::http_client_curl               - Imported target of opentelemetry-cpp::http_client_curl
 #
@@ -60,6 +64,9 @@ set(OPENTELEMETRY_VERSION
     "@OPENTELEMETRY_VERSION@"
     CACHE STRING "opentelemetry-cpp version" FORCE)
 
+set(OPENTELEMETRY_BUILD_VCPKG_TOOLCHAIN @VCPKG_TOOLCHAIN@)
+set(OPENTELEMETRY_BUILD_VCPKG_INSTALLED_DIR "@VCPKG_INSTALLED_DIR@")
+
 @PACKAGE_INIT@
 
 # ##############################################################################
@@ -69,17 +76,42 @@ find_package(Threads)
 set_and_check(OPENTELEMETRY_CPP_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 set_and_check(OPENTELEMETRY_CPP_LIBRARY_DIRS "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
 
+if(OPENTELEMETRY_BUILD_VCPKG_TOOLCHAIN)
+  if(NOT VCPKG_TOOLCHAIN)
+    message(
+      WARNING
+        "opentelemetry-cpp is built with vcpkg, but it's imported without vcpkg toolchain."
+    )
+    message(
+      WARNING
+        "We recommand to use the same vcpkg toolchain as opentelemetry-cpp.")
+  else()
+    file(TO_CMAKE_PATH "${VCPKG_INSTALLED_DIR}" REAL_VCPKG_INSTALLED_DIR)
+    file(TO_CMAKE_PATH "${OPENTELEMETRY_BUILD_VCPKG_INSTALLED_DIR}"
+         ESPECT_VCPKG_INSTALLED_DIR)
+    if(NOT REAL_VCPKG_INSTALLED_DIR STREQUAL ESPECT_VCPKG_INSTALLED_DIR)
+      message(
+        NOTICE
+        "opentelemetry-cpp is built with vcpkg installation directory ${OPENTELEMETRY_BUILD_VCPKG_INSTALLED_DIR}, but we got ${VCPKG_INSTALLED_DIR}.There may be compatible problems."
+      )
+    endif()
+  endif()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake")
 
 set(OPENTELEMETRY_CPP_LIBRARIES)
 set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
+    proto
     api
     sdk
     ext
     version
     common
+    resources
     trace
     metrics
+    metrics_deprecated
     logs
     in_memory_span_exporter
     otlp_recordable
@@ -94,6 +126,7 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     elasticsearch_log_exporter
     etw_exporter
     jaeger_trace_exporter
+    zipkin_trace_exporter
     zpages
     http_client_curl)
 foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)

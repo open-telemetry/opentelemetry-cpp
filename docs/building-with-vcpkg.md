@@ -117,3 +117,88 @@ search path, and makes the required libraries to be found through `find_package(
 The opentelemetry-cpp repo also brings the vcpkg package under `tools` directory.
 This would be used during Windows builds to install the missing dependencies ONLY
 if the external vcpkg toolchain is not configured.
+
+## Troubleshooting
+
+When run cmake,it is possible to get `IMPORTED_LOCATION not set for imported target
+or`An imported target missing its location property`.This is because we build
+dependency packages with some value of`CMAKE_BUILD_TYPE`but import them with
+another.Most of time,we can just use the installed targets and ignore the`CONFIG`
+setting.Here is a example to patch these imported targets.
+
+```cmake
+# ============ Patch IMPORTED_VARS BEGIN ============
+function(project_build_tools_patch_default_imported_config)
+  set(PATCH_VARS
+      IMPORTED_IMPLIB
+      IMPORTED_LIBNAME
+      IMPORTED_LINK_DEPENDENT_LIBRARIES
+      IMPORTED_LINK_INTERFACE_LANGUAGES
+      IMPORTED_LINK_INTERFACE_LIBRARIES
+      IMPORTED_LINK_INTERFACE_MULTIPLICITY
+      IMPORTED_LOCATION
+      IMPORTED_NO_SONAME
+      IMPORTED_OBJECTS
+      IMPORTED_SONAME)
+  foreach(TARGET_NAME ${ARGN})
+    if(TARGET ${TARGET_NAME})
+      get_target_property(IS_IMPORTED_TARGET ${TARGET_NAME} IMPORTED)
+      if(NOT IS_IMPORTED_TARGET)
+        continue()
+      endif()
+
+      if(CMAKE_VERSION VERSION_LESS "3.19.0")
+        get_target_property(TARGET_TYPE_NAME ${TARGET_NAME} TYPE)
+        if(TARGET_TYPE_NAME STREQUAL "INTERFACE_LIBRARY")
+          continue()
+        endif()
+      endif()
+
+      get_target_property(DO_NOT_OVERWRITE ${TARGET_NAME} IMPORTED_LOCATION)
+      if(DO_NOT_OVERWRITE)
+        continue()
+      endif()
+
+      if(CMAKE_VERSION VERSION_LESS "3.19.0")
+        get_target_property(TARGET_TYPE_NAME ${TARGET_NAME} TYPE)
+        if(TARGET_TYPE_NAME STREQUAL "INTERFACE_LIBRARY")
+          continue()
+        endif()
+      endif()
+
+      # MSVC's STL and debug level must match the target.
+      # So we can only move out IMPORTED_LOCATION_NOCONFIG
+      if(MSVC)
+        set(PATCH_IMPORTED_CONFIGURATION "NOCONFIG")
+      else()
+        get_target_property(PATCH_IMPORTED_CONFIGURATION ${TARGET_NAME} IMPORTED_CONFIGURATIONS)
+      endif()
+
+      if(NOT PATCH_IMPORTED_CONFIGURATION)
+        continue()
+      endif()
+
+      get_target_property(PATCH_TARGET_LOCATION ${TARGET_NAME} "IMPORTED_LOCATION_${PATCH_IMPORTED_CONFIGURATION}")
+      if(NOT PATCH_TARGET_LOCATION)
+        continue()
+      endif()
+
+      foreach(PATCH_IMPORTED_KEY IN LISTS PATCH_VARS)
+        get_target_property(PATCH_IMPORTED_VALUE ${TARGET_NAME} "${PATCH_IMPORTED_KEY}_${PATCH_IMPORTED_CONFIGURATION}")
+        if(PATCH_IMPORTED_VALUE)
+          set_target_properties(${TARGET_NAME} PROPERTIES
+            "${PATCH_IMPORTED_KEY}" "${PATCH_IMPORTED_VALUE}")
+        endif()
+      endforeach()
+    endif()
+  endforeach()
+endfunction()
+
+# We also need to patch the dependencies of prometheus-cpp
+project_build_tools_patch_default_imported_config(CURL::libcurl
+  prometheus-cpp::core prometheus-cpp::pull prometheus-cpp::push
+  civetweb::civetweb-cpp civetweb::civetweb)
+project_build_tools_patch_default_imported_config(${OPENTELEMETRY_CPP_LIBRARIES})
+
+# ------------ Patch IMPORTED_VARS END ------------
+```
