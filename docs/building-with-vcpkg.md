@@ -120,11 +120,11 @@ if the external vcpkg toolchain is not configured.
 
 ## Troubleshooting
 
-When run cmake,it is possible to get `IMPORTED_LOCATION not set for imported target
-or`An imported target missing its location property`.This is because we build
-dependency packages with some value of`CMAKE_BUILD_TYPE`but import them with
-another.Most of time,we can just use the installed targets and ignore the`CONFIG`
-setting.Here is a example to patch these imported targets.
+When run cmake,it is possible to get `IMPORTED_LOCATION` not set for imported target
+or `An imported target missing its location property`. This is because we build
+dependency packages with some value of `CMAKE_BUILD_TYPE` but import them with
+another. Most of time, we can just use the installed targets and ignore the `CONFIG`
+setting. Here is a example to patch these imported targets.
 
 ```cmake
 # ============ Patch IMPORTED_VARS BEGIN ============
