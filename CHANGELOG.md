@@ -15,6 +15,62 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.4.0] 2022-05-17
+
+* [API SDK] Upgrade proto to v0.17.0, update log data model ([#1383](https://github.com/open-telemetry/opentelemetry-cpp/pull/1383))
+* [BUILD] Alpine image ([#1382](https://github.com/open-telemetry/opentelemetry-cpp/pull/1382))
+* [LOGS SDK] Get span_id from context when Logger::Log received invalid span_id
+  ([#1398](https://github.com/open-telemetry/opentelemetry-cpp/pull/1398))
+* [METRICS SDK] Connect async storage with async instruments ([#1388](https://github.com/open-telemetry/opentelemetry-cpp/pull/1388))
+* [DOCS] Getting started document using ostream exporter ([#1394](https://github.com/open-telemetry/opentelemetry-cpp/pull/1394))
+* [BUILD] Fix missing link to nlohmann_json ([#1390](https://github.com/open-telemetry/opentelemetry-cpp/pull/1390))
+* [SDK] Fix sharing resource in batched exported spans ([#1386](https://github.com/open-telemetry/opentelemetry-cpp/pull/1386))
+* [PROTOCOL \& LOGS] Upgrade proto to v0.17.0, update log data model ([#1383](https://github.com/open-telemetry/opentelemetry-cpp/pull/1383))
+* [METRICS SDK] Remove un-necessary files. ([#1379](https://github.com/open-telemetry/opentelemetry-cpp/pull/1379))
+* [EXPORTER] Prometheus exporter meters and instrument name ([#1378](https://github.com/open-telemetry/opentelemetry-cpp/pull/1378))
+* [API] Add noexcept/const qualifier at missing places for Trace API. ([#1374](https://github.com/open-telemetry/opentelemetry-cpp/pull/1374))
+* [SDK] Fix empty tracestate header propagation ([#1373](https://github.com/open-telemetry/opentelemetry-cpp/pull/1373))
+* [METRICS SDK] Reuse temporal metric storage for sync storage ([#1369](https://github.com/open-telemetry/opentelemetry-cpp/pull/1369))
+* [SDK] Fix baggage propagation for empty/invalid baggage context ([#1367](https://github.com/open-telemetry/opentelemetry-cpp/pull/1367))
+* [BUILD] Export opentelemetry_otlp_recordable ([#1365](https://github.com/open-telemetry/opentelemetry-cpp/pull/1365))
+* [TESTS] Disable test on prometheus-cpp which not need ([#1363](https://github.com/open-telemetry/opentelemetry-cpp/pull/1363))
+* [METRICS] Fix class member initialization order ([#1360](https://github.com/open-telemetry/opentelemetry-cpp/pull/1360))
+* [METRICS SDK] Simplify SDK Configuration: Use View with default aggregation if
+  no matching View is configured
+  ([#1358](https://github.com/open-telemetry/opentelemetry-cpp/pull/1358))
+* [BUILD] Add missing include guard ([#1357](https://github.com/open-telemetry/opentelemetry-cpp/pull/1357))
+* [ETW EXPORTER] Fix scalar delete against array ([#1356](https://github.com/open-telemetry/opentelemetry-cpp/pull/1356))
+* [ETW EXPORTER] Conditional include for codecvt header ([#1355](https://github.com/open-telemetry/opentelemetry-cpp/pull/1355))
+* [BUILD] Use latest TraceLoggingDynamic.h ([#1354](https://github.com/open-telemetry/opentelemetry-cpp/pull/1354))
+* [SDK] Add explicit type cast in baggage UrlDecode ([#1353](https://github.com/open-telemetry/opentelemetry-cpp/pull/1353))
+* [METRICS SDK] Remove exporter registration to meter provider ([#1350](https://github.com/open-telemetry/opentelemetry-cpp/pull/1350))
+* [METRICS SDK] Fix output time in metrics OStream exporter ([#1346](https://github.com/open-telemetry/opentelemetry-cpp/pull/1346))
+* [BUILD] ostream metrics cmake ([#1344](https://github.com/open-telemetry/opentelemetry-cpp/pull/1344))
+* [BUILD] Link `opentelemetry_ext` with `opentelemetry_api` ([#1336](https://github.com/open-telemetry/opentelemetry-cpp/pull/1336))
+* [METRICS SDK] Enable metric collection for Async Instruments - Delta and
+  Cumulative
+  ([#1334](https://github.com/open-telemetry/opentelemetry-cpp/pull/1334))
+* [BUILD] Dependencies image as artifact ([#1333](https://github.com/open-telemetry/opentelemetry-cpp/pull/1333))
+* [EXAMPLE] Prometheus example ([#1332](https://github.com/open-telemetry/opentelemetry-cpp/pull/1332))
+* [METRICS EXPORTER] Prometheus exporter ([#1331](https://github.com/open-telemetry/opentelemetry-cpp/pull/1331))
+* [METRICS] Metrics histogram example ([#1330](https://github.com/open-telemetry/opentelemetry-cpp/pull/1330))
+* [TESTS] Replace deprecated googletest API ([#1327](https://github.com/open-telemetry/opentelemetry-cpp/pull/1327))
+* [BUILD] Fix Ninja path ([#1326](https://github.com/open-telemetry/opentelemetry-cpp/pull/1326))
+* [API] Update yield logic for ARM processor ([#1325](https://github.com/open-telemetry/opentelemetry-cpp/pull/1325))
+* [BUILD] Fix metrics compiler warnings ([#1328](https://github.com/open-telemetry/opentelemetry-cpp/pull/1328))
+* [METRICS SDK] Implement Merge and Diff operation for Histogram Aggregation ([#1303](https://github.com/open-telemetry/opentelemetry-cpp/pull/1303))
+
+Notes:
+
+While opentelemetry-cpp Logs are still in experimental stage,
+[#1383](https://github.com/open-telemetry/opentelemetry-cpp/pull/1383) updated
+opentelemetry-proto to 0.17.0, which includes some breaking change in the
+protocol, like
+[this](https://github.com/open-telemetry/opentelemetry-proto/pull/373). This
+makes `name` parameter for our log API unnecessary. However, this parameter is
+marked deprecated instead of being removed in this release, and it will be
+removed in future release.
+
 ## [1.3.0] 2022-04-11
 
 * [ETW EXPORTER] ETW provider handle cleanup ([#1322](https://github.com/open-telemetry/opentelemetry-cpp/pull/1322))

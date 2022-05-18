@@ -42,12 +42,6 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override;
 
   /**
-   * Set name for this log
-   * @param name the name to set
-   */
-  void SetName(nostd::string_view name) noexcept override;
-
-  /**
    * Set body field for this log.
    * @param message the body to set
    */

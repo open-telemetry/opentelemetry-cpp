@@ -69,7 +69,6 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 
   // Create a recordable
   auto record = exporter->MakeRecordable();
-  record->SetName("Timeout Log");
   record->SetSeverity(logs_api::Severity::kFatal);
   record->SetTimestamp(std::chrono::system_clock::now());
   record->SetBody("Body of the log message");

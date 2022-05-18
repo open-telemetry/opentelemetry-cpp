@@ -24,7 +24,6 @@ TEST(LogRecord, GetDefaultValues)
   LogRecord record;
 
   ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
-  ASSERT_EQ(record.GetName(), "");
   ASSERT_EQ(record.GetBody(), "");
   ASSERT_NE(record.GetResource().GetAttributes().size(), 0);
   ASSERT_EQ(record.GetAttributes().size(), 0);
@@ -46,7 +45,6 @@ TEST(LogRecord, SetAndGet)
   LogRecord record;
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"res1", true}});
   record.SetSeverity(logs_api::Severity::kInvalid);
-  record.SetName("Log name");
   record.SetBody("Message");
   record.SetResource(resource);
   record.SetAttribute("attr1", (int64_t)314159);
@@ -57,7 +55,6 @@ TEST(LogRecord, SetAndGet)
 
   // Test that all fields match what was set
   ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
-  ASSERT_EQ(record.GetName(), "Log name");
   ASSERT_EQ(record.GetBody(), "Message");
   ASSERT_TRUE(nostd::get<bool>(record.GetResource().GetAttributes().at("res1")));
   ASSERT_EQ(nostd::get<int64_t>(record.GetAttributes().at("attr1")), 314159);

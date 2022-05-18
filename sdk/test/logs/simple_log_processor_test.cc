@@ -85,7 +85,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   for (int i = 0; i < num_logs; i++)
   {
     auto recordable = processor.MakeRecordable();
-    recordable->SetName("Log");
+    recordable->SetBody("Log Body");
     processor.OnReceive(std::move(recordable));
 
     // Verify that the batch of 1 log record sent by processor matches what exporter received
@@ -96,7 +96,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   EXPECT_EQ(logs_received->size(), num_logs);
   for (int i = 0; i < num_logs; i++)
   {
-    EXPECT_EQ("Log", logs_received->at(i)->GetName());
+    EXPECT_EQ("Log Body", logs_received->at(i)->GetBody());
   }
 }
 
