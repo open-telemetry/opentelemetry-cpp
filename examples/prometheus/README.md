@@ -92,7 +92,7 @@ It is also possible to use `prom/prometheus` docker image.
 
 ### Configuration
 
-After finished downloading, extract it to a local location that's easy to
+After downloading, extract it to a local location that's easy to
 access. We will find the default Prometheus configuration YAML file in the
 folder, named `prometheus.yml`.
 
