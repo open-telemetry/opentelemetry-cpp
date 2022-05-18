@@ -13,7 +13,7 @@ source release of OpenTelemetry C++ SDK.
 The following command can be used to install the public open source release:
 
 ```console
-vcpkg install opentelemetry
+vcpkg install opentelemetry-cpp
 ```
 
 That's it! The package should be compiled for the current OS.
