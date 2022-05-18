@@ -39,7 +39,7 @@ std::unique_ptr<metrics_sdk::MetricExporter> exporter{
 OpenTelemetry `PrometheusExporter` will export
 data via the endpoint defined by
 `metrics_exporter::PrometheusExporterOptions::url`,
-which is `http://localhost:8080/` by default.
+which is `http://localhost:9464/` by default.
 
 ```mermaid
 graph LR
@@ -47,7 +47,7 @@ graph LR
 subgraph SDK
   MeterProvider
   MetricReader[PeriodicExportingMetricReader]
-  PrometheusExporter["PrometheusExporter<br/>(http://localhost:8080/)"]
+  PrometheusExporter["PrometheusExporter<br/>(http://localhost:9464/)"]
 end
 
 subgraph API
@@ -76,7 +76,7 @@ while (true)
 ### Check results in the browser
 
 Start the application and keep it running. Now we should be able to see the
-metrics at [http://localhost:8080/metrics](http://localhost:9464/metrics) from a
+metrics at [http://localhost:9464/metrics](http://localhost:9464/metrics) from a
 web browser:
 
 ![Browser UI](https://user-images.githubusercontent.com/71217171/168492500-12bd1c99-33ab-4515-a294-17bc349b5d13.png)
@@ -108,11 +108,11 @@ alerting:
     timeout: 5s
     api_version: v2
     static_configs:
-    - targets: [localhost:8080]
+    - targets: [localhost:9464]
 scrape_configs:
   - job_name: otel
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['localhost:9464']
 ```
 
 ### Start Prometheus
@@ -194,7 +194,7 @@ subgraph Prometheus
   PrometheusDatabase
 end
 
-PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:8080/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:8080/metrics#quot; every 10 seconds)"}}
+PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:9464/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:9464/metrics#quot; every 10 seconds)"}}
 PrometheusScraper --> PrometheusDatabase[("Prometheus TSDB (time series database)")]
 PrometheusDatabase -->|http://localhost:9090/graph| PrometheusUI["Browser<br/>(Prometheus Dashboard)"]
 PrometheusDatabase -->|http://localhost:9090/api/| Grafana[Grafana Server]
