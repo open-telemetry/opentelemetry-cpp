@@ -194,7 +194,7 @@ subgraph Prometheus
   PrometheusDatabase
 end
 
-PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:9464/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:9464/metrics#quot; every 10 seconds)"}}
+PrometheusExporter["PrometheusExporter<br/>(listening at #quot;http://localhost:9464/#quot;)"] -->|HTTP GET| PrometheusScraper{{"Prometheus scraper<br/>(polling #quot;http://localhost:9464/metrics#quot; every 5 seconds)"}}
 PrometheusScraper --> PrometheusDatabase[("Prometheus TSDB (time series database)")]
 PrometheusDatabase -->|http://localhost:9090/graph| PrometheusUI["Browser<br/>(Prometheus Dashboard)"]
 PrometheusDatabase -->|http://localhost:9090/api/| Grafana[Grafana Server]
