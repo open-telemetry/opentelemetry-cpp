@@ -138,13 +138,15 @@ public:
   }
 
   void CreateLongObservableCounter(nostd::string_view name,
-                                   void (*callback)(ObserverResult<long> &),
+                                   void *state,
+                                   void (*callback)(ObserverResult<long> &, void *),
                                    nostd::string_view description = "",
                                    nostd::string_view unit        = "") noexcept override
   {}
 
   void CreateDoubleObservableCounter(nostd::string_view name,
-                                     void (*callback)(ObserverResult<double> &),
+                                     void *state,
+                                     void (*callback)(ObserverResult<double> &, void *),
                                      nostd::string_view description = "",
                                      nostd::string_view unit        = "") noexcept override
   {}
@@ -166,13 +168,15 @@ public:
   }
 
   void CreateLongObservableGauge(nostd::string_view name,
-                                 void (*callback)(ObserverResult<long> &),
+                                void *state,
+                                 void (*callback)(ObserverResult<long> &, void *),
                                  nostd::string_view description = "",
                                  nostd::string_view unit        = "") noexcept override
   {}
 
   void CreateDoubleObservableGauge(nostd::string_view name,
-                                   void (*callback)(ObserverResult<double> &),
+                                   void *state,
+                                   void (*callback)(ObserverResult<double> &, void *),
                                    nostd::string_view description = "",
                                    nostd::string_view unit        = "") noexcept override
   {}
@@ -196,13 +200,15 @@ public:
   }
 
   void CreateLongObservableUpDownCounter(nostd::string_view name,
-                                         void (*callback)(ObserverResult<long> &),
+                                         void *state,
+                                         void (*callback)(ObserverResult<long> &, void *),
                                          nostd::string_view description = "",
                                          nostd::string_view unit        = "") noexcept override
   {}
 
   void CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                           void (*callback)(ObserverResult<double> &),
+                                           void *state,
+                                           void (*callback)(ObserverResult<double> &, void *),
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "") noexcept override
   {}

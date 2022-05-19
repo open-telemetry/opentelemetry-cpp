@@ -51,18 +51,20 @@ public:
    * shared_ptr to that Observable Counter
    *
    * @param name the name of the new Observable Counter.
+   * @param callback the function to be observed by the instrument.
+   * @param state to be passed back to callback
    * @param description a brief description of what the Observable Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created Observable Counter.
    */
   virtual void CreateLongObservableCounter(nostd::string_view name,
-                                           void (*callback)(ObserverResult<long> &),
+                                           void (*callback)(ObserverResult<long> &, void *),
+                                           void *state = nullptr,
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "") noexcept = 0;
 
   virtual void CreateDoubleObservableCounter(nostd::string_view name,
-                                             void (*callback)(ObserverResult<double> &),
+                                             void (*callback)(ObserverResult<double> &, void *),
+                                             void *state = nullptr,
                                              nostd::string_view description = "",
                                              nostd::string_view unit        = "") noexcept = 0;
 
@@ -89,18 +91,20 @@ public:
    * shared_ptr to that Observable Counter
    *
    * @param name the name of the new Observable Gauge.
+   * @param callback the function to be observed by the instrument.
+   * @param state to be passed back to callback
    * @param description a brief description of what the Observable Gauge is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created Observable Gauge.
    */
   virtual void CreateLongObservableGauge(nostd::string_view name,
-                                         void (*callback)(ObserverResult<long> &),
+                                         void (*callback)(ObserverResult<long> &, void *),
+                                         void *state = nullptr,
                                          nostd::string_view description = "",
                                          nostd::string_view unit        = "") noexcept = 0;
 
   virtual void CreateDoubleObservableGauge(nostd::string_view name,
-                                           void (*callback)(ObserverResult<double> &),
+                                           void (*callback)(ObserverResult<double> &, void *),
+                                           void *state = nullptr,
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "") noexcept = 0;
 
@@ -128,18 +132,20 @@ public:
    * a shared_ptr to that Observable UpDownCounter
    *
    * @param name the name of the new Observable UpDownCounter.
+   * @param callback the function to be observed by the instrument.
+   * @param state to be passed back to callback
    * @param description a brief description of what the Observable UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created Observable UpDownCounter.
    */
   virtual void CreateLongObservableUpDownCounter(nostd::string_view name,
-                                                 void (*callback)(ObserverResult<long> &),
+                                                 void (*callback)(ObserverResult<long> &, void *),
+                                                 void *state = nullptr,
                                                  nostd::string_view description = "",
                                                  nostd::string_view unit        = "") noexcept = 0;
 
   virtual void CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                                   void (*callback)(ObserverResult<double> &),
+                                                   void (*callback)(ObserverResult<double> &, void *),
+                                                   void *state = nullptr,
                                                    nostd::string_view description = "",
                                                    nostd::string_view unit = "") noexcept = 0;
 };

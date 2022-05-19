@@ -58,7 +58,8 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
 }
 
 void Meter::CreateLongObservableCounter(nostd::string_view name,
-                                        void (*callback)(metrics::ObserverResult<long> &),
+                                        void *state,
+                                        void (*callback)(metrics::ObserverResult<long> &, void *),
                                         nostd::string_view description,
                                         nostd::string_view unit) noexcept
 {
@@ -66,11 +67,12 @@ void Meter::CreateLongObservableCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
 void Meter::CreateDoubleObservableCounter(nostd::string_view name,
-                                          void (*callback)(metrics::ObserverResult<double> &),
+                                          void *state,
+                                          void (*callback)(metrics::ObserverResult<double> &, void *),
                                           nostd::string_view description,
                                           nostd::string_view unit) noexcept
 {
@@ -78,7 +80,7 @@ void Meter::CreateDoubleObservableCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -110,7 +112,8 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
 }
 
 void Meter::CreateLongObservableGauge(nostd::string_view name,
-                                      void (*callback)(metrics::ObserverResult<long> &),
+                                      void *state,
+                                      void (*callback)(metrics::ObserverResult<long> &, void *),
                                       nostd::string_view description,
                                       nostd::string_view unit) noexcept
 {
@@ -118,11 +121,12 @@ void Meter::CreateLongObservableGauge(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
 void Meter::CreateDoubleObservableGauge(nostd::string_view name,
-                                        void (*callback)(metrics::ObserverResult<double> &),
+                                        void *state,
+                                        void (*callback)(metrics::ObserverResult<double> &, void *),
                                         nostd::string_view description,
                                         nostd::string_view unit) noexcept
 {
@@ -130,7 +134,7 @@ void Meter::CreateDoubleObservableGauge(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -162,7 +166,8 @@ nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
 }
 
 void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
-                                              void (*callback)(metrics::ObserverResult<long> &),
+                                              void *state,
+                                              void (*callback)(metrics::ObserverResult<long> &, void *),
                                               nostd::string_view description,
                                               nostd::string_view unit) noexcept
 {
@@ -170,11 +175,12 @@ void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
 void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                                void (*callback)(metrics::ObserverResult<double> &),
+                                                void *state,
+                                                void (*callback)(metrics::ObserverResult<double> &, void *),
                                                 nostd::string_view description,
                                                 nostd::string_view unit) noexcept
 {
@@ -182,7 +188,7 @@ void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
