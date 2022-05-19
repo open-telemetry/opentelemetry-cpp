@@ -236,9 +236,9 @@ OPENTELEMETRY_END_NAMESPACE
 #  define OTEL_INTERNAL_LOG_INFO_2_ARGS(message, attributes)                                      \
     OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Info, message, \
                                attributes)
-#  define OTEL_INTERNAL_LOG_INFO_MACRO(...)                                    \
-    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_ERROR_2_ARGS, \
-                                  OTEL_INTERNAL_LOG_ERROR_1_ARGS)
+#  define OTEL_INTERNAL_LOG_INFO_MACRO(...)                                   \
+    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_INFO_2_ARGS, \
+                                  OTEL_INTERNAL_LOG_INFO_1_ARGS)
 #  define OTEL_INTERNAL_LOG_INFO(...) OTEL_INTERNAL_LOG_INFO_MACRO(__VA_ARGS__)(__VA_ARGS__)
 #else
 #  define OTEL_INTERNAL_LOG_INFO(...)
