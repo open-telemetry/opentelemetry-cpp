@@ -39,7 +39,8 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult<long> &observer_result, void *state)
+  static void Fetcher(opentelemetry::metrics::ObserverResult<long> &observer_result,
+                      void * /*state*/)
   {
     fetch_count++;
     if (fetch_count == 1)
