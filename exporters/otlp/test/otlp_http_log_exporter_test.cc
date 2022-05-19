@@ -137,15 +137,13 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs = *check_json["resource_logs"].begin();
-          auto instrumentation_library_span =
-              *resource_logs["instrumentation_library_logs"].begin();
-          auto log               = *instrumentation_library_span["logs"].begin();
+          auto resource_logs     = *check_json["resource_logs"].begin();
+          auto scope_logs        = *resource_logs["scope_logs"].begin();
+          auto log               = *scope_logs["log_records"].begin();
           auto received_trace_id = log["trace_id"].get<std::string>();
           auto received_span_id  = log["span_id"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log name", log["name"].get<std::string>());
           EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -159,7 +157,7 @@ public:
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
+    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
                  {"bool_value", true},
@@ -236,15 +234,13 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs = *check_json["resource_logs"].begin();
-          auto instrumentation_library_span =
-              *resource_logs["instrumentation_library_logs"].begin();
-          auto log               = *instrumentation_library_span["logs"].begin();
+          auto resource_logs     = *check_json["resource_logs"].begin();
+          auto scope_logs        = *resource_logs["scope_logs"].begin();
+          auto log               = *scope_logs["log_records"].begin();
           auto received_trace_id = log["trace_id"].get<std::string>();
           auto received_span_id  = log["span_id"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log name", log["name"].get<std::string>());
           EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -263,7 +259,7 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
+    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
                  {"bool_value", true},
@@ -335,10 +331,9 @@ public:
           opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_log = request_body.resource_logs(0).instrumentation_library_logs(0).logs(0);
+          auto received_log = request_body.resource_logs(0).scope_logs(0).log_records(0);
           EXPECT_EQ(received_log.trace_id(), report_trace_id);
           EXPECT_EQ(received_log.span_id(), report_span_id);
-          EXPECT_EQ("Log name", received_log.name());
           EXPECT_EQ("Log message", received_log.body().string_value());
           EXPECT_LE(15, received_log.attributes_size());
           bool check_service_name = false;
@@ -358,7 +353,7 @@ public:
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
+    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
                  {"bool_value", true},
@@ -431,10 +426,9 @@ public:
           opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_log = request_body.resource_logs(0).instrumentation_library_logs(0).logs(0);
+          auto received_log = request_body.resource_logs(0).scope_logs(0).log_records(0);
           EXPECT_EQ(received_log.trace_id(), report_trace_id);
           EXPECT_EQ(received_log.span_id(), report_span_id);
-          EXPECT_EQ("Log name", received_log.name());
           EXPECT_EQ("Log message", received_log.body().string_value());
           EXPECT_LE(15, received_log.attributes_size());
           bool check_service_name = false;
@@ -458,7 +452,7 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
+    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
                  {"bool_value", true},

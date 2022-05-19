@@ -6,6 +6,8 @@
 #  include <chrono>
 #  include <map>
 #  include <thread>
+#  include <vector>
+#  include "opentelemetry/context/context.h"
 #  include "opentelemetry/metrics/provider.h"
 
 namespace nostd       = opentelemetry::nostd;
@@ -23,6 +25,18 @@ std::map<std::string, std::string> get_random_attr()
   return std::map<std::string, std::string>{labels[rand() % (labels.size() - 1)],
                                             labels[rand() % (labels.size() - 1)]};
 }
+
+class MeasurementFetcher
+{
+public:
+  static void Fetcher(opentelemetry::metrics::ObserverResult<double> &observer_result)
+  {
+    double val                                = (rand() % 700) + 1.1;
+    std::map<std::string, std::string> labels = get_random_attr();
+    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+    observer_result.Observe(val /*, labelkv*/);
+  }
+};
 }  // namespace
 
 void foo_library::counter_example(const std::string &name)
@@ -36,6 +50,18 @@ void foo_library::counter_example(const std::string &name)
   {
     double val = (rand() % 700) + 1.1;
     double_counter->Add(val);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+}
+
+void foo_library::observable_counter_example(const std::string &name)
+{
+  std::string counter_name                    = name + "_observable_counter";
+  auto provider                               = metrics_api::Provider::GetMeterProvider();
+  nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  meter->CreateDoubleObservableCounter(counter_name, MeasurementFetcher::Fetcher);
+  while (true)
+  {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }

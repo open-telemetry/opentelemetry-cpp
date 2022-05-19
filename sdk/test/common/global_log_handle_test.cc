@@ -24,6 +24,14 @@ public:
     {
       EXPECT_EQ(0, strncmp(msg, "Error message", 13));
     }
+    else if (level == opentelemetry::sdk::common::internal_log::LogLevel::Info)
+    {
+      EXPECT_EQ(0, strncmp(msg, "Info message", 12));
+    }
+    else if (level == opentelemetry::sdk::common::internal_log::LogLevel::Warning)
+    {
+      EXPECT_EQ(0, strncmp(msg, "Warning message", 15));
+    }
     ++count;
   }
 
@@ -50,7 +58,9 @@ TEST(GlobalLogHandleTest, CustomLogHandler)
       opentelemetry::sdk::common::internal_log::LogLevel::Debug);
   OTEL_INTERNAL_LOG_ERROR("Error message");
   OTEL_INTERNAL_LOG_DEBUG("Debug message. Headers:", attributes);
-  EXPECT_EQ(before_count + 3, static_cast<CustomLogHandler *>(custom_log_handler.get())->count);
+  OTEL_INTERNAL_LOG_INFO("Info message");
+  OTEL_INTERNAL_LOG_WARN("Warning message");
+  EXPECT_EQ(before_count + 5, static_cast<CustomLogHandler *>(custom_log_handler.get())->count);
 
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(backup_log_handle);
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(backup_log_level);

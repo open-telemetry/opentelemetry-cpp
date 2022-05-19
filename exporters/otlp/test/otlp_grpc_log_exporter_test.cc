@@ -58,9 +58,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ShutdownTest)
   auto exporter = GetExporter(stub_interface);
 
   auto recordable_1 = exporter->MakeRecordable();
-  recordable_1->SetName("Test log 1");
   auto recordable_2 = exporter->MakeRecordable();
-  recordable_2->SetName("Test log 2");
 
   // exporter shuold not be shutdown by default
   nostd::span<std::unique_ptr<sdk::logs::Recordable>> batch_1(&recordable_1, 1);
@@ -87,9 +85,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportUnitTest)
   auto exporter = GetExporter(stub_interface);
 
   auto recordable_1 = exporter->MakeRecordable();
-  recordable_1->SetName("Test logs 1");
   auto recordable_2 = exporter->MakeRecordable();
-  recordable_2->SetName("Test logs 2");
 
   // Test successful RPC
   nostd::span<std::unique_ptr<sdk::logs::Recordable>> batch_1(&recordable_1, 1);
@@ -137,9 +133,9 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
                                                               '3', '2', '1', '0'};
   opentelemetry::trace::SpanId span_id{span_id_bin};
 
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
-  logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
+  logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
               {{"service.name", "unit_test_service"},
                {"tenant.id", "test_user"},
                {"bool_value", true},

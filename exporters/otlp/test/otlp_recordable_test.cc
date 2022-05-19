@@ -49,13 +49,6 @@ TEST(OtlpRecordable, SetIdentity)
   EXPECT_EQ(rec_invalid_parent.span().parent_span_id(), std::string{});
 }
 
-TEST(OtlpRecordable, SetName)
-{
-  OtlpRecordable rec;
-  nostd::string_view name = "Test Span";
-  rec.SetName(name);
-  EXPECT_EQ(rec.span().name(), name);
-}
 TEST(OtlpRecordable, SetSpanKind)
 {
   OtlpRecordable rec;
@@ -77,7 +70,7 @@ TEST(OtlpRecordable, SetInstrumentationLibrary)
 TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
 {
   OtlpRecordable rec;
-  const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto inst_lib = trace_sdk::InstrumentationLibrary::Create("test", "v1", expected_schema_url);
   rec.SetInstrumentationLibrary(*inst_lib);
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
@@ -220,7 +213,7 @@ TEST(OtlpRecordable, SetResourceWithSchemaURL)
   OtlpRecordable rec;
   const std::string service_name_key    = "service.name";
   const std::string service_name        = "test-otlp";
-  const std::string expected_schema_url = "https://opentelemetry.io/schemas/1.2.0";
+  const std::string expected_schema_url = "https://opentelemetry.io/schemas/1.11.0";
   auto resource =
       resource::Resource::Create({{service_name_key, service_name}}, expected_schema_url);
   rec.SetResource(resource);

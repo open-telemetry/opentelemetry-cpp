@@ -50,12 +50,6 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override;
 
   /**
-   * Set name for this log
-   * @param name the name to set
-   */
-  void SetName(nostd::string_view name) noexcept override;
-
-  /**
    * Set body field for this log.
    * @param message the body to set
    */
@@ -66,6 +60,9 @@ public:
    * @param Resource the resource to set
    */
   void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
+
+  /** Returns the associated resource */
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
    * Set an attribute of a log.

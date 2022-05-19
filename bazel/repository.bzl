@@ -2,7 +2,7 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-_ALL_CONTENT = """\
+_ALL_CONTENT = """
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
@@ -74,10 +74,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "985367f8905e91018e636cbf0d83ab3f834b665c4f5899a27d10cae9657710e2",
-        strip_prefix = "opentelemetry-proto-0.11.0",
+        sha256 = "f269fbcb30e17b03caa1decd231ce826e59d7651c0f71c3b28eb5140b4bb5412",
+        strip_prefix = "opentelemetry-proto-0.17.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.11.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.17.0.tar.gz",
         ],
     )
 
@@ -164,5 +164,5 @@ cc_library(
     visibility = ["//visibility:public"],
 )
         """,
-        path = "vcpkg/installed/x64-windows/",
+        path = "tools/vcpkg/installed/x64-windows/",
     )
