@@ -58,10 +58,10 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
 }
 
 void Meter::CreateLongObservableCounter(nostd::string_view name,
-                                        void *state,
                                         void (*callback)(metrics::ObserverResult<long> &, void *),
                                         nostd::string_view description,
-                                        nostd::string_view unit) noexcept
+                                        nostd::string_view unit,
+                                        void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
@@ -71,10 +71,11 @@ void Meter::CreateLongObservableCounter(nostd::string_view name,
 }
 
 void Meter::CreateDoubleObservableCounter(nostd::string_view name,
-                                          void *state,
-                                          void (*callback)(metrics::ObserverResult<double> &, void *),
+                                          void (*callback)(metrics::ObserverResult<double> &,
+                                                           void *),
                                           nostd::string_view description,
-                                          nostd::string_view unit) noexcept
+                                          nostd::string_view unit,
+                                          void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
@@ -112,10 +113,10 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
 }
 
 void Meter::CreateLongObservableGauge(nostd::string_view name,
-                                      void *state,
                                       void (*callback)(metrics::ObserverResult<long> &, void *),
                                       nostd::string_view description,
-                                      nostd::string_view unit) noexcept
+                                      nostd::string_view unit,
+                                      void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
@@ -125,10 +126,10 @@ void Meter::CreateLongObservableGauge(nostd::string_view name,
 }
 
 void Meter::CreateDoubleObservableGauge(nostd::string_view name,
-                                        void *state,
                                         void (*callback)(metrics::ObserverResult<double> &, void *),
                                         nostd::string_view description,
-                                        nostd::string_view unit) noexcept
+                                        nostd::string_view unit,
+                                        void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
@@ -166,10 +167,11 @@ nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
 }
 
 void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
-                                              void *state,
-                                              void (*callback)(metrics::ObserverResult<long> &, void *),
+                                              void (*callback)(metrics::ObserverResult<long> &,
+                                                               void *),
                                               nostd::string_view description,
-                                              nostd::string_view unit) noexcept
+                                              nostd::string_view unit,
+                                              void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
@@ -179,10 +181,11 @@ void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
 }
 
 void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                                void *state,
-                                                void (*callback)(metrics::ObserverResult<double> &, void *),
+                                                void (*callback)(metrics::ObserverResult<double> &,
+                                                                 void *),
                                                 nostd::string_view description,
-                                                nostd::string_view unit) noexcept
+                                                nostd::string_view unit,
+                                                void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},

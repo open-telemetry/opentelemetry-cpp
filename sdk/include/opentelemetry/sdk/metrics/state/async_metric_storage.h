@@ -27,7 +27,8 @@ class AsyncMetricStorage : public MetricStorage
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &),
+                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &,
+                                                  void *),
                      const AttributesProcessor *attributes_processor,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
@@ -81,7 +82,7 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
-  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &);
+  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &, void *);
   const AttributesProcessor *attributes_processor_;
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;

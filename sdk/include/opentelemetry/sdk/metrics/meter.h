@@ -43,17 +43,18 @@ public:
       nostd::string_view unit        = "") noexcept override;
 
   void CreateLongObservableCounter(nostd::string_view name,
-                                   void *state,
-                                   void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
+                                   void (*callback)(opentelemetry::metrics::ObserverResult<long> &,
+                                                    void *),
                                    nostd::string_view description = "",
-                                   nostd::string_view unit        = "") noexcept override;
+                                   nostd::string_view unit        = "",
+                                   void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableCounter(
       nostd::string_view name,
-      void *state,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+      nostd::string_view unit        = "",
+      void *state                    = nullptr) noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
@@ -66,17 +67,18 @@ public:
       nostd::string_view unit        = "") noexcept override;
 
   void CreateLongObservableGauge(nostd::string_view name,
-                                 void *state,
-                                 void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
+                                 void (*callback)(opentelemetry::metrics::ObserverResult<long> &,
+                                                  void *),
                                  nostd::string_view description = "",
-                                 nostd::string_view unit        = "") noexcept override;
+                                 nostd::string_view unit        = "",
+                                 void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableGauge(
       nostd::string_view name,
-      void *state,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+      nostd::string_view unit        = "",
+      void *state                    = nullptr) noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
@@ -90,17 +92,17 @@ public:
 
   void CreateLongObservableUpDownCounter(
       nostd::string_view name,
-      void *state,
       void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+      nostd::string_view unit        = "",
+      void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
-      void *state,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+      nostd::string_view unit        = "",
+      void *state                    = nullptr) noexcept override;
 
   /** Returns the associated instruementation library */
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
@@ -123,13 +125,14 @@ private:
 
   template <class T>
   void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
-                                  void (*callback)(opentelemetry::metrics::ObserverResult<T> &),
+                                  void (*callback)(opentelemetry::metrics::ObserverResult<T> &,
+                                                   void *),
                                   void *state = nullptr)
   {
     auto view_registry = meter_context_->GetViewRegistry();
     auto success       = view_registry->FindViews(
         instrument_descriptor, *instrumentation_library_,
-        [this, &instrument_descriptor, callback](const View &view) {
+        [this, &instrument_descriptor, callback, state](const View &view) {
           auto view_instr_desc         = instrument_descriptor;
           view_instr_desc.name_        = view.GetName();
           view_instr_desc.description_ = view.GetDescription();
