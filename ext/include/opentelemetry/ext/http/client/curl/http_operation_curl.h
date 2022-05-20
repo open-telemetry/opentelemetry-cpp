@@ -17,8 +17,8 @@
 #  include <io.h>
 #  include <winsock2.h>
 #else
-#  include <unistd.h>
 #  include <poll.h>
+#  include <unistd.h>
 #endif
 #include <curl/curl.h>
 
@@ -492,7 +492,7 @@ protected:
 #else 
 
     struct pollfd fds[1];
-    ::memset(fds, 0 , sizeof(fds));
+    ::memset(fds, 0, sizeof(fds));
 
     fds[0].fd = sockfd;
     if (for_recv)
@@ -506,17 +506,17 @@ protected:
 
     if (poll(fds, 1, timeout_ms) > 0)
     {
-      if (for_recv) 
+      if (for_recv)
       {
         res = (0 != (fds[0].revents & POLLIN));
-      } 
+      }
       else
       {
         res = (0 != (fds[0].revents & POLLOUT));
       }
     }
 
-#endif 
+#endif
 
     return res;
   }
