@@ -20,8 +20,8 @@ namespace trace
 AsyncBatchSpanProcessor::AsyncBatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
                                                  const AsyncBatchSpanProcessorOptions &options)
     : BatchSpanProcessor(std::move(exporter), options),
-      max_export_async_(options.max_export_async),
-      export_data_storage_(std::make_shared<ExportDataStorage>())
+      export_data_storage_(std::make_shared<ExportDataStorage>()),
+      max_export_async_(options.max_export_async)
 {
   export_data_storage_->export_ids_flag.resize(max_export_async_, true);
   for (size_t i = 1; i <= max_export_async_; i++)

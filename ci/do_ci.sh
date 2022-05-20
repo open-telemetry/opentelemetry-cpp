@@ -66,7 +66,7 @@ if [[ "$1" != "bazel.nortti" ]]; then
 fi
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
-BAZEL_OPTIONS_ASYNC="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_ASYNC_EXPORT"
+BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS --copt=-DENABLE_ASYNC_EXPORT"
 BAZEL_TEST_OPTIONS_ASYNC="$BAZEL_OPTIONS_ASYNC --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
