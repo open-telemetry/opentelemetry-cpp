@@ -47,7 +47,7 @@ public:
       nostd::string_view unit        = "") noexcept = 0;
 
   /**
-   * Creates a Asynchronouse (Observable) counter with the passed characteristics and returns a
+   * Creates a Asynchronous (Observable) counter with the passed characteristics and returns a
    * shared_ptr to that Observable Counter
    *
    * @param name the name of the new Observable Counter.
