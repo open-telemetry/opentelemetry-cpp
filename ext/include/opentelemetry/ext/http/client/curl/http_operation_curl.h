@@ -489,7 +489,7 @@ protected:
       }
     }
 
-#else 
+#else
 
     struct pollfd fds[1];
     ::memset(fds, 0, sizeof(fds));
