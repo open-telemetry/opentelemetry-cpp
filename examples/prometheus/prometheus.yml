@@ -9,8 +9,8 @@ alerting:
     timeout: 5s
     api_version: v2
     static_configs:
-    - targets: [localhost:8080]
+    - targets: [localhost:9464]
 scrape_configs:
   - job_name: otel
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['localhost:9464']

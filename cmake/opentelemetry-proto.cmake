@@ -3,7 +3,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
   set(needs_proto_download FALSE)
 else()
   if("${opentelemetry-proto}" STREQUAL "")
-    set(opentelemetry-proto "main")
+    set(opentelemetry-proto "v0.17.0")
   endif()
   include(ExternalProject)
   ExternalProject_Add(
@@ -153,8 +153,9 @@ if(WITH_OTLP_GRPC)
            ${METRICS_SERVICE_GRPC_PB_H_FILE}
            ${METRICS_SERVICE_GRPC_PB_CPP_FILE}
     COMMAND
-      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--proto_path=${PROTO_PATH}"
-      ${PROTOBUF_INCLUDE_FLAGS} "--cpp_out=${GENERATED_PROTOBUF_PATH}"
+      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--experimental_allow_proto3_optional"
+      "--proto_path=${PROTO_PATH}" ${PROTOBUF_INCLUDE_FLAGS}
+      "--cpp_out=${GENERATED_PROTOBUF_PATH}"
       "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
       --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}" ${COMMON_PROTO}
       ${RESOURCE_PROTO} ${TRACE_PROTO} ${LOGS_PROTO} ${METRICS_PROTO}
@@ -178,11 +179,11 @@ else()
            ${METRICS_SERVICE_PB_H_FILE}
            ${METRICS_SERVICE_PB_CPP_FILE}
     COMMAND
-      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--proto_path=${PROTO_PATH}"
-      ${PROTOBUF_INCLUDE_FLAGS} "--cpp_out=${GENERATED_PROTOBUF_PATH}"
-      ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO} ${LOGS_PROTO}
-      ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
-      ${METRICS_SERVICE_PROTO})
+      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--experimental_allow_proto3_optional"
+      "--proto_path=${PROTO_PATH}" ${PROTOBUF_INCLUDE_FLAGS}
+      "--cpp_out=${GENERATED_PROTOBUF_PATH}" ${COMMON_PROTO} ${RESOURCE_PROTO}
+      ${TRACE_PROTO} ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO}
+      ${LOGS_SERVICE_PROTO} ${METRICS_SERVICE_PROTO})
 endif()
 
 include_directories("${GENERATED_PROTOBUF_PATH}")

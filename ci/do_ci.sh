@@ -66,7 +66,7 @@ if [[ "$1" != "bazel.nortti" ]]; then
 fi
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
-BAZEL_OPTIONS_ASYNC="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_ASYNC_EXPORT"
+BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS --copt=-DENABLE_ASYNC_EXPORT"
 BAZEL_TEST_OPTIONS_ASYNC="$BAZEL_OPTIONS_ASYNC --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
@@ -241,8 +241,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
   # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
-  bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
+  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
+  bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS_ASYNC //...
@@ -294,7 +294,7 @@ elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.43.2" > third_party_release
   echo "thrift=0.14.1" >> third_party_release
   echo "abseil=20210324.0" >> third_party_release
-  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' >> third_party_release
+  git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi
 

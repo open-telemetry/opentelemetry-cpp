@@ -32,9 +32,9 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 {
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
-  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger1 = lp->GetLogger("logger1", "", "opentelelemtry_library", "", schema_url);
-  auto logger2 = lp->GetLogger("logger2", "", "opentelelemtry_library", "", schema_url);
+  auto logger2 = lp->GetLogger("logger2", "", "", "", schema_url);
 
   // Check that the logger is not nullptr
   ASSERT_NE(logger1, nullptr);
@@ -46,7 +46,7 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
   ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetVersion(), "");
   ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
 
-  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetName(), "logger2");
   ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetVersion(), "");
   ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
 
@@ -67,7 +67,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   // detail to this test
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
-  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger1 = lp->GetLogger("logger1", "", "opentelelemtry_library", "", schema_url);
 
   // Check GetLogger(logger_name, args)

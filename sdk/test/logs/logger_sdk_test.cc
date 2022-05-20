@@ -18,7 +18,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   // since it calls Processor::OnReceive()
 
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
@@ -54,7 +54,6 @@ public:
     // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor
     record_received_->SetSeverity(copy->GetSeverity());
-    record_received_->SetName(copy->GetName());
     record_received_->SetBody(copy->GetBody());
   }
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
@@ -71,7 +70,7 @@ TEST(LoggerSDK, LogToAProcessor)
 {
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = api_lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
@@ -90,10 +89,9 @@ TEST(LoggerSDK, LogToAProcessor)
   lp->AddProcessor(std::unique_ptr<LogProcessor>(new MockProcessor(shared_recordable)));
 
   // Check that the recordable created by the Log() statement is set properly
-  logger->Log(logs_api::Severity::kWarn, "Log Name", "Log Message");
+  logger->Log(logs_api::Severity::kWarn, "Log Message");
 
   ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
-  ASSERT_EQ(shared_recordable->GetName(), "Log Name");
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
 }
 #endif

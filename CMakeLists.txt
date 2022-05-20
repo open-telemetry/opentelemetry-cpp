@@ -173,6 +173,11 @@ if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 endif(WIN32)
 
+# Do not convert deprecated message to error
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+  add_compile_options(-Wno-error=deprecated-declarations)
+endif()
+
 option(
   WITH_API_ONLY
   "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"

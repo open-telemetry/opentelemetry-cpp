@@ -79,7 +79,6 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
       "  timestamp     : 0\n"
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
-      "  name          : \n"
       "  body          : \n",
       "  resource      : {",
       "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
@@ -117,7 +116,6 @@ TEST(OStreamLogExporter, SimpleLogToCout)
   auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
   record->SetTimestamp(now);
   record->SetSeverity(logs_api::Severity::kTrace);  // kTrace has enum value of 1
-  record->SetName("Name");
   record->SetBody("Message");
 
   // Log a record to cout
@@ -133,7 +131,6 @@ TEST(OStreamLogExporter, SimpleLogToCout)
           "\n"
           "  severity_num  : 1\n"
           "  severity_text : TRACE\n"
-          "  name          : Name\n"
           "  body          : Message\n",
       "  resource      : {",
       "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
@@ -187,7 +184,6 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
       "  timestamp     : 0\n"
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
-      "  name          : \n"
       "  body          : \n",
       "  resource      : {",
       "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
@@ -249,7 +245,6 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
       "  timestamp     : 0\n"
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
-      "  name          : \n"
       "  body          : \n",
       "  resource      : {",
       "{service.name: unknown_service}",
@@ -283,7 +278,7 @@ TEST(OStreamLogExporter, IntegrationTest)
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
       "Logger", "", "opentelelemtry_library", "", schema_url);
 
@@ -296,7 +291,7 @@ TEST(OStreamLogExporter, IntegrationTest)
 
   // Write a log to ostream exporter
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(logs_api::Severity::kDebug, "", "Hello", {}, {}, {}, {}, now);
+  logger->Log(logs_api::Severity::kDebug, "Hello", {}, {}, {}, {}, now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);
@@ -309,7 +304,6 @@ TEST(OStreamLogExporter, IntegrationTest)
           "\n"
           "  severity_num  : 5\n"
           "  severity_text : DEBUG\n"
-          "  name          : \n"
           "  body          : Hello\n",
       "  resource      : {",
       "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",

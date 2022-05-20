@@ -28,10 +28,10 @@ namespace exporter
 namespace metrics
 {
 
-inline const std::string GetOtlpDefaultHttpEndpoint()
+inline const std::string GetPrometheusDefaultHttpEndpoint()
 {
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
-  constexpr char kPrometheusEndpointDefault[] = "localhost:8080";
+  constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
 
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kPrometheusEndpointEnv);
   return endpoint.size() ? endpoint : kPrometheusEndpointDefault;
@@ -43,7 +43,7 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
 struct PrometheusExporterOptions
 {
   // The endpoint the Prometheus backend can collect metrics from
-  std::string url = GetOtlpDefaultHttpEndpoint();
+  std::string url = GetPrometheusDefaultHttpEndpoint();
 };
 
 class PrometheusExporter : public sdk::metrics::MetricExporter
