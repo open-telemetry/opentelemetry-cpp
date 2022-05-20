@@ -73,3 +73,18 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "async_batch_log_processor_test",
+    srcs = [
+        "async_batch_log_processor_test.cc",
+    ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
