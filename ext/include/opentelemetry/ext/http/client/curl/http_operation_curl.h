@@ -481,11 +481,11 @@ protected:
     {
       if (for_recv)
       {
-        res = FD_ISSET(sockfd, &infd);
+        res = (0 != FD_ISSET(sockfd, &infd));
       }
       else
       {
-        res = FD_ISSET(sockfd, &outfd);
+        res = (0 != FD_ISSET(sockfd, &outfd));
       }
     }
 
@@ -508,11 +508,11 @@ protected:
     {
       if (for_recv) 
       {
-        res = fds[0].revents & POLLIN;
+        res = (0 != (fds[0].revents & POLLIN));
       } 
       else
       {
-        res = fds[0].revents & POLLOUT;
+        res = (0 != (fds[0].revents & POLLOUT));
       }
     }
 
