@@ -17,6 +17,7 @@
 #  include <io.h>
 #  include <winsock2.h>
 #else
+#  include <poll.h>
 #  include <unistd.h>
 #endif
 #include <curl/curl.h>
