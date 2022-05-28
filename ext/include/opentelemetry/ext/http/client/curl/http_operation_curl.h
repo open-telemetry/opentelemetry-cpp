@@ -17,6 +17,7 @@
 #  include <io.h>
 #  include <winsock2.h>
 #else
+#  include <poll.h>
 #  include <unistd.h>
 #endif
 #include <curl/curl.h>
@@ -443,13 +444,19 @@ protected:
    * @param sockfd
    * @param for_recv
    * @param timeout_ms
-   * @return
+   * @return true if expected events occur, false if timeout or error happen
    */
-  static int WaitOnSocket(curl_socket_t sockfd, int for_recv, long timeout_ms)
+  static bool WaitOnSocket(curl_socket_t sockfd, int for_recv, long timeout_ms)
   {
+    bool res = false;
+
+#if defined(_WIN32)
+
+    if (sockfd > FD_SETSIZE)
+      return false;
+
     struct timeval tv;
     fd_set infd, outfd, errfd;
-    int res;
 
     tv.tv_sec  = timeout_ms / 1000;
     tv.tv_usec = (timeout_ms % 1000) * 1000;
@@ -470,7 +477,47 @@ protected:
     }
 
     /* select() returns the number of signalled sockets or -1 */
-    res = select((int)sockfd + 1, &infd, &outfd, &errfd, &tv);
+    if (select((int)sockfd + 1, &infd, &outfd, &errfd, &tv) > 0)
+    {
+      if (for_recv)
+      {
+        res = (0 != FD_ISSET(sockfd, &infd));
+      }
+      else
+      {
+        res = (0 != FD_ISSET(sockfd, &outfd));
+      }
+    }
+
+#else
+
+    struct pollfd fds[1];
+    ::memset(fds, 0, sizeof(fds));
+
+    fds[0].fd = sockfd;
+    if (for_recv)
+    {
+      fds[0].events = POLLIN;
+    }
+    else
+    {
+      fds[0].events = POLLOUT;
+    }
+
+    if (poll(fds, 1, timeout_ms) > 0)
+    {
+      if (for_recv)
+      {
+        res = (0 != (fds[0].revents & POLLIN));
+      }
+      else
+      {
+        res = (0 != (fds[0].revents & POLLOUT));
+      }
+    }
+
+#endif
+
     return res;
   }
 
