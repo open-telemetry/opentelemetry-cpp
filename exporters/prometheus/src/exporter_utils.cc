@@ -60,9 +60,17 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
             auto boundaries = histogram_point_data.boundaries_;
             auto counts     = histogram_point_data.counts_;
-            SetData(std::vector<double>{nostd::get<double>(histogram_point_data.sum_),
-                                        (double)histogram_point_data.count_},
-                    boundaries, counts, "", time, &metric_family);
+            double sum      = 0.0;
+            if (nostd::holds_alternative<double>(histogram_point_data.sum_))
+            {
+              sum = nostd::get<double>(histogram_point_data.sum_);
+            }
+            else
+            {
+              sum = nostd::get<long>(histogram_point_data.sum_);
+            }
+            SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
+                    counts, "", time, &metric_family);
           }
           else  // Counter, Untyped
           {
