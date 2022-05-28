@@ -187,3 +187,19 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "prometheus_exporter_utils_test",
+    srcs = [
+        "test/exporter_utils_test.cc",
+    ],
+    tags = [
+        "prometheus",
+        "test",
+    ],
+    deps = [
+        ":prometheus_exporter_utils",
+        ":prometheus_test_helper",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
