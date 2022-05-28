@@ -143,7 +143,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "prometheus_test_helper",
     hdrs = [
@@ -153,6 +152,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/trace",
     ],
 )
 
@@ -168,7 +168,22 @@ cc_test(
     deps = [
         ":prometheus_exporter",
         ":prometheus_test_helper",
-        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "prometheus_collector_test",
+    srcs = [
+        "test/collector_test.cc",
+    ],
+    tags = [
+        "prometheus",
+        "test",
+    ],
+    deps = [
+        ":prometheus_collector",
+        ":prometheus_test_helper",
         "@com_google_googletest//:gtest_main",
     ],
 )

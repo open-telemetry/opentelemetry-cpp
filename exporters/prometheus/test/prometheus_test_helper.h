@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma once
+
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/version.h"
@@ -124,4 +126,112 @@ metric_sdk::ResourceMetrics CreateDropPointData()
   return data;
 }
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
+bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::MetricData &rhs)
+{
+  if (lhs.start_ts != rhs.start_ts)
+  {
+    return false;
+  }
+  if (lhs.end_ts != rhs.end_ts)
+  {
+    return false;
+  }
+
+  if (lhs.instrument_descriptor.description_ != rhs.instrument_descriptor.description_)
+  {
+    return false;
+  }
+  if (lhs.instrument_descriptor.name_ != rhs.instrument_descriptor.name_)
+  {
+    return false;
+  }
+  if (lhs.instrument_descriptor.type_ != rhs.instrument_descriptor.type_)
+  {
+    return false;
+  }
+  if (lhs.instrument_descriptor.unit_ != rhs.instrument_descriptor.unit_)
+  {
+    return false;
+  }
+  if (lhs.instrument_descriptor.value_type_ != rhs.instrument_descriptor.value_type_)
+  {
+    return false;
+  }
+
+  if (lhs.point_data_attr_.size() != rhs.point_data_attr_.size())
+  {
+    return false;
+  }
+  for (uint32_t idx = 0; idx < lhs.point_data_attr_.size(); ++idx)
+  {
+    if (lhs.point_data_attr_.at(idx).attributes != rhs.point_data_attr_.at(idx).attributes)
+    {
+      return false;
+    }
+    auto &lhs_point_data = lhs.point_data_attr_.at(idx).point_data;
+    auto &rhs_point_data = rhs.point_data_attr_.at(idx).point_data;
+    if (nostd::holds_alternative<metric_sdk::SumPointData>(lhs_point_data))
+    {
+      if (nostd::get<metric_sdk::SumPointData>(lhs_point_data).value_ !=
+          nostd::get<metric_sdk::SumPointData>(rhs_point_data).value_)
+      {
+        return false;
+      }
+    }
+    else if (nostd::holds_alternative<metric_sdk::DropPointData>(lhs_point_data))
+    {
+      if (!nostd::holds_alternative<metric_sdk::DropPointData>(rhs_point_data))
+      {
+        return false;
+      }
+    }
+    else if (nostd::holds_alternative<metric_sdk::HistogramPointData>(lhs_point_data))
+    {
+      auto &lhs_histogram_d = nostd::get<metric_sdk::HistogramPointData>(lhs_point_data);
+      auto &rhs_histogram_d = nostd::get<metric_sdk::HistogramPointData>(rhs_point_data);
+      if (lhs_histogram_d.count_ != rhs_histogram_d.count_)
+      {
+        return false;
+      }
+      if (lhs_histogram_d.counts_ != rhs_histogram_d.counts_)
+      {
+        return false;
+      }
+      if (lhs_histogram_d.boundaries_ != rhs_histogram_d.boundaries_)
+      {
+        return false;
+      }
+      if (lhs_histogram_d.sum_ != rhs_histogram_d.sum_)
+      {
+        return false;
+      }
+    }
+    else if (nostd::holds_alternative<metric_sdk::LastValuePointData>(lhs_point_data))
+    {
+      auto &lhs_last_value_d = nostd::get<metric_sdk::LastValuePointData>(lhs_point_data);
+      auto &rhs_last_value_d = nostd::get<metric_sdk::LastValuePointData>(rhs_point_data);
+      if (lhs_last_value_d.is_lastvalue_valid_ != rhs_last_value_d.is_lastvalue_valid_)
+      {
+        return false;
+      }
+      if (lhs_last_value_d.sample_ts_ != rhs_last_value_d.sample_ts_)
+      {
+        return false;
+      }
+      if (lhs_last_value_d.value_ != rhs_last_value_d.value_)
+      {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+}  // namespace metrics
+}  // namespace sdk
+OPENTELEMETRY_END_NAMESPACE
 #endif  // ENABLE_METRICS_PREVIEW
