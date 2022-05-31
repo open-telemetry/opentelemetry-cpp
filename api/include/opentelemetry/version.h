@@ -6,7 +6,7 @@
 #include "opentelemetry/detail/preprocessor.h"
 
 #define OPENTELEMETRY_ABI_VERSION_NO 1
-#define OPENTELEMETRY_VERSION "1.3.0"
+#define OPENTELEMETRY_VERSION "1.4.0"
 #define OPENTELEMETRY_ABI_VERSION OPENTELEMETRY_STRINGIFY(OPENTELEMETRY_ABI_VERSION_NO)
 
 // clang-format off
