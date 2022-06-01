@@ -124,6 +124,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:global_log_handler",
         "@com_google_googletest//:gtest_main",
     ],
 )

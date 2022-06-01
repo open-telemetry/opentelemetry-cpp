@@ -27,6 +27,18 @@ cc_library(
     include_prefix = "src/common",
     deps = [
         "//api",
+        "//sdk:headers",
         "//sdk/src/common/platform:fork",
+    ],
+)
+
+cc_library(
+    name = "global_log_handler",
+    srcs = [
+        "global_log_handler.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
     ],
 )
