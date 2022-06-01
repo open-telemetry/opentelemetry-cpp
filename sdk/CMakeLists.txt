@@ -14,7 +14,7 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 install(
-  DIRECTORY include/opentelemetry
+  DIRECTORY include/opentelemetry/
   DESTINATION include/opentelemetry
   FILES_MATCHING
   PATTERN "*config.h")
