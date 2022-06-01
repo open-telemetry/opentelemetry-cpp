@@ -238,13 +238,24 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
+if((WITH_ETW)
+   AND NOT
+       (WITH_ELASTICSEARCH
+        OR WITH_ZIPKIN
+        OR WITH_OTLP
+        OR WITH_OTLP_GRPC
+        OR WITH_OTLP_HTTP
+        OR WITH_ZPAGES
+        OR WITH_PROMETHEUS))
+  set(WITH_ETW_ONLY ON)
+endif()
+
 if((NOT WITH_API_ONLY)
    AND (WITH_ELASTICSEARCH
         OR WITH_ZIPKIN
         OR WITH_OTLP
         OR WITH_OTLP_HTTP
         OR WITH_ZPAGES
-        OR BUILD_W3CTRACECONTEXT_TEST
         OR WITH_ETW
        ))
   # nlohmann_json package is required for most SDK build configurations
@@ -392,7 +403,7 @@ include_directories(api/include)
 
 add_subdirectory(api)
 
-if(NOT WITH_API_ONLY)
+if(NOT (WITH_API_ONLY OR WITH_ETW_ONLY))
   set(BUILD_TESTING ${BUILD_TESTING})
   include_directories(sdk/include)
   include_directories(sdk)
@@ -404,6 +415,10 @@ if(NOT WITH_API_ONLY)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
+endif()
+
+if(WITH_ETW_ONLY)
+  add_subdirectory(exporters/etw)
 endif()
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
