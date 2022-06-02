@@ -9,6 +9,7 @@
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
 #  include <gtest/gtest.h>
+#  include <cmath>  //sqrt
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;
@@ -121,6 +122,10 @@ TEST(SyncInstruments, DoubleHistogram)
   DoubleHistogram counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Record(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Record(-10.10, opentelemetry::context::Context{}));  // This is ignored.
+  EXPECT_NO_THROW(
+      counter.Record(std::sqrt(-10.10), opentelemetry::context::Context{}));  // This is ignored too
+  EXPECT_NO_THROW(
+      counter.Record(10.10 / 0.0, opentelemetry::context::Context{}));  // This is ignored too
 
   EXPECT_NO_THROW(counter.Record(
       10.10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),

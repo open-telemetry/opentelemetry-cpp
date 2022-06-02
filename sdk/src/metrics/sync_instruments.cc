@@ -6,6 +6,8 @@
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk_config.h"
 
+#  include <cmath>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -171,11 +173,12 @@ void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes,
                              const opentelemetry::context::Context &context) noexcept
 {
-  if (value < 0)
+  if (value < 0 || std::isnan(value) || std::isinf(value))
   {
     OTEL_INTERNAL_LOG_WARN(
-        "[DoubleHistogram::Record(value, attributes)] negative value provided to histogram Name:"
-        << instrument_descriptor_.name_ << " Value:" << value);
+        "[DoubleHistogram::Record(value, attributes)] negative/nan/infinite value provided to "
+        "histogram Name:"
+        << instrument_descriptor_.name_);
     return;
   }
   return storage_->RecordDouble(value, attributes, context);
@@ -183,11 +186,11 @@ void DoubleHistogram::Record(double value,
 
 void DoubleHistogram::Record(double value, const opentelemetry::context::Context &context) noexcept
 {
-  if (value < 0)
+  if (value < 0 || std::isnan(value) || std::isinf(value))
   {
     OTEL_INTERNAL_LOG_WARN(
-        "[DoubleHistogram::Record(value)] negative value provided to histogram Name:"
-        << instrument_descriptor_.name_ << " Value:" << value);
+        "[DoubleHistogram::Record(value)] negative/nan/infinite value provided to histogram Name:"
+        << instrument_descriptor_.name_);
     return;
   }
   return storage_->RecordDouble(value, context);
