@@ -222,7 +222,7 @@ public:
         break;
       }
       case common::AttributeType::kTypeString: {
-        PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
+        PropertyVariant::operator=(std::string{nostd::string_view(nostd::get<nostd::string_view>(v)).data()});
         break;
       }
 
