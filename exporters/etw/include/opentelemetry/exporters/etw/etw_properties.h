@@ -192,7 +192,7 @@ public:
   {}
 
   /**
-   * @brief Convert owning PropertyValue to non-owning common::AttributeValue
+   * @brief Convert non-owning common::AttributeValue to owning PropertyValue.
    * @return
    */
   PropertyValue &FromAttributeValue(const common::AttributeValue &v)
