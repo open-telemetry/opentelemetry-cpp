@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#  include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -139,11 +140,25 @@ void LongHistogram::Record(long value,
                            const opentelemetry::common::KeyValueIterable &attributes,
                            const opentelemetry::context::Context &context) noexcept
 {
+  if (value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[LongHistogram::Record(value, attributes)] negative value provided to histogram Name:"
+        << instrument_descriptor_.name_ << " Value:" << value);
+    return;
+  }
   return storage_->RecordLong(value, attributes, context);
 }
 
 void LongHistogram::Record(long value, const opentelemetry::context::Context &context) noexcept
 {
+  if (value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[LongHistogram::Record(value)] negative value provided to histogram Name:"
+        << instrument_descriptor_.name_ << " Value:" << value);
+    return;
+  }
   return storage_->RecordLong(value, context);
 }
 
@@ -156,11 +171,25 @@ void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes,
                              const opentelemetry::context::Context &context) noexcept
 {
+  if (value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(value, attributes)] negative value provided to histogram Name:"
+        << instrument_descriptor_.name_ << " Value:" << value);
+    return;
+  }
   return storage_->RecordDouble(value, attributes, context);
 }
 
 void DoubleHistogram::Record(double value, const opentelemetry::context::Context &context) noexcept
 {
+  if (value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[DoubleHistogram::Record(value)] negative value provided to histogram Name:"
+        << instrument_descriptor_.name_ << " Value:" << value);
+    return;
+  }
   return storage_->RecordDouble(value, context);
 }
 
