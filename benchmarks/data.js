@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654202300267,
+  "lastUpdate": 1654202301365,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -41854,6 +41854,54 @@ window.BENCHMARK_DATA = {
             "value": 1216954.3127890374,
             "unit": "ns/iter",
             "extra": "iterations: 503\ncpu: 298720.4771371771 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "labhas@microsoft.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "81df64b576c9c2c621d604b30f793fc527a3ea5a",
+          "message": "Fix ETW log exporter header inclusion (#1426)",
+          "timestamp": "2022-06-02T13:24:23-07:00",
+          "tree_id": "860b14d95c944cb80d66960af9852fc829cc1384",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/81df64b576c9c2c621d604b30f793fc527a3ea5a"
+        },
+        "date": 1654202298999,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 137.82575128236516,
+            "unit": "ns/iter",
+            "extra": "iterations: 1071000\ncpu: 137.7166199813259 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 190.5449850116661,
+            "unit": "ns/iter",
+            "extra": "iterations: 668000\ncpu: 189.80988023952102 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 891.1845050280607,
+            "unit": "ns/iter",
+            "extra": "iterations: 158000\ncpu: 889.6905063291139 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2144541.05922154,
+            "unit": "ns/iter",
+            "extra": "iterations: 315\ncpu: 465384.44444444444 ns\nthreads: 1"
           }
         ]
       }
