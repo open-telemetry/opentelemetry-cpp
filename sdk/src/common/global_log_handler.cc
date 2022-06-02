@@ -37,26 +37,12 @@ void DefaultLogHandler::Handle(LogLevel level,
   std::cout << output_s.str();  // thread safe.
 }
 
-void NoopLogHandler::Handle(LogLevel level,
-                            const char *file,
-                            int line,
-                            const char *msg,
-                            const sdk::common::AttributeMap &attributes) noexcept
-{
-  std::stringstream output_s;
-  output_s << "[" << LevelToString(level) << "] ";
-  if (file != nullptr)
-  {
-    output_s << "File: " << file << ":" << line;
-  }
-  if (msg != nullptr)
-  {
-    output_s << msg;
-  }
-  output_s << std::endl;
-  // TBD - print attributes
-  std::cout << output_s.str();  // thread safe.
-}
+void NoopLogHandler::Handle(LogLevel,
+                            const char *,
+                            int,
+                            const char *,
+                            const sdk::common::AttributeMap &) noexcept
+{}
 
 std::pair<nostd::shared_ptr<LogHandler>, LogLevel> &GlobalLogHandler::GetHandlerAndLevel() noexcept
 {
