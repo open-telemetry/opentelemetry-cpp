@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654228020824,
+  "lastUpdate": 1654228022202,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -42226,6 +42226,54 @@ window.BENCHMARK_DATA = {
             "value": 2144541.05922154,
             "unit": "ns/iter",
             "extra": "iterations: 315\ncpu: 465384.44444444444 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "labhas@microsoft.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "62b65fab92798572accb1f8a1446bf8245dc0dc1",
+          "message": "[Metrics SDK] Only record non-negative / finite / Non-NAN histogram values (#1427)\n\n* validate histogram value\r\n\r\n* handle Nan\r\n\r\n* add changelog\r\n\r\n* divide by 0 error on windows\r\n\r\n* fix markdown lint",
+          "timestamp": "2022-06-02T20:30:15-07:00",
+          "tree_id": "a20349d6133215c3e4206d468efb018581b1c2b0",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/62b65fab92798572accb1f8a1446bf8245dc0dc1"
+        },
+        "date": 1654228017345,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 154.00451118663207,
+            "unit": "ns/iter",
+            "extra": "iterations: 944000\ncpu: 153.69629237288135 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 239.628563113936,
+            "unit": "ns/iter",
+            "extra": "iterations: 613000\ncpu: 237.6960848287113 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1106.245517730713,
+            "unit": "ns/iter",
+            "extra": "iterations: 100000\ncpu: 1092.7110000000002 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2084417.0025416783,
+            "unit": "ns/iter",
+            "extra": "iterations: 252\ncpu: 587026.1904761906 ns\nthreads: 1"
           }
         ]
       }
