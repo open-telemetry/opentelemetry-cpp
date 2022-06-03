@@ -14,7 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
-* [METRICS] Only record non-negative / finite / Non-NAN histogram values ([#1427](https://github.com/open-telemetry/opentelemetry-cpp/pull/1427))
+
+* [METRICS] Only record non-negative / finite / Non-NAN histogram values([#1427](https://github.com/open-telemetry/opentelemetry-cpp/pull/1427))
 
 ## [1.4.0] 2022-05-17
 
