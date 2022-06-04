@@ -15,7 +15,7 @@
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
 
-#  include "opentelemetry/logs/tracer_provider.h"
+#  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_id.h"
 

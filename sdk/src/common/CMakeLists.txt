@@ -1,4 +1,4 @@
-set(COMMON_SRCS random.cc core.cc)
+set(COMMON_SRCS random.cc core.cc global_log_handler.cc)
 if(WIN32)
   list(APPEND COMMON_SRCS platform/fork_windows.cc)
 else()

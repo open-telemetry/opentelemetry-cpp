@@ -180,6 +180,7 @@ cc_library(
     tags = ["jaeger"],
     deps = [
         ":jaeger_exporter",
+        "//sdk/src/common:global_log_handler",
     ],
 )
 
