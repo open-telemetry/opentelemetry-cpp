@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654317777057,
+  "lastUpdate": 1654317778336,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -42424,6 +42424,54 @@ window.BENCHMARK_DATA = {
             "value": 2084417.0025416783,
             "unit": "ns/iter",
             "extra": "iterations: 252\ncpu: 587026.1904761906 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "admin@owent.net",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7e90dae3e4e72f8ba62859a25b4e773b182e4dce",
+          "message": "Fix global log handle symbols when using dlopen (#1420)",
+          "timestamp": "2022-06-03T21:30:20-07:00",
+          "tree_id": "3909f6b91dfd4a1c82f0b192fac53b91752c27f4",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/7e90dae3e4e72f8ba62859a25b4e773b182e4dce"
+        },
+        "date": 1654317775892,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 114.66258813527004,
+            "unit": "ns/iter",
+            "extra": "iterations: 1210000\ncpu: 114.37570247933884 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 166.52256989282026,
+            "unit": "ns/iter",
+            "extra": "iterations: 847000\ncpu: 165.18205430932707 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 593.7031622212302,
+            "unit": "ns/iter",
+            "extra": "iterations: 239000\ncpu: 593.2255230125525 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1070518.1564001297,
+            "unit": "ns/iter",
+            "extra": "iterations: 509\ncpu: 291995.0884086446 ns\nthreads: 1"
           }
         ]
       }
