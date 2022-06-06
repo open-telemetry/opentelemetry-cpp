@@ -198,7 +198,6 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
       "  trace_flags   : 00\n"
       "}\n"};
 
-  std::cout << "LALIT:::" << stdcerrOutput.str() << "\n";
   for (auto &expected : expected_output)
   {
     ASSERT_NE(stdcerrOutput.str().find(expected), std::string::npos);
