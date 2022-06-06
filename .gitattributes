@@ -41,3 +41,7 @@ LICENSE*                text
 ## git files
 .gitignore              text eol=lf
 .gitattributes          text eol=lf
+
+## bazel files
+WORKSPACE               text eol=lf
+BUILD                   text eol=lf
