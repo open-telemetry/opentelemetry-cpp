@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Only record non-negative / finite / Non-NAN histogram values([#1427](https://github.com/open-telemetry/opentelemetry-cpp/pull/1427))
+
 ## [1.4.0] 2022-05-17
 
 * [API SDK] Upgrade proto to v0.17.0, update log data model ([#1383](https://github.com/open-telemetry/opentelemetry-cpp/pull/1383))

@@ -192,7 +192,7 @@ public:
   {}
 
   /**
-   * @brief Convert owning PropertyValue to non-owning common::AttributeValue
+   * @brief Convert non-owning common::AttributeValue to owning PropertyValue.
    * @return
    */
   PropertyValue &FromAttributeValue(const common::AttributeValue &v)
@@ -222,7 +222,8 @@ public:
         break;
       }
       case common::AttributeType::kTypeString: {
-        PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
+        PropertyVariant::operator=
+            (std::string{nostd::string_view(nostd::get<nostd::string_view>(v)).data()});
         break;
       }
 
