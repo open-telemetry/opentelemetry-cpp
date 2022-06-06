@@ -192,12 +192,13 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
       "service.name: unknown_service\n",
       "key1: val1\n",
       "  attributes    : \n",
-      "a: 1\n",
+      "\ta: 1\n",
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
       "}\n"};
 
+  std::cout << "LALIT:::" << stdcerrOutput.str() << "\n";
   for (auto &expected : expected_output)
   {
     ASSERT_NE(stdcerrOutput.str().find(expected), std::string::npos);
@@ -254,7 +255,7 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
       "telemetry.sdk.language: cpp\n",
       "res1: [1,2,3]\n",
       "attributes    : \n",
-      "attr1: [0,1,0]\n"
+      "\tattr1: [0,1,0]\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
