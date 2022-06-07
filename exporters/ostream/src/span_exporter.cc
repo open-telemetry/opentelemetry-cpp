@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/ostream/span_exporter.h"
+#include "opentelemetry/exporters/ostream/common_utils.h"
+
 #include <iostream>
 #include <mutex>
 #include "opentelemetry/sdk_config.h"
@@ -115,7 +117,7 @@ void OStreamSpanExporter::printAttributes(
   for (const auto &kv : map)
   {
     sout_ << prefix << kv.first << ": ";
-    print_value(kv.second);
+    opentelemetry::exporter::ostream_common::print_value(kv.second, sout_);
   }
 }
 
