@@ -11,19 +11,24 @@ namespace metrics
 {
 
 template <class T>
+using ObservableCallbackPtr = void (*callback)(ObserverResult<T> &, void *);
+
 class AsynchronousInstrument
+{};
+
+template <class T>
+class ObservableInstrument
 {
 public:
+  /**
+   * Sets up a function that will be called whenever a metric collection is initiated.
+   */
+  virtual void AddCallback(ObservableCallbackPtr, void *state);
 
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    */
-  virtual void AddCallback(void (*callback)(ObserverResult<T> &, void *), void *state);
-  
-  /**
-   * Sets up a function that will be called whenever a metric collection is initiated.
-   */
-  virtual void RemoveCallback(void (*callback)(ObserverResult<T> &, void *), void *state);
+  virtual void RemoveCallback(ObservableCallbackPtr, void *state);
 };
 
 template <class T>
