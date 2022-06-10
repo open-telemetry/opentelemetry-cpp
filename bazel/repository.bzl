@@ -10,6 +10,15 @@ filegroup(
 )
 """
 
+#
+# MAINTAINER
+#
+# When changing (add, upgrade, remove) dependencies
+# in this file for the Bazel build,
+# please update the CMake build as well,
+# see <root>/third_party_release
+#
+
 def opentelemetry_cpp_deps():
     """Loads dependencies need to compile the opentelemetry-cpp library."""
 
@@ -86,9 +95,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf",
+        sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip",
         ],
     )
 
