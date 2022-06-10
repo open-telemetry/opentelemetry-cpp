@@ -13,10 +13,14 @@ filegroup(
 #
 # MAINTAINER
 #
+# This file is used for the Bazel build.
+#
 # When changing (add, upgrade, remove) dependencies
-# in this file for the Bazel build,
-# please update the CMake build as well,
-# see <root>/third_party_release
+# please update:
+# - the CMake build, see file
+#   <root>/third_party_release
+# - git submodule, see command
+#   git submodule status
 #
 
 def opentelemetry_cpp_deps():

@@ -1,10 +1,14 @@
 #
 # MAINTAINER
 #
+# This file is used for the CMake build.
+#
 # When changing (add, upgrade, remove) dependencies
-# in this file for the CMake build,
-# please update the Bazel build as well,
-# see <root>/bazel/repository.bzl
+# please update:
+# - the Bazel build, see file
+#   <root>/bazel/repository.bzl
+# - git submodule, see command
+#   git submodule status
 #
 
 gRPC=v1.43.2
