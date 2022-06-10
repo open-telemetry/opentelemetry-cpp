@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654829526075,
+  "lastUpdate": 1654829528422,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -43912,6 +43912,54 @@ window.BENCHMARK_DATA = {
             "value": 1668629.8686605662,
             "unit": "ns/iter",
             "extra": "iterations: 386\ncpu: 390351.29533678765 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@free.fr",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6ee70a736093cd1adfa7bffe6591e37d5f4a7e8d",
+          "message": "Fix GettingStarted documentation for Jaeger HTTP exporter (#1347) (#1439)",
+          "timestamp": "2022-06-09T19:38:44-07:00",
+          "tree_id": "fd4df0f1ce660dafae44ac9b2fa479a05d19a056",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/6ee70a736093cd1adfa7bffe6591e37d5f4a7e8d"
+        },
+        "date": 1654829525751,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 115.57222202124186,
+            "unit": "ns/iter",
+            "extra": "iterations: 1208000\ncpu: 115.35206953642384 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 168.4281465818556,
+            "unit": "ns/iter",
+            "extra": "iterations: 834000\ncpu: 167.9153477218225 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 779.1180035163617,
+            "unit": "ns/iter",
+            "extra": "iterations: 232000\ncpu: 649.8883620689656 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1153326.6281191243,
+            "unit": "ns/iter",
+            "extra": "iterations: 482\ncpu: 333509.54356846475 ns\nthreads: 1"
           }
         ]
       }
