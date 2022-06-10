@@ -59,6 +59,7 @@ private:
   void printInstrumentationInfoMetricData(
       const sdk::metrics::InstrumentationInfoMetrics &info_metrics);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
+  void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
 };
 }  // namespace metrics
 }  // namespace exporter
