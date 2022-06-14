@@ -1,0 +1,75 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+#ifndef ENABLE_METRICS_PREVIEW
+
+// clang-format off
+
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
+// clang-format on
+
+#  include "opentelemetry/exporters/otlp/otlp_environment.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace otlp
+{
+
+/**
+ * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
+ */
+class OtlpGrpcMetricsExporter : public opentelemetry::sdk::metrics::MetricExporter
+{
+public:
+  /**
+   * Create an OtlpGrpcExporter using all default options.
+   */
+  OtlpGrpcMetricsExporter();
+
+  /**
+   * Create an OtlpGrpcExporter using the given options.
+   */
+  explicit OtlpGrpcMetricsExporter(const OtlpGrpcMetricsExporterOptions &options);
+
+  opentelemetry::sdk::common::ExportResult Export(
+      const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
+
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
+
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+
+private:
+  // The configuration options associated with this exporter.
+  const OtlpGrpcMetricsExporterOptions options_;
+
+  // For testing
+  friend class OtlpGrpcExporterTestPeer;
+
+  // Store service stub internally. Useful for testing.
+  std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
+      metrics_service_stub_;
+
+  /**
+   * Create an OtlpGrpcExporter using the specified service stub.
+   * Only tests can call this constructor directly.
+   * @param stub the service stub to be used for exporting
+   */
+  OtlpGrpcMetricsExporter(
+      std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub);
+  bool is_shutdown_ = false;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
+};
+}  // namespace otlp
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
+#endif

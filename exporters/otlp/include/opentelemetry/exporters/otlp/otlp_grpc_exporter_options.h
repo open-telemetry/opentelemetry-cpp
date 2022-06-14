@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <memory>
 
@@ -33,6 +34,20 @@ struct OtlpGrpcExporterOptions
   // Additional HTTP headers
   OtlpHeaders metadata = GetOtlpDefaultHeaders();
 };
+
+/**
+ * Struct to hold OTLP metrics exporter options.
+ */
+struct OtlpGrpcMetricsExporterOptions : public OtlpGrpcExporterOptions
+{
+  opentelemetry::sdk::metrics::AggregationTemporality aggregation_temporality =
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta;
+};
+
+/**
+ * @brief
+ *
+ */
 
 }  // namespace otlp
 }  // namespace exporter

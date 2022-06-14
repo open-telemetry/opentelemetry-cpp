@@ -37,6 +37,18 @@ if(WITH_OTLP_GRPC)
                         PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
+
+  add_library(opentelemetry_exporter_otlp_grpc_metrics
+              src/otlp_grpc_metric_exporter.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
+                        PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter)
+
+  target_link_libraries(opentelemetry_exporter_otlp_grpc_metrics
+                        PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+       opentelemetry_exporter_otlp_grpc_metrics)
 endif()
 
 if(WITH_OTLP_HTTP)
