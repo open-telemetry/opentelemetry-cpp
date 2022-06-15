@@ -4,6 +4,7 @@
 #include <chrono>
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <algorithm>
+#  include "opentelemetry/exporters/ostream/common_utils.h"
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
@@ -102,7 +103,11 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
 
     for (const auto &pd : record.point_data_attr_)
     {
-      printPointData(pd.point_data);
+      if (!nostd::holds_alternative<sdk::metrics::DropPointData>(pd.point_data))
+      {
+        printPointData(pd.point_data);
+        printPointAttributes(pd.attributes);
+      }
     }
   }
   sout_ << "\n}\n";
@@ -171,8 +176,17 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
       sout_ << nostd::get<long>(last_point_data.value_);
     }
   }
-  else if (nostd::holds_alternative<sdk::metrics::DropPointData>(point_data))
-  {}
+}
+
+void OStreamMetricExporter::printPointAttributes(
+    const opentelemetry::sdk::metrics::PointAttributes &point_attributes)
+{
+  sout_ << "\n  attributes\t\t: ";
+  for (const auto &kv : point_attributes)
+  {
+    sout_ << "\n\t" << kv.first << ": ";
+    opentelemetry::exporter::ostream_common::print_value(kv.second, sout_);
+  }
 }
 
 bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
