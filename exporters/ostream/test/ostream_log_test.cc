@@ -80,11 +80,11 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
       "  body          : \n",
-      "  resource      : {",
-      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
-      "{telemetry.sdk.name: opentelemetry}",
-      "{telemetry.sdk.language: cpp}",
-      "  attributes    : {}\n"
+      "  resource      : \n",
+      "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "telemetry.sdk.name: opentelemetry\n",
+      "telemetry.sdk.language: cpp\n",
+      "  attributes    : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
@@ -132,11 +132,11 @@ TEST(OStreamLogExporter, SimpleLogToCout)
           "  severity_num  : 1\n"
           "  severity_text : TRACE\n"
           "  body          : Message\n",
-      "  resource      : {",
-      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
-      "{telemetry.sdk.name: opentelemetry}",
-      "{telemetry.sdk.language: cpp}",
-      "  attributes    : {}\n"
+      "  resource      : \n",
+      "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "telemetry.sdk.name: opentelemetry\n",
+      "telemetry.sdk.language: cpp\n",
+      "  attributes    : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
@@ -185,13 +185,14 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
       "  body          : \n",
-      "  resource      : {",
-      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
-      "{telemetry.sdk.name: opentelemetry}",
-      "{telemetry.sdk.language: cpp}",
-      "{service.name: unknown_service}",
-      "{key1: val1}",
-      "  attributes    : {{a: 1}}\n"
+      "  resource      : \n",
+      "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "telemetry.sdk.name: opentelemetry\n",
+      "telemetry.sdk.language: cpp\n",
+      "service.name: unknown_service\n",
+      "key1: val1\n",
+      "  attributes    : \n",
+      "\ta: 1\n",
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
@@ -246,13 +247,14 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
       "  severity_num  : 0\n"
       "  severity_text : INVALID\n"
       "  body          : \n",
-      "  resource      : {",
-      "{service.name: unknown_service}",
-      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
-      "{telemetry.sdk.name: opentelemetry}",
-      "{telemetry.sdk.language: cpp}",
-      "{res1: [1, 2, 3]}",
-      "  attributes    : {{attr1: [0, 1, 0]}}\n"
+      "  resource      : \n",
+      "service.name: unknown_service\n",
+      "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "telemetry.sdk.name: opentelemetry\n",
+      "telemetry.sdk.language: cpp\n",
+      "res1: [1,2,3]\n",
+      "attributes    : \n",
+      "\tattr1: [0,1,0]\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
@@ -305,12 +307,12 @@ TEST(OStreamLogExporter, IntegrationTest)
           "  severity_num  : 5\n"
           "  severity_text : DEBUG\n"
           "  body          : Hello\n",
-      "  resource      : {",
-      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION "}",
-      "{service.name: unknown_service}",
-      "{telemetry.sdk.name: opentelemetry}",
-      "{telemetry.sdk.language: cpp}",
-      "  attributes    : {}\n"
+      "  resource      : \n",
+      "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "service.name: unknown_service\n",
+      "telemetry.sdk.name: opentelemetry\n",
+      "telemetry.sdk.language: cpp\n",
+      "  attributes    : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"

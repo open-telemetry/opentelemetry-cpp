@@ -50,9 +50,9 @@ OpenTelemetry offers six tracing exporters out of the box:
     opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
     opts.transport_format  = opentelemetry::exporter::jaeger::TransportFormat::kThriftHttp;
     opts.endpoint = "localhost";
-    opts.server_port =  6831;
+    opts.server_port = 14268;
     opts.headers = {{}}; // optional headers
-    auto jaeger_udp_exporter =
+    auto jaeger_http_exporter =
         std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::jaeger::JaegerExporter(opts));
 
 

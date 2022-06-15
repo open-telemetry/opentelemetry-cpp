@@ -29,7 +29,7 @@ std::map<std::string, std::string> get_random_attr()
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult<double> &observer_result)
+  static void Fetcher(opentelemetry::metrics::ObserverResult<double> &observer_result, void *state)
   {
     double val                                = (rand() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
