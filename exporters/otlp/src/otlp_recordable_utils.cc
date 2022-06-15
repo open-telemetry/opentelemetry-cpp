@@ -355,15 +355,6 @@ void OtlpRecordableUtils::PopulateRequest(
     }
   }
 #endif
-#ifndef ENABLE_METRICS_PREVIEW
-  void OtlpRecordableUtils::PopulateRequest(
-      const opentelemetry::sdk::metrics::ResourceMetrics &data,
-      proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept
-  {
-    // TBD
-  }
-#endif
-
 }  // namespace otlp
 }  // namespace otlp
 OPENTELEMETRY_END_NAMESPACE

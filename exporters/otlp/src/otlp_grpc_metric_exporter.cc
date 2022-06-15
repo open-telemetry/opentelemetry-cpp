@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#  include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
 
 #  include <mutex>
 #  include "opentelemetry/ext/http/common/url_parser.h"
@@ -117,7 +117,7 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricsExporter::Export(
   }
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest request;
-  OtlpRecordableUtils::PopulateRequest(data, &request);
+  OtlpMetricsUtils::PopulateRequest(data, &request);
 
   grpc::ClientContext context;
   proto::collector::metrics::v1::ExportMetricsServiceResponse response;

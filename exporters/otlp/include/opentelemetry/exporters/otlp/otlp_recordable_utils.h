@@ -6,7 +6,6 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 
@@ -17,7 +16,6 @@
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
@@ -58,12 +56,6 @@ public:
   static void PopulateRequest(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
       proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept;
-#endif
-
-#ifndef ENABLE_METRICS_PREVIEW
-  static void PopulateRequest(
-      const opentelemetry::sdk::metrics::ResourceMetrics &data,
-      proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
 #endif
 };
 }  // namespace otlp
