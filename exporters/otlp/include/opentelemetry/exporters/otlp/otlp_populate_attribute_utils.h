@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 
 #include "opentelemetry/common/attribute_value.h"
