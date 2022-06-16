@@ -29,14 +29,14 @@ public:
   static opentelemetry::sdk::metrics::AggregationType GetAggregationType(
       const opentelemetry::sdk::metrics::InstrumentType &instrument_type) noexcept;
 
-  static proto::metrics::v1::AggregationTemporality ConvertAggregationTemporality(
+  static proto::metrics::v1::AggregationTemporality GetProtoAggregationTemporality(
       const opentelemetry::sdk::metrics::AggregationTemporality &aggregation_temporality) noexcept;
 
-  static void ConvertSumMetric(const metric_sdk::MetricData &metric_data,
-                               const proto::metrics::v1::Sum *sum) noexcept;
+  static void ConvertSumMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
+                               proto::metrics::v1::Sum *const sum) noexcept;
 
-  static void ConvertHistogramMetric(const metric_sdk::MetricData &metric_data,
-                                     const proto::metrics::v1::Histogram *histogram) noexcept;
+  static void ConvertHistogramMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
+                                     proto::metrics::v1::Histogram *const histogram) noexcept;
 
   static void PopulateRequest(
       const opentelemetry::sdk::metrics::ResourceMetrics &data,

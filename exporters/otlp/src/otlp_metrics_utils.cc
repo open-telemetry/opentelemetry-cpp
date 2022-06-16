@@ -14,7 +14,7 @@ namespace otlp
 {
 namespace metric_sdk = opentelemetry::sdk::metrics;
 
-proto::metrics::v1::AggregationTemporality OtlpMetricsUtils::ConvertAggregationTemporality(
+proto::metrics::v1::AggregationTemporality OtlpMetricsUtils::GetProtoAggregationTemporality(
     const opentelemetry::sdk::metrics::AggregationTemporality &aggregation_temporality) noexcept
 {
   if (aggregation_temporality == opentelemetry::sdk::metrics::AggregationTemporality::kCumulative)
@@ -48,19 +48,38 @@ metric_sdk::AggregationType OtlpMetricsUtils::GetAggregationType(
 }
 
 void OtlpMetricsUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
-                                        const proto::metrics::v1::Sum *sum) noexcept
+                                        proto::metrics::v1::Sum *const sum) noexcept
 {
-  auto ts = metric_data.start_ts(;) sum->for (auto &point_data : metric_data.point_data_attr_)
+  auto start_ts = metric_data.start_ts.time_since_epoch().count();
+  auto ts       = metric_data.end_ts.time_since_epoch().count();
+  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
     proto::metrics::v1::NumberDataPoint proto_point_data;
-    proto_point_data.set_start_time_unix_nano()
+    proto_point_data.set_start_time_unix_nano(start_ts);
+    proto_point_data.set_time_unix_nano(ts);
+    auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
+
+    if ((nostd::holds_alternative<long>(sum_data.value_)))
+    {
+      proto_point_data.set_as_int(nostd::get<long>(sum_data.value_));
+    }
+    else
+    {
+      proto_point_data.set_as_double(nostd::get<double>(sum_data.value_));
+    }
+    // set attributes
+    for (auto &kv_attr : point_data_with_attributes.attributes)
+    {
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_point_data.add_attributes(),
+                                                    kv_attr.first, kv_attr.second);
+    }
+    *sum->add_data_points() = proto_point_data;
   }
-  // sum->set_aggregation_temporality(ConvertAggregationTemporality(point_data_list.));
 }
 
 void OtlpMetricsUtils::ConvertHistogramMetric(
     const metric_sdk::MetricData &metric_data,
-    const proto::metrics::v1::Histogram *histogram) noexcept
+    proto::metrics::v1::Histogram *const histogram) noexcept
 {}
 
 void OtlpMetricsUtils::PopulateRequest(
@@ -102,14 +121,14 @@ void OtlpMetricsUtils::PopulateRequest(
       {
         proto::metrics::v1::Sum sum;
         sum.set_aggregation_temporality(
-            ConvertAggregationTemporality(metric_data.aggregation_temporality));
+            GetProtoAggregationTemporality(metric_data.aggregation_temporality));
         sum.set_is_monotonic(true);
-        ConvertSumMetric(metric_data.point_data_attr_, &sum);
+        ConvertSumMetric(metric_data, &sum);
       }
       else if (kind == metric_sdk::AggregationType::kHistogram)
       {
         proto::metrics::v1::Histogram histogram;
-        ConvertHistogramMetric(metric_data.point_data_attr_, &histogram);
+        ConvertHistogramMetric(metric_data, &histogram);
       }
     }
   }

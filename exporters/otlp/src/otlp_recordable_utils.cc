@@ -125,7 +125,8 @@ void OtlpRecordableUtils::PopulateRequest(
       }
     }
   }
+}
 #endif
 }  // namespace otlp
-}  // namespace otlp
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
