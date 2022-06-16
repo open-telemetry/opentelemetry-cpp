@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <memory>
 
