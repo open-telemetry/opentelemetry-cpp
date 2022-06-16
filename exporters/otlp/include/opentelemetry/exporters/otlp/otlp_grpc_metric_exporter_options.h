@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <memory>
 
