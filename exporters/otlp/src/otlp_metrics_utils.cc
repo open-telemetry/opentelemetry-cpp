@@ -124,12 +124,15 @@ void OtlpMetricsUtils::PopulateRequest(
             GetProtoAggregationTemporality(metric_data.aggregation_temporality));
         sum.set_is_monotonic(true);
         ConvertSumMetric(metric_data, &sum);
+        *metric.mutable_sum() = sum;
       }
       else if (kind == metric_sdk::AggregationType::kHistogram)
       {
         proto::metrics::v1::Histogram histogram;
         ConvertHistogramMetric(metric_data, &histogram);
+        *metric.mutable_histogram() = histogram;
       }
+      *instrumentation_lib_metrics->add_metrics() = metric;
     }
   }
 }

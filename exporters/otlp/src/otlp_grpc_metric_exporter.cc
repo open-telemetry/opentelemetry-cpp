@@ -132,14 +132,14 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricsExporter::Export(
     context.AddMetadata(header.first, header.second);
   }
 
-  /*grpc::Status status = metrics_service_stub_->Export(&context, request, &response);
+  grpc::Status status = metrics_service_stub_->Export(&context, request, &response);
 
   if (!status.ok())
   {
     OTEL_INTERNAL_LOG_ERROR(
         "[OTLP METRIC GRPC Exporter] Export() failed: " << status.error_message());
     return sdk::common::ExportResult::kFailure;
-  }*/
+  }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
