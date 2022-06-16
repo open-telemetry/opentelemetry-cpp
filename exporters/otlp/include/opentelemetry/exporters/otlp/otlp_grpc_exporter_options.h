@@ -35,20 +35,6 @@ struct OtlpGrpcExporterOptions
   OtlpHeaders metadata = GetOtlpDefaultHeaders();
 };
 
-/**
- * Struct to hold OTLP metrics exporter options.
- */
-struct OtlpGrpcMetricsExporterOptions : public OtlpGrpcExporterOptions
-{
-  opentelemetry::sdk::metrics::AggregationTemporality aggregation_temporality =
-      opentelemetry::sdk::metrics::AggregationTemporality::kDelta;
-};
-
-/**
- * @brief
- *
- */
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

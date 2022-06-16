@@ -14,7 +14,7 @@
 // clang-format on
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
