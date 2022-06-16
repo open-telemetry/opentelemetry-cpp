@@ -39,15 +39,6 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept
       override;
 
-#  ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Exports a span of logs sent from the processor asynchronously.
-   */
-  void Export(
-      const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
-#  endif
-
   /**
    * Marks the OStream Log Exporter as shut down.
    */

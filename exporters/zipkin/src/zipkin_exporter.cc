@@ -93,17 +93,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
-void ZipkinExporter::Export(
-    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  OTEL_INTERNAL_LOG_WARN("[ZIPKIN EXPORTER] async not supported. Making sync interface call");
-  auto status = Export(spans);
-  result_callback(status);
-}
-#endif
-
 void ZipkinExporter::InitializeLocalEndpoint()
 {
   if (options_.service_name.length())

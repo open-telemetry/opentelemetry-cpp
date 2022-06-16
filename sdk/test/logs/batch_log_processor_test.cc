@@ -57,17 +57,6 @@ public:
     return ExportResult::kSuccess;
   }
 
-#  ifdef ENABLE_ASYNC_EXPORT
-  void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
-              std::function<bool(opentelemetry::sdk::common::ExportResult)>
-                  &&result_callback) noexcept override
-  {
-    // We should keep the order of test records
-    auto result = Export(records);
-    result_callback(result);
-  }
-#  endif
-
   // toggles the boolean flag marking this exporter as shut down
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override

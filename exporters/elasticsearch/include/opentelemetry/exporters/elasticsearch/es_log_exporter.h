@@ -35,6 +35,10 @@ struct ElasticsearchExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug_;
 
+#  ifdef ENABLE_ASYNC_EXPORT
+  bool asynchronous_mode_ = false;
+#  endif
+
   /**
    * Constructor for the ElasticsearchExporterOptions. By default, the endpoint is
    * localhost:9200/logs with a timeout of 30 seconds and disabled console debugging
@@ -49,12 +53,19 @@ struct ElasticsearchExporterOptions
                                int port             = 9200,
                                std::string index    = "logs",
                                int response_timeout = 30,
-                               bool console_debug   = false)
-      : host_{host},
-        port_{port},
-        index_{index},
-        response_timeout_{response_timeout},
-        console_debug_{console_debug}
+                               bool console_debug   = false
+#  ifdef ENABLE_ASYNC_EXPORT
+                               ,
+                               bool asynchronous_mode = false
+#  endif
+                               )
+      : host_{host}, port_{port}, index_{index}, response_timeout_{response_timeout}, console_debug_
+  {
+    console_debug
+  }
+#  ifdef ENABLE_ASYNC_EXPORT
+  , asynchronous_mode_ { asynchronous_mode }
+#  endif
   {}
 };
 
@@ -88,19 +99,6 @@ public:
   sdk::common::ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
           &records) noexcept override;
-
-#  ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Exports a vector of log records to the Elasticsearch instance asynchronously.
-   * @param records A list of log records to send to Elasticsearch.
-   * @param result_callback callback function accepting ExportResult as argument
-   */
-  void Export(
-      const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
-          &records,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-      override;
-#  endif
 
   /**
    * Shutdown this exporter.

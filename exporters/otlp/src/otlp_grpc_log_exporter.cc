@@ -161,18 +161,6 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
-void OtlpGrpcLogExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  OTEL_INTERNAL_LOG_WARN(
-      "[OTLP LOG GRPC Exporter] async not supported. Making sync interface call");
-  auto status = Export(logs);
-  result_callback(status);
-}
-#  endif
-
 bool OtlpGrpcLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

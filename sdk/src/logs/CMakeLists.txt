@@ -4,7 +4,6 @@ add_library(
   logger.cc
   simple_log_processor.cc
   batch_log_processor.cc
-  async_batch_log_processor.cc
   logger_context.cc
   multi_log_processor.cc
   multi_recordable.cc)

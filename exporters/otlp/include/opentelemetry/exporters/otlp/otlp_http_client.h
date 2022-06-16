@@ -150,6 +150,12 @@ public:
    */
   void ReleaseSession(const opentelemetry::ext::http::client::Session &session) noexcept;
 
+  /**
+   * Get options of current OTLP http client.
+   * @return options of current OTLP http client.
+   */
+  inline const OtlpHttpClientOptions &GetOptions() const noexcept { return options_; }
+
 private:
   struct HttpSessionData
   {

@@ -64,22 +64,6 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
-#ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Exports a batch of span recordables asynchronously.
-   * @param spans a span of unique pointers to span recordables
-   * @param result_callback callback function accepting ExportResult as argument
-   */
-  void Export(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-              std::function<bool(opentelemetry::sdk::common::ExportResult)>
-                  &&result_callback) noexcept override
-  {
-    OTEL_INTERNAL_LOG_WARN(" async not supported. Making sync interface call");
-    auto status = Export(spans);
-    result_callback(status);
-  }
-#endif
-
   /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
