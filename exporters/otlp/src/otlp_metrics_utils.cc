@@ -54,33 +54,60 @@ void OtlpMetricsUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_dat
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
-    proto::metrics::v1::NumberDataPoint proto_point_data;
-    proto_point_data.set_start_time_unix_nano(start_ts);
-    proto_point_data.set_time_unix_nano(ts);
+    proto::metrics::v1::NumberDataPoint proto_sum_point_data;
+    proto_sum_point_data.set_start_time_unix_nano(start_ts);
+    proto_sum_point_data.set_time_unix_nano(ts);
     auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
 
     if ((nostd::holds_alternative<long>(sum_data.value_)))
     {
-      proto_point_data.set_as_int(nostd::get<long>(sum_data.value_));
+      proto_sum_point_data.set_as_int(nostd::get<long>(sum_data.value_));
     }
     else
     {
-      proto_point_data.set_as_double(nostd::get<double>(sum_data.value_));
+      proto_sum_point_data.set_as_double(nostd::get<double>(sum_data.value_));
     }
     // set attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
-      OtlpPopulateAttributeUtils::PopulateAttribute(proto_point_data.add_attributes(),
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data.add_attributes(),
                                                     kv_attr.first, kv_attr.second);
     }
-    *sum->add_data_points() = proto_point_data;
+    *sum->add_data_points() = proto_sum_point_data;
   }
 }
 
 void OtlpMetricsUtils::ConvertHistogramMetric(
     const metric_sdk::MetricData &metric_data,
     proto::metrics::v1::Histogram *const histogram) noexcept
-{}
+{
+  auto start_ts = metric_data.start_ts.time_since_epoch().count();
+  auto ts       = metric_data.end_ts.time_since_epoch().count();
+  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  {
+    proto::metrics::v1::HistogramDataPoint proto_histogram_point_data;
+    proto_histogram_point_data.set_start_time_unix_nano(start_ts);
+    proto_histogram_point_data.set_time_unix_nano(ts);
+    auto histogram_data =
+        nostd::get<sdk::metrics::HistogramPointData>(point_data_with_attributes.point_data);
+    if ((nostd::holds_alternative<long>(histogram_data.sum_)))
+    {
+      proto_histogram_point_data.set_sum(nostd::get<long>(histogram_data.sum_));
+    }
+    else
+    {
+      proto_histogram_point_data.set_sum(nostd::get<double>(histogram_data.sum_));
+    }
+    proto_histogram_point_data.set_count(histogram_data.count_);
+
+    // set attributes
+    for (auto &kv_attr : point_data_with_attributes.attributes)
+    {
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data.add_attributes(),
+                                                    kv_attr.first, kv_attr.second);
+    }
+  }
+}
 
 void OtlpMetricsUtils::PopulateRequest(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
