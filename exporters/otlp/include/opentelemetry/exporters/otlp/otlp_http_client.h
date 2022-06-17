@@ -122,6 +122,7 @@ public:
    * Sync export
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
+   * @return return the status of this operation
    */
   sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
 
@@ -130,10 +131,24 @@ public:
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    * @param result_callback callback to call when the exporting is done
+   * @return return the status of this operation
    */
-  void Export(
+  sdk::common::ExportResult Export(
       const google::protobuf::Message &message,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
+
+  /**
+   * Async export
+   * @param message message to export, it should be ExportTraceServiceRequest,
+   * ExportMetricsServiceRequest or ExportLogsServiceRequest
+   * @param result_callback callback to call when the exporting is done
+   * @param max_running_requests wait for at most max_running_requests running requests
+   * @return return the status of this operation
+   */
+  sdk::common::ExportResult Export(
+      const google::protobuf::Message &message,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+      std::size_t max_running_requests) noexcept;
 
   /**
    * Shut down the HTTP client.
@@ -149,6 +164,12 @@ public:
    * @param session the session to release
    */
   void ReleaseSession(const opentelemetry::ext::http::client::Session &session) noexcept;
+
+  /**
+   * Get options of current OTLP http client.
+   * @return options of current OTLP http client.
+   */
+  inline const OtlpHttpClientOptions &GetOptions() const noexcept { return options_; }
 
 private:
   struct HttpSessionData

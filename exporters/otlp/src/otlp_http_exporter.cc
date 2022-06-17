@@ -42,7 +42,20 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
 
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
     : options_(OtlpHttpExporterOptions()), http_client_(std::move(http_client))
-{}
+{
+  OtlpHttpExporterOptions &options = const_cast<OtlpHttpExporterOptions &>(options_);
+  options.url                      = http_client_->GetOptions().url;
+  options.content_type             = http_client_->GetOptions().content_type;
+  options.json_bytes_mapping       = http_client_->GetOptions().json_bytes_mapping;
+  options.use_json_name            = http_client_->GetOptions().use_json_name;
+  options.console_debug            = http_client_->GetOptions().console_debug;
+  options.timeout                  = http_client_->GetOptions().timeout;
+  options.http_headers             = http_client_->GetOptions().http_headers;
+#ifdef ENABLE_ASYNC_EXPORT
+  options.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
+  options.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
+#endif
+}
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRecordable() noexcept
@@ -61,24 +74,39 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
 
   proto::collector::trace::v1::ExportTraceServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);
-  return http_client_->Export(service_request);
-}
-
+  std::size_t span_count = spans.size();
 #ifdef ENABLE_ASYNC_EXPORT
-void OtlpHttpExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  if (spans.empty())
+  http_client_->Export(
+      service_request, [span_count](opentelemetry::sdk::common::ExportResult result) {
+        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+        {
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                                  << span_count
+                                  << " trace span(s) error: " << static_cast<int>(result));
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
+                                                                      << " trace span(s) success");
+        }
+        return true;
+      });
+  return opentelemetry::sdk::common::ExportResult::kSuccess;
+#else
+  opentelemetry::sdk::common::ExportResult result = http_client_->Export(service_request);
+  if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
   {
-    return;
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << span_count << " trace span(s) error: " << static_cast<int>(result));
   }
-
-  proto::collector::trace::v1::ExportTraceServiceRequest service_request;
-  OtlpRecordableUtils::PopulateRequest(spans, &service_request);
-  http_client_->Export(service_request, std::move(result_callback));
-}
+  else
+  {
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
+                                                                << " trace span(s) success");
+  }
+  return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
+}
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

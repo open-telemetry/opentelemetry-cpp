@@ -28,12 +28,7 @@ class SimpleLogProcessor : public LogProcessor
 {
 
 public:
-  explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter
-#  ifdef ENABLE_ASYNC_EXPORT
-                              ,
-                              bool is_export_async = false
-#  endif
-  );
+  explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
   virtual ~SimpleLogProcessor() = default;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -53,10 +48,6 @@ private:
   opentelemetry::common::SpinLockMutex lock_;
   // The atomic boolean flag to ensure the ShutDown() function is only called once
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
-
-#  ifdef ENABLE_ASYNC_EXPORT
-  bool is_export_async_ = false;
-#  endif
 };
 }  // namespace logs
 }  // namespace sdk

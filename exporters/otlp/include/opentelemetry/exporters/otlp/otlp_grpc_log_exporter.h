@@ -55,18 +55,6 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records) noexcept
       override;
 
-#  ifdef ENABLE_ASYNC_EXPORT
-  /**
-   * Exports a vector of log records asynchronously.
-   * @param records A list of log records.
-   * @param result_callback callback function accepting ExportResult as argument
-   */
-  virtual void Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-      override;
-#  endif
-
   /**
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return.

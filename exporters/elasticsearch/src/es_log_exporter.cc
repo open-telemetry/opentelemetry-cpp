@@ -246,6 +246,29 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   std::vector<uint8_t> body_vec(body.begin(), body.end());
   request->SetBody(body_vec);
 
+#  ifdef ENABLE_ASYNC_EXPORT
+  // Send the request
+  std::size_t span_count = records.size();
+  auto handler           = std::make_shared<AsyncResponseHandler>(
+      session,
+      [span_count](opentelemetry::sdk::common::ExportResult result) {
+        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] ERROR: Export "
+                                  << span_count
+                                  << " trace span(s) error: " << static_cast<int>(result));
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_DEBUG("[ES Trace Exporter] DEBUG: Export " << span_count
+                                                                       << " trace span(s) success");
+        }
+        return true;
+      },
+      options_.console_debug_);
+  session->SendRequest(handler);
+  return sdk::common::ExportResult::kSuccess;
+#  else
   // Send the request
   auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
   session->SendRequest(handler);
@@ -281,54 +304,8 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   }
 
   return sdk::common::ExportResult::kSuccess;
-}
-
-#  ifdef ENABLE_ASYNC_EXPORT
-void ElasticsearchLogExporter::Export(
-    const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
-        &records,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  // Return failure if this exporter has been shutdown
-  if (isShutdown())
-  {
-    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
-                            << records.size() << " log(s) failed, exporter is shutdown");
-    return;
-  }
-
-  // Create a connection to the ElasticSearch instance
-  auto session = http_client_->CreateSession(options_.host_ + std::to_string(options_.port_));
-  auto request = session->CreateRequest();
-
-  // Populate the request with headers and methods
-  request->SetUri(options_.index_ + "/_bulk?pretty");
-  request->SetMethod(http_client::Method::Post);
-  request->AddHeader("Content-Type", "application/json");
-  request->SetTimeoutMs(std::chrono::milliseconds(1000 * options_.response_timeout_));
-
-  // Create the request body
-  std::string body = "";
-  for (auto &record : records)
-  {
-    // Append {"index":{}} before JSON body, which tells Elasticsearch to write to index specified
-    // in URI
-    body += "{\"index\" : {}}\n";
-
-    // Add the context of the Recordable
-    auto json_record = std::unique_ptr<ElasticSearchRecordable>(
-        static_cast<ElasticSearchRecordable *>(record.release()));
-    body += json_record->GetJSON().dump() + "\n";
-  }
-  std::vector<uint8_t> body_vec(body.begin(), body.end());
-  request->SetBody(body_vec);
-
-  // Send the request
-  auto handler = std::make_shared<AsyncResponseHandler>(session, std::move(result_callback),
-                                                        options_.console_debug_);
-  session->SendRequest(handler);
-}
 #  endif
+}
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {

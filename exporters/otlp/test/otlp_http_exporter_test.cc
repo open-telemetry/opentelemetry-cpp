@@ -17,7 +17,6 @@
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
-#  include "opentelemetry/sdk/trace/async_batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
@@ -49,7 +48,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
-OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type)
+OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
+                                                bool async_mode)
 {
   OtlpHttpExporterOptions options;
   options.content_type  = content_type;
@@ -60,6 +60,10 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   OtlpHttpClientOptions otlp_http_client_options(
       options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
+  if (!async_mode)
+  {
+    otlp_http_client_options.max_concurrent_requests = 0;
+  }
   return otlp_http_client_options;
 }
 
@@ -80,10 +84,11 @@ public:
   }
 
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
-  GetMockOtlpHttpClient(HttpRequestContentType content_type)
+  GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
     auto http_client = http_client::HttpClientFactory::CreateNoSend();
-    return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
+    return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
+            http_client};
   }
 
   void ExportJsonIntegrationTest()
@@ -174,7 +179,7 @@ public:
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client =
-        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson, true);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -196,13 +201,13 @@ public:
     resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
     auto resource = resource::Resource::Create(resource_attributes);
 
-    auto processor_opts                  = sdk::trace::AsyncBatchSpanProcessorOptions();
+    auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::AsyncBatchSpanProcessor(std::move(exporter), processor_opts));
+        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
     auto provider = nostd::shared_ptr<trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -344,7 +349,7 @@ public:
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client =
-        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary, true);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -366,13 +371,13 @@ public:
     resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
     auto resource = resource::Resource::Create(resource_attributes);
 
-    auto processor_opts                  = sdk::trace::AsyncBatchSpanProcessorOptions();
+    auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
     processor_opts.max_export_batch_size = 5;
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::AsyncBatchSpanProcessor(std::move(exporter), processor_opts));
+        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
     auto provider = nostd::shared_ptr<trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 

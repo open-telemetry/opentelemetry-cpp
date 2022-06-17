@@ -31,17 +31,8 @@ public:
    * Initialize a simple span processor.
    * @param exporter the exporter used by the span processor
    */
-  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter
-#ifdef ENABLE_ASYNC_EXPORT
-                               ,
-                               bool is_export_async = false
-#endif
-                               ) noexcept
+  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter) noexcept
       : exporter_(std::move(exporter))
-#ifdef ENABLE_ASYNC_EXPORT
-        ,
-        is_export_async_(is_export_async)
-#endif
   {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
@@ -57,26 +48,11 @@ public:
   {
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-#ifdef ENABLE_ASYNC_EXPORT
-    if (is_export_async_ == false)
+    if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
     {
-#endif
-      if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
-      {
-        /* Once it is defined how the SDK does logging, an error should be
-         * logged in this case. */
-      }
-#ifdef ENABLE_ASYNC_EXPORT
+      /* Once it is defined how the SDK does logging, an error should be
+       * logged in this case. */
     }
-    else
-    {
-      exporter_->Export(batch, [](sdk::common::ExportResult result) {
-        /* Log the result
-         */
-        return true;
-      });
-    }
-#endif
   }
 
   bool ForceFlush(
@@ -102,9 +78,6 @@ private:
   std::unique_ptr<SpanExporter> exporter_;
   opentelemetry::common::SpinLockMutex lock_;
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
-#ifdef ENABLE_ASYNC_EXPORT
-  bool is_export_async_ = false;
-#endif
 };
 }  // namespace trace
 }  // namespace sdk

@@ -102,17 +102,6 @@ sdk::common::ExportResult OStreamLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
-void OStreamLogExporter::Export(
-    const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  // Do not have async support
-  auto result = Export(records);
-  result_callback(result);
-}
-#  endif
-
 bool OStreamLogExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
