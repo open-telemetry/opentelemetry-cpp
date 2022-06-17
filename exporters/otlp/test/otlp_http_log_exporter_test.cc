@@ -64,7 +64,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
   {
-    otlp_http_client_options.max_concurrent_requests = 1;
+    otlp_http_client_options.max_concurrent_requests = 0;
   }
   return otlp_http_client_options;
 }

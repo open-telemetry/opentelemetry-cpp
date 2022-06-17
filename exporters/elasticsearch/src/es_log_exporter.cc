@@ -247,31 +247,28 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   request->SetBody(body_vec);
 
 #  ifdef ENABLE_ASYNC_EXPORT
-  if (options_.asynchronous_mode_)
-  {
-    // Send the request
-    std::size_t span_count = records.size();
-    auto handler           = std::make_shared<AsyncResponseHandler>(
-        session,
-        [span_count](opentelemetry::sdk::common::ExportResult result) {
-          if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-          {
-            OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] ERROR: Export "
-                                    << span_count
-                                    << " trace span(s) error: " << static_cast<int>(result));
-          }
-          else
-          {
-            OTEL_INTERNAL_LOG_DEBUG("[ES Trace Exporter] DEBUG: Export "
-                                    << span_count << " trace span(s) success");
-          }
-          return true;
-        },
-        options_.console_debug_);
-    session->SendRequest(handler);
-    return sdk::common::ExportResult::kSuccess;
-  }
-#  endif
+  // Send the request
+  std::size_t span_count = records.size();
+  auto handler           = std::make_shared<AsyncResponseHandler>(
+      session,
+      [span_count](opentelemetry::sdk::common::ExportResult result) {
+        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] ERROR: Export "
+                                  << span_count
+                                  << " trace span(s) error: " << static_cast<int>(result));
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_DEBUG("[ES Trace Exporter] DEBUG: Export " << span_count
+                                                                       << " trace span(s) success");
+        }
+        return true;
+      },
+      options_.console_debug_);
+  session->SendRequest(handler);
+  return sdk::common::ExportResult::kSuccess;
+#  else
   // Send the request
   auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
   session->SendRequest(handler);
@@ -307,6 +304,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   }
 
   return sdk::common::ExportResult::kSuccess;
+#  endif
 }
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

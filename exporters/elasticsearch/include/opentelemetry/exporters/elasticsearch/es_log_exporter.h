@@ -35,10 +35,6 @@ struct ElasticsearchExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug_;
 
-#  ifdef ENABLE_ASYNC_EXPORT
-  bool asynchronous_mode_ = false;
-#  endif
-
   /**
    * Constructor for the ElasticsearchExporterOptions. By default, the endpoint is
    * localhost:9200/logs with a timeout of 30 seconds and disabled console debugging
@@ -53,19 +49,12 @@ struct ElasticsearchExporterOptions
                                int port             = 9200,
                                std::string index    = "logs",
                                int response_timeout = 30,
-                               bool console_debug   = false
-#  ifdef ENABLE_ASYNC_EXPORT
-                               ,
-                               bool asynchronous_mode = false
-#  endif
-                               )
-      : host_{host}, port_{port}, index_{index}, response_timeout_{response_timeout}, console_debug_
-  {
-    console_debug
-  }
-#  ifdef ENABLE_ASYNC_EXPORT
-  , asynchronous_mode_ { asynchronous_mode }
-#  endif
+                               bool console_debug   = false)
+      : host_{host},
+        port_{port},
+        index_{index},
+        response_timeout_{response_timeout},
+        console_debug_{console_debug}
   {}
 };
 

@@ -75,12 +75,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
   }
   proto::collector::logs::v1::ExportLogsServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(logs, &service_request);
-#  ifdef ENABLE_ASYNC_EXPORT
-  if (options_.max_concurrent_requests <= 1)
-  {
-    return http_client_->Export(service_request);
-  }
   std::size_t log_count = logs.size();
+#  ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(
       service_request, [log_count](opentelemetry::sdk::common::ExportResult result) {
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
@@ -97,7 +93,17 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
       });
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #  else
-  return http_client_->Export(service_request);
+  opentelemetry::sdk::common::ExportResult result = http_client_->Export(service_request);
+  if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << log_count << " log(s) error: " << static_cast<int>(result));
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << log_count << " log(s) success");
+  }
+  return opentelemetry::sdk::common::ExportResult::kSuccess;
 #  endif
 }
 
