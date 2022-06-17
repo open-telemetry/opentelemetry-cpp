@@ -90,6 +90,7 @@ void OtlpMetricsUtils::ConvertHistogramMetric(
     proto_histogram_point_data.set_time_unix_nano(ts);
     auto histogram_data =
         nostd::get<sdk::metrics::HistogramPointData>(point_data_with_attributes.point_data);
+    // sum
     if ((nostd::holds_alternative<long>(histogram_data.sum_)))
     {
       proto_histogram_point_data.set_sum(nostd::get<long>(histogram_data.sum_));
@@ -98,9 +99,31 @@ void OtlpMetricsUtils::ConvertHistogramMetric(
     {
       proto_histogram_point_data.set_sum(nostd::get<double>(histogram_data.sum_));
     }
+    // count
     proto_histogram_point_data.set_count(histogram_data.count_);
-
-    // set attributes
+    // buckets
+    if ((nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_)))
+    {
+      auto boundaries = nostd::get<std::list<double>>(histogram_data.boundaries_);
+      for (auto bound : boundaries)
+      {
+        proto_histogram_point_data.add_explicit_bounds(bound);
+      }
+    }
+    else
+    {
+      auto boundaries = nostd::get<std::list<long>>(histogram_data.boundaries_);
+      for (auto bound : boundaries)
+      {
+        proto_histogram_point_data.add_explicit_bounds(bound);
+      }
+    }
+    // bucket counts
+    for (auto bucket_value : histogram_data.counts_)
+    {
+      proto_histogram_point_data.add_bucket_counts(bucket_value);
+    }
+    // attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data.add_attributes(),
