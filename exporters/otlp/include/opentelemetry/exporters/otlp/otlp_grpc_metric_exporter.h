@@ -30,12 +30,12 @@ class OtlpGrpcMetricsExporter : public opentelemetry::sdk::metrics::MetricExport
 {
 public:
   /**
-   * Create an OtlpGrpcExporter using all default options.
+   * Create an OtlpGrpcMetricsExporter using all default options.
    */
   OtlpGrpcMetricsExporter();
 
   /**
-   * Create an OtlpGrpcExporter using the given options.
+   * Create an OtlpGrpcMetricsExporter using the given options.
    */
   explicit OtlpGrpcMetricsExporter(const OtlpGrpcMetricsExporterOptions &options);
 
@@ -59,7 +59,7 @@ private:
       metrics_service_stub_;
 
   /**
-   * Create an OtlpGrpcExporter using the specified service stub.
+   * Create an OtlpGrpcMetricsExporter using the specified service stub.
    * Only tests can call this constructor directly.
    * @param stub the service stub to be used for exporting
    */
