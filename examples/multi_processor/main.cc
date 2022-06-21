@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -13,7 +13,7 @@
 #  include "foo_library/foo_library.h"
 #endif
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
-#include "opentelemetry/exporters/ostream/span_exporter.h"
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 namespace trace_api = opentelemetry::trace;
@@ -24,18 +24,18 @@ namespace
 {
 InMemorySpanExporter *initTracer()
 {
-  auto exporter1 = std::unique_ptr<trace_sdk::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor1 = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter1)));
+  auto exporter1  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
+  auto processor1 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter1));
 
   InMemorySpanExporter *memory_span_exporter = new InMemorySpanExporter();
   auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(memory_span_exporter);
 
   // fetch the exporter for dumping data later
 
-  auto processor2 = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter2)));
+  auto processor2 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter2));
+
+  // TODO: Do not use AddProcessor() in the SDK implementation,
+  // use a vector of processors instead.
 
   auto provider = nostd::shared_ptr<trace_sdk::TracerProvider>(
       new trace_sdk::TracerProvider(std::move(processor1)));

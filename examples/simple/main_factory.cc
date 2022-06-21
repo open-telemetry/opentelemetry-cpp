@@ -1,10 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/jaeger/jaeger_exporter.h"
+/* API */
+
+#include "opentelemetry/trace/provider.h"
+
+/* SDK */
+
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
+
+/* Exporter */
+
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+
+/* Application code */
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -12,33 +22,28 @@
 #  include "foo_library/foo_library.h"
 #endif
 
-namespace trace     = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
+namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
-namespace jaeger    = opentelemetry::exporter::jaeger;
+namespace trace_exporter = opentelemetry::exporter::trace;
 
 namespace
 {
-opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
-void InitTracer()
+void initTracer()
 {
-  // Create Jaeger exporter instance
-  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new jaeger::JaegerExporter(opts));
+  // Using an exporter that simply dumps span data to stdout.
+  auto exporter = trace_exporter::OStreamSpanExporterFactory::Build(std::cout);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
   auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor));
+
   // Set the global trace provider
-  trace::Provider::SetTracerProvider(provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 }  // namespace
 
-int main(int argc, char *argv[])
+int main()
 {
-  if (argc == 2)
-  {
-    opts.endpoint = argv[1];
-  }
   // Removing this line will leave the default noop TracerProvider in place.
-  InitTracer();
+  initTracer();
 
   foo_library();
 }

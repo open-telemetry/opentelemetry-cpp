@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
 #include <string>
@@ -25,11 +26,9 @@ opentelemetry::exporter::otlp::OtlpHttpExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new otlp::OtlpHttpExporter(opts));
-  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
-  auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new trace_sdk::TracerProvider(std::move(processor)));
+  auto exporter  = otlp::OtlpHttpExporterFactory::Build(opts);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
+  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

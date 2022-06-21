@@ -17,7 +17,9 @@ target_link_libraries(
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
-  add_library(opentelemetry_exporter_otlp_grpc src/otlp_grpc_exporter.cc)
+  add_library(opentelemetry_exporter_otlp_grpc
+     src/otlp_grpc_exporter.cc
+     src/otlp_grpc_exporter_factory.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
@@ -60,7 +62,9 @@ if(WITH_OTLP_HTTP)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_client)
 
-  add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
+  add_library(opentelemetry_exporter_otlp_http
+     src/otlp_http_exporter.cc
+     src/otlp_http_exporter_factory.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)

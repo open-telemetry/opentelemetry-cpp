@@ -2,15 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include "opentelemetry/exporters/ostream/span_exporter.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
 
-#include "opentelemetry/context/propagation/global_propagator.h"
-#include "opentelemetry/context/propagation/text_map_propagator.h"
+/* API */
+
+#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+
+/* SDK */
+
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+
+/* Exporter */
+
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 
 #include <grpcpp/grpcpp.h>
 #include <cstring>
@@ -70,16 +79,13 @@ public:
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>(
-      new opentelemetry::sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
+  auto processor = opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.
   auto context  = std::make_shared<opentelemetry::sdk::trace::TracerContext>(std::move(processors));
-  auto provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new opentelemetry::sdk::trace::TracerProvider(context));
+  auto provider = opentelemetry::sdk::trace::TracerProviderFactory::Build(context);
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 

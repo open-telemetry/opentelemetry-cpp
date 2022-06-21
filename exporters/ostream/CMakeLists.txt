@@ -1,4 +1,7 @@
-add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc)
+add_library(
+  opentelemetry_exporter_ostream_span
+  src/span_exporter.cc
+  src/span_exporter_factory.cc)
 
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
