@@ -57,7 +57,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
-                      const std::string &labels,
+                      const opentelemetry::sdk::metrics::PointAttributes &labels,
                       ::prometheus::MetricType type,
                       std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family);
@@ -70,7 +70,7 @@ private:
   static void SetData(std::vector<T> values,
                       const opentelemetry::sdk::metrics::ListType &boundaries,
                       const std::vector<uint64_t> &counts,
-                      const std::string &labels,
+                      const opentelemetry::sdk::metrics::PointAttributes &labels,
                       std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family);
 
@@ -79,14 +79,13 @@ private:
    */
   static void SetMetricBasic(::prometheus::ClientMetric &metric,
                              std::chrono::nanoseconds time,
-                             const std::string &labels);
+                             const opentelemetry::sdk::metrics::PointAttributes &labels);
 
   /**
-   * Parse a string of labels (key:value) into a vector of pairs
-   * {,}
-   * {l1:v1,l2:v2,...,}
+   * Convert attribute value to string
    */
-  static std::vector<std::pair<std::string, std::string>> ParseLabel(std::string labels);
+  static std::string AttributeValueToString(
+      const opentelemetry::sdk::common::OwnedAttributeValue &value);
 
   /**
    * Handle Counter and Gauge.

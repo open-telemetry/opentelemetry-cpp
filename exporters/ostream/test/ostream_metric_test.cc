@@ -50,8 +50,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
                                        metric_sdk::InstrumentValueType::kDouble},
       opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, sum_point_data},
-          {metric_sdk::PointAttributes{}, sum_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
@@ -75,8 +75,12 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n  unit\t\t: unit"
       "\n  type\t\t: SumPointData"
       "\n  value\t\t: 10"
+      "\n  attributes\t\t: "
+      "\n\ta1: b1"
       "\n  type\t\t: SumPointData"
       "\n  value\t\t: 20"
+      "\n  attributes\t\t: "
+      "\n\ta1: b1"
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
@@ -109,8 +113,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
                                        metric_sdk::InstrumentValueType::kDouble},
       opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, histogram_point_data},
-          {metric_sdk::PointAttributes{}, histogram_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}, {"a2", "b2"}}, histogram_point_data},
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
@@ -137,11 +141,16 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n  sum     : 900.5"
       "\n  buckets     : [10.1, 20.2, 30.2, ]"
       "\n  counts     : [200, 300, 400, 500, ]"
+      "\n  attributes\t\t: "
+      "\n\ta1: b1"
+      "\n\ta2: b2"
       "\n  type     : HistogramPointData"
       "\n  count     : 3"
       "\n  sum     : 900"
       "\n  buckets     : [10, 20, 30, ]"
       "\n  counts     : [200, 300, 400, 500, ]"
+      "\n  attributes\t\t: "
+      "\n\ta1: b1"
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
@@ -199,10 +208,12 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  timestamp     : 0"
       "\n  valid     : true"
       "\n  value     : 10"
+      "\n  attributes\t\t: "
       "\n  type     : LastValuePointData"
       "\n  timestamp     : 0"
       "\n  valid     : true"
       "\n  value     : 20"
+      "\n  attributes\t\t: "
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
