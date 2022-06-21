@@ -14,7 +14,7 @@ namespace metrics
 {
 
 MetricReader::MetricReader(AggregationTemporality aggregation_temporality)
-    : aggregation_temporality_(aggregation_temporality)
+    : aggregation_temporality_(aggregation_temporality), shutdown_(false), metric_producer_(nullptr)
 {}
 
 void MetricReader::SetMetricProducer(MetricProducer *metric_producer)

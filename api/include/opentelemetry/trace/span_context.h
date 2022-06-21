@@ -81,7 +81,7 @@ public:
 
   bool IsRemote() const noexcept { return is_remote_; }
 
-  static SpanContext GetInvalid() { return SpanContext(false, false); }
+  static SpanContext GetInvalid() noexcept { return SpanContext(false, false); }
 
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 

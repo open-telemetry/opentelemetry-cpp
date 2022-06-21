@@ -10,6 +10,8 @@
 #  include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
 
@@ -70,14 +72,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
               sum = nostd::get<long>(histogram_point_data.sum_);
             }
             SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
-                    counts, "", time, &metric_family);
+                    counts, point_data_attr.attributes, time, &metric_family);
           }
           else  // Counter, Untyped
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, "", type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, &metric_family);
           }
         }
         output.emplace_back(metric_family);
@@ -106,6 +108,7 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
     const metric_sdk::PointType &point_type)
 {
+
   if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_type))
   {
     return metric_sdk::AggregationType::kSum;
@@ -148,7 +151,7 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const std::string &labels,
+                                      const metric_sdk::PointAttributes &labels,
                                       prometheus_client::MetricType type,
                                       std::chrono::nanoseconds time,
                                       prometheus_client::MetricFamily *metric_family)
@@ -167,7 +170,7 @@ template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const opentelemetry::sdk::metrics::ListType &boundaries,
                                       const std::vector<uint64_t> &counts,
-                                      const std::string &labels,
+                                      const metric_sdk::PointAttributes &labels,
                                       std::chrono::nanoseconds time,
                                       prometheus_client::MetricFamily *metric_family)
 {
@@ -189,59 +192,62 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
  */
 void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
                                              std::chrono::nanoseconds time,
-                                             const std::string &labels)
+                                             const metric_sdk::PointAttributes &labels)
 {
   metric.timestamp_ms = time.count() / 1000000;
 
-  auto label_pairs = ParseLabel(labels);
-  if (!label_pairs.empty())
+  // auto label_pairs = ParseLabel(labels);
+  if (!labels.empty())
   {
-    metric.label.resize(label_pairs.size());
-    for (size_t i = 0; i < label_pairs.size(); ++i)
+    metric.label.resize(labels.size());
+    size_t i = 0;
+    for (auto const &label : labels)
     {
-      auto origin_name      = label_pairs[i].first;
-      auto sanitized        = SanitizeNames(origin_name);
-      metric.label[i].name  = sanitized;
-      metric.label[i].value = label_pairs[i].second;
+      auto sanitized          = SanitizeNames(label.first);
+      metric.label[i].name    = sanitized;
+      metric.label[i++].value = AttributeValueToString(label.second);
     }
   }
 };
 
-/**
- * Parse a string of labels (key:value) into a vector of pairs
- * {,}
- * {l1:v1,l2:v2,...,}
- */
-std::vector<std::pair<std::string, std::string>> PrometheusExporterUtils::ParseLabel(
-    std::string labels)
+std::string PrometheusExporterUtils::AttributeValueToString(
+    const opentelemetry::sdk::common::OwnedAttributeValue &value)
 {
-  if (labels.size() < 3)
+  std::string result;
+  if (nostd::holds_alternative<bool>(value))
   {
-    return {};
+    result = nostd::get<bool>(value) ? "true" : "false";
   }
-  labels = labels.substr(1, labels.size() - 2);
-
-  std::vector<std::string> paired_labels;
-  std::stringstream s_stream(labels);
-  while (s_stream.good())
+  else if (nostd::holds_alternative<int>(value))
   {
-    std::string substr;
-    getline(s_stream, substr, ',');  // get first string delimited by comma
-    if (!substr.empty())
-    {
-      paired_labels.push_back(substr);
-    }
+    result = std::to_string(nostd::get<int>(value));
   }
-
-  std::vector<std::pair<std::string, std::string>> result;
-  for (auto &paired : paired_labels)
+  else if (nostd::holds_alternative<int64_t>(value))
   {
-    std::size_t split_index = paired.find(':');
-    std::string label       = paired.substr(0, split_index);
-    std::string value       = paired.substr(split_index + 1);
-    result.emplace_back(std::pair<std::string, std::string>(label, value));
+    result = std::to_string(nostd::get<int64_t>(value));
   }
-
+  else if (nostd::holds_alternative<unsigned int>(value))
+  {
+    result = std::to_string(nostd::get<unsigned int>(value));
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    result = std::to_string(nostd::get<uint64_t>(value));
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    result = std::to_string(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    result = nostd::get<std::string>(value);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Prometheus Exporter] AttributeValueToString - "
+        " Nested attributes not supported - ignored");
+  }
   return result;
 }
 
