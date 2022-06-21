@@ -13,7 +13,7 @@
 
 gRPC=v1.46.3
 thrift=0.14.1
-abseil=20210324.0
+abseil=20211102.0
 benchmark=v1.5.3
 googletest=release-1.10.0-459-ga6dfd3ac
 ms-gsl=v3.1.0-67-g6f45293
