@@ -15,6 +15,7 @@ namespace metrics_api = opentelemetry::metrics;
 
 namespace
 {
+
 std::map<std::string, std::string> get_random_attr()
 {
   static const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},

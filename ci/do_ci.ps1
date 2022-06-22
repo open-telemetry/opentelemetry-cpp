@@ -31,9 +31,9 @@ switch ($action) {
   "cmake.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-          -DVCPKG_TARGET_TRIPLET=x64-windows `
-          -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -52,10 +52,10 @@ switch ($action) {
   "cmake.exporter.otprotocol.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-          -DVCPKG_TARGET_TRIPLET=x64-windows `
-          -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-          -DWITH_OTPROTCOL=ON `
-          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DWITH_OTPROTCOL=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -74,9 +74,9 @@ switch ($action) {
   "cmake.build_example_plugin" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-          -DVCPKG_TARGET_TRIPLET=x64-windows `
-          -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -91,9 +91,9 @@ switch ($action) {
   "cmake.test_example_plugin" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-          -DVCPKG_TARGET_TRIPLET=x64-windows `
-          -DWITH_ASYNC_EXPORT_PREVIEW=ON `
-          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
