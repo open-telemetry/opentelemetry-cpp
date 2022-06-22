@@ -9,14 +9,6 @@
 
 #  include "opentelemetry/_metrics/instrument.h"
 #  include "opentelemetry/exporters/prometheus/collector.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/sketch_aggregator.h"
-#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "opentelemetry/version.h"
 #  include "prometheus_test_helper.h"
 
