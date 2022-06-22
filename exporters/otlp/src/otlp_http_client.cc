@@ -129,7 +129,7 @@ public:
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {
-    // need to modify stopping_ under lock before calling notify_all
+    // need to modify stopping_ under lock before calling callback
     bool need_stop = false;
     switch (state)
     {
