@@ -140,7 +140,7 @@ public:
   void OnResponse(http_client::Response &response) noexcept override
   {
 
-    // Store the body of the request
+    // Store the body of the response
     body_ = std::string(response.GetBody().begin(), response.GetBody().end());
     if (body_.find("\"failed\" : 0") == std::string::npos)
     {
@@ -158,27 +158,44 @@ public:
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
-    // If any failure event occurs, release the condition variable to unblock main thread
+    bool need_stop = false;
     switch (state)
     {
+      case http_client::SessionState::CreateFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Create request to elasticsearch failed");
+        need_stop = true;
+        break;
       case http_client::SessionState::ConnectFailed:
         OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed");
+        need_stop = true;
         break;
       case http_client::SessionState::SendFailed:
         OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch");
-
+        need_stop = true;
+        break;
+      case http_client::SessionState::SSLHandshakeFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] SSL handshake to elasticsearch failed");
+        need_stop = true;
         break;
       case http_client::SessionState::TimedOut:
         OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out");
-
+        need_stop = true;
         break;
       case http_client::SessionState::NetworkError:
         OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
+        need_stop = true;
+        break;
+      case http_client::SessionState::Cancelled:
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch cancelled");
+        need_stop = true;
         break;
       default:
         break;
     }
-    result_callback_(sdk::common::ExportResult::kFailure);
+    if (need_stop)
+    {
+      result_callback_(sdk::common::ExportResult::kFailure);
+    }
   }
 
 private:

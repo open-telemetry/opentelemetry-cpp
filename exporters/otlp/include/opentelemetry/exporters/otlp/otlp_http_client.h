@@ -81,7 +81,7 @@ struct OtlpHttpClientOptions
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
 
-  // Concurrent requests
+  // Requests per connections
   std::size_t max_requests_per_connection = 8;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,

@@ -76,7 +76,7 @@ public:
                   bool console_debug = false)
       : result_callback_{std::move(callback)}, console_debug_{console_debug}
   {
-    stoping_.store(false);
+    stopping_.store(false);
   }
 
   /**
@@ -104,14 +104,11 @@ public:
         ss << "Body:" << body_;
         OTEL_INTERNAL_LOG_DEBUG(ss.str());
       }
-
-      // Set the response_received_ flag to true and notify any threads waiting on this result
-      response_received_ = true;
     }
 
     {
       bool expected = false;
-      if (stoping_.compare_exchange_strong(expected, true, std::memory_order_release))
+      if (stopping_.compare_exchange_strong(expected, true, std::memory_order_release))
       {
         Unbind(sdk::common::ExportResult::kSuccess);
       }
@@ -132,7 +129,7 @@ public:
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {
-    // need to modify stoping_ under lock before calling notify_all
+    // need to modify stopping_ under lock before calling notify_all
     bool need_stop = false;
     switch (state)
     {
@@ -294,7 +291,7 @@ public:
     if (need_stop)
     {
       bool expected = false;
-      if (stoping_.compare_exchange_strong(expected, true, std::memory_order_release))
+      if (stopping_.compare_exchange_strong(expected, true, std::memory_order_release))
       {
         Unbind(sdk::common::ExportResult::kFailure);
       }
@@ -331,16 +328,15 @@ public:
   };
 
 private:
-  // Define a condition variable and mutex
+  // Define a mutex to keep thread safety
   std::mutex mutex_;
+
+  // Track the owner and the binded session
   OtlpHttpClient *owner_                                    = nullptr;
   const opentelemetry::ext::http::client::Session *session_ = nullptr;
 
   // Whether notify has been called
-  std::atomic<bool> stoping_;
-
-  // Whether the response has been received
-  bool response_received_ = false;
+  std::atomic<bool> stopping_;
 
   // A string to store the response body
   std::string body_ = "";
