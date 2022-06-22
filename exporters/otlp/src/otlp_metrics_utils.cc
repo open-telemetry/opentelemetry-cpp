@@ -50,6 +50,9 @@ metric_sdk::AggregationType OtlpMetricsUtils::GetAggregationType(
 void OtlpMetricsUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
                                         proto::metrics::v1::Sum *const sum) noexcept
 {
+  sum->set_aggregation_temporality(
+      GetProtoAggregationTemporality(metric_data.aggregation_temporality));
+  sum->set_is_monotonic(true);
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
@@ -129,20 +132,36 @@ void OtlpMetricsUtils::ConvertHistogramMetric(
       OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data.add_attributes(),
                                                     kv_attr.first, kv_attr.second);
     }
+    *histogram->add_data_points() = proto_histogram_point_data;
   }
 }
 
-void OtlpMetricsUtils::PopulateRequest(
-    const opentelemetry::sdk::metrics::ResourceMetrics &data,
-    proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept
+void OtlpMetricsUtils::PopulateInstrumentationInfoMetric(
+    const opentelemetry::sdk::metrics::MetricData &metric_data,
+    proto::metrics::v1::Metric *metric) noexcept
 {
-  if (request == nullptr || data.resource_ == nullptr)
+  metric->set_name(metric_data.instrument_descriptor.name_);
+  metric->set_description(metric_data.instrument_descriptor.description_);
+  metric->set_unit(metric_data.instrument_descriptor.unit_);
+  auto kind = GetAggregationType(metric_data.instrument_descriptor.type_);
+  if (kind == metric_sdk::AggregationType::kSum)
   {
-    return;
+    proto::metrics::v1::Sum sum;
+    ConvertSumMetric(metric_data, &sum);
+    *metric->mutable_sum() = sum;
   }
+  else if (kind == metric_sdk::AggregationType::kHistogram)
+  {
+    proto::metrics::v1::Histogram histogram;
+    ConvertHistogramMetric(metric_data, &histogram);
+    *metric->mutable_histogram() = histogram;
+  }
+}
 
-  // populate resource
-  auto resource_metrics = request->add_resource_metrics();
+void OtlpMetricsUtils::PopulateResourceMetrics(
+    const opentelemetry::sdk::metrics::ResourceMetrics &data,
+    proto::metrics::v1::ResourceMetrics *resource_metrics) noexcept
+{
   proto::resource::v1::Resource proto;
   OtlpPopulateAttributeUtils::PopulateAttribute(&proto, *(data.resource_));
   *resource_metrics->mutable_resource() = proto;
@@ -163,28 +182,23 @@ void OtlpMetricsUtils::PopulateRequest(
     for (auto &metric_data : instrumentation_metrics.metric_data_)
     {
       proto::metrics::v1::Metric metric;
-      metric.set_name(metric_data.instrument_descriptor.name_);
-      metric.set_description(metric_data.instrument_descriptor.description_);
-      metric.set_unit(metric_data.instrument_descriptor.unit_);
-      auto kind = GetAggregationType(metric_data.instrument_descriptor.type_);
-      if (kind == metric_sdk::AggregationType::kSum)
-      {
-        proto::metrics::v1::Sum sum;
-        sum.set_aggregation_temporality(
-            GetProtoAggregationTemporality(metric_data.aggregation_temporality));
-        sum.set_is_monotonic(true);
-        ConvertSumMetric(metric_data, &sum);
-        *metric.mutable_sum() = sum;
-      }
-      else if (kind == metric_sdk::AggregationType::kHistogram)
-      {
-        proto::metrics::v1::Histogram histogram;
-        ConvertHistogramMetric(metric_data, &histogram);
-        *metric.mutable_histogram() = histogram;
-      }
+      PopulateInstrumentationInfoMetric(metric_data, &metric);
       *instrumentation_lib_metrics->add_metrics() = metric;
     }
   }
+}
+
+void OtlpMetricsUtils::PopulateRequest(
+    const opentelemetry::sdk::metrics::ResourceMetrics &data,
+    proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept
+{
+  if (request == nullptr || data.resource_ == nullptr)
+  {
+    return;
+  }
+
+  auto resource_metrics = request->add_resource_metrics();
+  PopulateResourceMetrics(data, resource_metrics);
 }
 }  // namespace otlp
 }  // namespace exporter

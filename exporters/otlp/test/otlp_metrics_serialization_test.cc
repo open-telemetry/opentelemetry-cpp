@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
+#  include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 
 #  include <gtest/gtest.h>
 
@@ -20,7 +21,7 @@ metrics_sdk::MetricData CreateSumAggregationData()
 {
   metrics_sdk::MetricData data;
   data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
-  metrics_sdk::InstrumentDescriptor inst_desc = {"Counter", "", "",
+  metrics_sdk::InstrumentDescriptor inst_desc = {"Counter", "desc", "unit",
                                                  metrics_sdk::InstrumentType::kCounter,
                                                  metrics_sdk::InstrumentValueType::kDouble};
   metrics_sdk::SumPointData s_data_1, s_data_2;
@@ -39,6 +40,7 @@ metrics_sdk::MetricData CreateSumAggregationData()
   std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
   point_data_attr.push_back(point_data_attr_1);
   point_data_attr.push_back(point_data_attr_2);
+  data.point_data_attr_ = std::move(point_data_attr);
   return data;
 }
 
@@ -47,6 +49,15 @@ TEST(OtlpMetricsSerializationTest, Counter)
   metrics_sdk::MetricData data = CreateSumAggregationData();
   opentelemetry::proto::metrics::v1::Sum sum;
   otlp_exporter::OtlpMetricsUtils::ConvertSumMetric(data, &sum);
+  EXPECT_EQ(sum.aggregation_temporality(),
+            proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
+  EXPECT_EQ(sum.is_monotonic(), true);
+  for (size_t i = 0; i < 1; i++)
+  {
+    auto proto_number_point = sum.data_points(i);
+    EXPECT_EQ(proto_number_point.has_as_double(), true);
+  }
+
   EXPECT_EQ(1, 1);
 }
 

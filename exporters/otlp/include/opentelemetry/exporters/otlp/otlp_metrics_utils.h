@@ -38,6 +38,14 @@ public:
   static void ConvertHistogramMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
                                      proto::metrics::v1::Histogram *const histogram) noexcept;
 
+  static void PopulateInstrumentationInfoMetric(
+      const opentelemetry::sdk::metrics::MetricData &metric_data,
+      proto::metrics::v1::Metric *metric) noexcept;
+
+  static void PopulateResourceMetrics(
+      const opentelemetry::sdk::metrics::ResourceMetrics &data,
+      proto::metrics::v1::ResourceMetrics *proto_resource_metrics) noexcept;
+
   static void PopulateRequest(
       const opentelemetry::sdk::metrics::ResourceMetrics &data,
       proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
