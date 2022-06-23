@@ -55,7 +55,7 @@ TEST(OtlpMetricsSerializationTest, Counter)
   for (size_t i = 0; i < 1; i++)
   {
     auto proto_number_point = sum.data_points(i);
-    EXPECT_EQ(proto_number_point.has_as_double(), true);
+    EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 10.2 : 20.2);
   }
 
   EXPECT_EQ(1, 1);
