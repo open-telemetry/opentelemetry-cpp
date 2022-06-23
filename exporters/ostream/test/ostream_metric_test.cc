@@ -48,7 +48,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data2}}};
@@ -111,7 +112,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}, {"a2", "b2"}}, histogram_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data2}}};
@@ -179,7 +181,8 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, last_value_point_data},
           {metric_sdk::PointAttributes{}, last_value_point_data2}}};
@@ -236,7 +239,8 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, drop_point_data},
           {metric_sdk::PointAttributes{}, drop_point_data2}}};
