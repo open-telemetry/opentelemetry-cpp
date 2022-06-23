@@ -84,6 +84,8 @@ void OtlpMetricsUtils::ConvertHistogramMetric(
     const metric_sdk::MetricData &metric_data,
     proto::metrics::v1::Histogram *const histogram) noexcept
 {
+  histogram->set_aggregation_temporality(
+      GetProtoAggregationTemporality(metric_data.aggregation_temporality));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
