@@ -30,7 +30,7 @@ PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
  */
 PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
 {
-  collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector);
+  collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector(3));
 }
 
 /**
@@ -45,9 +45,14 @@ sdk::common::ExportResult PrometheusExporter::Export(
   {
     return sdk::common::ExportResult::kFailure;
   }
-  else if (collector_->GetCollection().size() + 1 > (size_t)collector_->GetMaxCollectionSize())
+  else if (collector_->GetCollection().size() + data.instrumentation_info_metric_data_.size() >
+           (size_t)collector_->GetMaxCollectionSize())
   {
     return sdk::common::ExportResult::kFailureFull;
+  }
+  else if (data.instrumentation_info_metric_data_.empty())
+  {
+    return sdk::common::ExportResult::kFailureInvalidArgument;
   }
   else
   {

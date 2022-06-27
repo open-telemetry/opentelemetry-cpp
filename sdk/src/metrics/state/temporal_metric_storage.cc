@@ -110,9 +110,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
 
   AttributesHashMap *result_to_export = (last_reported_metrics_[collector]).attributes_map.get();
   MetricData metric_data;
-  metric_data.instrument_descriptor = instrument_descriptor_;
-  metric_data.start_ts              = last_collection_ts;
-  metric_data.end_ts                = collection_ts;
+  metric_data.instrument_descriptor   = instrument_descriptor_;
+  metric_data.aggregation_temporality = aggregation_temporarily;
+  metric_data.start_ts                = last_collection_ts;
+  metric_data.end_ts                  = collection_ts;
   result_to_export->GetAllEnteries(
       [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
         PointDataAttributes point_data_attr;
