@@ -1,7 +1,8 @@
 add_library(
   opentelemetry_otlp_recordable
   src/otlp_log_recordable.cc src/otlp_recordable.cc
-  src/otlp_recordable_utils.cc)
+  src/otlp_populate_attribute_utils.cc src/otlp_recordable_utils.cc
+  src/otlp_metrics_utils.cc)
 set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
                                                                otlp_recordable)
 
@@ -37,6 +38,20 @@ if(WITH_OTLP_GRPC)
                         PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
+
+  if(NOT WITH_METRICS_PREVIEW)
+    add_library(opentelemetry_exporter_otlp_grpc_metrics
+                src/otlp_grpc_metric_exporter.cc)
+
+    set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
+                          PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter)
+
+    target_link_libraries(opentelemetry_exporter_otlp_grpc_metrics
+                          PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
+
+    list(APPEND OPENTELEMETRY_OTLP_TARGETS
+         opentelemetry_exporter_otlp_grpc_metrics)
+  endif()
 endif()
 
 if(WITH_OTLP_HTTP)
@@ -120,6 +135,18 @@ if(BUILD_TESTING)
       TARGET otlp_log_recordable_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_log_recordable_test)
+  endif()
+
+  if(NOT WITH_METRICS_PREVIEW)
+    add_executable(otlp_metrics_serialization_test
+                   test/otlp_metrics_serialization_test.cc)
+    target_link_libraries(
+      otlp_metrics_serialization_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+    gtest_add_tests(
+      TARGET otlp_metrics_serialization_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_metrics_serialization_test)
   endif()
 
   if(MSVC)
