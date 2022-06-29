@@ -62,16 +62,16 @@ const std::string OtlpRecordable::GetInstrumentationLibrarySchemaURL() const noe
   return schema_url;
 }
 
-proto::common::v1::InstrumentationLibrary OtlpRecordable::GetProtoInstrumentationLibrary()
+proto::common::v1::InstrumentationScope OtlpRecordable::GetProtoInstrumentationScope()
     const noexcept
 {
-  proto::common::v1::InstrumentationLibrary instrumentation_library;
+  proto::common::v1::InstrumentationScope instrumentation_scope;
   if (instrumentation_library_)
   {
-    instrumentation_library.set_name(instrumentation_library_->GetName());
-    instrumentation_library.set_version(instrumentation_library_->GetVersion());
+    instrumentation_scope.set_name(instrumentation_library_->GetName());
+    instrumentation_scope.set_version(instrumentation_library_->GetVersion());
   }
-  return instrumentation_library;
+  return instrumentation_scope;
 }
 
 void OtlpRecordable::SetResource(const sdk::resource::Resource &resource) noexcept

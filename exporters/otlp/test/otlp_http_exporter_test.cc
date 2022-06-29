@@ -141,10 +141,10 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       .WillOnce([&mock_session,
                  report_trace_id](opentelemetry::ext::http::client::EventHandler &callback) {
         auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-        auto resource_span                = *check_json["resource_spans"].begin();
-        auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
-        auto span                         = *instrumentation_library_span["spans"].begin();
-        auto received_trace_id            = span["trace_id"].get<std::string>();
+        auto resource_span     = *check_json["resource_spans"].begin();
+        auto scope_span        = *resource_span["scope_spans"].begin();
+        auto span              = *scope_span["spans"].begin();
+        auto received_trace_id = span["trace_id"].get<std::string>();
         EXPECT_EQ(received_trace_id, report_trace_id);
 
         auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -222,8 +222,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
         opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
         request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                     static_cast<int>(mock_session->GetRequest()->body_.size()));
-        auto received_trace_id =
-            request_body.resource_spans(0).instrumentation_library_spans(0).spans(0).trace_id();
+        auto received_trace_id = request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
         EXPECT_EQ(received_trace_id, report_trace_id);
 
         auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
