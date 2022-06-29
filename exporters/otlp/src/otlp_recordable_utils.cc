@@ -60,12 +60,12 @@ void OtlpRecordableUtils::PopulateRequest(
   {
     auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
     auto resource_span       = request->add_resource_spans();
-    auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
+    auto scope_spans = resource_span->add_scope_spans();
 
-    *instrumentation_lib->add_spans()                       = std::move(rec->span());
-    *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
+    *scope_spans->add_spans()                       = std::move(rec->span());
+    *scope_spans->mutable_scope() = rec->GetProtoInstrumentationScope();
 
-    instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
+    scope_spans->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
 
     *resource_span->mutable_resource() = rec->ProtoResource();
     resource_span->set_schema_url(rec->GetResourceSchemaURL());
