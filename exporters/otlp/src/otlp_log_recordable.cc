@@ -7,6 +7,7 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 
+#  include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
 namespace nostd = opentelemetry::nostd;
@@ -22,11 +23,11 @@ proto::resource::v1::Resource OtlpLogRecordable::ProtoResource() const noexcept
   proto::resource::v1::Resource proto;
   if (nullptr == resource_)
   {
-    OtlpRecordableUtils::PopulateAttribute(&proto, sdk::resource::Resource::GetDefault());
+    OtlpPopulateAttributeUtils::PopulateAttribute(&proto, sdk::resource::Resource::GetDefault());
   }
   else
   {
-    OtlpRecordableUtils::PopulateAttribute(&proto, *resource_);
+    OtlpPopulateAttributeUtils::PopulateAttribute(&proto, *resource_);
   }
 
   return proto;
@@ -189,7 +190,7 @@ const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() c
 void OtlpLogRecordable::SetAttribute(nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  OtlpRecordableUtils::PopulateAttribute(log_record_.add_attributes(), key, value);
+  OtlpPopulateAttributeUtils::PopulateAttribute(log_record_.add_attributes(), key, value);
 }
 
 void OtlpLogRecordable::SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept
