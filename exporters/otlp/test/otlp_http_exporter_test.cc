@@ -222,8 +222,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
         opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
         request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                     static_cast<int>(mock_session->GetRequest()->body_.size()));
-        auto received_trace_id =
-            request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
+        auto received_trace_id = request_body.resource_spans(0).scope_spans(0).spans(0).trace_id();
         EXPECT_EQ(received_trace_id, report_trace_id);
 
         auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
