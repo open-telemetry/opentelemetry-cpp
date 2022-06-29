@@ -59,10 +59,10 @@ void OtlpRecordableUtils::PopulateRequest(
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
-    auto resource_span       = request->add_resource_spans();
-    auto scope_spans = resource_span->add_scope_spans();
+    auto resource_span = request->add_resource_spans();
+    auto scope_spans   = resource_span->add_scope_spans();
 
-    *scope_spans->add_spans()                       = std::move(rec->span());
+    *scope_spans->add_spans()     = std::move(rec->span());
     *scope_spans->mutable_scope() = rec->GetProtoInstrumentationScope();
 
     scope_spans->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
