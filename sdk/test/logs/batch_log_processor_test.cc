@@ -9,7 +9,6 @@
 
 #  include <gtest/gtest.h>
 #  include <chrono>
-#  include <list>
 #  include <memory>
 #  include <thread>
 

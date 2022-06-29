@@ -43,6 +43,12 @@ public:
       // Store the body of the request
       body_ = std::string(response.GetBody().begin(), response.GetBody().end());
 
+      if (console_debug_)
+      {
+        OTEL_INTERNAL_LOG_DEBUG(
+            "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+      }
+
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
     }
@@ -77,19 +83,19 @@ public:
     switch (state)
     {
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
         cv_.notify_all();
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
         cv_.notify_all();
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
         cv_.notify_all();
         break;
     }
@@ -142,10 +148,15 @@ public:
 
     // Store the body of the response
     body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    if (console_debug_)
+    {
+      OTEL_INTERNAL_LOG_DEBUG(
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+    }
     if (body_.find("\"failed\" : 0") == std::string::npos)
     {
       OTEL_INTERNAL_LOG_ERROR(
-          "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
+          "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
           << body_);
       result_callback_(sdk::common::ExportResult::kFailure);
     }
@@ -162,31 +173,31 @@ public:
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Create request to elasticsearch failed");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Create request to elasticsearch failed");
         need_stop = true;
         break;
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
         need_stop = true;
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
         need_stop = true;
         break;
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] SSL handshake to elasticsearch failed");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
         need_stop = true;
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
         need_stop = true;
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
         need_stop = true;
         break;
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch cancelled");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch cancelled");
         need_stop = true;
         break;
       default:
@@ -271,14 +282,14 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
       [span_count](opentelemetry::sdk::common::ExportResult result) {
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
-          OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] ERROR: Export "
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
                                   << span_count
                                   << " trace span(s) error: " << static_cast<int>(result));
         }
         else
         {
-          OTEL_INTERNAL_LOG_DEBUG("[ES Trace Exporter] DEBUG: Export " << span_count
-                                                                       << " trace span(s) success");
+          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] DEBUG: Export " << span_count
+                                                                     << " trace span(s) success");
         }
         return true;
       },
@@ -293,9 +304,8 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   // Wait for the response to be received
   if (options_.console_debug_)
   {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[ES Trace Exporter] waiting for response from Elasticsearch (timeout = "
-        << options_.response_timeout_ << " seconds)");
+    OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] waiting for response from Elasticsearch (timeout = "
+                            << options_.response_timeout_ << " seconds)");
   }
   bool write_successful = handler->waitForResponse();
 
@@ -314,7 +324,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
+        "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
         << responseBody);
     // TODO: Retry logic
     return sdk::common::ExportResult::kFailure;
