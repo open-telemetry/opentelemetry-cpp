@@ -14,6 +14,8 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource  = opentelemetry::sdk::resource;
 namespace proto     = opentelemetry::proto;
 
+namespace trace_sdk_2 = opentelemetry::sdk::trace;
+
 TEST(OtlpRecordable, SetIdentity)
 {
   constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -62,7 +64,7 @@ TEST(OtlpRecordable, SetInstrumentationLibrary)
   OtlpRecordable rec;
   auto inst_lib = trace_sdk::InstrumentationLibrary::Create("test", "v1");
   rec.SetInstrumentationLibrary(*inst_lib);
-  auto proto_instr_libr = rec.GetProtoInstrumentationLibrary();
+  auto proto_instr_libr = rec.GetProtoInstrumentationScope();
   EXPECT_EQ(proto_instr_libr.name(), inst_lib->GetName());
   EXPECT_EQ(proto_instr_libr.version(), inst_lib->GetVersion());
 }
