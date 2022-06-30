@@ -23,17 +23,17 @@
 #  include "foo_library/foo_library.h"
 #endif
 
-namespace trace_api = opentelemetry::trace;
-namespace trace_sdk = opentelemetry::sdk::trace;
+namespace trace_api      = opentelemetry::trace;
+namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace trace_exporter = opentelemetry::exporter::trace;
 
 namespace
 {
 void initTracer()
 {
-  auto exporter = trace_exporter::OStreamSpanExporterFactory::Build();
+  auto exporter  = trace_exporter::OStreamSpanExporterFactory::Build();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
-  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor));
+  auto provider  = trace_sdk::TracerProviderFactory::Build(std::move(processor));
 
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);

@@ -15,7 +15,6 @@
 // Using an exporter that simply dumps span data to stdout.
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 
-
 #include <chrono>
 #include <thread>
 

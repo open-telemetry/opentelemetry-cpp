@@ -26,9 +26,9 @@ void InitTracer()
   // Create zipkin exporter instance
   resource::ResourceAttributes attributes = {{"service.name", "zipkin_demo_service"}};
   auto resource                           = resource::Resource::Create(attributes);
-  auto exporter  = zipkin::ZipkinExporterFactory::Build(opts);
+  auto exporter                           = zipkin::ZipkinExporterFactory::Build(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
-  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor), resource);
+  auto provider  = trace_sdk::TracerProviderFactory::Build(std::move(processor), resource);
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

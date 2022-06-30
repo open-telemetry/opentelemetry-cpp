@@ -21,9 +21,9 @@ namespace
 {
 void initTracer()
 {
-  auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
+  auto exporter  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
-  auto provider = trace_sdk::TracerProviderFactory::Build(
+  auto provider  = trace_sdk::TracerProviderFactory::Build(
       std::move(processor), opentelemetry::sdk::resource::Resource::Create({}));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);

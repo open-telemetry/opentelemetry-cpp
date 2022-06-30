@@ -60,7 +60,8 @@ public:
 void initTracer()
 {
   auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
-  auto processor = opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
+  auto processor =
+      opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.

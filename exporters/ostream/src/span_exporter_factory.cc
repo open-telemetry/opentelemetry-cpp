@@ -19,8 +19,8 @@ nostd::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build()
 
 nostd::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build(std::ostream &sout)
 {
-  std::unique_ptr<trace_sdk::SpanExporter> exporter(new OStreamSpanExporter(sout));
-  return exporter;
+  nostd::unique_ptr<trace_sdk::SpanExporter> exporter(new OStreamSpanExporter(sout));
+  return std::move(exporter);
 }
 
 }  // namespace trace

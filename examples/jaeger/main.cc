@@ -25,7 +25,7 @@ void InitTracer()
   // Create Jaeger exporter instance
   auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new jaeger::JaegerExporter(opts));
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
-  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor));
+  auto provider  = trace_sdk::TracerProviderFactory::Build(std::move(processor));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

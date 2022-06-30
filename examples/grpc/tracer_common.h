@@ -5,17 +5,17 @@
 
 /* API */
 
-#include "opentelemetry/trace/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/provider.h"
 
 /* SDK */
 
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 
 /* Exporter */
 
@@ -80,7 +80,8 @@ public:
 void initTracer()
 {
   auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
-  auto processor = opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
+  auto processor =
+      opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.
