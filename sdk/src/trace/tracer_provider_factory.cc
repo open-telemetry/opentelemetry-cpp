@@ -32,8 +32,7 @@ nostd::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
 nostd::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
     std::shared_ptr<sdk::trace::TracerContext> context)
 {
-  nostd::shared_ptr<trace_api::TracerProvider> provider(
-      new trace_sdk::TracerProvider(context));
+  nostd::shared_ptr<trace_api::TracerProvider> provider(new trace_sdk::TracerProvider(context));
   return provider;
 }
 

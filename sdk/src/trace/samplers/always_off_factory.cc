@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
 
 namespace trace_api = opentelemetry::trace;
 

@@ -93,10 +93,12 @@ cc_library(
     name = "ostream_span_exporter",
     srcs = [
         "src/span_exporter.cc",
+        "src/span_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/span_exporter.h",
+        "include/opentelemetry/exporters/ostream/span_exporter_factory.h",
     ],
     strip_include_prefix = "include",
     tags = ["ostream"],
