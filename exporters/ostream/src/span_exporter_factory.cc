@@ -12,14 +12,14 @@ namespace exporter
 namespace trace
 {
 
-nostd::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build()
+std::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build()
 {
   return Build(std::cout);
 };
 
-nostd::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build(std::ostream &sout)
+std::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Build(std::ostream &sout)
 {
-  nostd::unique_ptr<trace_sdk::SpanExporter> exporter(new OStreamSpanExporter(sout));
+  std::unique_ptr<trace_sdk::SpanExporter> exporter(new OStreamSpanExporter(sout));
   return std::move(exporter);
 }
 

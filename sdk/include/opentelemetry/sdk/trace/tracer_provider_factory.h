@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
+#include <memory>
+
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/tracer_provider.h"
@@ -17,16 +18,16 @@ namespace trace
 class TracerProviderFactory
 {
 public:
-  static nostd::shared_ptr<opentelemetry::trace::TracerProvider> Build(
+  static std::shared_ptr<opentelemetry::trace::TracerProvider> Build(
       std::unique_ptr<SpanProcessor> processor);
 
-  static nostd::shared_ptr<opentelemetry::trace::TracerProvider> Build(
+  static std::shared_ptr<opentelemetry::trace::TracerProvider> Build(
       std::unique_ptr<SpanProcessor> processor,
       opentelemetry::sdk::resource::Resource resource);
 
   // TODO: full list of Build() apis
 
-  static nostd::shared_ptr<opentelemetry::trace::TracerProvider> Build(
+  static std::shared_ptr<opentelemetry::trace::TracerProvider> Build(
       std::shared_ptr<sdk::trace::TracerContext> context);
 };
 

@@ -15,7 +15,7 @@ namespace trace
 std::unique_ptr<Sampler> AlwaysOnSamplerFactory::Build()
 {
   std::unique_ptr<Sampler> sampler(new AlwaysOnSampler());
-  return sampler;
+  return std::move(sampler);
 }
 
 }  // namespace trace

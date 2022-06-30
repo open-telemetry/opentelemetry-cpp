@@ -3,10 +3,10 @@
 
 #pragma once
 
-// We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
-#include "opentelemetry/sdk/trace/exporter.h"
+#include <memory>
 
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -23,12 +23,12 @@ public:
   /**
    * Create an OtlpHttpExporter using all default options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
 
   /**
    * Create an OtlpHttpExporter using the given options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const OtlpHttpExporterOptions &options);
 };
 

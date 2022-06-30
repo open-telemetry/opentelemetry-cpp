@@ -10,12 +10,12 @@ namespace sdk
 {
 namespace trace
 {
-nostd::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Build(
-    nostd::unique_ptr<SpanExporter> &&exporter,
+std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Build(
+    std::unique_ptr<SpanExporter> &&exporter,
     const BatchSpanProcessorOptions &options)
 {
-  nostd::unique_ptr<SpanProcessor> processor(new BatchSpanProcessor(std::move(exporter), options));
-  return processor;
+  std::unique_ptr<SpanProcessor> processor(new BatchSpanProcessor(std::move(exporter), options));
+  return std::move(processor);
 };
 
 }  // namespace trace

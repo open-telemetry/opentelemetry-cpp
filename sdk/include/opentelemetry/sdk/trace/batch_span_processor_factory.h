@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -17,8 +19,8 @@ namespace trace
 class BatchSpanProcessorFactory
 {
 public:
-  static nostd::unique_ptr<SpanProcessor> Build(nostd::unique_ptr<SpanExporter> &&exporter,
-                                                const BatchSpanProcessorOptions &options);
+  static std::unique_ptr<SpanProcessor> Build(std::unique_ptr<SpanExporter> &&exporter,
+                                              const BatchSpanProcessorOptions &options);
 };
 
 }  // namespace trace

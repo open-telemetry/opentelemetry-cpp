@@ -77,8 +77,7 @@ if(WITH_OTLP_HTTP)
        opentelemetry_exporter_otlp_http_client)
 
   add_library(opentelemetry_exporter_otlp_http
-     src/otlp_http_exporter.cc
-     src/otlp_http_exporter_factory.cc)
+              src/otlp_http_exporter.cc src/otlp_http_exporter_factory.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)

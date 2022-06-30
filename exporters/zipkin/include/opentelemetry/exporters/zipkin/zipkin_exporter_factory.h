@@ -3,8 +3,9 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,12 +20,12 @@ public:
   /**
    * Create a ZipkinExporter using all default options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
 
   /**
    * Create a ZipkinExporter using the given options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const ZipkinExporterOptions &options);
 };
 

@@ -13,17 +13,17 @@ namespace exporter
 namespace zipkin
 {
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build()
 {
   ZipkinExporterOptions options;
   return Build(options);
 }
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build(
     const ZipkinExporterOptions &options)
 {
-  nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new ZipkinExporter(options));
-  return exporter;
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new ZipkinExporter(options));
+  return std::move(exporter);
 }
 
 }  // namespace zipkin

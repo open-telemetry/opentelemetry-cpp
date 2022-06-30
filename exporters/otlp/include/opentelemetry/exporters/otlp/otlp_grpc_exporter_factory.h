@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
@@ -21,12 +23,12 @@ public:
   /**
    * Create an OtlpGrpcExporter using all default options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
 
   /**
    * Create an OtlpGrpcExporter using the given options.
    */
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const OtlpGrpcExporterOptions &options);
 };
 

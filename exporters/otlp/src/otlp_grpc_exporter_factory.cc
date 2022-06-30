@@ -14,17 +14,17 @@ namespace exporter
 namespace otlp
 {
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Build()
 {
   OtlpGrpcExporterOptions options;
   return Build(options);
 }
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Build(
     const OtlpGrpcExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new OtlpGrpcExporter(options));
-  return exporter;
+  return std::move(exporter);
 }
 
 }  // namespace otlp

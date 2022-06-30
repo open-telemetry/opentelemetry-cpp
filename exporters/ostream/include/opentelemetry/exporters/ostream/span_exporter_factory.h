@@ -4,8 +4,8 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -25,8 +25,8 @@ namespace trace
 class OStreamSpanExporterFactory
 {
 public:
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
-  static nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(std::ostream &sout);
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(std::ostream &sout);
 };
 
 }  // namespace trace

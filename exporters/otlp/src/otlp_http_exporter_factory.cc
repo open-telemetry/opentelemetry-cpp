@@ -5,25 +5,23 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
-namespace nostd = opentelemetry::nostd;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build()
 {
   OtlpHttpExporterOptions options;
   return Build(options);
 }
 
-nostd::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build(
     const OtlpHttpExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new OtlpHttpExporter(options));
-  return exporter;
+  return std::move(exporter);
 }
 
 }  // namespace otlp

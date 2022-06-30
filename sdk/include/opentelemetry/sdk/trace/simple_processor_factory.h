@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/unique_ptr.h"
+#include <memory>
+
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
@@ -16,7 +17,7 @@ namespace trace
 class SimpleSpanProcessorFactory
 {
 public:
-  static nostd::unique_ptr<SpanProcessor> Build(nostd::unique_ptr<SpanExporter> &&exporter);
+  static std::unique_ptr<SpanProcessor> Build(std::unique_ptr<SpanExporter> &&exporter);
 };
 
 }  // namespace trace

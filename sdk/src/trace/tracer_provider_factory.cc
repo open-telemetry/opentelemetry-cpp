@@ -13,27 +13,27 @@ namespace sdk
 namespace trace
 {
 
-nostd::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
     std::unique_ptr<SpanProcessor> processor)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Build(std::move(processor), resource);
 }
 
-nostd::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
     std::unique_ptr<SpanProcessor> processor,
     opentelemetry::sdk::resource::Resource resource)
 {
-  nostd::shared_ptr<trace_api::TracerProvider> provider(
+  std::shared_ptr<trace_api::TracerProvider> provider(
       new trace_sdk::TracerProvider(std::move(processor), resource));
-  return provider;
+  return std::move(provider);
 }
 
-nostd::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
     std::shared_ptr<sdk::trace::TracerContext> context)
 {
-  nostd::shared_ptr<trace_api::TracerProvider> provider(new trace_sdk::TracerProvider(context));
-  return provider;
+  std::shared_ptr<trace_api::TracerProvider> provider(new trace_sdk::TracerProvider(context));
+  return std::move(provider);
 }
 
 }  // namespace trace
