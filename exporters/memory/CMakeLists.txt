@@ -1,7 +1,9 @@
-add_library(opentelemetry_exporter_memory_trace src/in_memory_span_exporter_factory.cc)
+add_library(opentelemetry_exporter_memory_trace
+            src/in_memory_span_exporter_factory.cc)
 
-set_target_properties(opentelemetry_exporter_memory_trace
-                      PROPERTIES EXPORT_NAME opentelemetry_exporter_memory_trace)
+set_target_properties(
+  opentelemetry_exporter_memory_trace
+  PROPERTIES EXPORT_NAME opentelemetry_exporter_memory_trace)
 
 target_include_directories(
   opentelemetry_exporter_memory_trace
