@@ -13,7 +13,7 @@ classified into the following two broad categories:
 Assume an application needs to build a trace provider, using the gRPC trace
 exporter.
 
-### Case study, direct call to the SDK implementation classes.
+### Case study, direct call to the SDK implementation classes
 
 A possible way to build the exporter is to call, from the application code:
 
@@ -62,7 +62,7 @@ In summary, this line of code alone, in the application space:
 
 prevents in practice any deployment using shared libraries.
 
-### Case study, using Factory and builders from the SDK.
+### Case study, using Factory and builders from the SDK
 
 The SDK also provide Factory classes, that can be used as follows
 from the application code:
@@ -154,8 +154,8 @@ void Foo(int x = 0, int y = 1, int z = 2);
 Here, clients will call the old Foo(int x, int y) ABI, crashing in the SDK
 because the SDK expects 3 parameters, not 2.
 
-Because of this, conditional parameters are to be avoided, not to be used in the SDK
-interface.
+Because of this, conditional parameters are to be avoided,
+not to be used in the SDK interface.
 
 Note that using conditional parameters in the opentelemetry-cpp API is ok,
 because the API is header only (there is no ABI).
