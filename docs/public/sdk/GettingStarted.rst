@@ -58,7 +58,7 @@ OpenTelemetry offers six tracing exporters out of the box:
 
     // otlp grpc exporter
     opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
-    opts.endpoint = "localhost::4317";
+    opts.endpoint = "localhost:4317";
     opts.use_ssl_credentials = true;
     opts.ssl_credentials_cacert_as_string = "ssl-certificate";
     auto otlp_grpc_exporter =
