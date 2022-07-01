@@ -45,6 +45,12 @@ struct SamplingResult
   std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>> attributes;
   //  The tracestate used by the span.
   nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state;
+
+  inline bool IsRecording()
+  {
+    return decision == Decision::RECORD_ONLY || decision == Decision::RECORD_AND_SAMPLE;
+  }
+  inline bool IsSampled() { return decision == Decision::RECORD_AND_SAMPLE; }
 };
 
 /**
