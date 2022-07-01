@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/jaeger/jaeger_exporter.h"
+#include "opentelemetry/exporters/jaeger/jaeger_exporter_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -23,7 +23,7 @@ opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
 void InitTracer()
 {
   // Create Jaeger exporter instance
-  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new jaeger::JaegerExporter(opts));
+  auto exporter  = jaeger::JaegerExporterFactory::Build(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
   auto provider  = trace_sdk::TracerProviderFactory::Build(std::move(processor));
   // Set the global trace provider

@@ -23,7 +23,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::
     const ZipkinExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new ZipkinExporter(options));
-  return std::move(exporter);
+  return exporter;
 }
 
 }  // namespace zipkin

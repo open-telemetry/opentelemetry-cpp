@@ -1,15 +1,17 @@
-add_library(opentelemetry_exporter_in_memory INTERFACE)
+add_library(opentelemetry_exporter_memory_trace src/in_memory_span_exporter_factory.cc)
+
+set_target_properties(opentelemetry_exporter_memory_trace
+                      PROPERTIES EXPORT_NAME opentelemetry_exporter_memory_trace)
 
 target_include_directories(
-  opentelemetry_exporter_in_memory
-  INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-            "$<INSTALL_INTERFACE:include>")
+  opentelemetry_exporter_memory_trace
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
-set_target_properties(opentelemetry_exporter_in_memory
-                      PROPERTIES EXPORT_NAME in_memory_span_exporter)
+target_link_libraries(opentelemetry_exporter_memory_trace
+                      PUBLIC opentelemetry_trace)
 
 install(
-  TARGETS opentelemetry_exporter_in_memory
+  TARGETS opentelemetry_exporter_memory_trace
   EXPORT "${PROJECT_NAME}-target"
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -28,11 +30,11 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     in_memory_span_data_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_in_memory opentelemetry_resources)
+    opentelemetry_exporter_memory_trace opentelemetry_resources)
 
   target_link_libraries(
     in_memory_span_exporter_test ${GTEST_BOTH_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_in_memory
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_memory_trace
     opentelemetry_resources)
 
   gtest_add_tests(

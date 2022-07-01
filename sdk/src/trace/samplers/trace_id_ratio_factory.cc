@@ -16,7 +16,7 @@ namespace trace
 std::unique_ptr<Sampler> TraceIdRatioBasedSamplerFactory::Build(double ratio)
 {
   std::unique_ptr<Sampler> sampler(new TraceIdRatioBasedSampler(ratio));
-  return std::move(sampler);
+  return sampler;
 }
 
 }  // namespace trace

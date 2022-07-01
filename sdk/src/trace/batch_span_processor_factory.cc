@@ -15,7 +15,7 @@ std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Build(
     const BatchSpanProcessorOptions &options)
 {
   std::unique_ptr<SpanProcessor> processor(new BatchSpanProcessor(std::move(exporter), options));
-  return std::move(processor);
+  return processor;
 };
 
 }  // namespace trace

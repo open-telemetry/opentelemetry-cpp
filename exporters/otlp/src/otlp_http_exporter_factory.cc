@@ -21,7 +21,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory
     const OtlpHttpExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new OtlpHttpExporter(options));
-  return std::move(exporter);
+  return exporter;
 }
 
 }  // namespace otlp

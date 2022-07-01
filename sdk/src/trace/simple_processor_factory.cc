@@ -13,7 +13,7 @@ std::unique_ptr<SpanProcessor> SimpleSpanProcessorFactory::Build(
     std::unique_ptr<SpanExporter> &&exporter)
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
-  return std::move(processor);
+  return processor;
 };
 
 }  // namespace trace

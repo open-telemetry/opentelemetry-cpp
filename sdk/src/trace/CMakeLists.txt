@@ -14,7 +14,8 @@ add_library(
   samplers/parent_factory.cc
   samplers/trace_id_ratio.cc
   samplers/trace_id_ratio_factory.cc
-  random_id_generator.cc)
+  random_id_generator.cc
+  random_id_generator_factory.cc)
 
 set_target_properties(opentelemetry_trace PROPERTIES EXPORT_NAME trace)
 

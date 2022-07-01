@@ -15,7 +15,7 @@ namespace trace
 std::unique_ptr<Sampler> ParentBasedSamplerFactory::Build(std::shared_ptr<Sampler> delegate_sampler)
 {
   std::unique_ptr<Sampler> sampler(new ParentBasedSampler(delegate_sampler));
-  return std::move(sampler);
+  return sampler;
 }
 
 }  // namespace trace

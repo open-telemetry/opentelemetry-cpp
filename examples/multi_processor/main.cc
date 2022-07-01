@@ -1,49 +1,56 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
+/* API */
+
 #include "opentelemetry/trace/provider.h"
 
-// Using an exporter that simply dumps span data to stdout.
+/* SDK */
+
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+
+/* Exporter */
+
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+
+/* Application */
+
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
 #else
 #  include "foo_library/foo_library.h"
 #endif
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
-#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 
-using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::exporter::memory::InMemorySpanData;
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-InMemorySpanExporter *initTracer()
+std::shared_ptr<InMemorySpanData> initTracer()
 {
+  std::shared_ptr<InMemorySpanData> data;
+
   auto exporter1  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
   auto processor1 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter1));
 
-  InMemorySpanExporter *memory_span_exporter = new InMemorySpanExporter();
-  auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(memory_span_exporter);
-
-  // fetch the exporter for dumping data later
-
+  auto exporter2  = opentelemetry::exporter::memory::InMemorySpanExporterFactory::Build(data);
   auto processor2 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter2));
 
-  // TODO: Do not use AddProcessor() in the SDK implementation,
-  // use a vector of processors instead.
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
+  processors.push_back(std::move(processor1));
+  processors.push_back(std::move(processor2));
+  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processors));
 
-  auto provider = nostd::shared_ptr<trace_sdk::TracerProvider>(
-      new trace_sdk::TracerProvider(std::move(processor1)));
-  provider->AddProcessor(std::move(processor2));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(std::move(provider));
 
-  return memory_span_exporter;
+  return data;
 }
 
 void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
@@ -81,9 +88,9 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  InMemorySpanExporter *memory_span_exporter = initTracer();
+  std::shared_ptr<InMemorySpanData> data = initTracer();
 
   foo_library();
-  auto memory_spans = memory_span_exporter->GetData()->GetSpans();
+  auto memory_spans = data->GetSpans();
   dumpSpans(memory_spans);
 }
