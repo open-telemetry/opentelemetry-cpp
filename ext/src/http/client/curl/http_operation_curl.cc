@@ -540,12 +540,10 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   {
     return CURLE_FAILED_INIT;
   }
-  else
-  {
-    async_data_.reset(new AsyncData());
-    async_data_->is_promise_running.store(false, std::memory_order_release);
-    async_data_->session = nullptr;
-  }
+
+  async_data_.reset(new AsyncData());
+  async_data_->is_promise_running.store(false, std::memory_order_release);
+  async_data_->session = nullptr;
 
   ReleaseResponse();
 

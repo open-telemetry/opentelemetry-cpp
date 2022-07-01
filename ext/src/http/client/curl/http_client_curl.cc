@@ -39,6 +39,10 @@ void Session::SendRequest(
   std::string url       = host_ + std::string(http_request_->uri_);
   auto callback_ptr     = callback.get();
   bool reuse_connection = false;
+
+  // Set CURLOPT_FRESH_CONNECT and CURLOPT_FORBID_REUSE to 1L every max_sessions_per_connection_
+  // requests. So libcurl will create a new connection instead of queue the request to the existing
+  // connection.
   if (http_client_.GetMaxSessionsPerConnection() > 0)
   {
     reuse_connection = session_id_ % http_client_.GetMaxSessionsPerConnection() != 0;
@@ -69,6 +73,8 @@ void Session::SendRequest(
 
   if (success)
   {
+    // We will try to create a background to poll events.But when the background is running, we will
+    // reuse it instead of creating a new one.
     http_client_.MaybeSpawnBackgroundThread();
   }
   else if (callback)
@@ -159,7 +165,7 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   std::lock_guard<std::mutex> lock_guard{sessions_m_};
   sessions_.insert({session_id, session});
 
-  // FIXME: Session may leak if it do not SendRequest
+  // FIXME: Session may leak if it do not call SendRequest
   return session;
 }
 
@@ -352,6 +358,8 @@ void HttpClient::MaybeSpawnBackgroundThread()
             {
               still_running = 1;
             }
+
+            // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
               if (self->background_thread_)
