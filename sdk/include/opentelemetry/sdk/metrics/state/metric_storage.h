@@ -28,6 +28,7 @@ public:
                        nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
 };
 
+/* Represents the sync metric storage */
 class WritableMetricStorage
 {
 public:
@@ -45,6 +46,18 @@ public:
                             const opentelemetry::context::Context &context) noexcept = 0;
 
   virtual ~WritableMetricStorage() = default;
+};
+
+/* Represents the async metric stroage */
+class AsyncWritableMetricStorage
+{
+public:
+  /* Records a batch of measurements */
+  virtual void RecordLong(
+      std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements);
+
+  virtual void RecordDouble(
+      std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements);
 };
 
 class NoopMetricStorage : public MetricStorage

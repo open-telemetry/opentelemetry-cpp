@@ -33,15 +33,13 @@ class Asynchronous
 {
 public:
   Asynchronous(nostd::string_view name,
-               void (*callback)(opentelemetry::metrics::ObserverResult<T> &),
                nostd::string_view description = "",
                nostd::string_view unit        = "")
-      : name_(name), callback_(callback), description_(description), unit_(unit)
+      : name_(name), description_(description), unit_(unit)
   {}
 
 protected:
   std::string name_;
-  void (*callback_)(opentelemetry::metrics::ObserverResult<T> &);
   std::string description_;
   std::string unit_;
 };
@@ -51,10 +49,9 @@ class LongObservableCounter : public opentelemetry::metrics::ObservableCounter<l
 {
 public:
   LongObservableCounter(nostd::string_view name,
-                        void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
                         nostd::string_view description = "",
                         nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
 
   {}
 };
@@ -64,10 +61,9 @@ class DoubleObservableCounter : public opentelemetry::metrics::ObservableCounter
 {
 public:
   DoubleObservableCounter(nostd::string_view name,
-                          void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
                           nostd::string_view description = "",
                           nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
 
   {}
 };
@@ -77,10 +73,9 @@ class LongObservableGauge : public opentelemetry::metrics::ObservableGauge<long>
 {
 public:
   LongObservableGauge(nostd::string_view name,
-                      void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
                       nostd::string_view description = "",
                       nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
 
   {}
 };
@@ -90,10 +85,9 @@ class DoubleObservableGauge : public opentelemetry::metrics::ObservableGauge<dou
 {
 public:
   DoubleObservableGauge(nostd::string_view name,
-                        void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
                         nostd::string_view description = "",
                         nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
 
   {}
 };
@@ -103,10 +97,9 @@ class LongObservableUpDownCounter : public opentelemetry::metrics::ObservableUpD
 {
 public:
   LongObservableUpDownCounter(nostd::string_view name,
-                              void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
                               nostd::string_view description = "",
                               nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
 
   {}
 };
@@ -117,10 +110,9 @@ class DoubleObservableUpDownCounter
 {
 public:
   DoubleObservableUpDownCounter(nostd::string_view name,
-                                void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
                                 nostd::string_view description = "",
                                 nostd::string_view unit        = "")
-      : Asynchronous(name, callback, description, unit)
+      : Asynchronous(name, description, unit)
   {}
 };
 
