@@ -64,9 +64,9 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 
   auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
-  auto trace_flags     = sampling_result.decision == Decision::DROP
-                         ? trace_api::TraceFlags{}
-                         : trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled};
+  auto trace_flags     = sampling_result.IsSampled()
+                         ? trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}
+                         : trace_api::TraceFlags{};
 
   auto span_context = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
       trace_id, span_id, trace_flags, false,
@@ -74,7 +74,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
                                   : is_parent_span_valid ? parent_context.trace_state()
                                                          : trace_api::TraceState::GetDefault()));
 
-  if (sampling_result.decision == Decision::DROP)
+  if (!sampling_result.IsRecording())
   {
     // create no-op span with valid span-context.
 

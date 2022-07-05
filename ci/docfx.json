@@ -13,6 +13,8 @@
         "files": [
           "api/**.h",
           "api/**.cc",
+          "exporters/**.h",
+          "exporters/**.cc",
           "sdk/**.h",
           "sdk/**.cc"
         ]
