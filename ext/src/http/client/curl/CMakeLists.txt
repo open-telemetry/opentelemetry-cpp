@@ -1,7 +1,8 @@
 find_package(CURL)
 if(CURL_FOUND)
-  add_library(opentelemetry_http_client_curl http_client_factory_curl.cc
-                                             http_client_curl.cc)
+  add_library(
+    opentelemetry_http_client_curl http_client_factory_curl.cc
+                                   http_client_curl.cc http_operation_curl.cc)
 
   set_target_properties(opentelemetry_http_client_curl
                         PROPERTIES EXPORT_NAME http_client_curl)

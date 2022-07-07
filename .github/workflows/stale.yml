@@ -1,7 +1,7 @@
-name: 'Mark and close stale issues'
+name: "Mark and close stale issues"
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: "30 1 * * *"
 
 jobs:
   stale:
@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/stale@v5
         with:
-          stale-issue-message: 'This issue was marked as stale due to lack of activity.'
+          stale-issue-message: "This issue was marked as stale due to lack of activity."
           days-before-issue-stale: 60
-          exempt-issue-labels: 'do-not-stale'
+          exempt-issue-labels: "do-not-stale"

@@ -23,6 +23,22 @@ jobs:
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
+  cmake_with_async_export_test:
+    name: CMake test (without otlp-exporter and with async export)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake tests (without otlp-exporter)
+      run: |
+        sudo ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.with_async_export.test
+
   cmake_absel_stl_test:
     name: CMake test (with abseil)
     runs-on: ubuntu-latest
@@ -149,6 +165,28 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
+
+  bazel_test_async:
+    name: Bazel with async export
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.with_async_export.test
 
   bazel_with_abseil:
     name: Bazel with external abseil
@@ -354,6 +392,23 @@ jobs:
       run: ./ci/do_ci.ps1 cmake.test
     - name: run otprotocol test
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.test
+
+  windows_with_async_export:
+    name: CMake (With async export) -> exporter proto
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
+    - name: run cmake test
+      run: ./ci/do_ci.ps1 cmake.with_async_export.test
+    - name: run otprotocol test
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.with_async_export.test
 
   windows_bazel:
     name: Bazel Windows
