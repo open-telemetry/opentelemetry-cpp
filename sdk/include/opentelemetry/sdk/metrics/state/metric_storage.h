@@ -8,6 +8,8 @@
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

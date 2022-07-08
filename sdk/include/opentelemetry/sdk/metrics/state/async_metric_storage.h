@@ -27,8 +27,7 @@ class AsyncMetricStorage : public MetricStorage
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &,
-                                                  void *),
+                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult &, void *),
                      const AttributesProcessor *attributes_processor,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
@@ -46,13 +45,14 @@ public:
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
-    opentelemetry::sdk::metrics::ObserverResult<T> ob_res(attributes_processor_);
+    nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
+        new opentelemetry::sdk::metrics::ObserverResultT<T>(attributes_processor_));
 
     // read the measurement using configured callback
     measurement_collection_callback_(ob_res, state_);
     std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
     // process the read measurements - aggregate and store in hashmap
-    for (auto &measurement : ob_res.GetMeasurements())
+    for (auto &measurement : ob_res->GetMeasurements())
     {
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
@@ -82,7 +82,7 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
-  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &, void *);
+  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult &, void *);
   const AttributesProcessor *attributes_processor_;
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;

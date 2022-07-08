@@ -20,12 +20,12 @@ public:
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    */
-  virtual void AddCallback(ObservableCallbackPtr, void *state);
+  virtual void AddCallback(opentelemetry::metrics::ObservableCallbackPtr, void *state);
 
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    */
-  virtual void RemoveCallback(ObservableCallbackPtr, void *state);
+  virtual void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr, void *state);
 };
 
 template <class T>

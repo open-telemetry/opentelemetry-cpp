@@ -6,6 +6,7 @@
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/type_traits.h"
@@ -43,7 +44,8 @@ public:
   }
 };
 
-using ObserverResult = nostd::variant<ObserverResultT<long>, ObserverResultT<double>>;
+using ObserverResult = nostd::variant<nostd::shared_ptr<ObserverResultT<long>>,
+                                      nostd::shared_ptr<ObserverResultT<double>>>;
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

@@ -16,10 +16,10 @@ namespace sdk
 namespace metrics
 {
 template <class T>
-class ObserverResult final : public opentelemetry::metrics::ObserverResult<T>
+class ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
 {
 public:
-  ObserverResult(const AttributesProcessor *attributes_processor)
+  ObserverResultT(const AttributesProcessor *attributes_processor)
       : attributes_processor_(attributes_processor)
   {}
 
