@@ -13,10 +13,16 @@ namespace sdk
 namespace trace
 {
 
+/**
+ * Factory class for RandomIdGenerator.
+ */
 class RandomIdGeneratorFactory
 {
 public:
-  static std::unique_ptr<IdGenerator> Build();
+  /**
+   * Create a RandomIdGenerator.
+   */
+  static std::unique_ptr<IdGenerator> Create();
 };
 
 }  // namespace trace

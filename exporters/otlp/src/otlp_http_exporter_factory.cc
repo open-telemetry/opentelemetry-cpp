@@ -11,13 +11,13 @@ namespace exporter
 namespace otlp
 {
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create()
 {
   OtlpHttpExporterOptions options;
-  return Build(options);
+  return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create(
     const OtlpHttpExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new OtlpHttpExporter(options));

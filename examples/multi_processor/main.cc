@@ -1,23 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-/* API */
-
-#include "opentelemetry/trace/provider.h"
-
-/* SDK */
-
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-
-/* Exporter */
-
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-
-/* Application */
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -36,16 +26,16 @@ std::shared_ptr<InMemorySpanData> initTracer()
 {
   std::shared_ptr<InMemorySpanData> data;
 
-  auto exporter1  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
-  auto processor1 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter1));
+  auto exporter1  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
+  auto processor1 = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter1));
 
-  auto exporter2  = opentelemetry::exporter::memory::InMemorySpanExporterFactory::Build(data);
-  auto processor2 = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter2));
+  auto exporter2  = opentelemetry::exporter::memory::InMemorySpanExporterFactory::Create(data);
+  auto processor2 = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter2));
 
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor1));
   processors.push_back(std::move(processor2));
-  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processors));
+  auto provider = trace_sdk::TracerProviderFactory::Create(std::move(processors));
 
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(std::move(provider));

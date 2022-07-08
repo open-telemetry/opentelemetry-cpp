@@ -23,9 +23,9 @@ opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
 void InitTracer()
 {
   // Create Jaeger exporter instance
-  auto exporter  = jaeger::JaegerExporterFactory::Build(opts);
-  auto processor = trace_sdk::SimpleSpanProcessorFactory::Build(std::move(exporter));
-  auto provider  = trace_sdk::TracerProviderFactory::Build(std::move(processor));
+  auto exporter  = jaeger::JaegerExporterFactory::Create(opts);
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+  auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

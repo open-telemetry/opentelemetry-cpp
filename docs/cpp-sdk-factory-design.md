@@ -1,16 +1,20 @@
 # SDK Factory Design
 
-The use cases for applications calling the opentelemetry SDK can be
-classified into the following two broad categories:
+When an application owner needs to configure the opentelemetry SDK,
+this can be done in different ways:
 
-- SDK users, the application needs to assemble a trace provider / metrics
-  provider / log provider by assembling available SDK elements,
-- SDK implementors, the application needs to extend the opentelemetry SDK
-  by implementing new features.
+- by assembly of available SDK elements already provided,
+- by extension of the SDK to support more functionality.
 
-## SDK users
+The sections below investigate each use case,
+and the consequences when using shared libraries.
 
-Assume an application needs to build a trace provider, using the gRPC trace
+Last, a section discuss the impact of C++ conditional parameters
+on the SDK interface, and how this affects shared libraries.
+
+## SDK assembly
+
+Assume the application owner needs to build a trace provider, using the gRPC trace
 exporter.
 
 ### Case study, direct call to the SDK implementation classes
@@ -70,14 +74,15 @@ from the application code:
 ```cpp
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
 
-auto exporter = opentelemetry::exporter::otlp::OtlpGrpcExporterFactory::Build(opts);
+auto exporter =
+  opentelemetry::exporter::otlp::OtlpGrpcExporterFactory::Create(opts);
 ```
 
 While the application code does not change much,
 the amount of SDK internals exposed to the application is reduced
 significantly.
 
-OtlpGrpcExporterFactory::Build() actually returns a abstract SpanExporter
+OtlpGrpcExporterFactory::Create() actually returns a abstract SpanExporter
 object, instead of a concrete OtlpGrpcExporter object.
 
 As a result, the application binary is not even aware of the implementation
@@ -89,9 +94,9 @@ This property makes it possible to:
 - deploy a new SDK shared library
 - keep the application unchanged
 
-## SDK implementors
+## SDK extension
 
-Applications that want to extend existing SDK classes are expected
+Applications owners who want to extend existing SDK classes are expected
 to have a stronger dependency on the SDK internals.
 
 For example, with

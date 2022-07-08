@@ -12,14 +12,19 @@ namespace sdk
 {
 namespace trace
 {
+
 /**
- * Builds a AlwaysOffSampler.
+ * Factory class for AlwaysOffSampler.
  */
 class AlwaysOffSamplerFactory
 {
 public:
-  static std::unique_ptr<Sampler> Build();
+  /**
+   * Create an AlwaysOffSampler.
+   */
+  static std::unique_ptr<Sampler> Create();
 };
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

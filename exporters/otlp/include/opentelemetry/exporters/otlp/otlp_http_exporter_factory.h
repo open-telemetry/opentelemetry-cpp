@@ -15,7 +15,7 @@ namespace otlp
 {
 
 /**
- * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
+ * Factory class for OtlpHttpExporter.
  */
 class OtlpHttpExporterFactory
 {
@@ -23,12 +23,12 @@ public:
   /**
    * Create an OtlpHttpExporter using all default options.
    */
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create();
 
   /**
    * Create an OtlpHttpExporter using the given options.
    */
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpHttpExporterOptions &options);
 };
 

@@ -12,7 +12,7 @@ namespace sdk
 namespace trace
 {
 
-std::unique_ptr<Sampler> AlwaysOffSamplerFactory::Build()
+std::unique_ptr<Sampler> AlwaysOffSamplerFactory::Create()
 {
   std::unique_ptr<Sampler> sampler(new AlwaysOffSampler());
   return sampler;

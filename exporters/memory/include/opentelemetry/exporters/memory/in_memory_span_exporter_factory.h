@@ -12,12 +12,27 @@ namespace exporter
 namespace memory
 {
 
+/**
+ * Factory class for InMemorySpanExporter.
+ */
 class InMemorySpanExporterFactory
 {
 public:
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  /**
+   * Create a InMemorySpanExporter with a default buffer size.
+   * @param [out] data the InMemorySpanData the exporter will write to,
+   *                   for the caller to inspect
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       std::shared_ptr<InMemorySpanData> &data);
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+
+  /**
+   * Create a InMemorySpanExporter with a default buffer size.
+   * @param [out] data the InMemorySpanData the exporter will write to,
+   *                   for the caller to inspect
+   * @param [in] buffer_size size of the underlying InMemorySpanData
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       std::shared_ptr<InMemorySpanData> &data,
       size_t buffer_size);
 };

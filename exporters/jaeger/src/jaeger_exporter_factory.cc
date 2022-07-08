@@ -11,13 +11,13 @@ namespace exporter
 namespace jaeger
 {
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> JaegerExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> JaegerExporterFactory::Create()
 {
   JaegerExporterOptions options;
-  return Build(options);
+  return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> JaegerExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> JaegerExporterFactory::Create(
     const JaegerExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new JaegerExporter(options));

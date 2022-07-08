@@ -13,13 +13,13 @@ namespace exporter
 namespace zipkin
 {
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build()
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Create()
 {
   ZipkinExporterOptions options;
-  return Build(options);
+  return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinExporterFactory::Create(
     const ZipkinExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(new ZipkinExporter(options));

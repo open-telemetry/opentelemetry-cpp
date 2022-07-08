@@ -59,14 +59,14 @@ public:
 
 void initTracer()
 {
-  auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Build();
+  auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor =
-      opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Build(std::move(exporter));
+      opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.
   auto context  = std::make_shared<opentelemetry::sdk::trace::TracerContext>(std::move(processors));
-  auto provider = opentelemetry::sdk::trace::TracerProviderFactory::Build(context);
+  auto provider = opentelemetry::sdk::trace::TracerProviderFactory::Create(context);
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 

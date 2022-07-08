@@ -16,11 +16,17 @@ namespace sdk
 namespace trace
 {
 
+/**
+ * Factory class for BatchSpanProcessor.
+ */
 class BatchSpanProcessorFactory
 {
 public:
-  static std::unique_ptr<SpanProcessor> Build(std::unique_ptr<SpanExporter> &&exporter,
-                                              const BatchSpanProcessorOptions &options);
+  /**
+   * Create a BatchSpanProcessor.
+   */
+  static std::unique_ptr<SpanProcessor> Create(std::unique_ptr<SpanExporter> &&exporter,
+                                               const BatchSpanProcessorOptions &options);
 };
 
 }  // namespace trace

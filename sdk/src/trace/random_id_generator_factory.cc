@@ -11,7 +11,7 @@ namespace sdk
 namespace trace
 {
 
-std::unique_ptr<IdGenerator> RandomIdGeneratorFactory::Build()
+std::unique_ptr<IdGenerator> RandomIdGeneratorFactory::Create()
 {
   std::unique_ptr<IdGenerator> id_generator(new RandomIdGenerator());
   return id_generator;

@@ -15,31 +15,31 @@ namespace sdk
 namespace trace
 {
 
-std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Create(
     std::unique_ptr<SpanProcessor> processor)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  return Build(std::move(processor), resource);
+  return Create(std::move(processor), resource);
 }
 
-std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Create(
     std::unique_ptr<SpanProcessor> processor,
     opentelemetry::sdk::resource::Resource resource)
 {
-  auto sampler = AlwaysOnSamplerFactory::Build();
-  return Build(std::move(processor), resource, std::move(sampler));
+  auto sampler = AlwaysOnSamplerFactory::Create();
+  return Create(std::move(processor), resource, std::move(sampler));
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::unique_ptr<SpanProcessor> processor,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler)
 {
-  auto id_generator = RandomIdGeneratorFactory::Build();
-  return Build(std::move(processor), resource, std::move(sampler), std::move(id_generator));
+  auto id_generator = RandomIdGeneratorFactory::Create();
+  return Create(std::move(processor), resource, std::move(sampler), std::move(id_generator));
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::unique_ptr<SpanProcessor> processor,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler,
@@ -50,31 +50,31 @@ std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Bui
   return provider;
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processors)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  return Build(std::move(processors), resource);
+  return Create(std::move(processors), resource);
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processors,
     opentelemetry::sdk::resource::Resource resource)
 {
-  auto sampler = AlwaysOnSamplerFactory::Build();
-  return Build(std::move(processors), resource, std::move(sampler));
+  auto sampler = AlwaysOnSamplerFactory::Create();
+  return Create(std::move(processors), resource, std::move(sampler));
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processors,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler)
 {
-  auto id_generator = RandomIdGeneratorFactory::Build();
-  return Build(std::move(processors), resource, std::move(sampler), std::move(id_generator));
+  auto id_generator = RandomIdGeneratorFactory::Create();
+  return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator));
 }
 
-std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processors,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler,
@@ -85,7 +85,7 @@ std::shared_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Bui
   return provider;
 }
 
-std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Build(
+std::shared_ptr<trace_api::TracerProvider> TracerProviderFactory::Create(
     std::shared_ptr<sdk::trace::TracerContext> context)
 {
   std::shared_ptr<trace_api::TracerProvider> provider(new trace_sdk::TracerProvider(context));

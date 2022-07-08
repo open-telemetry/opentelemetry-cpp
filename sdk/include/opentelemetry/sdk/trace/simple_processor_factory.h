@@ -14,10 +14,16 @@ namespace sdk
 namespace trace
 {
 
+/**
+ * Factory class for SimpleSpanProcessor.
+ */
 class SimpleSpanProcessorFactory
 {
 public:
-  static std::unique_ptr<SpanProcessor> Build(std::unique_ptr<SpanExporter> &&exporter);
+  /**
+   * Create a SimpleSpanProcessor.
+   */
+  static std::unique_ptr<SpanProcessor> Create(std::unique_ptr<SpanExporter> &&exporter);
 };
 
 }  // namespace trace

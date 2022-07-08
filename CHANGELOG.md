@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [TRACE SDK] Add trace sdk builders (#1393) [#1471](https://github.com/open-telemetry/opentelemetry-cpp/pull/1471)
+* [EXAMPLE] Fix memory ownership of InMemorySpanExporter (#1473) [#1471](https://github.com/open-telemetry/opentelemetry-cpp/pull/1471)
+
 ## [1.4.1] 2022-06-19
 
 * [METRICS SDK] Fix variables inizialization [#1430](https://github.com/open-telemetry/opentelemetry-cpp/pull/1430)

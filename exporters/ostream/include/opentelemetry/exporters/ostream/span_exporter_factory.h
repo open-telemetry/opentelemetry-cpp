@@ -22,11 +22,21 @@ namespace exporter
 namespace trace
 {
 
+/**
+ * Factory class for OStreamSpanExporter.
+ */
 class OStreamSpanExporterFactory
 {
 public:
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(std::ostream &sout);
+  /**
+   * Creates an OStreamSpanExporter writing to the default location.
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create();
+
+  /**
+   * Creates an OStreamSpanExporter writing to the given location.
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(std::ostream &sout);
 };
 
 }  // namespace trace

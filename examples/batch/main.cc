@@ -1,19 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-/* API */
-
-#include "opentelemetry/trace/provider.h"
-
-/* SDK */
-
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-
-/* Exporter */
-
-// Using an exporter that simply dumps span data to stdout.
-#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/trace/provider.h"
 
 #include <chrono>
 #include <thread>
@@ -30,7 +21,7 @@ namespace
 
 void initTracer()
 {
-  auto exporter = trace_exporter::OStreamSpanExporterFactory::Build();
+  auto exporter = trace_exporter::OStreamSpanExporterFactory::Create();
 
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
@@ -46,9 +37,9 @@ void initTracer()
   resource::ResourceAttributes attributes = {{"service", "test_service"}, {"version", (uint32_t)1}};
   auto resource                           = resource::Resource::Create(attributes);
 
-  auto processor = trace_sdk::BatchSpanProcessorFactory::Build(std::move(exporter), options);
+  auto processor = trace_sdk::BatchSpanProcessorFactory::Create(std::move(exporter), options);
 
-  auto provider = trace_sdk::TracerProviderFactory::Build(std::move(processor), resource);
+  auto provider = trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
 
   // Set the global trace provider.
   trace_api::Provider::SetTracerProvider(provider);

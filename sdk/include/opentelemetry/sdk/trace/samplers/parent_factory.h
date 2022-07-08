@@ -12,14 +12,19 @@ namespace sdk
 {
 namespace trace
 {
+
 /**
- * Builds a ParentBasedSampler.
+ * Factory class for ParentBasedSampler.
  */
 class ParentBasedSamplerFactory
 {
 public:
-  static std::unique_ptr<Sampler> Build(std::shared_ptr<Sampler> delegate_sampler);
+  /**
+   * Create a ParentBasedSampler.
+   */
+  static std::unique_ptr<Sampler> Create(std::shared_ptr<Sampler> delegate_sampler);
 };
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

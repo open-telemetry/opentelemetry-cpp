@@ -12,11 +12,21 @@ namespace exporter
 namespace jaeger
 {
 
+/**
+ * Factory class for JaegerExporter.
+ */
 class JaegerExporterFactory
 {
 public:
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  /**
+   * Create a JaegerExporter using all default options.
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create();
+
+  /**
+   * Create a JaegerExporter using the given options.
+   */
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const JaegerExporterOptions &options);
 };
 

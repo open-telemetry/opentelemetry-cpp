@@ -14,18 +14,21 @@ namespace exporter
 namespace zipkin
 {
 
+/**
+ * Factory class for ZipkinExporter.
+ */
 class ZipkinExporterFactory
 {
 public:
   /**
    * Create a ZipkinExporter using all default options.
    */
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build();
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create();
 
   /**
    * Create a ZipkinExporter using the given options.
    */
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const ZipkinExporterOptions &options);
 };
 

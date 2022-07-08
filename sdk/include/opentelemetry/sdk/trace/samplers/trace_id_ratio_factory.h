@@ -12,14 +12,19 @@ namespace sdk
 {
 namespace trace
 {
+
 /**
- * Builds a TraceIdRatioBasedSampler.
+ * Factory class for TraceIdRatioBasedSampler.
  */
 class TraceIdRatioBasedSamplerFactory
 {
 public:
-  static std::unique_ptr<Sampler> Build(double ratio);
+  /**
+   * Create a TraceIdRatioBasedSampler.
+   */
+  static std::unique_ptr<Sampler> Create(double ratio);
 };
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

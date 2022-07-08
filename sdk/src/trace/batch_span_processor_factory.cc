@@ -10,7 +10,7 @@ namespace sdk
 {
 namespace trace
 {
-std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Build(
+std::unique_ptr<SpanProcessor> BatchSpanProcessorFactory::Create(
     std::unique_ptr<SpanExporter> &&exporter,
     const BatchSpanProcessorOptions &options)
 {

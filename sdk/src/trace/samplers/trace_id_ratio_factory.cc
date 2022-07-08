@@ -13,7 +13,7 @@ namespace sdk
 namespace trace
 {
 
-std::unique_ptr<Sampler> TraceIdRatioBasedSamplerFactory::Build(double ratio)
+std::unique_ptr<Sampler> TraceIdRatioBasedSamplerFactory::Create(double ratio)
 {
   std::unique_ptr<Sampler> sampler(new TraceIdRatioBasedSampler(ratio));
   return sampler;
