@@ -121,7 +121,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    files for SDK at custom/default install location.
 
    ```console
-   $ cmake --install . --config Debug --prefix /<install_root>/
+   $ cmake --install . --prefix /<install_root>/
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config.cmake
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config-version.cmake
    ...
