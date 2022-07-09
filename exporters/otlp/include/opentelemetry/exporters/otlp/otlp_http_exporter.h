@@ -13,6 +13,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 #include <string>
 

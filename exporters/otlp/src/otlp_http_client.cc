@@ -14,7 +14,6 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#include <mutex>
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
@@ -36,9 +35,11 @@ LIBPROTOBUF_EXPORT void Base64Escape(StringPiece src, std::string *dest);
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <fstream>
 #include <mutex>
@@ -71,7 +72,12 @@ public:
   /**
    * Creates a response handler, that by default doesn't display to console
    */
-  ResponseHandler(bool console_debug = false) : console_debug_{console_debug} {}
+  ResponseHandler(std::function<bool(opentelemetry::sdk::common::ExportResult)> &&callback,
+                  bool console_debug = false)
+      : result_callback_{std::move(callback)}, console_debug_{console_debug}
+  {
+    stopping_.store(false);
+  }
 
   /**
    * Automatically called when the response is received, store the body into a string and notify any
@@ -98,23 +104,15 @@ public:
         ss << "Body:" << body_;
         OTEL_INTERNAL_LOG_DEBUG(ss.str());
       }
-
-      // Set the response_received_ flag to true and notify any threads waiting on this result
-      response_received_ = true;
-      stop_waiting_      = true;
     }
-    cv_.notify_all();
-  }
 
-  /**resource
-   * A method the user calls to block their thread until the response is received. The longest
-   * duration is the timeout of the request, set by SetTimeoutMs()
-   */
-  bool waitForResponse()
-  {
-    std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk, [this] { return stop_waiting_; });
-    return response_received_;
+    {
+      bool expected = false;
+      if (stopping_.compare_exchange_strong(expected, true, std::memory_order_release))
+      {
+        Unbind(sdk::common::ExportResult::kSuccess);
+      }
+    }
   }
 
   /**
@@ -131,7 +129,8 @@ public:
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {
-    // need to modify stop_waiting_ under lock before calling notify_all
+    // need to modify stopping_ under lock before calling callback
+    bool need_stop = false;
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
@@ -141,8 +140,7 @@ public:
       case http_client::SessionState::TimedOut:
       case http_client::SessionState::NetworkError:
       case http_client::SessionState::Cancelled: {
-        std::unique_lock<std::mutex> lk(mutex_);
-        stop_waiting_ = true;
+        need_stop = true;
       }
       break;
 
@@ -153,10 +151,16 @@ public:
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
     {
-      case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: session create failed");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::CreateFailed: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: session create failed.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
       case http_client::SessionState::Created:
         if (console_debug_)
@@ -179,10 +183,16 @@ public:
         }
         break;
 
-      case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: connection failed");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::ConnectFailed: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: connection failed.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
       case http_client::SessionState::Connected:
         if (console_debug_)
@@ -198,10 +208,16 @@ public:
         }
         break;
 
-      case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: request send failed");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::SendFailed: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: request send failed.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
       case http_client::SessionState::Response:
         if (console_debug_)
@@ -210,20 +226,38 @@ public:
         }
         break;
 
-      case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: SSL handshake failed");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::SSLHandshakeFailed: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: SSL handshake failed.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
-      case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: request time out");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::TimedOut: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: request time out.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
-      case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: network error");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::NetworkError: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: network error.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
       case http_client::SessionState::ReadError:
         if (console_debug_)
@@ -239,29 +273,76 @@ public:
         }
         break;
 
-      case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Session state: (manually) cancelled\n");
-        cv_.notify_all();
-        break;
+      case http_client::SessionState::Cancelled: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: (manually) cancelled.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), reason.size());
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
 
       default:
         break;
     }
+
+    if (need_stop)
+    {
+      bool expected = false;
+      if (stopping_.compare_exchange_strong(expected, true, std::memory_order_release))
+      {
+        Unbind(sdk::common::ExportResult::kFailure);
+      }
+    }
   }
 
+  void Unbind(sdk::common::ExportResult result)
+  {
+    // ReleaseSession may destroy this object, so we need to move owner and session into stack
+    // first.
+    OtlpHttpClient *owner                                    = owner_;
+    const opentelemetry::ext::http::client::Session *session = session_;
+
+    owner_   = nullptr;
+    session_ = nullptr;
+
+    if (nullptr != owner && nullptr != session)
+    {
+      // Release the session at last
+      owner->ReleaseSession(*session);
+
+      if (result_callback_)
+      {
+        result_callback_(result);
+      }
+    }
+  }
+
+  void Bind(OtlpHttpClient *owner,
+            const opentelemetry::ext::http::client::Session &session) noexcept
+  {
+    session_ = &session;
+    owner_   = owner;
+  };
+
 private:
-  // Define a condition variable and mutex
-  std::condition_variable cv_;
+  // Define a mutex to keep thread safety
   std::mutex mutex_;
 
-  // Whether notify has been called
-  bool stop_waiting_ = false;
+  // Track the owner and the binded session
+  OtlpHttpClient *owner_                                    = nullptr;
+  const opentelemetry::ext::http::client::Session *session_ = nullptr;
 
-  // Whether the response has been received
-  bool response_received_ = false;
+  // Whether notify has been called
+  std::atomic<bool> stopping_;
 
   // A string to store the response body
   std::string body_ = "";
+
+  // Result callback when in async mode
+  std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -563,31 +644,200 @@ void ConvertListFieldToJson(nlohmann::json &value,
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
-    : options_(options), http_client_(http_client::HttpClientFactory::Create())
-{}
+    : is_shutdown_(false), options_(options), http_client_(http_client::HttpClientFactory::Create())
+{
+  http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
+}
+
+OtlpHttpClient::~OtlpHttpClient()
+{
+  if (!isShutdown())
+  {
+    Shutdown();
+  }
+
+  // Wait for all the sessions to finish
+  std::unique_lock<std::mutex> lock(session_waker_lock_);
+  while (true)
+  {
+    {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      if (running_sessions_.empty())
+      {
+        break;
+      }
+    }
+    // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+    // checking and waiting, we should not wait forever.
+    session_waker_.wait_for(lock, options_.timeout);
+  }
+
+  // And then remove all session datas
+  while (cleanupGCSessions())
+    ;
+}
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : options_(options), http_client_(http_client)
-{}
+    : is_shutdown_(false), options_(options), http_client_(http_client)
+{
+  http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
+}
 
 // ----------------------------- HTTP Client methods ------------------------------
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
-  // Return failure if this exporter has been shutdown
-  if (isShutdown())
-  {
-    const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
-    if (options_.console_debug)
-    {
-      std::cerr << error_message << std::endl;
-    }
-    OTEL_INTERNAL_LOG_ERROR(error_message);
+  opentelemetry::sdk::common::ExportResult session_result =
+      opentelemetry::sdk::common::ExportResult::kSuccess;
+  opentelemetry::sdk::common::ExportResult export_result = Export(
+      message,
+      [&session_result](opentelemetry::sdk::common::ExportResult result) {
+        session_result = result;
+        return result == opentelemetry::sdk::common::ExportResult::kSuccess;
+      },
+      0);
 
+  if (opentelemetry::sdk::common::ExportResult::kSuccess != export_result)
+  {
+    return export_result;
+  }
+
+  return session_result;
+}
+
+sdk::common::ExportResult OtlpHttpClient::Export(
+    const google::protobuf::Message &message,
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
+{
+  return Export(message, std::move(result_callback), options_.max_concurrent_requests);
+}
+
+sdk::common::ExportResult OtlpHttpClient::Export(
+    const google::protobuf::Message &message,
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+    std::size_t max_running_requests) noexcept
+{
+  auto session = createSession(message, std::move(result_callback));
+  if (opentelemetry::nostd::holds_alternative<sdk::common::ExportResult>(session))
+  {
+    sdk::common::ExportResult result =
+        opentelemetry::nostd::get<sdk::common::ExportResult>(session);
+    if (result_callback)
+    {
+      result_callback(result);
+    }
+    return result;
+  }
+
+  addSession(std::move(opentelemetry::nostd::get<HttpSessionData>(session)));
+
+  // Wait for the response to be received
+  if (options_.console_debug)
+  {
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[OTLP HTTP Client] DEBUG: Waiting for response from "
+        << options_.url << " (timeout = "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
+        << " milliseconds)");
+  }
+
+  // Wait for any session to finish if there are to many sessions
+  std::unique_lock<std::mutex> lock(session_waker_lock_);
+  bool wait_successful =
+      session_waker_.wait_for(lock, options_.timeout, [this, max_running_requests] {
+        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+        return running_sessions_.size() <= max_running_requests;
+      });
+
+  cleanupGCSessions();
+
+  if (!wait_successful)
+  {
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
+  return opentelemetry::sdk::common::ExportResult::kSuccess;
+}
+
+bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  {
+    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+    is_shutdown_ = true;
+
+    // Shutdown the session manager
+    http_client_->CancelAllSessions();
+    http_client_->FinishAllSessions();
+  }
+
+  // ASAN will report chrono: runtime error: signed integer overflow: A + B cannot be represented
+  //   in type 'long int' here. So we reset timeout to meet signed long int limit here.
+  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
+
+  // Wait for all the sessions to finish
+  std::unique_lock<std::mutex> lock(session_waker_lock_);
+  if (timeout <= std::chrono::microseconds::zero())
+  {
+    while (true)
+    {
+      {
+        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+        if (running_sessions_.empty())
+        {
+          break;
+        }
+      }
+      // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+      // checking and waiting, we should not wait forever.
+      session_waker_.wait_for(lock, options_.timeout);
+    }
+  }
+  else
+  {
+    session_waker_.wait_for(lock, timeout, [this] {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      return running_sessions_.empty();
+    });
+  }
+
+  while (cleanupGCSessions())
+    ;
+  return true;
+}
+
+void OtlpHttpClient::ReleaseSession(
+    const opentelemetry::ext::http::client::Session &session) noexcept
+{
+  bool has_session = false;
+
+  {
+    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+
+    auto session_iter = running_sessions_.find(&session);
+    if (session_iter != running_sessions_.end())
+    {
+      // Move session and handle into gc list, and they will be destroyed later
+      gc_sessions_.emplace_back(std::move(session_iter->second));
+      running_sessions_.erase(session_iter);
+
+      has_session = true;
+    }
+  }
+
+  if (has_session)
+  {
+    session_waker_.notify_all();
+  }
+}
+
+opentelemetry::nostd::variant<opentelemetry::sdk::common::ExportResult,
+                              OtlpHttpClient::HttpSessionData>
+OtlpHttpClient::createSession(
+    const google::protobuf::Message &message,
+    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
+{
   // Parse uri and store it to cache
   if (http_uri_.empty())
   {
@@ -655,6 +905,20 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   }
 
   // Send the request
+  std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+  // Return failure if this exporter has been shutdown
+  if (isShutdown())
+  {
+    const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
+    if (options_.console_debug)
+    {
+      std::cerr << error_message << std::endl;
+    }
+    OTEL_INTERNAL_LOG_ERROR(error_message);
+
+    return opentelemetry::sdk::common::ExportResult::kFailure;
+  }
+
   auto session = http_client_->CreateSession(options_.url);
   auto request = session->CreateRequest();
 
@@ -668,51 +932,52 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   request->SetBody(body_vec);
   request->ReplaceHeader("Content-Type", content_type);
 
-  // Send the request
-  std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug));
-  session->SendRequest(*handler);
-
-  // Wait for the response to be received
-  if (options_.console_debug)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[OTLP HTTP Client] DEBUG: Waiting for response from "
-        << options_.url << " (timeout = "
-        << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
-        << " milliseconds)");
-  }
-  bool write_successful = handler->waitForResponse();
-
-  // End the session
-  session->FinishSession();
-
-  // If an error occurred with the HTTP request
-  if (!write_successful)
-  {
-    // TODO: retry logic
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
-
-  return opentelemetry::sdk::common::ExportResult::kSuccess;
+  // Returns the created session data
+  return HttpSessionData{
+      std::move(session),
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
+          new ResponseHandler(std::move(result_callback), options_.console_debug)}};
 }
 
-bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept
+void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
 {
+  if (!session_data.session || !session_data.event_handle)
   {
-    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    is_shutdown_ = true;
+    return;
   }
 
-  // Shutdown the session manager
-  http_client_->CancelAllSessions();
-  http_client_->FinishAllSessions();
+  opentelemetry::ext::http::client::Session *key = session_data.session.get();
+  ResponseHandler *handle = static_cast<ResponseHandler *>(session_data.event_handle.get());
 
-  return true;
+  handle->Bind(this, *key);
+
+  HttpSessionData &store_session_data = running_sessions_[key];
+  store_session_data                  = std::move(session_data);
+
+  // Send request after the session is added
+  key->SendRequest(store_session_data.event_handle);
+}
+
+bool OtlpHttpClient::cleanupGCSessions() noexcept
+{
+  std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+  std::list<HttpSessionData> gc_sessions;
+  gc_sessions_.swap(gc_sessions);
+
+  for (auto &session_data : gc_sessions)
+  {
+    // FinishSession must be called with same thread and before the session is destroyed
+    if (session_data.session)
+    {
+      session_data.session->FinishSession();
+    }
+  }
+
+  return !gc_sessions_.empty();
 }
 
 bool OtlpHttpClient::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 

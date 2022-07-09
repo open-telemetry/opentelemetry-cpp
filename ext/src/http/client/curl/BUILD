@@ -5,6 +5,7 @@ cc_library(
     srcs = [
         "http_client_curl.cc",
         "http_client_factory_curl.cc",
+        "http_operation_curl.cc",
     ],
     copts = [
         "-DWITH_CURL",

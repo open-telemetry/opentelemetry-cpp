@@ -51,10 +51,7 @@ public:
 
   void ReplaceHeader(nostd::string_view name, nostd::string_view value) noexcept override;
 
-  virtual void SetUri(nostd::string_view uri) noexcept override
-  {
-    uri_ = static_cast<std::string>(uri);
-  }
+  void SetUri(nostd::string_view uri) noexcept override { uri_ = static_cast<std::string>(uri); }
 
   void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept override
   {
@@ -74,23 +71,31 @@ class Response : public opentelemetry::ext::http::client::Response
 public:
   Response() : status_code_(Http_Ok) {}
 
-  virtual const opentelemetry::ext::http::client::Body &GetBody() const noexcept override
-  {
-    return body_;
-  }
+  const opentelemetry::ext::http::client::Body &GetBody() const noexcept override { return body_; }
 
-  virtual bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
-      const noexcept override;
+  bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override;
 
-  virtual bool ForEachHeader(
-      const nostd::string_view &name,
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
-      const noexcept override;
+  bool ForEachHeader(const nostd::string_view &name,
+                     nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override;
 
-  virtual opentelemetry::ext::http::client::StatusCode GetStatusCode() const noexcept override
+  opentelemetry::ext::http::client::StatusCode GetStatusCode() const noexcept override
   {
     return status_code_;
+  }
+
+  void Finish(opentelemetry::ext::http::client::EventHandler &callback) noexcept
+  {
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Created, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Connecting, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Connected, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Sending, "");
+
+    // let the otlp_http_client to continue
+    callback.OnResponse(*this);
+
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Response, "");
   }
 
 public:
@@ -121,14 +126,14 @@ public:
 
   MOCK_METHOD(void,
               SendRequest,
-              (opentelemetry::ext::http::client::EventHandler &),
+              (std::shared_ptr<opentelemetry::ext::http::client::EventHandler>),
               (noexcept, override));
 
-  virtual bool CancelSession() noexcept override;
+  bool CancelSession() noexcept override;
 
-  virtual bool FinishSession() noexcept override;
+  bool FinishSession() noexcept override;
 
-  virtual bool IsSessionActive() noexcept override { return is_session_active_; }
+  bool IsSessionActive() noexcept override { return is_session_active_; }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
@@ -151,27 +156,18 @@ private:
 class HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
-  HttpClient() { session_ = std::shared_ptr<Session>{new Session(*this)}; }
+  HttpClient();
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
-      nostd::string_view) noexcept override
-  {
-    return session_;
-  }
+      nostd::string_view) noexcept override;
 
-  bool CancelAllSessions() noexcept override
-  {
-    session_->CancelSession();
-    return true;
-  }
+  bool CancelAllSessions() noexcept override;
 
-  bool FinishAllSessions() noexcept override
-  {
-    session_->FinishSession();
-    return true;
-  }
+  bool FinishAllSessions() noexcept override;
 
-  void CleanupSession(uint64_t session_id) {}
+  void SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept override;
+
+  void CleanupSession(uint64_t session_id);
 
   std::shared_ptr<Session> session_;
 };
