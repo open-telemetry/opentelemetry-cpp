@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1657344702841,
+  "lastUpdate": 1657392074465,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -49342,6 +49342,54 @@ window.BENCHMARK_DATA = {
             "value": 2039066.894315578,
             "unit": "ns/iter",
             "extra": "iterations: 283\ncpu: 471644.52296819794 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "owentou@tencent.com",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8691a2d582c2e0c811fbf383b572e1ff882b5b37",
+          "message": "Remove `--config Debug` when installing. (#1480)",
+          "timestamp": "2022-07-09T11:25:40-07:00",
+          "tree_id": "2b922991d384cdd4858c735da40889566ae90786",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/8691a2d582c2e0c811fbf383b572e1ff882b5b37"
+        },
+        "date": 1657392072422,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 141.5741970261417,
+            "unit": "ns/iter",
+            "extra": "iterations: 996000\ncpu: 141.39919678714858 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 203.76310639180707,
+            "unit": "ns/iter",
+            "extra": "iterations: 689000\ncpu: 203.55297532656027 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1025.093755414409,
+            "unit": "ns/iter",
+            "extra": "iterations: 155000\ncpu: 1018.4141935483871 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 3103575.9652307793,
+            "unit": "ns/iter",
+            "extra": "iterations: 258\ncpu: 532193.0232558141 ns\nthreads: 1"
           }
         ]
       }
