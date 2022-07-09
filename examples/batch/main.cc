@@ -39,7 +39,8 @@ void initTracer()
 
   auto processor = trace_sdk::BatchSpanProcessorFactory::Create(std::move(exporter), options);
 
-  auto provider = trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
 
   // Set the global trace provider.
   trace_api::Provider::SetTracerProvider(provider);

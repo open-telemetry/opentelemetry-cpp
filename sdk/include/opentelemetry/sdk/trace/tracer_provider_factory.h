@@ -24,19 +24,19 @@ class TracerProviderFactory
 public:
   /* Serie of builders with a single processor. */
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       opentelemetry::sdk::resource::Resource resource);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler,
@@ -44,19 +44,19 @@ public:
 
   /* Serie of builders with a vector of processor. */
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       opentelemetry::sdk::resource::Resource resource);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler);
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler,
@@ -64,7 +64,7 @@ public:
 
   /* Create with a tracer context. */
 
-  static std::shared_ptr<opentelemetry::trace::TracerProvider> Create(
+  static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::shared_ptr<sdk::trace::TracerContext> context);
 };
 

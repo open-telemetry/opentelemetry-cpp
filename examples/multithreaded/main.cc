@@ -21,8 +21,9 @@ void initTracer()
 {
   auto exporter  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  auto provider  = trace_sdk::TracerProviderFactory::Create(
-      std::move(processor), opentelemetry::sdk::resource::Resource::Create({}));
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor),
+                                               opentelemetry::sdk::resource::Resource::Create({}));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }

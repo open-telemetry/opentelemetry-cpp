@@ -35,7 +35,8 @@ std::shared_ptr<InMemorySpanData> initTracer()
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor1));
   processors.push_back(std::move(processor2));
-  auto provider = trace_sdk::TracerProviderFactory::Create(std::move(processors));
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processors));
 
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(std::move(provider));

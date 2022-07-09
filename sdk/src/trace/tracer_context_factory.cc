@@ -13,14 +13,14 @@ namespace sdk
 namespace trace
 {
 
-std::shared_ptr<TracerContext> TracerContextFactory::Create(
+std::unique_ptr<TracerContext> TracerContextFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processor)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Create(std::move(processor), resource);
 }
 
-std::shared_ptr<TracerContext> TracerContextFactory::Create(
+std::unique_ptr<TracerContext> TracerContextFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processor,
     opentelemetry::sdk::resource::Resource resource)
 {
@@ -28,7 +28,7 @@ std::shared_ptr<TracerContext> TracerContextFactory::Create(
   return Create(std::move(processor), resource, std::move(sampler));
 }
 
-std::shared_ptr<TracerContext> TracerContextFactory::Create(
+std::unique_ptr<TracerContext> TracerContextFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processor,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler)
@@ -37,13 +37,13 @@ std::shared_ptr<TracerContext> TracerContextFactory::Create(
   return Create(std::move(processor), resource, std::move(sampler), std::move(id_generator));
 }
 
-std::shared_ptr<TracerContext> TracerContextFactory::Create(
+std::unique_ptr<TracerContext> TracerContextFactory::Create(
     std::vector<std::unique_ptr<SpanProcessor>> &&processor,
     opentelemetry::sdk::resource::Resource resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator)
 {
-  std::shared_ptr<TracerContext> context(new TracerContext(
+  std::unique_ptr<TracerContext> context(new TracerContext(
       std::move(processor), resource, std::move(sampler), std::move(id_generator)));
   return context;
 }

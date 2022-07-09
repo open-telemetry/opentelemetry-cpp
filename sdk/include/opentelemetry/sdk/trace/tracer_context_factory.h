@@ -23,20 +23,20 @@ public:
   /**
    * Create a TracerContext.
    */
-  static std::shared_ptr<sdk::trace::TracerContext> Create(
+  static std::unique_ptr<TracerContext> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor);
 
   /**
    * Create a TracerContext.
    */
-  static std::shared_ptr<sdk::trace::TracerContext> Create(
+  static std::unique_ptr<TracerContext> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor,
       opentelemetry::sdk::resource::Resource resource);
 
   /**
    * Create a TracerContext.
    */
-  static std::shared_ptr<sdk::trace::TracerContext> Create(
+  static std::unique_ptr<TracerContext> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler);
@@ -44,7 +44,7 @@ public:
   /**
    * Create a TracerContext.
    */
-  static std::shared_ptr<sdk::trace::TracerContext> Create(
+  static std::unique_ptr<TracerContext> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor,
       opentelemetry::sdk::resource::Resource resource,
       std::unique_ptr<Sampler> sampler,

@@ -25,7 +25,8 @@ void InitTracer()
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpGrpcExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

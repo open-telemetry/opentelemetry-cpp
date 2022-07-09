@@ -28,7 +28,8 @@ void InitTracer()
   auto resource                           = resource::Resource::Create(attributes);
   auto exporter                           = zipkin::ZipkinExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  auto provider  = trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor), resource);
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
