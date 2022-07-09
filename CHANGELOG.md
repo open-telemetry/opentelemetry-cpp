@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
+* [EXT] `curl::HttpClient` use `curl_multi_handle` instead of creating a thread
+  for every request and it's able to reuse connections now. ([#1317](https://github.com/open-telemetry/opentelemetry-cpp/pull/1317))
+
 ## [1.4.1] 2022-06-19
 
 * [METRICS SDK] Fix variables inizialization [#1430](https://github.com/open-telemetry/opentelemetry-cpp/pull/1430)

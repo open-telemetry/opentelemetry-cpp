@@ -212,7 +212,7 @@ class Session
 public:
   virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
 
-  virtual void SendRequest(EventHandler &) noexcept = 0;
+  virtual void SendRequest(std::shared_ptr<EventHandler>) noexcept = 0;
 
   virtual bool IsSessionActive() noexcept = 0;
 
@@ -231,6 +231,8 @@ public:
   virtual bool CancelAllSessions() noexcept = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;
+
+  virtual void SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept = 0;
 
   virtual ~HttpClient() = default;
 };

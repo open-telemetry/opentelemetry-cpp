@@ -9,6 +9,7 @@
 
 #  include <gtest/gtest.h>
 #  include <chrono>
+#  include <memory>
 #  include <thread>
 
 using namespace opentelemetry::sdk::logs;

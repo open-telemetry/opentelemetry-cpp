@@ -11,6 +11,7 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 #include <string>
 
@@ -50,6 +51,15 @@ struct OtlpHttpExporterOptions
 
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+
+#ifdef ENABLE_ASYNC_EXPORT
+  // Concurrent requests
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
+  std::size_t max_concurrent_requests = 64;
+
+  // Requests per connections
+  std::size_t max_requests_per_connection = 8;
+#endif
 };
 
 /**
