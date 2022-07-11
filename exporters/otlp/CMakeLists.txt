@@ -104,6 +104,21 @@ if(WITH_OTLP_HTTP)
     list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
 
   endif()
+  if(NOT WITH_METRICS_PREVIEW)
+    add_library(opentelemetry_exporter_otlp_http_metric
+                src/otlp_http_metric_exporter.cc)
+
+    set_target_properties(opentelemetry_exporter_otlp_http_metric
+                          PROPERTIES EXPORT_NAME otlp_http_metric_exporter)
+
+    target_link_libraries(
+      opentelemetry_exporter_otlp_http_metric
+      PUBLIC opentelemetry_otlp_recordable
+             opentelemetry_exporter_otlp_http_client)
+
+    list(APPEND OPENTELEMETRY_OTLP_TARGETS
+         opentelemetry_exporter_otlp_http_metric)
+  endif()
 endif()
 
 install(
