@@ -180,6 +180,15 @@ if(BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_grpc_exporter_test)
 
+    add_executable(otlp_grpc_exporter_factory_test test/otlp_grpc_exporter_factory_test.cc)
+    target_link_libraries(
+      otlp_grpc_exporter_factory_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+    gtest_add_tests(
+      TARGET otlp_grpc_exporter_factory_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_grpc_exporter_factory_test)
+
     if(WITH_LOGS_PREVIEW)
       add_executable(otlp_grpc_log_exporter_test
                      test/otlp_grpc_log_exporter_test.cc)
@@ -203,6 +212,15 @@ if(BUILD_TESTING)
       TARGET otlp_http_exporter_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_exporter_test)
+
+    add_executable(otlp_http_exporter_factory_test test/otlp_http_exporter_factory_test.cc)
+    target_link_libraries(
+      otlp_http_exporter_factory_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_http)
+    gtest_add_tests(
+      TARGET otlp_http_exporter_factory_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_exporter_factory_test)
 
     if(WITH_LOGS_PREVIEW)
       add_executable(otlp_http_log_exporter_test

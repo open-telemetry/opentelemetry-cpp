@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 
 #include <atomic>
 #include <chrono>
@@ -37,19 +38,6 @@ constexpr char kDefaultMetricsPath[] = "/v1/metrics";
 // The HTTP header "Content-Type"
 constexpr char kHttpJsonContentType[]   = "application/json";
 constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
-
-enum class JsonBytesMappingKind
-{
-  kHexId,
-  kHex,
-  kBase64,
-};
-
-enum class HttpRequestContentType
-{
-  kJson,
-  kBinary,
-};
 
 /**
  * Struct to hold OTLP HTTP client options.

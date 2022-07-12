@@ -29,16 +29,16 @@ public:
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource resource);
+      const opentelemetry::sdk::resource::Resource &resource);
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource resource,
+      const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler);
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource resource,
+      const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler,
       std::unique_ptr<IdGenerator> id_generator);
 
@@ -49,16 +49,16 @@ public:
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-      opentelemetry::sdk::resource::Resource resource);
+      const opentelemetry::sdk::resource::Resource &resource);
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-      opentelemetry::sdk::resource::Resource resource,
+      const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler);
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-      opentelemetry::sdk::resource::Resource resource,
+      const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler,
       std::unique_ptr<IdGenerator> id_generator);
 
