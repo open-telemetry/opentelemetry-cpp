@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
+#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -64,12 +64,17 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
 opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
+  if (http_client_->IsShutdown())
+  {
+    return opentelemetry::sdk::common::ExportResult::kFailure;
+  }
+
   if (data.instrumentation_info_metric_data_.empty())
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
   proto::collector::metrics::v1::ExportMetricsServiceRequest service_request;
-  OtlpMetricsUtils::PopulateRequest(data, &service_request);
+  OtlpMetricUtils::PopulateRequest(data, &service_request);
   std::size_t metric_count = data.instrumentation_info_metric_data_.size();
 #  ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(service_request, [metric_count](
@@ -101,6 +106,11 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #  endif
+}
+
+bool OtlpHttpMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return http_client_->ForceFlush(timeout);
 }
 
 bool OtlpHttpMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept

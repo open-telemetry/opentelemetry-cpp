@@ -67,6 +67,11 @@ std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRec
 opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
 {
+  if (http_client_->IsShutdown())
+  {
+    return opentelemetry::sdk::common::ExportResult::kFailure;
+  }
+
   if (spans.empty())
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;

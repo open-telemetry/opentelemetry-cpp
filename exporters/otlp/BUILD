@@ -20,12 +20,14 @@ cc_library(
     name = "otlp_recordable",
     srcs = [
         "src/otlp_log_recordable.cc",
+        "src/otlp_metric_utils.cc",
         "src/otlp_populate_attribute_utils.cc",
         "src/otlp_recordable.cc",
         "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
+        "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable_utils.h",
@@ -162,6 +164,30 @@ cc_library(
 )
 
 cc_library(
+    name = "otlp_http_metric_exporter",
+    srcs = [
+        "src/otlp_http_metric_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_metric_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_http_metric",
+    ],
+    deps = [
+        ":otlp_http_client",
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+    ],
+)
+
+cc_library(
     name = "otlp_grpc_log_exporter",
     srcs = [
         "src/otlp_grpc_log_exporter.cc",
@@ -288,6 +314,22 @@ cc_test(
     ],
     deps = [
         ":otlp_http_log_exporter",
+        "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_http_metric_exporter_test",
+    srcs = ["test/otlp_http_metric_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_http_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_http_metric_exporter",
         "//api",
         "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",

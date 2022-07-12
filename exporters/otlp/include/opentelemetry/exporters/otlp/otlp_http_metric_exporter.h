@@ -82,6 +82,12 @@ public:
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
 
+  /**
+   * Force flush the exporter.
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
+
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
