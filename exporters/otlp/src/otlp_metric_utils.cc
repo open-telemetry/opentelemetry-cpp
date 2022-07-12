@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 
 #ifndef ENABLE_METRICS_PREVIEW
@@ -14,7 +14,7 @@ namespace otlp
 {
 namespace metric_sdk = opentelemetry::sdk::metrics;
 
-proto::metrics::v1::AggregationTemporality OtlpMetricsUtils::GetProtoAggregationTemporality(
+proto::metrics::v1::AggregationTemporality OtlpMetricUtils::GetProtoAggregationTemporality(
     const opentelemetry::sdk::metrics::AggregationTemporality &aggregation_temporality) noexcept
 {
   if (aggregation_temporality == opentelemetry::sdk::metrics::AggregationTemporality::kCumulative)
@@ -25,7 +25,7 @@ proto::metrics::v1::AggregationTemporality OtlpMetricsUtils::GetProtoAggregation
     return proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }
 
-metric_sdk::AggregationType OtlpMetricsUtils::GetAggregationType(
+metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
     const opentelemetry::sdk::metrics::InstrumentType &instrument_type) noexcept
 {
 
@@ -47,8 +47,8 @@ metric_sdk::AggregationType OtlpMetricsUtils::GetAggregationType(
   return metric_sdk::AggregationType::kDrop;
 }
 
-void OtlpMetricsUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
-                                        proto::metrics::v1::Sum *const sum) noexcept
+void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
+                                       proto::metrics::v1::Sum *const sum) noexcept
 {
   sum->set_aggregation_temporality(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
@@ -80,7 +80,7 @@ void OtlpMetricsUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_dat
   }
 }
 
-void OtlpMetricsUtils::ConvertHistogramMetric(
+void OtlpMetricUtils::ConvertHistogramMetric(
     const metric_sdk::MetricData &metric_data,
     proto::metrics::v1::Histogram *const histogram) noexcept
 {
@@ -138,7 +138,7 @@ void OtlpMetricsUtils::ConvertHistogramMetric(
   }
 }
 
-void OtlpMetricsUtils::PopulateInstrumentationInfoMetric(
+void OtlpMetricUtils::PopulateInstrumentationInfoMetric(
     const opentelemetry::sdk::metrics::MetricData &metric_data,
     proto::metrics::v1::Metric *metric) noexcept
 {
@@ -160,7 +160,7 @@ void OtlpMetricsUtils::PopulateInstrumentationInfoMetric(
   }
 }
 
-void OtlpMetricsUtils::PopulateResourceMetrics(
+void OtlpMetricUtils::PopulateResourceMetrics(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
     proto::metrics::v1::ResourceMetrics *resource_metrics) noexcept
 {
@@ -190,7 +190,7 @@ void OtlpMetricsUtils::PopulateResourceMetrics(
   }
 }
 
-void OtlpMetricsUtils::PopulateRequest(
+void OtlpMetricUtils::PopulateRequest(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
     proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept
 {
