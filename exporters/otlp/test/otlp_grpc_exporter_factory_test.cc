@@ -1,18 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-/*
-  Cripple the build environment on purpose.
-  This is to make sure that if protobuf headers
-  are included by OtlpGrpcExporterFactory,
-  even indirectly, the build will fail.
-*/
-#define PROTOBUF_VERSION 6666666
-
 #include <gtest/gtest.h>
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+
+/*
+  Make sure OtlpGrpcExporterFactory does not require,
+  even indirectly, protobuf headers.
+*/
+#ifdef GOOGLE_PROTOBUF_VERSION
+#  error "protobuf should not be included"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

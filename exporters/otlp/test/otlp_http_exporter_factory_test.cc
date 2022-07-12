@@ -1,26 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-/*
-  Cripple the build environment on purpose.
-  This is to make sure that if protobuf headers
-  are included by OtlpHttpExporterFactory,
-  even indirectly, the build will fail.
-*/
-#define PROTOBUF_VERSION 6666666
-
 #include <gtest/gtest.h>
 
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 
 /*
-  Make sure OtlpHttpExporterFactory does not leak nlohmann/json.hpp,
-  even indirectly.
+  Make sure OtlpHttpExporterFactory does not require,
+  even indirectly, nlohmann/json headers.
 */
 #ifdef NLOHMANN_JSON_VERSION_MAJOR
-#  error "OtlpHttpExporterFactory should not expose nlohmann/json.hpp"
+#  error "nlohmann/json should not be included"
 #endif /* NLOHMANN_JSON_VERSION_MAJOR */
+
+/*
+  Make sure OtlpHttpExporterFactory does not require,
+  even indirectly, protobuf headers.
+*/
+#ifdef GOOGLE_PROTOBUF_VERSION
+#  error "protobuf should not be included"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
