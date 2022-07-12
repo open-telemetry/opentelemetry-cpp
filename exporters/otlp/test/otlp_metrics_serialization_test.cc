@@ -18,7 +18,7 @@ namespace proto         = opentelemetry::proto;
 namespace metrics_sdk   = opentelemetry::sdk::metrics;
 namespace otlp_exporter = opentelemetry::exporter::otlp;
 
-metrics_sdk::MetricData CreateSumAggregationData()
+static metrics_sdk::MetricData CreateSumAggregationData()
 {
   metrics_sdk::MetricData data;
   data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
@@ -45,7 +45,7 @@ metrics_sdk::MetricData CreateSumAggregationData()
   return data;
 }
 
-metrics_sdk::MetricData CreateHistogramAggregationData()
+static metrics_sdk::MetricData CreateHistogramAggregationData()
 {
   metrics_sdk::MetricData data;
   data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
@@ -61,6 +61,33 @@ metrics_sdk::MetricData CreateHistogramAggregationData()
   s_data_2.count_      = 20;
   s_data_2.counts_     = {0, 8, 5, 7};
   s_data_2.boundaries_ = std::list<double>({0.0, 10.0, 20.0, 30.0});
+
+  data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
+  data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  data.instrument_descriptor = inst_desc;
+  metrics_sdk::PointDataAttributes point_data_attr_1, point_data_attr_2;
+  point_data_attr_1.attributes = {{"k1", "v1"}};
+  point_data_attr_1.point_data = s_data_1;
+
+  point_data_attr_2.attributes = {{"k2", "v2"}};
+  point_data_attr_2.point_data = s_data_1;
+  std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
+  point_data_attr.push_back(point_data_attr_1);
+  point_data_attr.push_back(point_data_attr_2);
+  data.point_data_attr_ = std::move(point_data_attr);
+  return data;
+}
+
+static metrics_sdk::MetricData CreateObservableGaugeAggregationData()
+{
+  metrics_sdk::MetricData data;
+  data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  metrics_sdk::InstrumentDescriptor inst_desc = {"LastValue", "desc", "unit",
+                                                 metrics_sdk::InstrumentType::kObservableGauge,
+                                                 metrics_sdk::InstrumentValueType::kDouble};
+  metrics_sdk::SumPointData s_data_1, s_data_2;
+  s_data_1.value_ = 30.2;
+  s_data_2.value_ = 50.2;
 
   data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
   data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
@@ -106,6 +133,20 @@ TEST(OtlpMetricSerializationTest, Histogram)
   {
     auto proto_number_point = histogram.data_points(i);
     EXPECT_EQ(proto_number_point.sum(), i == 0 ? 100.2 : 200.2);
+  }
+
+  EXPECT_EQ(1, 1);
+}
+
+TEST(OtlpMetricSerializationTest, ObservableGauge)
+{
+  metrics_sdk::MetricData data = CreateObservableGaugeAggregationData();
+  opentelemetry::proto::metrics::v1::Gauge gauge;
+  otlp_exporter::OtlpMetricUtils::ConvertGaugeMetric(data, &gauge);
+  for (size_t i = 0; i < 1; i++)
+  {
+    auto proto_number_point = gauge.data_points(i);
+    EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 30.2 : 50.2);
   }
 
   EXPECT_EQ(1, 1);
