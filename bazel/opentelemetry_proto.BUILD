@@ -125,7 +125,7 @@ cc_grpc_library(
 proto_library(
     name = "metrics_proto",
     srcs = [
-        "opentelemetry/proto/trace/v1/metrics.proto",
+        "opentelemetry/proto/metrics/v1/metrics.proto",
     ],
     deps = [
         ":common_proto",
