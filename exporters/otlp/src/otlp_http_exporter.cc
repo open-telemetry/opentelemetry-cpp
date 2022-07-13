@@ -69,6 +69,9 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
 {
   if (http_client_->IsShutdown())
   {
+    std::size_t span_count = spans.size();
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << span_count << " trace span(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 

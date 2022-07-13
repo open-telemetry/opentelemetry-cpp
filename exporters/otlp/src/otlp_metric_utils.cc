@@ -144,23 +144,23 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
-    proto::metrics::v1::NumberDataPoint *proto_sum_point_data = gauge->add_data_points();
-    proto_sum_point_data->set_start_time_unix_nano(start_ts);
-    proto_sum_point_data->set_time_unix_nano(ts);
-    auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
+    proto::metrics::v1::NumberDataPoint *proto_gauge_point_data = gauge->add_data_points();
+    proto_gauge_point_data->set_start_time_unix_nano(start_ts);
+    proto_gauge_point_data->set_time_unix_nano(ts);
+    auto gauge_data = nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
 
-    if ((nostd::holds_alternative<long>(sum_data.value_)))
+    if ((nostd::holds_alternative<long>(gauge_data.value_)))
     {
-      proto_sum_point_data->set_as_int(nostd::get<long>(sum_data.value_));
+      proto_gauge_point_data->set_as_int(nostd::get<long>(gauge_data.value_));
     }
     else
     {
-      proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
+      proto_gauge_point_data->set_as_double(nostd::get<double>(gauge_data.value_));
     }
     // set attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
-      OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_gauge_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second);
     }
   }
@@ -197,9 +197,7 @@ void OtlpMetricUtils::PopulateResourceMetrics(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
     proto::metrics::v1::ResourceMetrics *resource_metrics) noexcept
 {
-  proto::resource::v1::Resource proto;
-  OtlpPopulateAttributeUtils::PopulateAttribute(&proto, *(data.resource_));
-  *resource_metrics->mutable_resource() = proto;
+  OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(), *(data.resource_));
 
   for (auto &instrumentation_metrics : data.instrumentation_info_metric_data_)
   {
@@ -208,17 +206,14 @@ void OtlpMetricUtils::PopulateResourceMetrics(
       continue;
     }
     auto instrumentation_lib_metrics = resource_metrics->add_instrumentation_library_metrics();
-    proto::common::v1::InstrumentationLibrary instrumentation_library;
-    instrumentation_library.set_name(instrumentation_metrics.instrumentation_library_->GetName());
-    instrumentation_library.set_version(
+    proto::common::v1::InstrumentationLibrary* instrumentation_library = instrumentation_lib_metrics->mutable_instrumentation_library();
+    instrumentation_library->set_name(instrumentation_metrics.instrumentation_library_->GetName());
+    instrumentation_library->set_version(
         instrumentation_metrics.instrumentation_library_->GetVersion());
-    *instrumentation_lib_metrics->mutable_instrumentation_library() = instrumentation_library;
 
     for (auto &metric_data : instrumentation_metrics.metric_data_)
     {
-      proto::metrics::v1::Metric metric;
-      PopulateInstrumentationInfoMetric(metric_data, &metric);
-      *instrumentation_lib_metrics->add_metrics() = metric;
+      PopulateInstrumentationInfoMetric(metric_data, instrumentation_lib_metrics->add_metrics());
     }
   }
 }

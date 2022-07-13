@@ -71,6 +71,9 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
 {
   if (http_client_->IsShutdown())
   {
+    std::size_t log_count = logs.size();
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << log_count << " log(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 

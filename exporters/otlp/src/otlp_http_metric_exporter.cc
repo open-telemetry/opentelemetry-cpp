@@ -66,6 +66,9 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
 {
   if (http_client_->IsShutdown())
   {
+    std::size_t metric_count = data.instrumentation_info_metric_data_.size();
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << metric_count << " metric(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
