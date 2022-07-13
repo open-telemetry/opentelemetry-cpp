@@ -147,7 +147,8 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
     proto::metrics::v1::NumberDataPoint *proto_gauge_point_data = gauge->add_data_points();
     proto_gauge_point_data->set_start_time_unix_nano(start_ts);
     proto_gauge_point_data->set_time_unix_nano(ts);
-    auto gauge_data = nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
+    auto gauge_data =
+        nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
 
     if ((nostd::holds_alternative<long>(gauge_data.value_)))
     {
@@ -197,7 +198,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
     proto::metrics::v1::ResourceMetrics *resource_metrics) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(), *(data.resource_));
+  OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(),
+                                                *(data.resource_));
 
   for (auto &instrumentation_metrics : data.instrumentation_info_metric_data_)
   {
@@ -206,7 +208,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
       continue;
     }
     auto instrumentation_lib_metrics = resource_metrics->add_instrumentation_library_metrics();
-    proto::common::v1::InstrumentationLibrary* instrumentation_library = instrumentation_lib_metrics->mutable_instrumentation_library();
+    proto::common::v1::InstrumentationLibrary *instrumentation_library =
+        instrumentation_lib_metrics->mutable_instrumentation_library();
     instrumentation_library->set_name(instrumentation_metrics.instrumentation_library_->GetName());
     instrumentation_library->set_version(
         instrumentation_metrics.instrumentation_library_->GetVersion());
