@@ -231,7 +231,10 @@ cc_test(
 
 cc_test(
     name = "otlp_log_recordable_test",
-    srcs = ["test/otlp_log_recordable_test.cc"],
+    srcs = [
+        "test/otlp_log_recordable_test.cc",
+        "test/otlp_metrics_serialization_test.cc",
+    ],
     tags = [
         "otlp",
         "test",

@@ -85,7 +85,7 @@ static metrics_sdk::MetricData CreateObservableGaugeAggregationData()
   metrics_sdk::InstrumentDescriptor inst_desc = {"LastValue", "desc", "unit",
                                                  metrics_sdk::InstrumentType::kObservableGauge,
                                                  metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2;
+  metrics_sdk::LastValuePointData s_data_1, s_data_2;
   s_data_1.value_ = 30.2;
   s_data_2.value_ = 50.2;
 
