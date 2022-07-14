@@ -21,11 +21,11 @@ const size_t MAX_BUFFER_SIZE = 100;
  * A in memory exporter that switches a flag once a valid recordable was received
  * and keeps track of all received spans in memory.
  */
+using InMemorySpanData = exporter::memory::InMemoryData<sdk::trace::SpanData>;
+
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
-  using InMemorySpanData = exporter::memory::InMemoryData<sdk::trace::SpanData>;
-
   /**
    * @param buffer_size an optional value that sets the size of the InMemorySpanData
    */
