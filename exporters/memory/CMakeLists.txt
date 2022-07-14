@@ -26,12 +26,12 @@ install(
   PATTERN "*.h")
 
 if(BUILD_TESTING)
-  add_executable(in_memory_span_data_test test/in_memory_span_data_test.cc)
+  add_executable(in_memory_data_test test/in_memory_data_test.cc)
   add_executable(in_memory_span_exporter_test
                  test/in_memory_span_exporter_test.cc)
 
   target_link_libraries(
-    in_memory_span_data_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    in_memory_data_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_in_memory opentelemetry_resources)
 
   target_link_libraries(
@@ -40,9 +40,9 @@ if(BUILD_TESTING)
     opentelemetry_resources)
 
   gtest_add_tests(
-    TARGET in_memory_span_data_test
+    TARGET in_memory_data_test
     TEST_PREFIX exporter.
-    TEST_LIST in_memory_span_data_test)
+    TEST_LIST in_memory_data_test)
   gtest_add_tests(
     TARGET in_memory_span_exporter_test
     TEST_PREFIX exporter.

@@ -4,8 +4,10 @@
 #pragma once
 #include <mutex>
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,11 +24,13 @@ const size_t MAX_BUFFER_SIZE = 100;
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
+  using InMemorySpanData = exporter::memory::InMemoryData<sdk::trace::SpanData>;
+
   /**
    * @param buffer_size an optional value that sets the size of the InMemorySpanData
    */
   InMemorySpanExporter(size_t buffer_size = MAX_BUFFER_SIZE)
-      : data_(new opentelemetry::exporter::memory::InMemorySpanData(buffer_size))
+      : data_(new InMemorySpanData(buffer_size))
   {}
 
   /**
@@ -80,13 +84,10 @@ public:
   /**
    * @return Returns a shared pointer to this exporters InMemorySpanData
    */
-  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> GetData() noexcept
-  {
-    return data_;
-  }
+  std::shared_ptr<InMemorySpanData> GetData() noexcept { return data_; }
 
 private:
-  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> data_;
+  std::shared_ptr<InMemorySpanData> data_;
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   const bool isShutdown() const noexcept

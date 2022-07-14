@@ -15,15 +15,15 @@ TEST(InMemorySpanExporter, ExportBatch)
 {
   InMemorySpanExporter exporter;
 
-  ASSERT_EQ(0, exporter.GetData().get()->GetSpans().size());
+  ASSERT_EQ(0, exporter.GetData()->Get().size());
 
   std::unique_ptr<Recordable> spandata(new SpanData());
   opentelemetry::nostd::span<std::unique_ptr<Recordable>> batch(&spandata, 1);
 
   exporter.Export(batch);
 
-  ASSERT_EQ(1, exporter.GetData().get()->GetSpans().size());
+  ASSERT_EQ(1, exporter.GetData()->Get().size());
 
   // Consumes all spans in exporter
-  ASSERT_EQ(0, exporter.GetData().get()->GetSpans().size());
+  ASSERT_EQ(0, exporter.GetData()->Get().size());
 }
