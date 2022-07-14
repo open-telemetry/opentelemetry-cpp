@@ -3,7 +3,7 @@
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/trace/experimental_semantic_conventions.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 namespace
@@ -26,9 +26,9 @@ void sendRequest(const std::string &url)
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")
                   ->StartSpan(span_name,
-                              {{OTEL_GET_TRACE_ATTR(AttrHttpUrl), url_parser.url_},
-                               {OTEL_GET_TRACE_ATTR(AttrHttpScheme), url_parser.scheme_},
-                               {OTEL_GET_TRACE_ATTR(AttrHttpMethod), "GET"}},
+                              {{SemanticConventions::HTTP_URL, url_parser.url_},
+                               {SemanticConventions::HTTP_SCHEME, url_parser.scheme_},
+                               {SemanticConventions::HTTP_METHOD, "GET"}},
                               options);
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
@@ -44,7 +44,7 @@ void sendRequest(const std::string &url)
   {
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
-    span->SetAttribute(OTEL_GET_TRACE_ATTR(AttrHttpStatusCode), status_code);
+    span->SetAttribute(SemanticConventions::HTTP_STATUS_CODE, status_code);
     result.GetResponse().ForEachHeader(
         [&span](nostd::string_view header_name, nostd::string_view header_value) {
           span->SetAttribute("http.header." + std::string(header_name.data()), header_value);

@@ -3,8 +3,8 @@
 
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,12 +12,6 @@ namespace sdk
 {
 namespace resource
 {
-
-const std::string kTelemetrySdkLanguage  = "telemetry.sdk.language";
-const std::string kTelemetrySdkName      = "telemetry.sdk.name";
-const std::string kTelemetrySdkVersion   = "telemetry.sdk.version";
-const std::string kServiceName           = "service.name";
-const std::string kProcessExecutableName = "process.executable.name";
 
 Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
     : attributes_(attributes), schema_url_(schema_url)
@@ -36,17 +30,16 @@ Resource Resource::Create(const ResourceAttributes &attributes, const std::strin
   auto resource =
       Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url});
 
-  if (resource.attributes_.find(OTEL_GET_RESOURCE_ATTR(AttrServiceName)) ==
-      resource.attributes_.end())
+  if (resource.attributes_.find(SemanticConventions::SERVICE_NAME) == resource.attributes_.end())
   {
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
-        resource.attributes_.find(OTEL_GET_RESOURCE_ATTR(AttrProcessExecutableName));
+        resource.attributes_.find(SemanticConventions::PROCESS_EXECUTABLE_NAME);
     if (it_process_executable_name != resource.attributes_.end())
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }
-    resource.attributes_[OTEL_GET_RESOURCE_ATTR(AttrServiceName)] = default_service_name;
+    resource.attributes_[SemanticConventions::SERVICE_NAME] = default_service_name;
   }
   return resource;
 }
@@ -60,9 +53,9 @@ Resource &Resource::GetEmpty()
 Resource &Resource::GetDefault()
 {
   static Resource default_resource(
-      {{OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-       {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-       {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION}},
+      {{SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
+       {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
+       {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION}},
       std::string{});
   return default_resource;
 }

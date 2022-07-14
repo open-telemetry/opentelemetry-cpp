@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/zipkin/recordable.h"
-#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <map>
 #include <string>
@@ -216,9 +216,9 @@ void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(OTEL_GET_RESOURCE_ATTR(AttrServiceName)) != attributes.end())
+  if (attributes.find(SemanticConventions::SERVICE_NAME) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes[OTEL_GET_RESOURCE_ATTR(AttrServiceName)]);
+    service_name_ = nostd::get<std::string>(attributes[SemanticConventions::SERVICE_NAME]);
   }
 }
 
