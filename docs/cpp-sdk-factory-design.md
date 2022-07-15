@@ -33,7 +33,7 @@ opentelemetry-cpp libraries, the result is a binary that is consistent, and
 works.
 
 However, in case of a bug fixed in opentelemetry-cpp itself, the entire
-application must be rebuild (with a fixed version), redistributed,
+application must be rebuilt (with a fixed version), redistributed,
 and reinstalled, to have the bug effectively fixed.
 
 This is highly undesirable.
