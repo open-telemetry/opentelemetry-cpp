@@ -3,6 +3,13 @@
 
 #include "server.h"
 #include "opentelemetry/trace/context.h"
+
+// DEBUG: investigating build break
+
+#ifdef DELETE
+#error "Someone broke semantic_conventions"
+#endif
+
 #include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
