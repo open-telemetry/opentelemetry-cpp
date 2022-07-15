@@ -1,14 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
-
-// Using an exporter that simply dumps span data to stdout.
-#include "opentelemetry/exporters/ostream/span_exporter.h"
 
 #include <algorithm>
 #include <thread>
@@ -21,12 +19,11 @@ namespace
 {
 void initTracer()
 {
-  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(new trace_sdk::TracerProvider(
-      std::move(processor), opentelemetry::sdk::resource::Resource::Create({})));
+  auto exporter  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
+  auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor),
+                                               opentelemetry::sdk::resource::Resource::Create({}));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }

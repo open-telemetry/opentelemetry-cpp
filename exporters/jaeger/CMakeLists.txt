@@ -11,6 +11,7 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
 
 set(JAEGER_EXPORTER_SOURCES
     src/jaeger_exporter.cc
+    src/jaeger_exporter_factory.cc
     src/thrift_sender.cc
     src/udp_transport.cc
     src/recordable.cc
