@@ -16,7 +16,7 @@ namespace memory
  * A wrapper class holding in memory exporter data
  */
 template <typename T>
-class InMemoryData final
+class InMemoryData
 {
 public:
   /**

@@ -17,12 +17,19 @@ namespace memory
 {
 const size_t MAX_BUFFER_SIZE = 100;
 
+class InMemorySpanData final : public exporter::memory::InMemoryData<sdk::trace::SpanData>
+{
+public:
+  explicit InMemorySpanData(size_t buffer_size)
+      : exporter::memory::InMemoryData<sdk::trace::SpanData>(buffer_size)
+  {}
+
+  std::vector<std::unique_ptr<sdk::trace::SpanData>> GetSpans() noexcept { return Get(); }
+};
 /**
  * A in memory exporter that switches a flag once a valid recordable was received
  * and keeps track of all received spans in memory.
  */
-using InMemorySpanData = exporter::memory::InMemoryData<sdk::trace::SpanData>;
-
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:

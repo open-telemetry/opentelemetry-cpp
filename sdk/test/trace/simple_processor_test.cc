@@ -25,11 +25,11 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 
   processor.OnStart(*recordable, SpanContext::GetInvalid());
 
-  ASSERT_EQ(0, span_data->Get().size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 
   processor.OnEnd(std::move(recordable));
 
-  ASSERT_EQ(1, span_data->Get().size());
+  ASSERT_EQ(1, span_data->GetSpans().size());
 
   EXPECT_TRUE(processor.Shutdown());
 }

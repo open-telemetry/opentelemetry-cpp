@@ -118,11 +118,11 @@ TEST(Tracer, ToInMemorySpanExporter)
   auto scope_first = tracer->WithActiveSpan(span_first);
   auto span_second = tracer->StartSpan("span 2");
 
-  ASSERT_EQ(0, span_data->Get().size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 
   span_second->End();
 
-  auto span2 = span_data->Get();
+  auto span2 = span_data->GetSpans();
   ASSERT_EQ(1, span2.size());
   ASSERT_EQ("span 2", span2.at(0)->GetName());
   EXPECT_TRUE(span2.at(0)->GetTraceId().IsValid());
@@ -131,7 +131,7 @@ TEST(Tracer, ToInMemorySpanExporter)
 
   span_first->End();
 
-  auto span1 = span_data->Get();
+  auto span1 = span_data->GetSpans();
   ASSERT_EQ(1, span1.size());
   ASSERT_EQ("span 1", span1.at(0)->GetName());
   EXPECT_TRUE(span1.at(0)->GetTraceId().IsValid());
@@ -151,7 +151,7 @@ TEST(Tracer, StartSpanSampleOn)
 
   tracer_on->StartSpan("span 1")->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
 
   auto &cur_span_data = spans.at(0);
@@ -176,7 +176,7 @@ TEST(Tracer, StartSpanSampleOff)
   span->End();
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
-  ASSERT_EQ(0, span_data->Get().size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
 TEST(Tracer, StartSpanCustomIdGenerator)
@@ -187,7 +187,7 @@ TEST(Tracer, StartSpanCustomIdGenerator)
   auto tracer = initTracer(std::move(exporter), new AlwaysOnSampler(), id_generator);
 
   tracer->StartSpan("span 1")->End();
-  auto spans          = span_data->Get();
+  auto spans          = span_data->GetSpans();
   auto &cur_span_data = spans.at(0);
 
   EXPECT_EQ(cur_span_data->GetTraceId(), id_generator->GenerateTraceId());
@@ -209,7 +209,7 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
   tracer->StartSpan("span 1", start)->End(end);
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
 
   auto &cur_span_data = spans.at(0);
@@ -260,7 +260,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   tracer->StartSpan("span 2", m)->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(2, spans.size());
 
   auto &cur_span_data = spans.at(0);
@@ -322,7 +322,7 @@ TEST(Tracer, StartSpanWithAttributesCopy)
         ->End();
   }
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
 
   auto &cur_span_data = spans.at(0);
@@ -377,7 +377,7 @@ TEST(Tracer, SpanSetAttribute)
 
   span->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
   auto &cur_span_data = spans.at(0);
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
@@ -405,7 +405,7 @@ TEST(Tracer, TestAfterEnd)
   span->SetStatus(opentelemetry::trace::StatusCode::kError, description);
   span->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
   auto &cur_span_data = spans.at(0);
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
@@ -423,7 +423,7 @@ TEST(Tracer, SpanSetEvents)
   span->AddEvent("event 3", std::chrono::system_clock::now(), {{"attr1", 1}});
   span->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
 
   auto &span_data_events = spans.at(0)->GetEvents();
@@ -446,7 +446,7 @@ TEST(Tracer, SpanSetLinks)
 
     // Single span link passed through Initialization list
     tracer->StartSpan("efg", {{"attr1", 1}}, {{SpanContext(false, false), {{"attr2", 2}}}})->End();
-    auto spans = span_data->Get();
+    auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
 
     auto &span_data_links = spans.at(0)->GetLinks();
@@ -462,7 +462,7 @@ TEST(Tracer, SpanSetLinks)
                     {{SpanContext(false, false), {{"attr2", 2}}},
                      {SpanContext(false, false), {{"attr3", 3}}}})
         ->End();
-    auto spans = span_data->Get();
+    auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
 
     auto &span_data_links = spans.at(0)->GetLinks();
@@ -481,7 +481,7 @@ TEST(Tracer, SpanSetLinks)
                     {{SpanContext(false, false), {{"attr2", 2}, {"attr3", 3}}},
                      {SpanContext(false, false), {{"attr4", 4}}}})
         ->End();
-    auto spans = span_data->Get();
+    auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
 
     auto &span_data_links = spans.at(0)->GetLinks();
@@ -500,7 +500,7 @@ TEST(Tracer, SpanSetLinks)
     std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
         {SpanContext(false, false), attrs1}, {SpanContext(false, false), attrs2}};
     tracer->StartSpan("efg", attrs1, links)->End();
-    auto spans = span_data->Get();
+    auto spans = span_data->GetSpans();
 
     auto &span_data_links = spans.at(0)->GetLinks();
     ASSERT_EQ(2, span_data_links.size());
@@ -526,7 +526,7 @@ TEST(Tracer, TestAlwaysOnSampler)
   span_on_2->End();
   span_on_1->End();
 
-  auto spans = span_data->Get();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(2, spans.size());
   ASSERT_EQ("span 2", spans.at(0)->GetName());  // span 2 ends first.
   ASSERT_EQ("span 1", spans.at(1)->GetName());
@@ -546,7 +546,7 @@ TEST(Tracer, TestAlwaysOffSampler)
   span_off_1->End();
 
   // The tracer export nothing with an AlwaysOff sampler
-  ASSERT_EQ(0, span_data->Get().size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
 TEST(Tracer, TestParentBasedSampler)
@@ -607,20 +607,20 @@ TEST(Tracer, WithActiveSpan)
       auto span_second  = tracer->StartSpan("span 2");
       auto scope_second = tracer->WithActiveSpan(span_second);
 
-      spans = span_data->Get();
+      spans = span_data->GetSpans();
       ASSERT_EQ(0, spans.size());
 
       span_second->End();
     }
 
-    spans = span_data->Get();
+    spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
     EXPECT_EQ("span 2", spans.at(0)->GetName());
 
     span_first->End();
   }
 
-  spans = span_data->Get();
+  spans = span_data->GetSpans();
   ASSERT_EQ(1, spans.size());
   EXPECT_EQ("span 1", spans.at(0)->GetName());
 }
@@ -647,7 +647,7 @@ TEST(Tracer, ExpectParent)
   span_second->End();
   span_first->End();
 
-  spans = span_data->Get();
+  spans = span_data->GetSpans();
   ASSERT_EQ(3, spans.size());
   auto spandata_first  = std::move(spans.at(2));
   auto spandata_second = std::move(spans.at(1));
@@ -685,7 +685,7 @@ TEST(Tracer, ExpectParentAsContext)
   span_second->End();
   span_first->End();
 
-  spans = span_data->Get();
+  spans = span_data->GetSpans();
   ASSERT_EQ(3, spans.size());
   auto spandata_first  = std::move(spans.at(2));
   auto spandata_second = std::move(spans.at(1));
@@ -727,5 +727,5 @@ TEST(Tracer, SpanCleanupWithScope)
       }
     }
   }
-  EXPECT_EQ(4, span_data->Get().size());
+  EXPECT_EQ(4, span_data->GetSpans().size());
 }
