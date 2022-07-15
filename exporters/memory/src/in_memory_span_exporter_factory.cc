@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
-#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
