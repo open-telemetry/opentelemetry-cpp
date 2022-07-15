@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.9.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.12.0";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -31,6 +31,40 @@ static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.9.
   <ul> <li>This may be different from {@code faas.id} if an alias is involved.</li> </ul>
  */
 static constexpr const char *AWS_LAMBDA_INVOKED_ARN = "aws.lambda.invoked_arn";
+
+/**
+ * The <a href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#id">event_id</a>
+ * uniquely identifies the event.
+ */
+static constexpr const char *CLOUDEVENTS_EVENT_ID = "cloudevents.event_id";
+
+/**
+ * The <a
+ * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1">source</a>
+ * identifies the context in which an event happened.
+ */
+static constexpr const char *CLOUDEVENTS_EVENT_SOURCE = "cloudevents.event_source";
+
+/**
+ * The <a
+ * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#specversion">version of
+ * the CloudEvents specification</a> which the event uses.
+ */
+static constexpr const char *CLOUDEVENTS_EVENT_SPEC_VERSION = "cloudevents.event_spec_version";
+
+/**
+ * The <a
+ * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type">event_type</a>
+ * contains a value describing the type of event related to the originating occurrence.
+ */
+static constexpr const char *CLOUDEVENTS_EVENT_TYPE = "cloudevents.event_type";
+
+/**
+ * The <a
+ * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject">subject</a> of
+ * the event in the context of the event producer (identified by source).
+ */
+static constexpr const char *CLOUDEVENTS_EVENT_SUBJECT = "cloudevents.event_subject";
 
 /**
  * Parent-child Reference type
@@ -207,7 +241,7 @@ is passed to a Context manager's {@code __exit__} method in Python) but will
 usually be caught at the point of recording the exception in most languages.</li><li>It is usually
 not possible to determine at the point where an exception is thrown whether it will escape the scope
 of a span. However, it is trivial to know that an exception will escape, if one checks for an active
-exception just before ending the span, as done in the <a href="#exception-end-example">example
+exception just before ending the span, as done in the <a href="#recording-an-exception">example
 above</a>.</li><li>It follows that an exception may still escape the scope of the span even if the
 {@code exception.escaped} attribute was not set or set to false, since the event might have been
 recorded at a time where it was not clear whether the exception will escape.</li> </ul>
@@ -321,6 +355,10 @@ static constexpr const char *NET_PEER_PORT = "net.peer.port";
 
 /**
  * Remote hostname or similar, see note below.
+ *
+ * <p>Notes:
+  <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
+ lookup.</li> </ul>
  */
 static constexpr const char *NET_PEER_NAME = "net.peer.name";
 
@@ -521,6 +559,11 @@ static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH = "http.response_conte
  */
 static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
     "http.response_content_length_uncompressed";
+
+/**
+ * The ordinal number of request re-sending attempt.
+ */
+static constexpr const char *HTTP_RETRY_COUNT = "http.retry_count";
 
 /**
  * The primary server name of the matched virtual host. This should be obtained via configuration.
@@ -827,7 +870,7 @@ static constexpr const char *MESSAGING_ROCKETMQ_CONSUMPTION_MODEL =
     "messaging.rocketmq.consumption_model";
 
 /**
- * A string identifying the remoting system.
+ * A string identifying the remoting system. See below for a list of well-known identifiers.
  */
 static constexpr const char *RPC_SYSTEM = "rpc.system";
 
@@ -1160,12 +1203,14 @@ static constexpr const char *LTE_CA = "lte_ca";
 
 namespace HttpFlavorValues
 {
-/** HTTP 1.0. */
+/** HTTP/1.0. */
 static constexpr const char *HTTP_1_0 = "1.0";
-/** HTTP 1.1. */
+/** HTTP/1.1. */
 static constexpr const char *HTTP_1_1 = "1.1";
-/** HTTP 2. */
+/** HTTP/2. */
 static constexpr const char *HTTP_2_0 = "2.0";
+/** HTTP/3. */
+static constexpr const char *HTTP_3_0 = "3.0";
 /** SPDY protocol. */
 static constexpr const char *SPDY = "SPDY";
 /** QUIC protocol. */
@@ -1207,6 +1252,18 @@ static constexpr const char *CLUSTERING = "clustering";
 /** Broadcasting consumption model. */
 static constexpr const char *BROADCASTING = "broadcasting";
 }  // namespace MessagingRocketmqConsumptionModelValues
+
+namespace RpcSystemValues
+{
+/** gRPC. */
+static constexpr const char *GRPC = "grpc";
+/** Java RMI. */
+static constexpr const char *JAVA_RMI = "java_rmi";
+/** .NET WCF. */
+static constexpr const char *DOTNET_WCF = "dotnet_wcf";
+/** Apache Dubbo. */
+static constexpr const char *APACHE_DUBBO = "apache_dubbo";
+}  // namespace RpcSystemValues
 
 namespace RpcGrpcStatusCodeValues
 {

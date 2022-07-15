@@ -23,7 +23,44 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.9.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.12.0";
+
+/**
+ * Array of brand name and version separated by a space
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the <a
+ href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a>
+ (navigator.userAgentData.brands).</li> </ul>
+ */
+static constexpr const char *BROWSER_BRANDS = "browser.brands";
+
+/**
+ * The platform on which the browser is running
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the <a
+href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a>
+(navigator.userAgentData.platform). If unavailable, the legacy {@code navigator.platform} API SHOULD
+NOT be used instead and this attribute SHOULD be left unset in order for the values to be
+consistent. The list of possible values is defined in the <a
+href="https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform">W3C User-Agent Client Hints
+specification</a>. Note that some (but not all) of these values can overlap with values in the <a
+href="./os.md">os.type and os.name attributes</a>. However, for consistency, the values in the
+{@code browser.platform} attribute should capture the exact value that the user agent provides.</li>
+</ul>
+ */
+static constexpr const char *BROWSER_PLATFORM = "browser.platform";
+
+/**
+ * Full user-agent string provided by the browser
+ *
+ * <p>Notes:
+  <ul> <li>The user-agent value SHOULD be provided only from browsers that do not have a mechanism
+ to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the
+ value, the legacy {@code navigator.userAgent} API can be used.</li> </ul>
+ */
+static constexpr const char *BROWSER_USER_AGENT = "browser.user_agent";
 
 /**
  * Name of the cloud provider.
@@ -228,10 +265,19 @@ static constexpr const char *DEVICE_MANUFACTURER = "device.manufacturer";
  * The name of the single function that this runtime instance executes.
  *
  * <p>Notes:
-  <ul> <li>This is the name of the function as configured/deployed on the FaaS platform and is
- usually different from the name of the callback function (which may be stored in the <a
- href="../../trace/semantic_conventions/span-general.md#source-code-attributes">{@code
- code.namespace}/{@code code.function}</a> span attributes).</li> </ul>
+  <ul> <li>This is the name of the function as configured/deployed on the FaaS
+platform and is usually different from the name of the callback
+function (which may be stored in the
+<a href="../../trace/semantic_conventions/span-general.md#source-code-attributes">{@code
+code.namespace}/{@code code.function}</a> span attributes).</li><li>For some cloud providers, the
+above definition is ambiguous. The following definition of function name MUST be used for this
+attribute (and consequently the span name) for the listed cloud
+providers/products:</li><li><strong>Azure:</strong>  The full name {@code <FUNCAPP>/<FUNC>}, i.e.,
+function app name followed by a forward slash followed by the function name (this form can also be
+seen in the resource JSON for the function). This means that a span attribute MUST be used, as an
+Azure function app can host multiple functions that would usually share a TracerProvider (see also
+the {@code faas.id} attribute).</li>
+ </ul>
  */
 static constexpr const char *FAAS_NAME = "faas.name";
 
@@ -239,20 +285,23 @@ static constexpr const char *FAAS_NAME = "faas.name";
  * The unique ID of the single function that this runtime instance executes.
  *
  * <p>Notes:
-  <ul> <li>Depending on the cloud provider, use:</li><li><strong>AWS Lambda:</strong> The function
-<a href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a>.</li>
-<li>Take care not to use the &quot;invoked ARN&quot; directly but replace any
-<a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias suffix</a>
-with the resolved function version, as the same runtime instance may be invokable with multiple
-different aliases.</li><li><strong>GCP:</strong> The <a
+  <ul> <li>On some cloud providers, it may not be possible to determine the full ID at startup,
+so consider setting {@code faas.id} as a span attribute instead.</li><li>The exact value to use for
+{@code faas.id} depends on the cloud provider:</li><li><strong>AWS Lambda:</strong> The function <a
+href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a>. Take care
+not to use the &quot;invoked ARN&quot; directly but replace any <a
+href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias suffix</a> with
+the resolved function version, as the same runtime instance may be invokable with multiple different
+aliases.</li> <li><strong>GCP:</strong> The <a
 href="https://cloud.google.com/iam/docs/full-resource-names">URI of the resource</a></li>
 <li><strong>Azure:</strong> The <a
 href="https://docs.microsoft.com/en-us/rest/api/resources/resources/get-by-id">Fully Qualified
-Resource ID</a>.</li> <li>On some providers, it may not be possible to determine the full ID at
-startup, which is why this field cannot be made required. For example, on AWS the account ID part of
-the ARN is not available without calling another AWS API which may be deemed too slow for a
-short-running lambda function. As an alternative, consider setting {@code faas.id} as a span
-attribute instead.</li> </ul>
+Resource ID</a> of the invoked function, <em>not</em> the function app, having the form
+{@code
+/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>}.
+This means that a span attribute MUST be used, as an Azure function app can host multiple functions
+that would usually share a TracerProvider.</li>
+ </ul>
  */
 static constexpr const char *FAAS_ID = "faas.id";
 
@@ -706,7 +755,7 @@ static constexpr const char *DRAGONFLYBSD = "dragonflybsd";
 static constexpr const char *HPUX = "hpux";
 /** AIX (Advanced Interactive eXecutive). */
 static constexpr const char *AIX = "aix";
-/** Oracle Solaris. */
+/** SunOS, Oracle Solaris. */
 static constexpr const char *SOLARIS = "solaris";
 /** IBM z/OS. */
 static constexpr const char *Z_OS = "z_os";
