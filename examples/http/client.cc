@@ -6,7 +6,6 @@
 #include "tracer_common.h"
 
 #ifdef DELETE
-#  warning "DELETE is defined"
 // Causes a build error with FaasDocumentOperationValues::DELETE
 #  undef DELETE
 #endif
