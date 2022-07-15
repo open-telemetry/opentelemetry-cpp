@@ -20,12 +20,16 @@ const size_t MAX_BUFFER_SIZE = 100;
 class InMemorySpanData final : public exporter::memory::InMemoryData<sdk::trace::SpanData>
 {
 public:
+  /**
+   * @param buffer_size a required value that sets the size of the CircularBuffer
+   */
   explicit InMemorySpanData(size_t buffer_size)
       : exporter::memory::InMemoryData<sdk::trace::SpanData>(buffer_size)
   {}
 
   std::vector<std::unique_ptr<sdk::trace::SpanData>> GetSpans() noexcept { return Get(); }
 };
+
 /**
  * A in memory exporter that switches a flag once a valid recordable was received
  * and keeps track of all received spans in memory.
