@@ -566,7 +566,7 @@ TEST(Tracer, TestParentBasedSampler)
   span_parent_on_2->End();
   span_parent_on_1->End();
 
-  auto spans = span_data_parent_on->Get();
+  auto spans = span_data_parent_on->GetSpans();
   ASSERT_EQ(2, spans.size());
   ASSERT_EQ("span 2", spans.at(0)->GetName());
   ASSERT_EQ("span 1", spans.at(1)->GetName());
@@ -587,7 +587,7 @@ TEST(Tracer, TestParentBasedSampler)
 
   span_parent_off_1->End();
   span_parent_off_2->End();
-  ASSERT_EQ(0, span_data_parent_off->Get().size());
+  ASSERT_EQ(0, span_data_parent_off->GetSpans().size());
 }
 
 TEST(Tracer, WithActiveSpan)
@@ -595,7 +595,7 @@ TEST(Tracer, WithActiveSpan)
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer                                 = initTracer(std::move(exporter));
-  auto spans                                  = span_data.get()->Get();
+  auto spans                                  = span_data.get()->GetSpans();
 
   ASSERT_EQ(0, spans.size());
 
@@ -630,7 +630,7 @@ TEST(Tracer, ExpectParent)
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer                                 = initTracer(std::move(exporter));
-  auto spans                                  = span_data.get()->Get();
+  auto spans                                  = span_data.get()->GetSpans();
 
   ASSERT_EQ(0, spans.size());
 
@@ -665,7 +665,7 @@ TEST(Tracer, ExpectParentAsContext)
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer                                 = initTracer(std::move(exporter));
-  auto spans                                  = span_data.get()->Get();
+  auto spans                                  = span_data.get()->GetSpans();
 
   ASSERT_EQ(0, spans.size());
 
