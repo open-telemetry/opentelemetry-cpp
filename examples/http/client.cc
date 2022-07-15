@@ -3,8 +3,15 @@
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
+
+#ifdef DELETE
+#  warning "DELETE is defined"
+// Causes a build error with FaasDocumentOperationValues::DELETE
+#  undef DELETE
+#endif
+
+#include "opentelemetry/trace/semantic_conventions.h"
 
 namespace
 {

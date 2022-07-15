@@ -11,8 +11,15 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
+
+#ifdef DELETE
+#  warning "DELETE is defined"
+// Causes a build error with FaasDocumentOperationValues::DELETE
+#  undef DELETE
+#endif
+
+#include "opentelemetry/trace/semantic_conventions.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

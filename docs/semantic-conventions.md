@@ -73,5 +73,4 @@ For example,
 
 ### Commit
 
-Commit and file a PR.
-
+Commit and file a pull request.

@@ -4,17 +4,18 @@
 #include "server.h"
 #include "opentelemetry/trace/context.h"
 
-// DEBUG: investigating build break
-
-#ifdef DELETE
-#error "Someone broke semantic_conventions"
-#endif
-
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
 #include <thread>
+
+#ifdef DELETE
+#  warning "DELETE is defined"
+// Causes a build error with FaasDocumentOperationValues::DELETE
+#  undef DELETE
+#endif
+
+#include "opentelemetry/trace/semantic_conventions.h"
 
 namespace
 {
