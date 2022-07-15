@@ -47,10 +47,12 @@ cc_library(
     name = "otlp_grpc_exporter",
     srcs = [
         "src/otlp_grpc_exporter.cc",
+        "src/otlp_grpc_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
@@ -78,6 +80,7 @@ cc_library(
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_http.h",
         "include/opentelemetry/exporters/otlp/otlp_http_client.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
@@ -111,10 +114,13 @@ cc_library(
     name = "otlp_http_exporter",
     srcs = [
         "src/otlp_http_exporter.cc",
+        "src/otlp_http_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_http_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -226,8 +232,39 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_grpc_exporter_factory_test",
+    srcs = ["test/otlp_grpc_exporter_factory_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_http_exporter_test",
     srcs = ["test/otlp_http_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_http",
+        "test",
+    ],
+    deps = [
+        ":otlp_http_exporter",
+        "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_http_exporter_factory_test",
+    srcs = ["test/otlp_http_exporter_factory_test.cc"],
     tags = [
         "otlp",
         "otlp_http",

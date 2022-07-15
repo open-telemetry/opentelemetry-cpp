@@ -21,9 +21,12 @@ cc_library(
     name = "zipkin_exporter",
     srcs = [
         "src/zipkin_exporter.cc",
+        "src/zipkin_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/zipkin/zipkin_exporter.h",
+        "include/opentelemetry/exporters/zipkin/zipkin_exporter_factory.h",
+        "include/opentelemetry/exporters/zipkin/zipkin_exporter_options.h",
     ],
     copts = [
         "-DCURL_STATICLIB",

@@ -1,49 +1,47 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
-// Using an exporter that simply dumps span data to stdout.
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
 #else
 #  include "foo_library/foo_library.h"
 #endif
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
-#include "opentelemetry/exporters/ostream/span_exporter.h"
 
-using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::exporter::memory::InMemorySpanData;
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-InMemorySpanExporter *initTracer()
+std::shared_ptr<InMemorySpanData> initTracer()
 {
-  auto exporter1 = std::unique_ptr<trace_sdk::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor1 = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter1)));
+  std::shared_ptr<InMemorySpanData> data;
 
-  InMemorySpanExporter *memory_span_exporter = new InMemorySpanExporter();
-  auto exporter2 = std::unique_ptr<trace_sdk::SpanExporter>(memory_span_exporter);
+  auto exporter1  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
+  auto processor1 = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter1));
 
-  // fetch the exporter for dumping data later
+  auto exporter2  = opentelemetry::exporter::memory::InMemorySpanExporterFactory::Create(data);
+  auto processor2 = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter2));
 
-  auto processor2 = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter2)));
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
+  processors.push_back(std::move(processor1));
+  processors.push_back(std::move(processor2));
+  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processors));
 
-  auto provider = nostd::shared_ptr<trace_sdk::TracerProvider>(
-      new trace_sdk::TracerProvider(std::move(processor1)));
-  provider->AddProcessor(std::move(processor2));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(std::move(provider));
 
-  return memory_span_exporter;
+  return data;
 }
 
 void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
@@ -81,9 +79,9 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  InMemorySpanExporter *memory_span_exporter = initTracer();
+  std::shared_ptr<InMemorySpanData> data = initTracer();
 
   foo_library();
-  auto memory_spans = memory_span_exporter->GetData()->GetSpans();
+  auto memory_spans = data->GetSpans();
   dumpSpans(memory_spans);
 }
