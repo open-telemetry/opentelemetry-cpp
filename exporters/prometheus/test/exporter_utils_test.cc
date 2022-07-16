@@ -3,12 +3,9 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <gtest/gtest.h>
-#  include <map>
-#  include <numeric>
-#  include <string>
-#  include <typeinfo>
+#  include "prometheus/metric_family.h"
+#  include "prometheus/metric_type.h"
 
-#  include <opentelemetry/version.h>
 #  include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #  include "prometheus_test_helper.h"
 
@@ -46,6 +43,14 @@ void assert_basic(prometheus_client::MetricFamily &metric,
       ASSERT_EQ(buckets.size(), vals[2]);
       break;
     }
+    case prometheus_client::MetricType::Gauge:
+      // Gauge type not supported
+      ASSERT_TRUE(false);
+      break;
+    case prometheus_client::MetricType::Summary:
+      // Summary type not supported
+      ASSERT_TRUE(false);
+      break;
     case prometheus::MetricType::Untyped:
       break;
   }
@@ -83,7 +88,6 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollect
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
-
   std::vector<std::unique_ptr<metric_sdk::ResourceMetrics>> collection;
 
   collection.emplace_back(new metric_sdk::ResourceMetrics{CreateSumPointData()});
@@ -93,7 +97,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 0,
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 1,
                vals);
 
   collection.emplace_back(new metric_sdk::ResourceMetrics{CreateSumPointData()});
@@ -102,7 +106,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
   ASSERT_EQ(translated.size(), collection.size());
 
   auto metric2 = translated[1];
-  assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Counter, 0,
+  assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Counter, 1,
                vals);
 }
 
@@ -117,7 +121,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 0,
+  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 1,
                vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }

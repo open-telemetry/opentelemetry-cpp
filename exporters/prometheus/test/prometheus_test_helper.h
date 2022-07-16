@@ -11,10 +11,12 @@ namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 
+namespace
+{
 /**
  * Helper function to create ResourceMetrics
  */
-metric_sdk::ResourceMetrics CreateSumPointData()
+inline metric_sdk::ResourceMetrics CreateSumPointData()
 {
   metric_sdk::SumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
@@ -31,16 +33,17 @@ metric_sdk::ResourceMetrics CreateSumPointData()
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, sum_point_data},
-          {metric_sdk::PointAttributes{}, sum_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
+          {metric_sdk::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-metric_sdk::ResourceMetrics CreateHistogramPointData()
+inline metric_sdk::ResourceMetrics CreateHistogramPointData()
 {
   metric_sdk::HistogramPointData histogram_point_data{};
   histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
@@ -61,18 +64,19 @@ metric_sdk::ResourceMetrics CreateHistogramPointData()
                                                                                  "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
-                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentType::kHistogram,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, histogram_point_data},
-          {metric_sdk::PointAttributes{}, histogram_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data},
+          {metric_sdk::PointAttributes{{"a2", "b2"}}, histogram_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-metric_sdk::ResourceMetrics CreateLastValuePointData()
+inline metric_sdk::ResourceMetrics CreateLastValuePointData()
 {
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -93,16 +97,17 @@ metric_sdk::ResourceMetrics CreateLastValuePointData()
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, last_value_point_data},
-          {metric_sdk::PointAttributes{}, last_value_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, last_value_point_data},
+          {metric_sdk::PointAttributes{{"a2", "b2"}}, last_value_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-metric_sdk::ResourceMetrics CreateDropPointData()
+inline metric_sdk::ResourceMetrics CreateDropPointData()
 {
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -117,21 +122,23 @@ metric_sdk::ResourceMetrics CreateDropPointData()
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
                                        metric_sdk::InstrumentValueType::kDouble},
-      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
       std::vector<metric_sdk::PointDataAttributes>{
-          {metric_sdk::PointAttributes{}, drop_point_data},
-          {metric_sdk::PointAttributes{}, drop_point_data2}}};
+          {metric_sdk::PointAttributes{{"a1", "b1"}}, drop_point_data},
+          {metric_sdk::PointAttributes{{"a2", "b2"}}, drop_point_data2}}};
   data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
       {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::MetricData &rhs)
+inline bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::MetricData &rhs)
 {
   if (lhs.start_ts != rhs.start_ts)
   {

@@ -4,7 +4,6 @@
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include <gtest/gtest.h>
-#  include <typeinfo>
 
 #  include "opentelemetry/exporters/prometheus/collector.h"
 #  include "opentelemetry/exporters/prometheus/exporter.h"
