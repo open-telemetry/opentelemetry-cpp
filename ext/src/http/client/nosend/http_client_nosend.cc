@@ -63,6 +63,33 @@ bool Session::FinishSession() noexcept
   return true;
 }
 
+HttpClient::HttpClient()
+{
+  session_ = std::shared_ptr<Session>{new Session(*this)};
+}
+
+std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
+    nostd::string_view) noexcept
+{
+  return session_;
+}
+
+bool HttpClient::CancelAllSessions() noexcept
+{
+  session_->CancelSession();
+  return true;
+}
+
+bool HttpClient::FinishAllSessions() noexcept
+{
+  session_->FinishSession();
+  return true;
+}
+
+void HttpClient::SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept {}
+
+void HttpClient::CleanupSession(uint64_t session_id) {}
+
 }  // namespace nosend
 }  // namespace client
 }  // namespace http

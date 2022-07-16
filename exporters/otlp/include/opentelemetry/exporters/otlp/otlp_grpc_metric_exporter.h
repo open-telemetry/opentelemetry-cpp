@@ -26,18 +26,18 @@ namespace otlp
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OtlpGrpcMetricsExporter : public opentelemetry::sdk::metrics::MetricExporter
+class OtlpGrpcMetricExporter : public opentelemetry::sdk::metrics::MetricExporter
 {
 public:
   /**
-   * Create an OtlpGrpcMetricsExporter using all default options.
+   * Create an OtlpGrpcMetricExporter using all default options.
    */
-  OtlpGrpcMetricsExporter();
+  OtlpGrpcMetricExporter();
 
   /**
-   * Create an OtlpGrpcMetricsExporter using the given options.
+   * Create an OtlpGrpcMetricExporter using the given options.
    */
-  explicit OtlpGrpcMetricsExporter(const OtlpGrpcMetricsExporterOptions &options);
+  explicit OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options);
 
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
@@ -50,7 +50,7 @@ public:
 
 private:
   // The configuration options associated with this exporter.
-  const OtlpGrpcMetricsExporterOptions options_;
+  const OtlpGrpcMetricExporterOptions options_;
 
   // For testing
   friend class OtlpGrpcExporterTestPeer;
@@ -60,11 +60,11 @@ private:
       metrics_service_stub_;
 
   /**
-   * Create an OtlpGrpcMetricsExporter using the specified service stub.
+   * Create an OtlpGrpcMetricExporter using the specified service stub.
    * Only tests can call this constructor directly.
    * @param stub the service stub to be used for exporting
    */
-  OtlpGrpcMetricsExporter(
+  OtlpGrpcMetricExporter(
       std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub);
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;

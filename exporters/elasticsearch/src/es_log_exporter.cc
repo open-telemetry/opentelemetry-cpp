@@ -43,6 +43,12 @@ public:
       // Store the body of the request
       body_ = std::string(response.GetBody().begin(), response.GetBody().end());
 
+      if (console_debug_)
+      {
+        OTEL_INTERNAL_LOG_DEBUG(
+            "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+      }
+
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
     }
@@ -77,19 +83,19 @@ public:
     switch (state)
     {
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
         cv_.notify_all();
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
         cv_.notify_all();
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
         cv_.notify_all();
         break;
     }
@@ -109,6 +115,113 @@ private:
   // Whether to print the results from the callback
   bool console_debug_ = false;
 };
+
+#  ifdef ENABLE_ASYNC_EXPORT
+/**
+ * This class handles the async response message from the Elasticsearch request
+ */
+class AsyncResponseHandler : public http_client::EventHandler
+{
+public:
+  /**
+   * Creates a response handler, that by default doesn't display to console
+   */
+  AsyncResponseHandler(
+      std::shared_ptr<ext::http::client::Session> session,
+      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+      bool console_debug = false)
+      : console_debug_{console_debug},
+        session_{std::move(session)},
+        result_callback_{std::move(result_callback)}
+  {}
+
+  /**
+   * Cleans up the session in the destructor.
+   */
+  ~AsyncResponseHandler() { session_->FinishSession(); }
+
+  /**
+   * Automatically called when the response is received
+   */
+  void OnResponse(http_client::Response &response) noexcept override
+  {
+
+    // Store the body of the response
+    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    if (console_debug_)
+    {
+      OTEL_INTERNAL_LOG_DEBUG(
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+    }
+    if (body_.find("\"failed\" : 0") == std::string::npos)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
+          << body_);
+      result_callback_(sdk::common::ExportResult::kFailure);
+    }
+    else
+    {
+      result_callback_(sdk::common::ExportResult::kSuccess);
+    }
+  }
+
+  // Callback method when an http event occurs
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    bool need_stop = false;
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Create request to elasticsearch failed");
+        need_stop = true;
+        break;
+      case http_client::SessionState::ConnectFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
+        need_stop = true;
+        break;
+      case http_client::SessionState::SendFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
+        need_stop = true;
+        break;
+      case http_client::SessionState::SSLHandshakeFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
+        need_stop = true;
+        break;
+      case http_client::SessionState::TimedOut:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
+        need_stop = true;
+        break;
+      case http_client::SessionState::NetworkError:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
+        need_stop = true;
+        break;
+      case http_client::SessionState::Cancelled:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch cancelled");
+        need_stop = true;
+        break;
+      default:
+        break;
+    }
+    if (need_stop)
+    {
+      result_callback_(sdk::common::ExportResult::kFailure);
+    }
+  }
+
+private:
+  // Stores the session object for the request
+  std::shared_ptr<ext::http::client::Session> session_;
+  // Callback to call to on receiving events
+  std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
+
+  // A string to store the response body
+  std::string body_ = "";
+
+  // Whether to print the results from the callback
+  bool console_debug_ = false;
+};
+#  endif
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
@@ -161,16 +274,38 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   std::vector<uint8_t> body_vec(body.begin(), body.end());
   request->SetBody(body_vec);
 
+#  ifdef ENABLE_ASYNC_EXPORT
   // Send the request
-  std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug_));
-  session->SendRequest(*handler);
+  std::size_t span_count = records.size();
+  auto handler           = std::make_shared<AsyncResponseHandler>(
+      session,
+      [span_count](opentelemetry::sdk::common::ExportResult result) {
+        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
+                                  << span_count
+                                  << " trace span(s) error: " << static_cast<int>(result));
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] DEBUG: Export " << span_count
+                                                                     << " trace span(s) success");
+        }
+        return true;
+      },
+      options_.console_debug_);
+  session->SendRequest(handler);
+  return sdk::common::ExportResult::kSuccess;
+#  else
+  // Send the request
+  auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
+  session->SendRequest(handler);
 
   // Wait for the response to be received
   if (options_.console_debug_)
   {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[ES Trace Exporter] waiting for response from Elasticsearch (timeout = "
-        << options_.response_timeout_ << " seconds)");
+    OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] waiting for response from Elasticsearch (timeout = "
+                            << options_.response_timeout_ << " seconds)");
   }
   bool write_successful = handler->waitForResponse();
 
@@ -189,13 +324,14 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
+        "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
         << responseBody);
     // TODO: Retry logic
     return sdk::common::ExportResult::kFailure;
   }
 
   return sdk::common::ExportResult::kSuccess;
+#  endif
 }
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
+#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
 #  include <mutex>
 #  include "opentelemetry/ext/http/common/url_parser.h"
@@ -33,7 +33,7 @@ static std::string get_file_contents(const char *fpath)
 /**
  * Create gRPC channel from the exporter options.
  */
-static std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcMetricsExporterOptions &options)
+static std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcMetricExporterOptions &options)
 {
   std::shared_ptr<grpc::Channel> channel;
 
@@ -78,29 +78,29 @@ static std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcMetricsExpor
  * Create metrics service stub to communicate with the OpenTelemetry Collector.
  */
 std::unique_ptr<::opentelemetry::proto::collector::metrics::v1::MetricsService::Stub>
-MakeMetricsServiceStub(const OtlpGrpcMetricsExporterOptions &options)
+MakeMetricsServiceStub(const OtlpGrpcMetricExporterOptions &options)
 {
   return proto::collector::metrics::v1::MetricsService::NewStub(MakeGrpcChannel(options));
 }
 
 // -------------------------------- Constructors --------------------------------
 
-OtlpGrpcMetricsExporter::OtlpGrpcMetricsExporter()
-    : OtlpGrpcMetricsExporter(OtlpGrpcMetricsExporterOptions())
+OtlpGrpcMetricExporter::OtlpGrpcMetricExporter()
+    : OtlpGrpcMetricExporter(OtlpGrpcMetricExporterOptions())
 {}
 
-OtlpGrpcMetricsExporter::OtlpGrpcMetricsExporter(const OtlpGrpcMetricsExporterOptions &options)
+OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options)
     : options_(options), metrics_service_stub_(MakeMetricsServiceStub(options))
 {}
 
-OtlpGrpcMetricsExporter::OtlpGrpcMetricsExporter(
+OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub)
-    : options_(OtlpGrpcMetricsExporterOptions()), metrics_service_stub_(std::move(stub))
+    : options_(OtlpGrpcMetricExporterOptions()), metrics_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
 
-opentelemetry::sdk::common::ExportResult OtlpGrpcMetricsExporter::Export(
+opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
 
@@ -117,7 +117,7 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricsExporter::Export(
   }
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest request;
-  OtlpMetricsUtils::PopulateRequest(data, &request);
+  OtlpMetricUtils::PopulateRequest(data, &request);
 
   grpc::ClientContext context;
   proto::collector::metrics::v1::ExportMetricsServiceResponse response;

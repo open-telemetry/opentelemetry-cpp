@@ -109,7 +109,7 @@ and dependencies. Along with a `BUILD` file, a `WORKSPACE` file exists that
 identifies the directory it resides in as a bazel workspace. In the OTel C++
 repository, the SDK unit tests using the Google Test framework to ensure code
 functionality. In the
-[BUILD](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/sdk/test/trace)
+[BUILD](/sdk/test/trace)
 file for trace tests, there are six different targets, each corresponding to a
 different unit test. An example target taken from this file is shown below.
 

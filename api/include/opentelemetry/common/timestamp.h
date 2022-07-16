@@ -169,5 +169,39 @@ public:
 private:
   int64_t nanos_since_epoch_;
 };
+
+class DurationUtil
+{
+public:
+  template <class Rep, class Period>
+  static std::chrono::duration<Rep, Period> AdjustWaitForTimeout(
+      std::chrono::duration<Rep, Period> timeout,
+      std::chrono::duration<Rep, Period> indefinite_value) noexcept
+  {
+    // Do not call now() when this duration is max value, now() may have a expensive cost.
+    if (timeout == std::chrono::duration<Rep, Period>::max())
+    {
+      return indefinite_value;
+    }
+
+    // std::future<T>::wait_for, std::this_thread::sleep_for, and std::condition_variable::wait_for
+    // may use steady_clock or system_clock.We need make sure now() + timeout do not overflow.
+    auto max_timeout = std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(
+        std::chrono::steady_clock::time_point::max() - std::chrono::steady_clock::now());
+    if (timeout >= max_timeout)
+    {
+      return indefinite_value;
+    }
+    max_timeout = std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(
+        std::chrono::system_clock::time_point::max() - std::chrono::system_clock::now());
+    if (timeout >= max_timeout)
+    {
+      return indefinite_value;
+    }
+
+    return timeout;
+  }
+};
+
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE

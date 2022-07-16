@@ -1,12 +1,16 @@
-add_library(opentelemetry_exporter_in_memory INTERFACE)
+add_library(opentelemetry_exporter_in_memory
+            src/in_memory_span_exporter_factory.cc)
 
 target_include_directories(
   opentelemetry_exporter_in_memory
-  INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-            "$<INSTALL_INTERFACE:include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 set_target_properties(opentelemetry_exporter_in_memory
                       PROPERTIES EXPORT_NAME in_memory_span_exporter)
+
+target_link_libraries(opentelemetry_exporter_in_memory
+                      PUBLIC opentelemetry_trace)
 
 install(
   TARGETS opentelemetry_exporter_in_memory

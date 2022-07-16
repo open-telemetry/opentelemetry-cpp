@@ -3,7 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_metrics_utils.h"
+#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #  include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 
 #  include <gtest/gtest.h>
@@ -78,11 +78,11 @@ metrics_sdk::MetricData CreateHistogramAggregationData()
   return data;
 }
 
-TEST(OtlpMetricsSerializationTest, Counter)
+TEST(OtlpMetricSerializationTest, Counter)
 {
   metrics_sdk::MetricData data = CreateSumAggregationData();
   opentelemetry::proto::metrics::v1::Sum sum;
-  otlp_exporter::OtlpMetricsUtils::ConvertSumMetric(data, &sum);
+  otlp_exporter::OtlpMetricUtils::ConvertSumMetric(data, &sum);
   EXPECT_EQ(sum.aggregation_temporality(),
             proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
   EXPECT_EQ(sum.is_monotonic(), true);
@@ -95,11 +95,11 @@ TEST(OtlpMetricsSerializationTest, Counter)
   EXPECT_EQ(1, 1);
 }
 
-TEST(OtlpMetricsSerializationTest, Histogram)
+TEST(OtlpMetricSerializationTest, Histogram)
 {
   metrics_sdk::MetricData data = CreateHistogramAggregationData();
   opentelemetry::proto::metrics::v1::Histogram histogram;
-  otlp_exporter::OtlpMetricsUtils::ConvertHistogramMetric(data, &histogram);
+  otlp_exporter::OtlpMetricUtils::ConvertHistogramMetric(data, &histogram);
   EXPECT_EQ(histogram.aggregation_temporality(),
             proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
   for (size_t i = 0; i < 1; i++)
