@@ -4,7 +4,7 @@
 #pragma once
 #include <mutex>
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/exporters/memory/in_memory_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -16,19 +16,6 @@ namespace exporter
 namespace memory
 {
 const size_t MAX_BUFFER_SIZE = 100;
-
-class InMemorySpanData final : public exporter::memory::InMemoryData<sdk::trace::SpanData>
-{
-public:
-  /**
-   * @param buffer_size a required value that sets the size of the CircularBuffer
-   */
-  explicit InMemorySpanData(size_t buffer_size)
-      : exporter::memory::InMemoryData<sdk::trace::SpanData>(buffer_size)
-  {}
-
-  std::vector<std::unique_ptr<sdk::trace::SpanData>> GetSpans() noexcept { return Get(); }
-};
 
 /**
  * A in memory exporter that switches a flag once a valid recordable was received

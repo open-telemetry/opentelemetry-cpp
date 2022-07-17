@@ -1,27 +1,29 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "in_memory_data",
+    name = "in_memory_span_data",
     hdrs = [
         "include/opentelemetry/exporters/memory/in_memory_data.h",
+        "include/opentelemetry/exporters/memory/in_memory_span_data.h",
     ],
     strip_include_prefix = "include",
     tags = ["memory"],
     deps = [
         "//api",
         "//sdk/src/resource",
+        "//sdk/src/trace",
     ],
 )
 
 cc_test(
-    name = "in_memory_data_test",
-    srcs = ["test/in_memory_data_test.cc"],
+    name = "in_memory_span_data_test",
+    srcs = ["test/in_memory_span_data_test.cc"],
     tags = [
         "memory",
         "test",
     ],
     deps = [
-        ":in_memory_data",
+        ":in_memory_span_data",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -32,6 +34,7 @@ cc_library(
         "src/in_memory_span_exporter_factory.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/memory/in_memory_span_data.h",
         "include/opentelemetry/exporters/memory/in_memory_span_exporter.h",
         "include/opentelemetry/exporters/memory/in_memory_span_exporter_factory.h",
     ],
@@ -41,7 +44,7 @@ cc_library(
         "test",
     ],
     deps = [
-        ":in_memory_data",
+        ":in_memory_span_data",
         "//sdk/src/trace",
     ],
 )

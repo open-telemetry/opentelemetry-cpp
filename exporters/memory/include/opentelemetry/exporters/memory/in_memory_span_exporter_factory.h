@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
