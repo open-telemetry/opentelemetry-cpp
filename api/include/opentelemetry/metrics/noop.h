@@ -64,8 +64,7 @@ public:
   {}
 };
 
-template <class T>
-class NoopObservableCounter : public ObservableCounter<T>
+class NoopObservableCounter : public ObservableCounter
 {
 public:
   NoopObservableCounter(nostd::string_view name,

@@ -42,15 +42,15 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableCounter<long>> CreateLongObservableCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableCounter<double>>
-  CreateDoubleObservableCounter(nostd::string_view name,
-                                nostd::string_view description = "",
-                                nostd::string_view unit        = "") noexcept override;
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
@@ -62,12 +62,12 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableGauge<long>> CreateLongObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableGauge<double>> CreateDoubleObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -82,15 +82,15 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableUpDownCounter<long>>
-  CreateLongObservableUpDownCounter(nostd::string_view name,
-                                    nostd::string_view description = "",
-                                    nostd::string_view unit        = "") noexcept override;
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableUpDownCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableUpDownCounter<double>>
-  CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                      nostd::string_view description = "",
-                                      nostd::string_view unit        = "") noexcept override;
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableUpDownCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override;
 
   /** Returns the associated instruementation library */
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()

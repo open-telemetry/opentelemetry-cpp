@@ -19,25 +19,13 @@ public:
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    */
-  virtual void AddCallback(ObservableCallbackPtr, void *state);
+  virtual void AddCallback(ObservableCallbackPtr, void *state) noexcept;
 
   /**
    * Remove a function that was configured to be called whenever a metric collection is initiated.
    */
-  virtual void RemoveCallback(ObservableCallbackPtr, void *state);
+  virtual void RemoveCallback(ObservableCallbackPtr, void *state) noexcept;
 };
-
-template <class T>
-class ObservableCounter : public ObservableInstrument
-{};
-
-template <class T>
-class ObservableGauge : public ObservableInstrument
-{};
-
-template <class T>
-class ObservableUpDownCounter : public ObservableInstrument
-{};
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

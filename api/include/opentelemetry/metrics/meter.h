@@ -54,12 +54,12 @@ public:
    * @param description a brief description of what the Observable Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -90,12 +90,12 @@ public:
    * @param description a brief description of what the Observable Gauge is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -127,12 +127,12 @@ public:
    * @param description a brief description of what the Observable UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
 
-  virtual nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;

@@ -209,10 +209,20 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            NoExemplarReservoir::GetNoExemplarReservoir()));
-        storage_registry_[instrument_descriptor.name_] = storage;
+        if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
+        {
+          auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+              NoExemplarReservoir::GetNoExemplarReservoir()));
+          storage_registry_[instrument_descriptor.name_] = storage;
+        }
+        else
+        {
+          auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+          storage_registry_[instrument_descriptor.name_] = storage;
+        }
+
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);
         return true;
@@ -227,9 +237,11 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   return storages;
 }
 
-void Meter::RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor)
+#  if 0
+std::vector<std::unique_ptr<WritableMetricStorage>> Meter::RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor)
 {
   auto view_registry = meter_context_->GetViewRegistry();
+  std::vector<std::unique_ptr<WritableMetricStorage>> storages;
   auto success       = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor](const View &view) {
@@ -248,6 +260,7 @@ void Meter::RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descript
         return true;
       });
 }
+#  endif
 
 /** collect metrics across all the meters **/
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,

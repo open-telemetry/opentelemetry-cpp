@@ -13,22 +13,6 @@ namespace sdk
 namespace metrics
 {
 
-template <class T>
-class ObservableInstrument
-{
-public:
-  /**
-   * Sets up a function that will be called whenever a metric collection is initiated.
-   */
-  virtual void AddCallback(opentelemetry::metrics::ObservableCallbackPtr, void *state);
-
-  /**
-   * Sets up a function that will be called whenever a metric collection is initiated.
-   */
-  virtual void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr, void *state);
-};
-
-template <class T>
 class Asynchronous
 {
 public:
@@ -44,78 +28,35 @@ protected:
   std::string unit_;
 };
 
-class LongObservableCounter : public opentelemetry::metrics::ObservableCounter<long>,
-                              public Asynchronous<long>
+class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument,
+                             public Asynchronous
 {
 public:
-  LongObservableCounter(nostd::string_view name,
-                        nostd::string_view description = "",
-                        nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-
+  ObservableInstrument(InstrumentDescriptor instrument_descriptor,
+                       std::unique_ptr<WritableMetricStorage> storage)
+      : instrument_descriptor_(instrument_descriptor),
+        storage_(std::move(storage)),
+        observable_registry_{new ObservableRegistry()}
   {}
+
+  void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
+                   void *state) noexcept override
+  {
+    observable_registry_->AddCallback(callback, state, this);
+  }
+
+  void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
+                      void *state) noexcept override
+  {
+    observable_registry_->AddCallback(callback, state, this);
+  }
+
+private:
+protected:
+  InstrumentDescriptor instrument_descriptor_;
+  std::unique_ptr<WritableMetricStorage> storage_;
+  std::unique_ptr<ObservableRegistry> observable_registry_;
 };
-
-class DoubleObservableCounter : public opentelemetry::metrics::ObservableCounter<double>,
-                                public Asynchronous<double>
-{
-public:
-  DoubleObservableCounter(nostd::string_view name,
-                          nostd::string_view description = "",
-                          nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-
-  {}
-};
-
-class LongObservableGauge : public opentelemetry::metrics::ObservableGauge<long>,
-                            public Asynchronous<long>
-{
-public:
-  LongObservableGauge(nostd::string_view name,
-                      nostd::string_view description = "",
-                      nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-
-  {}
-};
-
-class DoubleObservableGauge : public opentelemetry::metrics::ObservableGauge<double>,
-                              public Asynchronous<double>
-{
-public:
-  DoubleObservableGauge(nostd::string_view name,
-                        nostd::string_view description = "",
-                        nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-
-  {}
-};
-
-class LongObservableUpDownCounter : public opentelemetry::metrics::ObservableUpDownCounter<long>,
-                                    public Asynchronous<long>
-{
-public:
-  LongObservableUpDownCounter(nostd::string_view name,
-                              nostd::string_view description = "",
-                              nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-
-  {}
-};
-
-class DoubleObservableUpDownCounter
-    : public opentelemetry::metrics::ObservableUpDownCounter<double>,
-      public Asynchronous<double>
-{
-public:
-  DoubleObservableUpDownCounter(nostd::string_view name,
-                                nostd::string_view description = "",
-                                nostd::string_view unit        = "")
-      : Asynchronous(name, description, unit)
-  {}
-};
-
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
