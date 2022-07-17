@@ -4,9 +4,11 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 
 #  include <memory>
+#  include <mutex>
 #  include <unordered_set>
 #  include <vector>
 
@@ -18,7 +20,7 @@ namespace metrics
 
 struct ObservableCallbackRecord
 {
-  ObservableCallbackPtr callback;
+  opentelemetry::metrics::ObservableCallbackPtr callback;
   void *state;
   ObservableInstrument *instrument;
 };
@@ -26,20 +28,24 @@ struct ObservableCallbackRecord
 class ObservableRegistry
 {
 public:
-  void AddCallback(ObservableCallbackPtr callback, void *state, ObservableInstrument *instrument)
+  void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
+                   void *state,
+                   ObservableInstrument *instrument)
   {
     // TBD - Check if existing
-    auto record = std::unique_ptr<ObservableCallbackRecord>(
-        ObservableCallbackRecord{callback, state, instrument});
+    std::unique_ptr<ObservableCallbackRecord> record(
+        new ObservableCallbackRecord{callback, state, instrument});
     std::unique_lock<std::mutex> lk(callbacks_m_);
     callbacks_.push_back(std::move(record));
   }
 
-  void RemoveCallback(ObservableCallbackPtr callback, void *state, ObservableInstrument *instrument)
+  void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
+                      void *state,
+                      ObservableInstrument *instrument)
   {
     auto new_end = std::remove_if(
         callbacks_.begin(), callbacks_.end(),
-        [callback, instrument](const std::unique_ptr<ObservableCallbackRecord> &record) {
+        [callback, state, instrument](const std::unique_ptr<ObservableCallbackRecord> &record) {
           return record->callback == callback && record->state == state &&
                  record->instrument == instrument;
         });
@@ -50,8 +56,9 @@ public:
   void Observe(opentelemetry::common::SystemTimestamp collection_ts)
   {
     std::unique_lock<std::mutex> lk(callbacks_m_);
-    for (auto callback : callbacks_)
+    for (auto &callback_wrap : callbacks_)
     {
+      callback_wrap->callback
     }
   }
 

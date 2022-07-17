@@ -7,11 +7,14 @@
 #  include "opentelemetry/metrics/observer_result.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+
+class WritableMetricStorage;
 
 class Asynchronous
 {
@@ -36,7 +39,10 @@ public:
                        std::unique_ptr<WritableMetricStorage> storage)
       : instrument_descriptor_(instrument_descriptor),
         storage_(std::move(storage)),
-        observable_registry_{new ObservableRegistry()}
+        observable_registry_{new ObservableRegistry()},
+        Asynchronous(instrument_descriptor_.name_,
+                     instrument_descriptor.description_,
+                     instrument_descriptor_.unit_)
   {}
 
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
