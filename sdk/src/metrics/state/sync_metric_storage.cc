@@ -18,7 +18,6 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
                                 nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
-  auto aggregation_temporarily = collector->GetAggregationTemporality();
 
   // Add the current delta metrics to `unreported metrics stash` for all the collectors,
   // this will also empty the delta metrics hashmap, and make it available for
