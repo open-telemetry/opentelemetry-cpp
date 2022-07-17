@@ -34,7 +34,6 @@ cc_library(
         "src/in_memory_span_exporter_factory.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/memory/in_memory_span_data.h",
         "include/opentelemetry/exporters/memory/in_memory_span_exporter.h",
         "include/opentelemetry/exporters/memory/in_memory_span_exporter_factory.h",
     ],

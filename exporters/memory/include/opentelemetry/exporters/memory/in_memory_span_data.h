@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/exporters/memory/in_memory_data.h"
-#include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 

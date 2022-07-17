@@ -6,7 +6,6 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk_config.h"
 
