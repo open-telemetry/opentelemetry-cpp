@@ -57,6 +57,10 @@ public:
     observable_registry_->AddCallback(callback, state, this);
   }
 
+  const InstrumentDescriptor &GetInstrumentDescriptor() { return instrument_descriptor_; }
+
+  const WritableMetricStorage *GetMetricStorage() { return storage_.get(); }
+
 private:
 protected:
   InstrumentDescriptor instrument_descriptor_;

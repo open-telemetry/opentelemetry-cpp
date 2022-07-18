@@ -11,7 +11,7 @@ namespace metrics
 {
 
 // typedef  void (*ObservableCallbackPtr)(ObserverResult &, void *);
-using ObservableCallbackPtr = void (*)(ObserverResult &, void *);
+using ObservableCallbackPtr = void (*)(ObserverResult, void *);
 
 class ObservableInstrument
 {

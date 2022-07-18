@@ -6,6 +6,7 @@
 
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/observer_result.h"
 
 #  include <memory>
 #  include <mutex>
@@ -58,7 +59,19 @@ public:
     std::unique_lock<std::mutex> lk(callbacks_m_);
     for (auto &callback_wrap : callbacks_)
     {
-      callback_wrap->callback
+      if (callback_wrap->instrument->GetInstrumentDescriptor().value_type_ ==
+          InstrumentValueType::kDouble)
+      {
+        nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
+            new opentelemetry::sdk::metrics::ObserverResultT<double>());
+        callback_wrap->callback(ob_res, callback_wrap->state);
+      }
+      else
+      {
+        nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>> ob_res(
+            new opentelemetry::sdk::metrics::ObserverResultT<long>());
+        callback_wrap->callback(ob_res, callback_wrap->state);
+      }
     }
   }
 
