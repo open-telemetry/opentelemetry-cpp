@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "in_memory_span_data",
     hdrs = [
+        "include/opentelemetry/exporters/memory/in_memory_data.h",
         "include/opentelemetry/exporters/memory/in_memory_span_data.h",
     ],
     strip_include_prefix = "include",
