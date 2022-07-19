@@ -64,32 +64,12 @@ public:
   {}
 };
 
-class NoopObservableCounter : public ObservableCounter
+class NoopObservableInstrument : public ObservableInstrument
 {
 public:
-  NoopObservableCounter(nostd::string_view name,
-                        nostd::string_view description,
-                        nostd::string_view unit) noexcept
-  {}
-};
-
-template <class T>
-class NoopObservableGauge : public ObservableGauge<T>
-{
-public:
-  NoopObservableGauge(nostd::string_view name,
-                      nostd::string_view description,
-                      nostd::string_view unit) noexcept
-  {}
-};
-
-template <class T>
-class NoopObservableUpDownCounter : public ObservableUpDownCounter<T>
-{
-public:
-  NoopObservableUpDownCounter(nostd::string_view name,
-                              nostd::string_view description,
-                              nostd::string_view unit) noexcept
+  NoopObservableInstrument(nostd::string_view name,
+                           nostd::string_view description,
+                           nostd::string_view unit) noexcept
   {}
 };
 
@@ -114,20 +94,22 @@ public:
     return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableCounter<long>>(new ObservableCounter<long>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableCounter<double>>(new ObservableCounter<double>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 
   nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
@@ -146,20 +128,22 @@ public:
     return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableGauge<long>>(new ObservableGauge<long>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableGauge<double>>(new ObservableGauge<double>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 
   nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
@@ -180,21 +164,22 @@ public:
         new NoopUpDownCounter<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateLongObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableUpDownCounter<long>>(new ObservableUpDownCounter<long>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<ObservableUpDownCounter<double>>(
-        new ObservableUpDownCounter<double>());
+    return nostd::shared_ptr<ObservableInstrument>(
+        new NoopObservableInstrument(name, description, unit));
   }
 };
 
