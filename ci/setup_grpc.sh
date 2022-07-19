@@ -6,10 +6,9 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
-new_grpc_version='v1.43.2'
+new_grpc_version='v1.46.3'
 gcc_version_for_new_grpc='5.1'
 install_grpc_version=${new_grpc_version}
-grpc_version='v1.39.0'
 install_dir='/usr/local/'
 usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
 

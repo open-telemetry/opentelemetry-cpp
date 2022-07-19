@@ -8,7 +8,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
-TAG=20210324.0
+TAG=20211102.0
 pushd $BUILD_DIR
 git clone --depth=1 -b ${TAG} https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
