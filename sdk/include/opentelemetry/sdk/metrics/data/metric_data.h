@@ -31,6 +31,7 @@ class MetricData
 {
 public:
   InstrumentDescriptor instrument_descriptor;
+  AggregationTemporality aggregation_temporality;
   opentelemetry::common::SystemTimestamp start_ts;
   opentelemetry::common::SystemTimestamp end_ts;
   std::vector<PointDataAttributes> point_data_attr_;

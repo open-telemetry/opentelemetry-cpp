@@ -266,7 +266,6 @@ inline OtlpHeaders GetOtlpDefaultLogHeaders()
 
   return result;
 }
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
