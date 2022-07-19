@@ -2,8 +2,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after http_client_factory.h")
+#  endif
+#endif
+
 #include "opentelemetry/ext/http/common/url_parser.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after url_parser.h")
+#  endif
+#endif
+
 #include "tracer_common.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after tracer_common.h")
+#  endif
+#endif
 
 #ifdef _WIN32
 #  ifdef DELETE

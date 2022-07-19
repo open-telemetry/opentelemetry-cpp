@@ -4,21 +4,115 @@
 #  include "messages.grpc.pb.h"
 #endif
 
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after messages.grpc.pb.h")
+#  endif
+#endif
+
 #include "opentelemetry/trace/context.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after context.h")
+#  endif
+#endif
+
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after span_context_kv_iterable_view.h")
+#  endif
+#endif
+
 #include "tracer_common.h"
 
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after tracer_common.h")
+#  endif
+#endif
+
 #include <grpcpp/grpcpp.h>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after grpcpp.h")
+#  endif
+#endif
+
 #include <grpcpp/server.h>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after server.h")
+#  endif
+#endif
+
 #include <grpcpp/server_builder.h>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after server_builder.h")
+#  endif
+#endif
+
 #include <grpcpp/server_context.h>
 
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after server_context.h")
+#  endif
+#endif
+
 #include <chrono>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after chrono")
+#  endif
+#endif
+
 #include <fstream>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after fstream")
+#  endif
+#endif
+
 #include <map>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after map")
+#  endif
+#endif
+
 #include <sstream>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after sstream")
+#  endif
+#endif
+
 #include <string>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after string")
+#  endif
+#endif
+
 #include <thread>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after thread")
+#  endif
+#endif
 
 #ifdef _WIN32
 #  ifdef DELETE

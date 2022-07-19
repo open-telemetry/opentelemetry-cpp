@@ -2,16 +2,56 @@
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after grpcpp.h")
+#  endif
+#endif
+
 #ifdef BAZEL_BUILD
 #  include "examples/grpc/protos/messages.grpc.pb.h"
 #else
 #  include "messages.grpc.pb.h"
 #endif
 
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after messages.grpc.pb.h")
+#  endif
+#endif
+
 #include <iostream>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after iostream")
+#  endif
+#endif
+
 #include <memory>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after memory")
+#  endif
+#endif
+
 #include <string>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after string")
+#  endif
+#endif
+
 #include "tracer_common.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after tracer_common.h")
+#  endif
+#endif
 
 #ifdef _WIN32
 #  ifdef DELETE

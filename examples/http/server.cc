@@ -2,12 +2,45 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after server.h")
+#    undef DELETE
+#  endif
+#endif
+
 #include "opentelemetry/trace/context.h"
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after context.h")
+#  endif
+#endif
 
 #include "tracer_common.h"
 
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after tracer_common.h")
+#  endif
+#endif
+
 #include <iostream>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after iostream")
+#  endif
+#endif
+
 #include <thread>
+
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": pollution after thread")
+#  endif
+#endif
 
 #ifdef _WIN32
 #  ifdef DELETE
