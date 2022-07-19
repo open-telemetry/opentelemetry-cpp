@@ -9,9 +9,13 @@
 #include <iostream>
 #include <thread>
 
-#ifdef DELETE
+#ifdef _WIN32
+#  ifdef DELETE
+// winnt.h defines DELETE
 // Causes a build error with FaasDocumentOperationValues::DELETE
-#  undef DELETE
+#    pragma message(__FILE__ ": removing define on DELETE")
+#    undef DELETE
+#  endif
 #endif
 
 #include "opentelemetry/trace/semantic_conventions.h"
