@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1658218302960,
+  "lastUpdate": 1658218305380,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -52096,6 +52096,54 @@ window.BENCHMARK_DATA = {
             "value": 1950383.186340332,
             "unit": "ns/iter",
             "extra": "iterations: 402\ncpu: 349672.8855721393 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "owentou@tencent.com",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "24d5100ada0c6cb9ccadb5827e4889e657ed8644",
+          "message": "[Metrics] Add OTLP http metric exporter (#1487)\n\n* Add OTLP http metric exporter\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Add changelog for OTLP HTTP metric exporter\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Add unit test of `SumPointData` for `OtlpHttpMetricExporter`\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Fix dependency of otlp recordable, add `Gauge` support for `OtlpMetricUtils::PopulateRequest`\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Add unit test for `OtlpHttpMetricExporter`\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Fix format\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>\r\n\r\n* Fix unit test `OtlpMetricSerializationTest.ObservableGauge`\r\n\r\nSigned-off-by: owentou <owentou@tencent.com>",
+          "timestamp": "2022-07-19T00:59:24-07:00",
+          "tree_id": "b4f2ee5f85b783e2690076669a3233751167c686",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/24d5100ada0c6cb9ccadb5827e4889e657ed8644"
+        },
+        "date": 1658218302199,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 122.25475344624553,
+            "unit": "ns/iter",
+            "extra": "iterations: 1144000\ncpu: 122.08907342657342 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 170.87514606165277,
+            "unit": "ns/iter",
+            "extra": "iterations: 823000\ncpu: 170.189914945322 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 641.9495419339016,
+            "unit": "ns/iter",
+            "extra": "iterations: 222000\ncpu: 639.512162162162 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2010941.2005490353,
+            "unit": "ns/iter",
+            "extra": "iterations: 391\ncpu: 347754.4757033247 ns\nthreads: 1"
           }
         ]
       }
