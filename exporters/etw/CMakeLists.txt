@@ -9,7 +9,7 @@ set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
                                                             etw_exporter)
 
 target_link_libraries(opentelemetry_exporter_etw
-                      INTERFACE nlohmann_json::nlohmann_json)
+                      INTERFACE opentelemetry_api nlohmann_json::nlohmann_json)
 if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()

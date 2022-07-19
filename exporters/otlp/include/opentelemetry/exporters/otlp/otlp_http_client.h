@@ -139,6 +139,11 @@ public:
       std::size_t max_running_requests) noexcept;
 
   /**
+   * Force flush the HTTP client.
+   */
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
+  /**
    * Shut down the HTTP client.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
@@ -158,6 +163,12 @@ public:
    * @return options of current OTLP http client.
    */
   inline const OtlpHttpClientOptions &GetOptions() const noexcept { return options_; }
+
+  /**
+   * Get if this OTLP http client is shutdown.
+   * @return return true after Shutdown is called.
+   */
+  bool IsShutdown() const noexcept;
 
 private:
   struct HttpSessionData
@@ -212,11 +223,11 @@ private:
    */
   bool cleanupGCSessions() noexcept;
 
-  bool isShutdown() const noexcept;
-
   // For testing
   friend class OtlpHttpExporterTestPeer;
   friend class OtlpHttpLogExporterTestPeer;
+  friend class OtlpHttpMetricExporterTestPeer;
+
   /**
    * Create an OtlpHttpClient using the specified http client.
    * Only tests can call this constructor directly.

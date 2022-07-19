@@ -67,6 +67,14 @@ std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRec
 opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
 {
+  if (http_client_->IsShutdown())
+  {
+    std::size_t span_count = spans.size();
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                            << span_count << " trace span(s) failed, exporter is shutdown");
+    return opentelemetry::sdk::common::ExportResult::kFailure;
+  }
+
   if (spans.empty())
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;

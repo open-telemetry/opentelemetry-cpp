@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/metrics/metric_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/otlp_http_client.h"
 
@@ -24,13 +24,13 @@ namespace otlp
 /**
  * Struct to hold OTLP exporter options.
  */
-struct OtlpHttpLogExporterOptions
+struct OtlpHttpMetricExporterOptions
 {
   // The endpoint to export to. By default
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpLogEndpoint();
+  std::string url = GetOtlpDefaultHttpMetricEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -47,10 +47,10 @@ struct OtlpHttpLogExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogTimeout();
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultMetricTimeout();
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
+  OtlpHeaders http_headers = GetOtlpDefaultMetricHeaders();
 
 #  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
@@ -63,57 +63,49 @@ struct OtlpHttpLogExporterOptions
 };
 
 /**
- * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format.
+ * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in HTTP.
  */
-class OtlpHttpLogExporter final : public opentelemetry::sdk::logs::LogExporter
+class OtlpHttpMetricExporter final : public opentelemetry::sdk::metrics::MetricExporter
 {
 public:
   /**
-   * Create an OtlpHttpLogExporter with default exporter options.
+   * Create an OtlpHttpMetricExporter with default exporter options.
    */
-  OtlpHttpLogExporter();
+  OtlpHttpMetricExporter();
 
   /**
-   * Create an OtlpHttpLogExporter with user specified options.
+   * Create an OtlpHttpMetricExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &options);
+  OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptions &options);
 
-  /**
-   * Creates a recordable that stores the data in a JSON object
-   */
-  std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override;
-
-  /**
-   * Exports a vector of log records to the Elasticsearch instance. Guaranteed to return after a
-   * timeout specified from the options passed from the constructor.
-   * @param records A list of log records to send to Elasticsearch.
-   */
   opentelemetry::sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records) noexcept
-      override;
+      const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
 
   /**
-   * Shutdown this exporter.
-   * @param timeout The maximum time to wait for the shutdown method to return
+   * Force flush the exporter.
    */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
+
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
 private:
   // Configuration options for the exporter
-  const OtlpHttpLogExporterOptions options_;
+  const OtlpHttpMetricExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;
   // For testing
-  friend class OtlpHttpLogExporterTestPeer;
+  friend class OtlpHttpMetricExporterTestPeer;
+
   /**
-   * Create an OtlpHttpLogExporter using the specified http client.
+   * Create an OtlpHttpMetricExporter using the specified http client.
    * Only tests can call this constructor directly.
    * @param http_client the http client to be used for exporting
    */
-  OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client);
+  OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> http_client);
 };
 }  // namespace otlp
 }  // namespace exporter

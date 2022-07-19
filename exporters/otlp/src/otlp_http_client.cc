@@ -651,7 +651,7 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
 
 OtlpHttpClient::~OtlpHttpClient()
 {
-  if (!isShutdown())
+  if (!IsShutdown())
   {
     Shutdown();
   }
@@ -760,17 +760,8 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  {
-    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    is_shutdown_ = true;
-
-    // Shutdown the session manager
-    http_client_->CancelAllSessions();
-    http_client_->FinishAllSessions();
-  }
-
   // ASAN will report chrono: runtime error: signed integer overflow: A + B cannot be represented
   //   in type 'long int' here. So we reset timeout to meet signed long int limit here.
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
@@ -793,14 +784,29 @@ bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
       // checking and waiting, we should not wait forever.
       session_waker_.wait_for(lock, options_.timeout);
     }
+    return true;
   }
   else
   {
-    session_waker_.wait_for(lock, timeout, [this] {
+    return session_waker_.wait_for(lock, timeout, [this] {
       std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
       return running_sessions_.empty();
     });
   }
+}
+
+bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  {
+    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+    is_shutdown_ = true;
+
+    // Shutdown the session manager
+    http_client_->CancelAllSessions();
+    http_client_->FinishAllSessions();
+  }
+
+  ForceFlush(timeout);
 
   while (cleanupGCSessions())
     ;
@@ -907,7 +913,7 @@ OtlpHttpClient::createSession(
   // Send the request
   std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
   // Return failure if this exporter has been shutdown
-  if (isShutdown())
+  if (IsShutdown())
   {
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
@@ -976,7 +982,7 @@ bool OtlpHttpClient::cleanupGCSessions() noexcept
   return !gc_sessions_.empty();
 }
 
-bool OtlpHttpClient::isShutdown() const noexcept
+bool OtlpHttpClient::IsShutdown() const noexcept
 {
   return is_shutdown_;
 }
