@@ -71,6 +71,9 @@ public:
                            nostd::string_view description,
                            nostd::string_view unit) noexcept
   {}
+
+  void AddCallback(ObservableCallbackPtr, void *state) noexcept override {}
+  void RemoveCallback(ObservableCallbackPtr, void *state) noexcept override {}
 };
 
 /**

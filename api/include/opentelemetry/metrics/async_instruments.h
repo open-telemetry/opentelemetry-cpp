@@ -19,12 +19,12 @@ public:
   /**
    * Sets up a function that will be called whenever a metric collection is initiated.
    */
-  virtual void AddCallback(ObservableCallbackPtr, void *state) noexcept;
+  virtual void AddCallback(ObservableCallbackPtr, void *state) noexcept = 0;
 
   /**
    * Remove a function that was configured to be called whenever a metric collection is initiated.
    */
-  virtual void RemoveCallback(ObservableCallbackPtr, void *state) noexcept;
+  virtual void RemoveCallback(ObservableCallbackPtr, void *state) noexcept = 0;
 };
 
 }  // namespace metrics
