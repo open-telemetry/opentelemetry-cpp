@@ -32,9 +32,11 @@
 #   opentelemetry-cpp::otlp_recordable                - Imported target of opentelemetry-cpp::otlp_recordable
 #   opentelemetry-cpp::otlp_grpc_exporter             - Imported target of opentelemetry-cpp::otlp_grpc_exporter
 #   opentelemetry-cpp::otlp_grpc_log_exporter         - Imported target of opentelemetry-cpp::otlp_grpc_log_exporter
+#   opentelemetry-cpp::otlp_grpc_metrics_exporter     - Imported target of opentelemetry-cpp::otlp_grpc_metrics_exporter
 #   opentelemetry-cpp::otlp_http_client               - Imported target of opentelemetry-cpp::otlp_http_client
 #   opentelemetry-cpp::otlp_http_exporter             - Imported target of opentelemetry-cpp::otlp_http_exporter
 #   opentelemetry-cpp::otlp_http_log_exporter         - Imported target of opentelemetry-cpp::otlp_http_log_exporter
+#   opentelemetry-cpp::otlp_http_metric_exporter      - Imported target of opentelemetry-cpp::otlp_http_metric_exporter
 #   opentelemetry-cpp::ostream_log_exporter           - Imported target of opentelemetry-cpp::ostream_log_exporter
 #   opentelemetry-cpp::ostream_metrics_exporter       - Imported target of opentelemetry-cpp::ostream_metrics_exporter
 #   opentelemetry-cpp::ostream_span_exporter          - Imported target of opentelemetry-cpp::ostream_span_exporter
@@ -84,9 +86,12 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     in_memory_span_exporter
     otlp_recordable
     otlp_grpc_exporter
+    otlp_grpc_log_exporter
+    otlp_grpc_metrics_exporter
     otlp_http_client
     otlp_http_exporter
     otlp_http_log_exporter
+    otlp_http_metric_exporter
     ostream_log_exporter
     ostream_metrics_exporter
     ostream_span_exporter

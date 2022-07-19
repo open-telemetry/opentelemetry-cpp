@@ -482,6 +482,17 @@ public:
 #    endif
 };
 
+TEST(OtlpHttpLogExporterTest, Shutdown)
+{
+  auto exporter = std::unique_ptr<opentelemetry::sdk::logs::LogExporter>(new OtlpHttpLogExporter());
+  ASSERT_TRUE(exporter->Shutdown());
+
+  nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> logs = {};
+
+  auto result = exporter->Export(logs);
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+}
+
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTestSync)
 {

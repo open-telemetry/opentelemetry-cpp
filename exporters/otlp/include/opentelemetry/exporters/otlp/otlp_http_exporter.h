@@ -59,7 +59,8 @@ public:
    * timeout is applied.
    * @return return the status of this operation
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   // The configuration options associated with this exporter.
