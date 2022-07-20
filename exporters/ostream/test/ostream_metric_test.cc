@@ -41,9 +41,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+      "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -53,8 +52,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -105,9 +104,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+      "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -117,8 +115,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}, {"a2", "b2"}}, histogram_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -166,9 +164,8 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+      "library_name", "1.2.0");
   metric_sdk::LastValuePointData last_value_point_data{};
   last_value_point_data.value_              = 10.0;
   last_value_point_data.is_lastvalue_valid_ = true;
@@ -186,8 +183,8 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, last_value_point_data},
           {metric_sdk::PointAttributes{}, last_value_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -230,9 +227,8 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+      "library_name", "1.2.0");
   metric_sdk::DropPointData drop_point_data{};
   metric_sdk::DropPointData drop_point_data2{};
   metric_sdk::MetricData metric_data{
@@ -244,8 +240,8 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, drop_point_data},
           {metric_sdk::PointAttributes{}, drop_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();

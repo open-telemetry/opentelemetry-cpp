@@ -17,17 +17,16 @@ namespace metrics
  * Metric Data to be exported along with resources and
  * Instrumentation library.
  */
-struct InstrumentationInfoMetrics
+struct ScopeMetrics
 {
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_;
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *scope_;
   std::vector<MetricData> metric_data_;
 };
 
 struct ResourceMetrics
 {
   const opentelemetry::sdk::resource::Resource *resource_;
-  std::vector<InstrumentationInfoMetrics> instrumentation_info_metric_data_;
+  std::vector<ScopeMetrics> scope_metric_data_;
 };
 
 /**

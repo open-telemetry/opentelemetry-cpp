@@ -27,11 +27,10 @@ class Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */
-  explicit Meter(std::shared_ptr<sdk::metrics::MeterContext> meter_context,
-                 std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-                     instrumentation_library =
-                         opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
-                             "")) noexcept;
+  explicit Meter(
+      std::shared_ptr<sdk::metrics::MeterContext> meter_context,
+      std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary> scope =
+          opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("")) noexcept;
 
   nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
       nostd::string_view name,
@@ -116,7 +115,7 @@ public:
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
-  std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+  std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> scope_;
   std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
@@ -132,7 +131,7 @@ private:
   {
     auto view_registry = meter_context_->GetViewRegistry();
     auto success       = view_registry->FindViews(
-        instrument_descriptor, *instrumentation_library_,
+        instrument_descriptor, *scope_,
         [this, &instrument_descriptor, callback, state](const View &view) {
           auto view_instr_desc = instrument_descriptor;
           if (!view.GetName().empty())

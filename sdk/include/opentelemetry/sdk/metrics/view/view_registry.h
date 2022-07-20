@@ -45,13 +45,13 @@ public:
 
   bool FindViews(const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
                  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                     &instrumentation_library,
+                     &instrumentation_scope,
                  nostd::function_ref<bool(const View &)> callback) const
   {
     bool found = false;
     for (auto const &registered_view : registered_views_)
     {
-      if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_library) &&
+      if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_scope) &&
           MatchInstrument(registered_view->instrument_selector_.get(), instrument_descriptor))
       {
         found = true;
@@ -79,13 +79,13 @@ private:
   std::vector<std::unique_ptr<RegisteredView>> registered_views_;
   static bool MatchMeter(opentelemetry::sdk::metrics::MeterSelector *selector,
                          const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                             &instrumentation_library)
+                             &instrumentation_scope)
   {
-    return selector->GetNameFilter()->Match(instrumentation_library.GetName()) &&
-           (instrumentation_library.GetVersion().size() == 0 ||
-            selector->GetVersionFilter()->Match(instrumentation_library.GetVersion())) &&
-           (instrumentation_library.GetSchemaURL().size() == 0 ||
-            selector->GetSchemaFilter()->Match(instrumentation_library.GetSchemaURL()));
+    return selector->GetNameFilter()->Match(instrumentation_scope.GetName()) &&
+           (instrumentation_scope.GetVersion().size() == 0 ||
+            selector->GetVersionFilter()->Match(instrumentation_scope.GetVersion())) &&
+           (instrumentation_scope.GetSchemaURL().size() == 0 ||
+            selector->GetSchemaFilter()->Match(instrumentation_scope.GetSchemaURL()));
   }
 
   static bool MatchInstrument(
