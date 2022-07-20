@@ -239,42 +239,6 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if((NOT WITH_API_ONLY)
-   AND (WITH_ELASTICSEARCH
-        OR WITH_ZIPKIN
-        OR WITH_OTLP
-        OR WITH_OTLP_HTTP
-        OR WITH_ZPAGES
-        OR BUILD_W3CTRACECONTEXT_TEST
-        OR WITH_ETW
-       ))
-  # nlohmann_json package is required for most SDK build configurations
-  find_package(nlohmann_json QUIET)
-  set(nlohmann_json_clone FALSE)
-  if(nlohmann_json_FOUND)
-    message("Using external nlohmann::json")
-  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
-         AND EXISTS
-             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
-    message("Trying to use local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    # This option allows to link nlohmann_json::nlohmann_json target
-    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-    # This option allows to add header to include directories
-    include_directories(
-      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
-  else()
-    set(nlohmann_json_clone TRUE)
-    include(cmake/nlohmann-json.cmake)
-    message("\nnlohmann_json package was not found. Cloning from github")
-  endif()
-endif()
-
 if(WITH_PROMETHEUS)
   find_package(prometheus-cpp CONFIG QUIET)
   if(NOT prometheus-cpp_FOUND)
@@ -351,6 +315,44 @@ if(WITH_OTLP)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
+endif()
+
+if(WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR WITH_OTLP_HTTP
+   OR WITH_ZPAGES
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_ETW)
+  set(USE_NLOHMANN_JSON ON)
+else()
+  set(USE_NLOHMANN_JSON OFF)
+endif()
+if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
+  # nlohmann_json package is required for most SDK build configurations
+  find_package(nlohmann_json QUIET)
+  set(nlohmann_json_clone FALSE)
+  if(nlohmann_json_FOUND)
+    message("Using external nlohmann::json")
+  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
+         AND EXISTS
+             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
+    message("Trying to use local nlohmann::json from submodule")
+    set(JSON_BuildTests
+        OFF
+        CACHE INTERNAL "")
+    set(JSON_Install
+        ON
+        CACHE INTERNAL "")
+    # This option allows to link nlohmann_json::nlohmann_json target
+    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+    # This option allows to add header to include directories
+    include_directories(
+      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+  else()
+    set(nlohmann_json_clone TRUE)
+    include(cmake/nlohmann-json.cmake)
+    message("\nnlohmann_json package was not found. Cloning from github")
+  endif()
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
