@@ -111,7 +111,7 @@ private:
   std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
 
-  void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor);
+  // void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor);
 };
 }  // namespace metrics
 }  // namespace sdk

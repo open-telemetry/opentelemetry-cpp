@@ -25,14 +25,15 @@ template <class T>
 class AsyncMetricStorage : public MetricStorage
 {
 public:
-  AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
-                     const AggregationType aggregation_type,
-                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult &, void *),
-                     const AttributesProcessor *attributes_processor,
-                     void *state = nullptr)
+  AsyncMetricStorage(
+      InstrumentDescriptor instrument_descriptor,
+      const AggregationType aggregation_type,
+      //   void (*measurement_callback)(opentelemetry::metrics::ObserverResult &, void *),
+      const AttributesProcessor *attributes_processor,
+      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
-        measurement_collection_callback_{measurement_callback},
+        //    measurement_collection_callback_{measurement_callback},
         attributes_processor_{attributes_processor},
         state_{state},
         cumulative_hash_map_(new AttributesHashMap()),
@@ -49,7 +50,7 @@ public:
         new opentelemetry::sdk::metrics::ObserverResultT<T>(attributes_processor_));
 
     // read the measurement using configured callback
-    measurement_collection_callback_(ob_res, state_);
+    //  measurement_collection_callback_(ob_res, state_);
     std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
     // process the read measurements - aggregate and store in hashmap
     for (auto &measurement : ob_res->GetMeasurements())

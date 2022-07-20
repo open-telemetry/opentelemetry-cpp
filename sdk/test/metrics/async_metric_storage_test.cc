@@ -39,7 +39,7 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult<long> &observer_result,
+  static void Fetcher(opentelemetry::metrics::ObserverResultT<long> &observer_result,
                       void * /*state*/)
   {
     fetch_count++;
@@ -97,7 +97,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 
   MeasurementFetcher measurement_fetcher;
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(instr_desc, AggregationType::kSum,
-                                                                MeasurementFetcher::Fetcher,
+                                                                // MeasurementFetcher::Fetcher,
                                                                 new DefaultAttributesProcessor());
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,

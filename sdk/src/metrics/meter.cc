@@ -66,7 +66,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -78,7 +78,7 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -118,7 +118,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDoubleObservableGauge(
@@ -130,7 +130,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -170,7 +170,7 @@ Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -182,7 +182,7 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  RegisterMetricStorage(instrument_descriptor);
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
@@ -200,49 +200,50 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
-    auto view_instr_desc = instrument_descriptor;
-    if (!view.GetName().empty())
-    {
-      view_instr_desc.name_ = view.GetName();
-    }
-    if (!view.GetDescription().empty())
-    {
-      view_instr_desc.description_ = view.GetDescription();
-    }
-    if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
-    {
-      auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-          view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-          NoExemplarReservoir::GetNoExemplarReservoir()));
-      storage_registry_[instrument_descriptor.name_] = storage;
-    }
-    else
-    {
-      if (instrument_descriptor.value_type_ == InstrumentValueType::kDouble)
-      {
-        auto storage = std::shared_ptr<AsyncMetricStorage<double>>(new AsyncMetricStorage<double>(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-      }
-      else
-      {
-        auto storage = std::shared_ptr<AsyncMetricStorage<long>>(new AsyncMetricStorage<long>(
-            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
-        storage_registry_[instrument_descriptor.name_] = storage;
-      }
+        auto view_instr_desc = instrument_descriptor;
+        if (!view.GetName().empty())
+        {
+          view_instr_desc.name_ = view.GetName();
+        }
+        if (!view.GetDescription().empty())
+        {
+          view_instr_desc.description_ = view.GetDescription();
+        }
+        auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
+        if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
+        {
+          auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+              NoExemplarReservoir::GetNoExemplarReservoir()));
+          storage_registry_[instrument_descriptor.name_] = storage;
+          multi_storage->AddStorage(storage);
+        }
+        else
+        {
+          if (instrument_descriptor.value_type_ == InstrumentValueType::kDouble)
+          {
+            auto storage =
+                std::shared_ptr<AsyncMetricStorage<double>>(new AsyncMetricStorage<double>(
+                    view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+            storage_registry_[instrument_descriptor.name_] = storage;
+          }
+          else
+          {
+            auto storage = std::shared_ptr<AsyncMetricStorage<long>>(new AsyncMetricStorage<long>(
+                view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+            storage_registry_[instrument_descriptor.name_] = storage;
+          }
+        }
+        return true;
+      });
 
-      auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
-      multi_storage->AddStorage(storage);
-      return true;
-    });
-
-    if (!success)
-    {
-      OTEL_INTERNAL_LOG_ERROR(
-          "[Meter::RegisterMetricStorage] - Error during finding matching views."
-          << "Some of the matching view configurations mayn't be used for metric collection");
-    }
-    return storages;
+  if (!success)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterMetricStorage] - Error during finding matching views."
+        << "Some of the matching view configurations mayn't be used for metric collection");
+  }
+  return storages;
 }
 
 #  if 0
@@ -274,20 +275,20 @@ std::vector<std::unique_ptr<WritableMetricStorage>> Meter::RegisterAsyncMetricSt
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
-    std::vector<MetricData> metric_data_list;
-    for (auto &metric_storage : storage_registry_)
-    {
-      metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
-                                     meter_context_->GetSDKStartTime(), collect_ts,
-                                     [&metric_data_list](MetricData metric_data) {
-                                       metric_data_list.push_back(metric_data);
-                                       return true;
-                                     });
-    }
-    return metric_data_list;
+  std::vector<MetricData> metric_data_list;
+  for (auto &metric_storage : storage_registry_)
+  {
+    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
+                                   meter_context_->GetSDKStartTime(), collect_ts,
+                                   [&metric_data_list](MetricData metric_data) {
+                                     metric_data_list.push_back(metric_data);
+                                     return true;
+                                   });
+  }
+  return metric_data_list;
 }
 
 }  // namespace metrics
-}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 #endif

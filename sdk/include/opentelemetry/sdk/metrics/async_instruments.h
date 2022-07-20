@@ -37,33 +37,19 @@ class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,
-                       std::unique_ptr<WritableMetricStorage> storage)
-      : instrument_descriptor_(instrument_descriptor),
-        storage_(std::move(storage)),
-        observable_registry_{new ObservableRegistry()},
-        Asynchronous(instrument_descriptor_.name_,
-                     instrument_descriptor.description_,
-                     instrument_descriptor_.unit_)
-  {}
+                       std::unique_ptr<WritableMetricStorage> storage);
 
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
-                   void *state) noexcept override
-  {
-    observable_registry_->AddCallback(callback, state, this);
-  }
+                   void *state) noexcept override;
 
   void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
-                      void *state) noexcept override
-  {
-    observable_registry_->AddCallback(callback, state, this);
-  }
+                      void *state) noexcept override;
 
-  const InstrumentDescriptor &GetInstrumentDescriptor() { return instrument_descriptor_; }
+  const InstrumentDescriptor &GetInstrumentDescriptor();
 
-  const WritableMetricStorage *GetMetricStorage() { return storage_.get(); }
+  const WritableMetricStorage *GetMetricStorage();
 
 private:
-protected:
   InstrumentDescriptor instrument_descriptor_;
   std::unique_ptr<WritableMetricStorage> storage_;
   std::unique_ptr<ObservableRegistry> observable_registry_;
