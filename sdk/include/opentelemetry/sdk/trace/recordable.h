@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -146,6 +147,14 @@ public:
    */
   virtual void SetInstrumentationLibrary(
       const InstrumentationLibrary &instrumentation_library) noexcept = 0;
+
+  /**
+   * Get the SpanData object for this Recordable.
+   *
+   * @return SpanData*
+   */
+
+  virtual explicit operator SpanData *() const { return nullptr; }
 };
 }  // namespace trace
 }  // namespace sdk
