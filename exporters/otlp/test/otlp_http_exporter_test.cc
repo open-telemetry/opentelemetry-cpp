@@ -431,6 +431,17 @@ public:
 #  endif
 };
 
+TEST(OtlpHttpExporterTest, Shutdown)
+{
+  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(new OtlpHttpExporter());
+  ASSERT_TRUE(exporter->Shutdown());
+
+  nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> spans = {};
+
+  auto result = exporter->Export(spans);
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+}
+
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 {

@@ -57,26 +57,25 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
-    proto::metrics::v1::NumberDataPoint proto_sum_point_data;
-    proto_sum_point_data.set_start_time_unix_nano(start_ts);
-    proto_sum_point_data.set_time_unix_nano(ts);
+    proto::metrics::v1::NumberDataPoint *proto_sum_point_data = sum->add_data_points();
+    proto_sum_point_data->set_start_time_unix_nano(start_ts);
+    proto_sum_point_data->set_time_unix_nano(ts);
     auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
 
     if ((nostd::holds_alternative<long>(sum_data.value_)))
     {
-      proto_sum_point_data.set_as_int(nostd::get<long>(sum_data.value_));
+      proto_sum_point_data->set_as_int(nostd::get<long>(sum_data.value_));
     }
     else
     {
-      proto_sum_point_data.set_as_double(nostd::get<double>(sum_data.value_));
+      proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
     }
     // set attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
-      OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data.add_attributes(),
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second);
     }
-    *sum->add_data_points() = proto_sum_point_data;
   }
 }
 
@@ -90,29 +89,30 @@ void OtlpMetricUtils::ConvertHistogramMetric(
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
   {
-    proto::metrics::v1::HistogramDataPoint proto_histogram_point_data;
-    proto_histogram_point_data.set_start_time_unix_nano(start_ts);
-    proto_histogram_point_data.set_time_unix_nano(ts);
+    proto::metrics::v1::HistogramDataPoint *proto_histogram_point_data =
+        histogram->add_data_points();
+    proto_histogram_point_data->set_start_time_unix_nano(start_ts);
+    proto_histogram_point_data->set_time_unix_nano(ts);
     auto histogram_data =
         nostd::get<sdk::metrics::HistogramPointData>(point_data_with_attributes.point_data);
     // sum
     if ((nostd::holds_alternative<long>(histogram_data.sum_)))
     {
-      proto_histogram_point_data.set_sum(nostd::get<long>(histogram_data.sum_));
+      proto_histogram_point_data->set_sum(nostd::get<long>(histogram_data.sum_));
     }
     else
     {
-      proto_histogram_point_data.set_sum(nostd::get<double>(histogram_data.sum_));
+      proto_histogram_point_data->set_sum(nostd::get<double>(histogram_data.sum_));
     }
     // count
-    proto_histogram_point_data.set_count(histogram_data.count_);
+    proto_histogram_point_data->set_count(histogram_data.count_);
     // buckets
     if ((nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_)))
     {
       auto boundaries = nostd::get<std::list<double>>(histogram_data.boundaries_);
       for (auto bound : boundaries)
       {
-        proto_histogram_point_data.add_explicit_bounds(bound);
+        proto_histogram_point_data->add_explicit_bounds(bound);
       }
     }
     else
@@ -120,21 +120,50 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       auto boundaries = nostd::get<std::list<long>>(histogram_data.boundaries_);
       for (auto bound : boundaries)
       {
-        proto_histogram_point_data.add_explicit_bounds(bound);
+        proto_histogram_point_data->add_explicit_bounds(bound);
       }
     }
     // bucket counts
     for (auto bucket_value : histogram_data.counts_)
     {
-      proto_histogram_point_data.add_bucket_counts(bucket_value);
+      proto_histogram_point_data->add_bucket_counts(bucket_value);
     }
     // attributes
     for (auto &kv_attr : point_data_with_attributes.attributes)
     {
-      OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data.add_attributes(),
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_histogram_point_data->add_attributes(),
                                                     kv_attr.first, kv_attr.second);
     }
-    *histogram->add_data_points() = proto_histogram_point_data;
+  }
+}
+
+void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
+                                         proto::metrics::v1::Gauge *const gauge) noexcept
+{
+  auto start_ts = metric_data.start_ts.time_since_epoch().count();
+  auto ts       = metric_data.end_ts.time_since_epoch().count();
+  for (auto &point_data_with_attributes : metric_data.point_data_attr_)
+  {
+    proto::metrics::v1::NumberDataPoint *proto_gauge_point_data = gauge->add_data_points();
+    proto_gauge_point_data->set_start_time_unix_nano(start_ts);
+    proto_gauge_point_data->set_time_unix_nano(ts);
+    auto gauge_data =
+        nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
+
+    if ((nostd::holds_alternative<long>(gauge_data.value_)))
+    {
+      proto_gauge_point_data->set_as_int(nostd::get<long>(gauge_data.value_));
+    }
+    else
+    {
+      proto_gauge_point_data->set_as_double(nostd::get<double>(gauge_data.value_));
+    }
+    // set attributes
+    for (auto &kv_attr : point_data_with_attributes.attributes)
+    {
+      OtlpPopulateAttributeUtils::PopulateAttribute(proto_gauge_point_data->add_attributes(),
+                                                    kv_attr.first, kv_attr.second);
+    }
   }
 }
 
@@ -146,17 +175,22 @@ void OtlpMetricUtils::PopulateInstrumentationInfoMetric(
   metric->set_description(metric_data.instrument_descriptor.description_);
   metric->set_unit(metric_data.instrument_descriptor.unit_);
   auto kind = GetAggregationType(metric_data.instrument_descriptor.type_);
-  if (kind == metric_sdk::AggregationType::kSum)
+  switch (kind)
   {
-    proto::metrics::v1::Sum sum;
-    ConvertSumMetric(metric_data, &sum);
-    *metric->mutable_sum() = sum;
-  }
-  else if (kind == metric_sdk::AggregationType::kHistogram)
-  {
-    proto::metrics::v1::Histogram histogram;
-    ConvertHistogramMetric(metric_data, &histogram);
-    *metric->mutable_histogram() = histogram;
+    case metric_sdk::AggregationType::kSum: {
+      ConvertSumMetric(metric_data, metric->mutable_sum());
+      break;
+    }
+    case metric_sdk::AggregationType::kHistogram: {
+      ConvertHistogramMetric(metric_data, metric->mutable_histogram());
+      break;
+    }
+    case metric_sdk::AggregationType::kLastValue: {
+      ConvertGaugeMetric(metric_data, metric->mutable_gauge());
+      break;
+    }
+    default:
+      break;
   }
 }
 
@@ -164,9 +198,8 @@ void OtlpMetricUtils::PopulateResourceMetrics(
     const opentelemetry::sdk::metrics::ResourceMetrics &data,
     proto::metrics::v1::ResourceMetrics *resource_metrics) noexcept
 {
-  proto::resource::v1::Resource proto;
-  OtlpPopulateAttributeUtils::PopulateAttribute(&proto, *(data.resource_));
-  *resource_metrics->mutable_resource() = proto;
+  OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(),
+                                                *(data.resource_));
 
   for (auto &instrumentation_metrics : data.instrumentation_info_metric_data_)
   {
@@ -175,17 +208,15 @@ void OtlpMetricUtils::PopulateResourceMetrics(
       continue;
     }
     auto instrumentation_lib_metrics = resource_metrics->add_instrumentation_library_metrics();
-    proto::common::v1::InstrumentationLibrary instrumentation_library;
-    instrumentation_library.set_name(instrumentation_metrics.instrumentation_library_->GetName());
-    instrumentation_library.set_version(
+    proto::common::v1::InstrumentationLibrary *instrumentation_library =
+        instrumentation_lib_metrics->mutable_instrumentation_library();
+    instrumentation_library->set_name(instrumentation_metrics.instrumentation_library_->GetName());
+    instrumentation_library->set_version(
         instrumentation_metrics.instrumentation_library_->GetVersion());
-    *instrumentation_lib_metrics->mutable_instrumentation_library() = instrumentation_library;
 
     for (auto &metric_data : instrumentation_metrics.metric_data_)
     {
-      proto::metrics::v1::Metric metric;
-      PopulateInstrumentationInfoMetric(metric_data, &metric);
-      *instrumentation_lib_metrics->add_metrics() = metric;
+      PopulateInstrumentationInfoMetric(metric_data, instrumentation_lib_metrics->add_metrics());
     }
   }
 }
