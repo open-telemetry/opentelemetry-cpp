@@ -7,6 +7,8 @@
 // https://github.com/open-telemetry/opentelemetry-specification/tree/v1.0.0/specification/trace/semantic_conventions
 // and MAY will change in future.
 
+// "This file is deprecated. Use opentelemetry/trace/semantic_conventions.h"
+
 #pragma once
 
 #include "opentelemetry/common/string_util.h"

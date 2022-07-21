@@ -6,8 +6,8 @@
 #  include <gtest/gtest.h>
 
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -104,20 +104,17 @@ TEST(OtlpLogRecordable, DefaultResource)
   for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
     auto attr = proto_resource.attributes(static_cast<int>(i));
-    if (attr.key() ==
-        opentelemetry::sdk::resource::attr(OTEL_CPP_CONST_HASHCODE(AttrTelemetrySdkLanguage)))
+    if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_LANGUAGE)
     {
       EXPECT_EQ(attr.value().string_value(), "cpp");
       ++found_resource_count;
     }
-    else if (attr.key() ==
-             opentelemetry::sdk::resource::attr(OTEL_CPP_CONST_HASHCODE(AttrTelemetrySdkName)))
+    else if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_NAME)
     {
       EXPECT_EQ(attr.value().string_value(), "opentelemetry");
       ++found_resource_count;
     }
-    else if (attr.key() ==
-             opentelemetry::sdk::resource::attr(OTEL_CPP_CONST_HASHCODE(AttrTelemetrySdkVersion)))
+    else if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_VERSION)
     {
       EXPECT_EQ(attr.value().string_value(), OPENTELEMETRY_SDK_VERSION);
       ++found_resource_count;

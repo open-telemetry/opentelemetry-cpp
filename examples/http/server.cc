@@ -3,7 +3,7 @@
 
 #include "server.h"
 #include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/experimental_semantic_conventions.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
@@ -39,13 +39,13 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{OTEL_GET_TRACE_ATTR(AttrHttpServerName), server_name},
-                                 {OTEL_GET_TRACE_ATTR(AttrNetHostPort), server_port},
-                                 {OTEL_GET_TRACE_ATTR(AttrHttpMethod), request.method},
-                                 {OTEL_GET_TRACE_ATTR(AttrHttpScheme), "http"},
-                                 {OTEL_GET_TRACE_ATTR(AttrHttpRequestContentLength),
+                                {{SemanticConventions::HTTP_SERVER_NAME, server_name},
+                                 {SemanticConventions::NET_HOST_PORT, server_port},
+                                 {SemanticConventions::HTTP_METHOD, request.method},
+                                 {SemanticConventions::HTTP_SCHEME, "http"},
+                                 {SemanticConventions::HTTP_REQUEST_CONTENT_LENGTH,
                                   static_cast<uint64_t>(request.content.length())},
-                                 {OTEL_GET_TRACE_ATTR(AttrHttpClientIp), request.client}},
+                                 {SemanticConventions::HTTP_CLIENT_IP, request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
