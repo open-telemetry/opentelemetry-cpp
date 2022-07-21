@@ -11,18 +11,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "tracer_common.h"
-
-#ifdef _WIN32
-#  ifdef DELETE
-// winnt.h defines DELETE
-// Causes a build error with FaasDocumentOperationValues::DELETE
-#    pragma message(__FILE__ ": removing define on DELETE")
-#    undef DELETE
-#  endif
-#endif
 
 #include "opentelemetry/trace/semantic_conventions.h"
+#include "tracer_common.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

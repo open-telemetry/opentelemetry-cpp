@@ -5,6 +5,7 @@
 #endif
 
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "tracer_common.h"
 
@@ -19,17 +20,6 @@
 #include <sstream>
 #include <string>
 #include <thread>
-
-#ifdef _WIN32
-#  ifdef DELETE
-// winnt.h defines DELETE
-// Causes a build error with FaasDocumentOperationValues::DELETE
-#    pragma message(__FILE__ ": removing define on DELETE")
-#    undef DELETE
-#  endif
-#endif
-
-#include "opentelemetry/trace/semantic_conventions.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;

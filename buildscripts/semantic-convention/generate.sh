@@ -35,6 +35,7 @@ docker run --rm \
   -f /source code \
   --template /templates/SemanticAttributes.h.j2 \
   --output /output/semantic_conventions.h \
+  -Dsemconv=trace \
   -Dclass=SemanticConventions \
   -DschemaUrl=$SCHEMA_URL \
   -Dnamespace_open="namespace trace {" \
@@ -48,6 +49,7 @@ docker run --rm \
   -f /source code \
   --template /templates/SemanticAttributes.h.j2 \
   --output /output/semantic_conventions.h \
+  -Dsemconv=resource \
   -Dclass=SemanticConventions \
   -DschemaUrl=$SCHEMA_URL \
   -Dnamespace_open="namespace sdk { namespace resource {" \

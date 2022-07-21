@@ -11,6 +11,18 @@
 #pragma once
 
 #include "opentelemetry/version.h"
+/*
+ * Special considerations for FaasDocumentOperationValues::DELETE.
+ *
+ * The winnt.h header file is known to define a DELETE symbol,
+ * which collides with FaasDocumentOperationValues::DELETE.
+ */
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": removing define on DELETE")
+#    undef DELETE
+#  endif
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
