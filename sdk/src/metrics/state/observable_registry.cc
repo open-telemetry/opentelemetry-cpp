@@ -6,6 +6,7 @@
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
+#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -43,20 +44,28 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
   std::unique_lock<std::mutex> lk(callbacks_m_);
   for (auto &callback_wrap : callbacks_)
   {
-    if (static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
+    auto value_type =
+        static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
             ->GetInstrumentDescriptor()
-            .value_type_ == InstrumentValueType::kDouble)
+            .value_type_;
+    auto storage =
+        static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
+            ->GetMetricStorage();
+    if (value_type == InstrumentValueType::kDouble)
     {
       nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<double>());
       callback_wrap->callback(ob_res, callback_wrap->state);
+      storage->RecordDouble(static_cast<opentelemetry::sdk::metrics::ObserverResultT<double> *>(ob_res.get())->GetMeasurements() , collection_ts);
     }
     else
     {
       nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<long>());
       callback_wrap->callback(ob_res, callback_wrap->state);
+      storage->RecordLong(static_cast<opentelemetry::sdk::metrics::ObserverResultT<long> *>(ob_res.get())->GetMeasurements() , collection_ts);
     }
+    // record observerd measurements to all configured metric storage
   }
 }
 

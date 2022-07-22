@@ -19,7 +19,7 @@ template <class T>
 class ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
 {
 public:
-  ObserverResultT(const AttributesProcessor *attributes_processor = nullptr)
+  explicit ObserverResultT(const AttributesProcessor *attributes_processor = nullptr)
       : attributes_processor_(attributes_processor)
   {}
 

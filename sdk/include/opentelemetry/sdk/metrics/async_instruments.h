@@ -15,7 +15,7 @@ namespace sdk
 namespace metrics
 {
 
-class WritableMetricStorage;
+class AsyncWritableMetricStorage;
 
 class Asynchronous
 {
@@ -37,7 +37,7 @@ class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,
-                       std::unique_ptr<WritableMetricStorage> storage);
+                       std::unique_ptr<AsyncWritableMetricStorage> storage);
 
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                    void *state) noexcept override;
@@ -47,11 +47,11 @@ public:
 
   const InstrumentDescriptor &GetInstrumentDescriptor();
 
-  const WritableMetricStorage *GetMetricStorage();
+  AsyncWritableMetricStorage *GetMetricStorage();
 
 private:
   InstrumentDescriptor instrument_descriptor_;
-  std::unique_ptr<WritableMetricStorage> storage_;
+  std::unique_ptr<AsyncWritableMetricStorage> storage_;
   std::unique_ptr<ObservableRegistry> observable_registry_;
 };
 }  // namespace metrics

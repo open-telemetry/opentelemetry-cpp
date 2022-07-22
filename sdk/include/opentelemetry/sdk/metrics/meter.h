@@ -20,7 +20,8 @@ namespace metrics
 {
 
 class MetricStorage;
-class WritableMetricStorage;
+class SyncWritableMetricStorage;
+class AsyncWritableMetricsStorge;
 
 class Meter final : public opentelemetry::metrics::Meter
 {
@@ -108,10 +109,10 @@ private:
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
 
-  std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
+  std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
 
-  // void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor);
+  std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor);
 };
 }  // namespace metrics
 }  // namespace sdk

@@ -15,7 +15,7 @@ namespace metrics
 {
 
 ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descriptor,
-                                           std::unique_ptr<WritableMetricStorage> storage)
+                                           std::unique_ptr<AsyncWritableMetricStorage> storage)
     : instrument_descriptor_(instrument_descriptor),
       storage_(std::move(storage)),
       observable_registry_{new ObservableRegistry()},
@@ -41,7 +41,7 @@ const InstrumentDescriptor &ObservableInstrument::GetInstrumentDescriptor()
   return instrument_descriptor_;
 }
 
-const WritableMetricStorage *ObservableInstrument::GetMetricStorage()
+AsyncWritableMetricStorage *ObservableInstrument::GetMetricStorage()
 {
   return storage_.get();
 }

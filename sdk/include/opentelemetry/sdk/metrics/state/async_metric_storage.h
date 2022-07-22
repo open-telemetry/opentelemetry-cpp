@@ -22,7 +22,7 @@ namespace metrics
 {
 
 template <class T>
-class AsyncMetricStorage : public MetricStorage
+class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
   AsyncMetricStorage(
@@ -40,14 +40,24 @@ public:
         temporal_metric_storage_(instrument_descriptor)
   {}
 
+  virtual void RecordLong(
+      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  {}
+
+  virtual void RecordDouble(
+      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  {}
+
   bool Collect(CollectorHandle *collector,
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
-    nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
-        new opentelemetry::sdk::metrics::ObserverResultT<T>(attributes_processor_));
+     nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
+        new opentelemetry::sdk::metrics::ObserverResultT<T>(nullptr));
 
     // read the measurement using configured callback
     //  measurement_collection_callback_(ob_res, state_);
