@@ -57,9 +57,8 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
-  void SetInstrumentationScope(
-      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
-          &instrumentation_scope) noexcept override;
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept override;
 
 private:
   proto::trace::v1::Span span_;

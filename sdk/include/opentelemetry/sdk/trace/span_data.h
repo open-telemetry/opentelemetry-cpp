@@ -284,8 +284,7 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
-  void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept override
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
   {
     instrumentation_scope_ = &instrumentation_scope;
   }

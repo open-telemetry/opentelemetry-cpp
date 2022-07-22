@@ -144,8 +144,7 @@ public:
     }
   }
 
-  void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept override
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
   {
     for (auto &recordable : recordables_)
     {
