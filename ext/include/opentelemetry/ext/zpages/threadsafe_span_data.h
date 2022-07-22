@@ -184,7 +184,7 @@ public:
                                    &instrumentation_scope) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    instrumentation_scope_ = &instrumentation_scope
+    instrumentation_scope_ = &instrumentation_scope;
   }
 
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
