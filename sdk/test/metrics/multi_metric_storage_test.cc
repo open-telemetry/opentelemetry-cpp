@@ -13,7 +13,7 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using namespace opentelemetry::sdk::metrics;
 
-class TestMetricStorage : public WritableMetricStorage
+class TestMetricStorage : public SyncWritableMetricStorage
 {
 public:
   void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override
@@ -46,9 +46,9 @@ public:
 
 TEST(MultiMetricStorageTest, BasicTests)
 {
-  std::shared_ptr<opentelemetry::sdk::metrics::WritableMetricStorage> storage(
+  std::shared_ptr<opentelemetry::sdk::metrics::SyncWritableMetricStorage> storage(
       new TestMetricStorage());
-  MultiMetricStorage storages{};
+  SyncMultiMetricStorage storages{};
   storages.AddStorage(storage);
   EXPECT_NO_THROW(storages.RecordLong(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(storages.RecordLong(20l, opentelemetry::context::Context{}));

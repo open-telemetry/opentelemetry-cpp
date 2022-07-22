@@ -56,7 +56,7 @@ public:
                opentelemetry::common::SystemTimestamp collection_ts,
                nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
-     nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
+    nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
         new opentelemetry::sdk::metrics::ObserverResultT<T>(nullptr));
 
     // read the measurement using configured callback

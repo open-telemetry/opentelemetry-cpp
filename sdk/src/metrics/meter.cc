@@ -210,13 +210,13 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
           view_instr_desc.description_ = view.GetDescription();
         }
         auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-        //if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
-        //{ 
-          auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
-              view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-              NoExemplarReservoir::GetNoExemplarReservoir()));
-          storage_registry_[instrument_descriptor.name_] = storage;
-          multi_storage->AddStorage(storage);
+        // if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
+        //{
+        auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+            NoExemplarReservoir::GetNoExemplarReservoir()));
+        storage_registry_[instrument_descriptor.name_] = storage;
+        multi_storage->AddStorage(storage);
         //}
         /*else
         {
@@ -248,11 +248,12 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   return storages;
 }
 
-std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor)
+std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
+    InstrumentDescriptor &instrument_descriptor)
 {
   auto view_registry = meter_context_->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
-  auto success       = view_registry->FindViews(
+  auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;

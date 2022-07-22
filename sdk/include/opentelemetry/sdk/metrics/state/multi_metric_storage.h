@@ -18,7 +18,10 @@ namespace metrics
 class SyncMultiMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void AddStorage(std::shared_ptr<SyncWritableMetricStorage> storage) { storages_.push_back(storage); }
+  void AddStorage(std::shared_ptr<SyncWritableMetricStorage> storage)
+  {
+    storages_.push_back(storage);
+  }
 
   virtual void RecordLong(long value,
                           const opentelemetry::context::Context &context) noexcept override
@@ -70,8 +73,9 @@ public:
     storages_.push_back(storage);
   }
 
-  void RecordLong(const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
-                  opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  void RecordLong(
+      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)
     {

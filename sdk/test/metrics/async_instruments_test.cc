@@ -19,7 +19,7 @@ TEST(AsyncInstruments, ObservableInstrument)
   InstrumentDescriptor instrument_descriptor = {"long_counter", "description", "1",
                                                 InstrumentType::kObservableCounter,
                                                 InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<AsyncWritableMetricStorage> metric_storage(new AsyncMultiMetricStorage());
   auto asyc_generate_meas_long = [](opentelemetry::metrics::ObserverResultT<long> &observer) {};
   ObservableInstrument observable_counter_long(instrument_descriptor, std::move(metric_storage));
   observable_counter_long.AddCallback(asyc_generate_measurements, nullptr);

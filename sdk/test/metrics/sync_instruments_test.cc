@@ -24,7 +24,7 @@ TEST(SyncInstruments, LongCounter)
 {
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10l));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
@@ -43,7 +43,7 @@ TEST(SyncInstruments, DoubleCounter)
 {
   InstrumentDescriptor instrument_descriptor = {
       "double_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   DoubleCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10.10));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
@@ -63,7 +63,7 @@ TEST(SyncInstruments, LongUpDownCounter)
   InstrumentDescriptor instrument_descriptor = {"long_updowncounter", "description", "1",
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10l));
   EXPECT_NO_THROW(counter.Add(10l, opentelemetry::context::Context{}));
@@ -83,7 +83,7 @@ TEST(SyncInstruments, DoubleUpDownCounter)
   InstrumentDescriptor instrument_descriptor = {"double_updowncounter", "description", "1",
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   DoubleUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Add(10.10));
   EXPECT_NO_THROW(counter.Add(10.10, opentelemetry::context::Context{}));
@@ -102,7 +102,7 @@ TEST(SyncInstruments, LongHistogram)
 {
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongHistogram counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Record(10l, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Record(-10l, opentelemetry::context::Context{}));  // This is ignored
@@ -119,7 +119,7 @@ TEST(SyncInstruments, DoubleHistogram)
   InstrumentDescriptor instrument_descriptor = {"double_histogram", "description", "1",
                                                 InstrumentType::kHistogram,
                                                 InstrumentValueType::kDouble};
-  std::unique_ptr<WritableMetricStorage> metric_storage(new MultiMetricStorage());
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   DoubleHistogram counter(instrument_descriptor, std::move(metric_storage));
   EXPECT_NO_THROW(counter.Record(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(counter.Record(-10.10, opentelemetry::context::Context{}));  // This is ignored.

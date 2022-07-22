@@ -56,14 +56,20 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
       nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<double>());
       callback_wrap->callback(ob_res, callback_wrap->state);
-      storage->RecordDouble(static_cast<opentelemetry::sdk::metrics::ObserverResultT<double> *>(ob_res.get())->GetMeasurements() , collection_ts);
+      storage->RecordDouble(
+          static_cast<opentelemetry::sdk::metrics::ObserverResultT<double> *>(ob_res.get())
+              ->GetMeasurements(),
+          collection_ts);
     }
     else
     {
       nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<long>());
       callback_wrap->callback(ob_res, callback_wrap->state);
-      storage->RecordLong(static_cast<opentelemetry::sdk::metrics::ObserverResultT<long> *>(ob_res.get())->GetMeasurements() , collection_ts);
+      storage->RecordLong(
+          static_cast<opentelemetry::sdk::metrics::ObserverResultT<long> *>(ob_res.get())
+              ->GetMeasurements(),
+          collection_ts);
     }
     // record observerd measurements to all configured metric storage
   }
