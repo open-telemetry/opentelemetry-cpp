@@ -10,6 +10,7 @@
 #  include <unordered_map>
 
 #  include "nlohmann/json.hpp"
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/version.h"
@@ -201,27 +202,42 @@ public:
   nlohmann::json GetJSON() noexcept { return json_; }
 
   /**
-   * Set instrumentation_library for this log.
-   * @param instrumentation_library the instrumentation library to set
+   * Set instrumentation_scope for this log.
+   * @param instrumentation_scopehe instrumentation library to set
    */
-  void SetInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library) noexcept
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept
   {
-    json_["name"]            = instrumentation_library.GetName();
-    instrumentation_library_ = &instrumentation_library;
+    json_["name"]          = instrumentation_scope.GetName();
+    instrumentation_scope_ = &instrumentation_scope;
+  }
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+          &instrumentation_scope) noexcept
+  {
+    SetInstrumentationScope(instrumentation_scope);
   }
 
   /** Returns the associated instruementation library */
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-  GetInstrumentationLibrary() const noexcept
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
+      const noexcept
   {
-    return *instrumentation_library_;
+    return GetInstrumentationScope();
+  }
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
+      const noexcept
+  {
+    return *instrumentation_scope_;
   }
 
 private:
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_ = nullptr;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
+      nullptr;
 };
 }  // namespace logs
 }  // namespace exporter

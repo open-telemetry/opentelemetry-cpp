@@ -5,11 +5,12 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <chrono>
 #  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
@@ -29,8 +30,8 @@ public:
   /** Construct a new Meter with the given  pipeline. */
   explicit Meter(
       std::shared_ptr<sdk::metrics::MeterContext> meter_context,
-      std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary> scope =
-          opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("")) noexcept;
+      std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
+          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
   nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
       nostd::string_view name,
@@ -105,8 +106,13 @@ public:
       void *state                    = nullptr) noexcept override;
 
   /** Returns the associated instruementation library */
-  const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
-      const noexcept;
+  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope() const noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationLibrary() const noexcept
+  {
+    return GetInstrumentationScope();
+  }
 
   /** collect metrics across all the instruments configured for the meter **/
   std::vector<MetricData> Collect(CollectorHandle *collector,
@@ -115,7 +121,7 @@ public:
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
-  std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> scope_;
+  std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
   std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;

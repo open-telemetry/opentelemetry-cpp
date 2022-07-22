@@ -123,7 +123,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -212,7 +212,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -322,7 +322,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
         {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
@@ -401,7 +401,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data{};
     last_value_point_data.value_              = 10.0;
@@ -523,7 +523,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
     data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
         {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
@@ -635,7 +635,7 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
         "library_name", "1.5.0");
 
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data{};

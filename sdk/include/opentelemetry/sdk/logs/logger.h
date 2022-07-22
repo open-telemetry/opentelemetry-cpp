@@ -4,8 +4,9 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/logger_context.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 
@@ -29,8 +30,8 @@ public:
   explicit Logger(
       opentelemetry::nostd::string_view name,
       std::shared_ptr<LoggerContext> context,
-      std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library =
-          instrumentationlibrary::InstrumentationLibrary::Create("")) noexcept;
+      std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope =
+          instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
   /**
    * Returns the name of this logger.
@@ -58,8 +59,15 @@ public:
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
   /** Returns the associated instruementation library */
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-  GetInstrumentationLibrary() const noexcept;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
+      const noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
+      const noexcept
+  {
+    return GetInstrumentationScope();
+  }
 
 private:
   // The name of this logger
@@ -67,7 +75,7 @@ private:
 
   // order of declaration is important here - instrumentation library should destroy after
   // logger-context.
-  std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+  std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
 };
 

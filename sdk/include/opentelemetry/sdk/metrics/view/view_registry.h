@@ -4,7 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <unordered_map>
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #  include "opentelemetry/sdk/metrics/view/view.h"
@@ -43,10 +43,10 @@ public:
     registered_views_.push_back(std::move(registered_view));
   }
 
-  bool FindViews(const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-                 const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                     &instrumentation_scope,
-                 nostd::function_ref<bool(const View &)> callback) const
+  bool FindViews(
+      const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
+      nostd::function_ref<bool(const View &)> callback) const
   {
     bool found = false;
     for (auto const &registered_view : registered_views_)
@@ -77,9 +77,9 @@ public:
 
 private:
   std::vector<std::unique_ptr<RegisteredView>> registered_views_;
-  static bool MatchMeter(opentelemetry::sdk::metrics::MeterSelector *selector,
-                         const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                             &instrumentation_scope)
+  static bool MatchMeter(
+      opentelemetry::sdk::metrics::MeterSelector *selector,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope)
   {
     return selector->GetNameFilter()->Match(instrumentation_scope.GetName()) &&
            (instrumentation_scope.GetVersion().size() == 0 ||

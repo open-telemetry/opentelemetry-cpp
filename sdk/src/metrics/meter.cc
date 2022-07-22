@@ -23,9 +23,9 @@ namespace metrics
 namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
-Meter::Meter(std::shared_ptr<MeterContext> meter_context,
-             std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
-                 instrumentation_scope) noexcept
+Meter::Meter(
+    std::shared_ptr<MeterContext> meter_context,
+    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
 {}
 
@@ -192,7 +192,7 @@ void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
   RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
-const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
+const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
     const noexcept
 {
   return scope_.get();

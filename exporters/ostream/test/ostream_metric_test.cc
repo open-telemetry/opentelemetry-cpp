@@ -41,7 +41,7 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
       "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
@@ -104,7 +104,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
       "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
@@ -164,7 +164,7 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
       "library_name", "1.2.0");
   metric_sdk::LastValuePointData last_value_point_data{};
   last_value_point_data.value_              = 10.0;
@@ -227,7 +227,7 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto scope     = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
       "library_name", "1.2.0");
   metric_sdk::DropPointData drop_point_data{};
   metric_sdk::DropPointData drop_point_data2{};

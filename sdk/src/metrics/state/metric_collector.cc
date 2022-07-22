@@ -38,7 +38,7 @@ bool MetricCollector::Collect(
     auto collection_ts = std::chrono::system_clock::now();
     ScopeMetrics scope_metrics;
     scope_metrics.metric_data_ = meter->Collect(this, collection_ts);
-    scope_metrics.scope_       = meter->GetInstrumentationLibrary();
+    scope_metrics.scope_       = meter->GetInstrumentationScope();
     resource_metrics.scope_metric_data_.push_back(scope_metrics);
   }
   resource_metrics.resource_ = &meter_context_->GetResource();

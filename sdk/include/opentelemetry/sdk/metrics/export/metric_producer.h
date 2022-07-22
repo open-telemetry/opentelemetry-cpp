@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 
@@ -19,7 +19,7 @@ namespace metrics
  */
 struct ScopeMetrics
 {
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *scope_;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_;
   std::vector<MetricData> metric_data_;
 };
 

@@ -173,19 +173,26 @@ public:
   opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 
   /**
-   * Set instrumentation_library for this log.
-   * @param instrumentation_library the instrumentation library to set
+   * Set instrumentation_scope for this log.
+   * @param instrumentation_scopehe instrumentation library to set
    */
-  void SetInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library) noexcept
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept
   {
-    instrumentation_library_ = &instrumentation_library;
+    instrumentation_scope_ = &instrumentation_scope;
+  }
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+          &instrumentation_scope) noexcept
+  {
+    SetInstrumentationScope(instrumentation_scope);
   }
 
 private:
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_ = nullptr;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
+      nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

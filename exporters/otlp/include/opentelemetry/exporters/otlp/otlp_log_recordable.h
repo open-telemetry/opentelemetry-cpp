@@ -9,11 +9,12 @@
 
 #  include "opentelemetry/proto/logs/v1/logs.pb.h"
 #  include "opentelemetry/proto/resource/v1/resource.pb.h"
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 // clang-format on
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 
@@ -91,24 +92,30 @@ public:
   void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override;
 
   /**
-   * Set instrumentation_library for this log.
-   * @param instrumentation_library the instrumentation library to set
+   * Set instrumentation_scope for this log.
+   * @param instrumentation_scopehe instrumentation library to set
    */
-  void SetInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library) noexcept override;
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept override;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
+      const noexcept
+  {
+    return GetInstrumentationScope();
+  }
 
   /** Returns the associated instruementation library */
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-  GetInstrumentationLibrary() const noexcept;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
+      const noexcept;
 
 private:
   proto::logs::v1::LogRecord log_record_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   // TODO shared resource
   // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_ = nullptr;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
+      nullptr;
 };
 
 }  // namespace otlp
