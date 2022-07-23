@@ -1,13 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
+#include "opentelemetry/nostd/shared_ptr.h"
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "foo_library.h"
 #  include <chrono>
 #  include <map>
 #  include <thread>
 #  include <vector>
+#  include "foo_library.h"
 #  include "opentelemetry/context/context.h"
+#  include "opentelemetry/metrics/aggregation_config.h"
 #  include "opentelemetry/metrics/provider.h"
 
 namespace nostd       = opentelemetry::nostd;
@@ -69,11 +72,19 @@ void foo_library::observable_counter_example(const std::string &name)
 
 void foo_library::histogram_example(const std::string &name)
 {
+  nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config{
+      new opentelemetry::metrics::HistogramAggregationConfig<double>};
+  static_cast<opentelemetry::metrics::HistogramAggregationConfig<double> *>(
+      aggregation_config.get())
+      ->boundaries_ =
+      std::list<double>{0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  ;
   std::string histogram_name                  = name + "_histogram";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto histogram_counter                      = meter->CreateDoubleHistogram(histogram_name);
-  auto context                                = opentelemetry::context::Context{};
+  auto histogram_counter =
+      meter->CreateDoubleHistogram(histogram_name, "des", "unit", aggregation_config);
+  auto context = opentelemetry::context::Context{};
   while (true)
   {
     double val                                = (rand() % 700) + 1.1;

@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -13,7 +14,8 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-using M = std::map<std::string, std::string>;
+using M         = std::map<std::string, std::string>;
+namespace nostd = opentelemetry::nostd;
 
 class MockCollectorHandle : public CollectorHandle
 {
@@ -42,7 +44,8 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
 
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
-      NoExemplarReservoir::GetNoExemplarReservoir());
+      NoExemplarReservoir::GetNoExemplarReservoir(),
+      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{});
 
   storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -148,7 +151,8 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
 
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
-      NoExemplarReservoir::GetNoExemplarReservoir());
+      NoExemplarReservoir::GetNoExemplarReservoir(),
+      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{});
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),

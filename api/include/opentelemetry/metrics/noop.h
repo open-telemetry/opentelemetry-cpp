@@ -122,9 +122,12 @@ public:
 class NoopMeter final : public Meter
 {
 public:
-  nostd::shared_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
-                                                     nostd::string_view description = "",
-                                                     nostd::string_view unit = "") noexcept override
+  nostd::shared_ptr<Counter<long>> CreateLongCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
   }
@@ -132,7 +135,9 @@ public:
   nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
   }
@@ -141,20 +146,26 @@ public:
                                    void (*callback)(ObserverResult<long> &, void *),
                                    nostd::string_view description = "",
                                    nostd::string_view unit        = "",
-                                   void *state                    = nullptr) noexcept override
+                                   nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                       nostd::shared_ptr<AggregationConfig>{},
+                                   void *state = nullptr) noexcept override
   {}
 
   void CreateDoubleObservableCounter(nostd::string_view name,
                                      void (*callback)(ObserverResult<double> &, void *),
                                      nostd::string_view description = "",
                                      nostd::string_view unit        = "",
-                                     void *state                    = nullptr) noexcept override
+                                     nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                         nostd::shared_ptr<AggregationConfig>{},
+                                     void *state = nullptr) noexcept override
   {}
 
   nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
   }
@@ -162,7 +173,9 @@ public:
   nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
@@ -171,20 +184,26 @@ public:
                                  void (*callback)(ObserverResult<long> &, void *),
                                  nostd::string_view description = "",
                                  nostd::string_view unit        = "",
-                                 void *state                    = nullptr) noexcept override
+                                 nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                     nostd::shared_ptr<AggregationConfig>{},
+                                 void *state = nullptr) noexcept override
   {}
 
   void CreateDoubleObservableGauge(nostd::string_view name,
                                    void (*callback)(ObserverResult<double> &, void *),
                                    nostd::string_view description = "",
                                    nostd::string_view unit        = "",
-                                   void *state                    = nullptr) noexcept override
+                                   nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                       nostd::shared_ptr<AggregationConfig>{},
+                                   void *state = nullptr) noexcept override
   {}
 
   nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<UpDownCounter<long>>{
         new NoopUpDownCounter<long>(name, description, unit)};
@@ -193,7 +212,9 @@ public:
   nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept override
   {
     return nostd::shared_ptr<UpDownCounter<double>>{
         new NoopUpDownCounter<double>(name, description, unit)};
@@ -203,13 +224,17 @@ public:
                                          void (*callback)(ObserverResult<long> &, void *),
                                          nostd::string_view description = "",
                                          nostd::string_view unit        = "",
-                                         void *state                    = nullptr) noexcept override
+                                         nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                             nostd::shared_ptr<AggregationConfig>{},
+                                         void *state = nullptr) noexcept override
   {}
 
   void CreateDoubleObservableUpDownCounter(nostd::string_view name,
                                            void (*callback)(ObserverResult<double> &, void *),
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "",
+                                           nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                               nostd::shared_ptr<AggregationConfig>{},
                                            void *state = nullptr) noexcept override
   {}
 };

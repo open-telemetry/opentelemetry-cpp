@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include "opentelemetry/nostd/shared_ptr.h"
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 
@@ -23,7 +25,9 @@ struct LastReportedMetrics
 class TemporalMetricStorage
 {
 public:
-  TemporalMetricStorage(InstrumentDescriptor instrument_descriptor);
+  TemporalMetricStorage(
+      InstrumentDescriptor instrument_descriptor,
+      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config);
 
   bool buildMetrics(CollectorHandle *collector,
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,
@@ -43,6 +47,7 @@ private:
 
   // Lock while building metrics
   mutable opentelemetry::common::SpinLockMutex lock_;
+  const nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config_;
 };
 }  // namespace metrics
 }  // namespace sdk

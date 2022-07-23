@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <memory>
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/metrics/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
@@ -18,11 +21,13 @@ namespace sdk
 {
 namespace metrics
 {
+
 class DefaultAggregation
 {
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(
-      const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor)
+      const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
+      const opentelemetry::metrics::AggregationConfig *aggregation_config)
   {
     switch (instrument_descriptor.type_)
     {
@@ -34,11 +39,17 @@ public:
                    ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation()))
                    : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation()));
         break;
-      case InstrumentType::kHistogram:
+      case InstrumentType::kHistogram: {
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation()))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation()));
+                   ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation(
+                         static_cast<const opentelemetry::metrics::HistogramAggregationConfig<long>
+                                         *>(aggregation_config))))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
+                         static_cast<
+                             const opentelemetry::metrics::HistogramAggregationConfig<double> *>(
+                             aggregation_config))));
         break;
+      }
       case InstrumentType::kObservableGauge:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongLastValueAggregation()))
@@ -88,7 +99,7 @@ public:
         }
         break;
       default:
-        return DefaultAggregation::CreateAggregation(instrument_descriptor);
+        return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
     }
   }
 
@@ -135,7 +146,7 @@ public:
               new DoubleSumAggregation(nostd::get<SumPointData>(point_data)));
         }
       default:
-        return DefaultAggregation::CreateAggregation(instrument_descriptor);
+        return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
     }
   }
 };

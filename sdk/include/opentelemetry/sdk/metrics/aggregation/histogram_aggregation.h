@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/metrics/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 
 #  include <mutex>
@@ -17,7 +18,8 @@ namespace metrics
 class LongHistogramAggregation : public Aggregation
 {
 public:
-  LongHistogramAggregation();
+  LongHistogramAggregation(
+      const opentelemetry::metrics::HistogramAggregationConfig<long> *aggregation_config = nullptr);
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
@@ -46,7 +48,8 @@ private:
 class DoubleHistogramAggregation : public Aggregation
 {
 public:
-  DoubleHistogramAggregation();
+  DoubleHistogramAggregation(const opentelemetry::metrics::HistogramAggregationConfig<double>
+                                 *aggregation_config = nullptr);
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 

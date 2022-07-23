@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include "opentelemetry/metrics/aggregation_config.h"
 #  include "opentelemetry/metrics/async_instruments.h"
 #  include "opentelemetry/metrics/sync_instruments.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
@@ -39,12 +40,16 @@ public:
   virtual nostd::shared_ptr<Counter<long>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   virtual nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   /**
    * Creates a Asynchronous (Observable) counter with the passed characteristics and returns a
@@ -60,13 +65,18 @@ public:
                                            void (*callback)(ObserverResult<long> &, void *),
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "",
-                                           void *state                    = nullptr) noexcept = 0;
+                                           nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                               nostd::shared_ptr<AggregationConfig>{},
+                                           void *state = nullptr) noexcept = 0;
 
-  virtual void CreateDoubleObservableCounter(nostd::string_view name,
-                                             void (*callback)(ObserverResult<double> &, void *),
-                                             nostd::string_view description = "",
-                                             nostd::string_view unit        = "",
-                                             void *state                    = nullptr) noexcept = 0;
+  virtual void CreateDoubleObservableCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double> &, void *),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{},
+      void *state = nullptr) noexcept = 0;
 
   /**
    * Creates a Histogram with the passed characteristics and returns a shared_ptr to that Histogram.
@@ -79,12 +89,16 @@ public:
   virtual nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   virtual nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   /**
    * Creates a Asynchronouse (Observable) Gauge with the passed characteristics and returns a
@@ -100,13 +114,17 @@ public:
                                          void (*callback)(ObserverResult<long> &, void *),
                                          nostd::string_view description = "",
                                          nostd::string_view unit        = "",
-                                         void *state                    = nullptr) noexcept = 0;
+                                         nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                             nostd::shared_ptr<AggregationConfig>{},
+                                         void *state = nullptr) noexcept = 0;
 
   virtual void CreateDoubleObservableGauge(nostd::string_view name,
                                            void (*callback)(ObserverResult<double> &, void *),
                                            nostd::string_view description = "",
                                            nostd::string_view unit        = "",
-                                           void *state                    = nullptr) noexcept = 0;
+                                           nostd::shared_ptr<AggregationConfig> aggregation_config =
+                                               nostd::shared_ptr<AggregationConfig>{},
+                                           void *state = nullptr) noexcept = 0;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -120,12 +138,16 @@ public:
   virtual nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   virtual nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept = 0;
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{}) noexcept = 0;
 
   /**
    * Creates a Asynchronouse (Observable) UpDownCounter with the passed characteristics and returns
@@ -137,18 +159,23 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param state to be passed back to callback
    */
-  virtual void CreateLongObservableUpDownCounter(nostd::string_view name,
-                                                 void (*callback)(ObserverResult<long> &, void *),
-                                                 nostd::string_view description = "",
-                                                 nostd::string_view unit        = "",
-                                                 void *state = nullptr) noexcept = 0;
+  virtual void CreateLongObservableUpDownCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long> &, void *),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{},
+      void *state = nullptr) noexcept = 0;
 
-  virtual void CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                                   void (*callback)(ObserverResult<double> &,
-                                                                    void *),
-                                                   nostd::string_view description = "",
-                                                   nostd::string_view unit        = "",
-                                                   void *state = nullptr) noexcept = 0;
+  virtual void CreateDoubleObservableUpDownCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double> &, void *),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "",
+      nostd::shared_ptr<AggregationConfig> aggregation_config =
+          nostd::shared_ptr<AggregationConfig>{},
+      void *state = nullptr) noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
