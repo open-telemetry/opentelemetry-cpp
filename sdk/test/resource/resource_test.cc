@@ -5,8 +5,8 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <cstdlib>
 #include <string>
@@ -35,10 +35,10 @@ TEST(ResourceTest, create_without_servicename)
       {"service", "backend"},
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "unknown_service"}};
+      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
+      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
+      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::SERVICE_NAME, "unknown_service"}};
 
   ResourceAttributes attributes = {
       {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -68,10 +68,10 @@ TEST(ResourceTest, create_with_servicename)
   ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "backend"},
+      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
+      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
+      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::SERVICE_NAME, "backend"},
   };
   ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -99,10 +99,10 @@ TEST(ResourceTest, create_with_servicename)
 TEST(ResourceTest, create_with_emptyatrributes)
 {
   ResourceAttributes expected_attributes = {
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "unknown_service"},
+      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
+      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
+      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::SERVICE_NAME, "unknown_service"},
   };
   ResourceAttributes attributes = {};
   auto resource                 = Resource::Create(attributes);
