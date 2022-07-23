@@ -43,12 +43,22 @@ public:
   virtual void RecordLong(
       const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
-  {}
+  {
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
+    {
+      return;
+    }
+  }
 
   virtual void RecordDouble(
       const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
-  {}
+  {
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
+    {
+      return;
+    }
+  }
 
   bool Collect(CollectorHandle *collector,
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,

@@ -66,7 +66,9 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -78,7 +80,9 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -118,7 +122,9 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDoubleObservableGauge(
@@ -130,7 +136,9 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -170,7 +178,9 @@ Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -182,7 +192,9 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage(instrument_descriptor);
+  auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::ObservableInstrument>{
+      new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
@@ -210,32 +222,12 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
           view_instr_desc.description_ = view.GetDescription();
         }
         auto multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-        // if (GetInstrumentClass(instrument_descriptor.type_) == InstrumentClass::kSync)
-        //{
+
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
             NoExemplarReservoir::GetNoExemplarReservoir()));
         storage_registry_[instrument_descriptor.name_] = storage;
         multi_storage->AddStorage(storage);
-        //}
-        /*else
-        {
-          if (instrument_descriptor.value_type_ == InstrumentValueType::kDouble)
-          {
-            auto storage =
-                std::shared_ptr<AsyncMetricStorage<double>>(new AsyncMetricStorage<double>(
-                    view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
-            storage_registry_[instrument_descriptor.name_] = storage;
-            multi_storage->AddStorage(storage);
-          }
-          else
-          {
-            auto storage = std::shared_ptr<AsyncMetricStorage<long>>(new AsyncMetricStorage<long>(
-                view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
-            storage_registry_[instrument_descriptor.name_] = storage;
-            multi_storage->AddStorage(storage);
-          }*/
-        //}
         return true;
       });
 
@@ -271,6 +263,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         return true;
       });
+  return storages;
 }
 
 /** collect metrics across all the meters **/
