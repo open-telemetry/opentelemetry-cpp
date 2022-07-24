@@ -46,29 +46,15 @@ public:
   bool FindViews(const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
                  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
                      &instrumentation_library,
-                 nostd::function_ref<bool(const View &)> callback) const
+                 nostd::function_ref<bool(const View &)> callback)
   {
-    bool found = false;
-    for (auto const &registered_view : registered_views_)
-    {
-      if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_library) &&
-          MatchInstrument(registered_view->instrument_selector_.get(), instrument_descriptor))
-      {
-        found = true;
-        if (!callback(*(registered_view->view_.get())))
-        {
-          return false;
-        }
-      }
-    }
-    // return default view if none found;
+    bool found = findViewsInternal(instrument_descriptor, instrumentation_library, callback);
+    // create default view if none found;
     if (!found)
     {
-      static View view("otel-default-view");
-      if (!callback(view))
-      {
-        return false;
-      }
+      createView(instrument_descriptor, instrumentation_library);
+      return findViewsInternal(instrument_descriptor, instrumentation_library, callback);
+      ;
     }
     return true;
   }
@@ -94,6 +80,44 @@ private:
   {
     return selector->GetNameFilter()->Match(instrument_descriptor.name_) &&
            (selector->GetInstrumentType() == instrument_descriptor.type_);
+  }
+
+  bool findViewsInternal(
+      const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library,
+      nostd::function_ref<bool(const View &)> callback) const
+  {
+    bool found = false;
+    for (auto const &registered_view : registered_views_)
+    {
+      if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_library) &&
+          MatchInstrument(registered_view->instrument_selector_.get(), instrument_descriptor))
+      {
+        found = true;
+        if (!callback(*(registered_view->view_.get())))
+        {
+          return false;
+        }
+      }
+    }
+    return found;
+  }
+
+  void createView(const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
+                  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+                      &instrumentation_library)
+  {
+    AddView(
+        std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector>{
+            new opentelemetry::sdk::metrics::InstrumentSelector{instrument_descriptor.type_,
+                                                                instrument_descriptor.name_}},
+        std::unique_ptr<opentelemetry::sdk::metrics::MeterSelector>{
+            new opentelemetry::sdk::metrics::MeterSelector{instrumentation_library.GetName(),
+                                                           instrumentation_library.GetVersion(),
+                                                           instrumentation_library.GetSchemaURL()}},
+        std::unique_ptr<opentelemetry::sdk::metrics::View>{
+            new opentelemetry::sdk::metrics::View{instrumentation_library.GetName()}});
   }
 };
 };  // namespace metrics

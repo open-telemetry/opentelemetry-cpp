@@ -29,7 +29,7 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_lib.get(),
                          [&count](const View &view) {
                            count++;
-                           EXPECT_EQ(view.GetName(), "otel-default-view");
+                           EXPECT_EQ(view.GetName(), "default");
                            EXPECT_EQ(view.GetDescription(), "");
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
