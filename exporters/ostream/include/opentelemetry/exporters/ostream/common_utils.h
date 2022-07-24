@@ -61,7 +61,8 @@ private:
 
 #endif
 
-void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &value, std::ostream &sout)
+inline void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &value,
+                        std::ostream &sout)
 {
 #if __cplusplus < 201402L
   opentelemetry::nostd::visit(OwnedAttributeValueVisitor(sout), value);
