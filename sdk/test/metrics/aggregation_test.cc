@@ -126,10 +126,11 @@ TEST(Aggregation, LongHistogramAggregation)
 
 TEST(Aggregation, LongHistogramAggregationBoundaries)
 {
-  nostd::shared_ptr<opentelemetry::metrics::HistogramAggregationConfig<long>> aggregation_config;
+  nostd::shared_ptr<opentelemetry::metrics::HistogramAggregationConfig<long>> aggregation_config{
+      new opentelemetry::metrics::HistogramAggregationConfig<long>};
   std::list<long> user_boundaries = {0, 50, 100, 250, 500, 750, 1000, 2500, 5000, 10000};
   aggregation_config->boundaries_ = user_boundaries;
-  DoubleHistogramAggregation aggr{};
+  LongHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
@@ -139,11 +140,12 @@ TEST(Aggregation, LongHistogramAggregationBoundaries)
 
 TEST(Aggregation, DoubleHistogramAggregationBoundaries)
 {
-  nostd::shared_ptr<opentelemetry::metrics::HistogramAggregationConfig<double>> aggregation_config;
+  nostd::shared_ptr<opentelemetry::metrics::HistogramAggregationConfig<double>> aggregation_config{
+      new opentelemetry::metrics::HistogramAggregationConfig<double>};
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;
-  DoubleHistogramAggregation aggr{};
+  DoubleHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
