@@ -96,9 +96,9 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   long value              = 0;
 
   MeasurementFetcher measurement_fetcher;
-  opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(instr_desc, AggregationType::kSum,
-                                                                // MeasurementFetcher::Fetcher,
-                                                                new DefaultAttributesProcessor());
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kSum,
+                                                          // MeasurementFetcher::Fetcher,
+                                                          new DefaultAttributesProcessor());
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {

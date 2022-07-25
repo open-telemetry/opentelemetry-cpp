@@ -21,59 +21,29 @@ namespace sdk
 namespace metrics
 {
 
-template <class T>
 class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
-  AsyncMetricStorage(
-      InstrumentDescriptor instrument_descriptor,
-      const AggregationType aggregation_type,
-      //   void (*measurement_callback)(opentelemetry::metrics::ObserverResult &, void *),
-      const AttributesProcessor *attributes_processor,
-      void *state = nullptr)
+  AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+                     const AggregationType aggregation_type,
+                     const AttributesProcessor *attributes_processor,
+                     void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
-        //    measurement_collection_callback_{measurement_callback},
         attributes_processor_{attributes_processor},
         state_{state},
+        delta_hash_map_(new AttributesHashMap()),
         cumulative_hash_map_(new AttributesHashMap()),
         temporal_metric_storage_(instrument_descriptor)
   {}
 
-  virtual void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  template <class T>
+  void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
+              opentelemetry::common::SystemTimestamp observation_time) noexcept
   {
-    if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
-    {
-      return;
-    }
-  }
-
-  virtual void RecordDouble(
-      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
-  {
-    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
-    {
-      return;
-    }
-  }
-
-  bool Collect(CollectorHandle *collector,
-               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
-               opentelemetry::common::SystemTimestamp sdk_start_ts,
-               opentelemetry::common::SystemTimestamp collection_ts,
-               nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
-  {
-    nostd::shared_ptr<opentelemetry::sdk::metrics::ObserverResultT<T>> ob_res(
-        new opentelemetry::sdk::metrics::ObserverResultT<T>(nullptr));
-
-    // read the measurement using configured callback
-    //  measurement_collection_callback_(ob_res, state_);
-    std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
+    // std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
     // process the read measurements - aggregate and store in hashmap
-    for (auto &measurement : ob_res->GetMeasurements())
+    for (auto &measurement : measurements)
     {
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
@@ -84,19 +54,49 @@ public:
         cumulative_hash_map_->Set(measurement.first,
                                   DefaultAggregation::CloneAggregation(
                                       aggregation_type_, instrument_descriptor_, *delta));
-        delta_hash_map->Set(measurement.first, std::move(delta));
+        delta_hash_map_->Set(measurement.first, std::move(delta));
       }
       else
       {
         cumulative_hash_map_->Set(
             measurement.first,
             DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
-        delta_hash_map->Set(measurement.first, std::move(aggr));
+        delta_hash_map_->Set(measurement.first, std::move(aggr));
       }
     }
+  }
+
+  void RecordLong(
+      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  {
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
+    {
+      return;
+    }
+    Record<long>(measurements, observation_time);
+  }
+
+  void RecordDouble(
+      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  {
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
+    {
+      return;
+    }
+    Record<double>(measurements, observation_time);
+  }
+
+  bool Collect(CollectorHandle *collector,
+               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
+  {
 
     return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
-                                                 std::move(delta_hash_map),
+                                                 std::move(delta_hash_map_),
                                                  metric_collection_callback);
   }
 
@@ -107,6 +107,7 @@ private:
   const AttributesProcessor *attributes_processor_;
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
+  std::unique_ptr<AttributesHashMap> delta_hash_map_;
   TemporalMetricStorage temporal_metric_storage_;
 };
 

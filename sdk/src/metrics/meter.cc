@@ -257,7 +257,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           view_instr_desc.description_ = view.GetDescription();
         }
-        auto storage = std::shared_ptr<AsyncMetricStorage<long>>(new AsyncMetricStorage<long>(
+        auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
         storage_registry_[instrument_descriptor.name_] = storage;
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
