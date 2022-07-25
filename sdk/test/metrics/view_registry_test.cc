@@ -29,8 +29,10 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_lib.get(),
                          [&count](const View &view) {
                            count++;
+#  if HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), "default");
                            EXPECT_EQ(view.GetDescription(), "");
+#  endif
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
                          });
