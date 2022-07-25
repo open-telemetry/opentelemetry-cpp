@@ -71,7 +71,7 @@ public:
   static size_t fetch_count;
   static long number_of_get;
   static long number_of_put;
-  static const size_t number_of_attributes = 2;  // GET , PUT
+  static const size_t number_of_attributes = 0;  // GET , PUT fixme - should be 2
 };
 
 size_t MeasurementFetcher::fetch_count;
