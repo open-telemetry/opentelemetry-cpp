@@ -176,6 +176,12 @@ private:
           storage_registry_[instrument_descriptor.name_] = storage;
           return true;
         });
+    if (!success)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+          << "Some of the matching view configurations may not be used for metric collection");
+    }
   }
 };
 }  // namespace metrics
