@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cstddef>
-#include <memory>
-#include <utility>
-#include "opentelemetry/nostd/shared_ptr.h"
 #ifndef ENABLE_METRICS_PREVIEW
+#  include <cstddef>
+#  include <memory>
+#  include <utility>
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 #  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"

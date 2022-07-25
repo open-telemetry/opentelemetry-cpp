@@ -1,16 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <memory>
-#include "opentelemetry/nostd/shared_ptr.h"
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "foo_library.h"
 #  include <chrono>
 #  include <map>
+#  include <memory>
 #  include <thread>
 #  include <vector>
-#  include "foo_library.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;

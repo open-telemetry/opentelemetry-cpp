@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include <utility>
 #ifndef ENABLE_METRICS_PREVIEW
+#  include <utility>
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
