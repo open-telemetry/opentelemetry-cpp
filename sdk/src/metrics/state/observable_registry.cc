@@ -71,7 +71,6 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
               ->GetMeasurements(),
           collection_ts);
     }
-    // record observerd measurements to all configured metric storage
   }
 }
 
