@@ -4,12 +4,15 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+//#include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
 #  include <gtest/gtest.h>
 #  include <vector>
@@ -39,21 +42,20 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResultT<long> &observer_result,
-                      void * /*state*/)
+  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void * /*state*/)
   {
     fetch_count++;
     if (fetch_count == 1)
     {
-      observer_result.Observe(20l, {{"RequestType", "GET"}});
-      observer_result.Observe(10l, {{"RequestType", "PUT"}});
+      opentelemetry::nostd::get<0>(observer_result)->Observe(20l, {{"RequestType", "GET"}});
+      opentelemetry::nostd::get<0>(observer_result)->Observe(10l, {{"RequestType", "PUT"}});
       number_of_get += 20l;
       number_of_put += 10l;
     }
     else if (fetch_count == 2)
     {
-      observer_result.Observe(40l, {{"RequestType", "GET"}});
-      observer_result.Observe(20l, {{"RequestType", "PUT"}});
+      opentelemetry::nostd::get<0>(observer_result)->Observe(40l, {{"RequestType", "GET"}});
+      opentelemetry::nostd::get<0>(observer_result)->Observe(20l, {{"RequestType", "PUT"}});
       number_of_get += 40l;
       number_of_put += 20l;
     }
@@ -81,6 +83,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 {
   MeasurementFetcher::init_values();
   AggregationTemporality temporality = GetParam();
+  ObservableRegistry registry;
+  registry.AddCallback(MeasurementFetcher::Fetcher, nullptr, nullptr);
 
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
                                      InstrumentValueType::kLong};
