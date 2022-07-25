@@ -3,7 +3,7 @@
 
 #include "opentelemetry/exporters/jaeger/recordable.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

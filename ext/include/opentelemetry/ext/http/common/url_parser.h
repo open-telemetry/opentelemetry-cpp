@@ -52,11 +52,16 @@ public:
     }
 
     // credentials
-    pos = url_.find_first_of("@", cpos);
-    if (pos != std::string::npos)
+    size_t pos1 = url_.find_first_of("@", cpos);
+    size_t pos2 = url_.find_first_of("/", cpos);
+    if (pos1 != std::string::npos)
     {
       // TODO - handle credentials
-      cpos = pos + 1;
+      if (pos2 == std::string::npos || pos1 < pos2)
+      {
+        pos  = pos1;
+        cpos = pos1 + 1;
+      }
     }
     pos          = url_.find_first_of(":", cpos);
     bool is_port = false;

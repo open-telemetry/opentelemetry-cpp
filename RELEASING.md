@@ -2,24 +2,27 @@
 
 ## Pre Release
 
-1: Make sure all relevant changes for this release are included under
+1: Upgrade to latest [semantic-conventions](docs/semantic-conventions.md)
+if required.
+
+2: Make sure all relevant changes for this release are included under
 `Unreleased` section in `CHANGELOG.md` and are in language that non-contributors
 to the project can understand.
 
-2: Run the pre-release script. It creates a branch `pre_release_<new-tag>` and
+3: Run the pre-release script. It creates a branch `pre_release_<new-tag>` and
 updates `CHANGELOG.md` with the `<new-tag>`:
 
 ```sh
 ./buildscripts/pre_release.sh -t <new-tag>
 ```
 
-3: Verify that CHANGELOG.md is updated properly:
+4: Verify that CHANGELOG.md is updated properly:
 
 ```sh
 git diff main
 ```
 
-4: Push the changes to upstream and create a Pull Request on GitHub. Be sure to
+5: Push the changes to upstream and create a Pull Request on GitHub. Be sure to
 include the curated changes from the [Changelog](./CHANGELOG.md) in the
 description.
 
