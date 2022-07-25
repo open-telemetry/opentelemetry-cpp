@@ -107,6 +107,11 @@ private:
 
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
+  // unreported metrics stash for all the collectors
+  std::unordered_map<CollectorHandle *, std::list<std::shared_ptr<AttributesHashMap>>>
+      unreported_metrics_;
+  // last reported metrics stash for all the collectors.
+  std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
   const AttributesProcessor *attributes_processor_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;

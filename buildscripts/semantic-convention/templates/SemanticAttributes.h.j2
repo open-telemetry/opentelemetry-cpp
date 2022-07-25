@@ -1,0 +1,120 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+{#
+  Adapted from:
+  opentelemetry-java/buildscripts/semantic-convention/templates/SemanticAttributes.java.j2
+  for opentelemetry-cpp
+#}
+{%- macro to_cpp_return_type(type) -%}
+  {%- if type == "string" -%}
+    char *
+  {%- elif type == "string[]" -%}
+    char *[]
+  {%- elif type == "boolean" -%}
+    bool
+  {%- elif type == "int" -%}
+    int
+  {%- elif type == "double" -%}
+    double
+  {%- else -%}
+    {{type}}
+  {%- endif -%}
+{%- endmacro %}
+{%- macro print_value(type, value) -%}
+  {{ "\"" if type == "char *"}}{{value}}{{ "\"" if type == "char *"}}
+{%- endmacro %}
+{%- macro upFirst(text) -%}
+  {{ text[0]|upper}}{{text[1:] }}
+{%- endmacro %}
+{%- macro lowerFirst(text) -%}
+  {{ text[0]|lower}}{{text[1:] }}
+{%- endmacro %}
+
+/*
+  DO NOT EDIT, this is an Auto-generated file
+  from buildscripts/semantic-convention{{template}}
+*/
+
+#pragma once
+
+#include "opentelemetry/version.h"
+
+{%- if semconv == "trace" %}
+/*
+ * Special considerations for FaasDocumentOperationValues::DELETE.
+ *
+ * The winnt.h header file is known to define a DELETE symbol,
+ * which collides with FaasDocumentOperationValues::DELETE.
+ */
+#ifdef _WIN32
+#  ifdef DELETE
+#    pragma message(__FILE__ ": removing define on DELETE")
+#    undef DELETE
+#  endif
+#endif
+{% endif %}
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+{{namespace_open}}
+
+namespace {{class}}
+{
+/**
+ * The URL of the OpenTelemetry schema for these keys and values.
+ */
+static constexpr const char *SCHEMA_URL = "{{schemaUrl}}";
+  {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+
+/**
+ * {{attribute.brief | render_markdown(code="{{@code {0}}}", paragraph="{0}")}}
+  {%- if attribute.note %}
+ *
+ * <p>Notes:
+  <ul> {{attribute.note | render_markdown(code="{{@code {0}}}", paragraph="<li>{0}</li>", list="{0}")}} </ul>
+  {%- endif %}
+{%- if attribute.deprecated %}
+ *
+ * @deprecated {{attribute.deprecated | to_doc_brief}}.
+  {%- endif %}
+ */
+  {%- if attribute.deprecated %}
+@Deprecated
+  {%- endif %}
+static constexpr const char *{{attribute.fqn | to_const_name}} = "{{attribute.fqn}}";
+{%- endfor %}
+
+// Enum definitions
+{%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+{%- if attribute.is_enum %}
+{%- set enum_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
+{%- set type = to_cpp_return_type(attribute.attr_type.enum_type) %}
+namespace {{enum_name}}
+{
+  {%- for member in attribute.attr_type.members %}
+  /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
+  static constexpr const {{ type }} {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }};
+  {%- endfor %}
+}
+{% endif %}
+{%- endfor %}
+
+{#
+  {%- if class == "SemanticAttributes" %}
+  // Manually defined and not YET in the YAML
+  /**
+   * The name of an event describing an exception.
+   *
+   * <p>Typically an event with that name should not be manually created. Instead {@link
+   * io.opentelemetry.api.trace.Span#recordException(Throwable)} should be used.
+   */
+  static constexpr const char *EXCEPTION_EVENT_NAME = "exception";
+
+  {% endif %}
+#}
+
+}  // namespace {{class}}
+{{namespace_close}}
+OPENTELEMETRY_END_NAMESPACE
+

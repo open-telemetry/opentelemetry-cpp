@@ -15,7 +15,33 @@ Increment the:
 
 ## [Unreleased]
 
+* [TRACE SDK] Add trace sdk builders (#1393) [#1471](https://github.com/open-telemetry/opentelemetry-cpp/pull/1471)
+* [EXAMPLE] Fix memory ownership of InMemorySpanExporter (#1473) [#1471](https://github.com/open-telemetry/opentelemetry-cpp/pull/1471)
+* [EXPORTER] Add metrics OTLP/HTTP exporter [#1487](https://github.com/open-telemetry/opentelemetry-cpp/pull/1487)
+* [EXPORTER] OTLP http exporter allow concurrency session ([#1209](https://github.com/open-telemetry/opentelemetry-cpp/pull/1209))
+* [EXT] `curl::HttpClient` use `curl_multi_handle` instead of creating a thread
+  for every request and it's able to reuse connections now. ([#1317](https://github.com/open-telemetry/opentelemetry-cpp/pull/1317))
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.12.0 [#873](https://github.com/open-telemetry/opentelemetry-cpp/pull/873)
+
+## [1.4.1] 2022-06-19
+
+* [METRICS SDK] Fix variables inizialization [#1430](https://github.com/open-telemetry/opentelemetry-cpp/pull/1430)
+* [DOCS] Fixed broken link to OpenTelemetry.io (#1445) [#1446](https://github.com/open-telemetry/opentelemetry-cpp/pull/1446)
+* [BUILD] Upgrade nlohmann_json to 3.10.5 (#1438) [#1441](https://github.com/open-telemetry/opentelemetry-cpp/pull/1441)
+* [METRICS SDK] fix histogram [#1440](https://github.com/open-telemetry/opentelemetry-cpp/pull/1440)
+* [DOCS] Fix GettingStarted documentation for Jaeger HTTP exporter (#1347) [#1439](https://github.com/open-telemetry/opentelemetry-cpp/pull/1439)
+* [BUILD] install sdk-config.h [#1419](https://github.com/open-telemetry/opentelemetry-cpp/pull/1419)
+* [EXAMPLE] Log current timestamp instead of epoch time [#1434](https://github.com/open-telemetry/opentelemetry-cpp/pull/1434)
+* [METRICS SDK] Add attributes/dimensions to metrics ostream exporter [#1400](https://github.com/open-telemetry/opentelemetry-cpp/pull/1400)
+* [SDK] Fix global log handle symbols when using dlopen [#1420](https://github.com/open-telemetry/opentelemetry-cpp/pull/1420)
 * [METRICS] Only record non-negative / finite / Non-NAN histogram values([#1427](https://github.com/open-telemetry/opentelemetry-cpp/pull/1427))
+* [ETW EXPORTER] Fix ETW log exporter header inclusion [#1426](https://github.com/open-telemetry/opentelemetry-cpp/pull/1426)
+* [ETW EXPORTER] Copy string_view passed to ETW exporter in PropertyVariant [#1425](https://github.com/open-telemetry/opentelemetry-cpp/pull/1425)
+* [METRICS API/SDK] Pass state to async callback function. [#1408](https://github.com/open-telemetry/opentelemetry-cpp/pull/1408)
+* [BUILD] fix nlohmann_json's (third party) include dir [#1415](https://github.com/open-telemetry/opentelemetry-cpp/pull/1415)
+* [SDK] fix: WaitOnSocket select error when sockfd above FD_SETSIZE [#1410](https://github.com/open-telemetry/opentelemetry-cpp/pull/1410)
+* [SDK] fix OTEL_INTERNAL_LOG_INFO [#1407](https://github.com/open-telemetry/opentelemetry-cpp/pull/1407)
+* [DOCS] Document Getting Started with Prometheus and Grafana [#1396](https://github.com/open-telemetry/opentelemetry-cpp/pull/1396)
 
 ## [1.4.0] 2022-05-17
 

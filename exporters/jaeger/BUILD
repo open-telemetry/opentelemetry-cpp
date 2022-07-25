@@ -167,12 +167,15 @@ cc_library(
         "src/TUDPTransport.cc",
         "src/http_transport.cc",
         "src/jaeger_exporter.cc",
+        "src/jaeger_exporter_factory.cc",
         "src/recordable.cc",
         "src/thrift_sender.cc",
         "src/udp_transport.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/jaeger/jaeger_exporter.h",
+        "include/opentelemetry/exporters/jaeger/jaeger_exporter_factory.h",
+        "include/opentelemetry/exporters/jaeger/jaeger_exporter_options.h",
         "include/opentelemetry/exporters/jaeger/recordable.h",
     ],
     copts = ["-fexceptions"],
@@ -180,6 +183,7 @@ cc_library(
     tags = ["jaeger"],
     deps = [
         ":jaeger_exporter",
+        "//sdk/src/common:global_log_handler",
     ],
 )
 

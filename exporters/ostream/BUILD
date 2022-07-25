@@ -6,6 +6,7 @@ cc_library(
         "src/log_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/log_exporter.h",
     ],
     strip_include_prefix = "include",
@@ -49,6 +50,7 @@ cc_library(
         "src/metric_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/metric_exporter.h",
     ],
     strip_include_prefix = "include",
@@ -91,9 +93,12 @@ cc_library(
     name = "ostream_span_exporter",
     srcs = [
         "src/span_exporter.cc",
+        "src/span_exporter_factory.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/span_exporter.h",
+        "include/opentelemetry/exporters/ostream/span_exporter_factory.h",
     ],
     strip_include_prefix = "include",
     tags = ["ostream"],

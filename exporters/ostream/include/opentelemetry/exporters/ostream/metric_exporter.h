@@ -45,11 +45,11 @@ public:
 
   /**
    * Shut down the exporter.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * @param timeout an optional timeout.
    * @return return the status of this operation
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
 private:
   std::ostream &sout_;
@@ -59,6 +59,7 @@ private:
   void printInstrumentationInfoMetricData(
       const sdk::metrics::InstrumentationInfoMetrics &info_metrics);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
+  void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
 };
 }  // namespace metrics
 }  // namespace exporter

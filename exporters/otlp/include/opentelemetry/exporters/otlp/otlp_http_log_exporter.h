@@ -11,6 +11,7 @@
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #  include <chrono>
+#  include <cstddef>
 #  include <memory>
 #  include <string>
 
@@ -50,6 +51,15 @@ struct OtlpHttpLogExporterOptions
 
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
+
+#  ifdef ENABLE_ASYNC_EXPORT
+  // Concurrent requests
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
+  std::size_t max_concurrent_requests = 64;
+
+  // Requests per connections
+  std::size_t max_requests_per_connection = 8;
+#  endif
 };
 
 /**
@@ -87,7 +97,8 @@ public:
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   // Configuration options for the exporter

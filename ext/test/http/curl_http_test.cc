@@ -25,12 +25,27 @@ namespace nostd       = opentelemetry::nostd;
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
-  virtual void OnResponse(http_client::Response &response) noexcept override{};
+  virtual void OnResponse(http_client::Response &response) noexcept override
+  {
+    got_response_ = true;
+  };
   virtual void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
-  {}
+  {
+    switch (state)
+    {
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed: {
+        is_called_ = true;
+        break;
+      }
+      default:
+        break;
+    }
+  }
   virtual void OnConnecting(const http_client::SSLCertificate &) noexcept {}
   virtual ~CustomEventHandler() = default;
   bool is_called_               = false;
+  bool got_response_            = false;
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -39,7 +54,8 @@ class GetEventHandler : public CustomEventHandler
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
-    is_called_ = true;
+    is_called_    = true;
+    got_response_ = true;
   };
 };
 
@@ -50,8 +66,32 @@ class PostEventHandler : public CustomEventHandler
     ASSERT_EQ(200, response.GetStatusCode());
     std::string body(response.GetBody().begin(), response.GetBody().end());
     ASSERT_EQ(body, "{'k1':'v1', 'k2':'v2', 'k3':'v3'}");
-    is_called_ = true;
+    is_called_    = true;
+    got_response_ = true;
   }
+};
+
+class FinishInCallbackHandler : public CustomEventHandler
+{
+public:
+  FinishInCallbackHandler(std::shared_ptr<http_client::Session> session) : session_(session) {}
+
+  void OnResponse(http_client::Response &response) noexcept override
+  {
+    ASSERT_EQ(200, response.GetStatusCode());
+    ASSERT_EQ(response.GetBody().size(), 0);
+    is_called_    = true;
+    got_response_ = true;
+
+    if (session_)
+    {
+      session_->FinishSession();
+      session_.reset();
+    }
+  }
+
+private:
+  std::shared_ptr<http_client::Session> session_;
 };
 
 class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
@@ -108,7 +148,7 @@ public:
       response.headers["Content-Type"] = "text/plain";
       response_status                  = 200;
     }
-    if (request.uri == "/post/")
+    else if (request.uri == "/post/")
     {
       std::unique_lock<std::mutex> lk(mtx_requests);
       received_requests_.push_back(request);
@@ -125,8 +165,10 @@ public:
   bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
   {
     std::unique_lock<std::mutex> lk(mtx_requests);
-    if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec),
-                               [&] { return received_requests_.size() >= expected_count; }))
+    if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec), [&] {
+          //
+          return received_requests_.size() >= expected_count;
+        }))
     {
       return true;
     }
@@ -196,12 +238,12 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  GetEventHandler *handler = new GetEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
-  delete handler;
+  ASSERT_TRUE(handler->got_response_);
 }
 
 TEST_F(BasicCurlHttpTests, SendPostRequest)
@@ -219,16 +261,15 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   http_client::Body body = {b, b + strlen(b)};
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
-  PostEventHandler *handler = new PostEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<PostEventHandler>();
+  session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
+  ASSERT_TRUE(handler->got_response_);
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
-
-  delete handler;
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)
@@ -240,11 +281,11 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session = session_manager->CreateSession("222.222.222.200:19000");  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  GetEventHandler *handler = new GetEventHandler();
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<GetEventHandler>();
+  session->SendRequest(handler);
   session->FinishSession();
-  ASSERT_FALSE(handler->is_called_);
-  delete handler;
+  ASSERT_TRUE(handler->is_called_);
+  ASSERT_FALSE(handler->got_response_);
 }
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
@@ -257,16 +298,16 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
 
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler,
-                                       curl::RequestMode::Async, headers, body, true);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
+                                       true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler,
-                                       curl::RequestMode::Async, headers, body, true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
+                                       true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler,
-                                       curl::RequestMode::Async, headers, body, false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
+                                       false);
   http_operations3.Send();
   delete handler;
 }
@@ -322,4 +363,155 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
   session = session_manager.CreateSession("http://127.0.0.1:31339");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
             "http://127.0.0.1:31339/");
+}
+
+TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
+{
+  curl::HttpClient http_client;
+
+  for (int round = 0; round < 2; ++round)
+  {
+    received_requests_.clear();
+    static constexpr const unsigned batch_count = 5;
+    std::shared_ptr<http_client::Session> sessions[batch_count];
+    std::shared_ptr<GetEventHandler> handlers[batch_count];
+    for (unsigned i = 0; i < batch_count; ++i)
+    {
+      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/");
+      auto request = sessions[i]->CreateRequest();
+      request->SetMethod(http_client::Method::Get);
+      request->SetUri("get/");
+
+      handlers[i] = std::make_shared<GetEventHandler>();
+
+      // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
+      std::unique_lock<std::mutex> lock_requests(mtx_requests);
+      sessions[i]->SendRequest(handlers[i]);
+      ASSERT_TRUE(sessions[i]->IsSessionActive());
+    }
+
+    ASSERT_TRUE(waitForRequests(30, batch_count));
+
+    for (unsigned i = 0; i < batch_count; ++i)
+    {
+      sessions[i]->FinishSession();
+      ASSERT_FALSE(sessions[i]->IsSessionActive());
+
+      ASSERT_TRUE(handlers[i]->is_called_);
+      ASSERT_TRUE(handlers[i]->got_response_);
+    }
+
+    http_client.WaitBackgroundThreadExit();
+  }
+}
+
+TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+
+  static constexpr const unsigned batch_count = 5;
+  std::shared_ptr<http_client::Session> sessions[batch_count];
+  std::shared_ptr<GetEventHandler> handlers[batch_count];
+  for (unsigned i = 0; i < batch_count; ++i)
+  {
+    sessions[i]  = http_client.CreateSession("http://222.222.222.200:19000/get/");
+    auto request = sessions[i]->CreateRequest();
+    request->SetMethod(http_client::Method::Get);
+    request->SetUri("get/");
+    request->SetTimeoutMs(std::chrono::milliseconds(256));
+
+    handlers[i] = std::make_shared<GetEventHandler>();
+
+    // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    sessions[i]->SendRequest(handlers[i]);
+    ASSERT_TRUE(sessions[i]->IsSessionActive());
+  }
+
+  for (unsigned i = 0; i < batch_count; ++i)
+  {
+    sessions[i]->FinishSession();
+    ASSERT_FALSE(sessions[i]->IsSessionActive());
+
+    ASSERT_TRUE(handlers[i]->is_called_);
+    ASSERT_FALSE(handlers[i]->got_response_);
+  }
+}
+
+TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
+{
+  curl::HttpClient http_client;
+
+  for (int round = 0; round < 2; ++round)
+  {
+    received_requests_.clear();
+    auto handler = std::make_shared<PostEventHandler>();
+
+    static constexpr const unsigned batch_count = 5;
+    std::shared_ptr<http_client::Session> sessions[batch_count];
+    for (auto &session : sessions)
+    {
+      session      = http_client.CreateSession("http://127.0.0.1:19000/post/");
+      auto request = session->CreateRequest();
+      request->SetMethod(http_client::Method::Post);
+      request->SetUri("post/");
+
+      // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
+      std::unique_lock<std::mutex> lock_requests(mtx_requests);
+      session->SendRequest(handler);
+      ASSERT_TRUE(session->IsSessionActive());
+    }
+
+    ASSERT_TRUE(waitForRequests(30, batch_count));
+
+    for (auto &session : sessions)
+    {
+      session->FinishSession();
+      ASSERT_FALSE(session->IsSessionActive());
+    }
+
+    ASSERT_TRUE(handler->is_called_);
+    ASSERT_TRUE(handler->got_response_);
+
+    http_client.WaitBackgroundThreadExit();
+  }
+}
+
+TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
+{
+  curl::HttpClient http_client;
+
+  for (int round = 0; round < 2; ++round)
+  {
+    received_requests_.clear();
+    static constexpr const unsigned batch_count = 5;
+    std::shared_ptr<http_client::Session> sessions[batch_count];
+    std::shared_ptr<FinishInCallbackHandler> handlers[batch_count];
+    for (unsigned i = 0; i < batch_count; ++i)
+    {
+      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/");
+      auto request = sessions[i]->CreateRequest();
+      request->SetMethod(http_client::Method::Get);
+      request->SetUri("get/");
+
+      handlers[i] = std::make_shared<FinishInCallbackHandler>(sessions[i]);
+
+      // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
+      std::unique_lock<std::mutex> lock_requests(mtx_requests);
+      sessions[i]->SendRequest(handlers[i]);
+      ASSERT_TRUE(sessions[i]->IsSessionActive());
+    }
+
+    http_client.WaitBackgroundThreadExit();
+    ASSERT_TRUE(waitForRequests(300, batch_count));
+
+    for (unsigned i = 0; i < batch_count; ++i)
+    {
+      ASSERT_FALSE(sessions[i]->IsSessionActive());
+
+      ASSERT_TRUE(handlers[i]->is_called_);
+      ASSERT_TRUE(handlers[i]->got_response_);
+    }
+  }
 }

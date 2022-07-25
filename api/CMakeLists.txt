@@ -92,3 +92,7 @@ if(WIN32)
     target_compile_definitions(opentelemetry_api INTERFACE HAVE_MSGPACK)
   endif()
 endif()
+
+if(WITH_ASYNC_EXPORT_PREVIEW)
+  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
+endif()
