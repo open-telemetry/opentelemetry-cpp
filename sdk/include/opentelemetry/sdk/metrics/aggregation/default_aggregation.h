@@ -6,8 +6,8 @@
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/metrics/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
@@ -27,7 +27,7 @@ class DefaultAggregation
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-      const opentelemetry::metrics::AggregationConfig *aggregation_config)
+      const opentelemetry::sdk::metrics::AggregationConfig *aggregation_config)
   {
     switch (instrument_descriptor.type_)
     {
@@ -42,12 +42,12 @@ public:
       case InstrumentType::kHistogram: {
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation(
-                         static_cast<const opentelemetry::metrics::HistogramAggregationConfig<long>
-                                         *>(aggregation_config))))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
                          static_cast<
-                             const opentelemetry::metrics::HistogramAggregationConfig<double> *>(
-                             aggregation_config))));
+                             const opentelemetry::sdk::metrics::HistogramAggregationConfig<long> *>(
+                             aggregation_config))))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
+                         static_cast<const opentelemetry::sdk::metrics::HistogramAggregationConfig<
+                             double> *>(aggregation_config))));
         break;
       }
       case InstrumentType::kObservableGauge:

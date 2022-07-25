@@ -10,6 +10,7 @@
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk_config.h"
 
 #  include <memory>
 
@@ -28,16 +29,14 @@ Meter::Meter(std::shared_ptr<MeterContext> meter_context,
     : instrumentation_library_{std::move(instrumentation_library)}, meter_context_{meter_context}
 {}
 
-nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
+                                                                   nostd::string_view description,
+                                                                   nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::Counter<long>>(
       new LongCounter(instrument_descriptor, std::move(storage)));
 }
@@ -45,59 +44,54 @@ nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(
 nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
     nostd::string_view name,
     nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter,
       InstrumentValueType::kDouble};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::Counter<double>>{
       new DoubleCounter(instrument_descriptor, std::move(storage))};
 }
 
-void Meter::CreateLongObservableCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateLongObservableCounter(nostd::string_view name,
+                                        void (*callback)(metrics::ObserverResult<long> &, void *),
+                                        nostd::string_view description,
+                                        nostd::string_view unit,
+                                        void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
-void Meter::CreateDoubleObservableCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<double> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateDoubleObservableCounter(nostd::string_view name,
+                                          void (*callback)(metrics::ObserverResult<double> &,
+                                                           void *),
+                                          nostd::string_view description,
+                                          nostd::string_view unit,
+                                          void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
     nostd::string_view name,
     nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kLong};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::Histogram<long>>{
       new LongHistogram(instrument_descriptor, std::move(storage))};
 }
@@ -105,59 +99,53 @@ nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
 nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
     nostd::string_view name,
     nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kDouble};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::Histogram<double>>{
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
-void Meter::CreateLongObservableGauge(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateLongObservableGauge(nostd::string_view name,
+                                      void (*callback)(metrics::ObserverResult<long> &, void *),
+                                      nostd::string_view description,
+                                      nostd::string_view unit,
+                                      void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
-void Meter::CreateDoubleObservableGauge(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<double> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateDoubleObservableGauge(nostd::string_view name,
+                                        void (*callback)(metrics::ObserverResult<double> &, void *),
+                                        nostd::string_view description,
+                                        nostd::string_view unit,
+                                        void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
     nostd::string_view name,
     nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kLong};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::UpDownCounter<long>>{
       new LongUpDownCounter(instrument_descriptor, std::move(storage))};
 }
@@ -165,46 +153,43 @@ nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
 nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
     nostd::string_view name,
     nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config) noexcept
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kDouble};
-  auto storage = RegisterMetricStorage(instrument_descriptor, aggregation_config);
+  auto storage = RegisterMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::UpDownCounter<double>>{
       new DoubleUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
-void Meter::CreateLongObservableUpDownCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<long> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
+                                              void (*callback)(metrics::ObserverResult<long> &,
+                                                               void *),
+                                              nostd::string_view description,
+                                              nostd::string_view unit,
+                                              void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kLong};
-  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<long>(instrument_descriptor, callback, state);
 }
 
-void Meter::CreateDoubleObservableUpDownCounter(
-    nostd::string_view name,
-    void (*callback)(metrics::ObserverResult<double> &, void *),
-    nostd::string_view description,
-    nostd::string_view unit,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-    void *state) noexcept
+void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
+                                                void (*callback)(metrics::ObserverResult<double> &,
+                                                                 void *),
+                                                nostd::string_view description,
+                                                nostd::string_view unit,
+                                                void *state) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kDouble};
-  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, aggregation_config, state);
+  RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
 const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
@@ -214,15 +199,14 @@ const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumenta
 }
 
 std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
-    InstrumentDescriptor &instrument_descriptor,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config)
+    InstrumentDescriptor &instrument_descriptor)
 {
   auto view_registry = meter_context_->GetViewRegistry();
   std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
 
   auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
-      [this, &instrument_descriptor, &storages, &aggregation_config](const View &view) {
+      [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -234,7 +218,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         }
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            NoExemplarReservoir::GetNoExemplarReservoir(), aggregation_config));
+            NoExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);

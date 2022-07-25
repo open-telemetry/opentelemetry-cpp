@@ -19,7 +19,7 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(
     InstrumentDescriptor instrument_descriptor,
-    nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config)
+    nostd::shared_ptr<AggregationConfig> aggregation_config)
     : instrument_descriptor_(instrument_descriptor), aggregation_config_(aggregation_config)
 {}
 

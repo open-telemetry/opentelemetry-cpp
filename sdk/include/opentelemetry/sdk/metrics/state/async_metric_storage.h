@@ -26,13 +26,13 @@ template <class T>
 class AsyncMetricStorage : public MetricStorage
 {
 public:
-  AsyncMetricStorage(
-      InstrumentDescriptor instrument_descriptor,
-      const AggregationType aggregation_type,
-      void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &, void *),
-      const AttributesProcessor *attributes_processor,
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-      void *state = nullptr)
+  AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+                     const AggregationType aggregation_type,
+                     void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &,
+                                                  void *),
+                     const AttributesProcessor *attributes_processor,
+                     nostd::shared_ptr<AggregationConfig> aggregation_config,
+                     void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         measurement_collection_callback_{measurement_callback},

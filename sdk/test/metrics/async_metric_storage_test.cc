@@ -99,7 +99,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(
       instr_desc, AggregationType::kSum, MeasurementFetcher::Fetcher,
       new DefaultAttributesProcessor(),
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{});
+      nostd::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {

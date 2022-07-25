@@ -6,9 +6,10 @@
 #  include <list>
 #  include "opentelemetry/version.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
 namespace metrics
 {
-
 class AggregationConfig
 {
 public:
@@ -22,6 +23,7 @@ public:
   std::list<T> boundaries_;
 };
 }  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 
 #endif  // ENABLE_METRICS_PREVIEW

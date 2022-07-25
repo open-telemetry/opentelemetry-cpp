@@ -13,7 +13,7 @@ namespace metrics
 {
 
 LongHistogramAggregation::LongHistogramAggregation(
-    const opentelemetry::metrics::HistogramAggregationConfig<long> *aggregation_config)
+    const HistogramAggregationConfig<long> *aggregation_config)
 {
   if (aggregation_config && aggregation_config->boundaries_.size())
   {
@@ -82,7 +82,7 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
 }
 
 DoubleHistogramAggregation::DoubleHistogramAggregation(
-    const opentelemetry::metrics::HistogramAggregationConfig<double> *aggregation_config)
+    const HistogramAggregationConfig<double> *aggregation_config)
 {
   if (aggregation_config && aggregation_config->boundaries_.size())
   {

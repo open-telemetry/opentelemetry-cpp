@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include "opentelemetry/nostd/shared_ptr.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <chrono>
 #  include "opentelemetry/metrics/meter.h"
@@ -37,98 +36,74 @@ public:
   nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
-  void CreateLongObservableCounter(
-      nostd::string_view name,
-      void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+  void CreateLongObservableCounter(nostd::string_view name,
+                                   void (*callback)(opentelemetry::metrics::ObserverResult<long> &,
+                                                    void *),
+                                   nostd::string_view description = "",
+                                   nostd::string_view unit        = "",
+                                   void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableCounter(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
       nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+      void *state                    = nullptr) noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
-  void CreateLongObservableGauge(
-      nostd::string_view name,
-      void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
-      nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+  void CreateLongObservableGauge(nostd::string_view name,
+                                 void (*callback)(opentelemetry::metrics::ObserverResult<long> &,
+                                                  void *),
+                                 nostd::string_view description = "",
+                                 nostd::string_view unit        = "",
+                                 void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableGauge(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
       nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+      void *state                    = nullptr) noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{}) noexcept override;
+      nostd::string_view unit        = "") noexcept override;
 
   void CreateLongObservableUpDownCounter(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<long> &, void *),
       nostd::string_view description = "",
       nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+      void *state                    = nullptr) noexcept override;
 
   void CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &, void *),
       nostd::string_view description = "",
       nostd::string_view unit        = "",
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config =
-          nostd::shared_ptr<opentelemetry::metrics::AggregationConfig>{},
-      void *state = nullptr) noexcept override;
+      void *state                    = nullptr) noexcept override;
 
   /** Returns the associated instruementation library */
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
@@ -147,20 +122,18 @@ private:
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
 
   std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
-      InstrumentDescriptor &instrument_descriptor,
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config);
+      InstrumentDescriptor &instrument_descriptor);
 
   template <class T>
-  void RegisterAsyncMetricStorage(
-      InstrumentDescriptor &instrument_descriptor,
-      void (*callback)(opentelemetry::metrics::ObserverResult<T> &, void *),
-      nostd::shared_ptr<opentelemetry::metrics::AggregationConfig> aggregation_config,
-      void *state = nullptr)
+  void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
+                                  void (*callback)(opentelemetry::metrics::ObserverResult<T> &,
+                                                   void *),
+                                  void *state = nullptr)
   {
     auto view_registry = meter_context_->GetViewRegistry();
     auto success       = view_registry->FindViews(
         instrument_descriptor, *instrumentation_library_,
-        [this, &instrument_descriptor, callback, aggregation_config, state](const View &view) {
+        [this, &instrument_descriptor, callback, state](const View &view) {
           auto view_instr_desc = instrument_descriptor;
           if (!view.GetName().empty())
           {
@@ -170,9 +143,9 @@ private:
           {
             view_instr_desc.description_ = view.GetDescription();
           }
-          auto storage = std::shared_ptr<AsyncMetricStorage<T>>(
-              new AsyncMetricStorage<T>(view_instr_desc, view.GetAggregationType(), callback,
-                                        &view.GetAttributesProcessor(), aggregation_config, state));
+          auto storage = std::shared_ptr<AsyncMetricStorage<T>>(new AsyncMetricStorage<T>(
+              view_instr_desc, view.GetAggregationType(), callback, &view.GetAttributesProcessor(),
+              view.GetAggregationConfig(), state));
           storage_registry_[instrument_descriptor.name_] = storage;
           return true;
         });
