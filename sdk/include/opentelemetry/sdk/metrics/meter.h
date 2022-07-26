@@ -11,6 +11,7 @@
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 
 #  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -148,6 +149,12 @@ private:
           storage_registry_[instrument_descriptor.name_] = storage;
           return true;
         });
+    if (!success)
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+          << "Some of the matching view configurations may not be used for metric collection");
+    }
   }
 };
 }  // namespace metrics
