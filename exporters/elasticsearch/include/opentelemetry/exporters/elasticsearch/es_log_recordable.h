@@ -212,14 +212,6 @@ public:
     instrumentation_scope_ = &instrumentation_scope;
   }
 
-  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
-  void SetInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
-          &instrumentation_scope) noexcept
-  {
-    SetInstrumentationScope(instrumentation_scope);
-  }
-
   /** Returns the associated instruementation library */
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
