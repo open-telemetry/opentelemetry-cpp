@@ -58,7 +58,7 @@ public:
            opentelemetry::trace::TraceFlags trace_flags,
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
-  /** Returns the associated instruementation library */
+  /** Returns the associated instrumentation scope */
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
       const noexcept;
 
@@ -73,7 +73,7 @@ private:
   // The name of this logger
   std::string logger_name_;
 
-  // order of declaration is important here - instrumentation library should destroy after
+  // order of declaration is important here - instrumentation scope should destroy after
   // logger-context.
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;

@@ -175,7 +175,7 @@ public:
   {
     if (instrumentation_scope_ == nullptr)
     {
-      // this shouldn't happen as Tracer ensures there is valid default instrumentation library.
+      // this shouldn't happen as Tracer ensures there is valid default instrumentation scope.
       static std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope>
           instrumentation_scope =
               opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(

@@ -24,8 +24,8 @@ public:
 
   /**
    * Returns a newly created InstrumentationScope with the specified library name and version.
-   * @param name name of the instrumentation library.
-   * @param version version of the instrumentation library.
+   * @param name name of the instrumentation scope.
+   * @param version version of the instrumentation scope.
    * @param schema_url schema url of the telemetry emitted by the library.
    * @returns the newly created InstrumentationScope.
    */
@@ -41,7 +41,7 @@ public:
 
   /**
    * Compare 2 instrumentation libraries.
-   * @param other the instrumentation library to compare to.
+   * @param other the instrumentation scope to compare to.
    * @returns true if the 2 instrumentation libraries are equal, false otherwise.
    */
   bool operator==(const InstrumentationScope &other) const
@@ -50,12 +50,12 @@ public:
   }
 
   /**
-   * Check whether the instrumentation library has given name and version.
+   * Check whether the instrumentation scope has given name and version.
    * This could be used to check version equality and avoid heap allocation.
-   * @param name name of the instrumentation library to compare.
-   * @param version version of the instrumentatoin library to compare.
-   * @param schema_url schema url of the telemetry emitted by the library.
-   * @returns true if name and version in this instrumentation library are equal with the given name
+   * @param name name of the instrumentation scope to compare.
+   * @param version version of the instrumentation scope to compare.
+   * @param schema_url schema url of the telemetry emitted by the scope.
+   * @returns true if name and version in this instrumentation scope are equal with the given name
    * and version.
    */
   bool equal(const nostd::string_view name,

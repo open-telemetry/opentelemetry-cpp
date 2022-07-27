@@ -105,7 +105,7 @@ public:
       nostd::string_view unit        = "",
       void *state                    = nullptr) noexcept override;
 
-  /** Returns the associated instruementation library */
+  /** Returns the associated instrumentation scope */
   const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope() const noexcept;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
@@ -119,7 +119,7 @@ public:
                                   opentelemetry::common::SystemTimestamp collect_ts) noexcept;
 
 private:
-  // order of declaration is important here - instrumentation library should destroy after
+  // order of declaration is important here - instrumentation scope should destroy after
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
   std::shared_ptr<sdk::metrics::MeterContext> meter_context_;

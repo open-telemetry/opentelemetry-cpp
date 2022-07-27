@@ -15,7 +15,7 @@ namespace metrics
 
 /**
  * Metric Data to be exported along with resources and
- * Instrumentation library.
+ * Instrumentation scope.
  */
 struct ScopeMetrics
 {

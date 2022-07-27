@@ -174,7 +174,7 @@ public:
 
   /**
    * Set instrumentation_scope for this log.
-   * @param instrumentation_scopehe instrumentation library to set
+   * @param instrumentation_scope the instrumentation scope to set
    */
   void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                                    &instrumentation_scope) noexcept

@@ -167,7 +167,7 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
   }
 }
 
-void OtlpMetricUtils::PopulateInstrumentationInfoMetric(
+void OtlpMetricUtils::PopulateInstrumentInfoMetrics(
     const opentelemetry::sdk::metrics::MetricData &metric_data,
     proto::metrics::v1::Metric *metric) noexcept
 {
@@ -214,7 +214,7 @@ void OtlpMetricUtils::PopulateResourceMetrics(
 
     for (auto &metric_data : scope_metrics.metric_data_)
     {
-      PopulateInstrumentationInfoMetric(metric_data, scope_lib_metrics->add_metrics());
+      PopulateInstrumentInfoMetrics(metric_data, scope_lib_metrics->add_metrics());
     }
   }
 }

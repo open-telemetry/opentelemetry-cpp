@@ -141,8 +141,8 @@ public:
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
 
   /**
-   * Set the instrumentation library of the span.
-   * @param instrumentation_scope the instrumentation library to set
+   * Set the instrumentation scope of the span.
+   * @param instrumentation_scope the instrumentation scope to set
    */
   virtual void SetInstrumentationScope(
       const InstrumentationScope &instrumentation_scope) noexcept = 0;

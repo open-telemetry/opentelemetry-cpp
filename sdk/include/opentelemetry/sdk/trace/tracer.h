@@ -48,7 +48,7 @@ public:
   /** Returns the configured Id generator */
   IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }
 
-  /** Returns the associated instruementation library */
+  /** Returns the associated instrumentation scope */
   const InstrumentationScope &GetInstrumentationScope() const noexcept
   {
     return *instrumentation_scope_;
@@ -67,7 +67,7 @@ public:
   Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
-  // order of declaration is important here - instrumentation library should destroy after
+  // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<sdk::trace::TracerContext> context_;
