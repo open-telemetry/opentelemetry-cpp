@@ -11,6 +11,7 @@
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 
 #  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
