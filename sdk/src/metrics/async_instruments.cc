@@ -18,10 +18,7 @@ ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descr
                                            std::unique_ptr<AsyncWritableMetricStorage> storage)
     : instrument_descriptor_(instrument_descriptor),
       storage_(std::move(storage)),
-      observable_registry_{new ObservableRegistry()},
-      Asynchronous(instrument_descriptor_.name_,
-                   instrument_descriptor.description_,
-                   instrument_descriptor_.unit_)
+      observable_registry_{new ObservableRegistry()}
 {}
 
 void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,

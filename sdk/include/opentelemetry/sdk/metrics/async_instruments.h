@@ -17,23 +17,7 @@ namespace metrics
 
 class AsyncWritableMetricStorage;
 
-class Asynchronous
-{
-public:
-  Asynchronous(nostd::string_view name,
-               nostd::string_view description = "",
-               nostd::string_view unit        = "")
-      : name_(name), description_(description), unit_(unit)
-  {}
-
-protected:
-  std::string name_;
-  std::string description_;
-  std::string unit_;
-};
-
-class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument,
-                             public Asynchronous
+class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,
