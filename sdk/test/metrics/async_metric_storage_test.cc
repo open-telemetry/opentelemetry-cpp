@@ -71,7 +71,7 @@ public:
   static size_t fetch_count;
   static long number_of_get;
   static long number_of_put;
-  static const size_t number_of_attributes = 0;  // GET , PUT fixme - should be 2
+  static const size_t number_of_attributes = 2;
 };
 
 size_t MeasurementFetcher::fetch_count;
@@ -83,8 +83,6 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 {
   MeasurementFetcher::init_values();
   AggregationTemporality temporality = GetParam();
-  ObservableRegistry registry;
-  registry.AddCallback(MeasurementFetcher::Fetcher, nullptr, nullptr);
 
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
                                      InstrumentValueType::kLong};
@@ -101,6 +99,14 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   MeasurementFetcher measurement_fetcher;
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kSum,
                                                           new DefaultAttributesProcessor());
+  long get_count                                                                  = 20l;
+  long put_count                                                                  = 10l;
+  size_t attribute_count                                                          = 2;
+  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements = {
+      {{{"RequestType", "GET"}}, get_count}, {{{"RequestType", "PUT"}}, put_count}};
+  storage.RecordLong(measurements,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {
                     for (auto data_attr : data.point_data_attr_)
@@ -109,20 +115,17 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                       if (opentelemetry::nostd::get<std::string>(
                               data_attr.attributes.find("RequestType")->second) == "GET")
                       {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                                  MeasurementFetcher::number_of_get);
+                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count);
                       }
                       else if (opentelemetry::nostd::get<std::string>(
                                    data_attr.attributes.find("RequestType")->second) == "PUT")
                       {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                                  MeasurementFetcher::number_of_put);
+                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count);
                       }
-                      count_attributes++;
                     }
                     return true;
                   });
-  EXPECT_EQ(MeasurementFetcher::number_of_attributes, count_attributes);
+  EXPECT_EQ(MeasurementFetcher::number_of_attributes, attribute_count);
 }
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
