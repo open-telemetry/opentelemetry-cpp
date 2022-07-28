@@ -40,9 +40,9 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<TextMapPropagator> propagator;
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<TextMapPropagator> propagator;
 
-  static common::SpinLockMutex lock;
+  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
 };
 
 OPENTELEMETRY_EXPORT nostd::shared_ptr<TextMapPropagator> GlobalTextMapPropagator::propagator(

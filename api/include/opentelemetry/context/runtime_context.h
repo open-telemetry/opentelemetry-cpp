@@ -167,7 +167,7 @@ private:
     return context_storage;
   }
 
-  static nostd::shared_ptr<RuntimeContextStorage> context_storage;
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<RuntimeContextStorage> context_storage;
 };
 
 OPENTELEMETRY_EXPORT nostd::shared_ptr<RuntimeContextStorage> RuntimeContext::context_storage(

@@ -7,6 +7,7 @@
 
 #  include "opentelemetry/_metrics/meter_provider.h"
 #  include "opentelemetry/_metrics/noop.h"
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
@@ -27,8 +28,9 @@ public:
    */
   static nostd::shared_ptr<MeterProvider> GetMeterProvider() noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    return nostd::shared_ptr<MeterProvider>(GetProvider());
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    nostd::shared_ptr<MeterProvider> result(provider);
+    return result;
   }
 
   /**
@@ -36,23 +38,19 @@ public:
    */
   static void SetMeterProvider(nostd::shared_ptr<MeterProvider> tp) noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    provider = tp;
   }
 
 private:
-  static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
-  {
-    static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
-    return provider;
-  }
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<MeterProvider> provider;
 
-  static common::SpinLockMutex &GetLock() noexcept
-  {
-    static common::SpinLockMutex lock;
-    return lock;
-  }
+  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
 };
+
+OPENTELEMETRY_EXPORT nostd::shared_ptr<MeterProvider> Provider::provider(new NoopMeterProvider);
+
+OPENTELEMETRY_EXPORT common::SpinLockMutex Provider::lock;
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

@@ -43,9 +43,9 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<TracerProvider> provider;
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<TracerProvider> provider;
 
-  static common::SpinLockMutex lock;
+  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
 };
 
 OPENTELEMETRY_EXPORT nostd::shared_ptr<TracerProvider> Provider::provider(new NoopTracerProvider);

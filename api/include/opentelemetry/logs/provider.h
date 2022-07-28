@@ -44,9 +44,9 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<LoggerProvider> provider;
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<LoggerProvider> provider;
 
-  static common::SpinLockMutex lock;
+  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
 };
 
 OPENTELEMETRY_EXPORT nostd::shared_ptr<LoggerProvider> Provider::provider(new NoopLoggerProvider);

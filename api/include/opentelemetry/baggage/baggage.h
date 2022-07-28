@@ -290,7 +290,7 @@ private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
   nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
 
-  static nostd::shared_ptr<Baggage> default_baggage;
+  OPENTELEMETRY_EXPORT static nostd::shared_ptr<Baggage> default_baggage;
 };
 
 OPENTELEMETRY_EXPORT nostd::shared_ptr<Baggage> Baggage::default_baggage(new Baggage());
