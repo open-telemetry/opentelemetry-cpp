@@ -6,6 +6,7 @@
 
 #  include <mutex>
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/logs/noop.h"
@@ -28,8 +29,9 @@ public:
    */
   static nostd::shared_ptr<LoggerProvider> GetLoggerProvider() noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    return nostd::shared_ptr<LoggerProvider>(GetProvider());
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    nostd::shared_ptr<LoggerProvider> result(provider);
+    return result;
   }
 
   /**
@@ -37,23 +39,19 @@ public:
    */
   static void SetLoggerProvider(nostd::shared_ptr<LoggerProvider> tp) noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    provider = tp;
   }
 
 private:
-  static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
-  {
-    static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);
-    return provider;
-  }
+  static nostd::shared_ptr<LoggerProvider> provider;
 
-  static common::SpinLockMutex &GetLock() noexcept
-  {
-    static common::SpinLockMutex lock;
-    return lock;
-  }
+  static common::SpinLockMutex lock;
 };
+
+OPENTELEMETRY_EXPORT nostd::shared_ptr<LoggerProvider> Provider::provider(new NoopLoggerProvider);
+
+OPENTELEMETRY_EXPORT common::SpinLockMutex Provider::lock;
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

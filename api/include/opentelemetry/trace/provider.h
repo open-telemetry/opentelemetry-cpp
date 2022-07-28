@@ -5,6 +5,7 @@
 
 #include <mutex>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/noop.h"
@@ -27,8 +28,9 @@ public:
    */
   static nostd::shared_ptr<TracerProvider> GetTracerProvider() noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    return nostd::shared_ptr<TracerProvider>(GetProvider());
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    nostd::shared_ptr<TracerProvider> result(provider);
+    return result;
   }
 
   /**
@@ -36,23 +38,19 @@ public:
    */
   static void SetTracerProvider(nostd::shared_ptr<TracerProvider> tp) noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    GetProvider() = tp;
+    std::lock_guard<common::SpinLockMutex> guard(lock);
+    provider = tp;
   }
 
 private:
-  static nostd::shared_ptr<TracerProvider> &GetProvider() noexcept
-  {
-    static nostd::shared_ptr<TracerProvider> provider(new NoopTracerProvider);
-    return provider;
-  }
+  static nostd::shared_ptr<TracerProvider> provider;
 
-  static common::SpinLockMutex &GetLock() noexcept
-  {
-    static common::SpinLockMutex lock;
-    return lock;
-  }
+  static common::SpinLockMutex lock;
 };
+
+OPENTELEMETRY_EXPORT nostd::shared_ptr<TracerProvider> Provider::provider(new NoopTracerProvider);
+
+OPENTELEMETRY_EXPORT common::SpinLockMutex Provider::lock;
 
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

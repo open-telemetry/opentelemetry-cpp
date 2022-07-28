@@ -6,6 +6,7 @@
 #include <cctype>
 
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
@@ -34,11 +35,7 @@ public:
       : kv_properties_(new opentelemetry::common::KeyValueProperties(keys_and_values))
   {}
 
-  static nostd::shared_ptr<Baggage> GetDefault()
-  {
-    static nostd::shared_ptr<Baggage> baggage{new Baggage()};
-    return baggage;
-  }
+  static nostd::shared_ptr<Baggage> GetDefault() { return default_baggage; }
 
   /* Get value for key in the baggage
      @returns true if key is found, false otherwise
@@ -292,7 +289,11 @@ private:
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
   nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
+
+  static nostd::shared_ptr<Baggage> default_baggage;
 };
+
+OPENTELEMETRY_EXPORT nostd::shared_ptr<Baggage> Baggage::default_baggage(new Baggage());
 
 }  // namespace baggage
 

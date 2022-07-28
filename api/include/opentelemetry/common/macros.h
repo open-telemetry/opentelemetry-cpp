@@ -89,3 +89,17 @@
 #else
 #  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg)
 #endif
+
+/**
+  @def OPENTELEMETRY_EXPORT
+  Declare a weak symbol with visibility default.
+*/
+#if defined(__clang__)
+#  define OPENTELEMETRY_EXPORT __attribute__((visibility("default"), weak))
+#elif defined(__GNUC__)
+#  define OPENTELEMETRY_EXPORT __attribute__((visibility("default"), weak))
+#elif defined(_MSC_VER)
+#  define OPENTELEMETRY_EXPORT __declspec(selectany)
+#else
+#  define OPENTELEMETRY_EXPORT
+#endif
