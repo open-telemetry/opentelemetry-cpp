@@ -43,14 +43,15 @@ public:
   }
 
 private:
-  OPENTELEMETRY_EXPORT static nostd::shared_ptr<TracerProvider> provider;
+  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<TracerProvider> provider;
 
-  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_EXPORT static common::SpinLockMutex lock;
 };
 
-OPENTELEMETRY_EXPORT nostd::shared_ptr<TracerProvider> Provider::provider(new NoopTracerProvider);
+OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<TracerProvider> Provider::provider(
+    new NoopTracerProvider);
 
-OPENTELEMETRY_EXPORT common::SpinLockMutex Provider::lock;
+OPENTELEMETRY_DEFINE_EXPORT common::SpinLockMutex Provider::lock;
 
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

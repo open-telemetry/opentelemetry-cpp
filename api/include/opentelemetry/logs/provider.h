@@ -44,14 +44,15 @@ public:
   }
 
 private:
-  OPENTELEMETRY_EXPORT static nostd::shared_ptr<LoggerProvider> provider;
+  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<LoggerProvider> provider;
 
-  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_EXPORT static common::SpinLockMutex lock;
 };
 
-OPENTELEMETRY_EXPORT nostd::shared_ptr<LoggerProvider> Provider::provider(new NoopLoggerProvider);
+OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<LoggerProvider> Provider::provider(
+    new NoopLoggerProvider);
 
-OPENTELEMETRY_EXPORT common::SpinLockMutex Provider::lock;
+OPENTELEMETRY_DEFINE_EXPORT common::SpinLockMutex Provider::lock;
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

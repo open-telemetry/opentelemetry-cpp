@@ -91,15 +91,29 @@
 #endif
 
 /**
-  @def OPENTELEMETRY_EXPORT
+  @def OPENTELEMETRY_DECLARE_EXPORT
   Declare a weak symbol with visibility default.
 */
 #if defined(__clang__)
-#  define OPENTELEMETRY_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DECLARE_EXPORT __attribute__((visibility("default"), weak))
 #elif defined(__GNUC__)
-#  define OPENTELEMETRY_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DECLARE_EXPORT __attribute__((visibility("default"), weak))
 #elif defined(_MSC_VER)
-#  define OPENTELEMETRY_EXPORT __declspec(selectany)
+#  define OPENTELEMETRY_DECLARE_EXPORT
 #else
-#  define OPENTELEMETRY_EXPORT
+#  define OPENTELEMETRY_DECLARE_EXPORT
+#endif
+
+/**
+  @def OPENTELEMETRY_DEFINE_EXPORT
+  Declare a weak symbol with visibility default.
+*/
+#if defined(__clang__)
+#  define OPENTELEMETRY_DEFINE_EXPORT __attribute__((visibility("default"), weak))
+#elif defined(__GNUC__)
+#  define OPENTELEMETRY_DEFINE_EXPORT __attribute__((visibility("default"), weak))
+#elif defined(_MSC_VER)
+#  define OPENTELEMETRY_DEFINE_EXPORT __declspec(selectany)
+#else
+#  define OPENTELEMETRY_DEFINE_EXPORT
 #endif

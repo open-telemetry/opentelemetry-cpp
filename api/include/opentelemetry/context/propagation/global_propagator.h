@@ -40,15 +40,15 @@ public:
   }
 
 private:
-  OPENTELEMETRY_EXPORT static nostd::shared_ptr<TextMapPropagator> propagator;
+  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<TextMapPropagator> propagator;
 
-  OPENTELEMETRY_EXPORT static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_EXPORT static common::SpinLockMutex lock;
 };
 
-OPENTELEMETRY_EXPORT nostd::shared_ptr<TextMapPropagator> GlobalTextMapPropagator::propagator(
-    new NoOpPropagator());
+OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<TextMapPropagator>
+    GlobalTextMapPropagator::propagator(new NoOpPropagator());
 
-OPENTELEMETRY_EXPORT common::SpinLockMutex GlobalTextMapPropagator::lock;
+OPENTELEMETRY_DEFINE_EXPORT common::SpinLockMutex GlobalTextMapPropagator::lock;
 
 }  // namespace propagation
 }  // namespace context

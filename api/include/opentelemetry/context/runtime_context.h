@@ -167,11 +167,11 @@ private:
     return context_storage;
   }
 
-  OPENTELEMETRY_EXPORT static nostd::shared_ptr<RuntimeContextStorage> context_storage;
+  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<RuntimeContextStorage> context_storage;
 };
 
-OPENTELEMETRY_EXPORT nostd::shared_ptr<RuntimeContextStorage> RuntimeContext::context_storage(
-    GetDefaultStorage());
+OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<RuntimeContextStorage>
+    RuntimeContext::context_storage(GetDefaultStorage());
 
 inline Token::~Token() noexcept
 {

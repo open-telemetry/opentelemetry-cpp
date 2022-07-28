@@ -313,10 +313,10 @@ private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
   nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
 
-  OPENTELEMETRY_EXPORT static nostd::shared_ptr<TraceState> default_ts;
+  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<TraceState> default_ts;
 };
 
-OPENTELEMETRY_EXPORT nostd::shared_ptr<TraceState> TraceState::default_ts(new TraceState());
+OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<TraceState> TraceState::default_ts(new TraceState());
 
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
