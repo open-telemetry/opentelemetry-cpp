@@ -79,13 +79,33 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 
   for (auto &record : data.scope_metric_data_)
   {
-    printInstrumentationInfoMetricData(record);
+    printInstrumentationInfoMetricData(record, data);
   }
   return sdk::common::ExportResult::kSuccess;
 }
 
+void OStreamMetricExporter::printAttributes(
+    const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &map,
+    const std::string prefix)
+{
+  for (const auto &kv : map)
+  {
+    sout_ << prefix << kv.first << ": ";
+    opentelemetry::exporter::ostream_common::print_value(kv.second, sout_);
+  }
+}
+
+void OStreamMetricExporter::printResources(const opentelemetry::sdk::resource::Resource &resources)
+{
+  auto attributes = resources.GetAttributes();
+  if (attributes.size())
+  {
+    printAttributes(attributes, "\n\t");
+  }
+}
+
 void OStreamMetricExporter::printInstrumentationInfoMetricData(
-    const sdk::metrics::ScopeMetrics &info_metric)
+    const sdk::metrics::ScopeMetrics &info_metric, const sdk::metrics::ResourceMetrics &data)
 {
   // sout_ is shared
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
@@ -109,6 +129,9 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
         printPointAttributes(pd.attributes);
       }
     }
+
+    sout_ << "\n  resources\t:";
+    printResources(*data.resource_);
   }
   sout_ << "\n}\n";
 }
