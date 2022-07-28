@@ -81,6 +81,11 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n  value\t\t: 20"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
@@ -151,6 +156,11 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n  counts     : [200, 300, 400, 500, ]"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
@@ -214,6 +224,11 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  valid     : true"
       "\n  value     : 20"
       "\n  attributes\t\t: "
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
@@ -261,6 +276,11 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       "\n  name\t\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
