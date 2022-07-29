@@ -8,6 +8,7 @@ add_library(
   batch_log_processor.cc
   batch_log_processor_factory.cc
   logger_context.cc
+  logger_context_factory.cc
   multi_log_processor.cc
   multi_log_processor_factory.cc
   multi_recordable.cc)
