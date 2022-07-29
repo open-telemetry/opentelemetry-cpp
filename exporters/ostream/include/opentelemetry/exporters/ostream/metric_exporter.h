@@ -56,13 +56,12 @@ private:
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
-  void printInstrumentationInfoMetricData(
-      const sdk::metrics::ScopeMetrics &info_metrics, const sdk::metrics::ResourceMetrics &data);
+  void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics,
+                                          const sdk::metrics::ResourceMetrics &data);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
   void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
-  void printAttributes(
-      const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &map,
-      const std::string prefix);
+  void printAttributes(const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &map,
+                       const std::string prefix);
   void printResources(const opentelemetry::sdk::resource::Resource &resources);
 };
 }  // namespace metrics

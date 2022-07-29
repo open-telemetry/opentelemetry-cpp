@@ -105,7 +105,8 @@ void OStreamMetricExporter::printResources(const opentelemetry::sdk::resource::R
 }
 
 void OStreamMetricExporter::printInstrumentationInfoMetricData(
-    const sdk::metrics::ScopeMetrics &info_metric, const sdk::metrics::ResourceMetrics &data)
+    const sdk::metrics::ScopeMetrics &info_metric,
+    const sdk::metrics::ResourceMetrics &data)
 {
   // sout_ is shared
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
