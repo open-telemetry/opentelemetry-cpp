@@ -23,6 +23,22 @@ jobs:
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
+  cmake_deprecated_metrics_test:
+    name: CMake test (without otlp-exporter and deprecated metrics)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake tests (without otlp-exporter)
+      run: |
+        sudo ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.deprecated_metrics.test
+
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
     runs-on: ubuntu-latest
@@ -98,6 +114,28 @@ jobs:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
 
+  cmake_gcc_48_otlp_exporter_deprecated_metrics_test:
+    name: CMake gcc 4.8 (with otlp exporter and deprecated metrics)
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+    - name: setup grpc
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.deprecated_metrics.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
   cmake_test_cxx20:
     name: CMake C++20 test
     runs-on: ubuntu-20.04
@@ -165,7 +203,27 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
-
+  bazel_deprecated_metrics_test:
+    name: Bazel deprecated metrics
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.deprecated_metrics.test
   bazel_test_async:
     name: Bazel with async export
     runs-on: ubuntu-latest
