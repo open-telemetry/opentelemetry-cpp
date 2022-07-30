@@ -48,7 +48,7 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
 private:
-  std::shared_ptr<MeterContext> meter_context_;
+  std::weak_ptr<MeterContext> meter_context_;
   std::shared_ptr<MetricReader> metric_reader_;
 };
 }  // namespace metrics

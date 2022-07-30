@@ -33,7 +33,8 @@ bool MetricCollector::Collect(
     nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
   ResourceMetrics resource_metrics;
-  for (auto &meter : meter_context_->GetMeters())
+  auto ctx = meter_context_.lock();
+  for (auto &meter : ctx->GetMeters())
   {
     auto collection_ts = std::chrono::system_clock::now();
     ScopeMetrics scope_metrics;
@@ -41,7 +42,7 @@ bool MetricCollector::Collect(
     scope_metrics.scope_       = meter->GetInstrumentationScope();
     resource_metrics.scope_metric_data_.push_back(scope_metrics);
   }
-  resource_metrics.resource_ = &meter_context_->GetResource();
+  resource_metrics.resource_ = &ctx->GetResource();
   callback(resource_metrics);
   return true;
 }

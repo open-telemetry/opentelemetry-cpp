@@ -29,7 +29,7 @@ class Meter final : public opentelemetry::metrics::Meter
 public:
   /** Construct a new Meter with the given  pipeline. */
   explicit Meter(
-      std::shared_ptr<sdk::metrics::MeterContext> meter_context,
+      std::weak_ptr<sdk::metrics::MeterContext> meter_context,
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
@@ -122,7 +122,7 @@ private:
   // order of declaration is important here - instrumentation scope should destroy after
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
-  std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
+  std::weak_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
 
@@ -135,7 +135,8 @@ private:
                                                    void *),
                                   void *state = nullptr)
   {
-    auto view_registry = meter_context_->GetViewRegistry();
+    auto ctx           = meter_context_.lock();
+    auto view_registry = ctx->GetViewRegistry();
     auto success       = view_registry->FindViews(
         instrument_descriptor, *scope_,
         [this, &instrument_descriptor, callback, state](const View &view) {

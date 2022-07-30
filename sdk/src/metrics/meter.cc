@@ -24,7 +24,7 @@ namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
 Meter::Meter(
-    std::shared_ptr<MeterContext> meter_context,
+    std::weak_ptr<MeterContext> meter_context,
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
 {}
@@ -201,7 +201,8 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
 std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx           = meter_context_.lock();
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
 
   auto success = view_registry->FindViews(
@@ -238,11 +239,11 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
   std::vector<MetricData> metric_data_list;
+  auto ctx = meter_context_.lock();
   for (auto &metric_storage : storage_registry_)
   {
-    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
-                                   meter_context_->GetSDKStartTime(), collect_ts,
-                                   [&metric_data_list](MetricData metric_data) {
+    metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
+                                   collect_ts, [&metric_data_list](MetricData metric_data) {
                                      metric_data_list.push_back(metric_data);
                                      return true;
                                    });
