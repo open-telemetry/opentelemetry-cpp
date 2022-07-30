@@ -90,7 +90,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
       sout_ << "\n  resources     : ";
       printResources(span->GetResource());
       sout_ << "\n  instr-lib     : ";
-      printInstrumentationLibrary(span->GetInstrumentationLibrary());
+      printInstrumentationScope(span->GetInstrumentationScope());
       sout_ << "\n}\n";
     }
   }
@@ -161,12 +161,11 @@ void OStreamSpanExporter::printResources(const opentelemetry::sdk::resource::Res
   }
 }
 
-void OStreamSpanExporter::printInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library)
+void OStreamSpanExporter::printInstrumentationScope(
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope)
 {
-  sout_ << instrumentation_library.GetName();
-  auto version = instrumentation_library.GetVersion();
+  sout_ << instrumentation_scope.GetName();
+  auto version = instrumentation_scope.GetVersion();
   if (version.size())
   {
     sout_ << "-" << version;

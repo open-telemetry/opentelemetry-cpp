@@ -121,17 +121,17 @@ void MultiRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags
   }
 }
 
-void MultiRecordable::SetInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+void MultiRecordable::SetInstrumentationScope(
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
 {
-  instrumentation_library_ = &instrumentation_library;
+  instrumentation_scope_ = &instrumentation_scope;
 }
 
-const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-MultiRecordable::GetInstrumentationLibrary() const noexcept
+const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
+MultiRecordable::GetInstrumentationScope() const noexcept
 {
-  return *instrumentation_library_;
+  return *instrumentation_scope_;
 }
 }  // namespace logs
 }  // namespace sdk

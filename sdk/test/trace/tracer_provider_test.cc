@@ -60,9 +60,9 @@ TEST(TracerProvider, GetTracer)
 #endif
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler().GetDescription());
 
-  auto instrumentation_library1 = sdkTracer1->GetInstrumentationLibrary();
-  ASSERT_EQ(instrumentation_library1.GetName(), "test");
-  ASSERT_EQ(instrumentation_library1.GetVersion(), "");
+  auto instrumentation_scope1 = sdkTracer1->GetInstrumentationScope();
+  ASSERT_EQ(instrumentation_scope1.GetName(), "test");
+  ASSERT_EQ(instrumentation_scope1.GetVersion(), "");
 
   // Should be an sdk::trace::Tracer with the processor attached.
 #ifdef OPENTELEMETRY_RTTI_ENABLED
@@ -70,9 +70,9 @@ TEST(TracerProvider, GetTracer)
 #else
   auto sdkTracer3 = static_cast<Tracer *>(t3.get());
 #endif
-  auto instrumentation_library3 = sdkTracer3->GetInstrumentationLibrary();
-  ASSERT_EQ(instrumentation_library3.GetName(), "different");
-  ASSERT_EQ(instrumentation_library3.GetVersion(), "1.0.0");
+  auto instrumentation_scope3 = sdkTracer3->GetInstrumentationScope();
+  ASSERT_EQ(instrumentation_scope3.GetName(), "different");
+  ASSERT_EQ(instrumentation_scope3.GetVersion(), "1.0.0");
 }
 
 TEST(TracerProvider, Shutdown)
