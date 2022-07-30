@@ -21,7 +21,7 @@ Increment the:
 * [BUILD] Don't require applications using jaeger exporter to know about libcurl
   [#1518](https://github.com/open-telemetry/opentelemetry-cpp/pull/1518)
 * [EXPORTER] Inline print_value() in ostream exporter [#1512](https://github.com/open-telemetry/opentelemetry-cpp/pull/1512)
-* [SDK] fix: urlPaser will incorrect parsing url like http://abc.com/xxx@xxx/a/b
+* [SDK] fix: urlPaser will incorrect parsing url like "http://abc.com/xxx@xxx/a/b"
   [#1511](https://github.com/open-telemetry/opentelemetry-cpp/pull/1511)
 * [BUILD] Try to build nlohmann-json only it's depended. [#1505](https://github.com/open-telemetry/opentelemetry-cpp/pull/1505)
 * [EXPORTER BUILD] Link opentelemetry_api to ETW exporter test [#1503](https://github.com/open-telemetry/opentelemetry-cpp/pull/1503)
