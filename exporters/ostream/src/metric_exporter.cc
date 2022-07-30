@@ -72,12 +72,12 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
   if (isShutdown())
   {
     OTEL_INTERNAL_LOG_ERROR("[OStream Metric] Exporting "
-                            << data.instrumentation_info_metric_data_.size()
+                            << data.scope_metric_data_.size()
                             << " records(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
-  for (auto &record : data.instrumentation_info_metric_data_)
+  for (auto &record : data.scope_metric_data_)
   {
     printInstrumentationInfoMetricData(record);
   }
@@ -85,14 +85,14 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 }
 
 void OStreamMetricExporter::printInstrumentationInfoMetricData(
-    const sdk::metrics::InstrumentationInfoMetrics &info_metric)
+    const sdk::metrics::ScopeMetrics &info_metric)
 {
   // sout_ is shared
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   sout_ << "{";
-  sout_ << "\n  name\t\t: " << info_metric.instrumentation_library_->GetName()
-        << "\n  schema url\t: " << info_metric.instrumentation_library_->GetSchemaURL()
-        << "\n  version\t: " << info_metric.instrumentation_library_->GetVersion();
+  sout_ << "\n  name\t\t: " << info_metric.scope_->GetName()
+        << "\n  schema url\t: " << info_metric.scope_->GetSchemaURL()
+        << "\n  version\t: " << info_metric.scope_->GetVersion();
   for (const auto &record : info_metric.metric_data_)
   {
     sout_ << "\n  start time\t: " << timeToString(record.start_ts)

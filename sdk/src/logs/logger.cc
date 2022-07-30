@@ -16,12 +16,12 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name,
-               std::shared_ptr<LoggerContext> context,
-               std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
-                   instrumentation_library) noexcept
+Logger::Logger(
+    nostd::string_view name,
+    std::shared_ptr<LoggerContext> context,
+    std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
-      instrumentation_library_(std::move(instrumentation_library)),
+      instrumentation_scope_(std::move(instrumentation_scope)),
       context_(context)
 {}
 
@@ -63,7 +63,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetTimestamp(timestamp);
   recordable->SetSeverity(severity);
   recordable->SetBody(body);
-  recordable->SetInstrumentationLibrary(GetInstrumentationLibrary());
+  recordable->SetInstrumentationScope(GetInstrumentationScope());
 
   recordable->SetResource(context_->GetResource());
 
@@ -114,10 +114,10 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   processor.OnReceive(std::move(recordable));
 }
 
-const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-Logger::GetInstrumentationLibrary() const noexcept
+const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
+Logger::GetInstrumentationScope() const noexcept
 {
-  return *instrumentation_library_;
+  return *instrumentation_scope_;
 }
 
 }  // namespace logs

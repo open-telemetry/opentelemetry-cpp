@@ -8,7 +8,7 @@
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 
 using namespace opentelemetry;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
 class MockMetricReader : public MetricReader
