@@ -1,9 +1,9 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
-    name = "instrumentationlibrary_test",
+    name = "instrumentationscope_test",
     srcs = [
-        "instrumentationlibrary_test.cc",
+        "instrumentationscope_test.cc",
     ],
     tags = ["test"],
     deps = [

@@ -242,11 +242,11 @@ void Recordable::SetSpanKind(trace_api::SpanKind span_kind) noexcept
   }
 }
 
-void Recordable::SetInstrumentationLibrary(
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library) noexcept
+void Recordable::SetInstrumentationScope(
+    const sdk::instrumentationscope::InstrumentationScope &instrumentation_scope) noexcept
 {
-  span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
-  span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
+  span_["tags"]["otel.library.name"]    = instrumentation_scope.GetName();
+  span_["tags"]["otel.library.version"] = instrumentation_scope.GetVersion();
 }
 
 }  // namespace zipkin

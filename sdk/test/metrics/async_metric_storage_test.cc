@@ -16,7 +16,7 @@
 #  include <vector>
 
 using namespace opentelemetry::sdk::metrics;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::resource;
 
 using namespace opentelemetry::sdk::metrics;

@@ -167,7 +167,7 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
   }
 }
 
-void OtlpMetricUtils::PopulateInstrumentationInfoMetric(
+void OtlpMetricUtils::PopulateInstrumentInfoMetrics(
     const opentelemetry::sdk::metrics::MetricData &metric_data,
     proto::metrics::v1::Metric *metric) noexcept
 {
@@ -201,22 +201,20 @@ void OtlpMetricUtils::PopulateResourceMetrics(
   OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(),
                                                 *(data.resource_));
 
-  for (auto &instrumentation_metrics : data.instrumentation_info_metric_data_)
+  for (auto &scope_metrics : data.scope_metric_data_)
   {
-    if (instrumentation_metrics.instrumentation_library_ == nullptr)
+    if (scope_metrics.scope_ == nullptr)
     {
       continue;
     }
-    auto instrumentation_lib_metrics = resource_metrics->add_instrumentation_library_metrics();
-    proto::common::v1::InstrumentationLibrary *instrumentation_library =
-        instrumentation_lib_metrics->mutable_instrumentation_library();
-    instrumentation_library->set_name(instrumentation_metrics.instrumentation_library_->GetName());
-    instrumentation_library->set_version(
-        instrumentation_metrics.instrumentation_library_->GetVersion());
+    auto scope_lib_metrics                         = resource_metrics->add_scope_metrics();
+    proto::common::v1::InstrumentationScope *scope = scope_lib_metrics->mutable_scope();
+    scope->set_name(scope_metrics.scope_->GetName());
+    scope->set_version(scope_metrics.scope_->GetVersion());
 
-    for (auto &metric_data : instrumentation_metrics.metric_data_)
+    for (auto &metric_data : scope_metrics.metric_data_)
     {
-      PopulateInstrumentationInfoMetric(metric_data, instrumentation_lib_metrics->add_metrics());
+      PopulateInstrumentInfoMetrics(metric_data, scope_lib_metrics->add_metrics());
     }
   }
 }

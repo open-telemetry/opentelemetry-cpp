@@ -9,6 +9,7 @@
 #  include <memory>
 #  include <unordered_map>
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
@@ -80,21 +81,27 @@ public:
   void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override;
 
   /**
-   * Set instrumentation_library for this log.
-   * @param instrumentation_library the instrumentation library to set
+   * Set instrumentation_scope for this log.
+   * @param instrumentation_scope the instrumentation scope to set
    */
-  void SetInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library) noexcept override;
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept override;
 
-  /** Returns the associated instruementation library */
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-  GetInstrumentationLibrary() const noexcept;
+  /** Returns the associated instrumentation scope */
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
+      const noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
+      const noexcept
+  {
+    return GetInstrumentationScope();
+  }
 
 private:
   std::unordered_map<std::size_t, std::unique_ptr<Recordable>> recordables_;
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_ = nullptr;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
+      nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

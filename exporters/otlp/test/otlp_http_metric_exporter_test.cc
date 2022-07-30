@@ -123,9 +123,8 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
             "metrics_library_name", "metrics_description", "metrics_unit",
@@ -136,10 +135,8 @@ public:
         std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, sum_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -151,16 +148,12 @@ public:
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
           auto resource_metrics = *check_json["resource_metrics"].begin();
-          // auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
-          // auto scope = scope_metrics["scope"];
-          auto instrumentation_library_metrics =
-              *resource_metrics["instrumentation_library_metrics"].begin();
-          auto scope = instrumentation_library_metrics["instrumentation_library"];
+          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto metric = *instrumentation_library_metrics["metrics"].begin();
+          auto metric = *scope_metrics["metrics"].begin();
           EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
@@ -219,9 +212,8 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
             "metrics_library_name", "metrics_description", "metrics_unit",
@@ -232,10 +224,8 @@ public:
         std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, sum_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -247,16 +237,12 @@ public:
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          // auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
-          // auto &scope = instrumentation_library_metrics.scope();
-          auto &instrumentation_library_metrics =
-              request_body.resource_metrics(0).instrumentation_library_metrics(0);
-          auto &scope = instrumentation_library_metrics.instrumentation_library();
+          auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
+          auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
           EXPECT_EQ("1.5.0", scope.version());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto &metric = instrumentation_library_metrics.metrics(0);
+          auto &metric = scope_metrics.metrics(0);
           EXPECT_EQ("metrics_library_name", metric.name());
           EXPECT_EQ("metrics_description", metric.description());
           EXPECT_EQ("metrics_unit", metric.unit());
@@ -336,13 +322,10 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -354,16 +337,12 @@ public:
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
           auto resource_metrics = *check_json["resource_metrics"].begin();
-          // auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
-          // auto scope = scope_metrics["scope"];
-          auto instrumentation_library_metrics =
-              *resource_metrics["instrumentation_library_metrics"].begin();
-          auto scope = instrumentation_library_metrics["instrumentation_library"];
+          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto metric = *instrumentation_library_metrics["metrics"].begin();
+          auto metric = *scope_metrics["metrics"].begin();
           EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
@@ -422,9 +401,8 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data{};
     last_value_point_data.value_              = 10.0;
     last_value_point_data.is_lastvalue_valid_ = true;
@@ -444,10 +422,8 @@ public:
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, last_value_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, last_value_point_data2}}};
 
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -459,16 +435,12 @@ public:
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          // auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
-          // auto &scope = instrumentation_library_metrics.scope();
-          auto &instrumentation_library_metrics =
-              request_body.resource_metrics(0).instrumentation_library_metrics(0);
-          auto &scope = instrumentation_library_metrics.instrumentation_library();
+          auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
+          auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
           EXPECT_EQ("1.5.0", scope.version());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto &metric = instrumentation_library_metrics.metrics(0);
+          auto &metric = scope_metrics.metrics(0);
           EXPECT_EQ("metrics_library_name", metric.name());
           EXPECT_EQ("metrics_description", metric.description());
           EXPECT_EQ("metrics_unit", metric.unit());
@@ -551,13 +523,10 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -569,16 +538,12 @@ public:
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
           auto resource_metrics = *check_json["resource_metrics"].begin();
-          // auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
-          // auto scope = scope_metrics["scope"];
-          auto instrumentation_library_metrics =
-              *resource_metrics["instrumentation_library_metrics"].begin();
-          auto scope = instrumentation_library_metrics["instrumentation_library"];
+          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto metric = *instrumentation_library_metrics["metrics"].begin();
+          auto metric = *scope_metrics["metrics"].begin();
           EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
@@ -670,9 +635,8 @@ public:
     auto resource = opentelemetry::sdk::resource::Resource::Create(
         opentelemetry::sdk::resource::ResourceAttributes{});
     data.resource_ = &resource;
-    auto instrumentation_library =
-        opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                   "1.5.0");
+    auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+        "library_name", "1.5.0");
 
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data{};
     histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
@@ -696,10 +660,8 @@ public:
             {opentelemetry::sdk::metrics::PointAttributes{{"a1", "b1"}}, histogram_point_data},
             {opentelemetry::sdk::metrics::PointAttributes{{"a2", "b2"}}, histogram_point_data2}}};
 
-    data.instrumentation_info_metric_data_ =
-        std::vector<opentelemetry::sdk::metrics::InstrumentationInfoMetrics>{
-            {instrumentation_library.get(),
-             std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+    data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+        {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
 
     auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
     auto mock_session =
@@ -711,16 +673,12 @@ public:
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          // auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
-          // auto &scope = instrumentation_library_metrics.scope();
-          auto &instrumentation_library_metrics =
-              request_body.resource_metrics(0).instrumentation_library_metrics(0);
-          auto &scope = instrumentation_library_metrics.instrumentation_library();
+          auto &scope_metrics = request_body.resource_metrics(0).scope_metrics(0);
+          auto &scope         = scope_metrics.scope();
           EXPECT_EQ("library_name", scope.name());
           EXPECT_EQ("1.5.0", scope.version());
 
-          // auto metric = *scope_metrics["metrics"].begin();
-          auto &metric = instrumentation_library_metrics.metrics(0);
+          auto &metric = scope_metrics.metrics(0);
           EXPECT_EQ("metrics_library_name", metric.name());
           EXPECT_EQ("metrics_description", metric.description());
           EXPECT_EQ("metrics_unit", metric.unit());
