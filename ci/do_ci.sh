@@ -60,10 +60,7 @@ mkdir -p "${BUILD_DIR}"
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST"
-# Previous legacy metrics use virtual drive, which can not be used without RTTI
-if [[ "$1" != "bazel.nortti" ]]; then
-  BAZEL_OPTIONS="$BAZEL_OPTIONS --copt=-DENABLE_METRICS_PREVIEW"
-fi
+
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS --copt=-DENABLE_ASYNC_EXPORT"
