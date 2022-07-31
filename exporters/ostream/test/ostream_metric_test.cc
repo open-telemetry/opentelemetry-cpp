@@ -83,7 +83,7 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.version: 1.5.0"
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -158,7 +158,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.version: 1.5.0"
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -226,7 +226,7 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  attributes\t\t: "
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.version: 1.5.0"
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -278,7 +278,7 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       "\n  unit\t\t: unit"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.4.1"
+      "\n\ttelemetry.sdk.version: 1.5.0"
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
