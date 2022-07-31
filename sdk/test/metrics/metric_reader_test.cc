@@ -32,8 +32,8 @@ TEST(MetricReaderTest, BasicTests)
 
   std::unique_ptr<MetricReader> metric_reader2(new MockMetricReader(aggr_temporality));
   std::shared_ptr<MeterContext> meter_context2(new MeterContext());
-  MetricProducer *metric_producer =
-      new MetricCollector(std::move(meter_context2), std::move(metric_reader2));
+  std::shared_ptr<MetricProducer> metric_producer{
+      new MetricCollector(std::move(meter_context2), std::move(metric_reader2))};
   EXPECT_NO_THROW(metric_producer->Collect([](ResourceMetrics &metric_data) { return true; }));
 }
 #endif
