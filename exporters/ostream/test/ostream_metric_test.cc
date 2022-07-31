@@ -7,6 +7,7 @@
 #  include <vector>
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/resource/resource_detector.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #  include <iostream>
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
@@ -83,7 +84,9 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.5.0"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output +=
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -158,7 +161,9 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.5.0"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output +=
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -226,7 +231,9 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  attributes\t\t: "
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.5.0"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output +=
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
@@ -278,7 +285,9 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       "\n  unit\t\t: unit"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
-      "\n\ttelemetry.sdk.version: 1.5.0"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output +=
       "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.language: cpp"
       "\n}\n";
