@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #  include <gtest/gtest.h>
@@ -40,8 +41,10 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
+  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir());
 
   storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -146,8 +149,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
+  std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir());
 
   storage.RecordDouble(10.0,
