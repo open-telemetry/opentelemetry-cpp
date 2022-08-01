@@ -107,11 +107,11 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   if (isShutdown())
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP METRICS gRPC] Exporting "
-                            << data.instrumentation_info_metric_data_.size()
+                            << data.scope_metric_data_.size()
                             << " metric(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
-  if (data.instrumentation_info_metric_data_.empty())
+  if (data.scope_metric_data_.empty())
   {
     return sdk::common::ExportResult::kSuccess;
   }

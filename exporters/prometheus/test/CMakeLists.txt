@@ -10,4 +10,15 @@ if(WITH_METRICS_PREVIEW)
       TEST_PREFIX exporter.
       TEST_LIST ${testname})
   endforeach()
+else()
+  foreach(testname exporter_test collector_test exporter_utils_test)
+    add_executable(${testname} "${testname}.cc")
+    target_link_libraries(
+      ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+      prometheus_exporter prometheus-cpp::pull opentelemetry_resources)
+    gtest_add_tests(
+      TARGET ${testname}
+      TEST_PREFIX exporter.
+      TEST_LIST ${testname})
+  endforeach()
 endif()

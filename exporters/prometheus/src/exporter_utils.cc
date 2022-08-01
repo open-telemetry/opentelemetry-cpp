@@ -41,7 +41,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   // iterate through the vector and set result data into it
   for (const auto &r : data)
   {
-    for (const auto &instrumentation_info : r->instrumentation_info_metric_data_)
+    for (const auto &instrumentation_info : r->scope_metric_data_)
     {
       for (const auto &metric_data : instrumentation_info.metric_data_)
       {

@@ -113,6 +113,13 @@ TEST(UrlParserTests, BasicTests)
         {"path", "/path1/path2"},
         {"query", "q1=a1&q2=a2"},
         {"success", "true"}}},
+      {"http://www.abc.com/path1@bbb/path2?q1=a1&q2=a2",
+       {{"host", "www.abc.com"},
+        {"port", "80"},
+        {"scheme", "http"},
+        {"path", "/path1@bbb/path2"},
+        {"query", "q1=a1&q2=a2"},
+        {"success", "true"}}},
 
   };
   for (auto &url_map : urls_map)

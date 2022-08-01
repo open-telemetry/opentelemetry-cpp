@@ -3,7 +3,7 @@
 
 #include "opentelemetry/exporters/jaeger/recordable.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -182,12 +182,12 @@ void JaegerRecordable::AddEvent(nostd::string_view name,
   logs_.push_back(log);
 }
 
-void JaegerRecordable::SetInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+void JaegerRecordable::SetInstrumentationScope(
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
 {
-  AddTag("otel.library.name", instrumentation_library.GetName(), tags_);
-  AddTag("otel.library.version", instrumentation_library.GetVersion(), tags_);
+  AddTag("otel.library.name", instrumentation_scope.GetName(), tags_);
+  AddTag("otel.library.version", instrumentation_scope.GetVersion(), tags_);
 }
 
 void JaegerRecordable::AddLink(const trace::SpanContext &span_context,
