@@ -66,19 +66,19 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
 {
   if (http_client_->IsShutdown())
   {
-    std::size_t metric_count = data.instrumentation_info_metric_data_.size();
+    std::size_t metric_count = data.scope_metric_data_.size();
     OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
                             << metric_count << " metric(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  if (data.instrumentation_info_metric_data_.empty())
+  if (data.scope_metric_data_.empty())
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
   proto::collector::metrics::v1::ExportMetricsServiceRequest service_request;
   OtlpMetricUtils::PopulateRequest(data, &service_request);
-  std::size_t metric_count = data.instrumentation_info_metric_data_.size();
+  std::size_t metric_count = data.scope_metric_data_.size();
 #  ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(service_request, [metric_count](
                                             opentelemetry::sdk::common::ExportResult result) {

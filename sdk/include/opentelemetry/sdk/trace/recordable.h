@@ -8,7 +8,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
-#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
@@ -27,7 +27,7 @@ namespace sdk
 namespace trace
 {
 
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
@@ -141,11 +141,17 @@ public:
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
 
   /**
-   * Set the instrumentation library of the span.
-   * @param instrumentation_library the instrumentation library to set
+   * Set the instrumentation scope of the span.
+   * @param instrumentation_scope the instrumentation scope to set
    */
-  virtual void SetInstrumentationLibrary(
-      const InstrumentationLibrary &instrumentation_library) noexcept = 0;
+  virtual void SetInstrumentationScope(
+      const InstrumentationScope &instrumentation_scope) noexcept = 0;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
+  void SetInstrumentationLibrary(const InstrumentationScope &instrumentation_scope) noexcept
+  {
+    SetInstrumentationScope(instrumentation_scope);
+  }
 };
 }  // namespace trace
 }  // namespace sdk
