@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659290420325,
+  "lastUpdate": 1659388800654,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -26622,6 +26622,180 @@ window.BENCHMARK_DATA = {
             "value": 26.95164680480957,
             "unit": "ms/iter",
             "extra": "iterations: 5\ncpu: 26.94321999999998 ms\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "71217171+esigo@users.noreply.github.com",
+            "name": "Ehsan Saei",
+            "username": "esigo"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "3af512e0ed3fd9762ba4d45debba2f6015858fdc",
+          "message": "Add configuration options for Aggregation creation (#1513)",
+          "timestamp": "2022-08-01T21:02:54Z",
+          "tree_id": "28b8e1044249a27c9077f7f37c1611acae8d2417",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/3af512e0ed3fd9762ba4d45debba2f6015858fdc"
+        },
+        "date": 1659388797676,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_CreateBaggageFromTenEntries",
+            "value": 3913.0796186128355,
+            "unit": "ns/iter",
+            "extra": "iterations: 35396\ncpu: 3912.8376087693523 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExtractBaggageHavingTenEntries",
+            "value": 1.6149569544038622,
+            "unit": "ns/iter",
+            "extra": "iterations: 86685696\ncpu: 1.6149400242457537 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_CreateBaggageFrom180Entries",
+            "value": 76826.10395120777,
+            "unit": "ns/iter",
+            "extra": "iterations: 1823\ncpu: 76823.25836533186 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ExtractBaggageWith180Entries",
+            "value": 1.6149477168601134,
+            "unit": "ns/iter",
+            "extra": "iterations: 86801788\ncpu: 1.6143734274229473 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SetValueBaggageWithTenEntries",
+            "value": 664.9822473661264,
+            "unit": "ns/iter",
+            "extra": "iterations: 209753\ncpu: 664.9764246518527 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SetValueBaggageWith180Entries",
+            "value": 16823.75335785136,
+            "unit": "ns/iter",
+            "extra": "iterations: 8313\ncpu: 16823.54144111631 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaggageToHeaderTenEntries",
+            "value": 2754.69847657128,
+            "unit": "ns/iter",
+            "extra": "iterations: 50608\ncpu: 2754.6692222573492 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaggageToHeader180Entries",
+            "value": 47172.73777034007,
+            "unit": "ns/iter",
+            "extra": "iterations: 2940\ncpu: 47170.340136054474 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreation",
+            "value": 68.5282577563228,
+            "unit": "ns/iter",
+            "extra": "iterations: 2634347\ncpu: 53.51333746085842 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreationWithScope",
+            "value": 455.5201718055552,
+            "unit": "ns/iter",
+            "extra": "iterations: 440365\ncpu: 320.3612912016169 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NestedSpanCreationWithScope",
+            "value": 1115.5240435723156,
+            "unit": "ns/iter",
+            "extra": "iterations: 138694\ncpu: 1009.0321138621716 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreationWithManualSpanContextPropagation",
+            "value": 234.0780381870253,
+            "unit": "ns/iter",
+            "extra": "iterations: 601465\ncpu: 232.7862801659283 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreationWitContextPropagation",
+            "value": 955.9517660491208,
+            "unit": "ns/iter",
+            "extra": "iterations: 146666\ncpu: 953.6443347469759 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanIdDefaultConstructor",
+            "value": 1.6880375851214144,
+            "unit": "ns/iter",
+            "extra": "iterations: 82460625\ncpu: 1.6870900505544313 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanIdConstructor",
+            "value": 1.6917898532305085,
+            "unit": "ns/iter",
+            "extra": "iterations: 82779010\ncpu: 1.691004760747924 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanIdToLowerBase16",
+            "value": 9.0588908701096,
+            "unit": "ns/iter",
+            "extra": "iterations: 15612802\ncpu: 8.969735221134556 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanIdIsValid",
+            "value": 1.7056393787817703,
+            "unit": "ns/iter",
+            "extra": "iterations: 82269704\ncpu: 1.7004704429227078 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpinLockThrashing/1/process_time/real_time",
+            "value": 0.11001399243213086,
+            "unit": "ms/iter",
+            "extra": "iterations: 1245\ncpu: 0.10649437751004018 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_SpinLockThrashing/2/process_time/real_time",
+            "value": 0.21791537602742514,
+            "unit": "ms/iter",
+            "extra": "iterations: 600\ncpu: 0.211345 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_ProcYieldSpinLockThrashing/1/process_time/real_time",
+            "value": 0.11020195120661588,
+            "unit": "ms/iter",
+            "extra": "iterations: 1279\ncpu: 0.10738318999218138 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_ProcYieldSpinLockThrashing/2/process_time/real_time",
+            "value": 0.21685273559005172,
+            "unit": "ms/iter",
+            "extra": "iterations: 648\ncpu: 0.2110634259259259 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_NaiveSpinLockThrashing/1/process_time/real_time",
+            "value": 0.1104135566329653,
+            "unit": "ms/iter",
+            "extra": "iterations: 1259\ncpu: 0.10771882446386022 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_NaiveSpinLockThrashing/2/process_time/real_time",
+            "value": 0.21737225261735327,
+            "unit": "ms/iter",
+            "extra": "iterations: 648\ncpu: 0.21169521604938268 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_ThreadYieldSpinLockThrashing/1/process_time/real_time",
+            "value": 6.564521789550781,
+            "unit": "ms/iter",
+            "extra": "iterations: 20\ncpu: 6.548005000000001 ms\nthreads: 1"
+          },
+          {
+            "name": "BM_ThreadYieldSpinLockThrashing/2/process_time/real_time",
+            "value": 27.258920669555664,
+            "unit": "ms/iter",
+            "extra": "iterations: 5\ncpu: 27.0311 ms\nthreads: 1"
           }
         ]
       }
