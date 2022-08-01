@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOG SDK] Add log sdk builders (#1486) [#1524](https://github.com/open-telemetry/opentelemetry-cpp/pull/1524)
+
 ## [1.5.0] 2022-07-29
 
 * [EXPORTER BUILD] Add resources to dep list of prometheus exporter test [#1527](https://github.com/open-telemetry/opentelemetry-cpp/pull/1527)
@@ -46,7 +48,6 @@ Increment the:
 * [EXT] `curl::HttpClient` use `curl_multi_handle` instead of creating a thread
   for every request and it's able to reuse connections now. ([#1317](https://github.com/open-telemetry/opentelemetry-cpp/pull/1317))
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.12.0 [#873](https://github.com/open-telemetry/opentelemetry-cpp/pull/873)
-* [LOG SDK] Add log sdk builders (#1486) [#1524](https://github.com/open-telemetry/opentelemetry-cpp/pull/1524)
 
 ## [1.4.1] 2022-06-19
 
