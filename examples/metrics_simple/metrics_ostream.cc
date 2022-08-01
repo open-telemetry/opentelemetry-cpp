@@ -72,7 +72,7 @@ void initMetrics(const std::string &name)
       new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, histogram_name)};
   std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
-  nostd::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config{
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config{
       new opentelemetry::sdk::metrics::HistogramAggregationConfig<double>};
   static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig<double> *>(
       aggregation_config.get())

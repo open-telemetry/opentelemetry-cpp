@@ -48,7 +48,7 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir(),
-      nostd::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
   storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -157,7 +157,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir(),
-      nostd::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
