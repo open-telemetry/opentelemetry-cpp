@@ -1,26 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/exporters/otlp/otlp_http_log_exporter_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_log_exporter_options.h"
+#  include <gtest/gtest.h>
+
+#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter_factory.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter_options.h"
 
 /*
   Make sure OtlpHttpExporterFactory does not require,
   even indirectly, nlohmann/json headers.
 */
-#ifdef NLOHMANN_JSON_VERSION_MAJOR
-#  error "nlohmann/json should not be included"
-#endif /* NLOHMANN_JSON_VERSION_MAJOR */
+#  ifdef NLOHMANN_JSON_VERSION_MAJOR
+#    error "nlohmann/json should not be included"
+#  endif /* NLOHMANN_JSON_VERSION_MAJOR */
 
 /*
   Make sure OtlpHttpExporterFactory does not require,
   even indirectly, protobuf headers.
 */
-#ifdef GOOGLE_PROTOBUF_VERSION
-#  error "protobuf should not be included"
-#endif
+#  ifdef GOOGLE_PROTOBUF_VERSION
+#    error "protobuf should not be included"
+#  endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -42,3 +44,5 @@ TEST(OtlpHttpLogExporterFactoryTest, BuildTest)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_LOGS_PREVIEW
