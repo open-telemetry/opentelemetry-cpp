@@ -4,8 +4,8 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_http_client.h"
-
+#  include "opentelemetry/exporters/otlp/otlp_environment.h"
+#  include "opentelemetry/exporters/otlp/otlp_http.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 
 #  include <chrono>
