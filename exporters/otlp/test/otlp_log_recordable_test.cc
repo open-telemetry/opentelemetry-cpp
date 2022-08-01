@@ -179,13 +179,13 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
   }
 }
 
-TEST(OtlpLogRecordable, SetInstrumentationLibrary)
+TEST(OtlpLogRecordable, SetInstrumentationScope)
 {
   OtlpLogRecordable rec;
   auto inst_lib =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("test", "v1");
-  rec.SetInstrumentationLibrary(*inst_lib);
-  EXPECT_EQ(rec.GetInstrumentationLibrary(), *inst_lib);
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("test", "v1");
+  rec.SetInstrumentationScope(*inst_lib);
+  EXPECT_EQ(rec.GetInstrumentationScope(), *inst_lib);
 }
 
 /**

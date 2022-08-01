@@ -47,14 +47,13 @@ TEST(PrometheusCollector, AddMetricDataWithCounterRecordsSuccessfully)
   ASSERT_EQ(collector_data.at(0)->resource_, data.resource_);
   for (auto &collector_d : collector_data)
   {
-    for (uint32_t instrument_idx = 0;
-         instrument_idx < collector_d->instrumentation_info_metric_data_.size(); ++instrument_idx)
+    for (uint32_t instrument_idx = 0; instrument_idx < collector_d->scope_metric_data_.size();
+         ++instrument_idx)
     {
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx)
-                    .instrumentation_library_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).instrumentation_library_);
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx).metric_data_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).metric_data_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).scope_,
+                data.scope_metric_data_.at(instrument_idx).scope_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).metric_data_,
+                data.scope_metric_data_.at(instrument_idx).metric_data_);
     }
   }
 }
@@ -86,14 +85,13 @@ TEST(PrometheusCollector, AddMetricDataWithHistogramSuccessfully)
   ASSERT_EQ(collector_data.at(0)->resource_, data.resource_);
   for (auto &collector_d : collector_data)
   {
-    for (uint32_t instrument_idx = 0;
-         instrument_idx < collector_d->instrumentation_info_metric_data_.size(); ++instrument_idx)
+    for (uint32_t instrument_idx = 0; instrument_idx < collector_d->scope_metric_data_.size();
+         ++instrument_idx)
     {
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx)
-                    .instrumentation_library_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).instrumentation_library_);
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx).metric_data_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).metric_data_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).scope_,
+                data.scope_metric_data_.at(instrument_idx).scope_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).metric_data_,
+                data.scope_metric_data_.at(instrument_idx).metric_data_);
     }
   }
 }
@@ -125,14 +123,13 @@ TEST(PrometheusCollector, AddMetricDataWithLastValueSuccessfully)
   ASSERT_EQ(collector_data.at(0)->resource_, data.resource_);
   for (auto &collector_d : collector_data)
   {
-    for (uint32_t instrument_idx = 0;
-         instrument_idx < collector_d->instrumentation_info_metric_data_.size(); ++instrument_idx)
+    for (uint32_t instrument_idx = 0; instrument_idx < collector_d->scope_metric_data_.size();
+         ++instrument_idx)
     {
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx)
-                    .instrumentation_library_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).instrumentation_library_);
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx).metric_data_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).metric_data_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).scope_,
+                data.scope_metric_data_.at(instrument_idx).scope_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).metric_data_,
+                data.scope_metric_data_.at(instrument_idx).metric_data_);
     }
   }
 }
@@ -164,14 +161,13 @@ TEST(PrometheusCollector, AddMetricDataWithDropSuccessfully)
   ASSERT_EQ(collector_data.at(0)->resource_, data.resource_);
   for (auto &collector_d : collector_data)
   {
-    for (uint32_t instrument_idx = 0;
-         instrument_idx < collector_d->instrumentation_info_metric_data_.size(); ++instrument_idx)
+    for (uint32_t instrument_idx = 0; instrument_idx < collector_d->scope_metric_data_.size();
+         ++instrument_idx)
     {
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx)
-                    .instrumentation_library_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).instrumentation_library_);
-      ASSERT_EQ(collector_d->instrumentation_info_metric_data_.at(instrument_idx).metric_data_,
-                data.instrumentation_info_metric_data_.at(instrument_idx).metric_data_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).scope_,
+                data.scope_metric_data_.at(instrument_idx).scope_);
+      ASSERT_EQ(collector_d->scope_metric_data_.at(instrument_idx).metric_data_,
+                data.scope_metric_data_.at(instrument_idx).metric_data_);
     }
   }
 }

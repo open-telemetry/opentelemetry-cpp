@@ -41,7 +41,7 @@ public:
   static void ConvertGaugeMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
                                  proto::metrics::v1::Gauge *const gauge) noexcept;
 
-  static void PopulateInstrumentationInfoMetric(
+  static void PopulateInstrumentInfoMetrics(
       const opentelemetry::sdk::metrics::MetricData &metric_data,
       proto::metrics::v1::Metric *metric) noexcept;
 
