@@ -54,9 +54,9 @@ const std::string OtlpRecordable::GetResourceSchemaURL() const noexcept
 const std::string OtlpRecordable::GetInstrumentationLibrarySchemaURL() const noexcept
 {
   std::string schema_url;
-  if (instrumentation_library_)
+  if (instrumentation_scope_)
   {
-    schema_url = instrumentation_library_->GetSchemaURL();
+    schema_url = instrumentation_scope_->GetSchemaURL();
   }
 
   return schema_url;
@@ -66,10 +66,10 @@ proto::common::v1::InstrumentationScope OtlpRecordable::GetProtoInstrumentationS
     const noexcept
 {
   proto::common::v1::InstrumentationScope instrumentation_scope;
-  if (instrumentation_library_)
+  if (instrumentation_scope_)
   {
-    instrumentation_scope.set_name(instrumentation_library_->GetName());
-    instrumentation_scope.set_version(instrumentation_library_->GetVersion());
+    instrumentation_scope.set_name(instrumentation_scope_->GetName());
+    instrumentation_scope.set_version(instrumentation_scope_->GetVersion());
   }
   return instrumentation_scope;
 }
@@ -176,11 +176,11 @@ void OtlpRecordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_.set_end_time_unix_nano(unix_end_time);
 }
 
-void OtlpRecordable::SetInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+void OtlpRecordable::SetInstrumentationScope(
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
 {
-  instrumentation_library_ = &instrumentation_library;
+  instrumentation_scope_ = &instrumentation_scope;
 }
 
 }  // namespace otlp

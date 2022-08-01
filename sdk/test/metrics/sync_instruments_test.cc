@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/context/context.h"
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
@@ -13,10 +13,10 @@
 #  include <limits>
 
 using namespace opentelemetry;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
-auto instrumentation_library = InstrumentationLibrary::Create("opentelemetry-cpp", "0.1.0");
+auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
 
 using M = std::map<std::string, std::string>;
 

@@ -8,7 +8,7 @@
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

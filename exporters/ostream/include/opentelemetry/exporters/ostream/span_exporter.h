@@ -61,9 +61,8 @@ private:
 
   void printResources(const opentelemetry::sdk::resource::Resource &resources);
 
-  void printInstrumentationLibrary(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library);
+  void printInstrumentationScope(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope);
 };
 }  // namespace trace
 }  // namespace exporter

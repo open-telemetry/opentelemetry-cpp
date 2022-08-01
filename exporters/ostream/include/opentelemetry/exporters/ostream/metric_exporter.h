@@ -56,8 +56,7 @@ private:
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
-  void printInstrumentationInfoMetricData(
-      const sdk::metrics::InstrumentationInfoMetrics &info_metrics);
+  void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
   void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
 };

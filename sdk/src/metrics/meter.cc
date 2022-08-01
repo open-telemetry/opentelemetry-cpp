@@ -23,10 +23,10 @@ namespace metrics
 namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
-Meter::Meter(std::shared_ptr<MeterContext> meter_context,
-             std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
-                 instrumentation_library) noexcept
-    : instrumentation_library_{std::move(instrumentation_library)}, meter_context_{meter_context}
+Meter::Meter(
+    std::shared_ptr<MeterContext> meter_context,
+    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+    : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
@@ -195,10 +195,10 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       new ObservableInstrument(instrument_descriptor, std::move(storage))};
 }
 
-const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
+const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
     const noexcept
 {
-  return instrumentation_library_.get();
+  return scope_.get();
 }
 
 std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
@@ -208,8 +208,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
   auto success = view_registry->FindViews(
-      instrument_descriptor, *instrumentation_library_,
-      [this, &instrument_descriptor, &storages](const View &view) {
+      instrument_descriptor, *scope_, [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {

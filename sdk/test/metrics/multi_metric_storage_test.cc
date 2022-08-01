@@ -10,7 +10,7 @@
 #  include <gtest/gtest.h>
 
 using namespace opentelemetry;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
 class TestMetricStorage : public SyncWritableMetricStorage
