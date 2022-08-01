@@ -94,9 +94,11 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
   size_t count_attributes = 0;
 
+  std::unique_ptr<DefaultAttributesProcessor> default_attributes_rocessor{
+      new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(instr_desc, AggregationType::kSum,
                                                                 MeasurementFetcher::Fetcher,
-                                                                new DefaultAttributesProcessor());
+                                                                default_attributes_rocessor.get());
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {
