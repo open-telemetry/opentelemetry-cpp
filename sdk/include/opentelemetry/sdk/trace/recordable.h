@@ -141,8 +141,6 @@ public:
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
 
-
-
   /**
    * Get the SpanData object for this Recordable.
    *
