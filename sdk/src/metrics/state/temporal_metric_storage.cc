@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
+#  include <cstddef>
+#  include <memory>
+#  include <utility>
+#  include "opentelemetry/nostd/shared_ptr.h"
 
-#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -12,8 +17,10 @@ namespace sdk
 namespace metrics
 {
 
-TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor)
-    : instrument_descriptor_(instrument_descriptor)
+TemporalMetricStorage::TemporalMetricStorage(
+    InstrumentDescriptor instrument_descriptor,
+    nostd::shared_ptr<AggregationConfig> aggregation_config)
+    : instrument_descriptor_(instrument_descriptor), aggregation_config_(aggregation_config)
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -54,9 +61,9 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           }
           else
           {
-            merged_metrics->Set(
-                attributes,
-                DefaultAggregation::CreateAggregation(instrument_descriptor_)->Merge(aggregation));
+            merged_metrics->Set(attributes, DefaultAggregation::CreateAggregation(
+                                                instrument_descriptor_, aggregation_config_.get())
+                                                ->Merge(aggregation));
             merged_metrics->GetAllEnteries(
                 [](const MetricAttributes &attr, Aggregation &aggr) { return true; });
           }
@@ -80,20 +87,20 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     if (aggregation_temporarily == AggregationTemporality::kCumulative)
     {
       // merge current delta to previous cumulative
-      last_aggr_hashmap->GetAllEnteries(
-          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto agg = merged_metrics->Get(attributes);
-            if (agg)
-            {
-              merged_metrics->Set(attributes, agg->Merge(aggregation));
-            }
-            else
-            {
-              merged_metrics->Set(attributes,
-                                  DefaultAggregation::CreateAggregation(instrument_descriptor_));
-            }
-            return true;
-          });
+      last_aggr_hashmap->GetAllEnteries([&merged_metrics, this](const MetricAttributes &attributes,
+                                                                Aggregation &aggregation) {
+        auto agg = merged_metrics->Get(attributes);
+        if (agg)
+        {
+          merged_metrics->Set(attributes, agg->Merge(aggregation));
+        }
+        else
+        {
+          merged_metrics->Set(
+              attributes, DefaultAggregation::CreateAggregation(instrument_descriptor_, nullptr));
+        }
+        return true;
+      });
     }
     last_reported_metrics_[collector] =
         LastReportedMetrics{std::move(merged_metrics), collection_ts};
