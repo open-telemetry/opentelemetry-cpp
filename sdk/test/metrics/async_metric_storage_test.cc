@@ -96,8 +96,9 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
   size_t count_attributes = 0;
 
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kSum,
-                                                          new DefaultAttributesProcessor());
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
   long get_count                                                                  = 20l;
   long put_count                                                                  = 10l;
   size_t attribute_count                                                          = 2;
