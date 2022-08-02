@@ -28,6 +28,7 @@ namespace trace
 {
 
 using namespace opentelemetry::sdk::instrumentationscope;
+class SpanData;
 
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
@@ -139,6 +140,14 @@ public:
    * @param duration the duration to set
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
+
+  /**
+   * Get the SpanData object for this Recordable.
+   *
+   * @return SpanData*
+   */
+
+  virtual explicit operator SpanData *() const { return nullptr; }
 
   /**
    * Set the instrumentation scope of the span.
