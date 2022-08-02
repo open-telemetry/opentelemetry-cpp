@@ -800,6 +800,7 @@ INPUT                  =  \
                          ../../api/include/opentelemetry/nostd/unique_ptr.h \
                          ../../api/include/opentelemetry/nostd/variant.h \
                          ../../api/include/opentelemetry/trace \
+                          ../../sdk/include/opentelemetry/sdk/instrumentationscope \
                           ../../sdk/include/opentelemetry/sdk/instrumentationlibrary \
                           ../../sdk/include/opentelemetry/sdk/resource \
                           ../../sdk/include/opentelemetry/sdk/trace

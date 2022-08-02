@@ -144,12 +144,11 @@ public:
     }
   }
 
-  void SetInstrumentationLibrary(
-      const InstrumentationLibrary &instrumentation_library) noexcept override
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
   {
     for (auto &recordable : recordables_)
     {
-      recordable.second->SetInstrumentationLibrary(instrumentation_library);
+      recordable.second->SetInstrumentationScope(instrumentation_scope);
     }
   }
 

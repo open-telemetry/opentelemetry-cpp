@@ -23,10 +23,10 @@ namespace metrics
 namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
-Meter::Meter(std::shared_ptr<MeterContext> meter_context,
-             std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
-                 instrumentation_library) noexcept
-    : instrumentation_library_{std::move(instrumentation_library)}, meter_context_{meter_context}
+Meter::Meter(
+    std::shared_ptr<MeterContext> meter_context,
+    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+    : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
@@ -192,10 +192,10 @@ void Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
   RegisterAsyncMetricStorage<double>(instrument_descriptor, callback, state);
 }
 
-const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
+const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
     const noexcept
 {
-  return instrumentation_library_.get();
+  return scope_.get();
 }
 
 std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
@@ -205,8 +205,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
 
   auto success = view_registry->FindViews(
-      instrument_descriptor, *instrumentation_library_,
-      [this, &instrument_descriptor, &storages](const View &view) {
+      instrument_descriptor, *scope_, [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -218,7 +217,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         }
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            NoExemplarReservoir::GetNoExemplarReservoir()));
+            NoExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);

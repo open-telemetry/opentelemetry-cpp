@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
@@ -15,12 +16,13 @@
 #  include <vector>
 
 using namespace opentelemetry::sdk::metrics;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::resource;
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-using M = std::map<std::string, std::string>;
+using M         = std::map<std::string, std::string>;
+namespace nostd = opentelemetry::nostd;
 
 class MockCollectorHandle : public CollectorHandle
 {
@@ -94,9 +96,12 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
   size_t count_attributes = 0;
 
-  opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(instr_desc, AggregationType::kSum,
-                                                                MeasurementFetcher::Fetcher,
-                                                                new DefaultAttributesProcessor());
+  std::unique_ptr<DefaultAttributesProcessor> default_attributes_rocessor{
+      new DefaultAttributesProcessor{}};
+  opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(
+      instr_desc, AggregationType::kSum, MeasurementFetcher::Fetcher,
+      default_attributes_rocessor.get(),
+      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {
