@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Debug on Linux",
             "type": "gdb",
             "request": "launch",
             "target": "${workspaceFolder}/bazel-bin/<path to the bin file>",
