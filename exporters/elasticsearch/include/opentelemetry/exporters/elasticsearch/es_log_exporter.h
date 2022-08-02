@@ -6,7 +6,7 @@
 
 #  include "nlohmann/json.hpp"
 #  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
@@ -104,7 +104,7 @@ private:
   ElasticsearchExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
-  std::unique_ptr<ext::http::client::HttpClient> http_client_;
+  std::shared_ptr<ext::http::client::HttpClient> http_client_;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
 };
