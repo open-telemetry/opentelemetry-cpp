@@ -36,8 +36,10 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
                          });
+#  if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
+#  endif
 }
 
 TEST(ViewRegistry, FindNonExistingView)
@@ -78,7 +80,9 @@ TEST(ViewRegistry, FindNonExistingView)
 #  endif
                            return true;
                          });
+#  if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
+#  endif
 }
 #endif
