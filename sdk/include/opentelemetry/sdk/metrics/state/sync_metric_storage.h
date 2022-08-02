@@ -3,6 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include <utility>
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -29,13 +30,14 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
-                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir)
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+                    nostd::shared_ptr<AggregationConfig> aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor},
         exemplar_reservoir_(exemplar_reservoir),
-        temporal_metric_storage_(instrument_descriptor)
+        temporal_metric_storage_(instrument_descriptor, aggregation_config)
 
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
