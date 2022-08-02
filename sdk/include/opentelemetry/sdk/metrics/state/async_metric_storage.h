@@ -3,6 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
@@ -30,6 +31,7 @@ public:
                      void (*measurement_callback)(opentelemetry::metrics::ObserverResult<T> &,
                                                   void *),
                      const AttributesProcessor *attributes_processor,
+                     nostd::shared_ptr<AggregationConfig> aggregation_config,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
@@ -37,7 +39,7 @@ public:
         attributes_processor_{attributes_processor},
         state_{state},
         cumulative_hash_map_(new AttributesHashMap()),
-        temporal_metric_storage_(instrument_descriptor)
+        temporal_metric_storage_(instrument_descriptor, aggregation_config)
   {}
 
   bool Collect(CollectorHandle *collector,

@@ -7,6 +7,7 @@
 #  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/variant.h"
 
 using namespace opentelemetry::sdk::metrics;
@@ -121,6 +122,35 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 0);  // aggr2(13) - aggr1(11)
   EXPECT_EQ(histogram_data.counts_[4], 0);  // aggr2(28) - aggr1(25)
   EXPECT_EQ(histogram_data.counts_[7], 1);  // aggr2(105) - aggr1(0)
+}
+
+TEST(Aggregation, LongHistogramAggregationBoundaries)
+{
+  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<long>>
+      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<long>};
+  std::list<long> user_boundaries = {0, 50, 100, 250, 500, 750, 1000, 2500, 5000, 10000};
+  aggregation_config->boundaries_ = user_boundaries;
+  LongHistogramAggregation aggr{aggregation_config.get()};
+  auto data = aggr.ToPoint();
+  ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
+  auto histogram_data = nostd::get<HistogramPointData>(data);
+  ASSERT_TRUE(nostd::holds_alternative<std::list<long>>(histogram_data.boundaries_));
+  EXPECT_EQ(nostd::get<std::list<long>>(histogram_data.boundaries_), user_boundaries);
+}
+
+TEST(Aggregation, DoubleHistogramAggregationBoundaries)
+{
+  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<double>>
+      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<double>};
+  std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
+                                       750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  aggregation_config->boundaries_   = user_boundaries;
+  DoubleHistogramAggregation aggr{aggregation_config.get()};
+  auto data = aggr.ToPoint();
+  ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
+  auto histogram_data = nostd::get<HistogramPointData>(data);
+  ASSERT_TRUE(nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_));
+  EXPECT_EQ(nostd::get<std::list<double>>(histogram_data.boundaries_), user_boundaries);
 }
 
 TEST(Aggregation, DoubleHistogramAggregation)

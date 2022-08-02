@@ -72,8 +72,14 @@ void initMetrics(const std::string &name)
       new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, histogram_name)};
   std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metric_sdk::View> histogram_view{
-      new metric_sdk::View{name, "description", metric_sdk::AggregationType::kHistogram}};
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config{
+      new opentelemetry::sdk::metrics::HistogramAggregationConfig<double>};
+  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig<double> *>(
+      aggregation_config.get())
+      ->boundaries_ =
+      std::list<double>{0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  std::unique_ptr<metric_sdk::View> histogram_view{new metric_sdk::View{
+      name, "description", metric_sdk::AggregationType::kHistogram, aggregation_config}};
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
   metrics_api::Provider::SetMeterProvider(provider);
