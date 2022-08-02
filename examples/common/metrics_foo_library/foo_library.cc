@@ -5,10 +5,12 @@
 #  include "foo_library.h"
 #  include <chrono>
 #  include <map>
+#  include <memory>
 #  include <thread>
 #  include <vector>
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
@@ -72,8 +74,8 @@ void foo_library::histogram_example(const std::string &name)
   std::string histogram_name                  = name + "_histogram";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto histogram_counter                      = meter->CreateDoubleHistogram(histogram_name);
-  auto context                                = opentelemetry::context::Context{};
+  auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "unit");
+  auto context           = opentelemetry::context::Context{};
   while (true)
   {
     double val                                = (rand() % 700) + 1.1;
