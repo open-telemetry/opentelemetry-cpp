@@ -243,7 +243,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
   auto view_registry = meter_context_->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
-      instrument_descriptor, *instrumentation_library_,
+      instrument_descriptor, *GetInstrumentationScope(),
       [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
