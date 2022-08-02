@@ -5,6 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/common/circular_buffer.h"
+#  include "opentelemetry/sdk/logs/batch_log_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
 
@@ -20,27 +21,6 @@ namespace sdk
 
 namespace logs
 {
-
-/**
- * Struct to hold batch SpanProcessor options.
- */
-struct BatchLogProcessorOptions
-{
-  /**
-   * The maximum buffer/queue size. After the size is reached, spans are
-   * dropped.
-   */
-  size_t max_queue_size = 2048;
-
-  /* The time interval between two consecutive exports. */
-  std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000);
-
-  /**
-   * The maximum batch size of every export. It must be smaller or
-   * equal to max_queue_size.
-   */
-  size_t max_export_batch_size = 512;
-};
 
 /**
  * This is an implementation of the LogProcessor which creates batches of finished logs and passes
