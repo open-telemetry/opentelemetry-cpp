@@ -34,8 +34,8 @@ public:
         aggregation_type_{aggregation_type},
         attributes_processor_{attributes_processor},
         state_{state},
-        delta_hash_map_(new AttributesHashMap()),
         cumulative_hash_map_(new AttributesHashMap()),
+        delta_hash_map_(new AttributesHashMap()),
         temporal_metric_storage_(instrument_descriptor, aggregation_config)
   {}
 
@@ -43,7 +43,6 @@ public:
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
               opentelemetry::common::SystemTimestamp observation_time) noexcept
   {
-    // std::shared_ptr<AttributesHashMap> delta_hash_map(new AttributesHashMap());
     // process the read measurements - aggregate and store in hashmap
     for (auto &measurement : measurements)
     {
@@ -105,7 +104,6 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
-  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult &, void *);
   const AttributesProcessor *attributes_processor_;
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;

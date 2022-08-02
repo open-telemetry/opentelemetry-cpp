@@ -10,7 +10,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-// typedef  void (*ObservableCallbackPtr)(ObserverResult &, void *);
 using ObservableCallbackPtr = void (*)(ObserverResult, void *);
 
 class ObservableInstrument

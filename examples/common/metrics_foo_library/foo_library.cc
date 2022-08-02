@@ -32,7 +32,7 @@ std::map<std::string, std::string> get_random_attr()
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult &observer_result, void *state)
+  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void *state)
   {
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
@@ -69,6 +69,7 @@ void foo_library::observable_counter_example(const std::string &name)
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
   auto counter                                = meter->CreateDoubleObservableCounter(counter_name);
+  counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   while (true)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

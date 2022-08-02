@@ -261,6 +261,12 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         return true;
       });
+  if (!success)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+        << "Some of the matching view configurations mayn't be used for metric collection");
+  }
   return storages;
 }
 
