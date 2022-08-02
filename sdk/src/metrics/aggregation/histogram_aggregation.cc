@@ -12,9 +12,17 @@ namespace sdk
 namespace metrics
 {
 
-LongHistogramAggregation::LongHistogramAggregation()
+LongHistogramAggregation::LongHistogramAggregation(
+    const HistogramAggregationConfig<long> *aggregation_config)
 {
-  point_data_.boundaries_ = std::list<long>{0l, 5l, 10l, 25l, 50l, 75l, 100l, 250l, 500l, 1000l};
+  if (aggregation_config && aggregation_config->boundaries_.size())
+  {
+    point_data_.boundaries_ = aggregation_config->boundaries_;
+  }
+  else
+  {
+    point_data_.boundaries_ = std::list<long>{0l, 5l, 10l, 25l, 50l, 75l, 100l, 250l, 500l, 1000l};
+  }
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<long>>(point_data_.boundaries_).size() + 1, 0);
   point_data_.sum_   = 0l;
@@ -73,10 +81,18 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
   return point_data_;
 }
 
-DoubleHistogramAggregation::DoubleHistogramAggregation()
+DoubleHistogramAggregation::DoubleHistogramAggregation(
+    const HistogramAggregationConfig<double> *aggregation_config)
 {
-  point_data_.boundaries_ =
-      std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
+  if (aggregation_config && aggregation_config->boundaries_.size())
+  {
+    point_data_.boundaries_ = aggregation_config->boundaries_;
+  }
+  else
+  {
+    point_data_.boundaries_ =
+        std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
+  }
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<double>>(point_data_.boundaries_).size() + 1, 0);
   point_data_.sum_   = 0.0;

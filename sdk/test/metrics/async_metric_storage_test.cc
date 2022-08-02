@@ -4,7 +4,6 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
-//#include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
@@ -23,7 +22,8 @@ using namespace opentelemetry::sdk::resource;
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-using M = std::map<std::string, std::string>;
+using M         = std::map<std::string, std::string>;
+namespace nostd = opentelemetry::nostd;
 
 class MockCollectorHandle : public CollectorHandle
 {
