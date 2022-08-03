@@ -96,9 +96,11 @@ public:
                nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
 
-    return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
-                                                 std::move(delta_hash_map_),
-                                                 metric_collection_callback);
+    auto status = temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts,
+                                                        collection_ts, std::move(delta_hash_map_),
+                                                        metric_collection_callback);
+    delta_hash_map_.reset(new AttributesHashMap());
+    return status;
   }
 
 private:
