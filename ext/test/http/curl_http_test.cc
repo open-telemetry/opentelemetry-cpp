@@ -426,7 +426,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
     std::unique_lock<std::mutex> lock_requests(mtx_requests);
     sessions[i]->SendRequest(handlers[i]);
-    ASSERT_TRUE(sessions[i]->IsSessionActive());
+    ASSERT_TRUE(sessions[i]->IsSessionActive() || handlers[i]->is_called_);
   }
 
   for (unsigned i = 0; i < batch_count; ++i)
