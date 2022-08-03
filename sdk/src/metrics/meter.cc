@@ -217,7 +217,7 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         }
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            NoExemplarReservoir::GetNoExemplarReservoir()));
+            NoExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
         multi_storage->AddStorage(storage);

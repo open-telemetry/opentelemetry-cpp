@@ -148,9 +148,9 @@ private:
           {
             view_instr_desc.description_ = view.GetDescription();
           }
-          auto storage = std::shared_ptr<AsyncMetricStorage<T>>(
-              new AsyncMetricStorage<T>(view_instr_desc, view.GetAggregationType(), callback,
-                                        &view.GetAttributesProcessor(), state));
+          auto storage = std::shared_ptr<AsyncMetricStorage<T>>(new AsyncMetricStorage<T>(
+              view_instr_desc, view.GetAggregationType(), callback, &view.GetAttributesProcessor(),
+              view.GetAggregationConfig(), state));
           storage_registry_[instrument_descriptor.name_] = storage;
           return true;
         });
