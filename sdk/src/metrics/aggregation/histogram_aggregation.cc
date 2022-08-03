@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
+#include <iomanip>
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #  include "opentelemetry/version.h"
@@ -23,18 +25,25 @@ LongHistogramAggregation::LongHistogramAggregation(
   {
     point_data_.boundaries_ = std::list<long>{0l, 5l, 10l, 25l, 50l, 75l, 100l, 250l, 500l, 1000l};
   }
+  if (aggregation_config)
+  {
+    record_min_max_ = aggregation_config->record_min_max_;
+  }
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<long>>(point_data_.boundaries_).size() + 1, 0);
-  point_data_.sum_   = 0l;
-  point_data_.count_ = 0;
+  point_data_.sum_            = 0l;
+  point_data_.count_          = 0;
+  point_data_.record_min_max_ = record_min_max_;
+  point_data_.min_            = std::numeric_limits<long>::max();
+  point_data_.max_            = std::numeric_limits<long>::min();
 }
 
 LongHistogramAggregation::LongHistogramAggregation(HistogramPointData &&data)
-    : point_data_{std::move(data)}
+    : point_data_{std::move(data)}, record_min_max_{point_data_.record_min_max_}
 {}
 
 LongHistogramAggregation::LongHistogramAggregation(const HistogramPointData &data)
-    : point_data_{data}
+    : point_data_{data}, record_min_max_{point_data_.record_min_max_}
 {}
 
 void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
@@ -42,7 +51,12 @@ void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attr
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
   point_data_.sum_ = nostd::get<long>(point_data_.sum_) + value;
-  size_t index     = 0;
+  if (record_min_max_)
+  {
+    point_data_.min_ = std::min(nostd::get<long>(point_data_.min_), value);
+    point_data_.max_ = std::max(nostd::get<long>(point_data_.max_), value);
+  }
+  size_t index = 0;
   for (auto it = nostd::get<std::list<long>>(point_data_.boundaries_).begin();
        it != nostd::get<std::list<long>>(point_data_.boundaries_).end(); ++it)
   {
@@ -93,10 +107,17 @@ DoubleHistogramAggregation::DoubleHistogramAggregation(
     point_data_.boundaries_ =
         std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
   }
+  if (aggregation_config)
+  {
+    record_min_max_ = aggregation_config->record_min_max_;
+  }
   point_data_.counts_ =
       std::vector<uint64_t>(nostd::get<std::list<double>>(point_data_.boundaries_).size() + 1, 0);
-  point_data_.sum_   = 0.0;
-  point_data_.count_ = 0;
+  point_data_.sum_            = 0.0;
+  point_data_.count_          = 0;
+  point_data_.record_min_max_ = record_min_max_;
+  point_data_.min_            = std::numeric_limits<double>::max();
+  point_data_.max_            = std::numeric_limits<double>::min();
 }
 
 DoubleHistogramAggregation::DoubleHistogramAggregation(HistogramPointData &&data)
@@ -112,7 +133,12 @@ void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
   point_data_.sum_ = nostd::get<double>(point_data_.sum_) + value;
-  size_t index     = 0;
+  if (record_min_max_)
+  {
+    point_data_.min_ = std::min(nostd::get<double>(point_data_.min_), value);
+    point_data_.max_ = std::max(nostd::get<double>(point_data_.max_), value);
+  }
+  size_t index = 0;
   for (auto it = nostd::get<std::list<double>>(point_data_.boundaries_).begin();
        it != nostd::get<std::list<double>>(point_data_.boundaries_).end(); ++it)
   {

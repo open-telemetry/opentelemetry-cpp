@@ -42,6 +42,7 @@ public:
 private:
   opentelemetry::common::SpinLockMutex lock_;
   HistogramPointData point_data_;
+  bool record_min_max_ = true;
 };
 
 class DoubleHistogramAggregation : public Aggregation
@@ -72,6 +73,7 @@ public:
 private:
   mutable opentelemetry::common::SpinLockMutex lock_;
   mutable HistogramPointData point_data_;
+  bool record_min_max_ = true;
 };
 
 template <class T>
@@ -83,9 +85,15 @@ void HistogramMerge(HistogramPointData &current,
   {
     merge.counts_[i] = current.counts_[i] + delta.counts_[i];
   }
-  merge.boundaries_ = current.boundaries_;
-  merge.sum_        = nostd::get<T>(current.sum_) + nostd::get<T>(delta.sum_);
-  merge.count_      = current.count_ + delta.count_;
+  merge.boundaries_     = current.boundaries_;
+  merge.sum_            = nostd::get<T>(current.sum_) + nostd::get<T>(delta.sum_);
+  merge.count_          = current.count_ + delta.count_;
+  merge.record_min_max_ = current.record_min_max_ && delta.record_min_max_;
+  if (merge.record_min_max_)
+  {
+    merge.min_ = std::min(nostd::get<T>(current.min_), nostd::get<T>(delta.min_));
+    merge.max_ = std::max(nostd::get<T>(current.max_), nostd::get<T>(delta.max_));
+  }
 }
 
 template <class T>
