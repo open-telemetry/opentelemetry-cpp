@@ -329,7 +329,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result             = http_client.Get("http://222.222.222.200:19000/get/", m1);
+  auto result             = http_client.Get("https://192.0.2.0:19000/get/", m1);
   EXPECT_EQ(result, false);
 
   // When network is under proxy, it may connect success but closed by peer when send data
@@ -415,7 +415,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
   std::shared_ptr<GetEventHandler> handlers[batch_count];
   for (unsigned i = 0; i < batch_count; ++i)
   {
-    sessions[i]  = http_client.CreateSession("http://222.222.222.200:19000/get/");
+    sessions[i]  = http_client.CreateSession("https://192.0.2.0:19000/get/");
     auto request = sessions[i]->CreateRequest();
     request->SetMethod(http_client::Method::Get);
     request->SetUri("get/");
@@ -426,7 +426,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
     // Lock mtx_requests to prevent response, we will check IsSessionActive() in the end
     std::unique_lock<std::mutex> lock_requests(mtx_requests);
     sessions[i]->SendRequest(handlers[i]);
-    ASSERT_TRUE(sessions[i]->IsSessionActive());
+    ASSERT_TRUE(sessions[i]->IsSessionActive() || handlers[i]->is_called_);
   }
 
   for (unsigned i = 0; i < batch_count; ++i)
