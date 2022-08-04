@@ -56,9 +56,9 @@ public:
   static sdk::metrics::AggregationTemporalitySelector ChooseTemporalitySelector(
       sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept;
   static sdk::metrics::AggregationTemporality DeltaTemporalitySelector(
-      InstrumentType instrument_type) noexcept;
+      sdk::metrics::InstrumentType instrument_type) noexcept;
   static sdk::metrics::AggregationTemporality CumulativeTemporalitySelector(
-      InstumentType instrument_type) noexcept;
+      sdk::metrics::InstrumentType instrument_type) noexcept;
 };
 
 }  // namespace otlp

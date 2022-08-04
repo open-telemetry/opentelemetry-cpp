@@ -90,20 +90,26 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter()
 {}
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options)
-    : options_(options), metrics_service_stub_(MakeMetricsServiceStub(options))
+    : options_(options),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
+      metrics_service_stub_(MakeMetricsServiceStub(options))
 {}
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub)
-    : options_(OtlpGrpcMetricExporterOptions()), metrics_service_stub_(std::move(stub))
+    : options_(OtlpGrpcMetricExporterOptions()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
+      metrics_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
 
-sdk::metrics::AggregationTemporality OtlpHttpMetricExporter::GetAggregationTemporality(
+sdk::metrics::AggregationTemporality OtlpGrpcMetricExporter::GetAggregationTemporality(
     sdk::metrics::InstrumentType instrument_type) const noexcept
 {
-  return options_.aggregation_temporality_selector(instrument_type);
+  return aggregation_temporality_selector_(instrument_type);
 }
 
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(

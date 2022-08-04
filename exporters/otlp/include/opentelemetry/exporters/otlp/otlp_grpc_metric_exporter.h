@@ -60,6 +60,9 @@ private:
   // The configuration options associated with this exporter.
   const OtlpGrpcMetricExporterOptions options_;
 
+  // Aggregation Temporality selector
+  const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
+
   // For testing
   friend class OtlpGrpcExporterTestPeer;
 

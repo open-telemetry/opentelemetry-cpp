@@ -242,7 +242,7 @@ sdk::metrics::AggregationTemporalitySelector OtlpMetricUtils::ChooseTemporalityS
 }
 
 sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
-    InstrumentType instrument_type) noexcept
+    sdk::metrics::InstrumentType instrument_type) noexcept
 {
   switch (instrument_type)
   {
@@ -256,10 +256,11 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
       return sdk::metrics::AggregationTemporality::kCumulative;
   }
+  return sdk::metrics::AggregationTemporality::kUnspecified;
 }
 
 sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelector(
-    InstumentType instrument_type) noexcept
+    sdk::metrics::InstrumentType instrument_type) noexcept
 {
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
