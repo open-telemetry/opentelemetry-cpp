@@ -214,6 +214,7 @@ void OtlpMetricUtils::PopulateResourceMetrics(
 
     for (auto &metric_data : scope_metrics.metric_data_)
     {
+      PopulateInstrumentInfoMetrics(metric_data, scope_lib_metrics->add_metrics());
     }
   }
 }
