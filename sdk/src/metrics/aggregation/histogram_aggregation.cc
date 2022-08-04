@@ -1,10 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
-#include <iomanip>
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#  include <algorithm>
+#  include <iomanip>
+#  include <limits>
 #  include "opentelemetry/version.h"
 
 #  include <mutex>
