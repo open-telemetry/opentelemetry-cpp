@@ -214,7 +214,6 @@ void OtlpMetricUtils::PopulateResourceMetrics(
 
     for (auto &metric_data : scope_metrics.metric_data_)
     {
-      PopulateInstrumentInfoMetrics(metric_data, scope_lib_metrics->add_metrics());
     }
   }
 }
@@ -231,6 +230,40 @@ void OtlpMetricUtils::PopulateRequest(
   auto resource_metrics = request->add_resource_metrics();
   PopulateResourceMetrics(data, resource_metrics);
 }
+
+sdk::metrics::AggregationTemporalitySelector OtlpMetricUtils::ChooseTemporalitySelector(
+    sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept
+{
+  if (preferred_aggregation_temporality == sdk::metrics::AggregationTemporality::kDelta)
+  {
+    return DeltaTemporalitySelector;
+  }
+  return CumulativeTemporalitySelector;
+}
+
+sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
+    InstrumentType instrument_type) noexcept
+{
+  switch (instrument_type)
+  {
+    case sdk::metrics::InstrumentType::kCounter:
+    case sdk::metrics::InstrumentType::kObservableCounter:
+    case sdk::metrics::InstrumentType::kHistogram:
+    case sdk::metrics::InstrumentType::kObservableGauge:
+      return sdk::metrics::AggregationTemporality::kDelta;
+      break;
+    case sdk::metrics::InstrumentType::kUpDownCounter:
+    case sdk::metrics::InstrumentType::kObservableUpDownCounter:
+      return sdk::metrics::AggregationTemporality::kCumulative;
+  }
+}
+
+sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelector(
+    InstumentType instrument_type) noexcept
+{
+  return sdk::metrics::AggregationTemporality::kCumulative;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

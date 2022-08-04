@@ -25,8 +25,7 @@ namespace metrics
 class MetricReader
 {
 public:
-  MetricReader(
-      AggregationTemporality aggregation_temporality = AggregationTemporality::kCumulative);
+  MetricReader();
 
   void SetMetricProducer(MetricProducer *metric_producer);
 
@@ -36,7 +35,14 @@ public:
    */
   bool Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept;
 
-  AggregationTemporality GetAggregationTemporality() const noexcept;
+  /**
+   * Get the AggregationTemporality for given Instrument Type for this reader.
+   *
+   * @return AggregationTemporality
+   */
+
+  virtual AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept = 0;
 
   /**
    * Shutdown the meter reader.
@@ -62,7 +68,6 @@ protected:
 
 private:
   MetricProducer *metric_producer_;
-  AggregationTemporality aggregation_temporality_;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool shutdown_;
 };

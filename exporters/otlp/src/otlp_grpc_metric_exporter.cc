@@ -100,6 +100,12 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
 
 // ----------------------------- Exporter methods ------------------------------
 
+sdk::metrics::AggregationTemporality OtlpHttpMetricExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+  return options_.aggregation_temporality_selector(instrument_type);
+}
+
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {

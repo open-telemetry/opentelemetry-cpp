@@ -28,6 +28,12 @@ public:
     return false;
   }
 
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override
+  {
+    return sdk::metrics::AggregationTemporality::kCumulative;
+  }
+
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
     return true;

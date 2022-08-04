@@ -64,7 +64,17 @@ inline void printVec(std::ostream &os, Container &vec)
   os << ']';
 }
 
-OStreamMetricExporter::OStreamMetricExporter(std::ostream &sout) noexcept : sout_(sout) {}
+OStreamMetricExporter::OStreamMetricExporter(
+    std::ostream &sout,
+    sdk::metrics::AggregationTemporality aggregation_temporality) noexcept
+    : sout_(sout), aggregation_temporality_(aggregation_temporality)
+{}
+
+sdk::metrics::AggregationTemporality OStreamMetricExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+  return aggregation_temporality_;
+}
 
 sdk::common::ExportResult OStreamMetricExporter::Export(
     const sdk::metrics::ResourceMetrics &data) noexcept

@@ -52,7 +52,8 @@ struct InstrumentDescriptor
   InstrumentValueType value_type_;
 };
 
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
+using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
 
 /*class InstrumentSelector {
 public:

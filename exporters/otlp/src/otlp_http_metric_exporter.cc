@@ -43,7 +43,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
                                                             )))
 {}
 
-OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> http_client)
+OtlpHttpMetricExporter::(std::unique_ptr<OtlpHttpClient> http_client)
     : options_(OtlpHttpMetricExporterOptions()), http_client_(std::move(http_client))
 {
   OtlpHttpMetricExporterOptions &options = const_cast<OtlpHttpMetricExporterOptions &>(options_);
@@ -60,6 +60,12 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
 #  endif
 }
 // ----------------------------- Exporter methods ------------------------------
+
+sdk::metrics::AggregationTemporality OtlpHttpMetricExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+  return options_.aggregation_temporality_selector(instrument_type);
+}
 
 opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept

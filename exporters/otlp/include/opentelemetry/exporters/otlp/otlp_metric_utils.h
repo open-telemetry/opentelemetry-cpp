@@ -52,6 +52,13 @@ public:
   static void PopulateRequest(
       const opentelemetry::sdk::metrics::ResourceMetrics &data,
       proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
+
+  static sdk::metrics::AggregationTemporalitySelector ChooseTemporalitySelector(
+      sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept;
+  static sdk::metrics::AggregationTemporality DeltaTemporalitySelector(
+      InstrumentType instrument_type) noexcept;
+  static sdk::metrics::AggregationTemporality CumulativeTemporalitySelector(
+      InstumentType instrument_type) noexcept;
 };
 
 }  // namespace otlp
