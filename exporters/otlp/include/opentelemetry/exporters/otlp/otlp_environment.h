@@ -335,7 +335,7 @@ inline bool GetOtlpDefaultMetricsIsSslEnable()
 inline const std::string GetOtlpDefaultMetricsSslCertificatePath()
 {
   constexpr char kOtlpMetricsSslCertificate[] = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE";
-  constexpr char kOtlpSslCertificate[]        = "OTEL_EXPORTER_OTLP_CERTIFICATE ";
+  constexpr char kOtlpSslCertificate[]        = "OTEL_EXPORTER_OTLP_CERTIFICATE";
   auto ssl_cert_path =
       opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpMetricsSslCertificate);
   if (ssl_cert_path.empty())
