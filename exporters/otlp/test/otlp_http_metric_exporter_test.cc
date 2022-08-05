@@ -953,7 +953,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromMetricsEnv)
 
 TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
 {
-  EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultHttpMetricEndpoint());
+  EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultMetricsEndpoint());
 }
 
 #  endif
