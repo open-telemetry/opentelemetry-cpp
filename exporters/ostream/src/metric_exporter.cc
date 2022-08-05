@@ -4,6 +4,7 @@
 #include <chrono>
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <algorithm>
+#  include <map>
 #  include "opentelemetry/exporters/ostream/common_utils.h"
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -79,13 +80,39 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 
   for (auto &record : data.scope_metric_data_)
   {
-    printInstrumentationInfoMetricData(record);
+    printInstrumentationInfoMetricData(record, data);
   }
   return sdk::common::ExportResult::kSuccess;
 }
 
+void OStreamMetricExporter::printAttributes(
+    const std::map<std::string, sdk::common::OwnedAttributeValue> &map,
+    const std::string prefix)
+{
+  for (const auto &kv : map)
+  {
+    sout_ << prefix << kv.first << ": ";
+    opentelemetry::exporter::ostream_common::print_value(kv.second, sout_);
+  }
+}
+
+void OStreamMetricExporter::printResources(const opentelemetry::sdk::resource::Resource &resources)
+{
+  auto attributes = resources.GetAttributes();
+  if (attributes.size())
+  {
+    // Convert unordered_map to map for printing so that iteration
+    // order is guaranteed.
+    std::map<std::string, sdk::common::OwnedAttributeValue> attr_map;
+    for (auto &kv : attributes)
+      attr_map[kv.first] = std::move(kv.second);
+    printAttributes(attr_map, "\n\t");
+  }
+}
+
 void OStreamMetricExporter::printInstrumentationInfoMetricData(
-    const sdk::metrics::ScopeMetrics &info_metric)
+    const sdk::metrics::ScopeMetrics &info_metric,
+    const sdk::metrics::ResourceMetrics &data)
 {
   // sout_ is shared
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
@@ -109,6 +136,9 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
         printPointAttributes(pd.attributes);
       }
     }
+
+    sout_ << "\n  resources\t:";
+    printResources(*data.resource_);
   }
   sout_ << "\n}\n";
 }
