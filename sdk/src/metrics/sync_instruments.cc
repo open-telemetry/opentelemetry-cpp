@@ -14,7 +14,7 @@ namespace sdk
 namespace metrics
 {
 LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
-                         std::unique_ptr<WritableMetricStorage> storage)
+                         std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
@@ -44,7 +44,7 @@ void LongCounter::Add(long value, const opentelemetry::context::Context &context
 }
 
 DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
-                             std::unique_ptr<WritableMetricStorage> storage)
+                             std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
@@ -74,7 +74,7 @@ void DoubleCounter::Add(double value, const opentelemetry::context::Context &con
 }
 
 LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
-                                     std::unique_ptr<WritableMetricStorage> storage)
+                                     std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
@@ -104,7 +104,7 @@ void LongUpDownCounter::Add(long value, const opentelemetry::context::Context &c
 }
 
 DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
-                                         std::unique_ptr<WritableMetricStorage> storage)
+                                         std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
@@ -134,7 +134,7 @@ void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Contex
 }
 
 LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
-                             std::unique_ptr<WritableMetricStorage> storage)
+                             std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
@@ -165,7 +165,7 @@ void LongHistogram::Record(long value, const opentelemetry::context::Context &co
 }
 
 DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
-                                 std::unique_ptr<WritableMetricStorage> storage)
+                                 std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
