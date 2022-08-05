@@ -23,9 +23,6 @@ struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
   // Preferred Aggregation Temporality
   sdk::metrics::AggregationTemporality aggregation_temporality =
       sdk::metrics::AggregationTemporality::kCumulative;
-
-  // opentelemetry::sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector =
-  //    OtlpMetricUtils::ChooseTemporalitySelector();
 };
 
 }  // namespace otlp

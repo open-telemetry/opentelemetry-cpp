@@ -252,7 +252,6 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
     case sdk::metrics::InstrumentType::kHistogram:
     case sdk::metrics::InstrumentType::kObservableGauge:
       return sdk::metrics::AggregationTemporality::kDelta;
-      break;
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
       return sdk::metrics::AggregationTemporality::kCumulative;
