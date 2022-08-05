@@ -8,6 +8,8 @@
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -28,7 +30,8 @@ public:
                        nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
 };
 
-class WritableMetricStorage
+/* Represents the sync metric storage */
+class SyncWritableMetricStorage
 {
 public:
   virtual void RecordLong(long value, const opentelemetry::context::Context &context) noexcept = 0;
@@ -44,7 +47,21 @@ public:
                             const opentelemetry::common::KeyValueIterable &attributes,
                             const opentelemetry::context::Context &context) noexcept = 0;
 
-  virtual ~WritableMetricStorage() = default;
+  virtual ~SyncWritableMetricStorage() = default;
+};
+
+/* Represents the async metric stroage */
+class AsyncWritableMetricStorage
+{
+public:
+  /* Records a batch of measurements */
+  virtual void RecordLong(
+      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
+
+  virtual void RecordDouble(
+      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 };
 
 class NoopMetricStorage : public MetricStorage
@@ -61,7 +78,7 @@ public:
   }
 };
 
-class NoopWritableMetricStorage : public WritableMetricStorage
+class NoopWritableMetricStorage : public SyncWritableMetricStorage
 {
 public:
   void RecordLong(long value, const opentelemetry::context::Context &context) noexcept = 0;
@@ -77,6 +94,20 @@ public:
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
                     const opentelemetry::context::Context &context) noexcept override
+  {}
+};
+
+class NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
+{
+public:
+  void RecordLong(
+      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+  {}
+
+  void RecordDouble(
+      const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
+      opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {}
 };
 

@@ -23,7 +23,7 @@ namespace sdk
 {
 namespace metrics
 {
-class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
+class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
 public:
