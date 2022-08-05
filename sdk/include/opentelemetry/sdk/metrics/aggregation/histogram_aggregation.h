@@ -103,8 +103,9 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
   {
     diff.counts_[i] = next.counts_[i] - current.counts_[i];
   }
-  diff.boundaries_ = current.boundaries_;
-  diff.count_      = next.count_ - current.count_;
+  diff.boundaries_     = current.boundaries_;
+  diff.count_          = next.count_ - current.count_;
+  diff.record_min_max_ = false;
 }
 
 }  // namespace metrics
