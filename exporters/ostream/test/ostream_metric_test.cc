@@ -84,12 +84,11 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.version: ";
   expected_output += OPENTELEMETRY_SDK_VERSION;
-  expected_output +=
-      "\n\ttelemetry.sdk.name: opentelemetry"
-      "\n\ttelemetry.sdk.language: cpp"
-      "\n}\n";
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -161,12 +160,11 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n\ta1: b1"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.version: ";
   expected_output += OPENTELEMETRY_SDK_VERSION;
-  expected_output +=
-      "\n\ttelemetry.sdk.name: opentelemetry"
-      "\n\ttelemetry.sdk.language: cpp"
-      "\n}\n";
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -231,12 +229,11 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  attributes\t\t: "
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.version: ";
   expected_output += OPENTELEMETRY_SDK_VERSION;
-  expected_output +=
-      "\n\ttelemetry.sdk.name: opentelemetry"
-      "\n\ttelemetry.sdk.language: cpp"
-      "\n}\n";
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -285,12 +282,11 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       "\n  unit\t\t: unit"
       "\n  resources\t:"
       "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
       "\n\ttelemetry.sdk.version: ";
   expected_output += OPENTELEMETRY_SDK_VERSION;
-  expected_output +=
-      "\n\ttelemetry.sdk.name: opentelemetry"
-      "\n\ttelemetry.sdk.language: cpp"
-      "\n}\n";
+  expected_output += "\n}\n";
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }

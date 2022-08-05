@@ -4,6 +4,7 @@
 #include <chrono>
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <algorithm>
+#  include <map>
 #  include "opentelemetry/exporters/ostream/common_utils.h"
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -85,7 +86,7 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 }
 
 void OStreamMetricExporter::printAttributes(
-    const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &map,
+    const std::map<std::string, sdk::common::OwnedAttributeValue> &map,
     const std::string prefix)
 {
   for (const auto &kv : map)
@@ -100,7 +101,12 @@ void OStreamMetricExporter::printResources(const opentelemetry::sdk::resource::R
   auto attributes = resources.GetAttributes();
   if (attributes.size())
   {
-    printAttributes(attributes, "\n\t");
+    // Convert unordered_map to map for printing so that iteration
+    // order is guaranteed.
+    std::map<std::string, sdk::common::OwnedAttributeValue> attr_map;
+    for (auto &kv : attributes)
+      attr_map[kv.first] = std::move(kv.second);
+    printAttributes(attr_map, "\n\t");
   }
 }
 
