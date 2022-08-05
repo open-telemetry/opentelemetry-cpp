@@ -349,7 +349,7 @@ inline const std::string GetOtlpDefaultMetricsSslCertificateString()
 {
   constexpr char kOtlpTracesSslCertificateString[] =
       "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING";
-  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING ";
+  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
   auto ssl_cert =
       opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificateString);
   if (ssl_cert.empty())
