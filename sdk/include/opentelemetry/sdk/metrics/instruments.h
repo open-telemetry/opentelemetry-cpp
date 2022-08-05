@@ -19,6 +19,12 @@ enum class InstrumentType
   kObservableUpDownCounter
 };
 
+enum class InstrumentClass
+{
+  kSync,
+  kAsync
+};
+
 enum class InstrumentValueType
 {
   kInt,
@@ -51,6 +57,19 @@ struct InstrumentDescriptor
   InstrumentType type_;
   InstrumentValueType value_type_;
 };
+
+static InstrumentClass GetInstrumentClass(InstrumentType type)
+{
+  if (type == InstrumentType::kCounter || type == InstrumentType::kHistogram ||
+      type == InstrumentType::kUpDownCounter)
+  {
+    return InstrumentClass::kSync;
+  }
+  else
+  {
+    return InstrumentClass::kAsync;
+  }
+}
 
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
