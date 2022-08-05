@@ -95,6 +95,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   histogram_point_data.count_      = 3;
   histogram_point_data.counts_     = {200, 300, 400, 500};
   histogram_point_data.sum_        = 900.5;
+  histogram_point_data.min_        = 1.8;
+  histogram_point_data.max_        = 12.0;
   metric_sdk::HistogramPointData histogram_point_data2{};
   histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
   histogram_point_data2.count_      = 3;
@@ -139,8 +141,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n  type     : HistogramPointData"
       "\n  count     : 3"
       "\n  sum     : 900.5"
-      "\n  min     : 0"
-      "\n  max     : 0"
+      "\n  min     : 1.8"
+      "\n  max     : 12"
       "\n  buckets     : [10.1, 20.2, 30.2, ]"
       "\n  counts     : [200, 300, 400, 500, ]"
       "\n  attributes\t\t: "
