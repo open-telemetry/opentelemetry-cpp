@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOG SDK] Add log sdk builders (#1486) [#1524](https://github.com/open-telemetry/opentelemetry-cpp/pull/1524)
+
 ## [1.5.0] 2022-07-29
 
 * [EXPORTER BUILD] Add resources to dep list of prometheus exporter test [#1527](https://github.com/open-telemetry/opentelemetry-cpp/pull/1527)
