@@ -58,8 +58,11 @@ public:
 
   ListType boundaries_          = {};
   ValueType sum_                = {};
+  ValueType min_                = {};
+  ValueType max_                = {};
   std::vector<uint64_t> counts_ = {};
   uint64_t count_               = {};
+  bool record_min_max_          = true;
 };
 
 class DropPointData

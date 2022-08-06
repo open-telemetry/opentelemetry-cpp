@@ -106,6 +106,25 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     }
     // count
     proto_histogram_point_data->set_count(histogram_data.count_);
+    if (histogram_data.record_min_max_)
+    {
+      if (nostd::holds_alternative<long>(histogram_data.min_))
+      {
+        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.min_));
+      }
+      else
+      {
+        proto_histogram_point_data->set_min(nostd::get<double>(histogram_data.min_));
+      }
+      if (nostd::holds_alternative<long>(histogram_data.max_))
+      {
+        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.max_));
+      }
+      else
+      {
+        proto_histogram_point_data->set_max(nostd::get<double>(histogram_data.max_));
+      }
+    }
     // buckets
     if ((nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_)))
     {

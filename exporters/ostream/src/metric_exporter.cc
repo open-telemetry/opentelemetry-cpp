@@ -184,6 +184,26 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
       sout_ << nostd::get<long>(histogram_point_data.sum_);
     }
 
+    if (histogram_point_data.record_min_max_)
+    {
+      if (nostd::holds_alternative<long>(histogram_point_data.min_))
+      {
+        sout_ << "\n  min     : " << nostd::get<long>(histogram_point_data.min_);
+      }
+      else if (nostd::holds_alternative<double>(histogram_point_data.min_))
+      {
+        sout_ << "\n  min     : " << nostd::get<double>(histogram_point_data.min_);
+      }
+      if (nostd::holds_alternative<long>(histogram_point_data.max_))
+      {
+        sout_ << "\n  max     : " << nostd::get<long>(histogram_point_data.max_);
+      }
+      if (nostd::holds_alternative<double>(histogram_point_data.max_))
+      {
+        sout_ << "\n  max     : " << nostd::get<double>(histogram_point_data.max_);
+      }
+    }
+
     sout_ << "\n  buckets     : ";
     if (nostd::holds_alternative<std::list<double>>(histogram_point_data.boundaries_))
     {
