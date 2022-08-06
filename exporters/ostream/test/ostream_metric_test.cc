@@ -7,6 +7,7 @@
 #  include <vector>
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/resource/resource_detector.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #  include <iostream>
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
@@ -81,7 +82,13 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n  value\t\t: 20"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -157,7 +164,13 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n  counts     : [200, 300, 400, 500, ]"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -220,7 +233,13 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  valid     : true"
       "\n  value     : 20"
       "\n  attributes\t\t: "
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -267,7 +286,13 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       "\n  name\t\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
