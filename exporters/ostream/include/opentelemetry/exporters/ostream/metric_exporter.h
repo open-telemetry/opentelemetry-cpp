@@ -67,9 +67,13 @@ private:
   mutable opentelemetry::common::SpinLockMutex lock_;
   sdk::metrics::AggregationTemporality aggregation_temporality_;
   bool isShutdown() const noexcept;
-  void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics);
+  void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics,
+                                          const sdk::metrics::ResourceMetrics &data);
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
   void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
+  void printAttributes(const std::map<std::string, sdk::common::OwnedAttributeValue> &map,
+                       const std::string prefix);
+  void printResources(const opentelemetry::sdk::resource::Resource &resources);
 };
 }  // namespace metrics
 }  // namespace exporter
