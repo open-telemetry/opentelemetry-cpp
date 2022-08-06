@@ -81,6 +81,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_NO_THROW(aggr.Aggregate(12l, {}));   // lies in fourth bucket
   EXPECT_NO_THROW(aggr.Aggregate(100l, {}));  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
+  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 100);
   EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
@@ -91,6 +93,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
   EXPECT_EQ(histogram_data.counts_[8], 1);
+  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 252);
 
   // Merge
   LongHistogramAggregation aggr1;
@@ -113,6 +117,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 2);  // 11, 13
   EXPECT_EQ(histogram_data.counts_[4], 2);  // 25, 28
   EXPECT_EQ(histogram_data.counts_[7], 1);  // 105
+  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 1);
+  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 105);
 
   // Diff
   auto aggr4     = aggr1.Diff(aggr2);
@@ -170,6 +176,8 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[7], 1);
+  EXPECT_EQ(nostd::get<double>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<double>(histogram_data.max_), 100);
   EXPECT_NO_THROW(aggr.Aggregate(13.0, {}));   // lies in fourth bucket
   EXPECT_NO_THROW(aggr.Aggregate(252.0, {}));  // lies in ninth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
@@ -177,6 +185,8 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 2);
   EXPECT_EQ(histogram_data.counts_[8], 1);
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 377);
+  EXPECT_EQ(nostd::get<double>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<double>(histogram_data.max_), 252);
 
   // Merge
   DoubleHistogramAggregation aggr1;
@@ -199,6 +209,8 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 2);  // 11.0, 13.0
   EXPECT_EQ(histogram_data.counts_[4], 2);  // 25.1, 28.1
   EXPECT_EQ(histogram_data.counts_[7], 1);  // 105.0
+  EXPECT_EQ(nostd::get<double>(histogram_data.min_), 1);
+  EXPECT_EQ(nostd::get<double>(histogram_data.max_), 105);
 
   // Diff
   auto aggr4     = aggr1.Diff(aggr2);
