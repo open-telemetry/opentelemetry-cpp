@@ -39,6 +39,14 @@ public:
    */
   explicit OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options);
 
+  /**
+   * Get the AggregationTemporality for exporter
+   *
+   * @return AggregationTemporality
+   */
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override;
+
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
 
@@ -51,6 +59,9 @@ public:
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcMetricExporterOptions options_;
+
+  // Aggregation Temporality selector
+  const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // For testing
   friend class OtlpGrpcExporterTestPeer;
