@@ -268,7 +268,6 @@ inline OtlpHeaders GetOtlpDefaultLogHeaders()
 }
 
 // --- Metrics Environment Variables
-
 inline const std::string GetOtlpDefaultMetricsEndpoint()
 {
   constexpr char kOtlpMetricsEndpointEnv[] = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
