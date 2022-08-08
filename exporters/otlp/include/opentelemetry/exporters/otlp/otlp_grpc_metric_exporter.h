@@ -14,7 +14,6 @@
 // clang-format on
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,6 +21,30 @@ namespace exporter
 {
 namespace otlp
 {
+
+/**
+ * Struct to hold OTLP metrics exporter options.
+ */
+struct OtlpGrpcMetricExporterOptions
+{
+
+  // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
+  std::string endpoint = GetOtlpDefaultMetricsEndpoint();
+  // By default when false, uses grpc::InsecureChannelCredentials(); If true,
+  // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
+  bool use_ssl_credentials = GetOtlpDefaultMetricsIsSslEnable();
+  // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
+  std::string ssl_credentials_cacert_path = GetOtlpDefaultMetricsSslCertificatePath();
+  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
+  // SSL encryption.
+  std::string ssl_credentials_cacert_as_string = GetOtlpDefaultMetricsSslCertificateString();
+  // Timeout for grpc deadline
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultMetricsTimeout();
+  // Additional HTTP headers
+  OtlpHeaders metadata = GetOtlpDefaultMetricsHeaders();
+  opentelemetry::sdk::metrics::AggregationTemporality aggregation_temporality =
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta;
+};
 
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
