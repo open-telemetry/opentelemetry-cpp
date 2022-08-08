@@ -32,7 +32,8 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
-  auto aggregation_temporarily = collector->GetAggregationTemporality();
+  AggregationTemporality aggregation_temporarily =
+      collector->GetAggregationTemporality(instrument_descriptor_.type_);
   for (auto &col : collectors)
   {
     unreported_metrics_[col.get()].push_back(delta_metrics);

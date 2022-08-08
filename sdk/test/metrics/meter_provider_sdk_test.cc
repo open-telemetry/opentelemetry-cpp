@@ -23,6 +23,12 @@ public:
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override
+  {
+    return AggregationTemporality::kCumulative;
+  }
+
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
@@ -39,6 +45,11 @@ class MockMetricReader : public MetricReader
 {
 public:
   MockMetricReader(std::unique_ptr<MetricExporter> exporter) : exporter_(std::move(exporter)) {}
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override
+  {
+    return exporter_->GetAggregationTemporality(instrument_type);
+  }
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual void OnInitialized() noexcept override {}
