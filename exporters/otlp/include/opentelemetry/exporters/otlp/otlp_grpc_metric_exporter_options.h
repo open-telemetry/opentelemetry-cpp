@@ -19,8 +19,10 @@ namespace otlp
  */
 struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
 {
-  opentelemetry::sdk::metrics::AggregationTemporality aggregation_temporality =
-      opentelemetry::sdk::metrics::AggregationTemporality::kDelta;
+
+  // Preferred Aggregation Temporality
+  sdk::metrics::AggregationTemporality aggregation_temporality =
+      sdk::metrics::AggregationTemporality::kCumulative;
 };
 
 }  // namespace otlp

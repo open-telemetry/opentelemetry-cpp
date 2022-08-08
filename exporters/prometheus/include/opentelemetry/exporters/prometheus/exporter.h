@@ -57,6 +57,14 @@ public:
   PrometheusExporter(const PrometheusExporterOptions &options);
 
   /**
+   * Get the AggregationTemporality for Prometheus exporter
+   *
+   * @return AggregationTemporality
+   */
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override;
+
+  /**
    * Exports a batch of Metric Records.
    * @param records: a collection of records to export
    * @return: returns a ReturnCode detailing a success, or type of failure

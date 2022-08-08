@@ -14,8 +14,12 @@ using namespace opentelemetry::sdk::metrics;
 class MockMetricReader : public MetricReader
 {
 public:
-  MockMetricReader(AggregationTemporality aggr_temporality) : MetricReader(aggr_temporality) {}
-
+  MockMetricReader() = default;
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override
+  {
+    return AggregationTemporality::kCumulative;
+  }
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual void OnInitialized() noexcept override {}
@@ -24,13 +28,14 @@ public:
 TEST(MetricReaderTest, BasicTests)
 {
   AggregationTemporality aggr_temporality = AggregationTemporality::kDelta;
-  std::unique_ptr<MetricReader> metric_reader1(new MockMetricReader(aggr_temporality));
-  EXPECT_EQ(metric_reader1->GetAggregationTemporality(), aggr_temporality);
+  std::unique_ptr<MetricReader> metric_reader1(new MockMetricReader());
+  EXPECT_EQ(metric_reader1->GetAggregationTemporality(InstrumentType::kCounter),
+            AggregationTemporality::kCumulative);
 
   std::shared_ptr<MeterContext> meter_context1(new MeterContext());
   EXPECT_NO_THROW(meter_context1->AddMetricReader(std::move(metric_reader1)));
 
-  std::unique_ptr<MetricReader> metric_reader2(new MockMetricReader(aggr_temporality));
+  std::unique_ptr<MetricReader> metric_reader2(new MockMetricReader());
   std::shared_ptr<MeterContext> meter_context2(new MeterContext());
   std::shared_ptr<MetricProducer> metric_producer{
       new MetricCollector(std::move(meter_context2), std::move(metric_reader2))};
