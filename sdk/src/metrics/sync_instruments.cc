@@ -181,7 +181,8 @@ DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descrip
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[DoubleUpDownCounter::DoubleUpDownCounter] - Error during constructing DoubleUpDownCounter."
+        "[DoubleUpDownCounter::DoubleUpDownCounter] - Error during constructing "
+        "DoubleUpDownCounter."
         << "The metric storage is invalid"
         << "No value will be added");
   }
