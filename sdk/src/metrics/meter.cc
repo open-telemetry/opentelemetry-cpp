@@ -204,7 +204,13 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
 std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto ctx           = meter_context_.lock();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::RegisterMetricStorage] - Error during finding matching views."
+                            << "The metric context is invalid");
+    return nullptr;
+  }
   auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
@@ -241,7 +247,14 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto ctx           = meter_context_.lock();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+        << "The metric context is invalid");
+    return nullptr;
+  }
   auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
@@ -279,6 +292,12 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
 
   std::vector<MetricData> metric_data_list;
   auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::Collect] - Error during collection."
+                            << "The metric context is invalid");
+    return std::vector<MetricData>{};
+  }
   for (auto &metric_storage : storage_registry_)
   {
     metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
