@@ -668,8 +668,12 @@ OtlpHttpClient::~OtlpHttpClient()
       }
     }
     // When changes of running_sessions_ and notify_one/notify_all happen between predicate
-    // checking and waiting, we should not wait forever.
-    session_waker_.wait_for(lock, options_.timeout);
+    // checking and waiting, we should not wait forever. We should cleanup gc sessions here as soon
+    // as possible to call FinishSession() and cleanup resources.
+    if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
+    {
+      cleanupGCSessions();
+    }
   }
 
   // And then remove all session datas
@@ -781,8 +785,12 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
         }
       }
       // When changes of running_sessions_ and notify_one/notify_all happen between predicate
-      // checking and waiting, we should not wait forever.
-      session_waker_.wait_for(lock, options_.timeout);
+      // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
+      // as possible to call FinishSession() and cleanup resources.
+      if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
+      {
+        cleanupGCSessions();
+      }
     }
     return true;
   }
