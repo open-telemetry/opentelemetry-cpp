@@ -12,7 +12,7 @@ TEST(ObserverResult, BasicTests)
 {
   const AttributesProcessor *attributes_processor = new DefaultAttributesProcessor();
 
-  ObserverResult<long> observer_result(attributes_processor);
+  ObserverResultT<long> observer_result(attributes_processor);
 
   observer_result.Observe(10l);
   observer_result.Observe(20l);

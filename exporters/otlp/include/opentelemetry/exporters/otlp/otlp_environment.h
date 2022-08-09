@@ -73,7 +73,7 @@ inline bool GetOtlpDefaultIsSslEnable()
 inline const std::string GetOtlpDefaultSslCertificatePath()
 {
   constexpr char kOtlpTracesSslCertificate[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE";
-  constexpr char kOtlpSslCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE ";
+  constexpr char kOtlpSslCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE";
   auto ssl_cert_path =
       opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificate);
   if (ssl_cert_path.empty())
@@ -85,8 +85,8 @@ inline const std::string GetOtlpDefaultSslCertificatePath()
 
 inline const std::string GetOtlpDefaultSslCertificateString()
 {
-  constexpr char kOtlpTracesSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
-  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING ";
+  constexpr char kOtlpTracesSslCertificateString[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING";
+  constexpr char kOtlpSslCertificateString[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
   auto ssl_cert =
       opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificateString);
   if (ssl_cert.empty())
@@ -267,7 +267,8 @@ inline OtlpHeaders GetOtlpDefaultLogHeaders()
   return result;
 }
 
-inline const std::string GetOtlpDefaultHttpMetricEndpoint()
+// --- Metrics Environment Variables
+inline const std::string GetOtlpDefaultMetricsEndpoint()
 {
   constexpr char kOtlpMetricsEndpointEnv[] = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
   constexpr char kOtlpEndpointEnv[]        = "OTEL_EXPORTER_OTLP_ENDPOINT";
@@ -285,7 +286,7 @@ inline const std::string GetOtlpDefaultHttpMetricEndpoint()
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
 
-inline const std::chrono::system_clock::duration GetOtlpDefaultMetricTimeout()
+inline const std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout()
 {
   constexpr char kOtlpMetricsTimeoutEnv[] = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
   constexpr char kOtlpTimeoutEnv[]        = "OTEL_EXPORTER_OTLP_TIMEOUT";
@@ -298,7 +299,7 @@ inline const std::chrono::system_clock::duration GetOtlpDefaultMetricTimeout()
   return GetOtlpTimeoutFromString(timeout.c_str());
 }
 
-inline OtlpHeaders GetOtlpDefaultMetricHeaders()
+inline OtlpHeaders GetOtlpDefaultMetricsHeaders()
 {
   constexpr char kOtlpMetricsHeadersEnv[] = "OTEL_EXPORTER_OTLP_METRICS_HEADERS";
   constexpr char kOtlpHeadersEnv[]        = "OTEL_EXPORTER_OTLP_HEADERS";
@@ -311,6 +312,50 @@ inline OtlpHeaders GetOtlpDefaultMetricHeaders()
   DumpOtlpHeaders(result, kOtlpMetricsHeadersEnv, metric_remove_cache);
 
   return result;
+}
+
+inline bool GetOtlpDefaultMetricsIsSslEnable()
+{
+  constexpr char kOtlpMetricsIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_METRICS_SSL_ENABLE";
+  constexpr char kOtlpIsSslEnableEnv[]        = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+
+  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpMetricsIsSslEnableEnv);
+  if (ssl_enable.empty())
+  {
+    ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpIsSslEnableEnv);
+  }
+  if (ssl_enable == "True" || ssl_enable == "TRUE" || ssl_enable == "true" || ssl_enable == "1")
+  {
+    return true;
+  }
+  return false;
+}
+
+inline const std::string GetOtlpDefaultMetricsSslCertificatePath()
+{
+  constexpr char kOtlpMetricsSslCertificate[] = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE";
+  constexpr char kOtlpSslCertificate[]        = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+  auto ssl_cert_path =
+      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpMetricsSslCertificate);
+  if (ssl_cert_path.empty())
+  {
+    ssl_cert_path = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificate);
+  }
+  return ssl_cert_path.size() ? ssl_cert_path : "";
+}
+
+inline const std::string GetOtlpDefaultMetricsSslCertificateString()
+{
+  constexpr char kOtlpTracesSslCertificateString[] =
+      "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING";
+  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+  auto ssl_cert =
+      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificateString);
+  if (ssl_cert.empty())
+  {
+    ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificateString);
+  }
+  return ssl_cert.size() ? ssl_cert : "";
 }
 
 }  // namespace otlp
