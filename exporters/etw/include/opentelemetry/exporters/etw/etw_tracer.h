@@ -389,9 +389,11 @@ public:
         parentContext = span_context;
       }
     }
-    auto sampling_result = GetSampler(tracerProvider_).ShouldSample(parentContext, traceId_, name,
-                                                             options.kind, attributes, links);
-    if (sampling_result.decision == sdk::trace::Decision::DROP) {
+    auto sampling_result =
+        GetSampler(tracerProvider_)
+            .ShouldSample(parentContext, traceId_, name, options.kind, attributes, links);
+    if (sampling_result.decision == sdk::trace::Decision::DROP)
+    {
       static nostd::shared_ptr<trace::Span> noop_span(
           new trace::NoopSpan{this->shared_from_this()});
       return noop_span;
@@ -763,7 +765,8 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_{owner.traceId_, GetIdGenerator(owner.tracerProvider_).GenerateSpanId(), opentelemetry::trace::TraceFlags{0}, false}
+        context_{owner.traceId_, GetIdGenerator(owner.tracerProvider_).GenerateSpanId(),
+                 opentelemetry::trace::TraceFlags{0}, false}
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
