@@ -18,7 +18,8 @@ class MeterContext;
 class CollectorHandle
 {
 public:
-  virtual AggregationTemporality GetAggregationTemporality() noexcept = 0;
+  virtual AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) noexcept = 0;
 };
 
 /**
@@ -33,7 +34,8 @@ public:
   MetricCollector(std::shared_ptr<MeterContext> &&context,
                   std::unique_ptr<MetricReader> metric_reader);
 
-  AggregationTemporality GetAggregationTemporality() noexcept override;
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) noexcept override;
 
   /**
    * The callback to be called for each metric exporter. This will only be those

@@ -502,6 +502,8 @@ public:
     histogram_point_data.count_      = 3;
     histogram_point_data.counts_     = {200, 300, 400, 500};
     histogram_point_data.sum_        = 900.5;
+    histogram_point_data.min_        = 1.8;
+    histogram_point_data.max_        = 19.0;
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data2{};
     histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
     histogram_point_data2.count_      = 3;
@@ -551,6 +553,8 @@ public:
           auto data_points = metric["histogram"]["data_points"];
           EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[0]["count"]));
           EXPECT_EQ(900.5, data_points[0]["sum"].get<double>());
+          EXPECT_EQ(1.8, data_points[0]["min"].get<double>());
+          EXPECT_EQ(19, data_points[0]["max"].get<double>());
           EXPECT_EQ(4, data_points[0]["bucket_counts"].size());
           if (4 == data_points[0]["bucket_counts"].size())
           {
@@ -953,7 +957,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromMetricsEnv)
 
 TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
 {
-  EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultHttpMetricEndpoint());
+  EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultMetricsEndpoint());
 }
 
 #  endif

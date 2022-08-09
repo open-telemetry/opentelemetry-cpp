@@ -24,9 +24,10 @@ MetricCollector::MetricCollector(
   metric_reader_->SetMetricProducer(this);
 }
 
-AggregationTemporality MetricCollector::GetAggregationTemporality() noexcept
+AggregationTemporality MetricCollector::GetAggregationTemporality(
+    InstrumentType instrument_type) noexcept
 {
-  return metric_reader_->GetAggregationTemporality();
+  return metric_reader_->GetAggregationTemporality(instrument_type);
 }
 
 bool MetricCollector::Collect(

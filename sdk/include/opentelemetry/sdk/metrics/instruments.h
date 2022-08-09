@@ -19,6 +19,12 @@ enum class InstrumentType
   kObservableUpDownCounter
 };
 
+enum class InstrumentClass
+{
+  kSync,
+  kAsync
+};
+
 enum class InstrumentValueType
 {
   kInt,
@@ -52,7 +58,20 @@ struct InstrumentDescriptor
   InstrumentValueType value_type_;
 };
 
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
+using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
+static InstrumentClass GetInstrumentClass(InstrumentType type)
+{
+  if (type == InstrumentType::kCounter || type == InstrumentType::kHistogram ||
+      type == InstrumentType::kUpDownCounter)
+  {
+    return InstrumentClass::kSync;
+  }
+  else
+  {
+    return InstrumentClass::kAsync;
+  }
+}
 
 /*class InstrumentSelector {
 public:
