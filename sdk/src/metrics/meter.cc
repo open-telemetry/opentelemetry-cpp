@@ -241,7 +241,8 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx           = meter_context_.lock();
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),

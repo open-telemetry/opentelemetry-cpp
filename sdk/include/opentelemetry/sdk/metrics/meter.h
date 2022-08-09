@@ -114,43 +114,10 @@ private:
   std::weak_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
-
-  std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
+  std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
-
-  template <class T>
-  void RegisterAsyncMetricStorage(InstrumentDescriptor &instrument_descriptor,
-                                  void (*callback)(opentelemetry::metrics::ObserverResult<T> &,
-                                                   void *),
-                                  void *state = nullptr)
-  {
-    auto ctx           = meter_context_.lock();
-    auto view_registry = ctx->GetViewRegistry();
-    auto success       = view_registry->FindViews(
-        instrument_descriptor, *scope_,
-        [this, &instrument_descriptor, callback, state](const View &view) {
-          auto view_instr_desc = instrument_descriptor;
-          if (!view.GetName().empty())
-          {
-            view_instr_desc.name_ = view.GetName();
-          }
-          if (!view.GetDescription().empty())
-          {
-            view_instr_desc.description_ = view.GetDescription();
-          }
-          auto storage = std::shared_ptr<AsyncMetricStorage<T>>(
-              new AsyncMetricStorage<T>(view_instr_desc, view.GetAggregationType(), callback,
-                                        &view.GetAttributesProcessor(), state));
-          storage_registry_[instrument_descriptor.name_] = storage;
-          return true;
-        });
-    if (!success)
-    {
-      OTEL_INTERNAL_LOG_ERROR(
-          "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
-          << "Some of the matching view configurations may not be used for metric collection");
-    }
-  }
+  std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
+      InstrumentDescriptor &instrument_descriptor);
 };
 }  // namespace metrics
 }  // namespace sdk
