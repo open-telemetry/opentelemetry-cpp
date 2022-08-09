@@ -157,7 +157,8 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public opentelemetry::trace::Tracer, public std::enable_shared_from_this<trace::Tracer>
+class Tracer : public opentelemetry::trace::Tracer,
+               public std::enable_shared_from_this<trace::Tracer>
 {
 
   /**
@@ -356,7 +357,7 @@ public:
         encoding(encoding),
         provHandle(initProvHandle())
   {
-    
+
     traceId_ = tracerProvider_.id_generator_->GenerateTraceId();
   }
 
@@ -389,13 +390,13 @@ public:
       }
     }
     auto sampling_result = tracerProvider_.sampler_->ShouldSample(parentContext, traceId_, name,
-                                                             options.kind, attributes, links);
-    if (sampling_result.decision == sdk::trace::Decision::DROP) {
+                                                                  options.kind, attributes, links);
+    if (sampling_result.decision == sdk::trace::Decision::DROP)
+    {
       static nostd::shared_ptr<trace::Span> noop_span(
           new trace::NoopSpan{this->shared_from_this()});
       return noop_span;
     }
-    
 
 #ifdef OPENTELEMETRY_RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
@@ -763,7 +764,8 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_{owner.traceId_, owner.tracerProvider_.id_generator_->GenerateSpanId(), opentelemetry::trace::TraceFlags{0}, false}
+        context_{owner.traceId_, owner.tracerProvider_.id_generator_->GenerateSpanId(),
+                 opentelemetry::trace::TraceFlags{0}, false}
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
@@ -921,13 +923,13 @@ public:
 
   /**
    * @brief Sampler configured
-   * 
+   *
    */
   std::unique_ptr<sdk::trace::Sampler> sampler_;
 
   /**
    * @brief IdGenerator for trace_id and span_id
-   * 
+   *
    */
   std::unique_ptr<sdk::trace::IdGenerator> id_generator_;
 
@@ -936,9 +938,12 @@ public:
    * @param options Configuration options
    */
   TracerProvider(TelemetryProviderOptions options,
-  std::unique_ptr<sdk::trace::Sampler> sampler = std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
-  std::unique_ptr<sdk::trace::IdGenerator> id_generator = std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(new sdk::trace::ETWRandomIdGenerator())) : opentelemetry::trace::TracerProvider(), 
-  sampler_{std::move(sampler)}
+                 std::unique_ptr<sdk::trace::Sampler> sampler =
+                     std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
+                 std::unique_ptr<sdk::trace::IdGenerator> id_generator =
+                     std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+                         new sdk::trace::ETWRandomIdGenerator()))
+      : opentelemetry::trace::TracerProvider(), sampler_{std::move(sampler)}
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
