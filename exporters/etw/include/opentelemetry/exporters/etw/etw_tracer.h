@@ -944,7 +944,9 @@ public:
                  std::unique_ptr<sdk::trace::IdGenerator> id_generator =
                      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
                          new sdk::trace::ETWRandomIdGenerator()))
-      : opentelemetry::trace::TracerProvider(), sampler_{std::move(sampler)}
+      : opentelemetry::trace::TracerProvider(),
+        sampler_{std::move(sampler)},
+        id_generator_{std::move(id_generator)}
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
