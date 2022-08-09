@@ -29,13 +29,23 @@ public:
    * export() function will send metrics data into.
    * The default ostream is set to stdout
    */
-  explicit OStreamMetricExporter(std::ostream &sout = std::cout) noexcept;
+  explicit OStreamMetricExporter(std::ostream &sout = std::cout,
+                                 sdk::metrics::AggregationTemporality aggregation_temporality =
+                                     sdk::metrics::AggregationTemporality::kCumulative) noexcept;
 
   /**
    * Export
    * @param data metrics data
    */
   sdk::common::ExportResult Export(const sdk::metrics::ResourceMetrics &data) noexcept override;
+
+  /**
+   * Get the AggregationTemporality for ostream exporter
+   *
+   * @return AggregationTemporality
+   */
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override;
 
   /**
    * Force flush the exporter.
@@ -55,6 +65,7 @@ private:
   std::ostream &sout_;
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
+  sdk::metrics::AggregationTemporality aggregation_temporality_;
   bool isShutdown() const noexcept;
   void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics,
                                           const sdk::metrics::ResourceMetrics &data);
