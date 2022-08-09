@@ -73,7 +73,7 @@ DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[LongUpDownCounter::LongUpDownCounter] - Error during constructing LongUpDownCounter."
+        "[DoubleCounter::DoubleCounter] - Error during constructing DoubleCounter."
         << "The metric storage is invalid"
         << "No value will be added");
   }
@@ -181,7 +181,7 @@ DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descrip
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[LongUpDownCounter::LongUpDownCounter] - Error during constructing LongUpDownCounter."
+        "[DoubleUpDownCounter::DoubleUpDownCounter] - Error during constructing DoubleUpDownCounter."
         << "The metric storage is invalid"
         << "No value will be added");
   }
@@ -231,7 +231,7 @@ LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[LongUpDownCounter::LongUpDownCounter] - Error during constructing LongUpDownCounter."
+        "[LongHistogram::LongHistogram] - Error during constructing LongHistogram."
         << "The metric storage is invalid"
         << "No value will be added");
   }
@@ -270,7 +270,7 @@ DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[LongUpDownCounter::LongUpDownCounter] - Error during constructing LongUpDownCounter."
+        "[DoubleHistogram::DoubleHistogram] - Error during constructing DoubleHistogram."
         << "The metric storage is invalid"
         << "No value will be added");
   }
