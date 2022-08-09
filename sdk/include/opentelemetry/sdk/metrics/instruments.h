@@ -58,6 +58,8 @@ struct InstrumentDescriptor
   InstrumentValueType value_type_;
 };
 
+using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
+using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
 static InstrumentClass GetInstrumentClass(InstrumentType type)
 {
   if (type == InstrumentType::kCounter || type == InstrumentType::kHistogram ||
@@ -70,8 +72,6 @@ static InstrumentClass GetInstrumentClass(InstrumentType type)
     return InstrumentClass::kAsync;
   }
 }
-
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
 /*class InstrumentSelector {
 public:
