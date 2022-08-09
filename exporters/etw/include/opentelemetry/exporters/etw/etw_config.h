@@ -10,6 +10,8 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 
+#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry//sdk/trace/sampler.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -144,6 +146,24 @@ template <class T>
 TelemetryProviderConfiguration &GetConfiguration(T &t)
 {
   return t.config_;
+}
+
+/**
+* @brief Utility function to obtain etw::TracerProvider.id_generator_
+*/
+template <class T>
+sdk::trace::IdGenerator &GetIdGenerator(T &t)
+{
+  return *t.id_generator_;
+}
+
+/**
+ * @brief Utility function to obtain etw::TracerProvider.sampler_
+ */
+template <class T>
+sdk::trace::Sampler &GetSampler(T &t)
+{
+  return *t.sampler_;
 }
 
 /**

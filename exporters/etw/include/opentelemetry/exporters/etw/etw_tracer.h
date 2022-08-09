@@ -157,7 +157,7 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public opentelemetry::trace::Tracer, public std::enable_shared_from_this<trace::Tracer>
+class Tracer : public opentelemetry::trace::Tracer, public std::enable_shared_from_this<opentelemetry::trace::Tracer>
 {
 
   /**
@@ -357,7 +357,7 @@ public:
         provHandle(initProvHandle())
   {
     
-    traceId_ = tracerProvider_.id_generator_->GenerateTraceId();
+    traceId_ = GetIdGenerator(tracerProvider_).GenerateTraceId();
   }
 
   /**
@@ -388,7 +388,7 @@ public:
         parentContext = span_context;
       }
     }
-    auto sampling_result = tracerProvider_.sampler_->ShouldSample(parentContext, traceId_, name,
+    auto sampling_result = GetSampler(tracerProvider_).ShouldSample(parentContext, traceId_, name,
                                                              options.kind, attributes, links);
     if (sampling_result.decision == sdk::trace::Decision::DROP) {
       static nostd::shared_ptr<trace::Span> noop_span(
@@ -763,7 +763,7 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_{owner.traceId_, owner.tracerProvider_.id_generator_->GenerateSpanId(), opentelemetry::trace::TraceFlags{0}, false}
+        context_{owner.traceId_, GetIdGenerator(owner.tracerProvider_).GenerateSpanId(), opentelemetry::trace::TraceFlags{0}, false}
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
