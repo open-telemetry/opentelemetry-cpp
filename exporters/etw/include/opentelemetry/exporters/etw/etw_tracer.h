@@ -975,7 +975,11 @@ public:
     config_.encoding = GetEncoding(options);
   }
 
-  TracerProvider() : opentelemetry::trace::TracerProvider()
+  TracerProvider()
+      : opentelemetry::trace::TracerProvider(),
+        sampler_{std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler)},
+        id_generator_{std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+            new sdk::trace::ETWRandomIdGenerator())}
   {
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
