@@ -16,10 +16,9 @@ namespace sdk
 namespace metrics
 {
 
-MetricCollector::MetricCollector(
-    std::shared_ptr<opentelemetry::sdk::metrics::MeterContext> &&context,
-    std::unique_ptr<MetricReader> metric_reader)
-    : meter_context_{std::move(context)}, metric_reader_{std::move(metric_reader)}
+MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
+                                 std::unique_ptr<MetricReader> metric_reader)
+    : meter_context_{context}, metric_reader_{std::move(metric_reader)}
 {
   metric_reader_->SetMetricProducer(this);
 }
@@ -34,8 +33,7 @@ bool MetricCollector::Collect(
     nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
   ResourceMetrics resource_metrics;
-  auto ctx = meter_context_.lock();
-  for (auto &meter : ctx->GetMeters())
+  for (auto &meter : meter_context_->GetMeters())
   {
     auto collection_ts = std::chrono::system_clock::now();
     ScopeMetrics scope_metrics;
@@ -43,7 +41,7 @@ bool MetricCollector::Collect(
     scope_metrics.scope_       = meter->GetInstrumentationScope();
     resource_metrics.scope_metric_data_.push_back(scope_metrics);
   }
-  resource_metrics.resource_ = &ctx->GetResource();
+  resource_metrics.resource_ = &meter_context_->GetResource();
   callback(resource_metrics);
   return true;
 }
