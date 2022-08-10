@@ -8,6 +8,7 @@
 #  include <string>
 
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
@@ -381,6 +382,24 @@ TEST(ETWTracer, GlobalSingletonTracer)
 
   localTracer->CloseWithMicroseconds(0);
   globalTracer.CloseWithMicroseconds(0);
+}
+
+TEST(ETWTracer, AlwayOffSampler)
+{
+  std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
+  std::unique_ptr<sdk::trace::Sampler> always_off{new sdk::trace::AlwaysOffSampler()};
+  exporter::etw::TracerProvider tp
+    ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+     },
+     std::move(always_off));
+  auto tracer = tp.GetTracer(providerName);
+  auto span = tracer->StartSpan("span_off");
+  EXPECT_EQ(span->GetContext().IsValid(), false);
 }
 
 /* clang-format on */
