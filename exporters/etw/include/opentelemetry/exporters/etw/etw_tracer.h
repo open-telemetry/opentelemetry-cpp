@@ -1012,7 +1012,7 @@ public:
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
-                                                               Tracer(*this, name, evtFmt)};
+                                                             Tracer(*this, name, evtFmt)};
     return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
   }
 };

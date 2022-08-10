@@ -8,7 +8,7 @@
 #  include <string>
 
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
-#include "opentelemetry/sdk/trace/samplers/always_off.h"
+#  include "opentelemetry/sdk/trace/samplers/always_off.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
