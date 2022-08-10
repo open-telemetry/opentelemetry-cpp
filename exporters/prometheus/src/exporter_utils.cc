@@ -5,6 +5,7 @@
 #  include <sstream>
 #  include <utility>
 #  include <vector>
+#  include "prometheus/metric_family.h"
 
 #  include <prometheus/metric_type.h>
 #  include "opentelemetry/exporters/prometheus/exporter_utils.h"
@@ -74,12 +75,38 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
                     counts, point_data_attr.attributes, time, &metric_family);
           }
+          else if (type == prometheus_client::MetricType::Gauge)
+          {
+            if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
+                    point_data_attr.point_data))
+            {
+              auto last_value_point_data =
+                  nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
+              std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
+              SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            }
+            else
+            {
+              OTEL_INTERNAL_LOG_WARN(
+                  "[Prometheus Exporter] TranslateToPrometheus - "
+                  "invalid LastValuePointData type");
+            }
+          }
           else  // Counter, Untyped
           {
-            auto sum_point_data =
-                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
-            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
+            {
+              auto sum_point_data =
+                  nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+              std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+              SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            }
+            else
+            {
+              OTEL_INTERNAL_LOG_WARN(
+                  "[Prometheus Exporter] TranslateToPrometheus - "
+                  "invalid SumPointData type");
+            }
           }
         }
         output.emplace_back(metric_family);
@@ -140,6 +167,8 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
       return prometheus_client::MetricType::Counter;
     case metric_sdk::AggregationType::kHistogram:
       return prometheus_client::MetricType::Histogram;
+    case metric_sdk::AggregationType::kLastValue:
+      return prometheus_client::MetricType::Gauge;
     default:
       return prometheus_client::MetricType::Untyped;
   }
@@ -274,6 +303,10 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
   {
     case prometheus_client::MetricType::Counter: {
       metric->counter.value = value;
+      break;
+    }
+    case prometheus_client::MetricType::Gauge: {
+      metric->gauge.value = value;
       break;
     }
     case prometheus_client::MetricType::Untyped: {
