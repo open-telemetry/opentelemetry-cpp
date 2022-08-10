@@ -77,9 +77,12 @@ void Session::SendRequest(
     // reuse it instead of creating a new one.
     http_client_.MaybeSpawnBackgroundThread();
   }
-  else if (callback)
+  else
   {
-    callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+    if (callback)
+    {
+      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+    }
     is_session_active_.store(false, std::memory_order_release);
   }
 }
@@ -176,8 +179,9 @@ bool HttpClient::CancelAllSessions() noexcept
   {
     std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions;
     {
+      // We can only cleanup session and curl handles in the IO thread.
       std::lock_guard<std::mutex> lock_guard{sessions_m_};
-      sessions.swap(sessions_);
+      sessions = sessions_;
     }
 
     if (sessions.empty())
@@ -200,8 +204,9 @@ bool HttpClient::FinishAllSessions() noexcept
   {
     std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions;
     {
+      // We can only cleanup session and curl handles in the IO thread.
       std::lock_guard<std::mutex> lock_guard{sessions_m_};
-      sessions.swap(sessions_);
+      sessions = sessions_;
     }
 
     if (sessions.empty())
