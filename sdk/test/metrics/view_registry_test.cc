@@ -29,13 +29,17 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_scope.get(),
                          [&count](const View &view) {
                            count++;
-                           EXPECT_EQ(view.GetName(), "otel-default-view");
+#  if HAVE_WORKING_REGEX
+                           EXPECT_EQ(view.GetName(), "");
                            EXPECT_EQ(view.GetDescription(), "");
+#  endif
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
                          });
+#  if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
+#  endif
 }
 
 TEST(ViewRegistry, FindNonExistingView)
@@ -76,7 +80,9 @@ TEST(ViewRegistry, FindNonExistingView)
 #  endif
                            return true;
                          });
+#  if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
+#  endif
 }
 #endif
