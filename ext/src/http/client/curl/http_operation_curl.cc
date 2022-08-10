@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cstring>
+
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
