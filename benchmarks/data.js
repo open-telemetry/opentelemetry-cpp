@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1660099408374,
+  "lastUpdate": 1660099410173,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -61198,6 +61198,54 @@ window.BENCHMARK_DATA = {
             "value": 2063568.24830521,
             "unit": "ns/iter",
             "extra": "iterations: 387\ncpu: 348154.2635658915 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "owentou@tencent.com",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ba1cd0d9f91f49e87ed92fd8f6228ef7b5a74944",
+          "message": "Fix infinitely waiting when shutdown with more than one running http sessions. (#1549)\n\nSigned-off-by: owentou <owentou@tencent.com>",
+          "timestamp": "2022-08-09T19:28:22-07:00",
+          "tree_id": "887b2322cc4513a862818abd09e212f5cc5efa0f",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/ba1cd0d9f91f49e87ed92fd8f6228ef7b5a74944"
+        },
+        "date": 1660099406365,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 150.1817783896061,
+            "unit": "ns/iter",
+            "extra": "iterations: 946000\ncpu: 148.2178646934461 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 206.910161411061,
+            "unit": "ns/iter",
+            "extra": "iterations: 680000\ncpu: 206.22102941176476 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 752.8269544560859,
+            "unit": "ns/iter",
+            "extra": "iterations: 188000\ncpu: 751.4946808510641 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2082385.6318219109,
+            "unit": "ns/iter",
+            "extra": "iterations: 322\ncpu: 399680.12422360235 ns\nthreads: 1"
           }
         ]
       }
