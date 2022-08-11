@@ -25,19 +25,20 @@ void BM_AttributseHashMap(benchmark::State &state)
   std::vector<MetricAttributes> attributes = {{{"k1", "v1"}, {"k2", "v2"}},
                                               {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}}};
 
-  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
-      []() -> std::unique_ptr<Aggregation> {
-    return std::unique_ptr<Aggregation>(new DropAggregation);
-  };
+  auto work = [&attributes, &hash_map](const size_t i) {
+    std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
+        []() -> std::unique_ptr<Aggregation> {
+      return std::unique_ptr<Aggregation>(new DropAggregation);
+    };
 
+    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);
+    benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
+  };
   while (state.KeepRunning())
   {
     for (size_t i = 0; i < MAX_THREADS; i++)
     {
-      workers.push_back(std::thread([&]() {
-        hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);
-        benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
-      }));
+      workers.push_back(std::thread(work, i));
     }
   }
 
