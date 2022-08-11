@@ -40,7 +40,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  opentelemetry::common::SpinLockMutex lock_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
   HistogramPointData point_data_;
   bool record_min_max_ = true;
 };
