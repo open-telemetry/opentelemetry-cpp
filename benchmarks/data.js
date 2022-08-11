@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1660189085281,
+  "lastUpdate": 1660189087139,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -62140,6 +62140,54 @@ window.BENCHMARK_DATA = {
             "value": 2779773.7637081663,
             "unit": "ns/iter",
             "extra": "iterations: 259\ncpu: 528322.0077220079 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arden.bryce@gmail.com",
+            "name": "Bryce Arden",
+            "username": "bsarden"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b4ed0471d0a570dcb454deea81d945430e94bb59",
+          "message": "build: fix IWYU error in instruments.h (#1555)",
+          "timestamp": "2022-08-10T20:25:36-07:00",
+          "tree_id": "74820857e111e0802d1e10c16c3300272972a4c7",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/b4ed0471d0a570dcb454deea81d945430e94bb59"
+        },
+        "date": 1660189082489,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 123.06127900188962,
+            "unit": "ns/iter",
+            "extra": "iterations: 1138000\ncpu: 123.0566783831283 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 170.74610959493833,
+            "unit": "ns/iter",
+            "extra": "iterations: 807000\ncpu: 170.73358116480796 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 622.422684656891,
+            "unit": "ns/iter",
+            "extra": "iterations: 227000\ncpu: 622.4193832599121 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1518176.539277653,
+            "unit": "ns/iter",
+            "extra": "iterations: 379\ncpu: 344662.00527704484 ns\nthreads: 1"
           }
         ]
       }
