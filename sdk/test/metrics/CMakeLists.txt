@@ -12,6 +12,7 @@ foreach(
   sync_instruments_test
   async_instruments_test
   metric_reader_test
+  observable_registry_test
   periodic_exporting_metric_reader_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

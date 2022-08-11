@@ -21,6 +21,7 @@ class HistogramAggregationConfig : public AggregationConfig
 {
 public:
   std::list<T> boundaries_;
+  bool record_min_max_ = true;
 };
 }  // namespace metrics
 }  // namespace sdk

@@ -43,10 +43,11 @@ void assert_basic(prometheus_client::MetricFamily &metric,
       ASSERT_EQ(buckets.size(), vals[2]);
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-      // Gauge type not supported
-      ASSERT_TRUE(false);
+    case prometheus_client::MetricType::Gauge: {
+      ASSERT_DOUBLE_EQ(metric_data.gauge.value, vals[0]);
       break;
+    }
+    break;
     case prometheus_client::MetricType::Summary:
       // Summary type not supported
       ASSERT_TRUE(false);
@@ -107,6 +108,30 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto metric2 = translated[1];
   assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Counter, 1,
+               vals);
+}
+
+TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
+{
+  std::vector<std::unique_ptr<metric_sdk::ResourceMetrics>> collection;
+
+  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateLastValuePointData()});
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
+  ASSERT_EQ(translated.size(), collection.size());
+
+  auto metric1          = translated[0];
+  std::vector<int> vals = {10};
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
+               vals);
+
+  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateLastValuePointData()});
+
+  translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
+  ASSERT_EQ(translated.size(), collection.size());
+
+  auto metric2 = translated[1];
+  assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
                vals);
 }
 
