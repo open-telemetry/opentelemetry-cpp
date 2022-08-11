@@ -26,7 +26,7 @@ namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
 Meter::Meter(
-    std::shared_ptr<MeterContext> meter_context,
+    std::weak_ptr<MeterContext> meter_context,
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : scope_{std::move(instrumentation_scope)},
       meter_context_{meter_context},
@@ -208,7 +208,14 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
 std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::RegisterMetricStorage] - Error during finding matching views."
+                            << "The metric context is invalid");
+    return nullptr;
+  }
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
   auto success = view_registry->FindViews(
@@ -244,7 +251,15 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+        << "The metric context is invalid");
+    return nullptr;
+  }
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),
@@ -281,11 +296,17 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
 
   observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::Collect] - Error during collection."
+                            << "The metric context is invalid");
+    return std::vector<MetricData>{};
+  }
   for (auto &metric_storage : storage_registry_)
   {
-    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
-                                   meter_context_->GetSDKStartTime(), collect_ts,
-                                   [&metric_data_list](MetricData metric_data) {
+    metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
+                                   collect_ts, [&metric_data_list](MetricData metric_data) {
                                      metric_data_list.push_back(metric_data);
                                      return true;
                                    });

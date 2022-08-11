@@ -68,6 +68,7 @@ std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &n
 
 PointType LongLastValueAggregation::ToPoint() const noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
 }
 
@@ -126,6 +127,7 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
 
 PointType DoubleLastValueAggregation::ToPoint() const noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
 }
 }  // namespace metrics

@@ -129,8 +129,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                     return true;
                   });
   // subsequent recording after collection shouldn't fail
-  EXPECT_NO_THROW(storage.RecordLong(
-      measurements, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now())));
+  storage.RecordLong(measurements,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   EXPECT_EQ(MeasurementFetcher::number_of_attributes, attribute_count);
 }
 
