@@ -8,7 +8,9 @@
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/sdk_config.h"
 
@@ -26,7 +28,9 @@ namespace nostd   = opentelemetry::nostd;
 Meter::Meter(
     std::shared_ptr<MeterContext> meter_context,
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
-    : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
+    : scope_{std::move(instrumentation_scope)},
+      meter_context_{meter_context},
+      observable_registry_(new ObservableRegistry())
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
@@ -66,7 +70,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -80,7 +84,7 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -122,7 +126,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDoubleObservableGauge(
@@ -136,7 +140,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -178,7 +182,7 @@ Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -192,7 +196,7 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
@@ -275,6 +279,7 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
 
+  observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
   for (auto &metric_storage : storage_registry_)
   {

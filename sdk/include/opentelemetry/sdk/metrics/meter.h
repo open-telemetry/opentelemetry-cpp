@@ -24,6 +24,7 @@ namespace metrics
 class MetricStorage;
 class SyncWritableMetricStorage;
 class AsyncWritableMetricsStorge;
+class ObservableRegistry;
 
 class Meter final : public opentelemetry::metrics::Meter
 {
@@ -114,6 +115,7 @@ private:
   std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
+  std::shared_ptr<ObservableRegistry> observable_registry_;
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(

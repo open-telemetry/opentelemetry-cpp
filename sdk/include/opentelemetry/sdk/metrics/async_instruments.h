@@ -21,7 +21,8 @@ class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,
-                       std::unique_ptr<AsyncWritableMetricStorage> storage);
+                       std::unique_ptr<AsyncWritableMetricStorage> storage,
+                       std::shared_ptr<ObservableRegistry> observable_registry);
 
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                    void *state) noexcept override;
@@ -36,7 +37,7 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   std::unique_ptr<AsyncWritableMetricStorage> storage_;
-  std::unique_ptr<ObservableRegistry> observable_registry_;
+  std::shared_ptr<ObservableRegistry> observable_registry_;
 };
 }  // namespace metrics
 }  // namespace sdk
