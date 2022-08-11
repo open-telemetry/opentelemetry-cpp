@@ -127,14 +127,14 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
   // sout_ is shared
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   sout_ << "{";
-  sout_ << "\n  name\t\t: " << info_metric.scope_->GetName()
+  sout_ << "\n  scope name\t: " << info_metric.scope_->GetName()
         << "\n  schema url\t: " << info_metric.scope_->GetSchemaURL()
         << "\n  version\t: " << info_metric.scope_->GetVersion();
   for (const auto &record : info_metric.metric_data_)
   {
     sout_ << "\n  start time\t: " << timeToString(record.start_ts)
           << "\n  end time\t: " << timeToString(record.end_ts)
-          << "\n  name\t\t: " << record.instrument_descriptor.name_
+          << "\n  instrument name\t: " << record.instrument_descriptor.name_
           << "\n  description\t: " << record.instrument_descriptor.description_
           << "\n  unit\t\t: " << record.instrument_descriptor.unit_;
 
