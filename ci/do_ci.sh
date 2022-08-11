@@ -171,25 +171,6 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   make
   make test
   exit 0
-elif [[ "$1" == "cmake.legacy.exporter.otprotocol.deprecated_metrics.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  export BUILD_ROOT="${BUILD_DIR}"
-  ${SRC_DIR}/tools/build-gtest.sh
-  ${SRC_DIR}/tools/build-benchmark.sh
-  cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_METRICS_PREVIEW=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
-  make -j $(nproc)
-  cd exporters/otlp && make test
-  exit 0
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
