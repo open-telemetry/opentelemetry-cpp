@@ -57,18 +57,16 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
                      opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
-  EXPECT_NO_THROW(storage.RecordLong(
-      30l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordLong(30l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                     opentelemetry::context::Context{});
   expected_total_put_requests += 30;
 
   storage.RecordLong(20l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
-  EXPECT_NO_THROW(storage.RecordLong(
-      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordLong(40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                     opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
@@ -107,13 +105,11 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
     expected_total_put_requests = 0;
   }
 
-  EXPECT_NO_THROW(storage.RecordLong(
-      50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
-      opentelemetry::context::Context{}));
+  storage.RecordLong(50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                     opentelemetry::context::Context{});
   expected_total_get_requests += 50;
-  EXPECT_NO_THROW(storage.RecordLong(
-      40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordLong(40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                     opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
   collection_ts    = std::chrono::system_clock::now();
@@ -167,9 +163,9 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
                        opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
-  EXPECT_NO_THROW(storage.RecordDouble(
-      30.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordDouble(30.0,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                       opentelemetry::context::Context{});
   expected_total_put_requests += 30;
 
   storage.RecordDouble(20.0,
@@ -177,9 +173,9 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
                        opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
-  EXPECT_NO_THROW(storage.RecordDouble(
-      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordDouble(40.0,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                       opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
@@ -218,13 +214,13 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
     expected_total_put_requests = 0;
   }
 
-  EXPECT_NO_THROW(storage.RecordDouble(
-      50.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
-      opentelemetry::context::Context{}));
+  storage.RecordDouble(50.0,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+                       opentelemetry::context::Context{});
   expected_total_get_requests += 50;
-  EXPECT_NO_THROW(storage.RecordDouble(
-      40.0, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
-      opentelemetry::context::Context{}));
+  storage.RecordDouble(40.0,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+                       opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
   collection_ts    = std::chrono::system_clock::now();

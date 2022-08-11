@@ -50,11 +50,11 @@ TEST(MultiMetricStorageTest, BasicTests)
       new TestMetricStorage());
   SyncMultiMetricStorage storages{};
   storages.AddStorage(storage);
-  EXPECT_NO_THROW(storages.RecordLong(10l, opentelemetry::context::Context{}));
-  EXPECT_NO_THROW(storages.RecordLong(20l, opentelemetry::context::Context{}));
+  storages.RecordLong(10l, opentelemetry::context::Context{});
+  storages.RecordLong(20l, opentelemetry::context::Context{});
 
-  EXPECT_NO_THROW(storages.RecordDouble(10.0, opentelemetry::context::Context{}));
-  EXPECT_NO_THROW(storages.RecordLong(30l, opentelemetry::context::Context{}));
+  storages.RecordDouble(10.0, opentelemetry::context::Context{});
+  storages.RecordLong(30l, opentelemetry::context::Context{});
 
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_long, 3);
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_double, 1);
