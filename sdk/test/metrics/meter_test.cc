@@ -3,6 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -57,8 +58,16 @@ TEST(MeterTest, BasicAsyncTests)
 
   size_t count = 0;
   metricReaderPtr->Collect([&count](ResourceMetrics &metric_data) {
-    count += metric_data.scope_metric_data_.size();
-    EXPECT_EQ(count, 1);
+    EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
+    if (metric_data.scope_metric_data_.size())
+    {
+      EXPECT_EQ(metric_data.scope_metric_data_[0].metric_data_.size(), 1);
+      if (metric_data.scope_metric_data_.size())
+      {
+        count += metric_data.scope_metric_data_[0].metric_data_.size();
+        EXPECT_EQ(count, 1);
+      }
+    }
     return true;
   });
 }
