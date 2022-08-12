@@ -203,7 +203,7 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.deprecated_metrics.test
-  
+
   bazel_test_async:
     name: Bazel with async export
     runs-on: ubuntu-latest
