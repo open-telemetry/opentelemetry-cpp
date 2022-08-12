@@ -24,7 +24,7 @@ jobs:
         ./ci/do_ci.sh cmake.test
 
   cmake_deprecated_metrics_test:
-    name: CMake test (without otlp-exporter and deprecated metrics)
+    name: CMake test (without otlp-exporter and with deprecated metrics)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
