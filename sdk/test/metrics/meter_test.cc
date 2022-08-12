@@ -38,17 +38,6 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr)
   p->AddMetricReader(std::move(metric_reader));
   auto meter = provider->GetMeter("meter_name");
   return meter;
-  // auto sdk_meter = std::static_pointer_cast<opentelemetry::sdk::metrics::Meter>(meter);
-
-  /*
-    provider->
-    auto context = std::make_shared<opentelemetry::sdk::metrics::MeterContext>();
-    std::unique_ptr<MetricReader> metric_reader(new MockMetricReader());
-    *metricReaderPtr = metric_reader.get();
-    context->AddMetricReader(std::move(metric_reader));
-    std::shared_ptr<Meter> meter(new Meter(context));
-    return meter;
-    */
 }
 }  // namespace
 
