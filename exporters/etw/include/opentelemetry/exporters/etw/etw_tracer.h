@@ -963,7 +963,7 @@ public:
     GetOption(options, "enableAutoParent", config.enableAutoParent, false);
 
     // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
-    config_.encoding = GetEncoding(options);
+    config.encoding = GetEncoding(options);
 
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
     tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
@@ -975,13 +975,14 @@ public:
         id_generator_{std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
             new sdk::trace::ETWRandomIdGenerator())}
   {
-    config_.enableTraceId           = true;
-    config_.enableSpanId            = true;
-    config_.enableActivityId        = false;
-    config_.enableActivityTracking  = false;
-    config_.enableRelatedActivityId = false;
-    config_.enableAutoParent        = false;
-    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
+    TelemetryProviderConfiguration config;
+    config.enableTraceId           = true;
+    config.enableSpanId            = true;
+    config.enableActivityId        = false;
+    config.enableActivityTracking  = false;
+    config.enableRelatedActivityId = false;
+    config.enableAutoParent        = false;
+    config.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
 
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
     tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
@@ -1005,7 +1006,7 @@ public:
   {
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
-    ETWProvider::EventFormat evtFmt = config_.encoding;
+    ETWProvider::EventFormat evtFmt = tracerContext_.config.encoding;
     std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
                                                              Tracer(tracerContext_, name, evtFmt)};
     return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
