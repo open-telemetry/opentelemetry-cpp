@@ -965,7 +965,8 @@ public:
     // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
     config.encoding = GetEncoding(options);
 
-    std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
+    std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
+        new TelemetryProviderConfiguration(std::move(config)));
     tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
   }
 
@@ -984,7 +985,8 @@ public:
     config.enableAutoParent        = false;
     config.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
 
-    std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
+    std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
+        new TelemetryProviderConfiguration(std::move(config)));
     tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
   }
 
