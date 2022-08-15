@@ -358,7 +358,7 @@ public:
         encoding(encoding),
         provHandle(initProvHandle())
   {
-    traceId_ = GetIdGenerator(tracerProvider_).GenerateTraceId();
+    traceId_ = GetIdGenerator(tracerContext_).GenerateTraceId();
   }
 
   /**
