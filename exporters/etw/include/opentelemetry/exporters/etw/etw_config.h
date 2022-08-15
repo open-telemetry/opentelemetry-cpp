@@ -42,6 +42,25 @@ typedef struct
       encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
 } TelemetryProviderConfiguration;
 
+typedef struct
+{
+  /**
+   * @brief TracerProvider options supplied during initialization.
+   */
+  std::unique_ptr<TelemetryProviderConfiguration> config;
+
+  /**
+   * @brief Sampler supplied during initialization
+   */
+  std::unique_ptr<sdk::trace::Sampler> sampler;
+
+  /**
+   * @brief IdGenerator supplied during initialization
+   */
+  std::unique_ptr<sdk::trace::IdGenerator> idGenerator;
+
+} TracerContext;
+
 /**
  * @brief Helper template to convert a variant value from TelemetryProviderOptions to
  * LoggerProviderConfiguration
@@ -145,7 +164,7 @@ static inline ETWProvider::EventFormat GetEncoding(const TelemetryProviderOption
 template <class T>
 TelemetryProviderConfiguration &GetConfiguration(T &t)
 {
-  return t.config_;
+  return *(t->config_);
 }
 
 /**
@@ -154,7 +173,7 @@ TelemetryProviderConfiguration &GetConfiguration(T &t)
 template <class T>
 sdk::trace::IdGenerator &GetIdGenerator(T &t)
 {
-  return *t.id_generator_;
+  return *(t->id_generator_);
 }
 
 /**
@@ -163,7 +182,7 @@ sdk::trace::IdGenerator &GetIdGenerator(T &t)
 template <class T>
 sdk::trace::Sampler &GetSampler(T &t)
 {
-  return *t.sampler_;
+  return *(t->sampler_);
 }
 
 /**

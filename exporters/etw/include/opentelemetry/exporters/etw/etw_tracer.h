@@ -165,7 +165,7 @@ class Tracer : public opentelemetry::trace::Tracer,
   /**
    * @brief Parent provider of this Tracer
    */
-  etw::TracerProvider &tracerProvider_;
+  std::shared_ptr<etw::TracerContext> tracerContext_;
 
   /**
    * @brief ProviderId (Name or GUID)
@@ -235,7 +235,7 @@ class Tracer : public opentelemetry::trace::Tracer,
                        const opentelemetry::trace::Span *parentSpan = nullptr,
                        const opentelemetry::trace::EndSpanOptions & = {})
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(tracerContext_);
     const opentelemetry::trace::Span &spanBase =
         reinterpret_cast<const opentelemetry::trace::Span &>(span);
     auto spanContext = spanBase.GetContext();
@@ -349,11 +349,11 @@ public:
    * @param providerId ProviderId - Name or GUID
    * @param encoding ETW encoding format to use.
    */
-  Tracer(etw::TracerProvider &parent,
+  Tracer(std::shared_ptr<TracerContext> tracer_context,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
       : opentelemetry::trace::Tracer(),
-        tracerProvider_(parent),
+        tracerContext_(tracer_context),
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
         provHandle(initProvHandle())
@@ -375,7 +375,7 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(tracerContext_);
 
     // Parent Context:
     // - either use current span
@@ -390,7 +390,7 @@ public:
       }
     }
     auto sampling_result =
-        GetSampler(tracerProvider_)
+        GetSampler(tracerContext_)
             .ShouldSample(parentContext, traceId_, name, options.kind, attributes, links);
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
@@ -426,7 +426,7 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(tracerContext_);
 
     // Parent Context:
     // - either use current span
@@ -590,7 +590,7 @@ public:
     // to have it, this feature (custom timestamp) remains unimplemented.
     (void)timestamp;
 
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(tracerContext_);
 
     evt[ETW_FIELD_NAME] = name.data();
 
@@ -765,7 +765,7 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_{owner.traceId_, GetIdGenerator(owner.tracerProvider_).GenerateSpanId(),
+        context_{owner.traceId_, GetIdGenerator(owner.tracerContext_).GenerateSpanId(),
                  opentelemetry::trace::TraceFlags{0}, false}
   {
     name_ = name;
@@ -920,19 +920,7 @@ public:
   /**
    * @brief TracerProvider options supplied during initialization.
    */
-  TelemetryProviderConfiguration config_;
-
-  /**
-   * @brief Sampler configured
-   *
-   */
-  std::unique_ptr<sdk::trace::Sampler> sampler_;
-
-  /**
-   * @brief IdGenerator for trace_id and span_id
-   *
-   */
-  std::unique_ptr<sdk::trace::IdGenerator> id_generator_;
+  std::shared_ptr<TracerContext> tracerContext_;
 
   /**
    * @brief Construct instance of TracerProvider with given options
@@ -944,13 +932,14 @@ public:
                  std::unique_ptr<sdk::trace::IdGenerator> id_generator =
                      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
                          new sdk::trace::ETWRandomIdGenerator()))
-      : opentelemetry::trace::TracerProvider(),
-        sampler_{std::move(sampler)},
-        id_generator_{std::move(id_generator)}
+      : opentelemetry::trace::TracerProvider()
+  // sampler_{std::move(sampler)},
+  // id_generator_{std::move(id_generator)}
   {
+    TelemetryProviderConfiguration config;
     // By default we ensure that all events carry their with TraceId and SpanId
-    GetOption(options, "enableTraceId", config_.enableTraceId, true);
-    GetOption(options, "enableSpanId", config_.enableSpanId, true);
+    GetOption(options, "enableTraceId", config.enableTraceId, true);
+    GetOption(options, "enableSpanId", config.enableSpanId, true);
 
     // Backwards-compatibility option that allows to reuse ETW-specific parenting described here:
     // https://docs.microsoft.com/en-us/uwp/api/windows.foundation.diagnostics.loggingoptions.relatedactivityid
@@ -958,23 +947,26 @@ public:
 
     // Emit separate events compatible with TraceLogging Activity/Start and Activity/Stop
     // format for every Span emitted.
-    GetOption(options, "enableActivityTracking", config_.enableActivityTracking, false);
+    GetOption(options, "enableActivityTracking", config.enableActivityTracking, false);
 
     // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
     // ETW gets the identifier from the thread local storage. For details on getting this
     // identifier, see EventActivityIdControl.
-    GetOption(options, "enableActivityId", config_.enableActivityId, false);
+    GetOption(options, "enableActivityId", config.enableActivityId, false);
 
     // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous
     // component. Use this parameter to link your component's events to the previous component's
     // events.
-    GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
+    GetOption(options, "enableRelatedActivityId", config.enableRelatedActivityId, false);
 
     // When a new Span is started, the current span automatically becomes its parent.
-    GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
+    GetOption(options, "enableAutoParent", config.enableAutoParent, false);
 
     // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
     config_.encoding = GetEncoding(options);
+
+    std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
+    tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
   }
 
   TracerProvider()
@@ -990,6 +982,9 @@ public:
     config_.enableRelatedActivityId = false;
     config_.enableAutoParent        = false;
     config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
+
+    std::unique_ptr<TelemetryProviderConfiguration> config_ptr{std::move(config)};
+    tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(id_generator), std::move(sampler)};
   }
 
   /**
@@ -1012,7 +1007,7 @@ public:
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
-                                                             Tracer(*this, name, evtFmt)};
+                                                             Tracer(tracerContext_, name, evtFmt)};
     return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
   }
 };
