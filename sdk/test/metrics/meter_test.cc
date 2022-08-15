@@ -51,13 +51,13 @@ void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer,
 
 TEST(MeterTest, BasicAsyncTests)
 {
-  MetricReader *metricReaderPtr = nullptr;
-  auto meter                    = InitMeter(&metricReaderPtr);
-  auto observable_counter       = meter->CreateLongObservableCounter("observable_counter");
+  MetricReader *metric_reader_ptr = nullptr;
+  auto meter                      = InitMeter(&metric_reader_ptr);
+  auto observable_counter         = meter->CreateLongObservableCounter("observable_counter");
   observable_counter->AddCallback(asyc_generate_measurements, nullptr);
 
   size_t count = 0;
-  metricReaderPtr->Collect([&count](ResourceMetrics &metric_data) {
+  metric_reader_ptr->Collect([&count](ResourceMetrics &metric_data) {
     EXPECT_EQ(metric_data.scope_metric_data_.size(), 1);
     if (metric_data.scope_metric_data_.size())
     {
