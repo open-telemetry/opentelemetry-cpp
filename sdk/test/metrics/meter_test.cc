@@ -23,9 +23,9 @@ public:
   {
     return AggregationTemporality::kCumulative;
   }
-  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
-  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-  virtual void OnInitialized() noexcept override {}
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+  void OnInitialized() noexcept override {}
 };
 
 namespace
