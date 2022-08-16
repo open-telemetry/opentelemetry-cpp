@@ -31,7 +31,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  opentelemetry::common::SpinLockMutex lock_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
   LastValuePointData point_data_;
 };
 
