@@ -963,11 +963,10 @@ public:
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
         new TelemetryProviderConfiguration(std::move(config)));
     tracerContext_ = std::make_shared<TracerContext>(
-      TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
+        TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
-  TracerProvider()
-      : opentelemetry::trace::TracerProvider()
+  TracerProvider() : opentelemetry::trace::TracerProvider()
   {
     TelemetryProviderConfiguration config;
     config.enableTraceId           = true;
@@ -982,8 +981,8 @@ public:
         new TelemetryProviderConfiguration(std::move(config)));
     std::unique_ptr<sdk::trace::Sampler> sampler(new sdk::trace::AlwaysOnSampler());
     std::unique_ptr<sdk::trace::IdGenerator> id_generator(new sdk::trace::ETWRandomIdGenerator());
-    tracerContext_ = std::make_shared<TracerContext>(TracerContext{
-      std::move(config_ptr), std::move(sampler), std::move(id_generator)});
+    tracerContext_ = std::make_shared<TracerContext>(
+        TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   /**
