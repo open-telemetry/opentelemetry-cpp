@@ -965,7 +965,8 @@ public:
 
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
         new TelemetryProviderConfiguration(std::move(config)));
-    tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
+    tracerContext_ = std::make_shared<TracerContext>(
+        new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   TracerProvider()
