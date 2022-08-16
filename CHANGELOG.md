@@ -17,7 +17,9 @@ Increment the:
 
 ## [1.6.0] 2022-08-15
 
-* [METRICS SDK] Calling Observable Instruments callback during metrics collection [#1554](https://github.com/open-telemetry/opentelemetry-cpp/pull/1554)
+* [METRICS SDK] Calling Observable Instruments callback during metrics
+  collection
+  [#1554](https://github.com/open-telemetry/opentelemetry-cpp/pull/1554)
 * [METRICS CI] Add CI jobs for new and deprecated metrics [#1531](https://github.com/open-telemetry/opentelemetry-cpp/pull/1531)
 * [METRICS BUILD] Fix metrics asan and tsan CI [#1562](https://github.com/open-telemetry/opentelemetry-cpp/pull/1562)
 * [METRICS SDK] remove throw check from metrics  with noexcept [#1560](https://github.com/open-telemetry/opentelemetry-cpp/pull/1560)
@@ -27,7 +29,9 @@ Increment the:
 * [METRICS BUILD] fix IWYU error in instruments.h [#1555](https://github.com/open-telemetry/opentelemetry-cpp/pull/1555)
 * [EXPORTER] Prometheus exporter support Gauge Type [#1553](https://github.com/open-telemetry/opentelemetry-cpp/pull/1553)
 * [METRICS SDK] Fix default Metric view name [#1515](https://github.com/open-telemetry/opentelemetry-cpp/pull/1515)
-* [SDK] Fix infinitely waiting when shutdown with more than one running http sessions. [#1549](https://github.com/open-telemetry/opentelemetry-cpp/pull/1549)
+* [SDK] Fix infinitely waiting when shutdown with more than one running http
+  sessions.
+  [#1549](https://github.com/open-telemetry/opentelemetry-cpp/pull/1549)
 * [METRICS SDK] Fix OTLP gRPC Metrics env variables [#1543](https://github.com/open-telemetry/opentelemetry-cpp/pull/1543)
 * [METRICS SDK] Metric aggregation temporality controls  [#1541](https://github.com/open-telemetry/opentelemetry-cpp/pull/1541)
 * [METRICS SDK] Histogram min/max support [#1540](https://github.com/open-telemetry/opentelemetry-cpp/pull/1540)
