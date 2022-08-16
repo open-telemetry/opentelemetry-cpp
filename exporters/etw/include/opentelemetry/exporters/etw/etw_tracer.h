@@ -27,7 +27,6 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 
 #include "opentelemetry/trace/noop.h"
-//#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
