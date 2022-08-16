@@ -24,13 +24,14 @@ namespace metrics
 class MetricStorage;
 class SyncWritableMetricStorage;
 class AsyncWritableMetricsStorge;
+class ObservableRegistry;
 
 class Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */
   explicit Meter(
-      std::shared_ptr<sdk::metrics::MeterContext> meter_context,
+      std::weak_ptr<sdk::metrics::MeterContext> meter_context,
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
@@ -111,9 +112,10 @@ private:
   // order of declaration is important here - instrumentation scope should destroy after
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
-  std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
+  std::weak_ptr<sdk::metrics::MeterContext> meter_context_;
   // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
+  std::shared_ptr<ObservableRegistry> observable_registry_;
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(

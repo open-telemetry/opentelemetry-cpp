@@ -66,12 +66,12 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type\t\t: SumPointData"
@@ -137,12 +137,12 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type     : HistogramPointData"
@@ -215,12 +215,12 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type     : LastValuePointData"
@@ -278,12 +278,12 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  resources\t:"

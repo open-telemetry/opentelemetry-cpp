@@ -14,6 +14,7 @@
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
 #  include <gtest/gtest.h>
+#  include <memory>
 #  include <vector>
 
 using namespace opentelemetry::sdk::metrics;
@@ -99,8 +100,10 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
   size_t count_attributes = 0;
 
+  std::unique_ptr<AttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),
+      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
   long get_count                                                                  = 20l;
   long put_count                                                                  = 10l;
@@ -129,8 +132,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                     return true;
                   });
   // subsequent recording after collection shouldn't fail
-  EXPECT_NO_THROW(storage.RecordLong(
-      measurements, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now())));
+  storage.RecordLong(measurements,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   EXPECT_EQ(MeasurementFetcher::number_of_attributes, attribute_count);
 }
 

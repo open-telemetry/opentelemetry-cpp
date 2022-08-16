@@ -93,6 +93,7 @@ std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(const Aggregation &n
 
 PointType LongHistogramAggregation::ToPoint() const noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
 }
 
@@ -176,6 +177,7 @@ std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(
 
 PointType DoubleHistogramAggregation::ToPoint() const noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
 }
 

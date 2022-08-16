@@ -15,10 +15,12 @@ namespace metrics
 {
 
 ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descriptor,
-                                           std::unique_ptr<AsyncWritableMetricStorage> storage)
+                                           std::unique_ptr<AsyncWritableMetricStorage> storage,
+                                           std::shared_ptr<ObservableRegistry> observable_registry)
     : instrument_descriptor_(instrument_descriptor),
       storage_(std::move(storage)),
-      observable_registry_{new ObservableRegistry()}
+      observable_registry_{observable_registry}
+
 {}
 
 void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
