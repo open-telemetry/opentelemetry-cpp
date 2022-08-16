@@ -83,8 +83,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> to_span_ptr(SpanType *ptr)
   return nostd::shared_ptr<opentelemetry::trace::Span>{ptr};
 }
 
-class TracerProvider;
-
 /**
  * @brief Utility template for obtaining Span Name
  * @tparam T            etw::Span
@@ -161,11 +159,10 @@ void UpdateStatus(T &t, Properties &props)
 class Tracer : public opentelemetry::trace::Tracer,
                public std::enable_shared_from_this<trace::Tracer>
 {
-
   /**
    * @brief Parent provider of this Tracer
    */
-  std::shared_ptr<etw::TracerContext> tracerContext_;
+  std::shared_ptr<TracerContext> tracerContext_;
 
   /**
    * @brief ProviderId (Name or GUID)
@@ -765,7 +762,7 @@ public:
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
         parent_(parent),
-        context_{owner.traceId_, GetIdGenerator(owner.tracerContext_).GenerateSpanId(),
+        context_{owner.traceId_, GetIdGenerator(owner_.tracerContext_).GenerateSpanId(),
                  opentelemetry::trace::TraceFlags{0}, false}
   {
     name_ = name;
@@ -966,7 +963,7 @@ public:
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
         new TelemetryProviderConfiguration(std::move(config)));
     tracerContext_ = std::make_shared<TracerContext>(
-        new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
+      TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   TracerProvider()
@@ -985,8 +982,8 @@ public:
         new TelemetryProviderConfiguration(std::move(config)));
     std::unique_ptr<sdk::trace::Sampler> sampler(new sdk::trace::AlwaysOnSampler());
     std::unique_ptr<sdk::trace::IdGenerator> id_generator(new sdk::trace::ETWRandomIdGenerator());
-    tracerContext_ = std::make_shared<TracerContext>(
-      new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
+    tracerContext_ = std::make_shared<TracerContext>(TracerContext{
+      std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   /**

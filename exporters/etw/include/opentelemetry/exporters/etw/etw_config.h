@@ -161,7 +161,7 @@ static inline ETWProvider::EventFormat GetEncoding(const TelemetryProviderOption
  * @return      TelemetryProviderConfiguration ref
  */
 template <class T>
-TelemetryProviderConfiguration &GetConfiguration(T &t)
+TelemetryProviderConfiguration &GetConfiguration(T t)
 {
   return *(t->config);
 }
@@ -170,7 +170,7 @@ TelemetryProviderConfiguration &GetConfiguration(T &t)
  * @brief Utility function to obtain etw::TracerProvider.id_generator
  */
 template <class T>
-sdk::trace::IdGenerator &GetIdGenerator(T &t)
+sdk::trace::IdGenerator &GetIdGenerator(T t)
 {
   return *(t->idGenerator);
 }
@@ -179,7 +179,7 @@ sdk::trace::IdGenerator &GetIdGenerator(T &t)
  * @brief Utility function to obtain etw::TracerProvider.sampler
  */
 template <class T>
-sdk::trace::Sampler &GetSampler(T &t)
+sdk::trace::Sampler &GetSampler(T t)
 {
   return *(t->sampler);
 }
