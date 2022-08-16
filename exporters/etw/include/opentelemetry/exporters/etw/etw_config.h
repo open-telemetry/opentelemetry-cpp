@@ -58,7 +58,6 @@ typedef struct
    * @brief IdGenerator supplied during initialization
    */
   std::unique_ptr<sdk::trace::IdGenerator> idGenerator;
-
 } TracerContext;
 
 /**
@@ -164,25 +163,25 @@ static inline ETWProvider::EventFormat GetEncoding(const TelemetryProviderOption
 template <class T>
 TelemetryProviderConfiguration &GetConfiguration(T &t)
 {
-  return *(t->config_);
+  return *(t->config);
 }
 
 /**
- * @brief Utility function to obtain etw::TracerProvider.id_generator_
+ * @brief Utility function to obtain etw::TracerProvider.id_generator
  */
 template <class T>
 sdk::trace::IdGenerator &GetIdGenerator(T &t)
 {
-  return *(t->id_generator_);
+  return *(t->idGenerator);
 }
 
 /**
- * @brief Utility function to obtain etw::TracerProvider.sampler_
+ * @brief Utility function to obtain etw::TracerProvider.sampler
  */
 template <class T>
 sdk::trace::Sampler &GetSampler(T &t)
 {
-  return *(t->sampler_);
+  return *(t->sampler);
 }
 
 /**

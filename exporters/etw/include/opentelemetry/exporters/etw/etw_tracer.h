@@ -933,8 +933,6 @@ public:
                      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
                          new sdk::trace::ETWRandomIdGenerator()))
       : opentelemetry::trace::TracerProvider()
-  // sampler_{std::move(sampler)},
-  // id_generator_{std::move(id_generator)}
   {
     TelemetryProviderConfiguration config;
     // By default we ensure that all events carry their with TraceId and SpanId
@@ -967,14 +965,11 @@ public:
 
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
         new TelemetryProviderConfiguration(std::move(config)));
-    tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});;
+    tracerContext_ = std::make_shared<TracerContext>(new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   TracerProvider()
-      : opentelemetry::trace::TracerProvider(),
-        sampler_{std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler)},
-        id_generator_{std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-            new sdk::trace::ETWRandomIdGenerator())}
+      : opentelemetry::trace::TracerProvider()
   {
     TelemetryProviderConfiguration config;
     config.enableTraceId           = true;
@@ -988,9 +983,9 @@ public:
     std::unique_ptr<TelemetryProviderConfiguration> config_ptr(
         new TelemetryProviderConfiguration(std::move(config)));
     std::unique_ptr<sdk::trace::Sampler> sampler(new sdk::trace::AlwaysOnSampler());
-    std::unique_ptr<sdk::trace::IdGenerator> id_generator(new sdk::trace::ETWRandomIdGenerator())
-        tracerContext_ = std::make_shared<TracerContext>(
-            new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_genetator)});
+    std::unique_ptr<sdk::trace::IdGenerator> id_generator(new sdk::trace::ETWRandomIdGenerator());
+    tracerContext_ = std::make_shared<TracerContext>(
+      new TracerContext{std::move(config_ptr), std::move(sampler), std::move(id_generator)});
   }
 
   /**
@@ -1011,7 +1006,7 @@ public:
   {
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
-    ETWProvider::EventFormat evtFmt = tracerContext_.config.encoding;
+    ETWProvider::EventFormat evtFmt = tracerContext_->config->encoding;
     std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
                                                              Tracer(tracerContext_, name, evtFmt)};
     return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
