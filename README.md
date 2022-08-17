@@ -16,7 +16,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | Metrics | Release Candidate [1,2] | N/A                                                                      |
 | Logs    | Experimental [3]        | N/A                                                                      |
 
-* [1]: The metric implementation is in pre-release (RC) phase. There would be
+* [1]: The metric implementation is in release candidate phase. There would be
       few iterations of new feature additions, and bug fixes before it is
       publically available. Few breaking changes in API and SDK are expected.
 * [2]: The earlier implementation (based on old
