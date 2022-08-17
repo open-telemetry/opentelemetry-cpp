@@ -8,7 +8,9 @@
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/sdk_config.h"
 
@@ -24,9 +26,11 @@ namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
 Meter::Meter(
-    std::shared_ptr<MeterContext> meter_context,
+    std::weak_ptr<MeterContext> meter_context,
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
-    : scope_{std::move(instrumentation_scope)}, meter_context_{meter_context}
+    : scope_{std::move(instrumentation_scope)},
+      meter_context_{meter_context},
+      observable_registry_(new ObservableRegistry())
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
@@ -66,7 +70,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -80,7 +84,7 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -122,7 +126,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateLon
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDoubleObservableGauge(
@@ -136,7 +140,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -178,7 +182,7 @@ Meter::CreateLongObservableUpDownCounter(nostd::string_view name,
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -192,7 +196,7 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
   return nostd::shared_ptr<metrics::ObservableInstrument>{
-      new ObservableInstrument(instrument_descriptor, std::move(storage))};
+      new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
 const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentationScope()
@@ -204,7 +208,14 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
 std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::RegisterMetricStorage] - Error during finding matching views."
+                            << "The metric context is invalid");
+    return nullptr;
+  }
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
   auto success = view_registry->FindViews(
@@ -240,7 +251,15 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-  auto view_registry = meter_context_->GetViewRegistry();
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterAsyncMetricStorage] - Error during finding matching views."
+        << "The metric context is invalid");
+    return nullptr;
+  }
+  auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),
@@ -275,12 +294,19 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
 
+  observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
+  auto ctx = meter_context_.lock();
+  if (!ctx)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Meter::Collect] - Error during collection."
+                            << "The metric context is invalid");
+    return std::vector<MetricData>{};
+  }
   for (auto &metric_storage : storage_registry_)
   {
-    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
-                                   meter_context_->GetSDKStartTime(), collect_ts,
-                                   [&metric_data_list](MetricData metric_data) {
+    metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
+                                   collect_ts, [&metric_data_list](MetricData metric_data) {
                                      metric_data_list.push_back(metric_data);
                                      return true;
                                    });

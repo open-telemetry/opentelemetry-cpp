@@ -16,10 +16,9 @@ namespace sdk
 namespace metrics
 {
 
-MetricCollector::MetricCollector(
-    std::shared_ptr<opentelemetry::sdk::metrics::MeterContext> &&context,
-    std::unique_ptr<MetricReader> metric_reader)
-    : meter_context_{std::move(context)}, metric_reader_{std::move(metric_reader)}
+MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
+                                 std::unique_ptr<MetricReader> metric_reader)
+    : meter_context_{context}, metric_reader_{std::move(metric_reader)}
 {
   metric_reader_->SetMetricProducer(this);
 }
@@ -33,6 +32,12 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
 bool MetricCollector::Collect(
     nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
+  if (!meter_context_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
+                            << "The metric context is invalid");
+    return false;
+  }
   ResourceMetrics resource_metrics;
   for (auto &meter : meter_context_->GetMeters())
   {

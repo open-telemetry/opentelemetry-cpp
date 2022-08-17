@@ -56,6 +56,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) c
 
 PointType LongSumAggregation::ToPoint() const noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return point_data_;
 }
 

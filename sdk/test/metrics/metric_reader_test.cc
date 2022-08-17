@@ -33,12 +33,12 @@ TEST(MetricReaderTest, BasicTests)
             AggregationTemporality::kCumulative);
 
   std::shared_ptr<MeterContext> meter_context1(new MeterContext());
-  EXPECT_NO_THROW(meter_context1->AddMetricReader(std::move(metric_reader1)));
+  meter_context1->AddMetricReader(std::move(metric_reader1));
 
   std::unique_ptr<MetricReader> metric_reader2(new MockMetricReader());
   std::shared_ptr<MeterContext> meter_context2(new MeterContext());
   std::shared_ptr<MetricProducer> metric_producer{
-      new MetricCollector(std::move(meter_context2), std::move(metric_reader2))};
-  EXPECT_NO_THROW(metric_producer->Collect([](ResourceMetrics &metric_data) { return true; }));
+      new MetricCollector(meter_context2.get(), std::move(metric_reader2))};
+  metric_producer->Collect([](ResourceMetrics &metric_data) { return true; });
 }
 #endif
