@@ -40,10 +40,11 @@ class PeriodicExportingMetricReader : public MetricReader
 {
 
 public:
-  PeriodicExportingMetricReader(
-      std::unique_ptr<MetricExporter> exporter,
-      const PeriodicExportingMetricReaderOptions &option,
-      AggregationTemporality aggregation_temporality = AggregationTemporality::kCumulative);
+  PeriodicExportingMetricReader(std::unique_ptr<MetricExporter> exporter,
+                                const PeriodicExportingMetricReaderOptions &option);
+
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override;
 
 private:
   bool OnForceFlush(std::chrono::microseconds timeout) noexcept override;

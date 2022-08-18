@@ -26,21 +26,20 @@ namespace otlp
 
 namespace
 {
-struct InstrumentationLibraryPointerHasher
+struct InstrumentationScopePointerHasher
 {
-  std::size_t operator()(const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+  std::size_t operator()(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                              *instrumentation) const noexcept
   {
     return instrumentation->HashCode();
   }
 };
 
-struct InstrumentationLibraryPointerEqual
+struct InstrumentationScopePointerEqual
 {
   std::size_t operator()(
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *left,
-      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *right)
-      const noexcept
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *left,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *right) const noexcept
   {
     return *left == *right;
   }
@@ -83,9 +82,9 @@ void OtlpRecordableUtils::PopulateRequest(
   }
 
   using logs_index_by_instrumentation_type =
-      std::unordered_map<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *,
+      std::unordered_map<const opentelemetry::sdk::instrumentationscope::InstrumentationScope *,
                          std::list<std::unique_ptr<OtlpLogRecordable>>,
-                         InstrumentationLibraryPointerHasher, InstrumentationLibraryPointerEqual>;
+                         InstrumentationScopePointerHasher, InstrumentationScopePointerEqual>;
   std::unordered_map<const opentelemetry::sdk::resource::Resource *,
                      logs_index_by_instrumentation_type>
       logs_index_by_resource;
@@ -94,7 +93,7 @@ void OtlpRecordableUtils::PopulateRequest(
   {
     auto rec =
         std::unique_ptr<OtlpLogRecordable>(static_cast<OtlpLogRecordable *>(recordable.release()));
-    auto instrumentation = &rec->GetInstrumentationLibrary();
+    auto instrumentation = &rec->GetInstrumentationScope();
     auto resource        = &rec->GetResource();
 
     logs_index_by_resource[resource][instrumentation].emplace_back(std::move(rec));

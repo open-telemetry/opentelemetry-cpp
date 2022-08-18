@@ -59,11 +59,11 @@ TEST(OtlpRecordable, SetSpanKind)
   EXPECT_EQ(rec.span().kind(), proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
 }
 
-TEST(OtlpRecordable, SetInstrumentationLibrary)
+TEST(OtlpRecordable, SetInstrumentationScope)
 {
   OtlpRecordable rec;
-  auto inst_lib = trace_sdk::InstrumentationLibrary::Create("test", "v1");
-  rec.SetInstrumentationLibrary(*inst_lib);
+  auto inst_lib = trace_sdk::InstrumentationScope::Create("test", "v1");
+  rec.SetInstrumentationScope(*inst_lib);
   auto proto_instr_libr = rec.GetProtoInstrumentationScope();
   EXPECT_EQ(proto_instr_libr.name(), inst_lib->GetName());
   EXPECT_EQ(proto_instr_libr.version(), inst_lib->GetVersion());
@@ -73,8 +73,8 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
 {
   OtlpRecordable rec;
   const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto inst_lib = trace_sdk::InstrumentationLibrary::Create("test", "v1", expected_schema_url);
-  rec.SetInstrumentationLibrary(*inst_lib);
+  auto inst_lib = trace_sdk::InstrumentationScope::Create("test", "v1", expected_schema_url);
+  rec.SetInstrumentationScope(*inst_lib);
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
 }
 

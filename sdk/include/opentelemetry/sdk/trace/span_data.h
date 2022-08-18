@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -99,7 +100,7 @@ private:
 class SpanData final : public Recordable
 {
 public:
-  SpanData() : resource_{nullptr}, instrumentation_library_{nullptr} {}
+  SpanData() : resource_{nullptr}, instrumentation_scope_{nullptr} {}
   /**
    * Get the trace id for this span
    * @return the trace id for this span
@@ -170,19 +171,24 @@ public:
    * @returns the attributes associated with the resource configured for TracerProvider
    */
 
-  const opentelemetry::sdk::trace::InstrumentationLibrary &GetInstrumentationLibrary()
-      const noexcept
+  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationScope() const noexcept
   {
-    if (instrumentation_library_ == nullptr)
+    if (instrumentation_scope_ == nullptr)
     {
-      // this shouldn't happen as Tracer ensures there is valid default instrumentation library.
-      static std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-          instrumentation_library =
-              opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+      // this shouldn't happen as Tracer ensures there is valid default instrumentation scope.
+      static std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope>
+          instrumentation_scope =
+              opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
                   "unknown_service");
-      return *instrumentation_library;
+      return *instrumentation_scope;
     }
-    return *instrumentation_library_;
+    return *instrumentation_scope_;
+  }
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
+  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationLibrary() const noexcept
+  {
+    return GetInstrumentationScope();
   }
 
   /**
@@ -278,10 +284,9 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
-  void SetInstrumentationLibrary(
-      const InstrumentationLibrary &instrumentation_library) noexcept override
+  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
   {
-    instrumentation_library_ = &instrumentation_library;
+    instrumentation_scope_ = &instrumentation_scope;
   }
 
 private:
@@ -297,7 +302,7 @@ private:
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   const opentelemetry::sdk::resource::Resource *resource_;
-  const InstrumentationLibrary *instrumentation_library_;
+  const InstrumentationScope *instrumentation_scope_;
 };
 }  // namespace trace
 }  // namespace sdk

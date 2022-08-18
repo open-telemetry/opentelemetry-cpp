@@ -7,6 +7,7 @@
 #  include <vector>
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/resource/resource_detector.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #  include <iostream>
 #  include "opentelemetry/exporters/ostream/metric_exporter.h"
@@ -41,9 +42,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -53,8 +53,8 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -66,12 +66,12 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type\t\t: SumPointData"
@@ -82,7 +82,13 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
       "\n  value\t\t: 20"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -96,6 +102,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   histogram_point_data.count_      = 3;
   histogram_point_data.counts_     = {200, 300, 400, 500};
   histogram_point_data.sum_        = 900.5;
+  histogram_point_data.min_        = 1.8;
+  histogram_point_data.max_        = 12.0;
   metric_sdk::HistogramPointData histogram_point_data2{};
   histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
   histogram_point_data2.count_      = 3;
@@ -105,9 +113,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.2.0");
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -117,8 +124,8 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{{"a1", "b1"}, {"a2", "b2"}}, histogram_point_data},
           {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -130,17 +137,19 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type     : HistogramPointData"
       "\n  count     : 3"
       "\n  sum     : 900.5"
+      "\n  min     : 1.8"
+      "\n  max     : 12"
       "\n  buckets     : [10.1, 20.2, 30.2, ]"
       "\n  counts     : [200, 300, 400, 500, ]"
       "\n  attributes\t\t: "
@@ -149,11 +158,19 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       "\n  type     : HistogramPointData"
       "\n  count     : 3"
       "\n  sum     : 900"
+      "\n  min     : 0"
+      "\n  max     : 0"
       "\n  buckets     : [10, 20, 30, ]"
       "\n  counts     : [200, 300, 400, 500, ]"
       "\n  attributes\t\t: "
       "\n\ta1: b1"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -166,9 +183,8 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.2.0");
   metric_sdk::LastValuePointData last_value_point_data{};
   last_value_point_data.value_              = 10.0;
   last_value_point_data.is_lastvalue_valid_ = true;
@@ -186,8 +202,8 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, last_value_point_data},
           {metric_sdk::PointAttributes{}, last_value_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -199,12 +215,12 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
       "\n  type     : LastValuePointData"
@@ -217,7 +233,13 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
       "\n  valid     : true"
       "\n  value     : 20"
       "\n  attributes\t\t: "
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
 
@@ -230,9 +252,8 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
-  auto instrumentation_library =
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("library_name",
-                                                                                 "1.2.0");
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.2.0");
   metric_sdk::DropPointData drop_point_data{};
   metric_sdk::DropPointData drop_point_data2{};
   metric_sdk::MetricData metric_data{
@@ -244,8 +265,8 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
       std::vector<metric_sdk::PointDataAttributes>{
           {metric_sdk::PointAttributes{}, drop_point_data},
           {metric_sdk::PointAttributes{}, drop_point_data2}}};
-  data.instrumentation_info_metric_data_ = std::vector<metric_sdk::InstrumentationInfoMetrics>{
-      {instrumentation_library.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+  data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
+      {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
 
   std::stringstream stdoutOutput;
   std::streambuf *sbuf = std::cout.rdbuf();
@@ -257,15 +278,21 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
 
   std::string expected_output =
       "{"
-      "\n  name\t\t: library_name"
+      "\n  scope name\t: library_name"
       "\n  schema url\t: "
       "\n  version\t: 1.2.0"
       "\n  start time\t: Thu Jan  1 00:00:00 1970"
       "\n  end time\t: Thu Jan  1 00:00:00 1970"
-      "\n  name\t\t: library_name"
+      "\n  instrument name\t: library_name"
       "\n  description\t: description"
       "\n  unit\t\t: unit"
-      "\n}\n";
+      "\n  resources\t:"
+      "\n\tservice.name: unknown_service"
+      "\n\ttelemetry.sdk.language: cpp"
+      "\n\ttelemetry.sdk.name: opentelemetry"
+      "\n\ttelemetry.sdk.version: ";
+  expected_output += OPENTELEMETRY_SDK_VERSION;
+  expected_output += "\n}\n";
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }

@@ -22,9 +22,9 @@ TEST(LoggerSDK, LogToNullProcessor)
   auto logger = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetName(), "opentelelemtry_library");
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetVersion(), "");
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
   // Log a sample log record to a nullptr processor
   logger->Debug("Test log");
 }
@@ -81,9 +81,9 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(logger, logger2);
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetName(), "opentelelemtry_library");
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetVersion(), "");
-  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
   // Set a processor for the LoggerProvider
   auto shared_recordable = std::shared_ptr<LogRecord>(new LogRecord());
   lp->AddProcessor(std::unique_ptr<LogProcessor>(new MockProcessor(shared_recordable)));

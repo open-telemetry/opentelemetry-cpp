@@ -41,7 +41,7 @@ public:
   static void ConvertGaugeMetric(const opentelemetry::sdk::metrics::MetricData &metric_data,
                                  proto::metrics::v1::Gauge *const gauge) noexcept;
 
-  static void PopulateInstrumentationInfoMetric(
+  static void PopulateInstrumentInfoMetrics(
       const opentelemetry::sdk::metrics::MetricData &metric_data,
       proto::metrics::v1::Metric *metric) noexcept;
 
@@ -52,6 +52,13 @@ public:
   static void PopulateRequest(
       const opentelemetry::sdk::metrics::ResourceMetrics &data,
       proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
+
+  static sdk::metrics::AggregationTemporalitySelector ChooseTemporalitySelector(
+      sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept;
+  static sdk::metrics::AggregationTemporality DeltaTemporalitySelector(
+      sdk::metrics::InstrumentType instrument_type) noexcept;
+  static sdk::metrics::AggregationTemporality CumulativeTemporalitySelector(
+      sdk::metrics::InstrumentType instrument_type) noexcept;
 };
 
 }  // namespace otlp

@@ -16,10 +16,10 @@ namespace sdk
 namespace metrics
 {
 template <class T>
-class ObserverResult final : public opentelemetry::metrics::ObserverResult<T>
+class ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
 {
 public:
-  ObserverResult(const AttributesProcessor *attributes_processor)
+  explicit ObserverResultT(const AttributesProcessor *attributes_processor = nullptr)
       : attributes_processor_(attributes_processor)
   {}
 
@@ -27,8 +27,15 @@ public:
 
   void Observe(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    auto attr = attributes_processor_->process(attributes);
-    data_.insert({attr, value});
+    if (attributes_processor_)
+    {
+      auto attr = attributes_processor_->process(attributes);
+      data_.insert({attr, value});
+    }
+    else
+    {
+      data_.insert({MetricAttributes{attributes}, value});
+    }
   }
 
   const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &GetMeasurements()
@@ -38,7 +45,6 @@ public:
 
 private:
   std::unordered_map<MetricAttributes, T, AttributeHashGenerator> data_;
-
   const AttributesProcessor *attributes_processor_;
 };
 }  // namespace metrics

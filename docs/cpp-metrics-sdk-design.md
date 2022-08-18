@@ -59,7 +59,7 @@ implementation of the `MeterProvider` into the API.
 **`GetMeter(name, version)` method must be supported**
 
 * Expects 2 string arguments:
-  * name (required): identifies the instrumentation library.
+  * name (required): identifies the instrumentation scope.
   * version (optional): specifies the version of the instrumenting library (the
     library injecting OpenTelemetry calls into the code).
 
@@ -142,7 +142,7 @@ public:
   *
   * Arguments:
   * MeterProvider, the MeterProvider object that spawned this Meter.
-  * InstrumentationInfo, the name of the instrumentation library and, optionally,
+  * InstrumentationInfo, the name of the instrumentation scope and, optionally,
   *                      the version.
   *
   */

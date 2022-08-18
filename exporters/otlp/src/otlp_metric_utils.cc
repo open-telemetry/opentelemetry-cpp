@@ -106,6 +106,25 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     }
     // count
     proto_histogram_point_data->set_count(histogram_data.count_);
+    if (histogram_data.record_min_max_)
+    {
+      if (nostd::holds_alternative<long>(histogram_data.min_))
+      {
+        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.min_));
+      }
+      else
+      {
+        proto_histogram_point_data->set_min(nostd::get<double>(histogram_data.min_));
+      }
+      if (nostd::holds_alternative<long>(histogram_data.max_))
+      {
+        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.max_));
+      }
+      else
+      {
+        proto_histogram_point_data->set_max(nostd::get<double>(histogram_data.max_));
+      }
+    }
     // buckets
     if ((nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_)))
     {
@@ -167,7 +186,7 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
   }
 }
 
-void OtlpMetricUtils::PopulateInstrumentationInfoMetric(
+void OtlpMetricUtils::PopulateInstrumentInfoMetrics(
     const opentelemetry::sdk::metrics::MetricData &metric_data,
     proto::metrics::v1::Metric *metric) noexcept
 {
@@ -201,22 +220,20 @@ void OtlpMetricUtils::PopulateResourceMetrics(
   OtlpPopulateAttributeUtils::PopulateAttribute(resource_metrics->mutable_resource(),
                                                 *(data.resource_));
 
-  for (auto &instrumentation_metrics : data.instrumentation_info_metric_data_)
+  for (auto &scope_metrics : data.scope_metric_data_)
   {
-    if (instrumentation_metrics.instrumentation_library_ == nullptr)
+    if (scope_metrics.scope_ == nullptr)
     {
       continue;
     }
-    auto instrumentation_lib_metrics = resource_metrics->add_instrumentation_library_metrics();
-    proto::common::v1::InstrumentationLibrary *instrumentation_library =
-        instrumentation_lib_metrics->mutable_instrumentation_library();
-    instrumentation_library->set_name(instrumentation_metrics.instrumentation_library_->GetName());
-    instrumentation_library->set_version(
-        instrumentation_metrics.instrumentation_library_->GetVersion());
+    auto scope_lib_metrics                         = resource_metrics->add_scope_metrics();
+    proto::common::v1::InstrumentationScope *scope = scope_lib_metrics->mutable_scope();
+    scope->set_name(scope_metrics.scope_->GetName());
+    scope->set_version(scope_metrics.scope_->GetVersion());
 
-    for (auto &metric_data : instrumentation_metrics.metric_data_)
+    for (auto &metric_data : scope_metrics.metric_data_)
     {
-      PopulateInstrumentationInfoMetric(metric_data, instrumentation_lib_metrics->add_metrics());
+      PopulateInstrumentInfoMetrics(metric_data, scope_lib_metrics->add_metrics());
     }
   }
 }
@@ -233,6 +250,40 @@ void OtlpMetricUtils::PopulateRequest(
   auto resource_metrics = request->add_resource_metrics();
   PopulateResourceMetrics(data, resource_metrics);
 }
+
+sdk::metrics::AggregationTemporalitySelector OtlpMetricUtils::ChooseTemporalitySelector(
+    sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept
+{
+  if (preferred_aggregation_temporality == sdk::metrics::AggregationTemporality::kDelta)
+  {
+    return DeltaTemporalitySelector;
+  }
+  return CumulativeTemporalitySelector;
+}
+
+sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
+    sdk::metrics::InstrumentType instrument_type) noexcept
+{
+  switch (instrument_type)
+  {
+    case sdk::metrics::InstrumentType::kCounter:
+    case sdk::metrics::InstrumentType::kObservableCounter:
+    case sdk::metrics::InstrumentType::kHistogram:
+    case sdk::metrics::InstrumentType::kObservableGauge:
+      return sdk::metrics::AggregationTemporality::kDelta;
+    case sdk::metrics::InstrumentType::kUpDownCounter:
+    case sdk::metrics::InstrumentType::kObservableUpDownCounter:
+      return sdk::metrics::AggregationTemporality::kCumulative;
+  }
+  return sdk::metrics::AggregationTemporality::kUnspecified;
+}
+
+sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelector(
+    sdk::metrics::InstrumentType instrument_type) noexcept
+{
+  return sdk::metrics::AggregationTemporality::kCumulative;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

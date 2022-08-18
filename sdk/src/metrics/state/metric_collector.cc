@@ -16,30 +16,36 @@ namespace sdk
 namespace metrics
 {
 
-MetricCollector::MetricCollector(
-    std::shared_ptr<opentelemetry::sdk::metrics::MeterContext> &&context,
-    std::unique_ptr<MetricReader> metric_reader)
-    : meter_context_{std::move(context)}, metric_reader_{std::move(metric_reader)}
+MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
+                                 std::unique_ptr<MetricReader> metric_reader)
+    : meter_context_{context}, metric_reader_{std::move(metric_reader)}
 {
   metric_reader_->SetMetricProducer(this);
 }
 
-AggregationTemporality MetricCollector::GetAggregationTemporality() noexcept
+AggregationTemporality MetricCollector::GetAggregationTemporality(
+    InstrumentType instrument_type) noexcept
 {
-  return metric_reader_->GetAggregationTemporality();
+  return metric_reader_->GetAggregationTemporality(instrument_type);
 }
 
 bool MetricCollector::Collect(
     nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
 {
+  if (!meter_context_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[MetricCollector::Collect] - Error during collecting."
+                            << "The metric context is invalid");
+    return false;
+  }
   ResourceMetrics resource_metrics;
   for (auto &meter : meter_context_->GetMeters())
   {
     auto collection_ts = std::chrono::system_clock::now();
-    InstrumentationInfoMetrics instrumentation_info_metrics;
-    instrumentation_info_metrics.metric_data_             = meter->Collect(this, collection_ts);
-    instrumentation_info_metrics.instrumentation_library_ = meter->GetInstrumentationLibrary();
-    resource_metrics.instrumentation_info_metric_data_.push_back(instrumentation_info_metrics);
+    ScopeMetrics scope_metrics;
+    scope_metrics.metric_data_ = meter->Collect(this, collection_ts);
+    scope_metrics.scope_       = meter->GetInstrumentationScope();
+    resource_metrics.scope_metric_data_.push_back(scope_metrics);
   }
   resource_metrics.resource_ = &meter_context_->GetResource();
   callback(resource_metrics);

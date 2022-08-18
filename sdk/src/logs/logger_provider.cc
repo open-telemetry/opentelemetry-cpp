@@ -47,7 +47,7 @@ LoggerProvider::~LoggerProvider()
 {
   // Logger hold the shared pointer to the context. So we can not use destructor of LoggerContext to
   // Shutdown and flush all pending recordables when we hasve more than one loggers.These
-  // recordables may use the raw pointer of instrumentation_library_ in Logger
+  // recordables may use the raw pointer of instrumentation_scope_ in Logger
   if (context_)
   {
     context_->Shutdown();
@@ -67,7 +67,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   // If a logger with a name "logger_name" already exists, return it
   for (auto &logger : loggers_)
   {
-    auto &logger_lib = logger->GetInstrumentationLibrary();
+    auto &logger_lib = logger->GetInstrumentationScope();
     if (logger->GetName() == logger_name &&
         logger_lib.equal(library_name, library_version, schema_url))
     {
@@ -89,16 +89,16 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   */
 
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
-  opentelemetry::nostd::unique_ptr<instrumentationlibrary::InstrumentationLibrary> lib;
+  opentelemetry::nostd::unique_ptr<instrumentationscope::InstrumentationScope> lib;
   if (library_name.empty())
   {
-    lib = instrumentationlibrary::InstrumentationLibrary::Create(logger_name, library_version,
-                                                                 schema_url);
+    lib = instrumentationscope::InstrumentationScope::Create(logger_name, library_version,
+                                                             schema_url);
   }
   else
   {
-    lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
-                                                                 schema_url);
+    lib = instrumentationscope::InstrumentationScope::Create(library_name, library_version,
+                                                             schema_url);
   }
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(

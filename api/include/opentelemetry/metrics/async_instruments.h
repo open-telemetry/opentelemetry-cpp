@@ -9,20 +9,22 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
-class AsynchronousInstrument
-{};
 
-template <class T>
-class ObservableCounter : public AsynchronousInstrument
-{};
+using ObservableCallbackPtr = void (*)(ObserverResult, void *);
 
-template <class T>
-class ObservableGauge : public AsynchronousInstrument
-{};
+class ObservableInstrument
+{
+public:
+  /**
+   * Sets up a function that will be called whenever a metric collection is initiated.
+   */
+  virtual void AddCallback(ObservableCallbackPtr, void *state) noexcept = 0;
 
-template <class T>
-class ObservableUpDownCounter : public AsynchronousInstrument
-{};
+  /**
+   * Remove a function that was configured to be called whenever a metric collection is initiated.
+   */
+  virtual void RemoveCallback(ObservableCallbackPtr, void *state) noexcept = 0;
+};
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

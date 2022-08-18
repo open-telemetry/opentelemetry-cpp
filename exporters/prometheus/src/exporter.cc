@@ -33,6 +33,13 @@ PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
   collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector(3));
 }
 
+sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+  // Prometheus exporter only support Cumulative
+  return sdk::metrics::AggregationTemporality::kCumulative;
+}
+
 /**
  * Exports a batch of Metric Records.
  * @param records: a collection of records to export
@@ -45,12 +52,12 @@ sdk::common::ExportResult PrometheusExporter::Export(
   {
     return sdk::common::ExportResult::kFailure;
   }
-  else if (collector_->GetCollection().size() + data.instrumentation_info_metric_data_.size() >
+  else if (collector_->GetCollection().size() + data.scope_metric_data_.size() >
            (size_t)collector_->GetMaxCollectionSize())
   {
     return sdk::common::ExportResult::kFailureFull;
   }
-  else if (data.instrumentation_info_metric_data_.empty())
+  else if (data.scope_metric_data_.empty())
   {
     return sdk::common::ExportResult::kFailureInvalidArgument;
   }

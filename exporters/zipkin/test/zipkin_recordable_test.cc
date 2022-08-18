@@ -103,9 +103,9 @@ TEST(ZipkinSpanRecordable, SetDuration)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
+TEST(ZipkinSpanRecordable, SetInstrumentationScope)
 {
-  using InstrumentationLibrary = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary;
+  using InstrumentationScope = opentelemetry::sdk::instrumentationscope::InstrumentationScope;
 
   const char *library_name    = "otel-cpp";
   const char *library_version = "0.5.0";
@@ -113,7 +113,7 @@ TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
       {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
   zipkin::Recordable rec;
 
-  rec.SetInstrumentationLibrary(*InstrumentationLibrary::Create(library_name, library_version));
+  rec.SetInstrumentationScope(*InstrumentationScope::Create(library_name, library_version));
 
   EXPECT_EQ(rec.span(), j_span);
 }

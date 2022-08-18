@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "opentelemetry/exporters/jaeger/recordable.h"
-#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -18,7 +18,7 @@ namespace common   = opentelemetry::common;
 
 using namespace jaegertracing;
 using namespace opentelemetry::exporter::jaeger;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using std::vector;
 
 using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
@@ -247,15 +247,15 @@ TEST(JaegerSpanRecordable, SetAttributes)
   EXPECT_EQ(tags, expected_tags);
 }
 
-TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
+TEST(JaegerSpanRecordable, SetInstrumentationScope)
 {
   JaegerRecordable rec;
 
-  std::string library_name     = "opentelemetry-cpp";
-  std::string library_version  = "0.1.0";
-  auto instrumentation_library = InstrumentationLibrary::Create(library_name, library_version);
+  std::string library_name    = "opentelemetry-cpp";
+  std::string library_version = "0.1.0";
+  auto instrumentation_scope  = InstrumentationScope::Create(library_name, library_version);
 
-  rec.SetInstrumentationLibrary(*instrumentation_library);
+  rec.SetInstrumentationScope(*instrumentation_scope);
 
   auto tags = rec.Tags();
   EXPECT_EQ(tags.size(), 2);

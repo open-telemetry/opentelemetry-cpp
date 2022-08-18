@@ -42,13 +42,13 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
 
   for (auto &meter : context_->GetMeters())
   {
-    auto meter_lib = meter->GetInstrumentationLibrary();
+    auto meter_lib = meter->GetInstrumentationScope();
     if (meter_lib->equal(name, version, schema_url))
     {
       return nostd::shared_ptr<metrics_api::Meter>{meter};
     }
   }
-  auto lib   = instrumentationlibrary::InstrumentationLibrary::Create(name, version, schema_url);
+  auto lib   = instrumentationscope::InstrumentationScope::Create(name, version, schema_url);
   auto meter = std::shared_ptr<Meter>(new Meter(context_, std::move(lib)));
   context_->AddMeter(meter);
   return nostd::shared_ptr<metrics_api::Meter>{meter};

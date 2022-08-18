@@ -28,6 +28,8 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter()
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptions &options)
     : options_(options),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
                                                             options.content_type,
                                                             options.json_bytes_mapping,
@@ -44,7 +46,10 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> http_client)
-    : options_(OtlpHttpMetricExporterOptions()), http_client_(std::move(http_client))
+    : options_(OtlpHttpMetricExporterOptions()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
+      http_client_(std::move(http_client))
 {
   OtlpHttpMetricExporterOptions &options = const_cast<OtlpHttpMetricExporterOptions &>(options_);
   options.url                            = http_client_->GetOptions().url;
@@ -61,24 +66,31 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
 }
 // ----------------------------- Exporter methods ------------------------------
 
+sdk::metrics::AggregationTemporality OtlpHttpMetricExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+
+  return aggregation_temporality_selector_(instrument_type);
+}
+
 opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
   if (http_client_->IsShutdown())
   {
-    std::size_t metric_count = data.instrumentation_info_metric_data_.size();
+    std::size_t metric_count = data.scope_metric_data_.size();
     OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
                             << metric_count << " metric(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  if (data.instrumentation_info_metric_data_.empty())
+  if (data.scope_metric_data_.empty())
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
   proto::collector::metrics::v1::ExportMetricsServiceRequest service_request;
   OtlpMetricUtils::PopulateRequest(data, &service_request);
-  std::size_t metric_count = data.instrumentation_info_metric_data_.size();
+  std::size_t metric_count = data.scope_metric_data_.size();
 #  ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(service_request, [metric_count](
                                             opentelemetry::sdk::common::ExportResult result) {

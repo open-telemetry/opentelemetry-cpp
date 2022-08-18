@@ -23,6 +23,12 @@ public:
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override
+  {
+    return AggregationTemporality::kCumulative;
+  }
+
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
@@ -39,6 +45,11 @@ class MockMetricReader : public MetricReader
 {
 public:
   MockMetricReader(std::unique_ptr<MetricExporter> exporter) : exporter_(std::move(exporter)) {}
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept override
+  {
+    return exporter_->GetAggregationTemporality(instrument_type);
+  }
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
   virtual void OnInitialized() noexcept override {}
@@ -79,13 +90,13 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NE(nullptr, sdkMeter1);
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::unique_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
-  ASSERT_NO_THROW(mp1.AddMetricReader(std::move(reader)));
+  mp1.AddMetricReader(std::move(reader));
 
   std::unique_ptr<View> view{std::unique_ptr<View>()};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "instru1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
-  ASSERT_NO_THROW(
-      mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view)));
+
+  mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 #endif

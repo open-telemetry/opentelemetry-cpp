@@ -210,22 +210,22 @@ void OtlpLogRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags trace_fla
   log_record_.set_flags(trace_flags.flags());
 }
 
-void OtlpLogRecordable::SetInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+void OtlpLogRecordable::SetInstrumentationScope(
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+        &instrumentation_scope) noexcept
 {
-  instrumentation_library_ = &instrumentation_library;
+  instrumentation_scope_ = &instrumentation_scope;
 }
 
-const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
-OtlpLogRecordable::GetInstrumentationLibrary() const noexcept
+const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
+OtlpLogRecordable::GetInstrumentationScope() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_library_) { return *instrumentation_library_; }
+  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_scope_) { return *instrumentation_scope_; }
 
   static opentelemetry::nostd::unique_ptr<
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope>
       default_instrumentation =
-          opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
               "default", "1.0.0", "https://opentelemetry.io/schemas/1.11.0");
   return *default_instrumentation;
 }

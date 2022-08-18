@@ -18,8 +18,8 @@ namespace trace
 {
 
 Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
-               std::unique_ptr<InstrumentationLibrary> instrumentation_library) noexcept
-    : instrumentation_library_{std::move(instrumentation_library)}, context_{context}
+               std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
+    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{context}
 {}
 
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(

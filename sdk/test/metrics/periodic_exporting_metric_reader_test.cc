@@ -10,7 +10,7 @@
 #  include <gtest/gtest.h>
 
 using namespace opentelemetry;
-using namespace opentelemetry::sdk::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
 class MockPushMetricExporter : public MetricExporter
@@ -26,6 +26,12 @@ public:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
     return false;
+  }
+
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override
+  {
+    return sdk::metrics::AggregationTemporality::kCumulative;
   }
 
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override

@@ -63,7 +63,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return;
   }
   recordable_->SetName(name);
-  recordable_->SetInstrumentationLibrary(tracer_->GetInstrumentationLibrary());
+  recordable_->SetInstrumentationScope(tracer_->GetInstrumentationScope());
   recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
                                                ? parent_span_context.span_id()
                                                : trace_api::SpanId());
