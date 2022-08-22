@@ -91,29 +91,29 @@
 #endif
 
 /**
-  @def OPENTELEMETRY_DECLARE_EXPORT
+  @def OPENTELEMETRY_DECLARE_API_SINGLETON
   Declare a weak symbol with visibility default.
 */
 #if defined(__clang__)
-#  define OPENTELEMETRY_DECLARE_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DECLARE_API_SINGLETON __attribute__((visibility("default"), weak))
 #elif defined(__GNUC__)
-#  define OPENTELEMETRY_DECLARE_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DECLARE_API_SINGLETON __attribute__((visibility("default"), weak))
 #elif defined(_MSC_VER)
-#  define OPENTELEMETRY_DECLARE_EXPORT
+#  define OPENTELEMETRY_DECLARE_API_SINGLETON
 #else
-#  define OPENTELEMETRY_DECLARE_EXPORT
+#  define OPENTELEMETRY_DECLARE_API_SINGLETON
 #endif
 
 /**
-  @def OPENTELEMETRY_DEFINE_EXPORT
-  Declare a weak symbol with visibility default.
+  @def OPENTELEMETRY_DEFINE_API_SINGLETON
+  Define a weak symbol with visibility default.
 */
 #if defined(__clang__)
-#  define OPENTELEMETRY_DEFINE_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DEFINE_API_SINGLETON __attribute__((visibility("default"), weak))
 #elif defined(__GNUC__)
-#  define OPENTELEMETRY_DEFINE_EXPORT __attribute__((visibility("default"), weak))
+#  define OPENTELEMETRY_DEFINE_API_SINGLETON __attribute__((visibility("default"), weak))
 #elif defined(_MSC_VER)
-#  define OPENTELEMETRY_DEFINE_EXPORT __declspec(selectany)
+#  define OPENTELEMETRY_DEFINE_API_SINGLETON __declspec(selectany)
 #else
-#  define OPENTELEMETRY_DEFINE_EXPORT
+#  define OPENTELEMETRY_DEFINE_API_SINGLETON
 #endif

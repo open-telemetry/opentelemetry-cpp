@@ -43,15 +43,15 @@ public:
   }
 
 private:
-  OPENTELEMETRY_DECLARE_EXPORT static nostd::shared_ptr<MeterProvider> provider;
+  OPENTELEMETRY_DECLARE_API_SINGLETON static nostd::shared_ptr<MeterProvider> provider;
 
-  OPENTELEMETRY_DECLARE_EXPORT static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_API_SINGLETON static common::SpinLockMutex lock;
 };
 
-OPENTELEMETRY_DEFINE_EXPORT nostd::shared_ptr<MeterProvider> Provider::provider(
+OPENTELEMETRY_DEFINE_API_SINGLETON nostd::shared_ptr<MeterProvider> Provider::provider(
     new NoopMeterProvider);
 
-OPENTELEMETRY_DEFINE_EXPORT common::SpinLockMutex Provider::lock;
+OPENTELEMETRY_DEFINE_API_SINGLETON common::SpinLockMutex Provider::lock;
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
