@@ -7,6 +7,7 @@
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#  include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -51,6 +52,12 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
     auto storage =
         static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
             ->GetMetricStorage();
+    if (!storage)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[ObservableRegistry::Observe] - Error during observe."
+                              << "The metric storage is invalid");
+      return;
+    }
     if (value_type == InstrumentValueType::kDouble)
     {
       nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(

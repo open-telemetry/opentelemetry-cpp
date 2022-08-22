@@ -1,6 +1,7 @@
 foreach(
   testname
   meter_provider_sdk_test
+  meter_test
   view_registry_test
   aggregation_test
   attributes_processor_test

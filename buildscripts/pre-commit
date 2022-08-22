@@ -58,19 +58,20 @@ namespace sdk
 {
 namespace version
 {
-    const int MAJOR_VERSION = ${major};
-    const int MINOR_VERSION = ${minor};
-    const int PATCH_VERSION = ${patch};
-    const char* PRE_RELEASE = "${pre_release}";
-    const char* BUILD_METADATA = "${build_metadata}";
-    const int COUNT_NEW_COMMITS = ${count_new_commits};
-    const char* BRANCH = "${branch}";
-    const char* COMMIT_HASH = "${latest_commit_hash}";
-    const char* SHORT_VERSION = "${short_version}";
-    const char* FULL_VERSION = "${full_version}";
-    const char* BUILD_DATE = "$(date -u)";
-}
-}
+const int MAJOR_VERSION = ${major};
+const int MINOR_VERSION = ${minor};
+const int PATCH_VERSION = ${patch};
+const char* PRE_RELEASE = "${pre_release}";
+const char* BUILD_METADATA = "${build_metadata}";
+const int COUNT_NEW_COMMITS = ${count_new_commits};
+const char* BRANCH = "${branch}";
+const char* COMMIT_HASH = "${latest_commit_hash}";
+const char* SHORT_VERSION = "${short_version}";
+const char* FULL_VERSION =
+    "${full_version}";
+const char* BUILD_DATE = "$(date -u)";
+}  // namespace version
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 END
 git add "$(pwd)/sdk/src/version/version.cc"
