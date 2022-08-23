@@ -90,15 +90,27 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter()
 {}
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options)
-    : options_(options), metrics_service_stub_(MakeMetricsServiceStub(options))
+    : options_(options),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
+      metrics_service_stub_(MakeMetricsServiceStub(options))
 {}
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub)
-    : options_(OtlpGrpcMetricExporterOptions()), metrics_service_stub_(std::move(stub))
+    : options_(OtlpGrpcMetricExporterOptions()),
+      aggregation_temporality_selector_{
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
+      metrics_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
+
+sdk::metrics::AggregationTemporality OtlpGrpcMetricExporter::GetAggregationTemporality(
+    sdk::metrics::InstrumentType instrument_type) const noexcept
+{
+  return aggregation_temporality_selector_(instrument_type);
+}
 
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
@@ -141,6 +153,25 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     return sdk::common::ExportResult::kFailure;
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
+}
+
+bool OtlpGrpcMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  // TODO: OTLP gRPC exporter does not support concurrency exporting now.
+  return true;
+}
+
+bool OtlpGrpcMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  is_shutdown_ = true;
+  return true;
+}
+
+bool OtlpGrpcMetricExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace otlp

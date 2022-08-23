@@ -18,7 +18,8 @@ class MeterContext;
 class CollectorHandle
 {
 public:
-  virtual AggregationTemporality GetAggregationTemporality() noexcept = 0;
+  virtual AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) noexcept = 0;
 };
 
 /**
@@ -30,10 +31,10 @@ public:
 class MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
-  MetricCollector(std::shared_ptr<MeterContext> &&context,
-                  std::unique_ptr<MetricReader> metric_reader);
+  MetricCollector(MeterContext *context, std::unique_ptr<MetricReader> metric_reader);
 
-  AggregationTemporality GetAggregationTemporality() noexcept override;
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) noexcept override;
 
   /**
    * The callback to be called for each metric exporter. This will only be those
@@ -48,7 +49,7 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
 private:
-  std::shared_ptr<MeterContext> meter_context_;
+  MeterContext *meter_context_;
   std::shared_ptr<MetricReader> metric_reader_;
 };
 }  // namespace metrics

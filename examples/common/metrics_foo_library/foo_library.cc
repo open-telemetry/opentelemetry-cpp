@@ -5,10 +5,12 @@
 #  include "foo_library.h"
 #  include <chrono>
 #  include <map>
+#  include <memory>
 #  include <thread>
 #  include <vector>
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
@@ -30,12 +32,18 @@ std::map<std::string, std::string> get_random_attr()
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult<double> &observer_result, void *state)
+  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void *state)
   {
-    double val                                = (rand() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
-    observer_result.Observe(val /*, labelkv*/);
+    if (nostd::holds_alternative<
+            nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer_result))
+    {
+      double val = (rand() % 700) + 1.1;
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
+          observer_result)
+          ->Observe(val /*, labelkv */);
+    }
   }
 };
 }  // namespace
@@ -60,7 +68,8 @@ void foo_library::observable_counter_example(const std::string &name)
   std::string counter_name                    = name + "_observable_counter";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  meter->CreateDoubleObservableCounter(counter_name, MeasurementFetcher::Fetcher);
+  auto counter                                = meter->CreateDoubleObservableCounter(counter_name);
+  counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   while (true)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -72,8 +81,8 @@ void foo_library::histogram_example(const std::string &name)
   std::string histogram_name                  = name + "_histogram";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto histogram_counter                      = meter->CreateDoubleHistogram(histogram_name);
-  auto context                                = opentelemetry::context::Context{};
+  auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "unit");
+  auto context           = opentelemetry::context::Context{};
   while (true)
   {
     double val                                = (rand() % 700) + 1.1;

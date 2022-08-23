@@ -17,10 +17,8 @@ namespace metrics
 
 PeriodicExportingMetricReader::PeriodicExportingMetricReader(
     std::unique_ptr<MetricExporter> exporter,
-    const PeriodicExportingMetricReaderOptions &option,
-    AggregationTemporality aggregation_temporality)
-    : MetricReader(aggregation_temporality),
-      exporter_{std::move(exporter)},
+    const PeriodicExportingMetricReaderOptions &option)
+    : exporter_{std::move(exporter)},
       export_interval_millis_{option.export_interval_millis},
       export_timeout_millis_{option.export_timeout_millis}
 {
@@ -34,6 +32,11 @@ PeriodicExportingMetricReader::PeriodicExportingMetricReader(
   }
 }
 
+AggregationTemporality PeriodicExportingMetricReader::GetAggregationTemporality(
+    InstrumentType instrument_type) const noexcept
+{
+  return exporter_->GetAggregationTemporality(instrument_type);
+}
 void PeriodicExportingMetricReader::OnInitialized() noexcept
 {
   worker_thread_ = std::thread(&PeriodicExportingMetricReader::DoBackgroundWork, this);

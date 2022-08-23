@@ -5,6 +5,7 @@
 
 #  include <sstream>  // std::stringstream
 
+#  include <condition_variable>
 #  include <mutex>
 #  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
@@ -225,11 +226,11 @@ private:
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
-      http_client_{new ext::http::client::curl::HttpClient()}
+      http_client_{ext::http::client::HttpClientFactory::Create()}
 {}
 
 ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
-    : options_{options}, http_client_{new ext::http::client::curl::HttpClient()}
+    : options_{options}, http_client_{ext::http::client::HttpClientFactory::Create()}
 {}
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() noexcept

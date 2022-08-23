@@ -186,7 +186,7 @@ private:
       event_handle.swap(input_handle);
     }
 
-    inline explicit HttpSessionData(HttpSessionData &&other)
+    inline HttpSessionData(HttpSessionData &&other)
     {
       session.swap(other.session);
       event_handle.swap(other.event_handle);

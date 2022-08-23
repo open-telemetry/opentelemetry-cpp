@@ -9,6 +9,7 @@
 #  include "opentelemetry/exporters/otlp/otlp_http_client.h"
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
+#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
 #  include <chrono>
 #  include <cstddef>
@@ -30,7 +31,7 @@ struct OtlpHttpMetricExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpMetricEndpoint();
+  std::string url = GetOtlpDefaultMetricsEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -47,10 +48,14 @@ struct OtlpHttpMetricExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultMetricTimeout();
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultMetricsTimeout();
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultMetricHeaders();
+  OtlpHeaders http_headers = GetOtlpDefaultMetricsHeaders();
+
+  // Preferred Aggregation Temporality
+  sdk::metrics::AggregationTemporality aggregation_temporality =
+      sdk::metrics::AggregationTemporality::kCumulative;
 
 #  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
@@ -79,6 +84,14 @@ public:
    */
   OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptions &options);
 
+  /**
+   * Get the AggregationTemporality for exporter
+   *
+   * @return AggregationTemporality
+   */
+  sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      sdk::metrics::InstrumentType instrument_type) const noexcept override;
+
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept override;
 
@@ -94,6 +107,9 @@ public:
 private:
   // Configuration options for the exporter
   const OtlpHttpMetricExporterOptions options_;
+
+  // Aggregation Temporality Selector
+  const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;

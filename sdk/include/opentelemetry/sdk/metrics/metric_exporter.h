@@ -36,6 +36,14 @@ public:
   virtual opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &data) noexcept = 0;
 
   /**
+   * Get the AggregationTemporality for given Instrument Type for this exporter.
+   *
+   * @return AggregationTemporality
+   */
+  virtual AggregationTemporality GetAggregationTemporality(
+      InstrumentType instrument_type) const noexcept = 0;
+
+  /**
    * Force flush the exporter.
    */
   virtual bool ForceFlush(

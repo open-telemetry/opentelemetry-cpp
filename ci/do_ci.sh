@@ -60,10 +60,7 @@ mkdir -p "${BUILD_DIR}"
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST"
-# Previous legacy metrics use virtual drive, which can not be used without RTTI
-if [[ "$1" != "bazel.nortti" ]]; then
-  BAZEL_OPTIONS="$BAZEL_OPTIONS --copt=-DENABLE_METRICS_PREVIEW"
-fi
+
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS --copt=-DENABLE_ASYNC_EXPORT"
@@ -100,8 +97,24 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_LOGS_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
+elif [[ "$1" == "cmake.deprecated_metrics.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=OFF \
+        -DWITH_JAEGER=OFF \
+        -DWITH_ELASTICSEARCH=OFF \
+        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_LOGS_PREVIEW=OFF \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -112,7 +125,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -136,7 +149,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -242,6 +255,10 @@ elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
   exit 0
+elif [[ "$1" == "bazel.deprecated_metrics.test" ]]; then
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --copt=-DENABLE_METRICS_PREVIEW //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS --copt=-DENABLE_METRICS_PREVIEW //...
+  exit 0
 elif [[ "$1" == "bazel.with_async_export.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC //...
@@ -262,8 +279,8 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
   # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients

@@ -87,10 +87,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "f269fbcb30e17b03caa1decd231ce826e59d7651c0f71c3b28eb5140b4bb5412",
-        strip_prefix = "opentelemetry-proto-0.17.0",
+        sha256 = "464bc2b348e674a1a03142e403cbccb01be8655b6de0f8bfe733ea31fcd421be",
+        strip_prefix = "opentelemetry-proto-0.19.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.17.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.19.0.tar.gz",
         ],
     )
 

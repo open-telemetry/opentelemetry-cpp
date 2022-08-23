@@ -13,19 +13,12 @@ namespace sdk
 namespace metrics
 {
 
-MetricReader::MetricReader(AggregationTemporality aggregation_temporality)
-    : metric_producer_(nullptr), aggregation_temporality_(aggregation_temporality), shutdown_(false)
-{}
+MetricReader::MetricReader() : metric_producer_(nullptr), shutdown_(false) {}
 
 void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
 {
   metric_producer_ = metric_producer;
   OnInitialized();
-}
-
-AggregationTemporality MetricReader::GetAggregationTemporality() const noexcept
-{
-  return aggregation_temporality_;
 }
 
 bool MetricReader::Collect(
