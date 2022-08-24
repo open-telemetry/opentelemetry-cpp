@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1661220247115,
+  "lastUpdate": 1661303402866,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -66454,6 +66454,54 @@ window.BENCHMARK_DATA = {
             "value": 2128446.133762835,
             "unit": "ns/iter",
             "extra": "iterations: 377\ncpu: 343609.0185676392 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "labhas@microsoft.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "453534726b1342c54c871c331d7f5c7f50c3c2db",
+          "message": "ETW Exporter - Add support for Sampler and ID Generator (#1547)",
+          "timestamp": "2022-08-24T00:53:16Z",
+          "tree_id": "0700c88e33f0c73d1ddd013cca13ab805652fe36",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/453534726b1342c54c871c331d7f5c7f50c3c2db"
+        },
+        "date": 1661303399820,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 155.6227978010823,
+            "unit": "ns/iter",
+            "extra": "iterations: 931000\ncpu: 155.30397422126745 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 229.9635641036495,
+            "unit": "ns/iter",
+            "extra": "iterations: 620000\ncpu: 229.9243548387097 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1046.8792915344238,
+            "unit": "ns/iter",
+            "extra": "iterations: 100000\ncpu: 1045.2020000000002 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2648785.11428833,
+            "unit": "ns/iter",
+            "extra": "iterations: 300\ncpu: 489311.0000000001 ns\nthreads: 1"
           }
         ]
       }
