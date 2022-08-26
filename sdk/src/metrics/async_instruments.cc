@@ -32,7 +32,7 @@ void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbac
 void ObservableInstrument::RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                                           void *state) noexcept
 {
-  observable_registry_->AddCallback(callback, state, this);
+  observable_registry_->RemoveCallback(callback, state, this);
 }
 
 const InstrumentDescriptor &ObservableInstrument::GetInstrumentDescriptor()
