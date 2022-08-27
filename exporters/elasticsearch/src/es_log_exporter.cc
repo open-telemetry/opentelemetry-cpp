@@ -31,12 +31,29 @@ public:
    */
   ResponseHandler(bool console_debug = false) : console_debug_{console_debug} {}
 
+  std::string BuildResponseLogMessage(http_client::Response &response,
+                                      const std::string &body) noexcept
+  {
+    std::stringstream ss;
+    ss << "Status:" << response.GetStatusCode() << "Header:";
+    response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
+                                 opentelemetry::nostd::string_view header_value) {
+      ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
+      return true;
+    });
+    ss << "Body:" << body;
+
+    return ss.str();
+  }
+
   /**
    * Automatically called when the response is received, store the body into a string and notify any
    * threads blocked on this result
    */
   void OnResponse(http_client::Response &response) noexcept override
   {
+    std::string log_message;
+
     // Lock the private members so they can't be read while being modified
     {
       std::unique_lock<std::mutex> lk(mutex_);
@@ -44,10 +61,22 @@ public:
       // Store the body of the request
       body_ = std::string(response.GetBody().begin(), response.GetBody().end());
 
+      if (response.GetStatusCode() != 200 && response.GetStatusCode() != 202)
+      {
+        log_message = BuildResponseLogMessage(response, body_);
+
+        OTEL_INTERNAL_LOG_ERROR("ES Log Exporter] Export failed, " << log_message);
+      }
+
       if (console_debug_)
       {
-        OTEL_INTERNAL_LOG_DEBUG(
-            "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+        if (log_message.empty())
+        {
+          log_message = BuildResponseLogMessage(response, body_);
+        }
+
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Got response from Elasticsearch, "
+                                << log_message);
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result

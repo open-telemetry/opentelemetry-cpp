@@ -79,12 +79,29 @@ public:
     stopping_.store(false);
   }
 
+  std::string BuildResponseLogMessage(http_client::Response &response,
+                                      const std::string &body) noexcept
+  {
+    std::stringstream ss;
+    ss << "Status:" << response.GetStatusCode() << "Header:";
+    response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
+                                 opentelemetry::nostd::string_view header_value) {
+      ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
+      return true;
+    });
+    ss << "Body:" << body;
+
+    return ss.str();
+  }
+
   /**
    * Automatically called when the response is received, store the body into a string and notify any
    * threads blocked on this result
    */
   void OnResponse(http_client::Response &response) noexcept override
   {
+    sdk::common::ExportResult result = sdk::common::ExportResult::kSuccess;
+    std::string log_message;
     // Lock the private members so they can't be read while being modified
     {
       std::unique_lock<std::mutex> lk(mutex_);
@@ -92,17 +109,21 @@ public:
       // Store the body of the request
       body_ = std::string(response.GetBody().begin(), response.GetBody().end());
 
+      if (response.GetStatusCode() != 200 && response.GetStatusCode() != 202)
+      {
+        log_message = BuildResponseLogMessage(response, body_);
+
+        OTEL_INTERNAL_LOG_ERROR("OTLP HTTP Client] Export failed, " << log_message);
+        result = sdk::common::ExportResult::kFailure;
+      }
+
       if (console_debug_)
       {
-        std::stringstream ss;
-        ss << "[OTLP HTTP Client] Status:" << response.GetStatusCode() << "Header:";
-        response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
-                                     opentelemetry::nostd::string_view header_value) {
-          ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
-          return true;
-        });
-        ss << "Body:" << body_;
-        OTEL_INTERNAL_LOG_DEBUG(ss.str());
+        if (log_message.empty())
+        {
+          log_message = BuildResponseLogMessage(response, body_);
+        }
+        OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
       }
     }
 
@@ -110,7 +131,7 @@ public:
       bool expected = false;
       if (stopping_.compare_exchange_strong(expected, true, std::memory_order_release))
       {
-        Unbind(sdk::common::ExportResult::kSuccess);
+        Unbind(result);
       }
     }
   }
