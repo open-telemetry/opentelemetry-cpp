@@ -97,7 +97,6 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
-  size_t count_attributes = 0;
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum, new DefaultAttributesProcessor(),

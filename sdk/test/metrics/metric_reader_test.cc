@@ -27,7 +27,6 @@ public:
 
 TEST(MetricReaderTest, BasicTests)
 {
-  AggregationTemporality aggr_temporality = AggregationTemporality::kDelta;
   std::unique_ptr<MetricReader> metric_reader1(new MockMetricReader());
   EXPECT_EQ(metric_reader1->GetAggregationTemporality(InstrumentType::kCounter),
             AggregationTemporality::kCumulative);
