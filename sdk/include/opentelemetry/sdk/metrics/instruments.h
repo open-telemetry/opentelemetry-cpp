@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <functional>
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -61,7 +62,7 @@ struct InstrumentDescriptor
 
 using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
 using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
-static InstrumentClass GetInstrumentClass(InstrumentType type)
+OPENTELEMETRY_MAYBE_UNUSED static InstrumentClass GetInstrumentClass(InstrumentType type)
 {
   if (type == InstrumentType::kCounter || type == InstrumentType::kHistogram ||
       type == InstrumentType::kUpDownCounter)
