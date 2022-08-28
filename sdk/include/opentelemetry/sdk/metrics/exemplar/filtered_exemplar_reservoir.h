@@ -3,10 +3,12 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include <memory>
 #  include <vector>
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,16 +16,24 @@ namespace sdk
 {
 namespace metrics
 {
-class NoExemplarReservoir final : public ExemplarReservoir
+class FilteredExemplarReservoir final : public ExemplarReservoir
 {
 
 public:
+  FilteredExemplarReservoir(std::shared_ptr<ExemplarFilter> filter,
+                            std::shared_ptr<ExemplarReservoir> reservoir)
+      : filter_(filter), reservoir_(reservoir)
+  {}
+
   void OfferMeasurement(long value,
                         const MetricAttributes &attributes,
                         const opentelemetry::context::Context &context,
                         const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
   {
-    // Stores nothing
+    if (filter_->ShouldSampleMeasurement(value, attributes, context))
+    {
+      reservoir_->OfferMeasurement(value, attributes, context, timestamp);
+    }
   }
 
   void OfferMeasurement(double value,
@@ -31,16 +41,22 @@ public:
                         const opentelemetry::context::Context &context,
                         const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
   {
-    // Stores nothing.
+    if (filter_->ShouldSampleMeasurement(value, attributes, context))
+    {
+      reservoir_->OfferMeasurement(value, attributes, context, timestamp);
+    }
   }
 
   std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes &pointAttributes) noexcept override
   {
-    return std::vector<std::shared_ptr<ExemplarData>>{};
+    return reservoir_->CollectAndReset(pointAttributes);
   }
 
-  explicit NoExemplarReservoir() = default;
+private:
+  explicit FilteredExemplarReservoir() = default;
+  std::shared_ptr<ExemplarFilter> filter_;
+  std::shared_ptr<ExemplarReservoir> reservoir_;
 };
 
 }  // namespace metrics
