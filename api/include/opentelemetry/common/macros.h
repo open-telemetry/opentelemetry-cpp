@@ -89,3 +89,13 @@
 #else
 #  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg)
 #endif
+
+#if defined(__clang__)
+#  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+#elif defined(__GNUC__)
+#  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+#elif defined(_MSC_VER)
+#  define OPENTELEMETRY_API_SINGLETON
+#else
+#  define OPENTELEMETRY_API_SINGLETON
+#endif

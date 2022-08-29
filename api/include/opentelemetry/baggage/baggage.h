@@ -6,6 +6,7 @@
 #include <cctype>
 
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
@@ -34,7 +35,7 @@ public:
       : kv_properties_(new opentelemetry::common::KeyValueProperties(keys_and_values))
   {}
 
-  static nostd::shared_ptr<Baggage> GetDefault()
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<Baggage> GetDefault()
   {
     static nostd::shared_ptr<Baggage> baggage{new Baggage()};
     return baggage;
