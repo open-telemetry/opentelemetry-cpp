@@ -105,6 +105,30 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
     expected_total_put_requests = 0;
   }
 
+  // collect one more time.
+  collection_ts    = std::chrono::system_clock::now();
+  count_attributes = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
+        for (auto data_attr : data.point_data_attr_)
+        {
+          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            count_attributes++;
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            count_attributes++;
+          }
+        }
+        return true;
+      });
+
   storage.RecordLong(50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 50;
@@ -213,6 +237,30 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
     expected_total_get_requests = 0;
     expected_total_put_requests = 0;
   }
+
+  // collect one more time.
+  collection_ts    = std::chrono::system_clock::now();
+  count_attributes = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
+        for (auto data_attr : data.point_data_attr_)
+        {
+          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            count_attributes++;
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            count_attributes++;
+          }
+        }
+        return true;
+      });
 
   storage.RecordDouble(50.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
