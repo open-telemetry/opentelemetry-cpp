@@ -10,9 +10,14 @@ add_library(component_d SHARED component_d.cc)
 
 add_executable(singleton_test singleton_test.cc)
 
-target_link_libraries(singleton_test
-   component_a component_b component_c component_d
-   ${GTEST_BOTH_LIBRARIES} opentelemetry_api)
+target_link_libraries(
+  singleton_test
+  component_a
+  component_b
+  component_c
+  component_d
+  ${GTEST_BOTH_LIBRARIES}
+  opentelemetry_api)
 
 gtest_add_tests(
   TARGET singleton_test

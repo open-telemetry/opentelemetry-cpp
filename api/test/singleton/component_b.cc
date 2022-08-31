@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/version.h"
 
 #include "component_b.h"
 
