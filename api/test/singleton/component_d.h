@@ -4,5 +4,4 @@
 // component_d is compiled with visibility("hidden"),
 // so make the entry point visible
 
-__attribute__((visibility("default")))
-void do_something_in_d();
+__attribute__((visibility("default"))) void do_something_in_d();

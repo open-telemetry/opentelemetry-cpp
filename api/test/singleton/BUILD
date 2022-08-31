@@ -65,11 +65,11 @@ cc_test(
         "test",
     ],
     deps = [
-        "//api",
         "component_a",
         "component_b",
         "component_c",
         "component_d",
+        "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )

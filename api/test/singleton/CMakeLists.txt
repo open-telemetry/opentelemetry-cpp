@@ -31,4 +31,3 @@ gtest_add_tests(
   TARGET singleton_test
   TEST_PREFIX singleton.
   TEST_LIST singleton_test)
-
