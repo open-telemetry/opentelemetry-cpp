@@ -71,8 +71,42 @@ cc_library(
         "component_d.h",
     ],
     copts = select({
+        "//bazel:windows": HIDDEN_WIN_COPTS,
+        "//conditions:default": HIDDEN_NOWIN_COPTS,
+    }),
+    deps = [
+        "//api",
+    ],
+)
+
+cc_library(
+    name = "component_e",
+    srcs = [
+        "component_e.cc",
+    ],
+    hdrs = [
+        "component_e.h",
+    ],
+    copts = select({
         "//bazel:windows": DEFAULT_WIN_COPTS,
         "//conditions:default": DEFAULT_NOWIN_COPTS,
+    }),
+    deps = [
+        "//api",
+    ],
+)
+
+cc_library(
+    name = "component_f",
+    srcs = [
+        "component_f.cc",
+    ],
+    hdrs = [
+        "component_f.h",
+    ],
+    copts = select({
+        "//bazel:windows": HIDDEN_WIN_COPTS,
+        "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
     deps = [
         "//api",
@@ -93,6 +127,8 @@ cc_test(
         "component_b",
         "component_c",
         "component_d",
+        "component_e",
+        "component_f",
         "//api",
         "@com_google_googletest//:gtest_main",
     ],

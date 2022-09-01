@@ -10,6 +10,8 @@
 #include "component_b.h"
 #include "component_c.h"
 #include "component_d.h"
+#include "component_e.h"
+#include "component_f.h"
 
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/provider.h"
@@ -26,6 +28,8 @@ void do_something()
   do_something_in_b();
   do_something_in_c();
   do_something_in_d();
+  do_something_in_e();
+  do_something_in_f();
 }
 
 int span_a_lib_count   = 0;
@@ -40,6 +44,12 @@ int span_c_f2_count    = 0;
 int span_d_lib_count   = 0;
 int span_d_f1_count    = 0;
 int span_d_f2_count    = 0;
+int span_e_lib_count   = 0;
+int span_e_f1_count    = 0;
+int span_e_f2_count    = 0;
+int span_f_lib_count   = 0;
+int span_f_f1_count    = 0;
+int span_f_f2_count    = 0;
 int unknown_span_count = 0;
 
 void reset_counts()
@@ -56,6 +66,12 @@ void reset_counts()
   span_d_lib_count   = 0;
   span_d_f1_count    = 0;
   span_d_f2_count    = 0;
+  span_e_lib_count   = 0;
+  span_e_f1_count    = 0;
+  span_e_f2_count    = 0;
+  span_f_lib_count   = 0;
+  span_f_f1_count    = 0;
+  span_f_f2_count    = 0;
   unknown_span_count = 0;
 }
 
@@ -120,6 +136,30 @@ public:
     else if (name == "D::f2")
     {
       span_d_f2_count++;
+    }
+    else if (name == "E::library")
+    {
+      span_e_lib_count++;
+    }
+    else if (name == "E::f1")
+    {
+      span_e_f1_count++;
+    }
+    else if (name == "E::f2")
+    {
+      span_e_f2_count++;
+    }
+    else if (name == "F::library")
+    {
+      span_f_lib_count++;
+    }
+    else if (name == "F::f1")
+    {
+      span_f_f1_count++;
+    }
+    else if (name == "F::f2")
+    {
+      span_f_f2_count++;
     }
     else
     {
@@ -189,6 +229,12 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_d_lib_count, 0);
   EXPECT_EQ(span_d_f1_count, 0);
   EXPECT_EQ(span_d_f2_count, 0);
+  EXPECT_EQ(span_e_lib_count, 0);
+  EXPECT_EQ(span_e_f1_count, 0);
+  EXPECT_EQ(span_e_f2_count, 0);
+  EXPECT_EQ(span_f_lib_count, 0);
+  EXPECT_EQ(span_f_f1_count, 0);
+  EXPECT_EQ(span_f_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -208,6 +254,12 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_d_lib_count, 1);
   EXPECT_EQ(span_d_f1_count, 2);
   EXPECT_EQ(span_d_f2_count, 1);
+  EXPECT_EQ(span_e_lib_count, 1);
+  EXPECT_EQ(span_e_f1_count, 2);
+  EXPECT_EQ(span_e_f2_count, 1);
+  EXPECT_EQ(span_f_lib_count, 1);
+  EXPECT_EQ(span_f_f1_count, 2);
+  EXPECT_EQ(span_f_f2_count, 1);
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -227,5 +279,11 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_d_lib_count, 0);
   EXPECT_EQ(span_d_f1_count, 0);
   EXPECT_EQ(span_d_f2_count, 0);
+  EXPECT_EQ(span_e_lib_count, 0);
+  EXPECT_EQ(span_e_f1_count, 0);
+  EXPECT_EQ(span_e_f2_count, 0);
+  EXPECT_EQ(span_f_lib_count, 0);
+  EXPECT_EQ(span_f_f1_count, 0);
+  EXPECT_EQ(span_f_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 }
