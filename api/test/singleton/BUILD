@@ -30,6 +30,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -43,6 +44,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = True,
 )
 
 cc_library(
@@ -60,6 +62,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = False,
 )
 
 cc_library(
@@ -77,6 +80,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = False,
 )
 
 cc_library(
@@ -94,6 +98,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = False,
 )
 
 cc_library(
@@ -111,6 +116,7 @@ cc_library(
     deps = [
         "//api",
     ],
+    linkstatic = False,
 )
 
 cc_test(
@@ -132,4 +138,5 @@ cc_test(
         "//api",
         "@com_google_googletest//:gtest_main",
     ],
+    linkstatic = False,
 )
