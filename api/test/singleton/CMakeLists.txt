@@ -4,10 +4,8 @@
 include(GoogleTest)
 
 add_library(component_a STATIC component_a.cc)
-set_target_properties(component_a PROPERTIES CXX_VISIBILITY_PRESET default)
 
 add_library(component_b STATIC component_b.cc)
-set_target_properties(component_b PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 add_library(component_c SHARED component_c.cc)
 set_target_properties(component_c PROPERTIES CXX_VISIBILITY_PRESET default)
