@@ -5,6 +5,8 @@
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/version.h"
 
+#define BUILD_COMPONENT_D
+
 #include "component_d.h"
 
 namespace trace = opentelemetry::trace;

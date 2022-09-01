@@ -3,6 +3,14 @@
 
 # FIXME: visibility("hidden") / visibility("default") compiling options.
 
+DEFAULT_COPTS = [
+    "-fvisibility=default",
+]
+
+HIDDEN_COPTS = [
+    "-fvisibility=hidden",
+]
+
 cc_library(
     name = "component_a",
     srcs = [
@@ -37,6 +45,7 @@ cc_library(
     hdrs = [
         "component_c.h",
     ],
+    copts = DEFAULT_COPTS,
     deps = [
         "//api",
     ],
@@ -50,6 +59,7 @@ cc_library(
     hdrs = [
         "component_d.h",
     ],
+    copts = HIDDEN_COPTS,
     deps = [
         "//api",
     ],
