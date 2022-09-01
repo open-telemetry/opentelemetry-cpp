@@ -3,11 +3,19 @@
 
 # FIXME: visibility("hidden") / visibility("default") compiling options.
 
-DEFAULT_COPTS = [
+DEFAULT_WIN_COPTS = [
+]
+
+# gcc and clang, assumed to be used on this platform
+DEFAULT_NOWIN_COPTS = [
     "-fvisibility=default",
 ]
 
-HIDDEN_COPTS = [
+HIDDEN_WIN_COPTS = [
+]
+
+# gcc and clang, assumed to be used on this platform
+HIDDEN_NOWIN_COPTS = [
     "-fvisibility=hidden",
 ]
 
@@ -45,7 +53,10 @@ cc_library(
     hdrs = [
         "component_c.h",
     ],
-    copts = DEFAULT_COPTS,
+    copts = select({
+        "//bazel:windows": DEFAULT_WIN_COPTS,
+        "//conditions:default": DEFAULT_NOWIN_COPTS,
+    }),
     deps = [
         "//api",
     ],
@@ -59,7 +70,10 @@ cc_library(
     hdrs = [
         "component_d.h",
     ],
-    copts = HIDDEN_COPTS,
+    copts = select({
+        "//bazel:windows": DEFAULT_WIN_COPTS,
+        "//conditions:default": DEFAULT_NOWIN_COPTS,
+    }),
     deps = [
         "//api",
     ],
