@@ -108,12 +108,14 @@ TEST(LoggerProviderSDK, GetResource)
 TEST(LoggerProviderSDK, Shutdown)
 {
   std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
+  SimpleLogProcessor *processor_ptr = processor.get();
   std::vector<std::unique_ptr<LogProcessor>> processors;
   processors.push_back(std::move(processor));
 
   LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
 
   EXPECT_TRUE(lp.Shutdown());
+  EXPECT_TRUE(processor_ptr->IsShutdown());
 
   // It's safe to shutdown again
   EXPECT_TRUE(lp.Shutdown());

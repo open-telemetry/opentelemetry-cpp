@@ -17,7 +17,7 @@ namespace logs
  * @param exporter the configured exporter where log records are sent
  */
 SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter)
-    : exporter_(std::move(exporter))
+    : exporter_(std::move(exporter)), is_shutdown_(false)
 {}
 
 std::unique_ptr<Recordable> SimpleLogProcessor::MakeRecordable() noexcept
@@ -51,13 +51,19 @@ bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   // Should only shutdown exporter ONCE.
-  if (!shutdown_latch_.test_and_set(std::memory_order_acquire) && exporter_ != nullptr)
+  if (!is_shutdown_.exchange(true, std::memory_order_acq_rel) && exporter_ != nullptr)
   {
     return exporter_->Shutdown(timeout);
   }
 
   return true;
 }
+
+bool SimpleLogProcessor::IsShutdown() const noexcept
+{
+  return is_shutdown_.load(std::memory_order_acquire);
+}
+
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
