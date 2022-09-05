@@ -20,6 +20,20 @@ namespace context
 namespace propagation
 {
 
+class PropagatorSingleton
+{
+public:
+  PropagatorSingleton() : lock(), propagator(new NoOpPropagator()) {}
+
+  common::SpinLockMutex lock;
+  nostd::shared_ptr<TextMapPropagator> propagator;
+
+  PropagatorSingleton(const PropagatorSingleton &) = delete;
+  PropagatorSingleton &operator=(const PropagatorSingleton &) = delete;
+  PropagatorSingleton(PropagatorSingleton &&)                 = delete;
+  PropagatorSingleton &operator=(PropagatorSingleton &&) = delete;
+};
+
 /**
  * Stores the singleton TextMapPropagator.
  */
@@ -28,27 +42,22 @@ class GlobalTextMapPropagator
 public:
   static nostd::shared_ptr<TextMapPropagator> GetGlobalPropagator() noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(lock);
-    nostd::shared_ptr<TextMapPropagator> result(propagator);
+    std::lock_guard<common::SpinLockMutex> guard(s.lock);
+    nostd::shared_ptr<TextMapPropagator> result(s.propagator);
     return result;
   }
 
   static void SetGlobalPropagator(nostd::shared_ptr<TextMapPropagator> prop) noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(lock);
-    propagator = prop;
+    std::lock_guard<common::SpinLockMutex> guard(s.lock);
+    s.propagator = prop;
   }
 
 private:
-  OPENTELEMETRY_DECLARE_API_SINGLETON static nostd::shared_ptr<TextMapPropagator> propagator;
-
-  OPENTELEMETRY_DECLARE_API_SINGLETON static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_API_SINGLETON static PropagatorSingleton s;
 };
 
-OPENTELEMETRY_DEFINE_API_SINGLETON nostd::shared_ptr<TextMapPropagator>
-    GlobalTextMapPropagator::propagator(new NoOpPropagator());
-
-OPENTELEMETRY_DEFINE_API_SINGLETON common::SpinLockMutex GlobalTextMapPropagator::lock;
+OPENTELEMETRY_DEFINE_API_SINGLETON PropagatorSingleton GlobalTextMapPropagator::s;
 
 }  // namespace propagation
 }  // namespace context

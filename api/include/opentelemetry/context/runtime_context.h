@@ -75,6 +75,19 @@ protected:
  */
 static RuntimeContextStorage *GetDefaultStorage() noexcept;
 
+class RuntimeContextSingleton
+{
+public:
+  RuntimeContextSingleton() : context_storage(GetDefaultStorage()) {}
+
+  nostd::shared_ptr<RuntimeContextStorage> context_storage;
+
+  RuntimeContextSingleton(const RuntimeContextSingleton &) = delete;
+  RuntimeContextSingleton &operator=(const RuntimeContextSingleton &) = delete;
+  RuntimeContextSingleton(RuntimeContextSingleton &&)                 = delete;
+  RuntimeContextSingleton &operator=(RuntimeContextSingleton &&) = delete;
+};
+
 // Provides a wrapper for propagating the context object globally.
 //
 // By default, a thread-local runtime context storage is used.
@@ -146,7 +159,7 @@ public:
    */
   static void SetRuntimeContextStorage(nostd::shared_ptr<RuntimeContextStorage> storage) noexcept
   {
-    context_storage = storage;
+    s.context_storage = storage;
   }
 
   /**
@@ -164,15 +177,13 @@ public:
 private:
   static nostd::shared_ptr<RuntimeContextStorage> GetRuntimeContextStorage() noexcept
   {
-    return context_storage;
+    return s.context_storage;
   }
 
-  OPENTELEMETRY_DECLARE_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage>
-      context_storage;
+  OPENTELEMETRY_DECLARE_API_SINGLETON static RuntimeContextSingleton s;
 };
 
-OPENTELEMETRY_DEFINE_API_SINGLETON nostd::shared_ptr<RuntimeContextStorage>
-    RuntimeContext::context_storage(GetDefaultStorage());
+OPENTELEMETRY_DEFINE_API_SINGLETON RuntimeContextSingleton RuntimeContext::s;
 
 inline Token::~Token() noexcept
 {

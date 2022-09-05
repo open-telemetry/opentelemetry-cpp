@@ -27,10 +27,10 @@ cc_library(
     hdrs = [
         "component_a.h",
     ],
+    linkstatic = True,
     deps = [
         "//api",
     ],
-    linkstatic = True,
 )
 
 cc_library(
@@ -41,10 +41,10 @@ cc_library(
     hdrs = [
         "component_b.h",
     ],
+    linkstatic = True,
     deps = [
         "//api",
     ],
-    linkstatic = True,
 )
 
 cc_library(
@@ -59,10 +59,10 @@ cc_library(
         "//bazel:windows": DEFAULT_WIN_COPTS,
         "//conditions:default": DEFAULT_NOWIN_COPTS,
     }),
+    linkstatic = False,
     deps = [
         "//api",
     ],
-    linkstatic = False,
 )
 
 cc_library(
@@ -77,10 +77,10 @@ cc_library(
         "//bazel:windows": HIDDEN_WIN_COPTS,
         "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
+    linkstatic = False,
     deps = [
         "//api",
     ],
-    linkstatic = False,
 )
 
 cc_library(
@@ -95,10 +95,10 @@ cc_library(
         "//bazel:windows": DEFAULT_WIN_COPTS,
         "//conditions:default": DEFAULT_NOWIN_COPTS,
     }),
+    linkstatic = False,
     deps = [
         "//api",
     ],
-    linkstatic = False,
 )
 
 cc_library(
@@ -113,10 +113,10 @@ cc_library(
         "//bazel:windows": HIDDEN_WIN_COPTS,
         "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
+    linkstatic = False,
     deps = [
         "//api",
     ],
-    linkstatic = False,
 )
 
 cc_test(
@@ -124,6 +124,7 @@ cc_test(
     srcs = [
         "singleton_test.cc",
     ],
+    linkstatic = False,
     tags = [
         "api",
         "test",
@@ -138,5 +139,4 @@ cc_test(
         "//api",
         "@com_google_googletest//:gtest_main",
     ],
-    linkstatic = False,
 )

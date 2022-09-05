@@ -15,6 +15,21 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
+
+class ProviderSingleton
+{
+public:
+  ProviderSingleton() : lock(), provider(new NoopMeterProvider()) {}
+
+  common::SpinLockMutex lock;
+  nostd::shared_ptr<MeterProvider> provider;
+
+  ProviderSingleton(const ProviderSingleton &) = delete;
+  ProviderSingleton &operator=(const ProviderSingleton &) = delete;
+  ProviderSingleton(ProviderSingleton &&)                 = delete;
+  ProviderSingleton &operator=(ProviderSingleton &&) = delete;
+};
+
 /**
  * Stores the singleton global MeterProvider.
  */
@@ -29,8 +44,8 @@ public:
    */
   static nostd::shared_ptr<MeterProvider> GetMeterProvider() noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(lock);
-    nostd::shared_ptr<MeterProvider> result(provider);
+    std::lock_guard<common::SpinLockMutex> guard(s.lock);
+    nostd::shared_ptr<MeterProvider> result(s.provider);
     return result;
   }
 
@@ -39,20 +54,15 @@ public:
    */
   static void SetMeterProvider(nostd::shared_ptr<MeterProvider> tp) noexcept
   {
-    std::lock_guard<common::SpinLockMutex> guard(lock);
-    provider = tp;
+    std::lock_guard<common::SpinLockMutex> guard(s.lock);
+    s.provider = tp;
   }
 
 private:
-  OPENTELEMETRY_DECLARE_API_SINGLETON static nostd::shared_ptr<MeterProvider> provider;
-
-  OPENTELEMETRY_DECLARE_API_SINGLETON static common::SpinLockMutex lock;
+  OPENTELEMETRY_DECLARE_API_SINGLETON static ProviderSingleton s;
 };
 
-OPENTELEMETRY_DEFINE_API_SINGLETON nostd::shared_ptr<MeterProvider> Provider::provider(
-    new NoopMeterProvider);
-
-OPENTELEMETRY_DEFINE_API_SINGLETON common::SpinLockMutex Provider::lock;
+OPENTELEMETRY_DEFINE_API_SINGLETON ProviderSingleton Provider::s;
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
