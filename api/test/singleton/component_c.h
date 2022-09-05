@@ -1,4 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-void do_something_in_c();
+#if defined(_MSC_VER)
+// component_c is a DDL
+
+#  ifdef BUILD_COMPONENT_C
+__declspec(dllexport)
+#  else
+__declspec(dllimport)
+#  endif
+
+#endif
+
+    void do_something_in_c();
