@@ -44,7 +44,7 @@ bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool LoggerContext::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return processor_->ForceFlush(timeout);
+  return processor_->Shutdown(timeout);
 }
 
 }  // namespace logs
