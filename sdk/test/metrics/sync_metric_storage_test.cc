@@ -96,7 +96,7 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
         }
         return true;
       });
-
+  EXPECT_EQ(count_attributes, 2);  // GET and PUT
   // In case of delta temporarily, subsequent collection would contain new data points, so resetting
   // the counts
   if (temporality == AggregationTemporality::kDelta)
@@ -116,18 +116,22 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
             count_attributes++;
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
             count_attributes++;
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
           }
         }
         return true;
       });
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    EXPECT_EQ(count_attributes, 2);  // GET AND PUT
+  }
 
   storage.RecordLong(50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -158,7 +162,9 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
         }
         return true;
       });
+  EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
+
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
@@ -229,6 +235,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
         }
         return true;
       });
+  EXPECT_EQ(count_attributes, 2);  // GET and PUT
 
   // In case of delta temporarily, subsequent collection would contain new data points, so resetting
   // the counts
@@ -249,18 +256,22 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
             count_attributes++;
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
             count_attributes++;
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
           }
         }
         return true;
       });
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    EXPECT_EQ(count_attributes, 2);  // GET AND PUT
+  }
 
   storage.RecordDouble(50.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -293,6 +304,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
         }
         return true;
       });
+  EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
