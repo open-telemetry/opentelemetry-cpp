@@ -6,6 +6,7 @@
 
 #  include <mutex>
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/logs/noop.h"
@@ -42,13 +43,13 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);
     return provider;
   }
 
-  static common::SpinLockMutex &GetLock() noexcept
+  OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
     static common::SpinLockMutex lock;
     return lock;
