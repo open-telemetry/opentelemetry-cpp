@@ -99,7 +99,8 @@
 #elif defined(__GNUC__)
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
 #elif defined(_MSC_VER)
-#  define OPENTELEMETRY_API_SINGLETON
+/* Tentative fix */
+#  define OPENTELEMETRY_API_SINGLETON __declspec(selectany)
 #else
 #  define OPENTELEMETRY_API_SINGLETON
 #endif
