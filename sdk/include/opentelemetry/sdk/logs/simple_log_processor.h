@@ -41,13 +41,15 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
+  bool IsShutdown() const noexcept;
+
 private:
   // The configured exporter
   std::unique_ptr<LogExporter> exporter_;
   // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
-  // The atomic boolean flag to ensure the ShutDown() function is only called once
-  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+  // The atomic boolean to ensure the ShutDown() function is only called once
+  std::atomic<bool> is_shutdown_;
 };
 }  // namespace logs
 }  // namespace sdk

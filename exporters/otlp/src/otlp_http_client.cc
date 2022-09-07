@@ -847,20 +847,20 @@ void OtlpHttpClient::ReleaseSession(
 {
   bool has_session = false;
 
+  std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+
+  auto session_iter = running_sessions_.find(&session);
+  if (session_iter != running_sessions_.end())
   {
-    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+    // Move session and handle into gc list, and they will be destroyed later
+    gc_sessions_.emplace_back(std::move(session_iter->second));
+    running_sessions_.erase(session_iter);
 
-    auto session_iter = running_sessions_.find(&session);
-    if (session_iter != running_sessions_.end())
-    {
-      // Move session and handle into gc list, and they will be destroyed later
-      gc_sessions_.emplace_back(std::move(session_iter->second));
-      running_sessions_.erase(session_iter);
-
-      has_session = true;
-    }
+    has_session = true;
   }
 
+  // Call session_waker_.notify_all() with session_manager_lock_ locked to keep session_waker_
+  // available when destroying OtlpHttpClient
   if (has_session)
   {
     session_waker_.notify_all();
