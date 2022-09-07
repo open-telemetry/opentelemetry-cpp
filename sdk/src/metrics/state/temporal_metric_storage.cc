@@ -34,9 +34,12 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
-  for (auto &col : collectors)
+  if (delta_metrics->Size())
   {
-    unreported_metrics_[col.get()].push_back(delta_metrics);
+    for (auto &col : collectors)
+    {
+      unreported_metrics_[col.get()].push_back(delta_metrics);
+    }
   }
 
   // Get the unreported metrics for the `collector` from `unreported metrics stash`
@@ -88,20 +91,20 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     if (aggregation_temporarily == AggregationTemporality::kCumulative)
     {
       // merge current delta to previous cumulative
-      last_aggr_hashmap->GetAllEnteries([&merged_metrics, this](const MetricAttributes &attributes,
-                                                                Aggregation &aggregation) {
-        auto agg = merged_metrics->Get(attributes);
-        if (agg)
-        {
-          merged_metrics->Set(attributes, agg->Merge(aggregation));
-        }
-        else
-        {
-          merged_metrics->Set(
-              attributes, DefaultAggregation::CreateAggregation(instrument_descriptor_, nullptr));
-        }
-        return true;
-      });
+      last_aggr_hashmap->GetAllEnteries(
+          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
+            auto agg = merged_metrics->Get(attributes);
+            if (agg)
+            {
+              merged_metrics->Set(attributes, agg->Merge(aggregation));
+            }
+            else
+            {
+              auto def_agg = DefaultAggregation::CreateAggregation(instrument_descriptor_, nullptr);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
+            }
+            return true;
+          });
     }
     last_reported_metrics_[collector] =
         LastReportedMetrics{std::move(merged_metrics), collection_ts};
