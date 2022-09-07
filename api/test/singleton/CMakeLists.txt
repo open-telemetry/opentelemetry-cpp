@@ -35,10 +35,9 @@ target_link_libraries(
 
 if(NOT WIN32)
 
-gtest_add_tests(
-  TARGET singleton_test
-  TEST_PREFIX singleton.
-  TEST_LIST singleton_test)
+  gtest_add_tests(
+    TARGET singleton_test
+    TEST_PREFIX singleton.
+    TEST_LIST singleton_test)
 
 endif()
-
