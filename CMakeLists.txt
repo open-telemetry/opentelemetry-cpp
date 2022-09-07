@@ -127,9 +127,12 @@ endif()
 
 if(WITH_STL)
   # These definitions are needed for test projects that do not link against
-  # opentelemetry-api library directly. We ensure that variant implementation
-  # (absl::variant or std::variant) in variant unit test code is consistent with
-  # the global project build definitions. Optimize for speed to reduce the hops
+  # opentelemetry-api library directly. We ensure that STL implementation
+  # (nostd:: or std::) in unit test code is consistent with
+  # the global project build definitions.
+  add_definitions(-DHAVE_CPP_STDLIB)
+
+  # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(CMAKE_BUILD_TYPE MATCHES Debug)
       # Turn off optimizations for DEBUG
