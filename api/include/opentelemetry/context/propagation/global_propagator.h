@@ -55,7 +55,7 @@ private:
   }
 
 #ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
-  static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
+  static nostd::shared_ptr<TextMapPropagator> propagator;
   static common::SpinLockMutex lock;
 #endif
 };
