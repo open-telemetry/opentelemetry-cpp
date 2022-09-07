@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1662592914637,
+  "lastUpdate": 1662592915902,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -69010,6 +69010,54 @@ window.BENCHMARK_DATA = {
             "value": 2080629.9269407054,
             "unit": "ns/iter",
             "extra": "iterations: 287\ncpu: 479956.794425087 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e4b04208c630ed8ca779a5bccb51884b0535c4cf",
+          "message": "Fix 1585 - Multiple cumulative metric collections without measurement recording. (#1586)",
+          "timestamp": "2022-09-07T16:09:21-07:00",
+          "tree_id": "d44957625039bf8976ef237713be2f777760267e",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/e4b04208c630ed8ca779a5bccb51884b0535c4cf"
+        },
+        "date": 1662592912244,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 117.97608287950116,
+            "unit": "ns/iter",
+            "extra": "iterations: 1154000\ncpu: 117.83882149046796 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 173.18961061077354,
+            "unit": "ns/iter",
+            "extra": "iterations: 810000\ncpu: 172.93604938271605 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 641.672065974351,
+            "unit": "ns/iter",
+            "extra": "iterations: 223000\ncpu: 637.2412556053811 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1949803.4916092865,
+            "unit": "ns/iter",
+            "extra": "iterations: 452\ncpu: 331725.8849557523 ns\nthreads: 1"
           }
         ]
       }
