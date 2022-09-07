@@ -37,7 +37,9 @@ public:
 
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<Baggage> GetDefault()
   {
+#ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static nostd::shared_ptr<Baggage> baggage{new Baggage()};
+#endif
     return baggage;
   }
 
@@ -293,7 +295,15 @@ private:
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
   nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+  static nostd::shared_ptr<Baggage> baggage;
+#endif
 };
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+OPENTELEMETRY_MEMBER_SINGLETON nostd::shared_ptr<Baggage> Baggage::baggage{new Baggage()};
+#endif
 
 }  // namespace baggage
 

@@ -169,10 +169,21 @@ private:
 
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
+#ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
+#endif
     return context;
   }
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+  static nostd::shared_ptr<RuntimeContextStorage> context;
+#endif
 };
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+OPENTELEMETRY_MEMBER_SINGLETON nostd::shared_ptr<RuntimeContextStorage> RuntimeContext::context(
+    GetDefaultStorage());
+#endif
 
 inline Token::~Token() noexcept
 {
@@ -318,6 +329,9 @@ private:
 
   OPENTELEMETRY_API_SINGLETON Stack &GetStack()
   {
+    // Safe with OPENTELEMETRY_SINGLETON_IN_METHOD.
+
+    // TODO: Investigate if this is safe with windows
     static thread_local Stack stack_ = Stack();
     return stack_;
   }

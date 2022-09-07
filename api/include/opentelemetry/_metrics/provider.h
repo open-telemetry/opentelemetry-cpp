@@ -44,16 +44,30 @@ public:
 private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
+#  ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
+#  endif
     return provider;
   }
 
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
+#  ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static common::SpinLockMutex lock;
+#  endif
     return lock;
   }
+
+#  ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+  static nostd::shared_ptr<MeterProvider> provider;
+  static common::SpinLockMutex lock;
+#  endif
 };
+
+#  ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+static nostd::shared_ptr<MeterProvider> Provider::provider(new NoopMeterProvider);
+static common::SpinLockMutex Provider::lock;
+#  endif
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

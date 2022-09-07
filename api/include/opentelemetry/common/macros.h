@@ -90,17 +90,141 @@
 #  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg)
 #endif
 
+/* clang-format off */
+
 /**
-  @def OPENTELEMETRY_API_SINGLETON
-  Declare a symbol with visibility default.
+  @page HEADER_ONLY_SINGLETON Header only singleton.
+
+  @section ELF_SINGLETON
+
+  For clang and gcc, the desired coding pattern is as follows.
+
+  @verbatim
+  class Foo
+  {
+    // (a)
+    __attribute__((visibility("default")))
+    // (b)
+    T& get_singleton()
+    {
+      // (c)
+      static T singleton;
+      return singleton;
+    }
+  };
+  @endverbatim
+
+  (a) is needed when the code is build with
+  @code -fvisibility="hidden" @endcode
+  to ensure that all instances of (b) are visible to the linker.
+
+  What is duplicated in the binary is @em code, in (b).
+
+  The linker will make sure only one instance
+  of all the (b) methods is used.
+
+  (c) is a singleton implemented inside a method.
+
+  This is very desirable, because:
+
+  - the C++ compiler guarantees the variable (c) is thread safe,
+    starting with C++ XX (TODO: link needed)
+
+  - constructors for (c) singletons are executed in code path order,
+    or not at all if the singleton is never used.
+
+  @section WINDOWS_SINGLETON
+
+  For Visual Studio, the desired coding pattern is as follows.
+
+  @verbatim
+  class Foo
+  {
+    // (d)
+    T& get_singleton()
+    {
+      return singleton;
+    }
+
+    // (e)
+    static T singleton;
+  };
+
+  // (f)
+  __declspec(selectany) T Foo::singleton;
+  @endverbatim
+
+  (d) is just used to expose the singleton,
+  so that other methods do not see implementation details.
+
+  (e) is a declaration
+
+  (f) is a definition, that breaks ODR (One Definition Rule),
+  corrected with the
+  @code __declspec(selectany) @endcode
+  annotation.
+
+  (f) has to be done separately from (e), in an "out of class definition",
+  because combining (e) and (f) in an "in class definition" is not a valid
+  syntax with @c selectany.
+
+  What is duplicated in the binary is @em data, in (f).
+
+  In this pattern, initialization of (f) does not happen in code path order,
+  initialization depends on global C++ constructors.
+
+  @section CODING_PATTERN
+
+  As a result, to support all platforms,
+  the coding pattern to use is as follows
+
+  @verbatim
+  class Foo
+  {
+    OPENTELEMETRY_API_SINGLETON
+    T& get_singleton()
+    {
+      #ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
+      static T singleton;
+      #endif
+      return singleton;
+    }
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+    static T singleton;
+#endif
+  };
+
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+  OPENTELEMETRY_MEMBER_SINGLETON T Foo::singleton;
+#endif
+  @endverbatim
 */
+
+/* clang-format on */
+
 #if defined(__clang__)
+
+#  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+
 #elif defined(__GNUC__)
+
+#  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+
 #elif defined(_MSC_VER)
-/* TODO: fix windows as well. */
+
+#  define OPENTELEMETRY_SINGLETON_IN_MEMBER
 #  define OPENTELEMETRY_API_SINGLETON
+#  define OPENTELEMETRY_MEMBER_SINGLETON __declspec(selectany)
+
 #else
+
+/* Add support for another compiler here. */
+
+#  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON
+
 #endif

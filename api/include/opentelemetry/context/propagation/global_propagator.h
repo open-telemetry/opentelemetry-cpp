@@ -40,16 +40,31 @@ public:
 private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TextMapPropagator> &GetPropagator() noexcept
   {
+#ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
+#endif
     return propagator;
   }
 
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
+#ifdef OPENTELEMETRY_SINGLETON_IN_METHOD
     static common::SpinLockMutex lock;
+#endif
     return lock;
   }
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+  static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
+  static common::SpinLockMutex lock;
+#endif
 };
+
+#ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
+OPENTELEMETRY_MEMBER_SINGLETON nostd::shared_ptr<TextMapPropagator>
+    GlobalTextMapPropagator::propagator(new NoOpPropagator());
+OPENTELEMETRY_MEMBER_SINGLETON common::SpinLockMutex GlobalTextMapPropagator::lock;
+#endif
 
 }  // namespace propagation
 }  // namespace context
