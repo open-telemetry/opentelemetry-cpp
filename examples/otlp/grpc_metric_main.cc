@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
     options.endpoint = argv[1];
     if (argc > 2)
     {
-      example_type = argv[1];
+      example_type = argv[2];
       if (argc > 3)
       {
         options.use_ssl_credentials         = true;
-        options.ssl_credentials_cacert_path = argv[2];
+        options.ssl_credentials_cacert_path = argv[3];
       }
     }
   }
