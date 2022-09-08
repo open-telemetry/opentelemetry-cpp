@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main, async-changes ]
+    branches: [ main ]
 
 jobs:
   cmake_test:
