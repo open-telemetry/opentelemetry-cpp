@@ -38,3 +38,10 @@ if(WITH_OTLP_HTTP)
       opentelemetry_exporter_otlp_http_log)
   endif()
 endif()
+
+if (WITH_OTLP_GRPC AND NOT WITH_METRICS_PREVIEW)
+add_executable(example_otlp_metric_grpc grpc_metric_main.cc)
+target_link_libraries(
+  example_otlp_metric_grpc ${CMAKE_THREAD_LIBS_INIT} common_foo_library
+  opentelemetry_metrics opentelemetry_exporter_otlp_grpc_metrics gRPC::grpc++)
+endif()
