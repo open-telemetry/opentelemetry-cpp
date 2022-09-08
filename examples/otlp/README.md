@@ -4,7 +4,7 @@ This is an example of how to use the [OpenTelemetry
 Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/README.md)
 (OTLP) exporter.
 
-## Traces
+### Traces
 The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance,
 the application in `http_main.cc` initializes an `OtlpHttpExporter` instance.
 And they register a tracer provider from the [OpenTelemetry
@@ -12,7 +12,7 @@ SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
 
-## Logs
+### Logs
 The application in `http_log_main.cc` initializes an `OtlpHttpLogExporter` instance,
 the application in `grpc_log_main.cc` initializes an `OtlpGrpcLogExporter` instance.
 And they register a logger provider from the [OpenTelemetry
@@ -20,19 +20,21 @@ SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `logs_foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
 
-## Metrics
+### Metrics
 The application in `grpc_metrics_main.cc` initializes an `OtlpGrpcMetricExporter` instance.
 And it registers a meter provider from the [OpenTelemetry
 SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `metrics_foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
 
+### Enable SSL/TLS
 To enable TLS authentication for OTLP grpc exporter, SslCredentials can be used
 by specifying the path to client certificate pem file, or the string containing
 this certificate via OtlpGrpcExporterOptions. The path to such a .pem file can be
 provided as a command-line argument alongwith the collector endpoint to the main
 binary invocation above.
 
+### Running OpenTelemetry Collector as docker container
 Resulting spans are exported to the **OpenTelemetry Collector** using the OTLP
 exporter. The OpenTelemetry Collector can be configured to export to other
 backends (see list of [supported
