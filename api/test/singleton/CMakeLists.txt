@@ -4,20 +4,26 @@
 include(GoogleTest)
 
 add_library(component_a STATIC component_a.cc)
+target_link_libraries(component_a opentelemetry_api)
 
 add_library(component_b STATIC component_b.cc)
+target_link_libraries(component_b opentelemetry_api)
 
 add_library(component_c SHARED component_c.cc)
 set_target_properties(component_c PROPERTIES CXX_VISIBILITY_PRESET default)
+target_link_libraries(component_c opentelemetry_api)
 
 add_library(component_d SHARED component_d.cc)
 set_target_properties(component_d PROPERTIES CXX_VISIBILITY_PRESET hidden)
+target_link_libraries(component_d opentelemetry_api)
 
 add_library(component_e SHARED component_e.cc)
 set_target_properties(component_e PROPERTIES CXX_VISIBILITY_PRESET default)
+target_link_libraries(component_e opentelemetry_api)
 
 add_library(component_f SHARED component_f.cc)
 set_target_properties(component_f PROPERTIES CXX_VISIBILITY_PRESET hidden)
+target_link_libraries(component_f opentelemetry_api)
 
 add_executable(singleton_test singleton_test.cc)
 
