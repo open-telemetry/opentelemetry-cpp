@@ -4,7 +4,7 @@
 // Make the entry point visible, loaded dynamically
 
 #if defined(_MSC_VER)
-// component_d is a DDL
+// component_f is a DDL
 
 #  ifdef BUILD_COMPONENT_F
 __declspec(dllexport)
@@ -13,8 +13,8 @@ __declspec(dllimport)
 #  endif
 
 #else
-// component_d is a shared library (*.so)
-// component_d is compiled with visibility("hidden"),
+// component_f is a shared library (*.so)
+// component_f is compiled with visibility("hidden"),
 __attribute__((visibility("default")))
 #endif
 

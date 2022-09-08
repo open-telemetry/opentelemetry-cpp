@@ -6,6 +6,12 @@
 #include <assert.h>
 #include <iostream>
 
+#if defined(_MSC_VER)
+/* Singleton in windows DDL not supported yet. */
+#else
+#  define WITH_DYNAMIC_TEST
+#endif
+
 #include "component_a.h"
 #include "component_b.h"
 #include "component_c.h"
@@ -26,10 +32,12 @@ void do_something()
 {
   do_something_in_a();
   do_something_in_b();
+#ifdef WITH_DYNAMIC_TEST
   do_something_in_c();
   do_something_in_d();
   do_something_in_e();
   do_something_in_f();
+#endif
 }
 
 int span_a_lib_count   = 0;
@@ -223,6 +231,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_lib_count, 0);
   EXPECT_EQ(span_b_f1_count, 0);
   EXPECT_EQ(span_b_f2_count, 0);
+#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_lib_count, 0);
   EXPECT_EQ(span_c_f1_count, 0);
   EXPECT_EQ(span_c_f2_count, 0);
@@ -235,6 +244,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
+#endif
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -249,6 +259,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_f1_count, 2);
   EXPECT_EQ(span_b_f2_count, 1);
   EXPECT_EQ(span_c_lib_count, 1);
+#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_f1_count, 2);
   EXPECT_EQ(span_c_f2_count, 1);
   EXPECT_EQ(span_d_lib_count, 1);
@@ -260,6 +271,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 1);
   EXPECT_EQ(span_f_f1_count, 2);
   EXPECT_EQ(span_f_f2_count, 1);
+#endif
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -273,6 +285,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_lib_count, 0);
   EXPECT_EQ(span_b_f1_count, 0);
   EXPECT_EQ(span_b_f2_count, 0);
+#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_lib_count, 0);
   EXPECT_EQ(span_c_f1_count, 0);
   EXPECT_EQ(span_c_f2_count, 0);
@@ -285,5 +298,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
+#endif
   EXPECT_EQ(unknown_span_count, 0);
 }
