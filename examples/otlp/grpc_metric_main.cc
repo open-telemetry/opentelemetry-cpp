@@ -3,8 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
-# include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
@@ -20,21 +19,21 @@
 #    include "metrics_foo_library/foo_library.h"
 #  endif
 
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace nostd           = opentelemetry::nostd;
-namespace common          = opentelemetry::common;
-namespace exportermetrics = opentelemetry::exporter::metrics;
-namespace metrics_api     = opentelemetry::metrics;
-namespace otlp_exporter    = opentelemetry::exporter::otlp;
+namespace metric_sdk    = opentelemetry::sdk::metrics;
+namespace nostd         = opentelemetry::nostd;
+namespace common        = opentelemetry::common;
+namespace metrics_api   = opentelemetry::metrics;
+namespace otlp_exporter = opentelemetry::exporter::otlp;
 
 namespace
 {
 
 otlp_exporter::OtlpGrpcMetricExporterOptions options;
 
-void initMetrics(const std::string &name)
+void initMetrics()
 {
-  std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
+  std::unique_ptr<metric_sdk::MetricExporter> exporter{
+      new otlp_exporter::OtlpGrpcMetricExporter(options)};
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -63,14 +62,15 @@ int main(int argc, char *argv[])
     {
       example_type = argv[1];
       if (argc > 3)
-      { 
+      {
         options.use_ssl_credentials         = true;
-        opts.ssl_credentials_cacert_path = argv[2];
+        options.ssl_credentials_cacert_path = argv[2];
       }
     }
   }
   // Removing this line will leave the default noop MetricProvider in place.
   initMetrics();
+  std::string name{"otlp_grpc_metric_example"};
 
   if (example_type == "counter")
   {
@@ -94,9 +94,5 @@ int main(int argc, char *argv[])
     observable_counter_example.join();
     histogram_example.join();
   }
-
-
-
-
 }
 #endif
