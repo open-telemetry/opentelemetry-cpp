@@ -15,6 +15,7 @@
 #endif
 
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -41,7 +42,7 @@ public:
   static constexpr auto kKeyValueSeparator = '=';
   static constexpr auto kMembersSeparator  = ',';
 
-  static nostd::shared_ptr<TraceState> GetDefault()
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TraceState> GetDefault()
   {
     static nostd::shared_ptr<TraceState> ts{new TraceState()};
     return ts;
@@ -316,5 +317,6 @@ private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
   nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
 };
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
