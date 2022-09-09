@@ -16,7 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Upgrade opentelemetry-proto to v0.19.0 [#1579](https://github.com/open-telemetry/opentelemetry-cpp/pull/1579)
-* [METRICS EXPORTER] Add `OtlpGrpcMetricExporterFactory` and `OtlpHttpMetricExporterFactory` [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
+* [METRICS EXPORTER] Add `OtlpGrpcMetricExporterFactory` and `OtlpHttpMetricExporterFactory`.
+  [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 * [METRICS EXPORTER] Add `OtlpGrpcClient` [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 
 ## [1.6.0] 2022-08-15
