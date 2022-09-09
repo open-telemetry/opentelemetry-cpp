@@ -214,11 +214,11 @@
 #  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
 
-#elif defined(_MSC_VER)
+// #elif defined(_MSC_VER)
 
-#  define OPENTELEMETRY_SINGLETON_IN_MEMBER
-#  define OPENTELEMETRY_API_SINGLETON
-#  define OPENTELEMETRY_MEMBER_SINGLETON __declspec(selectany)
+// #  define OPENTELEMETRY_SINGLETON_IN_MEMBER
+// #  define OPENTELEMETRY_API_SINGLETON
+// #  define OPENTELEMETRY_MEMBER_SINGLETON __declspec(selectany)
 
 #else
 
