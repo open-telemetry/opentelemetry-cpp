@@ -141,6 +141,64 @@ cc_library(
 )
 
 cc_library(
+    name = "otlp_grpc_metric_exporter",
+    srcs = [
+        "src/otlp_grpc_metric_exporter.cc",
+        "src/otlp_grpc_metric_exporter_factory.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_grpc_metric",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//ext:headers",
+        "//sdk/src/metrics",
+
+        # For gRPC
+        "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+cc_library(
+    name = "otlp_http_metric_exporter",
+    srcs = [
+        "src/otlp_http_metric_exporter.cc",
+        "src/otlp_http_metric_exporter_factory.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_metric_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_http_metric",
+    ],
+    deps = [
+        ":otlp_http_client",
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+    ],
+)
+
+cc_library(
     name = "otlp_http_log_exporter",
     srcs = [
         "src/otlp_http_log_exporter.cc",
@@ -164,30 +222,6 @@ cc_library(
         ":otlp_recordable",
         "//sdk/src/logs",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
-    ],
-)
-
-cc_library(
-    name = "otlp_http_metric_exporter",
-    srcs = [
-        "src/otlp_http_metric_exporter.cc",
-    ],
-    hdrs = [
-        "include/opentelemetry/exporters/otlp/otlp_environment.h",
-        "include/opentelemetry/exporters/otlp/otlp_http_metric_exporter.h",
-        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
-        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
-    ],
-    strip_include_prefix = "include",
-    tags = [
-        "otlp",
-        "otlp_http_metric",
-    ],
-    deps = [
-        ":otlp_http_client",
-        ":otlp_recordable",
-        "//sdk/src/metrics",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
     ],
 )
 
@@ -346,22 +380,6 @@ cc_test(
 )
 
 cc_test(
-    name = "otlp_http_metric_exporter_test",
-    srcs = ["test/otlp_http_metric_exporter_test.cc"],
-    tags = [
-        "otlp",
-        "otlp_http_metric",
-        "test",
-    ],
-    deps = [
-        ":otlp_http_metric_exporter",
-        "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "otlp_grpc_log_exporter_test",
     srcs = ["test/otlp_grpc_log_exporter_test.cc"],
     tags = [
@@ -389,6 +407,53 @@ cc_test(
         ":otlp_grpc_log_exporter",
         "//api",
         "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_grpc_metric_exporter_factory_test",
+    srcs = ["test/otlp_grpc_metric_exporter_factory_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_metric_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_http_metric_exporter_test",
+    srcs = ["test/otlp_http_metric_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_http_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_http_metric_exporter",
+        "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_http_metric_exporter_factory_test",
+    srcs = ["test/otlp_http_metric_exporter_factory_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_http_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_http_metric_exporter",
+        "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
