@@ -39,7 +39,7 @@ target_link_libraries(
   ${CMAKE_THREAD_LIBS_INIT}
   opentelemetry_api)
 
-if(WIN32)
+if(NOT WIN32)
   gtest_add_tests(
     TARGET singleton_test
     TEST_PREFIX singleton.
