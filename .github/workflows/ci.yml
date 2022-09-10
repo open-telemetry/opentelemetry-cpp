@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, gRPC-latest ]
   pull_request:
     branches: [ main ]
 
@@ -145,6 +145,22 @@ jobs:
       run: |
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_grpc_latest_test:
+    name: CMake test (with otlp-exporter and latest gRPC)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh -r v1.48.1
+        ./ci/do_ci.sh cmake.exporter.otlp.grpc.latest.test
 
   plugin_test:
     name: Plugin -> CMake

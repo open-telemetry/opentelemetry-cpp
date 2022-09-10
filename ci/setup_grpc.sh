@@ -8,18 +8,23 @@ export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
 new_grpc_version='v1.43.2'
 gcc_version_for_new_grpc='5.1'
+std_version='11'
 install_grpc_version=${new_grpc_version}
 grpc_version='v1.39.0'
 install_dir='/usr/local/'
 usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
 
-while getopts ":v:i:" o; do
+while getopts ":v:i:r:" o; do
     case "${o}" in
         v)
             gcc_version=${OPTARG}
             ;;
         i)
             install_dir=${OPTARG}
+            ;;
+        r)
+            install_grpc_version=${OPTARG}
+            std_version='14'
             ;;
         *)
             usage
