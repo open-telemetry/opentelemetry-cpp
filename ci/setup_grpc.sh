@@ -57,7 +57,7 @@ cmake -DCMAKE_BUILD_TYPE=Release  \
 make -j${nproc} install && popd
 mkdir -p build && pushd build
 cmake -DgRPC_INSTALL=ON \
-    -DCMAKE_CXX_STANDARD=11 \
+    -DCMAKE_CXX_STANDARD=${std_version} \
     -DgRPC_BUILD_TESTS=OFF \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     -DCMAKE_PREFIX_PATH=$INSTALL_DIR \
