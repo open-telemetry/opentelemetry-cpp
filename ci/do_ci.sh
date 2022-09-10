@@ -339,7 +339,7 @@ elif [[ "$1" == "cmake.exporter.otlp.grpc.latest.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
-        -DENABLE_LOGS_PREVIEW \
+        -DENABLE_LOGS_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"

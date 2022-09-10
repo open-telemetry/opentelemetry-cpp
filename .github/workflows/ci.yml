@@ -147,7 +147,7 @@ jobs:
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_grpc_latest_test:
-    name: CMake test (with otlp-exporter and latest gRPC)
+    name: CMake test (with otlp-exporter and latest gRPC release)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
