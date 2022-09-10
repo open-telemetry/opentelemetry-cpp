@@ -43,5 +43,7 @@ ignore:
   - "buildscripts/**/*"
   - "third_party/**/*"
   - "tools/**/*"
+  - ".vscode/**/*"
+  - ".github/**/*"
   - "**/test/**/*"
   - "**.md"
