@@ -4,13 +4,13 @@
 #include "opentelemetry/context/context.h"
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/exemplar/with_trace_sample_filter.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
 
 using namespace opentelemetry::sdk::metrics;
 
 TEST(WithTraceSampleFilter, SampleMeasurement)
 {
-  auto filter = opentelemetry::sdk::metrics::WithTraceSampleFilter::GetWithTraceSampleFilter();
+  auto filter = opentelemetry::sdk::metrics::ExemplarFilter::GetWithTraceSampleFilter();
   ASSERT_FALSE(
       filter->ShouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
   ASSERT_FALSE(

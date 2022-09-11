@@ -31,6 +31,10 @@ public:
                                        const opentelemetry::context::Context &context) noexcept = 0;
 
   virtual ~ExemplarFilter() = default;
+
+  static nostd::shared_ptr<ExemplarFilter> GetNeverSampleFilter();
+  static nostd::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter();
+  static nostd::shared_ptr<ExemplarFilter> GetWithTraceSampleFilter();
 };
 
 }  // namespace metrics

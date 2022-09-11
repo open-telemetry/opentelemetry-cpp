@@ -82,18 +82,10 @@ public:
     }
     for (auto reservoirCell : storage_)
     {
-      // std::shared_ptr<ExemplarData>(ReservoirCell::*func)(const common::OrderedAttributeMap &) =
-      // &ReservoirCell::GetAndResetDouble;
       auto result = (reservoirCell.*(map_and_reset_cell_))(pointAttributes);
-      // reservoirCell.func(pointAttributes);
-      // auto result = map_and_reset_cell_(reservoirCell, pointAttributes);
       results.push_back(result);
     }
     reservoir_cell_selector_.reset();
-    // std::shared_ptr<ExemplarData> (opentelemetry::sdk::metrics::ReservoirCell::*)(const
-    // opentelemetry::sdk::metrics::MetricAttributes &) int (Fred::*)(char,float)
-    // nostd::function_ref<std::shared_ptr<ExemplarData>(const ReservoirCell &reservoir_cell,
-    // const MetricAttributes &attributes)> f = &ReservoirCell::GetAndResetDouble;
     return results;
   }
 

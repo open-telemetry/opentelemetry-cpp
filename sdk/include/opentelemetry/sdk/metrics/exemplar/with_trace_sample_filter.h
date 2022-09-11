@@ -15,12 +15,6 @@ namespace metrics
 class WithTraceSampleFilter final : public ExemplarFilter
 {
 public:
-  static nostd::shared_ptr<ExemplarFilter> GetWithTraceSampleFilter()
-  {
-    nostd::shared_ptr<ExemplarFilter> withTraceSampleFilter{new WithTraceSampleFilter{}};
-    return withTraceSampleFilter;
-  }
-
   bool ShouldSampleMeasurement(long value,
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context) noexcept override
@@ -35,8 +29,9 @@ public:
     return hasSampledTrace(context);
   }
 
-private:
   explicit WithTraceSampleFilter() = default;
+
+private:
   static bool hasSampledTrace(const opentelemetry::context::Context &context)
   {
     return opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
