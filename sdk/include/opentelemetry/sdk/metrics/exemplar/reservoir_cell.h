@@ -57,8 +57,11 @@ public:
   std::shared_ptr<ExemplarData> GetAndResetLong(const MetricAttributes &point_attributes)
   {
     auto attributes = attributes_;
+    PointDataAttributes point_data_attributes;
+    point_data_attributes.attributes = filtered(attributes, point_attributes);
+    point_data_attributes.point_data = ExemplarData::CreateSumPointData(long_value_);
     std::shared_ptr<ExemplarData> result{
-        new ExemplarData{ExemplarData::Create(context_, record_time_, PointDataAttributes{})}};
+        new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
     reset();
     return result;
   }
@@ -71,8 +74,11 @@ public:
   std::shared_ptr<ExemplarData> GetAndResetDouble(const MetricAttributes &point_attributes)
   {
     auto attributes = attributes_;
+    PointDataAttributes point_data_attributes;
+    point_data_attributes.attributes = filtered(attributes, point_attributes);
+    point_data_attributes.point_data = ExemplarData::CreateSumPointData(double_value_);
     std::shared_ptr<ExemplarData> result{
-        new ExemplarData{ExemplarData::Create(context_, record_time_, PointDataAttributes{})}};
+        new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
     reset();
     return result;
   }

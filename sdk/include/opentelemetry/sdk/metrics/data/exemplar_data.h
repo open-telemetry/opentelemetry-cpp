@@ -8,6 +8,7 @@
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -46,6 +47,24 @@ public:
    * inside a sampled trace, the Context will be invalid.
    */
   std::shared_ptr<trace::SpanContext> GetSpanContext() { return context_.lock(); }
+
+  static PointType CreateSumPointData(ValueType value)
+  {
+    SumPointData sum_point_data{};
+    sum_point_data.value_ = value;
+    return sum_point_data;
+  }
+
+  static PointType CreateLastValuePointData(ValueType value)
+  {
+    LastValuePointData last_value_point_data{};
+    last_value_point_data.value_              = value;
+    last_value_point_data.is_lastvalue_valid_ = true;
+    last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
+    return last_value_point_data;
+  }
+
+  static PointType CreateDropPointData() { return DropPointData{}; }
 
 private:
   ExemplarData(std::shared_ptr<trace::SpanContext> context,
