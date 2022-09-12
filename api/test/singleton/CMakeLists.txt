@@ -3,6 +3,8 @@
 
 include(GoogleTest)
 
+# Header only singletons are not available in windows yet.
+
 if(NOT WIN32)
 
   add_library(component_a STATIC component_a.cc)
