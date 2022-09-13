@@ -86,9 +86,11 @@ bool HttpClient::FinishAllSessions() noexcept
   return true;
 }
 
-void HttpClient::SetMaxSessionsPerConnection(std::size_t max_requests_per_connection) noexcept {}
+void HttpClient::SetMaxSessionsPerConnection(std::size_t /*
+max_requests_per_connection */) noexcept
+{}
 
-void HttpClient::CleanupSession(uint64_t session_id) {}
+void HttpClient::CleanupSession(uint64_t /* session_id */) {}
 
 }  // namespace nosend
 }  // namespace client

@@ -86,15 +86,9 @@ class DummyProcessor : public LogProcessor
     return std::unique_ptr<Recordable>(new LogRecord);
   }
 
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept {}
-  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {
-    return true;
-  }
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {
-    return true;
-  }
+  void OnReceive(std::unique_ptr<Recordable> && /* record */) noexcept {}
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept { return true; }
 };
 
 TEST(LoggerProviderSDK, GetResource)

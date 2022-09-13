@@ -56,14 +56,8 @@ public:
     record_received_->SetSeverity(copy->GetSeverity());
     record_received_->SetBody(copy->GetBody());
   }
-  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {
-    return true;
-  }
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
-  {
-    return true;
-  }
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept { return true; }
 };
 
 TEST(LoggerSDK, LogToAProcessor)

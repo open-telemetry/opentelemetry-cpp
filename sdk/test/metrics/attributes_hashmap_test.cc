@@ -61,7 +61,10 @@ TEST(AttributesHashMap, BasicTests)
 
   // GetAllEnteries
   size_t count = 0;
-  hash_map.GetAllEnteries([&count](const MetricAttributes &attributes, Aggregation &aggregation) {
+  hash_map.GetAllEnteries([&count](const MetricAttributes & /* attributes
+                                                             */
+                                   ,
+                                   Aggregation & /* aggregation */) {
     count++;
     return true;
   });

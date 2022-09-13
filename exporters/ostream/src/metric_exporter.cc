@@ -72,7 +72,7 @@ OStreamMetricExporter::OStreamMetricExporter(
 {}
 
 sdk::metrics::AggregationTemporality OStreamMetricExporter::GetAggregationTemporality(
-    sdk::metrics::InstrumentType instrument_type) const noexcept
+    sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
   return aggregation_temporality_;
 }
@@ -249,13 +249,14 @@ void OStreamMetricExporter::printPointAttributes(
   }
 }
 
-bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds /* timeout
+*/) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return true;
 }
 
-bool OStreamMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamMetricExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

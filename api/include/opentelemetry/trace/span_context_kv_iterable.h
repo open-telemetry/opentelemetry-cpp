@@ -47,7 +47,7 @@ public:
     return true;
   }
 
-  size_t size() const noexcept override { return 0; };
+  size_t size() const noexcept override { return 0; }
 };
 
 }  // namespace trace

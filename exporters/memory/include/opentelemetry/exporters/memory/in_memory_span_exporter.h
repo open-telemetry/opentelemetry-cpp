@@ -70,13 +70,12 @@ public:
    * note: passing custom timeout values is not currently supported for this exporter
    * @return Returns the status of the operation
    */
-  bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     is_shutdown_ = true;
     return true;
-  };
+  }
 
   /**
    * @return Returns a shared pointer to this exporters InMemorySpanData

@@ -80,13 +80,15 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcMetricExporter::ForceFlush(std::chrono::microseconds /* timeout
+*/) noexcept
 {
   // TODO: OTLP gRPC exporter does not support concurrency exporting now.
   return true;
 }
 
-bool OtlpGrpcMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcMetricExporter::Shutdown(std::chrono::microseconds /* timeout
+*/) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

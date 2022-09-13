@@ -56,7 +56,7 @@ LoggerProvider::~LoggerProvider()
 
 nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view logger_name,
-    nostd::string_view options,
+    nostd::string_view /* options */,
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url) noexcept
@@ -108,7 +108,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
 
 nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view logger_name,
-    nostd::span<nostd::string_view> args,
+    nostd::span<nostd::string_view> /* args */,
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url) noexcept

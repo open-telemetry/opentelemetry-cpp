@@ -25,11 +25,12 @@ namespace nostd       = opentelemetry::nostd;
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
-  virtual void OnResponse(http_client::Response &response) noexcept override
+  virtual void OnResponse(http_client::Response & /* response */) noexcept override
   {
     got_response_ = true;
-  };
-  virtual void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  }
+  virtual void OnEvent(http_client::SessionState state, nostd::string_view
+                       /* reason */) noexcept override
   {
     switch (state)
     {
@@ -56,7 +57,7 @@ class GetEventHandler : public CustomEventHandler
     ASSERT_EQ(response.GetBody().size(), 0);
     is_called_    = true;
     got_response_ = true;
-  };
+  }
 };
 
 class PostEventHandler : public CustomEventHandler
@@ -107,7 +108,7 @@ protected:
   std::mutex cv_m;
 
 public:
-  BasicCurlHttpTests() : is_setup_(false), is_running_(false){};
+  BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
 
   virtual void SetUp() override
   {

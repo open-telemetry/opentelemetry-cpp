@@ -69,12 +69,12 @@ private:
 
 class MatchEverythingPattern : public Predicate
 {
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override { return true; }
+  bool Match(opentelemetry::nostd::string_view /* str */) const noexcept override { return true; }
 };
 
 class MatchNothingPattern : public Predicate
 {
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override { return false; }
+  bool Match(opentelemetry::nostd::string_view /* str */) const noexcept override { return false; }
 };
 }  // namespace metrics
 }  // namespace sdk
