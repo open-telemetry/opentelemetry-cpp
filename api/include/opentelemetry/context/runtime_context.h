@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -166,7 +167,7 @@ private:
     return GetStorage();
   }
 
-  static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
     return context;
@@ -315,7 +316,7 @@ private:
     Context *base_;
   };
 
-  Stack &GetStack()
+  OPENTELEMETRY_API_SINGLETON Stack &GetStack()
   {
     static thread_local Stack stack_ = Stack();
     return stack_;

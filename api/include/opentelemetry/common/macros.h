@@ -89,3 +89,86 @@
 #else
 #  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg)
 #endif
+
+/* clang-format off */
+
+/**
+  @page HEADER_ONLY_SINGLETON Header only singleton.
+
+  @section ELF_SINGLETON
+
+  For clang and gcc, the desired coding pattern is as follows.
+
+  @verbatim
+  class Foo
+  {
+    // (a)
+    __attribute__((visibility("default")))
+    // (b)
+    T& get_singleton()
+    {
+      // (c)
+      static T singleton;
+      return singleton;
+    }
+  };
+  @endverbatim
+
+  (a) is needed when the code is build with
+  @code -fvisibility="hidden" @endcode
+  to ensure that all instances of (b) are visible to the linker.
+
+  What is duplicated in the binary is @em code, in (b).
+
+  The linker will make sure only one instance
+  of all the (b) methods is used.
+
+  (c) is a singleton implemented inside a method.
+
+  This is very desirable, because:
+
+  - the C++ compiler guarantees that construction
+    of the variable (c) is thread safe.
+
+  - constructors for (c) singletons are executed in code path order,
+    or not at all if the singleton is never used.
+
+  @section OTHER_SINGLETON
+
+  For other platforms, header only singletons are not supported at this
+point.
+
+  @section CODING_PATTERN
+
+  The coding pattern to use in the source code is as follows
+
+  @verbatim
+  class Foo
+  {
+    OPENTELEMETRY_API_SINGLETON
+    T& get_singleton()
+    {
+      static T singleton;
+      return singleton;
+    }
+  };
+  @endverbatim
+*/
+
+/* clang-format on */
+
+#if defined(__clang__)
+
+#  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+
+#elif defined(__GNUC__)
+
+#  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+
+#else
+
+/* Add support for other compilers here. */
+
+#  define OPENTELEMETRY_API_SINGLETON
+
+#endif
