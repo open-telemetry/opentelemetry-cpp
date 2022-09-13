@@ -23,8 +23,8 @@ class MockCollectorHandle : public CollectorHandle
 public:
   MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
-  AggregationTemporality GetAggregationTemporality(InstrumentType /*
-instrument_type */) noexcept override
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType /* instrument_type */) noexcept override
   {
     return temporality;
   }

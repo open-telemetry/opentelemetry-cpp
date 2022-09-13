@@ -88,8 +88,8 @@ public:
                   const opentelemetry::context::Context & /* context */) noexcept override
   {}
 
-  void RecordDouble(double /* value */, const opentelemetry::context::Context & /*
-context */) noexcept override
+  void RecordDouble(double /* value */,
+                    const opentelemetry::context::Context & /* context */) noexcept override
   {}
 
   void RecordDouble(double /* value */,

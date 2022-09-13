@@ -132,8 +132,8 @@ public:
     return std::unique_ptr<Recordable>(new LogRecord());
   }
 
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> & /*
-records */) noexcept override
+  ExportResult Export(
+      const nostd::span<std::unique_ptr<Recordable>> & /* records */) noexcept override
   {
     return ExportResult::kSuccess;
   }

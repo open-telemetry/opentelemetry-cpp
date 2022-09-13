@@ -249,8 +249,7 @@ void OStreamMetricExporter::printPointAttributes(
   }
 }
 
-bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds /* timeout
-*/) noexcept
+bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return true;

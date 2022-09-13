@@ -29,8 +29,8 @@ public:
   {
     got_response_ = true;
   }
-  virtual void OnEvent(http_client::SessionState state, nostd::string_view
-                       /* reason */) noexcept override
+  virtual void OnEvent(http_client::SessionState state,
+                       nostd::string_view /* reason */) noexcept override
   {
     switch (state)
     {
