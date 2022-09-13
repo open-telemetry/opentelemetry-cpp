@@ -68,8 +68,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             merged_metrics->Set(attributes, DefaultAggregation::CreateAggregation(
                                                 instrument_descriptor_, aggregation_config_.get())
                                                 ->Merge(aggregation));
-            merged_metrics->GetAllEnteries(
-                [](const MetricAttributes & /* attr */, Aggregation & /* aggr */) { return true; });
           }
           return true;
         });
@@ -111,8 +109,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   }
   else
   {
-    merged_metrics->GetAllEnteries(
-        [](const MetricAttributes & /* attr */, Aggregation & /* aggr */) { return true; });
     last_reported_metrics_.insert(
         std::make_pair(collector, LastReportedMetrics{std::move(merged_metrics), collection_ts}));
   }
