@@ -100,13 +100,13 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    bool attribute_storage_bool_value[]          = {true, false, true};
-    int32_t attribute_storage_int32_value[]      = {1, 2};
-    uint32_t attribute_storage_uint32_value[]    = {3, 4};
-    int64_t attribute_storage_int64_value[]      = {5, 6};
-    uint64_t attribute_storage_uint64_value[]    = {7, 8};
-    double attribute_storage_double_value[]      = {3.2, 3.3};
-    std::string attribute_storage_string_value[] = {"vector", "string"};
+    bool attribute_storage_bool_value[]                                = {true, false, true};
+    int32_t attribute_storage_int32_value[]                            = {1, 2};
+    uint32_t attribute_storage_uint32_value[]                          = {3, 4};
+    int64_t attribute_storage_int64_value[]                            = {5, 6};
+    uint64_t attribute_storage_uint64_value[]                          = {7, 8};
+    double attribute_storage_double_value[]                            = {3.2, 3.3};
+    opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
@@ -194,13 +194,13 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    bool attribute_storage_bool_value[]          = {true, false, true};
-    int32_t attribute_storage_int32_value[]      = {1, 2};
-    uint32_t attribute_storage_uint32_value[]    = {3, 4};
-    int64_t attribute_storage_int64_value[]      = {5, 6};
-    uint64_t attribute_storage_uint64_value[]    = {7, 8};
-    double attribute_storage_double_value[]      = {3.2, 3.3};
-    std::string attribute_storage_string_value[] = {"vector", "string"};
+    bool attribute_storage_bool_value[]                                = {true, false, true};
+    int32_t attribute_storage_int32_value[]                            = {1, 2};
+    uint32_t attribute_storage_uint32_value[]                          = {3, 4};
+    int64_t attribute_storage_int64_value[]                            = {5, 6};
+    uint64_t attribute_storage_uint64_value[]                          = {7, 8};
+    double attribute_storage_double_value[]                            = {3.2, 3.3};
+    opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
     sdk::logs::BatchLogProcessorOptions options;
@@ -296,13 +296,13 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    bool attribute_storage_bool_value[]          = {true, false, true};
-    int32_t attribute_storage_int32_value[]      = {1, 2};
-    uint32_t attribute_storage_uint32_value[]    = {3, 4};
-    int64_t attribute_storage_int64_value[]      = {5, 6};
-    uint64_t attribute_storage_uint64_value[]    = {7, 8};
-    double attribute_storage_double_value[]      = {3.2, 3.3};
-    std::string attribute_storage_string_value[] = {"vector", "string"};
+    bool attribute_storage_bool_value[]                                = {true, false, true};
+    int32_t attribute_storage_int32_value[]                            = {1, 2};
+    uint32_t attribute_storage_uint32_value[]                          = {3, 4};
+    int64_t attribute_storage_int64_value[]                            = {5, 6};
+    uint64_t attribute_storage_uint64_value[]                          = {7, 8};
+    double attribute_storage_double_value[]                            = {3.2, 3.3};
+    opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
     sdk::logs::BatchLogProcessorOptions processor_options;
@@ -390,13 +390,13 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    bool attribute_storage_bool_value[]          = {true, false, true};
-    int32_t attribute_storage_int32_value[]      = {1, 2};
-    uint32_t attribute_storage_uint32_value[]    = {3, 4};
-    int64_t attribute_storage_int64_value[]      = {5, 6};
-    uint64_t attribute_storage_uint64_value[]    = {7, 8};
-    double attribute_storage_double_value[]      = {3.2, 3.3};
-    std::string attribute_storage_string_value[] = {"vector", "string"};
+    bool attribute_storage_bool_value[]                                = {true, false, true};
+    int32_t attribute_storage_int32_value[]                            = {1, 2};
+    uint32_t attribute_storage_uint32_value[]                          = {3, 4};
+    int64_t attribute_storage_int64_value[]                            = {5, 6};
+    uint64_t attribute_storage_uint64_value[]                          = {7, 8};
+    double attribute_storage_double_value[]                            = {3.2, 3.3};
+    opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 

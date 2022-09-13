@@ -29,6 +29,7 @@
 #   opentelemetry-cpp::metrics                        - Imported target of opentelemetry-cpp::metrics
 #   opentelemetry-cpp::logs                           - Imported target of opentelemetry-cpp::logs
 #   opentelemetry-cpp::in_memory_span_exporter        - Imported target of opentelemetry-cpp::in_memory_span_exporter
+#   opentelemetry-cpp::otlp_grpc_client               - Imported target of opentelemetry-cpp::otlp_grpc_client
 #   opentelemetry-cpp::otlp_recordable                - Imported target of opentelemetry-cpp::otlp_recordable
 #   opentelemetry-cpp::otlp_grpc_exporter             - Imported target of opentelemetry-cpp::otlp_grpc_exporter
 #   opentelemetry-cpp::otlp_grpc_log_exporter         - Imported target of opentelemetry-cpp::otlp_grpc_log_exporter
@@ -85,6 +86,7 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     logs
     in_memory_span_exporter
     otlp_recordable
+    otlp_grpc_client
     otlp_grpc_exporter
     otlp_grpc_log_exporter
     otlp_grpc_metrics_exporter
