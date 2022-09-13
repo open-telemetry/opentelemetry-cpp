@@ -398,7 +398,7 @@ jobs:
         env BENCHMARK_DIR=/benchmark
         ./ci/do_ci.sh benchmark
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: benchmark_reports
         path: /home/runner/benchmark
