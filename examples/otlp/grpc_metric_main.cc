@@ -3,7 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
@@ -32,8 +32,7 @@ otlp_exporter::OtlpGrpcMetricExporterOptions options;
 
 void initMetrics()
 {
-  std::unique_ptr<metric_sdk::MetricExporter> exporter{
-      new otlp_exporter::OtlpGrpcMetricExporter(options)};
+  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(options);
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
