@@ -6,7 +6,7 @@ if(WITH_OTLP_GRPC)
   add_executable(example_otlp_grpc grpc_main.cc)
   target_link_libraries(
     example_otlp_grpc ${CMAKE_THREAD_LIBS_INIT} common_foo_library
-    opentelemetry_trace opentelemetry_exporter_otlp_grpc gRPC::grpc++)
+    opentelemetry_trace opentelemetry_exporter_otlp_grpc)
   if(WITH_LOGS_PREVIEW)
     add_executable(example_otlp_grpc_log grpc_log_main.cc)
     target_link_libraries(
@@ -16,8 +16,7 @@ if(WITH_OTLP_GRPC)
       opentelemetry_trace
       opentelemetry_logs
       opentelemetry_exporter_otlp_grpc
-      opentelemetry_exporter_otlp_grpc_log
-      gRPC::grpc++)
+      opentelemetry_exporter_otlp_grpc_log)
   endif()
 endif()
 
