@@ -19,6 +19,7 @@ Increment the:
 * [METRICS EXPORTER] Add `OtlpGrpcMetricExporterFactory` and `OtlpHttpMetricExporterFactory`.
   [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 * [METRICS EXPORTER] Add `OtlpGrpcClient` [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
+* [BUILD] Fix header only api singletons [#1604](https://github.com/open-telemetry/opentelemetry-cpp/pull/1604)
 
 ## [1.6.0] 2022-08-15
 
