@@ -16,12 +16,18 @@ class MockMetricReader : public MetricReader
 public:
   MockMetricReader() = default;
   AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept override
+      InstrumentType /* instrument_type */) const noexcept override
   {
     return AggregationTemporality::kCumulative;
   }
-  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+  virtual bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    return true;
+  }
+  virtual bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    return true;
+  }
   virtual void OnInitialized() noexcept override {}
 };
 
@@ -38,6 +44,6 @@ TEST(MetricReaderTest, BasicTests)
   std::shared_ptr<MeterContext> meter_context2(new MeterContext());
   std::shared_ptr<MetricProducer> metric_producer{
       new MetricCollector(meter_context2.get(), std::move(metric_reader2))};
-  metric_producer->Collect([](ResourceMetrics &metric_data) { return true; });
+  metric_producer->Collect([](ResourceMetrics & /* metric_data */) { return true; });
 }
 #endif

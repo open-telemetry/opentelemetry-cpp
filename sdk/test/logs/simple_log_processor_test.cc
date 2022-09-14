@@ -54,7 +54,7 @@ public:
   }
 
   // Increment the shutdown counter everytime this method is called
-  bool Shutdown(std::chrono::microseconds timeout) noexcept override
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     *shutdown_counter_ += 1;
     return true;
@@ -132,12 +132,13 @@ public:
     return std::unique_ptr<Recordable>(new LogRecord());
   }
 
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
+  ExportResult Export(
+      const nostd::span<std::unique_ptr<Recordable>> & /* records */) noexcept override
   {
     return ExportResult::kSuccess;
   }
 
-  bool Shutdown(std::chrono::microseconds timeout) noexcept override { return false; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return false; }
 };
 
 // Tests for when when processor should fail to shutdown

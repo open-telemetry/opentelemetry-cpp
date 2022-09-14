@@ -59,7 +59,7 @@ auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
 }
 
 template <class T, size_t N>
-size_t size(T (&array)[N]) noexcept
+size_t size(T (&/* array */)[N]) noexcept
 {
   return N;
 }

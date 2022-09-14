@@ -18,27 +18,21 @@ class MockMetricExporter : public MetricExporter
 
 public:
   MockMetricExporter() = default;
-  opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &records) noexcept override
+  opentelemetry::sdk::common::ExportResult Export(
+      const ResourceMetrics & /* records */) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
   AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept override
+      InstrumentType /* instrument_type */) const noexcept override
   {
     return AggregationTemporality::kCumulative;
   }
 
-  bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
-  {
-    return true;
-  }
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    return true;
-  }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };
 
 class MockMetricReader : public MetricReader
@@ -50,8 +44,14 @@ public:
   {
     return exporter_->GetAggregationTemporality(instrument_type);
   }
-  virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-  virtual bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+  virtual bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    return true;
+  }
+  virtual bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    return true;
+  }
   virtual void OnInitialized() noexcept override {}
 
 private:

@@ -104,7 +104,7 @@ class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map
-  AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>(){};
+  AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>() {}
 
   // Contruct attribute map and populate with attributes
   AttributeMap(const opentelemetry::common::KeyValueIterable &attributes) : AttributeMap()
@@ -152,7 +152,7 @@ class OrderedAttributeMap : public std::map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map
-  OrderedAttributeMap() : std::map<std::string, OwnedAttributeValue>(){};
+  OrderedAttributeMap() : std::map<std::string, OwnedAttributeValue>() {}
 
   // Contruct attribute map and populate with attributes
   OrderedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes)

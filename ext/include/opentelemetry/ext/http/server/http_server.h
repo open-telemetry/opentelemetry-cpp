@@ -53,15 +53,15 @@ protected:
   CallbackFunction callback = nullptr;
 
 public:
-  HttpRequestCallback(){};
+  HttpRequestCallback() {}
 
   HttpRequestCallback &operator=(HttpRequestCallback other)
   {
     callback = other.callback;
     return *this;
-  };
+  }
 
-  HttpRequestCallback(CallbackFunction func) : callback(func){};
+  HttpRequestCallback(CallbackFunction func) : callback(func) {}
 
   HttpRequestCallback &operator=(CallbackFunction func)
   {
@@ -76,7 +76,7 @@ public:
       return callback(request, response);
     }
     return 0;
-  };
+  }
 };
 
 // Simple HTTP server
@@ -123,32 +123,32 @@ protected:
     {
       first  = key;
       second = value;
-    };
+    }
 
     HttpRequestHandler() : std::pair<std::string, HttpRequestCallback *>()
     {
       first  = "";
       second = nullptr;
-    };
+    }
 
     HttpRequestHandler &operator=(std::pair<std::string, HttpRequestCallback *> other)
     {
       first  = other.first;
       second = other.second;
       return (*this);
-    };
+    }
 
     HttpRequestHandler &operator=(HttpRequestCallback &cb)
     {
       second = &cb;
       return (*this);
-    };
+    }
 
     HttpRequestHandler &operator=(HttpRequestCallback *cb)
     {
       second = cb;
       return (*this);
-    };
+    }
   };
 
   std::list<HttpRequestHandler> m_handlers;
@@ -164,7 +164,8 @@ public:
         allowKeepalive(true),
         m_reactor(*this),
         m_maxRequestHeadersSize(8192),
-        m_maxRequestContentSize(2 * 1024 * 1024){};
+        m_maxRequestContentSize(2 * 1024 * 1024)
+  {}
 
   HttpServer(std::string serverHost, int port = 30000) : HttpServer()
   {
@@ -172,7 +173,7 @@ public:
     os << serverHost << ":" << port;
     setServerName(os.str());
     addListeningPort(port);
-  };
+  }
 
   ~HttpServer()
   {
@@ -229,7 +230,7 @@ public:
     LOG_INFO("HttpServer: Added handler for %s", other.first.c_str());
     m_handlers.push_back(HttpRequestHandler(other.first, &other.second));
     return (*this);
-  };
+  }
 
   void start() { m_reactor.start(); }
 

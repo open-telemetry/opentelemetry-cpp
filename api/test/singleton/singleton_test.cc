@@ -78,10 +78,11 @@ void reset_counts()
 class MyTracer : public trace::Tracer
 {
 public:
-  nostd::shared_ptr<trace::Span> StartSpan(nostd::string_view name,
-                                           const common::KeyValueIterable &attributes,
-                                           const trace::SpanContextKeyValueIterable &links,
-                                           const trace::StartSpanOptions &options) noexcept override
+  nostd::shared_ptr<trace::Span> StartSpan(
+      nostd::string_view name,
+      const common::KeyValueIterable & /* attributes */,
+      const trace::SpanContextKeyValueIterable & /* links */,
+      const trace::StartSpanOptions & /* options */) noexcept override
   {
     nostd::shared_ptr<trace::Span> result(new trace::DefaultSpan(trace::SpanContext::GetInvalid()));
 
@@ -169,9 +170,9 @@ public:
     return result;
   }
 
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override {}
+  void ForceFlushWithMicroseconds(uint64_t /* timeout */) noexcept override {}
 
-  void CloseWithMicroseconds(uint64_t timeout) noexcept override {}
+  void CloseWithMicroseconds(uint64_t /* timeout */) noexcept override {}
 };
 
 class MyTracerProvider : public trace::TracerProvider
@@ -183,9 +184,9 @@ public:
     return result;
   }
 
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view library_name,
-                                             nostd::string_view library_version,
-                                             nostd::string_view schema_url) noexcept override
+  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* library_name */,
+                                             nostd::string_view /* library_version */,
+                                             nostd::string_view /* schema_url */) noexcept override
   {
     nostd::shared_ptr<trace::Tracer> result(new MyTracer());
     return result;
