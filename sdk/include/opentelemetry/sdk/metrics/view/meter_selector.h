@@ -16,22 +16,22 @@ public:
   MeterSelector(opentelemetry::nostd::string_view name,
                 opentelemetry::nostd::string_view version,
                 opentelemetry::nostd::string_view schema)
-      : name_filter_{std::move(PredicateFactory::GetPredicate(name, PredicateType::kExact))},
-        version_filter_{std::move(PredicateFactory::GetPredicate(version, PredicateType::kExact))},
-        schema_filter_{std::move(PredicateFactory::GetPredicate(schema, PredicateType::kExact))}
+      : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kExact)},
+        version_filter_{PredicateFactory::GetPredicate(version, PredicateType::kExact)},
+        schema_filter_{PredicateFactory::GetPredicate(schema, PredicateType::kExact)}
   {}
 
   // Returns name filter predicate. This shouldn't be deleted
-  const opentelemetry::sdk::metrics::Predicate *const GetNameFilter() { return name_filter_.get(); }
+  const opentelemetry::sdk::metrics::Predicate *GetNameFilter() const { return name_filter_.get(); }
 
   // Returns version filter predicate. This shouldn't be deleted
-  const opentelemetry::sdk::metrics::Predicate *const GetVersionFilter()
+  const opentelemetry::sdk::metrics::Predicate *GetVersionFilter() const
   {
     return version_filter_.get();
   }
 
   // Returns schema filter predicate. This shouldn't be deleted
-  const opentelemetry::sdk::metrics::Predicate *const GetSchemaFilter()
+  const opentelemetry::sdk::metrics::Predicate *GetSchemaFilter() const
   {
     return schema_filter_.get();
   }

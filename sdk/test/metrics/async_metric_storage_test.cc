@@ -31,6 +31,8 @@ class MockCollectorHandle : public CollectorHandle
 public:
   MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
+  virtual ~MockCollectorHandle() {}
+
   AggregationTemporality GetAggregationTemporality(
       InstrumentType /* instrument_type */) noexcept override
   {

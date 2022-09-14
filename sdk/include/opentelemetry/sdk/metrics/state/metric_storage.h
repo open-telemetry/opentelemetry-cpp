@@ -54,6 +54,9 @@ public:
 class AsyncWritableMetricStorage
 {
 public:
+  AsyncWritableMetricStorage() {}
+  virtual ~AsyncWritableMetricStorage() {}
+
   /* Records a batch of measurements */
   virtual void RecordLong(
       const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
@@ -81,7 +84,7 @@ public:
 class NoopWritableMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept = 0;
+  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override = 0;
 
   void RecordLong(long /* value */,
                   const opentelemetry::common::KeyValueIterable & /* attributes */,

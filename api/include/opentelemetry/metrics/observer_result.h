@@ -24,6 +24,8 @@ class ObserverResultT
 {
 
 public:
+  virtual ~ObserverResultT() {}
+
   virtual void Observe(T value) noexcept = 0;
 
   virtual void Observe(T value, const common::KeyValueIterable &attributes) noexcept = 0;

@@ -16,7 +16,11 @@ namespace metrics
 {
 
 class SynchronousInstrument
-{};
+{
+public:
+  SynchronousInstrument(){}
+  virtual ~SynchronousInstrument() {}
+};
 
 template <class T>
 class Counter : public SynchronousInstrument

@@ -37,6 +37,8 @@ public:
         attributes_processor_{std::move(attributes_processor)}
   {}
 
+  virtual ~View() {}
+
   virtual std::string GetName() const noexcept { return name_; }
 
   virtual std::string GetDescription() const noexcept { return description_; }

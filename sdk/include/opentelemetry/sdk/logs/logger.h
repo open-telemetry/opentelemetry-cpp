@@ -58,6 +58,19 @@ public:
            opentelemetry::trace::TraceFlags trace_flags,
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
+  // Deprecated
+  void Log(opentelemetry::logs::Severity severity,
+           nostd::string_view /* name */,
+           nostd::string_view body,
+           const opentelemetry::common::KeyValueIterable &attributes,
+           opentelemetry::trace::TraceId trace_id,
+           opentelemetry::trace::SpanId span_id,
+           opentelemetry::trace::TraceFlags trace_flags,
+           opentelemetry::common::SystemTimestamp timestamp) noexcept override
+  {
+    Log(severity, body, attributes, trace_id, span_id, trace_flags, timestamp);
+  }
+
   /** Returns the associated instrumentation scope */
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
       const noexcept;

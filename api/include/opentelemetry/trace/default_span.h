@@ -22,33 +22,34 @@ public:
   // Returns an invalid span.
   static DefaultSpan GetInvalid() { return DefaultSpan(SpanContext::GetInvalid()); }
 
-  trace::SpanContext GetContext() const noexcept { return span_context_; }
+  trace::SpanContext GetContext() const noexcept override { return span_context_; }
 
-  bool IsRecording() const noexcept { return false; }
+  bool IsRecording() const noexcept override { return false; }
 
   void SetAttribute(nostd::string_view /* key */,
-                    const common::AttributeValue & /* value */) noexcept
+                    const common::AttributeValue & /* value */) noexcept override
   {}
 
-  void AddEvent(nostd::string_view /* name */) noexcept {}
+  void AddEvent(nostd::string_view /* name */) noexcept override {}
 
-  void AddEvent(nostd::string_view /* name */, common::SystemTimestamp /* timestamp */) noexcept {}
+  void AddEvent(nostd::string_view /* name */,
+                common::SystemTimestamp /* timestamp */) noexcept override
+  {}
+
+  void AddEvent(nostd::string_view /* name */,
+                const common::KeyValueIterable & /* attributes */) noexcept override
+  {}
 
   void AddEvent(nostd::string_view /* name */,
                 common::SystemTimestamp /* timestamp */,
-                const common::KeyValueIterable & /* attributes */) noexcept
+                const common::KeyValueIterable & /* attributes */) noexcept override
   {}
 
-  void AddEvent(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept
-  {
-    this->AddEvent(name, std::chrono::system_clock::now(), attributes);
-  }
+  void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
 
-  void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept {}
+  void UpdateName(nostd::string_view /* name */) noexcept override {}
 
-  void UpdateName(nostd::string_view /* name */) noexcept {}
-
-  void End(const EndSpanOptions & /* options */ = {}) noexcept {}
+  void End(const EndSpanOptions & /* options */) noexcept override {}
 
   nostd::string_view ToString() const noexcept { return "DefaultSpan"; }
 

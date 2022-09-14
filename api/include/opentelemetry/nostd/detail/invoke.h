@@ -97,7 +97,7 @@ inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&... args)
 
 template <typename F, typename... Args>
 inline constexpr auto invoke(F &&f, Args &&... args)
-    OPENTELEMETRY_RETURN(detail::invoke_impl(std::forward<F>(f), std::forward<Args>(args)...));
+    OPENTELEMETRY_RETURN(detail::invoke_impl(std::forward<F>(f), std::forward<Args>(args)...))
 
 namespace detail
 {
