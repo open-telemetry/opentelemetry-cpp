@@ -22,22 +22,15 @@ public:
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
-  bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
-  {
-    return false;
-  }
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return false; }
 
   sdk::metrics::AggregationTemporality GetAggregationTemporality(
-      sdk::metrics::InstrumentType instrument_type) const noexcept override
+      sdk::metrics::InstrumentType /* instrument_type */) const noexcept override
   {
     return sdk::metrics::AggregationTemporality::kCumulative;
   }
 
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    return true;
-  }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
   size_t GetDataCount() { return records_.size(); }
 

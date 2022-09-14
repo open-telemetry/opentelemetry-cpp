@@ -14,16 +14,18 @@ namespace metrics
 class NeverSampleFilter final : public ExemplarFilter
 {
 public:
-  bool ShouldSampleMeasurement(long value,
-                               const MetricAttributes &attributes,
-                               const opentelemetry::context::Context &context) noexcept override
+  bool ShouldSampleMeasurement(
+      long /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */) noexcept override
   {
     return false;
   }
 
-  bool ShouldSampleMeasurement(double value,
-                               const MetricAttributes &attributes,
-                               const opentelemetry::context::Context &context) noexcept override
+  bool ShouldSampleMeasurement(
+      double /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */) noexcept override
   {
     return false;
   }

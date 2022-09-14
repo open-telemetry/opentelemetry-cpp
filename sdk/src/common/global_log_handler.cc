@@ -20,7 +20,7 @@ void DefaultLogHandler::Handle(LogLevel level,
                                const char *file,
                                int line,
                                const char *msg,
-                               const sdk::common::AttributeMap &attributes) noexcept
+                               const sdk::common::AttributeMap & /* attributes */) noexcept
 {
   std::stringstream output_s;
   output_s << "[" << LevelToString(level) << "] ";

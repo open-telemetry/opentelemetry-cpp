@@ -22,7 +22,7 @@ public:
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
 
@@ -42,7 +42,7 @@ public:
   DoubleLastValueAggregation(LastValuePointData &&);
   DoubleLastValueAggregation(const LastValuePointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 

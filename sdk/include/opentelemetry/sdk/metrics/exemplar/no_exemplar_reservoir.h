@@ -18,24 +18,26 @@ class NoExemplarReservoir final : public ExemplarReservoir
 {
 
 public:
-  void OfferMeasurement(long value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      long /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     // Stores nothing
   }
 
-  void OfferMeasurement(double value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      double /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     // Stores nothing.
   }
 
-  std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
-      const MetricAttributes &pointAttributes) noexcept override
+  std::vector<ExemplarData> CollectAndReset(
+      const MetricAttributes & /* pointAttributes */) noexcept override
   {
     return std::vector<std::shared_ptr<ExemplarData>>{};
   }

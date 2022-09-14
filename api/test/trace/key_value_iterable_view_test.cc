@@ -13,10 +13,11 @@ static int TakeKeyValues(const common::KeyValueIterable &iterable)
 {
   std::map<std::string, common::AttributeValue> result;
   int count = 0;
-  iterable.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    ++count;
-    return true;
-  });
+  iterable.ForEachKeyValue(
+      [&](nostd::string_view /* key */, common::AttributeValue /* value */) noexcept {
+        ++count;
+        return true;
+      });
   return count;
 }
 

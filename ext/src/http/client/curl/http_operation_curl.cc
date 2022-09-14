@@ -171,10 +171,10 @@ int HttpOperation::PreRequestCallback(void *clientp, char *, char *, int, int)
 
 #if LIBCURL_VERSION_NUM >= 0x072000
 int HttpOperation::OnProgressCallback(void *clientp,
-                                      curl_off_t dltotal,
-                                      curl_off_t dlnow,
-                                      curl_off_t ultotal,
-                                      curl_off_t ulnow)
+                                      curl_off_t /* dltotal */,
+                                      curl_off_t /* dlnow */,
+                                      curl_off_t /* ultotal */,
+                                      curl_off_t /* ulnow */)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(clientp);
   if (nullptr == self)
@@ -196,10 +196,10 @@ int HttpOperation::OnProgressCallback(void *clientp,
 }
 #else
 int HttpOperation::OnProgressCallback(void *clientp,
-                                      double dltotal,
-                                      double dlnow,
-                                      double ultotal,
-                                      double ulnow)
+                                      double /* dltotal */,
+                                      double /* dlnow */,
+                                      double /* ultotal */,
+                                      double /* ulnow */)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(clientp);
   if (nullptr == self)
