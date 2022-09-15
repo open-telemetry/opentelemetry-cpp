@@ -65,9 +65,9 @@ template <class SpanType, class TracerType>
 SpanType *new_span(TracerType *objPtr,
                    nostd::string_view name,
                    const opentelemetry::trace::StartSpanOptions &options,
-                   const opentelemetry::trace::SpanContext &span_context)
+                   std::unique_ptr<opentelemetry::trace::SpanContext> span_context)
 {
-  return new (std::nothrow) SpanType{*objPtr, name, options, span_context};
+  return new (std::nothrow) SpanType{*objPtr, name, options, std::move(span_context)};
 }
 
 /**
@@ -419,9 +419,13 @@ public:
     auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
     // Sampling based on attributes is not supported for now, so passing empty below.
+    std::map<std::string, int> empty_attributes = {{}};
     opentelemetry::sdk::trace::SamplingResult sampling_result =
         GetSampler(tracerProvider_)
-            .ShouldSample(parentContext, traceId, name, options.kind, {}, links);
+            .ShouldSample(parentContext, traceId, name, options.kind,
+                          opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+                              empty_attributes),
+                          links);
 
     opentelemetry::trace::TraceFlags trace_flags =
         sampling_result.decision == opentelemetry::sdk::trace::Decision::DROP
@@ -433,8 +437,8 @@ public:
             traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), trace_flags, false,
             sampling_result.trace_state
                 ? sampling_result.trace_state
-                : parentContext.IsValid ? parentContext.trace_state()
-                                        : opentelemetry::trace::TraceState::GetDefault()));
+                : parentContext.IsValid() ? parentContext.trace_state()
+                                          : opentelemetry::trace::TraceState::GetDefault()));
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
@@ -459,10 +463,8 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options, spanContext);
+    auto currentSpan = new_span<Span, Tracer>(this, name, options, std::move(spanContext));
     nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
-
-    // auto spanContext = result->GetContext();
 
     // Decorate with additional standard fields
     std::string eventName = name.data();
@@ -478,13 +480,13 @@ public:
       {
         evt[ETW_FIELD_SPAN_PARENTID] = ToLowerBase16(parentContext.span_id());
       }
-      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(result.get()->GetContext().span_id());
     }
 
     // Populate Etw.Payload["TraceId"] attribute
     if (cfg.enableTraceId)
     {
-      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(result.get()->GetContext().trace_id());
     }
 
     // Populate Etw.ActivityId at envelope level if enabled
@@ -708,7 +710,7 @@ protected:
    */
   Span *GetParent() const { return parent_; }
 
-  opentelemetry::trace::SpanContext context_;
+  std::unique_ptr<opentelemetry::trace::SpanContext> context_;
 
 public:
   /**
@@ -762,12 +764,12 @@ public:
   Span(Tracer &owner,
        nostd::string_view name,
        const opentelemetry::trace::StartSpanOptions &options,
-       const opentelemetry::trace::SpanContext &span_context,
+       std::unique_ptr<opentelemetry::trace::SpanContext> span_context,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
-        context_(span_context),
+        context_(std::move(span_context)),
         parent_(parent)
   {
     name_ = name;
@@ -886,7 +888,7 @@ public:
    * @brief Obtain SpanContext
    * @return
    */
-  opentelemetry::trace::SpanContext GetContext() const noexcept override { return context_; }
+  opentelemetry::trace::SpanContext GetContext() const noexcept override { return *context_.get(); }
 
   /**
    * @brief Check if Span is recording data.
