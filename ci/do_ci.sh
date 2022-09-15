@@ -334,19 +334,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
   exit 0
-elif [[ "$1" == "cmake.exporter.otlp.grpc.latest.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
-        -DENABLE_LOGS_PREVIEW=ON \
-        "${SRC_DIR}"
-  grpc_cpp_plugin=`which grpc_cpp_plugin`
-  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
-  make -j $(nproc)
-  cd exporters/otlp && make test
-  exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.43.2" > third_party_release
   echo "thrift=0.14.1" >> third_party_release
