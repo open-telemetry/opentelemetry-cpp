@@ -33,7 +33,7 @@ public:
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
-   * with the other Resource. In case of a collision, current Resource takes
+   * with the other Resource. In case of a collision, the other Resource takes
    * precedence.
    *
    * @param other the Resource that will be merged with this.

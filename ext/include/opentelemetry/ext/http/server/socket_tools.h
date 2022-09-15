@@ -33,7 +33,7 @@
 #    include <sys/epoll.h>
 #  endif
 
-#  if __APPLE__
+#  ifdef __APPLE__
 #    include "TargetConditionals.h"
 // Use kqueue on mac
 #    include <sys/event.h>

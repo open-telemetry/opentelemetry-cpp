@@ -40,8 +40,8 @@ public:
     return exporter_->MakeRecordable();
   }
 
-  void OnStart(Recordable &span,
-               const opentelemetry::trace::SpanContext &parent_context) noexcept override
+  void OnStart(Recordable & /* span */,
+               const opentelemetry::trace::SpanContext & /* parent_context */) noexcept override
   {}
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
@@ -55,11 +55,7 @@ public:
     }
   }
 
-  bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
-  {
-    return true;
-  }
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override

@@ -43,7 +43,7 @@ void SimpleLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcep
 /**
  *  The simple processor does not have any log records to flush so this method is not used
  */
-bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }

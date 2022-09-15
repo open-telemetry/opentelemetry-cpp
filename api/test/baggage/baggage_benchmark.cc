@@ -46,7 +46,8 @@ void BM_ExtractBaggageHavingTenEntries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(kNumEntries));
   while (state.KeepRunning())
   {
-    baggage->GetAllEntries([](nostd::string_view key, nostd::string_view value) { return true; });
+    baggage->GetAllEntries(
+        [](nostd::string_view /* key */, nostd::string_view /* value */) { return true; });
   }
 }
 BENCHMARK(BM_ExtractBaggageHavingTenEntries);
@@ -66,7 +67,8 @@ void BM_ExtractBaggageWith180Entries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(Baggage::kMaxKeyValuePairs));
   while (state.KeepRunning())
   {
-    baggage->GetAllEntries([](nostd::string_view key, nostd::string_view value) { return true; });
+    baggage->GetAllEntries(
+        [](nostd::string_view /* key */, nostd::string_view /* value */) { return true; });
   }
 }
 BENCHMARK(BM_ExtractBaggageWith180Entries);

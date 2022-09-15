@@ -24,7 +24,7 @@ public:
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   /* Returns the result of merge of the existing aggregation with delta aggregation with same
    * boundaries */
@@ -53,7 +53,7 @@ public:
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
