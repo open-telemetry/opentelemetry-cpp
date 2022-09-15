@@ -64,9 +64,10 @@ class Span;
 template <class SpanType, class TracerType>
 SpanType *new_span(TracerType *objPtr,
                    nostd::string_view name,
-                   const opentelemetry::trace::StartSpanOptions &options)
+                   const opentelemetry::trace::StartSpanOptions &options,
+                   const opentelemetry::trace::SpanContext &span_context)
 {
-  return new (std::nothrow) SpanType{*objPtr, name, options};
+  return new (std::nothrow) SpanType{*objPtr, name, options, span_context};
 }
 
 /**
@@ -374,30 +375,6 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
-
-    // Parent Context:
-    // - either use current span
-    // - or attach to parent SpanContext specified in options
-    opentelemetry::trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
-    if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
-    {
-      auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
-      if (span_context.IsValid())
-      {
-        parentContext = span_context;
-      }
-    }
-    auto sampling_result =
-        GetSampler(tracerProvider_)
-            .ShouldSample(parentContext, traceId_, name, options.kind, attributes, links);
-    if (sampling_result.decision == sdk::trace::Decision::DROP)
-    {
-      static nostd::shared_ptr<trace::Span> noop_span(
-          new trace::NoopSpan{this->shared_from_this()});
-      return noop_span;
-    }
-
 #ifdef OPENTELEMETRY_RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
@@ -433,11 +410,36 @@ public:
     opentelemetry::trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
     if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
     {
-      auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
-      if (span_context.IsValid())
+      auto spanContext = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
+      if (spanContext.IsValid())
       {
-        parentContext = span_context;
+        parentContext = spanContext;
       }
+    }
+    auto sampling_result =
+        GetSampler(tracerProvider_)
+            .ShouldSample(parentContext, traceId_, name, options.kind, attributes, links);
+
+    auto trace_flags =
+        sampling_result.decision == Decision::DROP
+            ? opentelemetry::trace::TraceFlags{}
+            : opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled};
+
+    auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
+
+    auto spanContext =
+        std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
+            traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), trace_flags, false,
+            sampling_result.trace_state
+                ? sampling_result.trace_state
+                : parentContext.IsValid ? parent_context.trace_state()
+                                        : opentelemetry::trace::TraceState::GetDefault()));
+
+    if (sampling_result.decision == sdk::trace::Decision::DROP)
+    {
+      static nostd::shared_ptr<trace::Span> noop_span(
+          new trace::NoopSpan{this->shared_from_this()});
+      return noop_span;
     }
 
     // Populate Etw.RelatedActivityId at envelope level if enabled
@@ -456,10 +458,10 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options);
+    auto currentSpan = new_span<Span, Tracer>(this, name, options, spanContext);
     nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
 
-    auto spanContext = result->GetContext();
+    // auto spanContext = result->GetContext();
 
     // Decorate with additional standard fields
     std::string eventName = name.data();
@@ -759,13 +761,13 @@ public:
   Span(Tracer &owner,
        nostd::string_view name,
        const opentelemetry::trace::StartSpanOptions &options,
+       const opentelemetry::trace::SpanContext &span_context,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
-        parent_(parent),
-        context_{owner.traceId_, GetIdGenerator(owner.tracerProvider_).GenerateSpanId(),
-                 opentelemetry::trace::TraceFlags{0}, false}
+        context_(span_context),
+        parent_(parent)
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
