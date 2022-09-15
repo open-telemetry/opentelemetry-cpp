@@ -47,7 +47,8 @@ LongHistogramAggregation::LongHistogramAggregation(const HistogramPointData &dat
     : point_data_{data}, record_min_max_{point_data_.record_min_max_}
 {}
 
-void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
+void LongHistogramAggregation::Aggregate(long value,
+                                         const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
@@ -130,7 +131,8 @@ DoubleHistogramAggregation::DoubleHistogramAggregation(const HistogramPointData 
     : point_data_{data}
 {}
 
-void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
+void DoubleHistogramAggregation::Aggregate(double value,
+                                           const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;

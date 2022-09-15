@@ -28,7 +28,8 @@ public:
 
   Baggage() noexcept : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
   Baggage(size_t size) noexcept
-      : kv_properties_(new opentelemetry::common::KeyValueProperties(size)){};
+      : kv_properties_(new opentelemetry::common::KeyValueProperties(size))
+  {}
 
   template <class T>
   Baggage(const T &keys_and_values) noexcept

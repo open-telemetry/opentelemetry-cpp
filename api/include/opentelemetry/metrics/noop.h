@@ -19,16 +19,17 @@ template <class T>
 class NoopCounter : public Counter<T>
 {
 public:
-  NoopCounter(nostd::string_view name,
-              nostd::string_view description,
-              nostd::string_view unit) noexcept
+  NoopCounter(nostd::string_view /* name */,
+              nostd::string_view /* description */,
+              nostd::string_view /* unit */) noexcept
   {}
-  void Add(T value) noexcept override {}
-  void Add(T value, const opentelemetry::context::Context &context) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
-  void Add(T value,
-           const common::KeyValueIterable &attributes,
-           const opentelemetry::context::Context &context) noexcept override
+  void Add(T /* value */) noexcept override {}
+  void Add(T /* value */, const opentelemetry::context::Context & /* context */) noexcept override
+  {}
+  void Add(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
+  void Add(T /* value */,
+           const common::KeyValueIterable & /* attributes */,
+           const opentelemetry::context::Context & /* context */) noexcept override
   {}
 };
 
@@ -36,14 +37,16 @@ template <class T>
 class NoopHistogram : public Histogram<T>
 {
 public:
-  NoopHistogram(nostd::string_view name,
-                nostd::string_view description,
-                nostd::string_view unit) noexcept
+  NoopHistogram(nostd::string_view /* name */,
+                nostd::string_view /* description */,
+                nostd::string_view /* unit */) noexcept
   {}
-  void Record(T value, const opentelemetry::context::Context &context) noexcept override {}
-  void Record(T value,
-              const common::KeyValueIterable &attributes,
-              const opentelemetry::context::Context &context) noexcept override
+  void Record(T /* value */,
+              const opentelemetry::context::Context & /* context */) noexcept override
+  {}
+  void Record(T /* value */,
+              const common::KeyValueIterable & /* attributes */,
+              const opentelemetry::context::Context & /* context */) noexcept override
   {}
 };
 
@@ -51,29 +54,30 @@ template <class T>
 class NoopUpDownCounter : public UpDownCounter<T>
 {
 public:
-  NoopUpDownCounter(nostd::string_view name,
-                    nostd::string_view description,
-                    nostd::string_view unit) noexcept
+  NoopUpDownCounter(nostd::string_view /* name */,
+                    nostd::string_view /* description */,
+                    nostd::string_view /* unit */) noexcept
   {}
-  void Add(T value) noexcept override {}
-  void Add(T value, const opentelemetry::context::Context &context) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
-  void Add(T value,
-           const common::KeyValueIterable &attributes,
-           const opentelemetry::context::Context &context) noexcept override
+  void Add(T /* value */) noexcept override {}
+  void Add(T /* value */, const opentelemetry::context::Context & /* context */) noexcept override
+  {}
+  void Add(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
+  void Add(T /* value */,
+           const common::KeyValueIterable & /* attributes */,
+           const opentelemetry::context::Context & /* context */) noexcept override
   {}
 };
 
 class NoopObservableInstrument : public ObservableInstrument
 {
 public:
-  NoopObservableInstrument(nostd::string_view name,
-                           nostd::string_view description,
-                           nostd::string_view unit) noexcept
+  NoopObservableInstrument(nostd::string_view /* name */,
+                           nostd::string_view /* description */,
+                           nostd::string_view /* unit */) noexcept
   {}
 
-  void AddCallback(ObservableCallbackPtr, void *state) noexcept override {}
-  void RemoveCallback(ObservableCallbackPtr, void *state) noexcept override {}
+  void AddCallback(ObservableCallbackPtr, void * /* state */) noexcept override {}
+  void RemoveCallback(ObservableCallbackPtr, void * /* state */) noexcept override {}
 };
 
 /**
@@ -194,9 +198,9 @@ class NoopMeterProvider final : public MeterProvider
 public:
   NoopMeterProvider() : meter_{nostd::shared_ptr<Meter>(new NoopMeter)} {}
 
-  nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
-                                    nostd::string_view library_version,
-                                    nostd::string_view schema_url) noexcept override
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view /* library_name */,
+                                    nostd::string_view /* library_version */,
+                                    nostd::string_view /* schema_url */) noexcept override
   {
     return meter_;
   }

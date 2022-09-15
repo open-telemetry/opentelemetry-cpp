@@ -41,7 +41,7 @@ public:
 
   template <class T>
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
-              opentelemetry::common::SystemTimestamp observation_time) noexcept
+              opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     // process the read measurements - aggregate and store in hashmap
     for (auto &measurement : measurements)

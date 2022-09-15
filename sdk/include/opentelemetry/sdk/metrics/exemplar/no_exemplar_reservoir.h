@@ -23,24 +23,26 @@ public:
     return nostd::shared_ptr<ExemplarReservoir>{new NoExemplarReservoir{}};
   }
 
-  void OfferMeasurement(long value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      long /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     // Stores nothing
   }
 
-  void OfferMeasurement(double value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      double /* value */,
+      const MetricAttributes & /* attributes */,
+      const opentelemetry::context::Context & /* context */,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     // Stores nothing.
   }
 
   std::vector<ExemplarData> CollectAndReset(
-      const MetricAttributes &pointAttributes) noexcept override
+      const MetricAttributes & /* pointAttributes */) noexcept override
   {
     return std::vector<ExemplarData>{};
   }
