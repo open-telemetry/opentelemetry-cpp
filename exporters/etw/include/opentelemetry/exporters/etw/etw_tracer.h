@@ -416,23 +416,24 @@ public:
         parentContext = spanContext;
       }
     }
-    auto sampling_result =
-        GetSampler(tracerProvider_)
-            .ShouldSample(parentContext, traceId_, name, options.kind, attributes, links);
+    auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
-    auto trace_flags =
-        sampling_result.decision == Decision::DROP
+    // Sampling based on attributes is not supported for now, so passing empty below.
+    opentelemetry::sdk::trace::SamplingResult sampling_result =
+        GetSampler(tracerProvider_)
+            .ShouldSample(parentContext, traceId, name, options.kind, {}, links);
+
+    opentelemetry::trace::TraceFlags trace_flags =
+        sampling_result.decision == opentelemetry::sdk::trace::Decision::DROP
             ? opentelemetry::trace::TraceFlags{}
             : opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled};
-
-    auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
     auto spanContext =
         std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
             traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), trace_flags, false,
             sampling_result.trace_state
                 ? sampling_result.trace_state
-                : parentContext.IsValid ? parent_context.trace_state()
+                : parentContext.IsValid ? parentContext.trace_state()
                                         : opentelemetry::trace::TraceState::GetDefault()));
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
