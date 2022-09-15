@@ -16,26 +16,28 @@ using namespace opentelemetry::sdk::metrics;
 class TestMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(long /* value */,
+                  const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_long++;
   }
 
-  void RecordLong(long value,
-                  const opentelemetry::common::KeyValueIterable &attributes,
-                  const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(long /* value */,
+                  const opentelemetry::common::KeyValueIterable & /* attributes */,
+                  const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_long++;
   }
 
-  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double /* value */,
+                    const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_double++;
   }
 
-  void RecordDouble(double value,
-                    const opentelemetry::common::KeyValueIterable &attributes,
-                    const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double /* value */,
+                    const opentelemetry::common::KeyValueIterable & /* attributes */,
+                    const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_double++;
   }

@@ -183,8 +183,6 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export()
 {
-  uint64_t current_pending;
-  uint64_t current_notified;
   do
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;

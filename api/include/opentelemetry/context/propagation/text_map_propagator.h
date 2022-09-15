@@ -26,7 +26,7 @@ public:
 
   /* list of all the keys in the carrier.
    By default, it returns true without invoking callback */
-  virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept
+  virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> /* callback */) const noexcept
   {
     return true;
   }

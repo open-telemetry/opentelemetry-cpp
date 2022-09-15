@@ -58,8 +58,7 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
-  bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     *is_shutdown_ = true;
     return true;

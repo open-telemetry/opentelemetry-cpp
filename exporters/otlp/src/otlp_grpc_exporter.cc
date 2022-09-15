@@ -72,7 +72,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
