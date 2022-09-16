@@ -7,6 +7,7 @@
 #  include <map>
 #  include <string>
 
+#  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
@@ -14,6 +15,7 @@
 using namespace OPENTELEMETRY_NAMESPACE;
 
 using namespace opentelemetry::exporter::etw;
+using namespace opentelemetry::sdk::trace;
 
 const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
 
@@ -38,6 +40,42 @@ class MockIdGenerator : public sdk::trace::IdGenerator
   }
   uint8_t buf_span[8]   = {1, 2, 3, 4, 5, 6, 7, 8};
   uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+};
+
+/* A Custom Sampler, implementing parent based sampler*/
+class MockSampler : public sdk::trace::Sampler
+{
+public:
+  MockSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
+      : delegate_sampler_(delegate_sampler)
+  {}
+  sdk::trace::SamplingResult ShouldSample(
+      const trace_api::SpanContext &parent_context,
+      trace_api::TraceId trace_id,
+      nostd::string_view name,
+      trace_api::SpanKind span_kind,
+      const opentelemetry::common::KeyValueIterable &attributes,
+      const trace_api::SpanContextKeyValueIterable &links) noexcept
+  {
+    if (!parent_context.IsValid())
+    {
+      // If no parent (root span) exists returns the result of the delegateSampler
+      return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes,
+                                             links);
+    }
+
+    // If parent exists:
+    if (parent_context.IsSampled())
+    {
+      return {Decision::RECORD_AND_SAMPLE, nullptr, parent_context.trace_state()};
+    }
+    return {Decision::DROP, nullptr, parent_context.trace_state()};
+  }
+
+  nostd::string_view GetDescription() const noexcept { return "Custom Sampler"; }
+
+private:
+  std::shared_ptr<Sampler> delegate_sampler_;
 };
 
 /* clang-format off */
@@ -417,7 +455,8 @@ TEST(ETWTracer, AlwayOffSampler)
      std::move(always_off));
   auto tracer = tp.GetTracer(providerName);
   auto span = tracer->StartSpan("span_off");
-  EXPECT_EQ(span->GetContext().IsValid(), false);
+  EXPECT_EQ(span->GetContext().IsValid(), true);
+  EXPECT_EQ(span->GetContext().IsSampled(), false);
 }
 
 TEST(ETWTracer, CustomIdGenerator)
@@ -438,6 +477,35 @@ TEST(ETWTracer, CustomIdGenerator)
   auto tracer = tp.GetTracer(providerName);
   auto span = tracer->StartSpan("span_on");
   EXPECT_EQ(span->GetContext().trace_id(), id_generator->GenerateTraceId());
+}
+
+TEST(ETWTracer, CustomSampler)
+{
+  std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
+  auto parent_off = std::unique_ptr<Sampler>(new MockSampler(std::make_shared<AlwaysOnSampler>()));
+  exporter::etw::TracerProvider tp
+    ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+     },
+     std::move(parent_off));
+  auto tracer = tp.GetTracer(providerName);
+  {
+    auto span = tracer->StartSpan("span_off");
+    EXPECT_EQ(span->GetContext().IsValid(), true);
+    EXPECT_EQ(span->GetContext().IsSampled(), true);
+    auto scope = tracer->WithActiveSpan(span);
+    auto trace_id = span->GetContext().trace_id();
+    {
+      auto child_span = tracer->StartSpan("span on");
+      EXPECT_EQ(child_span->GetContext().IsValid(), true);
+      EXPECT_EQ(child_span->GetContext().IsSampled(), true);
+      EXPECT_EQ(child_span->GetContext().trace_id(), trace_id);
+    }
+  }
 }
 
 /* clang-format on */

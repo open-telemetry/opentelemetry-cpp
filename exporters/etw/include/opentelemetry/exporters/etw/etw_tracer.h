@@ -442,8 +442,8 @@ public:
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
-      static nostd::shared_ptr<trace::Span> noop_span(
-          new trace::NoopSpan{this->shared_from_this()});
+      auto noop_span = nostd::shared_ptr<trace::Span>{
+          new (std::nothrow) trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
       return noop_span;
     }
 
