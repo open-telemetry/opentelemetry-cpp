@@ -156,14 +156,14 @@ public:
     return body;
   }
   bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
-                         callable) const noexcept override
+                     /* callable */) const noexcept override
   {
     return true;
   }
 
-  bool ForEachHeader(const nostd::string_view &key,
+  bool ForEachHeader(const nostd::string_view & /* key */,
                      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
-                         callable) const noexcept override
+                     /* callable */) const noexcept override
   {
     return true;
   }

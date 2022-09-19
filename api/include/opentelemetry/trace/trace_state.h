@@ -235,8 +235,8 @@ public:
   }
 
 private:
-  TraceState() : kv_properties_(new opentelemetry::common::KeyValueProperties()){};
-  TraceState(size_t size) : kv_properties_(new opentelemetry::common::KeyValueProperties(size)){};
+  TraceState() : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
+  TraceState(size_t size) : kv_properties_(new opentelemetry::common::KeyValueProperties(size)) {}
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
@@ -327,6 +327,5 @@ private:
 #ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
 OPENTELEMETRY_MEMBER_SINGLETON nostd::shared_ptr<TraceState> TraceState::ts{new TraceState()};
 #endif
-
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

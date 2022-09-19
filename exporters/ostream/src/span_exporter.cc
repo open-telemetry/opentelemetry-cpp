@@ -98,7 +98,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamSpanExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

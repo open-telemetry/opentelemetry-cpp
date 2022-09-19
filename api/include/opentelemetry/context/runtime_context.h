@@ -60,7 +60,7 @@ public:
    */
   virtual bool Detach(Token &token) noexcept = 0;
 
-  virtual ~RuntimeContextStorage(){};
+  virtual ~RuntimeContextStorage() {}
 
 protected:
   nostd::unique_ptr<Token> CreateToken(const Context &context) noexcept
@@ -243,7 +243,7 @@ private:
   {
     friend class ThreadLocalContextStorage;
 
-    Stack() noexcept : size_(0), capacity_(0), base_(nullptr){};
+    Stack() noexcept : size_(0), capacity_(0), base_(nullptr) {}
 
     // Pops the top Context off the stack.
     void Pop() noexcept

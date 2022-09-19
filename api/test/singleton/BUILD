@@ -1,8 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# FIXME: visibility("hidden") / visibility("default") compiling options.
-
 DEFAULT_WIN_COPTS = [
 ]
 

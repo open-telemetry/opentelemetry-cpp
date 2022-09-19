@@ -127,8 +127,8 @@
 
   This is very desirable, because:
 
-  - the C++ compiler guarantees the variable (c) is thread safe,
-    starting with C++ XX (TODO: link needed)
+  - the C++ compiler guarantees that construction
+    of the variable (c) is thread safe.
 
   - constructors for (c) singletons are executed in code path order,
     or not at all if the singleton is never used.
@@ -195,7 +195,6 @@
 #endif
   };
 
-
 #ifdef OPENTELEMETRY_SINGLETON_IN_MEMBER
   OPENTELEMETRY_MEMBER_SINGLETON T Foo::singleton;
 #endif
@@ -214,15 +213,15 @@
 #  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
 
-// #elif defined(_MSC_VER)
+#elif defined(_MSC_VER)
 
-// #  define OPENTELEMETRY_SINGLETON_IN_MEMBER
-// #  define OPENTELEMETRY_API_SINGLETON
-// #  define OPENTELEMETRY_MEMBER_SINGLETON __declspec(selectany)
+#  define OPENTELEMETRY_SINGLETON_IN_MEMBER
+#  define OPENTELEMETRY_API_SINGLETON
+#  define OPENTELEMETRY_MEMBER_SINGLETON __declspec(selectany)
 
 #else
 
-/* Add support for another compiler here. */
+/* Add support for other compilers here. */
 
 #  define OPENTELEMETRY_SINGLETON_IN_METHOD
 #  define OPENTELEMETRY_API_SINGLETON

@@ -118,7 +118,8 @@ void BM_TraceIdRatioBasedSamplerShouldSample(benchmark::State &state)
 BENCHMARK(BM_TraceIdRatioBasedSamplerShouldSample);
 
 // Sampler Helper Function
-void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
+void BenchmarkSpanCreation(std::shared_ptr<Sampler> /* TODO: fix issue #1612 sampler */,
+                           benchmark::State &state)
 {
   std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));

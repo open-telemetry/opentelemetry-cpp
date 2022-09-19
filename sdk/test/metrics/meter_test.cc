@@ -19,12 +19,12 @@ class MockMetricReader : public MetricReader
 public:
   MockMetricReader() = default;
   AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept override
+      InstrumentType /* instrument_type */) const noexcept override
   {
     return AggregationTemporality::kCumulative;
   }
-  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
-  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+  bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   void OnInitialized() noexcept override {}
 };
 
@@ -42,7 +42,7 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr)
 }
 }  // namespace
 
-void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void *state)
+void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void * /* state */)
 {
   auto observer_long =
       nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>>>(observer);

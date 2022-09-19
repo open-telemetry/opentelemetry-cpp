@@ -6,12 +6,6 @@
 #include <assert.h>
 #include <iostream>
 
-#if defined(_MSC_VER)
-/* Singleton in windows DDL not supported yet. */
-#else
-#  define WITH_DYNAMIC_TEST
-#endif
-
 #include "component_a.h"
 #include "component_b.h"
 #include "component_c.h"
@@ -32,12 +26,10 @@ void do_something()
 {
   do_something_in_a();
   do_something_in_b();
-#ifdef WITH_DYNAMIC_TEST
   do_something_in_c();
   do_something_in_d();
   do_something_in_e();
   do_something_in_f();
-#endif
 }
 
 int span_a_lib_count   = 0;
@@ -86,10 +78,11 @@ void reset_counts()
 class MyTracer : public trace::Tracer
 {
 public:
-  nostd::shared_ptr<trace::Span> StartSpan(nostd::string_view name,
-                                           const common::KeyValueIterable &attributes,
-                                           const trace::SpanContextKeyValueIterable &links,
-                                           const trace::StartSpanOptions &options) noexcept override
+  nostd::shared_ptr<trace::Span> StartSpan(
+      nostd::string_view name,
+      const common::KeyValueIterable & /* attributes */,
+      const trace::SpanContextKeyValueIterable & /* links */,
+      const trace::StartSpanOptions & /* options */) noexcept override
   {
     nostd::shared_ptr<trace::Span> result(new trace::DefaultSpan(trace::SpanContext::GetInvalid()));
 
@@ -177,9 +170,9 @@ public:
     return result;
   }
 
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override {}
+  void ForceFlushWithMicroseconds(uint64_t /* timeout */) noexcept override {}
 
-  void CloseWithMicroseconds(uint64_t timeout) noexcept override {}
+  void CloseWithMicroseconds(uint64_t /* timeout */) noexcept override {}
 };
 
 class MyTracerProvider : public trace::TracerProvider
@@ -191,9 +184,9 @@ public:
     return result;
   }
 
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view library_name,
-                                             nostd::string_view library_version,
-                                             nostd::string_view schema_url) noexcept override
+  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* library_name */,
+                                             nostd::string_view /* library_version */,
+                                             nostd::string_view /* schema_url */) noexcept override
   {
     nostd::shared_ptr<trace::Tracer> result(new MyTracer());
     return result;
@@ -231,7 +224,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_lib_count, 0);
   EXPECT_EQ(span_b_f1_count, 0);
   EXPECT_EQ(span_b_f2_count, 0);
-#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_lib_count, 0);
   EXPECT_EQ(span_c_f1_count, 0);
   EXPECT_EQ(span_c_f2_count, 0);
@@ -244,7 +236,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
-#endif
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -259,7 +250,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_f1_count, 2);
   EXPECT_EQ(span_b_f2_count, 1);
   EXPECT_EQ(span_c_lib_count, 1);
-#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_f1_count, 2);
   EXPECT_EQ(span_c_f2_count, 1);
   EXPECT_EQ(span_d_lib_count, 1);
@@ -271,7 +261,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 1);
   EXPECT_EQ(span_f_f1_count, 2);
   EXPECT_EQ(span_f_f2_count, 1);
-#endif
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -285,7 +274,6 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_lib_count, 0);
   EXPECT_EQ(span_b_f1_count, 0);
   EXPECT_EQ(span_b_f2_count, 0);
-#ifdef WITH_DYNAMIC_TEST
   EXPECT_EQ(span_c_lib_count, 0);
   EXPECT_EQ(span_c_f1_count, 0);
   EXPECT_EQ(span_c_f2_count, 0);
@@ -298,6 +286,5 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
-#endif
   EXPECT_EQ(unknown_span_count, 0);
 }

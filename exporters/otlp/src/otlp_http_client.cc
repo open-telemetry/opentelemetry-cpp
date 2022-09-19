@@ -346,7 +346,7 @@ public:
   {
     session_ = &session;
     owner_   = owner;
-  };
+  }
 
 private:
   // Define a mutex to keep thread safety

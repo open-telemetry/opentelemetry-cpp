@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <unordered_map>
+
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
@@ -110,13 +112,13 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
 
   auto exporter = GetExporter(stub_interface);
 
-  bool attribute_storage_bool_value[]          = {true, false, true};
-  int32_t attribute_storage_int32_value[]      = {1, 2};
-  uint32_t attribute_storage_uint32_value[]    = {3, 4};
-  int64_t attribute_storage_int64_value[]      = {5, 6};
-  uint64_t attribute_storage_uint64_value[]    = {7, 8};
-  double attribute_storage_double_value[]      = {3.2, 3.3};
-  std::string attribute_storage_string_value[] = {"vector", "string"};
+  bool attribute_storage_bool_value[]                                = {true, false, true};
+  int32_t attribute_storage_int32_value[]                            = {1, 2};
+  uint32_t attribute_storage_uint32_value[]                          = {3, 4};
+  int64_t attribute_storage_int64_value[]                            = {5, 6};
+  uint64_t attribute_storage_uint64_value[]                          = {7, 8};
+  double attribute_storage_double_value[]                            = {3.2, 3.3};
+  opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
   provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
@@ -135,23 +137,23 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
-  logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-              {{"service.name", "unit_test_service"},
-               {"tenant.id", "test_user"},
-               {"bool_value", true},
-               {"int32_value", static_cast<int32_t>(1)},
-               {"uint32_value", static_cast<uint32_t>(2)},
-               {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-               {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-               {"double_value", static_cast<double>(3.1)},
-               {"vec_bool_value", attribute_storage_bool_value},
-               {"vec_int32_value", attribute_storage_int32_value},
-               {"vec_uint32_value", attribute_storage_uint32_value},
-               {"vec_int64_value", attribute_storage_int64_value},
-               {"vec_uint64_value", attribute_storage_uint64_value},
-               {"vec_double_value", attribute_storage_double_value},
-               {"vec_string_value", attribute_storage_string_value}},
-              trace_id, span_id,
+  std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
+  attributes["service.name"]     = "unit_test_service";
+  attributes["tenant.id"]        = "test_user";
+  attributes["bool_value"]       = true;
+  attributes["int32_value"]      = static_cast<int32_t>(1);
+  attributes["uint32_value"]     = static_cast<uint32_t>(2);
+  attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
+  attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
+  attributes["double_value"]     = static_cast<double>(3.1);
+  attributes["vec_bool_value"]   = attribute_storage_bool_value;
+  attributes["vec_int32_value"]  = attribute_storage_int32_value;
+  attributes["vec_uint32_value"] = attribute_storage_uint32_value;
+  attributes["vec_int64_value"]  = attribute_storage_int64_value;
+  attributes["vec_uint64_value"] = attribute_storage_uint64_value;
+  attributes["vec_double_value"] = attribute_storage_double_value;
+  attributes["vec_string_value"] = attribute_storage_string_value;
+  logger->Log(opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
               opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
               std::chrono::system_clock::now());
 }

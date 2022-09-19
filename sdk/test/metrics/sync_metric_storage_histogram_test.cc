@@ -23,7 +23,8 @@ class MockCollectorHandle : public CollectorHandle
 public:
   MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
-  AggregationTemporality GetAggregationTemporality(InstrumentType instrument_type) noexcept override
+  AggregationTemporality GetAggregationTemporality(
+      InstrumentType /* instrument_type */) noexcept override
   {
     return temporality;
   }
@@ -32,16 +33,17 @@ private:
   AggregationTemporality temporality;
 };
 
-class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
+class WritableMetricStorageHistogramTestFixture
+    : public ::testing::TestWithParam<AggregationTemporality>
 {};
 
-TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
+TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
 {
   AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
   long expected_total_get_requests   = 0;
   long expected_total_put_requests   = 0;
-  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
+  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kHistogram,
                                      InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
@@ -49,7 +51,7 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+      instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
@@ -80,17 +82,17 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -112,18 +114,18 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
           }
         }
         return true;
@@ -146,17 +148,17 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -165,18 +167,18 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
 
-INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
-                         WritableMetricStorageTestFixture,
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageHistogramTestLong,
+                         WritableMetricStorageHistogramTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
 
-TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
+TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
 {
   AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
-  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
+  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kHistogram,
                                      InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
@@ -184,7 +186,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+      instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
 
@@ -219,17 +221,17 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -252,18 +254,18 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_put_requests);
           }
         }
         return true;
@@ -288,17 +290,17 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
         for (auto data_attr : data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<double>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -306,8 +308,8 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
       });
   EXPECT_EQ(count_attributes, 2);  // GET and PUT
 }
-INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
-                         WritableMetricStorageTestFixture,
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageHistogramTestDouble,
+                         WritableMetricStorageHistogramTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
 
