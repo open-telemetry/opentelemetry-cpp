@@ -122,8 +122,7 @@ void Span::AddEvent(nostd::string_view name, SystemTimestamp timestamp) noexcept
   recordable_->AddEvent(name, timestamp);
 }
 
-void Span::AddEvent(nostd::string_view name,
-                    const common::KeyValueIterable &attributes) noexcept
+void Span::AddEvent(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

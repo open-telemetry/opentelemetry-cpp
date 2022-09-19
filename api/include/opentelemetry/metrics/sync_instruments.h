@@ -18,7 +18,7 @@ namespace metrics
 class SynchronousInstrument
 {
 public:
-  SynchronousInstrument(){}
+  SynchronousInstrument() {}
   virtual ~SynchronousInstrument() {}
 };
 
