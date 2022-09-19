@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1663606810218,
+  "lastUpdate": 1663621480357,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -73150,6 +73150,54 @@ window.BENCHMARK_DATA = {
             "value": 3038709.2739661816,
             "unit": "ns/iter",
             "extra": "iterations: 281\ncpu: 549028.4697508897 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "labhas@microsoft.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2142d007d06415b73fd8ccf21c7d2820cb088c03",
+          "message": "[ETW Exporter] - Add Trace flags in SpanContext (#1618)",
+          "timestamp": "2022-09-19T13:51:57-07:00",
+          "tree_id": "1a161b0d3a40552ebc56b27106141a02eaa18a73",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/2142d007d06415b73fd8ccf21c7d2820cb088c03"
+        },
+        "date": 1663621476581,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 119.4384190943334,
+            "unit": "ns/iter",
+            "extra": "iterations: 1155000\ncpu: 119.22432900432901 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 173.10601693612557,
+            "unit": "ns/iter",
+            "extra": "iterations: 810000\ncpu: 172.74382716049382 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 627.8895071424577,
+            "unit": "ns/iter",
+            "extra": "iterations: 227000\ncpu: 625.7607929515422 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2108119.374556507,
+            "unit": "ns/iter",
+            "extra": "iterations: 417\ncpu: 346033.573141487 ns\nthreads: 1"
           }
         ]
       }
