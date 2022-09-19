@@ -38,7 +38,7 @@ public:
                    opentelemetry::nostd::string_view value) noexcept override
   {
     std::cout << " Client ::: Adding " << key << " " << value << "\n";
-    context_->AddMetadata(key.data(), value.data());
+    context_->AddMetadata(std::string(key), std::string(value));
   }
 
   ClientContext *context_;
@@ -52,7 +52,7 @@ public:
   virtual opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override
   {
-    auto it = context_->client_metadata().find(key.data());
+    auto it = context_->client_metadata().find({key.data(), key.size()});
     if (it != context_->client_metadata().end())
     {
       return it->second.data();
