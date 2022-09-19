@@ -54,8 +54,8 @@ public:
 class AsyncWritableMetricStorage
 {
 public:
-  AsyncWritableMetricStorage() {}
-  virtual ~AsyncWritableMetricStorage() {}
+  AsyncWritableMetricStorage()          = default;
+  virtual ~AsyncWritableMetricStorage() = default;
 
   /* Records a batch of measurements */
   virtual void RecordLong(

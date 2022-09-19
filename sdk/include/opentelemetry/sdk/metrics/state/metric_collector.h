@@ -33,7 +33,7 @@ class MetricCollector : public MetricProducer, public CollectorHandle
 public:
   MetricCollector(MeterContext *context, std::unique_ptr<MetricReader> metric_reader);
 
-  virtual ~MetricCollector() {}
+  virtual ~MetricCollector() = default;
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept override;

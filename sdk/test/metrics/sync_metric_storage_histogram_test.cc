@@ -23,7 +23,7 @@ class MockCollectorHandle : public CollectorHandle
 public:
   MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
-  virtual ~MockCollectorHandle() {}
+  virtual ~MockCollectorHandle() = default;
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType /* instrument_type */) noexcept override

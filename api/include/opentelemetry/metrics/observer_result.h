@@ -24,7 +24,7 @@ class ObserverResultT
 {
 
 public:
-  virtual ~ObserverResultT() {}
+  virtual ~ObserverResultT() = default;
 
   virtual void Observe(T value) noexcept = 0;
 

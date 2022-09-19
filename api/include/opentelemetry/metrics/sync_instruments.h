@@ -18,8 +18,8 @@ namespace metrics
 class SynchronousInstrument
 {
 public:
-  SynchronousInstrument() {}
-  virtual ~SynchronousInstrument() {}
+  SynchronousInstrument()          = default;
+  virtual ~SynchronousInstrument() = default;
 };
 
 template <class T>

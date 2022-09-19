@@ -37,7 +37,7 @@ public:
         attributes_processor_{std::move(attributes_processor)}
   {}
 
-  virtual ~View() {}
+  virtual ~View() = default;
 
   virtual std::string GetName() const noexcept { return name_; }
 
