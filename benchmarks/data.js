@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1663606808362,
+  "lastUpdate": 1663606810218,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -73102,6 +73102,54 @@ window.BENCHMARK_DATA = {
             "value": 2113049.0747297774,
             "unit": "ns/iter",
             "extra": "iterations: 322\ncpu: 391821.4285714284 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dennis.hezel@gmail.com",
+            "name": "Dennis",
+            "username": "Tradias"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ed9f583c47f74d312754d16e0e79202f0a26821f",
+          "message": "[gRPC]: Fix out-of-bounds access of string_view in GrpcClientCarrier in the example (#1619)",
+          "timestamp": "2022-09-19T09:43:35-07:00",
+          "tree_id": "552e63e4d8985b4017ec618c540eb1142512d8fd",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/ed9f583c47f74d312754d16e0e79202f0a26821f"
+        },
+        "date": 1663606804657,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 132.82578875761078,
+            "unit": "ns/iter",
+            "extra": "iterations: 1065000\ncpu: 132.29464788732395 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 216.212927126417,
+            "unit": "ns/iter",
+            "extra": "iterations: 612000\ncpu: 215.60539215686273 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1064.3038716349567,
+            "unit": "ns/iter",
+            "extra": "iterations: 143000\ncpu: 1063.2048951048948 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 3038709.2739661816,
+            "unit": "ns/iter",
+            "extra": "iterations: 281\ncpu: 549028.4697508897 ns\nthreads: 1"
           }
         ]
       }
