@@ -65,9 +65,9 @@ template <class SpanType, class TracerType>
 SpanType *new_span(TracerType *objPtr,
                    nostd::string_view name,
                    const opentelemetry::trace::StartSpanOptions &options,
-                   std::unique_ptr<opentelemetry::trace::SpanContext> span_context)
+                   std::unique_ptr<opentelemetry::trace::SpanContext> spanContext)
 {
-  return new (std::nothrow) SpanType{*objPtr, name, options, std::move(span_context)};
+  return new (std::nothrow) SpanType{*objPtr, name, options, std::move(spanContext)};
 }
 
 /**
@@ -419,22 +419,22 @@ public:
     auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
 
     // Sampling based on attributes is not supported for now, so passing empty below.
-    std::map<std::string, int> empty_attributes = {{}};
+    std::map<std::string, int> emptyAttributes = {{}};
     opentelemetry::sdk::trace::SamplingResult sampling_result =
         GetSampler(tracerProvider_)
             .ShouldSample(parentContext, traceId, name, options.kind,
                           opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
-                              empty_attributes),
+                              emptyAttributes),
                           links);
 
-    opentelemetry::trace::TraceFlags trace_flags =
+    opentelemetry::trace::TraceFlags traceFlags =
         sampling_result.decision == opentelemetry::sdk::trace::Decision::DROP
             ? opentelemetry::trace::TraceFlags{}
             : opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled};
 
     auto spanContext =
         std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
-            traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), trace_flags, false,
+            traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), traceFlags, false,
             sampling_result.trace_state
                 ? sampling_result.trace_state
                 : parentContext.IsValid() ? parentContext.trace_state()
@@ -442,9 +442,9 @@ public:
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
-      auto noop_span = nostd::shared_ptr<trace::Span>{
+      auto noopSpan = nostd::shared_ptr<trace::Span>{
           new (std::nothrow) trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
-      return noop_span;
+      return noopSpan;
     }
 
     // Populate Etw.RelatedActivityId at envelope level if enabled
@@ -764,12 +764,12 @@ public:
   Span(Tracer &owner,
        nostd::string_view name,
        const opentelemetry::trace::StartSpanOptions &options,
-       std::unique_ptr<opentelemetry::trace::SpanContext> span_context,
+       std::unique_ptr<opentelemetry::trace::SpanContext> spanContext,
        Span *parent = nullptr) noexcept
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
-        context_(std::move(span_context)),
+        context_(std::move(spanContext)),
         parent_(parent)
   {
     name_ = name;
