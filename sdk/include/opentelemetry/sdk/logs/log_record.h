@@ -177,7 +177,7 @@ public:
    * @param instrumentation_scope the instrumentation scope to set
    */
   void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
-                                   &instrumentation_scope) noexcept
+                                   &instrumentation_scope) noexcept override
   {
     instrumentation_scope_ = &instrumentation_scope;
   }

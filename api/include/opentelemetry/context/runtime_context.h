@@ -18,7 +18,7 @@ class Token
 public:
   bool operator==(const Context &other) const noexcept { return context_ == other; }
 
-  ~Token();
+  ~Token() noexcept;
 
 private:
   friend class RuntimeContextStorage;

@@ -43,7 +43,7 @@ public:
         break;
     }
   }
-  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept {}
+  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
   virtual ~CustomEventHandler() = default;
   bool is_called_               = false;
   bool got_response_            = false;

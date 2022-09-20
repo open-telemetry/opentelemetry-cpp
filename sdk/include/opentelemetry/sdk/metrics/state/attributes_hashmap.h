@@ -72,7 +72,7 @@ public:
       return it->second.get();
     }
 
-    hash_map_[attributes] = std::move(aggregation_callback());
+    hash_map_[attributes] = aggregation_callback();
     return hash_map_[attributes].get();
   }
 

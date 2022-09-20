@@ -41,8 +41,7 @@ public:
 
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
-      return std::move(
-          DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_));
+      return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
     };
   }
 
