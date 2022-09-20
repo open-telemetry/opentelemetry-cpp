@@ -62,7 +62,7 @@ uint64_t CalculateThresholdFromBuffer(const trace_api::TraceId &trace_id) noexce
   uint64_t res = 0;
   std::memcpy(&res, &trace_id, 8);
 
-  double ratio = (double)res / UINT64_MAX;
+  double ratio = (double)res / (double)UINT64_MAX;
 
   return CalculateThreshold(ratio);
 }

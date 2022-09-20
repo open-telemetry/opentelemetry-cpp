@@ -23,6 +23,8 @@ public:
       : attributes_processor_(attributes_processor)
   {}
 
+  virtual ~ObserverResultT() = default;
+
   void Observe(T value) noexcept override { data_.insert({{}, value}); }
 
   void Observe(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
