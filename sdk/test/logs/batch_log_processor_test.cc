@@ -32,7 +32,7 @@ public:
         export_delay_(export_delay)
   {}
 
-  std::unique_ptr<Recordable> MakeRecordable() noexcept
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
     return std::unique_ptr<Recordable>(new LogRecord());
   }

@@ -16,12 +16,12 @@ class InstrumentSelector
 public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,
                      opentelemetry::nostd::string_view name)
-      : name_filter_{std::move(PredicateFactory::GetPredicate(name, PredicateType::kPattern))},
+      : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kPattern)},
         instrument_type_{instrument_type}
   {}
 
   // Returns name filter predicate. This shouldn't be deleted
-  const opentelemetry::sdk::metrics::Predicate *const GetNameFilter() { return name_filter_.get(); }
+  const opentelemetry::sdk::metrics::Predicate *GetNameFilter() const { return name_filter_.get(); }
 
   // Returns instrument filter.
   InstrumentType GetInstrumentType() { return instrument_type_; }
