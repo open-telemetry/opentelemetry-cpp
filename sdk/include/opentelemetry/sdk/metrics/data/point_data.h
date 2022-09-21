@@ -17,7 +17,6 @@ namespace metrics
 {
 
 using ValueType = nostd::variant<long, double>;
-using ListType  = nostd::variant<std::list<long>, std::list<double>>;
 
 // TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
 
@@ -55,8 +54,8 @@ public:
   HistogramPointData &operator=(HistogramPointData &&) = default;
   HistogramPointData(const HistogramPointData &)       = default;
   HistogramPointData()                                 = default;
-
-  ListType boundaries_          = {};
+  HistogramPointData(std::list<double> &boundaries) : boundaries_(boundaries) {}
+  std::list<double> boundaries_ = {};
   ValueType sum_                = {};
   ValueType min_                = {};
   ValueType max_                = {};

@@ -205,16 +205,7 @@ void OStreamMetricExporter::printPointData(const opentelemetry::sdk::metrics::Po
     }
 
     sout_ << "\n  buckets     : ";
-    if (nostd::holds_alternative<std::list<double>>(histogram_point_data.boundaries_))
-    {
-      auto &double_boundaries = nostd::get<std::list<double>>(histogram_point_data.boundaries_);
-      printVec(sout_, double_boundaries);
-    }
-    else if (nostd::holds_alternative<std::list<long>>(histogram_point_data.boundaries_))
-    {
-      auto &long_boundaries = nostd::get<std::list<long>>(histogram_point_data.boundaries_);
-      printVec(sout_, long_boundaries);
-    }
+    printVec(sout_, histogram_point_data.boundaries_);
 
     sout_ << "\n  counts     : ";
     printVec(sout_, histogram_point_data.counts_);
