@@ -39,7 +39,7 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{SemanticConventions::HTTP_SERVER_NAME, server_name},
+                                {{SemanticConventions::NET_HOST_NAME, server_name},
                                  {SemanticConventions::NET_HOST_PORT, server_port},
                                  {SemanticConventions::HTTP_METHOD, request.method},
                                  {SemanticConventions::HTTP_SCHEME, "http"},

@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.12.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.13.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -507,6 +507,11 @@ static constexpr const char *OS_VERSION = "os.version";
  * Process identifier (PID).
  */
 static constexpr const char *PROCESS_PID = "process.pid";
+
+/**
+ * Parent Process identifier (PID).
+ */
+static constexpr const char *PROCESS_PARENT_PID = "process.parent_pid";
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the {@code Name} in
