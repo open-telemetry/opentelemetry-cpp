@@ -24,9 +24,10 @@ LongHistogramAggregation::LongHistogramAggregation(
   }
   else
   {
-    point_data_.boundaries_ =
-        std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
+    point_data_.boundaries_ = {0.0,   5.0,   10.0,   25.0,   50.0,   75.0,   100.0,  250.0,
+                               500.0, 750.0, 1000.0, 2500.0, 5000.0, 7500.0, 10000.0};
   }
+
   if (aggregation_config)
   {
     record_min_max_ = aggregation_config->record_min_max_;
