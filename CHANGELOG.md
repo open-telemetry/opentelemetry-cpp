@@ -21,7 +21,7 @@ Increment the:
 * [METRICS EXPORTER] Add `OtlpGrpcMetricExporterFactory` and `OtlpHttpMetricExporterFactory`.
   [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.13.0 [#1624](https://github.com/open-telemetry/opentelemetry-cpp/pull/1624)
-* [BUILD] Fixes issue #1612. [#1622](https://github.com/open-telemetry/opentelemetry-cpp/pull/1622)
+* [BUILD] Fixes span creation benchmark issue. [#1622](https://github.com/open-telemetry/opentelemetry-cpp/pull/1622)
 * [BUILD] Fix more build warnings (#1616) [#1620](https://github.com/open-telemetry/opentelemetry-cpp/pull/1620)
 * [SDK gRPC]: Fix out-of-bounds access of string_view in GrpcClientCarrier in the example [#1619](https://github.com/open-telemetry/opentelemetry-cpp/pull/1619)
 * [EXPORTER ETW] Add Trace flags in SpanContext [#1618](https://github.com/open-telemetry/opentelemetry-cpp/pull/1618)
