@@ -20,6 +20,7 @@ Increment the:
   [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 * [METRICS EXPORTER] Add `OtlpGrpcClient` [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
 * [BUILD] Fix header only api singletons [#1604](https://github.com/open-telemetry/opentelemetry-cpp/pull/1604)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.13.0 [#1624](https://github.com/open-telemetry/opentelemetry-cpp/pull/1624)
 
 ## [1.6.0] 2022-08-15
 
