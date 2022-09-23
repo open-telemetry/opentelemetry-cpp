@@ -7,7 +7,7 @@
 
 namespace http_common = opentelemetry::ext::http::common;
 
-inline const char *const BoolToString(bool b)
+inline const char *BoolToString(bool b)
 {
   return b ? "true" : "false";
 }

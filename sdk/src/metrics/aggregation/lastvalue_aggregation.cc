@@ -28,7 +28,8 @@ LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &dat
     : point_data_{data}
 {}
 
-void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
+void LongLastValueAggregation::Aggregate(long value,
+                                         const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;
@@ -86,7 +87,8 @@ DoubleLastValueAggregation::DoubleLastValueAggregation(const LastValuePointData 
     : point_data_{data}
 {}
 
-void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
+void DoubleLastValueAggregation::Aggregate(double value,
+                                           const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;

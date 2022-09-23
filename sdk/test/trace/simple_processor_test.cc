@@ -45,14 +45,13 @@ public:
     return std::unique_ptr<Recordable>(new SpanData());
   }
 
-  ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
+  ExportResult Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>>
+                          & /* recordables */) noexcept override
   {
     return ExportResult::kSuccess;
   }
 
-  bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     *shutdown_counter_ += 1;
     return true;

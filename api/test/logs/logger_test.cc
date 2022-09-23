@@ -117,33 +117,43 @@ class TestLogger : public Logger
 {
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
-  void Log(Severity severity,
-           string_view body,
-           const common::KeyValueIterable &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept override
+  void Log(Severity /* severity */,
+           string_view /* body */,
+           const common::KeyValueIterable & /* attributes */,
+           trace::TraceId /* trace_id */,
+           trace::SpanId /* span_id */,
+           trace::TraceFlags /* trace_flags */,
+           common::SystemTimestamp /* timestamp */) noexcept override
+  {}
+
+  void Log(Severity /* severity */,
+           nostd::string_view /* name */,
+           nostd::string_view /* body */,
+           const common::KeyValueIterable & /* attributes */,
+           trace::TraceId /* trace_id */,
+           trace::SpanId /* span_id */,
+           trace::TraceFlags /* trace_flags */,
+           common::SystemTimestamp /* timestamp */) noexcept override
   {}
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::string_view options,
-                                      nostd::string_view library_name,
-                                      nostd::string_view library_version = "",
-                                      nostd::string_view schema_url      = "") override
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
+                                      nostd::string_view /* options */,
+                                      nostd::string_view /* library_name */,
+                                      nostd::string_view /* library_version */,
+                                      nostd::string_view /* schema_url */) override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
 
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::span<nostd::string_view> args,
-                                      nostd::string_view library_name,
-                                      nostd::string_view library_version = "",
-                                      nostd::string_view schema_url      = "") override
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
+                                      nostd::span<nostd::string_view> /* args */,
+                                      nostd::string_view /* library_name */,
+                                      nostd::string_view /* library_version */,
+                                      nostd::string_view /* schema_url */) override
   {
     return shared_ptr<Logger>(new TestLogger());
   }

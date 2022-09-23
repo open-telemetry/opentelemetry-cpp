@@ -118,15 +118,16 @@ void BM_TraceIdRatioBasedSamplerShouldSample(benchmark::State &state)
 BENCHMARK(BM_TraceIdRatioBasedSamplerShouldSample);
 
 // Sampler Helper Function
-void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
+void BenchmarkSpanCreation(std::unique_ptr<Sampler> &&sampler, benchmark::State &state)
 {
   std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  auto context  = std::make_shared<TracerContext>(std::move(processors));
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  auto tracer   = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+  auto context =
+      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler));
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 
   while (state.KeepRunning())
   {
@@ -141,14 +142,16 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
 // Test to measure performance for span creation
 void BM_SpanCreation(benchmark::State &state)
 {
-  BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOnSampler>()), state);
+  std::unique_ptr<Sampler> sampler(new AlwaysOnSampler());
+  BenchmarkSpanCreation(std::move(sampler), state);
 }
 BENCHMARK(BM_SpanCreation);
 
 // Test to measure performance overhead for no-op span creation
 void BM_NoopSpanCreation(benchmark::State &state)
 {
-  BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOffSampler>()), state);
+  std::unique_ptr<Sampler> sampler(new AlwaysOffSampler());
+  BenchmarkSpanCreation(std::move(sampler), state);
 }
 BENCHMARK(BM_NoopSpanCreation);
 
