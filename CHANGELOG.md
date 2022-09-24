@@ -15,11 +15,42 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.6.1] 2022-09-22
+
 * [BUILD] Upgrade opentelemetry-proto to v0.19.0 [#1579](https://github.com/open-telemetry/opentelemetry-cpp/pull/1579)
 * [METRICS EXPORTER] Add `OtlpGrpcMetricExporterFactory` and `OtlpHttpMetricExporterFactory`.
   [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
-* [METRICS EXPORTER] Add `OtlpGrpcClient` [#1606](https://github.com/open-telemetry/opentelemetry-cpp/pull/1606)
-* [BUILD] Fix header only api singletons [#1604](https://github.com/open-telemetry/opentelemetry-cpp/pull/1604)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.13.0 [#1624](https://github.com/open-telemetry/opentelemetry-cpp/pull/1624)
+* [BUILD] Fixes span creation benchmark issue. [#1622](https://github.com/open-telemetry/opentelemetry-cpp/pull/1622)
+* [BUILD] Fix more build warnings (#1616) [#1620](https://github.com/open-telemetry/opentelemetry-cpp/pull/1620)
+* [SDK gRPC]: Fix out-of-bounds access of string_view in GrpcClientCarrier in
+      the example
+      [#1619](https://github.com/open-telemetry/opentelemetry-cpp/pull/1619)
+* [EXPORTER ETW] Add Trace flags in SpanContext [#1618](https://github.com/open-telemetry/opentelemetry-cpp/pull/1618)
+* [SDK] resource sdk: Update Resource::Merge function docs [#1615](https://github.com/open-telemetry/opentelemetry-cpp/pull/1615)
+* [BUILD] Fix build warnings [#1613](https://github.com/open-telemetry/opentelemetry-cpp/pull/1613)
+* [API BUILD] Fix header only api singletons (#1520) [#1604](https://github.com/open-telemetry/opentelemetry-cpp/pull/1604)
+* [METRICS SDK] Fix default value of
+  `OtlpHttpMetricExporterOptions::aggregation_temporality`.
+  [#1601](https://github.com/open-telemetry/opentelemetry-cpp/pull/1601)
+* [METRICS EXAMPLE] Example for OTLP gRPC exporter for Metrics. [#1598](https://github.com/open-telemetry/opentelemetry-cpp/pull/1598)
+* [SDK] Fix `LoggerContext::Shutdown` and tsan of `OtlpHttpClient` [#1592](https://github.com/open-telemetry/opentelemetry-cpp/pull/1592)
+* [METRICS SDK] Fix 1585 - Multiple cumulative metric collections without
+  measurement recording.
+  [#1586](https://github.com/open-telemetry/opentelemetry-cpp/pull/1586)
+* [BUILD] metrics warnings [#1583](https://github.com/open-telemetry/opentelemetry-cpp/pull/1583)
+* [METRICS SDK] Fix ObservableInstrument::RemoveCallback [#1582](https://github.com/open-telemetry/opentelemetry-cpp/pull/1582)
+* [SDK] Add error log when getting a http error code [#1581](https://github.com/open-telemetry/opentelemetry-cpp/pull/1581)
+* [EXPORTER] ETW Exporter - Add support for Sampler and ID Generator [#1547](https://github.com/open-telemetry/opentelemetry-cpp/pull/1547)
+
+Notes:
+
+While [OpenTelemetry sememantic
+convention](https://github.com/open-telemetry/opentelemetry-specification/tree/main/semantic_conventions)
+is still in experimental state, PR
+[#1624](https://github.com/open-telemetry/opentelemetry-cpp/pull/1624) upgraded
+it from 1.12.0 to 1.13.0 which **MAY** break the instrumentation library. Please
+update the sementic convention in instruementation library is needed.
 
 ## [1.6.0] 2022-08-15
 

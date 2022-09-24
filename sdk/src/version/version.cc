@@ -10,16 +10,16 @@ namespace version
 {
 const int MAJOR_VERSION     = 1;
 const int MINOR_VERSION     = 6;
-const int PATCH_VERSION     = 0;
+const int PATCH_VERSION     = 1;
 const char *PRE_RELEASE     = "NONE";
 const char *BUILD_METADATA  = "NONE";
-const int COUNT_NEW_COMMITS = 23;
-const char *BRANCH          = "pre_release_1.6.0";
-const char *COMMIT_HASH     = "ad23f20392f26350fec7afca229729c2ef9ef92b";
-const char *SHORT_VERSION   = "1.6.0";
+const int COUNT_NEW_COMMITS = 27;
+const char *BRANCH          = "pre_release_1.6.1";
+const char *COMMIT_HASH     = "38012fab34faa50d5020959b68eba77ac485b508";
+const char *SHORT_VERSION   = "1.6.1";
 const char *FULL_VERSION =
-    "1.5.0-NONE-NONE-23-pre_release_1.6.0-ad23f20392f26350fec7afca229729c2ef9ef92b";
-const char *BUILD_DATE = "Tue Aug 16 00:35:48 UTC 2022";
+    "1.6.0-NONE-NONE-27-pre_release_1.6.1-38012fab34faa50d5020959b68eba77ac485b508";
+const char *BUILD_DATE = "Thu Sep 22 18:05:21 UTC 2022";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

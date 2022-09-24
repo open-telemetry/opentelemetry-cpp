@@ -95,24 +95,25 @@ inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&... args)
 #endif
 }  // namespace detail
 
+/* clang-format off */
 template <typename F, typename... Args>
 inline constexpr auto invoke(F &&f, Args &&... args)
-    OPENTELEMETRY_RETURN(detail::invoke_impl(std::forward<F>(f), std::forward<Args>(args)...));
+    OPENTELEMETRY_RETURN(detail::invoke_impl(std::forward<F>(f), std::forward<Args>(args)...))
 
 namespace detail
+/* clang-format on */
 {
 
-template <typename Void, typename, typename...>
-struct invoke_result
-{};
+  template <typename Void, typename, typename...>
+  struct invoke_result
+  {};
 
-template <typename F, typename... Args>
-struct invoke_result<void_t<decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...))>,
-                     F,
-                     Args...>
-{
-  using type = decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...));
-};
+  template <typename F, typename... Args>
+  struct invoke_result<void_t<decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...))>,
+                       F, Args...>
+  {
+    using type = decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...));
+  };
 
 }  // namespace detail
 

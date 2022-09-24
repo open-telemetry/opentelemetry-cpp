@@ -49,6 +49,16 @@ public:
            trace::TraceFlags /* trace_flags */,
            common::SystemTimestamp /* timestamp */) noexcept override
   {}
+
+  void Log(Severity /* severity */,
+           nostd::string_view /* name */,
+           nostd::string_view /* body */,
+           const common::KeyValueIterable & /* attributes */,
+           trace::TraceId /* trace_id */,
+           trace::SpanId /* span_id */,
+           trace::TraceFlags /* trace_flags */,
+           common::SystemTimestamp /* timestamp */) noexcept override
+  {}
 };
 
 /**

@@ -36,6 +36,9 @@ public:
                 opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
   void AddEvent(nostd::string_view name,
+                const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+
+  void AddEvent(nostd::string_view name,
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 

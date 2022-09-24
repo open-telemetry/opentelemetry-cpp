@@ -87,6 +87,18 @@ public:
   }
 
   /**
+   * Add an event to a span.
+   * @param name the name of the event
+   * @param attributes the attributes associated with the event
+   */
+  void AddEvent(nostd::string_view name,
+                const opentelemetry::common::KeyValueIterable &attributes) noexcept
+  {
+    AddEvent(name, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
+             attributes);
+  }
+
+  /**
    * Add a link to a span.
    * @param span_context the span context of the linked span
    * @param attributes the attributes associated with the link

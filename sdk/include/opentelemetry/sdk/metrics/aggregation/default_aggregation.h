@@ -56,7 +56,7 @@ public:
                    : std::move(std::unique_ptr<Aggregation>(new DoubleLastValueAggregation()));
         break;
       default:
-        return std::move(std::unique_ptr<Aggregation>(new DropAggregation()));
+        return std::unique_ptr<Aggregation>(new DropAggregation());
     };
   }
 

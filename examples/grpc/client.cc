@@ -50,7 +50,7 @@ public:
         {{SemanticConventions::RPC_SYSTEM, "grpc"},
          {SemanticConventions::RPC_SERVICE, "grpc-example.GreetService"},
          {SemanticConventions::RPC_METHOD, "Greet"},
-         {SemanticConventions::NET_PEER_IP, ip},
+         {SemanticConventions::NET_SOCK_PEER_ADDR, ip},
          {SemanticConventions::NET_PEER_PORT, port}},
         options);
 
