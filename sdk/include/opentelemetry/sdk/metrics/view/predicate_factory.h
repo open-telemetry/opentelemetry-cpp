@@ -26,17 +26,17 @@ public:
     if ((type == PredicateType::kPattern && pattern == "*") ||
         (type == PredicateType::kExact && pattern == ""))
     {
-      return std::move(std::unique_ptr<Predicate>(new MatchEverythingPattern()));
+      return std::unique_ptr<Predicate>(new MatchEverythingPattern());
     }
     if (type == PredicateType::kPattern)
     {
-      return std::move(std::unique_ptr<Predicate>(new PatternPredicate(pattern)));
+      return std::unique_ptr<Predicate>(new PatternPredicate(pattern));
     }
     if (type == PredicateType::kExact)
     {
-      return std::move(std::unique_ptr<Predicate>(new ExactPredicate(pattern)));
+      return std::unique_ptr<Predicate>(new ExactPredicate(pattern));
     }
-    return std::move(std::unique_ptr<Predicate>(new MatchNothingPattern()));
+    return std::unique_ptr<Predicate>(new MatchNothingPattern());
   }
 };
 }  // namespace metrics

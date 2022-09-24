@@ -33,7 +33,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.12.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.13.0";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -355,18 +355,45 @@ static constexpr const char *FAAS_INVOKED_REGION = "faas.invoked_region";
 static constexpr const char *NET_TRANSPORT = "net.transport";
 
 /**
- * Remote address of the peer (dotted decimal for IPv4 or <a
- * href="https://tools.ietf.org/html/rfc5952">RFC5952</a> for IPv6)
+ * Application layer protocol used. The value SHOULD be normalized to lowercase.
  */
-static constexpr const char *NET_PEER_IP = "net.peer.ip";
+static constexpr const char *NET_APP_PROTOCOL_NAME = "net.app.protocol.name";
 
 /**
- * Remote port number.
+ * Version of the application layer protocol used. See note below.
+ *
+ * <p>Notes:
+  <ul> <li>{@code net.app.protocol.version} refers to the version of the protocol used and might be
+ different from the protocol client's version. If the HTTP client used has a version of {@code
+ 0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
+ </ul>
  */
-static constexpr const char *NET_PEER_PORT = "net.peer.port";
+static constexpr const char *NET_APP_PROTOCOL_VERSION = "net.app.protocol.version";
 
 /**
- * Remote hostname or similar, see note below.
+ * Remote socket peer name.
+ */
+static constexpr const char *NET_SOCK_PEER_NAME = "net.sock.peer.name";
+
+/**
+ * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, <a
+ * href="https://man7.org/linux/man-pages/man7/address_families.7.html">etc</a>.
+ */
+static constexpr const char *NET_SOCK_PEER_ADDR = "net.sock.peer.addr";
+
+/**
+ * Remote socket peer port.
+ */
+static constexpr const char *NET_SOCK_PEER_PORT = "net.sock.peer.port";
+
+/**
+ * Protocol <a href="https://man7.org/linux/man-pages/man7/address_families.7.html">address
+ * family</a> which is used for communication.
+ */
+static constexpr const char *NET_SOCK_FAMILY = "net.sock.family";
+
+/**
+ * Logical remote hostname, see note below.
  *
  * <p>Notes:
   <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
@@ -375,19 +402,29 @@ static constexpr const char *NET_PEER_PORT = "net.peer.port";
 static constexpr const char *NET_PEER_NAME = "net.peer.name";
 
 /**
- * Like {@code net.peer.ip} but for the host IP. Useful in case of a multi-IP host.
+ * Logical remote port number
  */
-static constexpr const char *NET_HOST_IP = "net.host.ip";
+static constexpr const char *NET_PEER_PORT = "net.peer.port";
 
 /**
- * Like {@code net.peer.port} but for the host port.
+ * Logical local hostname or similar, see note below.
+ */
+static constexpr const char *NET_HOST_NAME = "net.host.name";
+
+/**
+ * Logical local port number, preferably the one that the peer used to connect
  */
 static constexpr const char *NET_HOST_PORT = "net.host.port";
 
 /**
- * Local hostname or similar, see note below.
+ * Local socket address. Useful in case of a multi-IP host.
  */
-static constexpr const char *NET_HOST_NAME = "net.host.name";
+static constexpr const char *NET_SOCK_HOST_ADDR = "net.sock.host.addr";
+
+/**
+ * Local socket port number.
+ */
+static constexpr const char *NET_SOCK_HOST_PORT = "net.sock.host.port";
 
 /**
  * The internet connection type currently being used by the host.
@@ -490,39 +527,6 @@ static constexpr const char *CODE_LINENO = "code.lineno";
 static constexpr const char *HTTP_METHOD = "http.method";
 
 /**
- * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
- fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
- *
- * <p>Notes:
-  <ul> <li>{@code http.url} MUST NOT contain credentials passed via URL in form of {@code
- https://username:password@www.example.com/}. In such case the attribute's value should be {@code
- https://www.example.com/}.</li> </ul>
- */
-static constexpr const char *HTTP_URL = "http.url";
-
-/**
- * The full request target as passed in a HTTP request line or equivalent.
- */
-static constexpr const char *HTTP_TARGET = "http.target";
-
-/**
- * The value of the <a href="https://tools.ietf.org/html/rfc7230#section-5.4">HTTP host header</a>.
- An empty Host header should also be reported, see note.
- *
- * <p>Notes:
-  <ul> <li>When the header is present but empty the attribute SHOULD be set to the empty string.
- Note that this is a valid situation that is expected in certain cases, according the aforementioned
- <a href="https://tools.ietf.org/html/rfc7230#section-5.4">section of RFC 7230</a>. When the header
- is not set the attribute MUST NOT be set.</li> </ul>
- */
-static constexpr const char *HTTP_HOST = "http.host";
-
-/**
- * The URI scheme identifying the used protocol.
- */
-static constexpr const char *HTTP_SCHEME = "http.scheme";
-
-/**
  * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
  */
 static constexpr const char *HTTP_STATUS_CODE = "http.status_code";
@@ -537,40 +541,37 @@ static constexpr const char *HTTP_STATUS_CODE = "http.status_code";
 static constexpr const char *HTTP_FLAVOR = "http.flavor";
 
 /**
- * Value of the <a href="https://tools.ietf.org/html/rfc7231#section-5.5.3">HTTP User-Agent</a>
- * header sent by the client.
+ * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
+ * User-Agent</a> header sent by the client.
  */
 static constexpr const char *HTTP_USER_AGENT = "http.user_agent";
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
  * headers and is often, but not always, present as the <a
- * href="https://tools.ietf.org/html/rfc7230#section-3.3.2">Content-Length</a> header. For requests
- * using transport encoding, this should be the compressed size.
+ * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
+ * header. For requests using transport encoding, this should be the compressed size.
  */
 static constexpr const char *HTTP_REQUEST_CONTENT_LENGTH = "http.request_content_length";
 
 /**
- * The size of the uncompressed request payload body after transport decoding. Not set if transport
- * encoding not used.
- */
-static constexpr const char *HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED =
-    "http.request_content_length_uncompressed";
-
-/**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding
  * headers and is often, but not always, present as the <a
- * href="https://tools.ietf.org/html/rfc7230#section-3.3.2">Content-Length</a> header. For requests
- * using transport encoding, this should be the compressed size.
+ * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
+ * header. For requests using transport encoding, this should be the compressed size.
  */
 static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH = "http.response_content_length";
 
 /**
- * The size of the uncompressed response payload body after transport decoding. Not set if transport
- * encoding not used.
+ * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
+ fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
+ *
+ * <p>Notes:
+  <ul> <li>{@code http.url} MUST NOT contain credentials passed via URL in form of {@code
+ https://username:password@www.example.com/}. In such case the attribute's value should be {@code
+ https://www.example.com/}.</li> </ul>
  */
-static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
-    "http.response_content_length_uncompressed";
+static constexpr const char *HTTP_URL = "http.url";
 
 /**
  * The ordinal number of request re-sending attempt.
@@ -578,20 +579,23 @@ static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED =
 static constexpr const char *HTTP_RETRY_COUNT = "http.retry_count";
 
 /**
- * The primary server name of the matched virtual host. This should be obtained via configuration.
- If no such configuration can be obtained, this attribute MUST NOT be set ( {@code net.host.name}
- should be used instead).
- *
- * <p>Notes:
-  <ul> <li>{@code http.url} is usually not readily available on the server side but would have to be
- assembled in a cumbersome and sometimes lossy process from other information (see e.g.
- open-telemetry/opentelemetry-python/pull/148). It is thus preferred to supply the raw data that is
- available.</li> </ul>
+ * The URI scheme identifying the used protocol.
  */
-static constexpr const char *HTTP_SERVER_NAME = "http.server_name";
+static constexpr const char *HTTP_SCHEME = "http.scheme";
 
 /**
- * The matched route (path template).
+ * The full request target as passed in a HTTP request line or equivalent.
+ */
+static constexpr const char *HTTP_TARGET = "http.target";
+
+/**
+ * The matched route (path template in the format used by the respective server framework). See note
+ below
+ *
+ * <p>Notes:
+  <ul> <li>'http.route' MUST NOT be populated when this is not supported by the HTTP server
+ framework as the route attribute should have low-cardinality and the URI path can NOT substitute
+ it.</li> </ul>
  */
 static constexpr const char *HTTP_ROUTE = "http.route";
 
@@ -600,13 +604,13 @@ static constexpr const char *HTTP_ROUTE = "http.route";
 href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For">X-Forwarded-For</a>).
  *
  * <p>Notes:
-  <ul> <li>This is not necessarily the same as {@code net.peer.ip}, which would
+  <ul> <li>This is not necessarily the same as {@code net.sock.peer.addr}, which would
 identify the network-level peer, which may be a proxy.</li><li>This attribute should be set when a
-source of information different from the one used for {@code net.peer.ip}, is available even if that
-other source just confirms the same value as {@code net.peer.ip}. Rationale: For {@code
-net.peer.ip}, one typically does not know if it comes from a proxy, reverse proxy, or the actual
-client. Setting
-{@code http.client_ip} when it's the same as {@code net.peer.ip} means that
+source of information different from the one used for {@code net.sock.peer.addr}, is available even
+if that other source just confirms the same value as {@code net.sock.peer.addr}. Rationale: For
+{@code net.sock.peer.addr}, one typically does not know if it comes from a proxy, reverse proxy, or
+the actual client. Setting
+{@code http.client_ip} when it's the same as {@code net.sock.peer.addr} means that
 one is at least somewhat confident that the address is not that of
 the closest proxy.</li> </ul>
  */
@@ -730,6 +734,24 @@ static constexpr const char *AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
  */
 static constexpr const char *AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
     "aws.dynamodb.global_secondary_index_updates";
+
+/**
+ * The name of the operation being executed.
+ */
+static constexpr const char *GRAPHQL_OPERATION_NAME = "graphql.operation.name";
+
+/**
+ * The type of the operation being executed.
+ */
+static constexpr const char *GRAPHQL_OPERATION_TYPE = "graphql.operation.type";
+
+/**
+ * The GraphQL document being executed.
+ *
+ * <p>Notes:
+  <ul> <li>The value may be sanitized to exclude sensitive information.</li> </ul>
+ */
+static constexpr const char *GRAPHQL_DOCUMENT = "graphql.document";
 
 /**
  * A string identifying the messaging system.
@@ -1069,6 +1091,8 @@ static constexpr const char *ELASTICSEARCH = "elasticsearch";
 static constexpr const char *MEMCACHED = "memcached";
 /** CockroachDB. */
 static constexpr const char *COCKROACHDB = "cockroachdb";
+/** OpenSearch. */
+static constexpr const char *OPENSEARCH = "opensearch";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
@@ -1141,10 +1165,6 @@ namespace NetTransportValues
 static constexpr const char *IP_TCP = "ip_tcp";
 /** ip_udp. */
 static constexpr const char *IP_UDP = "ip_udp";
-/** Another IP-based protocol. */
-static constexpr const char *IP = "ip";
-/** Unix Domain socket. See below. */
-static constexpr const char *UNIX = "unix";
 /** Named or anonymous pipe. See note below. */
 static constexpr const char *PIPE = "pipe";
 /** In-process communication. */
@@ -1152,6 +1172,16 @@ static constexpr const char *INPROC = "inproc";
 /** Something else (non IP-based). */
 static constexpr const char *OTHER = "other";
 }  // namespace NetTransportValues
+
+namespace NetSockFamilyValues
+{
+/** IPv4 address. */
+static constexpr const char *INET = "inet";
+/** IPv6 address. */
+static constexpr const char *INET6 = "inet6";
+/** Unix domain socket path. */
+static constexpr const char *UNIX = "unix";
+}  // namespace NetSockFamilyValues
 
 namespace NetHostConnectionTypeValues
 {
@@ -1228,6 +1258,16 @@ static constexpr const char *SPDY = "SPDY";
 /** QUIC protocol. */
 static constexpr const char *QUIC = "QUIC";
 }  // namespace HttpFlavorValues
+
+namespace GraphqlOperationTypeValues
+{
+/** GraphQL query. */
+static constexpr const char *QUERY = "query";
+/** GraphQL mutation. */
+static constexpr const char *MUTATION = "mutation";
+/** GraphQL subscription. */
+static constexpr const char *SUBSCRIPTION = "subscription";
+}  // namespace GraphqlOperationTypeValues
 
 namespace MessagingDestinationKindValues
 {

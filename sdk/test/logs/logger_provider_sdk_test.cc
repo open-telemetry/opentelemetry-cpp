@@ -81,14 +81,14 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
 class DummyProcessor : public LogProcessor
 {
-  std::unique_ptr<Recordable> MakeRecordable() noexcept
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
     return std::unique_ptr<Recordable>(new LogRecord);
   }
 
-  void OnReceive(std::unique_ptr<Recordable> && /* record */) noexcept {}
-  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept { return true; }
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept { return true; }
+  void OnReceive(std::unique_ptr<Recordable> && /* record */) noexcept override {}
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };
 
 TEST(LoggerProviderSDK, GetResource)

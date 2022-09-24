@@ -86,7 +86,7 @@ private:
   std::shared_ptr<InMemorySpanData> data_;
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept
+  bool isShutdown() const noexcept
   {
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     return is_shutdown_;
