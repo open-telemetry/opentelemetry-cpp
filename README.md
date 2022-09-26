@@ -121,9 +121,9 @@ For edit access, get in touch on
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 * [Josh Suereth](https://github.com/jsuereth), Google
+* [Marc Alff](https://github.com/marcalff), Oracle
 * [Reiley Yang](https://github.com/reyang), Microsoft
 * [WenTao Ou](https://github.com/owent), Tencent
-* [Marc Alff](https://github.com/marcalff), Oracle
 
 [Emeritus
 Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager):
