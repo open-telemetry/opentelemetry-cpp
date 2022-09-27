@@ -45,12 +45,12 @@ Increment the:
 
 Notes:
 
-While [OpenTelemetry sememantic
+While [OpenTelemetry semantic
 convention](https://github.com/open-telemetry/opentelemetry-specification/tree/main/semantic_conventions)
 is still in experimental state, PR
 [#1624](https://github.com/open-telemetry/opentelemetry-cpp/pull/1624) upgraded
 it from 1.12.0 to 1.13.0 which **MAY** break the instrumentation library. Please
-update the sementic convention in instruementation library is needed.
+update the semantic convention in instrumentation library is needed.
 
 ## [1.6.0] 2022-08-15
 
