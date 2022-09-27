@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1664257321235,
+  "lastUpdate": 1664257323670,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -76450,6 +76450,54 @@ window.BENCHMARK_DATA = {
             "value": 2002620.9262701182,
             "unit": "ns/iter",
             "extra": "iterations: 416\ncpu: 315908.4134615384 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@oracle.com",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "16264366132f18c7d37eb646f68024285065c696",
+          "message": "Add Marc Alff in cpp-approvers (#1635)\n\n* Add Marc Alff in cpp-approvers\r\n\r\nPer discussion in C++ SIG Meeting, 2022-09-26.\r\n\r\n* Order by name.\r\n\r\nCo-authored-by: Tom Tan <Tom.Tan@microsoft.com>",
+          "timestamp": "2022-09-26T22:29:49-07:00",
+          "tree_id": "d4fd92bac74088fad85983cd5243af8991223577",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/16264366132f18c7d37eb646f68024285065c696"
+        },
+        "date": 1664257318219,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 112.21207134920735,
+            "unit": "ns/iter",
+            "extra": "iterations: 1234000\ncpu: 111.99319286871962 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 169.28236168551157,
+            "unit": "ns/iter",
+            "extra": "iterations: 830000\ncpu: 168.699156626506 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 611.6777018927709,
+            "unit": "ns/iter",
+            "extra": "iterations: 233000\ncpu: 610.487982832618 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1835578.6253552919,
+            "unit": "ns/iter",
+            "extra": "iterations: 436\ncpu: 281279.1284403671 ns\nthreads: 1"
           }
         ]
       }
