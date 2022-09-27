@@ -52,6 +52,7 @@ public:
       return;
     }
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -67,6 +68,7 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
     auto attr = attributes_processor_->process(attributes);
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -77,6 +79,7 @@ public:
       return;
     }
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -93,6 +96,7 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
     auto attr = attributes_processor_->process(attributes);
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -117,6 +121,7 @@ private:
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
   TemporalMetricStorage temporal_metric_storage_;
+  opentelemetry::common::SpinLockMutex lock_;
 };
 
 }  // namespace metrics
