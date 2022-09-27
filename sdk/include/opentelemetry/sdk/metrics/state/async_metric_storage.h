@@ -44,35 +44,26 @@ public:
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     // process the read measurements - aggregate and store in hashmap
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
     for (auto &measurement : measurements)
     {
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
-      cumulative_hashmap_lock_.lock();
       auto prev = cumulative_hash_map_->Get(measurement.first);
-      cumulative_hashmap_lock_.unlock();
       if (prev)
       {
         auto delta = prev->Diff(*aggr);
-        cumulative_hashmap_lock_.lock();
         cumulative_hash_map_->Set(measurement.first,
                                   DefaultAggregation::CloneAggregation(
                                       aggregation_type_, instrument_descriptor_, *delta));
-        cumulative_hashmap_lock_.unlock();
-        delta_hashmap_lock_.lock();
         delta_hash_map_->Set(measurement.first, std::move(delta));
-        delta_hashmap_lock_.unlock();
       }
       else
       {
-        cumulative_hashmap_lock_.lock();
         cumulative_hash_map_->Set(
             measurement.first,
             DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
-        cumulative_hashmap_lock_.unlock();
-        delta_hashmap_lock_.lock();
         delta_hash_map_->Set(measurement.first, std::move(aggr));
-        delta_hashmap_lock_.unlock();
       }
     }
   }
@@ -108,7 +99,7 @@ public:
 
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
-      std::lock_guard<opentelemetry::common::SpinLockMutex> guard(delta_hashmap_lock_);
+      std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_.reset(new AttributesHashMap);
     }
@@ -125,10 +116,8 @@ private:
   const AttributesProcessor *attributes_processor_;
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
-  opentelemetry::common::SpinLockMutex cumulative_hashmap_lock_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
-  opentelemetry::common::SpinLockMutex delta_hashmap_lock_;
-
+  opentelemetry::common::SpinLockMutex hashmap_lock_;
   TemporalMetricStorage temporal_metric_storage_;
 };
 
