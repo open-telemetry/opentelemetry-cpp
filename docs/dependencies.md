@@ -31,7 +31,7 @@ Both these dependencies are listed here:
       License`
   - Uses Abseil C++ Library for `absl::variant` as default `nostd::variant` if
     `WITH_ABSEIL` cmake option or
-    `--@io_opentelemetry_cpp/api:with_abseil=true` (aka
+    `--@io_opentelemetry_cpp//api:with_abseil=true` (aka
     `--//api:with_abseil=true`) bazel option is enabled. License: `Apache
     License 2.0`
 

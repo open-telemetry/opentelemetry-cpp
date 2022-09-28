@@ -20,4 +20,4 @@ ms-gsl=v3.1.0-67-g6f45293
 nlohmann-json=v3.10.5
 opentelemetry-proto=v0.19.0
 prometheus-cpp=v1.0.0
-vcpkg=2022.04.12
+vcpkg=2022.08.15
