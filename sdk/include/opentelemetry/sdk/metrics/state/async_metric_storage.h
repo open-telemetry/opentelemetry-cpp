@@ -44,6 +44,7 @@ public:
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
     // process the read measurements - aggregate and store in hashmap
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
     for (auto &measurement : measurements)
     {
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
@@ -96,10 +97,16 @@ public:
                nostd::function_ref<bool(MetricData)> metric_collection_callback) noexcept override
   {
 
-    auto status = temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts,
-                                                        collection_ts, std::move(delta_hash_map_),
-                                                        metric_collection_callback);
-    delta_hash_map_.reset(new AttributesHashMap());
+    std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
+    {
+      std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
+      delta_metrics = std::move(delta_hash_map_);
+      delta_hash_map_.reset(new AttributesHashMap);
+    }
+
+    auto status =
+        temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
+                                              delta_metrics, metric_collection_callback);
     return status;
   }
 
@@ -110,6 +117,7 @@ private:
   void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
+  opentelemetry::common::SpinLockMutex hashmap_lock_;
   TemporalMetricStorage temporal_metric_storage_;
 };
 
