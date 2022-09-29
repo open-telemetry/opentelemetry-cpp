@@ -25,14 +25,17 @@ void BM_AttributseHashMap(benchmark::State &state)
   std::vector<MetricAttributes> attributes = {{{"k1", "v1"}, {"k2", "v2"}},
                                               {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}}};
 
-  auto work = [&attributes, &hash_map](const size_t i) {
+  std::mutex m;
+
+  auto work = [&attributes, &hash_map, &m](const size_t i) {
     std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
         []() -> std::unique_ptr<Aggregation> {
       return std::unique_ptr<Aggregation>(new DropAggregation);
     };
-
+    m.lock();
     hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);
     benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
+    m.unlock();
   };
   while (state.KeepRunning())
   {

@@ -20,8 +20,12 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   // Add the current delta metrics to `unreported metrics stash` for all the collectors,
   // this will also empty the delta metrics hashmap, and make it available for
   // recordings
-  std::shared_ptr<AttributesHashMap> delta_metrics = std::move(attributes_hashmap_);
-  attributes_hashmap_.reset(new AttributesHashMap);
+  std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
+  {
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    delta_metrics = std::move(attributes_hashmap_);
+    attributes_hashmap_.reset(new AttributesHashMap);
+  }
 
   return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
                                                std::move(delta_metrics), callback);
