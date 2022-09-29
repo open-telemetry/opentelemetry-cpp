@@ -497,14 +497,17 @@ TEST(ETWTracer, CustomSampler)
     auto span = tracer->StartSpan("span_off");
     EXPECT_EQ(span->GetContext().IsValid(), true);
     EXPECT_EQ(span->GetContext().IsSampled(), true);
-    auto scope = tracer->WithActiveSpan(span);
-    auto trace_id = span->GetContext().trace_id();
     {
+      auto scope = tracer->WithActiveSpan(span);
+      auto trace_id = span->GetContext().trace_id();
       auto child_span = tracer->StartSpan("span on");
       EXPECT_EQ(child_span->GetContext().IsValid(), true);
       EXPECT_EQ(child_span->GetContext().IsSampled(), true);
-      EXPECT_EQ(child_span->GetContext().trace_id(), trace_id);
+      EXPECT_EQ(child_span->GetContext().trace_id(), span->GetContext().trace_id());
     }
+    auto another_span = tracer->StartSpan("span_test");
+    EXPECT_NE(span->GetContext().tracer_id(), another_span->GetContext().trace_id());
+
   }
 }
 

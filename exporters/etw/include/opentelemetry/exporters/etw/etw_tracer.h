@@ -182,8 +182,6 @@ class Tracer : public opentelemetry::trace::Tracer,
    */
   ETWProvider::Handle &provHandle;
 
-  opentelemetry::trace::TraceId traceId_;
-
   std::atomic<bool> isClosed_{true};
 
   /**
@@ -328,8 +326,6 @@ class Tracer : public opentelemetry::trace::Tracer,
     }
   }
 
-  const opentelemetry::trace::TraceId &trace_id() { return traceId_; }
-
   friend class Span;
 
   /**
@@ -357,9 +353,7 @@ public:
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
         provHandle(initProvHandle())
-  {
-    traceId_ = GetIdGenerator(tracerProvider_).GenerateTraceId();
-  }
+  {}
 
   /**
    * @brief Start Span
@@ -416,7 +410,8 @@ public:
         parentContext = spanContext;
       }
     }
-    auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
+    auto traceId = parentContext.IsValid() ? parentContext.trace_id()
+                                           : GetIdGenerator(tracerProvider_).GenerateTraceId();
 
     // Sampling based on attributes is not supported for now, so passing empty below.
     std::map<std::string, int> emptyAttributes = {{}};
