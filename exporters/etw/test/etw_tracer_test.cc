@@ -506,7 +506,7 @@ TEST(ETWTracer, CustomSampler)
       EXPECT_EQ(child_span->GetContext().trace_id(), span->GetContext().trace_id());
     }
     auto another_span = tracer->StartSpan("span_test");
-    EXPECT_NE(span->GetContext().tracer_id(), another_span->GetContext().trace_id());
+    EXPECT_NE(span->GetContext().trace_id(), another_span->GetContext().trace_id());
 
   }
 }
