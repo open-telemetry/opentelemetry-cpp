@@ -53,9 +53,9 @@ public:
       if (prev)
       {
         auto delta = prev->Diff(*aggr);
-        cumulative_hash_map_->Set(measurement.first,
-                                  DefaultAggregation::CloneAggregation(
-                                      aggregation_type_, instrument_descriptor_, *delta));
+        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
+        /* DefaultAggregation::CloneAggregation(
+             aggregation_type_, instrument_descriptor_, *delta));*/
         delta_hash_map_->Set(measurement.first, std::move(delta));
       }
       else

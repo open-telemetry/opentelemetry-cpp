@@ -107,12 +107,12 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
-  long get_count                                                                  = 20l;
-  long put_count                                                                  = 10l;
-  size_t attribute_count                                                          = 2;
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements = {
-      {{{"RequestType", "GET"}}, get_count}, {{{"RequestType", "PUT"}}, put_count}};
-  storage.RecordLong(measurements,
+  long get_count1                                                                  = 20l;
+  long put_count1                                                                  = 10l;
+  size_t attribute_count                                                           = 2;
+  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
+      {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
+  storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
@@ -123,20 +123,58 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
                       if (opentelemetry::nostd::get<std::string>(
                               data_attr.attributes.find("RequestType")->second) == "GET")
                       {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count);
+                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count1);
                       }
                       else if (opentelemetry::nostd::get<std::string>(
                                    data_attr.attributes.find("RequestType")->second) == "PUT")
                       {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count);
+                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count1);
                       }
                     }
                     return true;
                   });
   // subsequent recording after collection shouldn't fail
-  storage.RecordLong(measurements,
+  // monotonic increasing values;
+  long get_count2 = 50l;
+  long put_count2 = 70l;
+
+  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements2 = {
+      {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
+  storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
-  EXPECT_EQ(MeasurementFetcher::number_of_attributes, attribute_count);
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
+        for (auto data_attr : data.point_data_attr_)
+        {
+          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count2 - get_count1);
+            }
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
+                        put_count2 - put_count1);  // 50 - 30
+            }
+          }
+        }
+        return true;
+      });
 }
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,

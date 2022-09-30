@@ -12,6 +12,8 @@
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
+#  include <iostream>
+
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
 
@@ -29,6 +31,8 @@ std::map<std::string, std::string> get_random_attr()
                                             labels[rand() % (labels.size() - 1)]};
 }
 
+static double val = 1.0;
+
 class MeasurementFetcher
 {
 public:
@@ -39,10 +43,12 @@ public:
     if (nostd::holds_alternative<
             nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer_result))
     {
-      double val = (rand() % 700) + 1.1;
+      // double val = (rand() % 700) + 1.1;
+      // val = 1.0;
       nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
           observer_result)
           ->Observe(val /*, labelkv */);
+      val += 2.0;
     }
   }
 };

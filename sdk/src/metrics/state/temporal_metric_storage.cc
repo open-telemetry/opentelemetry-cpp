@@ -34,6 +34,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
+
   if (delta_metrics->Size())
   {
     for (auto &col : collectors)
