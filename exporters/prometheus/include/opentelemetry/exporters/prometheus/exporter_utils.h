@@ -68,7 +68,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
-                      const opentelemetry::sdk::metrics::ListType &boundaries,
+                      const std::list<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       std::chrono::nanoseconds time,
@@ -103,9 +103,9 @@ private:
   /**
    * Handle Histogram
    */
-  template <typename T, typename U>
+  template <typename T>
   static void SetValue(std::vector<T> values,
-                       const std::list<U> &boundaries,
+                       const std::list<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
 };

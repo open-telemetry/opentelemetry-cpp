@@ -126,21 +126,10 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       }
     }
     // buckets
-    if ((nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_)))
+
+    for (auto bound : histogram_data.boundaries_)
     {
-      auto boundaries = nostd::get<std::list<double>>(histogram_data.boundaries_);
-      for (auto bound : boundaries)
-      {
-        proto_histogram_point_data->add_explicit_bounds(bound);
-      }
-    }
-    else
-    {
-      auto boundaries = nostd::get<std::list<long>>(histogram_data.boundaries_);
-      for (auto bound : boundaries)
-      {
-        proto_histogram_point_data->add_explicit_bounds(bound);
-      }
+      proto_histogram_point_data->add_explicit_bounds(bound);
     }
     // bucket counts
     for (auto bucket_value : histogram_data.counts_)

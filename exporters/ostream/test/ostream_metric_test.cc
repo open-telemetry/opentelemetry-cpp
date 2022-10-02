@@ -105,7 +105,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   histogram_point_data.min_        = 1.8;
   histogram_point_data.max_        = 12.0;
   metric_sdk::HistogramPointData histogram_point_data2{};
-  histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
+  histogram_point_data2.boundaries_ = std::list<double>{10.0, 20.0, 30.0};
   histogram_point_data2.count_      = 3;
   histogram_point_data2.counts_     = {200, 300, 400, 500};
   histogram_point_data2.sum_        = 900l;

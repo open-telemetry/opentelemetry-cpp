@@ -197,7 +197,7 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const opentelemetry::sdk::metrics::ListType &boundaries,
+                                      const std::list<double> &boundaries,
                                       const std::vector<uint64_t> &counts,
                                       const metric_sdk::PointAttributes &labels,
                                       std::chrono::nanoseconds time,
@@ -206,14 +206,7 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
   SetMetricBasic(metric, time, labels);
-  if (nostd::holds_alternative<std::list<long>>(boundaries))
-  {
-    SetValue(values, nostd::get<std::list<long>>(boundaries), counts, &metric);
-  }
-  else
-  {
-    SetValue(values, nostd::get<std::list<double>>(boundaries), counts, &metric);
-  }
+  SetValue(values, boundaries, counts, &metric);
 }
 
 /**
@@ -321,9 +314,9 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 /**
  * Handle Histogram
  */
-template <typename T, typename U>
+template <typename T>
 void PrometheusExporterUtils::SetValue(std::vector<T> values,
-                                       const std::list<U> &boundaries,
+                                       const std::list<double> &boundaries,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)
 {
