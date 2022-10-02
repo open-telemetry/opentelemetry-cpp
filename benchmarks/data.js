@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1664736668959,
+  "lastUpdate": 1664736672025,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -78310,6 +78310,54 @@ window.BENCHMARK_DATA = {
             "value": 1478747.829147007,
             "unit": "ns/iter",
             "extra": "iterations: 368\ncpu: 337222.28260869574 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d127140564ce7c06884389ad4c39d9f85cdcd4a3",
+          "message": "[Metrics SDK] Change boundry type to `double` for Explicit Bucket Histogram Aggregation, and change default bucket range (#1626)\n\n* fix bucket boundaries type for histogram aggregation\r\n\r\n* update bucket range, and fix build",
+          "timestamp": "2022-10-02T11:39:06-07:00",
+          "tree_id": "2b61f4a10e26c274c93f187f2c8e6f0f46f3107c",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/d127140564ce7c06884389ad4c39d9f85cdcd4a3"
+        },
+        "date": 1664736666304,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 111.97945434421567,
+            "unit": "ns/iter",
+            "extra": "iterations: 1231000\ncpu: 111.93062550771731 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 168.30116510391235,
+            "unit": "ns/iter",
+            "extra": "iterations: 832000\ncpu: 168.0953125 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 612.8114692131337,
+            "unit": "ns/iter",
+            "extra": "iterations: 233000\ncpu: 611.5686695278972 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1540404.3708843577,
+            "unit": "ns/iter",
+            "extra": "iterations: 541\ncpu: 261478.74306839192 ns\nthreads: 1"
           }
         ]
       }
