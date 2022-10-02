@@ -168,8 +168,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_),
-                        put_count2 - put_count1);  // 50 - 30
+              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count2 - put_count1);
             }
           }
         }
