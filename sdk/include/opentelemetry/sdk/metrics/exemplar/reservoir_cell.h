@@ -34,7 +34,7 @@ public:
                              const MetricAttributes &attributes,
                              const opentelemetry::context::Context &context)
   {
-    long_value_ = value;
+    value_ = value;
     offerMeasurement(attributes, context);
   }
 
@@ -45,7 +45,7 @@ public:
                                const MetricAttributes &attributes,
                                const opentelemetry::context::Context &context)
   {
-    double_value_ = value;
+    value_ = value;
     offerMeasurement(attributes, context);
   }
 
@@ -56,10 +56,17 @@ public:
    */
   std::shared_ptr<ExemplarData> GetAndResetLong(const MetricAttributes &point_attributes)
   {
+    if (!context_)
+    {
+      return nullptr;
+    }
     auto attributes = attributes_;
     PointDataAttributes point_data_attributes;
     point_data_attributes.attributes = filtered(attributes, point_attributes);
-    point_data_attributes.point_data = ExemplarData::CreateSumPointData(long_value_);
+    if (nostd::holds_alternative<long>(value_))
+    {
+      point_data_attributes.point_data = ExemplarData::CreateSumPointData(nostd::get<long>(value_));
+    }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
     reset();
@@ -73,10 +80,18 @@ public:
    */
   std::shared_ptr<ExemplarData> GetAndResetDouble(const MetricAttributes &point_attributes)
   {
+    if (!context_)
+    {
+      return nullptr;
+    }
     auto attributes = attributes_;
     PointDataAttributes point_data_attributes;
     point_data_attributes.attributes = filtered(attributes, point_attributes);
-    point_data_attributes.point_data = ExemplarData::CreateSumPointData(double_value_);
+    if (nostd::holds_alternative<double>(value_))
+    {
+      point_data_attributes.point_data =
+          ExemplarData::CreateSumPointData(nostd::get<double>(value_));
+    }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
     reset();
@@ -85,9 +100,8 @@ public:
 
   void reset()
   {
-    long_value_   = 0;
-    double_value_ = 0;
-    record_time_  = opentelemetry::common::SystemTimestamp{};
+    value_       = 0.0;
+    record_time_ = opentelemetry::common::SystemTimestamp{};
   }
 
 private:
@@ -125,8 +139,7 @@ private:
 
   // Cell stores either long or double values, but must not store both
   std::shared_ptr<trace::SpanContext> context_;
-  long long_value_;
-  double double_value_;
+  nostd::variant<long, double> value_;
   opentelemetry::common::SystemTimestamp record_time_;
   MetricAttributes attributes_;
   // For testing

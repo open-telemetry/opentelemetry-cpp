@@ -46,7 +46,7 @@ public:
    * Returns the SpanContext associated with this exemplar. If the exemplar was not recorded
    * inside a sampled trace, the Context will be invalid.
    */
-  std::shared_ptr<trace::SpanContext> GetSpanContext() { return context_.lock(); }
+  const trace::SpanContext &GetSpanContext() const noexcept { return context_; }
 
   static PointType CreateSumPointData(ValueType value)
   {
@@ -70,9 +70,10 @@ private:
   ExemplarData(std::shared_ptr<trace::SpanContext> context,
                opentelemetry::common::SystemTimestamp timestamp,
                const PointDataAttributes &point_data_attr)
-      : context_(context), timestamp_(timestamp), point_data_attr_(point_data_attr)
+      : context_(*context.get()), timestamp_(timestamp), point_data_attr_(point_data_attr)
   {}
-  std::weak_ptr<trace::SpanContext> context_;
+
+  trace::SpanContext context_;
   opentelemetry::common::SystemTimestamp timestamp_;
   PointDataAttributes point_data_attr_;
 };

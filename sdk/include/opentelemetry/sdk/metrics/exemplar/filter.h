@@ -32,9 +32,9 @@ public:
 
   virtual ~ExemplarFilter() = default;
 
-  static nostd::shared_ptr<ExemplarFilter> GetNeverSampleFilter();
-  static nostd::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter();
-  static nostd::shared_ptr<ExemplarFilter> GetWithTraceSampleFilter();
+  static std::shared_ptr<ExemplarFilter> GetNeverSampleFilter() noexcept;
+  static std::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter() noexcept;
+  static std::shared_ptr<ExemplarFilter> GetWithTraceSampleFilter() noexcept;
 };
 
 }  // namespace metrics

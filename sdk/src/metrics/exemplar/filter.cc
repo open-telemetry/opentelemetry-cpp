@@ -13,21 +13,21 @@ namespace sdk
 namespace metrics
 {
 
-nostd::shared_ptr<ExemplarFilter> ExemplarFilter::GetNeverSampleFilter()
+std::shared_ptr<ExemplarFilter> ExemplarFilter::GetNeverSampleFilter() noexcept
 {
-  nostd::shared_ptr<ExemplarFilter> neverSampleFilter{new NeverSampleFilter{}};
+  static std::shared_ptr<ExemplarFilter> neverSampleFilter{new NeverSampleFilter{}};
   return neverSampleFilter;
 }
 
-nostd::shared_ptr<ExemplarFilter> ExemplarFilter::GetAlwaysSampleFilter()
+std::shared_ptr<ExemplarFilter> ExemplarFilter::GetAlwaysSampleFilter() noexcept
 {
-  static nostd::shared_ptr<ExemplarFilter> alwaysSampleFilter{new AlwaysSampleFilter{}};
+  static std::shared_ptr<ExemplarFilter> alwaysSampleFilter{new AlwaysSampleFilter{}};
   return alwaysSampleFilter;
 }
 
-nostd::shared_ptr<ExemplarFilter> ExemplarFilter::GetWithTraceSampleFilter()
+std::shared_ptr<ExemplarFilter> ExemplarFilter::GetWithTraceSampleFilter() noexcept
 {
-  nostd::shared_ptr<ExemplarFilter> withTraceSampleFilter{new WithTraceSampleFilter{}};
+  std::shared_ptr<ExemplarFilter> withTraceSampleFilter{new WithTraceSampleFilter{}};
   return withTraceSampleFilter;
 }
 

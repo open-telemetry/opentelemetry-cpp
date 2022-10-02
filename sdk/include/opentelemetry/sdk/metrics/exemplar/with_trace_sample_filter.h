@@ -34,7 +34,8 @@ public:
 private:
   static bool hasSampledTrace(const opentelemetry::context::Context &context)
   {
-    return opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
+    return opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
+           opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
   }
 };
 }  // namespace metrics

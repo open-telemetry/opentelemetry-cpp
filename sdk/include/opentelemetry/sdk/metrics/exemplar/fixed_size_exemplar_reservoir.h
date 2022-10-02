@@ -19,7 +19,6 @@ namespace sdk
 namespace metrics
 {
 
-template <typename T>
 class FixedSizeExemplarReservoir : public ExemplarReservoir
 {
 

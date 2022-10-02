@@ -20,7 +20,7 @@ namespace sdk
 namespace metrics
 {
 
-class HistogramExemplarReservoir : public FixedSizeExemplarReservoir<ExemplarData>
+class HistogramExemplarReservoir : public FixedSizeExemplarReservoir
 {
 
 public:
@@ -34,7 +34,7 @@ public:
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
                              std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
                                  const common::OrderedAttributeMap &attributes))
-      : FixedSizeExemplarReservoir<ExemplarData>(size, reservoir_cell_selector, map_and_reset_cell)
+      : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
   {}
 
   class HistogramCellSelector : public ReservoirCellSelector

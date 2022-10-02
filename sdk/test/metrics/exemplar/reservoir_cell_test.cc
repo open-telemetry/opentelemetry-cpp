@@ -15,12 +15,12 @@ class ReservoirCellTestPeer : public ::testing::Test
 public:
   long GetLongVal(const opentelemetry::sdk::metrics::ReservoirCell &reservoir_cell)
   {
-    return reservoir_cell.long_value_;
+    return nostd::get<long>(reservoir_cell.value_);
   }
 
   double GetDoubleVal(const opentelemetry::sdk::metrics::ReservoirCell &reservoir_cell)
   {
-    return reservoir_cell.double_value_;
+    return nostd::get<double>(reservoir_cell.value_);
   }
 
   opentelemetry::common::SystemTimestamp GetRecordTime(
@@ -55,11 +55,11 @@ TEST_F(ReservoirCellTestPeer, GetAndReset)
   opentelemetry::sdk::metrics::ReservoirCell reservoir_cell;
   auto double_data = reservoir_cell.GetAndResetDouble(MetricAttributes{});
   ASSERT_TRUE(GetRecordTime(reservoir_cell) == opentelemetry::common::SystemTimestamp{});
-  ASSERT_TRUE(double_data != nullptr);
+  ASSERT_TRUE(double_data == nullptr);
 
   auto long_data = reservoir_cell.GetAndResetLong(MetricAttributes{});
   ASSERT_TRUE(GetRecordTime(reservoir_cell) == opentelemetry::common::SystemTimestamp{});
-  ASSERT_TRUE(long_data != nullptr);
+  ASSERT_TRUE(long_data == nullptr);
 }
 
 TEST_F(ReservoirCellTestPeer, Filtered)
