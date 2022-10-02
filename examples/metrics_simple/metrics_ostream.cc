@@ -62,7 +62,7 @@ void initMetrics(const std::string &name)
   std::unique_ptr<metric_sdk::MeterSelector> observable_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
   std::unique_ptr<metric_sdk::View> observable_sum_view{
-      new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
+      new metric_sdk::View{name, "test_description", metric_sdk::AggregationType::kSum}};
   p->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
              std::move(observable_sum_view));
 
