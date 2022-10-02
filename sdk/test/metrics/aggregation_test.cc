@@ -75,7 +75,6 @@ TEST(Aggregation, LongHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
   ASSERT_TRUE(nostd::holds_alternative<long>(histogram_data.sum_));
-  ASSERT_TRUE(nostd::holds_alternative<std::list<long>>(histogram_data.boundaries_));
   EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
   aggr.Aggregate(12l, {});   // lies in fourth bucket
@@ -134,14 +133,14 @@ TEST(Aggregation, LongHistogramAggregationBoundaries)
 {
   nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<long>>
       aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<long>};
-  std::list<long> user_boundaries = {0, 50, 100, 250, 500, 750, 1000, 2500, 5000, 10000};
-  aggregation_config->boundaries_ = user_boundaries;
+  std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
+                                       750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  aggregation_config->boundaries_   = user_boundaries;
   LongHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<std::list<long>>(histogram_data.boundaries_));
-  EXPECT_EQ(nostd::get<std::list<long>>(histogram_data.boundaries_), user_boundaries);
+  EXPECT_EQ(histogram_data.boundaries_, user_boundaries);
 }
 
 TEST(Aggregation, DoubleHistogramAggregationBoundaries)
@@ -155,8 +154,7 @@ TEST(Aggregation, DoubleHistogramAggregationBoundaries)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_));
-  EXPECT_EQ(nostd::get<std::list<double>>(histogram_data.boundaries_), user_boundaries);
+  EXPECT_EQ(histogram_data.boundaries_, user_boundaries);
 }
 
 TEST(Aggregation, DoubleHistogramAggregation)
@@ -166,7 +164,6 @@ TEST(Aggregation, DoubleHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
   ASSERT_TRUE(nostd::holds_alternative<double>(histogram_data.sum_));
-  ASSERT_TRUE(nostd::holds_alternative<std::list<double>>(histogram_data.boundaries_));
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
   aggr.Aggregate(12.0, {});   // lies in fourth bucket

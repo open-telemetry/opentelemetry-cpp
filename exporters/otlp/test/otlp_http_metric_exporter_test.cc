@@ -482,14 +482,14 @@ public:
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data{};
-    histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
+    histogram_point_data.boundaries_ = {10.1, 20.2, 30.2};
     histogram_point_data.count_      = 3;
     histogram_point_data.counts_     = {200, 300, 400, 500};
     histogram_point_data.sum_        = 900.5;
     histogram_point_data.min_        = 1.8;
     histogram_point_data.max_        = 19.0;
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data2{};
-    histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
+    histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
     histogram_point_data2.sum_        = 900l;
@@ -619,12 +619,12 @@ public:
         "library_name", "1.5.0");
 
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data{};
-    histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
+    histogram_point_data.boundaries_ = {10.1, 20.2, 30.2};
     histogram_point_data.count_      = 3;
     histogram_point_data.counts_     = {200, 300, 400, 500};
     histogram_point_data.sum_        = 900.5;
     opentelemetry::sdk::metrics::HistogramPointData histogram_point_data2{};
-    histogram_point_data2.boundaries_ = std::list<long>{10, 20, 30};
+    histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
     histogram_point_data2.sum_        = 900l;
