@@ -20,7 +20,7 @@ template <typename T>
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:
-  std::list<T> boundaries_;
+  std::list<double> boundaries_;
   bool record_min_max_ = true;
 };
 }  // namespace metrics
