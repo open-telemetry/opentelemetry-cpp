@@ -166,16 +166,13 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 option(MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 if(MAINTAINER_MODE)
-
   add_compile_options(-Wall)
   add_compile_options(-Werror)
   add_compile_options(-Wextra)
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
-    # Tested with GCC 9.4,
-    # compiling options most likely are available
-    # on older compilers as well.
+    # Tested with GCC 9.4 on github.
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
       # Relaxed warnings
 
@@ -186,11 +183,8 @@ if(MAINTAINER_MODE)
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-    # Tested with CLang 12.0.1,
-    # compiling options most likely are available
-    # on older compilers as well.
-    # FIXME: figure out which version is used in github ci.
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 1.0)
+    # Tested with CLang 11.0 on github.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
       # Relaxed warnings
       add_compile_options(-Wno-error=unused-private-field)
 

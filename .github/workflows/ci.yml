@@ -32,12 +32,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc CXX=/usr/bin/g++ ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc CXX=/usr/bin/g++ ./ci/setup_ci_environment.sh
     - name: run cmake gcc (maintainer mode)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.maintainer.test
+        sudo CC=/usr/bin/gcc CXX=/usr/bin/g++ ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc CXX=/usr/bin/g++ ./ci/do_ci.sh cmake.maintainer.test
 
   cmake_clang_maintainer_test:
     name: CMake clang (maintainer mode)
@@ -48,11 +48,11 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/setup_ci_environment.sh
     - name: run cmake clang (maintainer mode)
       run: |
-        sudo ./ci/setup_thrift.sh
+        sudo CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/setup_thrift.sh
         CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/do_ci.sh cmake.maintainer.test
 
   cmake_deprecated_metrics_test:
