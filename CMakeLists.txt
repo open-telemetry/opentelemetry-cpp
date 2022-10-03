@@ -173,7 +173,7 @@ if(MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
     # Tested with GCC 9.4 on github.
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
       # Relaxed warnings
 
       # Enforced warnings
@@ -183,8 +183,8 @@ if(MAINTAINER_MODE)
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-    # Tested with CLang 11.0 on github.
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
+    # Tested with Clang 11.0 on github.
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
       # Relaxed warnings
       add_compile_options(-Wno-error=unused-private-field)
 
