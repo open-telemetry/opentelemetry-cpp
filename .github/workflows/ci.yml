@@ -55,6 +55,20 @@ jobs:
         sudo CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/setup_thrift.sh
         CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/do_ci.sh cmake.maintainer.test
 
+  cmake_msvc_maintainer_test:
+    name: CMake msvc (maintainer mode)
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 cmake.maintainer.test
+
   cmake_deprecated_metrics_test:
     name: CMake test (without otlp-exporter and with deprecated metrics)
     runs-on: ubuntu-latest
