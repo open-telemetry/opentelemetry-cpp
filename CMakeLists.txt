@@ -166,11 +166,10 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 option(MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 if(MAINTAINER_MODE)
-  add_compile_options(-Wall)
-  add_compile_options(-Werror)
-  add_compile_options(-Wextra)
-
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    add_compile_options(-Wall)
+    add_compile_options(-Werror)
+    add_compile_options(-Wextra)
 
     # Tested with GCC 9.4 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
@@ -182,6 +181,9 @@ if(MAINTAINER_MODE)
   endif()
 
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(-Wall)
+    add_compile_options(-Werror)
+    add_compile_options(-Wextra)
 
     # Tested with Clang 11.0 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
@@ -202,6 +204,11 @@ if(MAINTAINER_MODE)
       add_compile_options(-Winconsistent-missing-override)
       add_compile_options(-Wnewline-eof)
     endif()
+  endif()
+
+  if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(/WX)
+    add_compile_options(/W4)
   endif()
 endif(MAINTAINER_MODE)
 
