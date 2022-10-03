@@ -23,6 +23,38 @@ jobs:
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
+  cmake_gcc_maintainer_test:
+    name: CMake gcc (maintainer mode)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake gcc (maintainer mode)
+      run: |
+        sudo ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.maintainer.test
+
+  cmake_clang_maintainer_test:
+    name: CMake clang (maintainer mode)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake clang (maintainer mode)
+      run: |
+        sudo ./ci/setup_thrift.sh
+        CC=/usr/bin/clang CXX=/usr/bin/clang++ ./ci/do_ci.sh cmake.maintainer.test
+
   cmake_deprecated_metrics_test:
     name: CMake test (without otlp-exporter and with deprecated metrics)
     runs-on: ubuntu-latest

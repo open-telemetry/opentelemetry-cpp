@@ -163,6 +163,54 @@ option(BUILD_TESTING "Whether to enable tests" ON)
 
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
+option(MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
+
+if(MAINTAINER_MODE)
+
+  add_compile_options(-Wall)
+  add_compile_options(-Werror)
+  add_compile_options(-Wextra)
+
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+
+    # Tested with GCC 9.4,
+    # compiling options most likely are available
+    # on older compilers as well.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
+      # Relaxed warnings
+
+      # Enforced warnings
+    endif()
+
+  endif()
+
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+
+    # Tested with CLang 12.0.1,
+    # compiling options most likely are available
+    # on older compilers as well.
+    # FIXME: figure out which version is used in github ci.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 1.0)
+      # Relaxed warnings
+      add_compile_options(-Wno-error=unused-private-field)
+
+      # Relaxed warning, for GRPC generated code.
+      add_compile_options(-Wno-error=shadow-field)
+
+      # Enforced warnings
+      add_compile_options(-Wconditional-uninitialized)
+      add_compile_options(-Wextra-semi)
+      add_compile_options(-Wheader-hygiene)
+      add_compile_options(-Wnon-virtual-dtor)
+      add_compile_options(-Wundefined-reinterpret-cast)
+      add_compile_options(-Wrange-loop-analysis)
+      add_compile_options(-Winconsistent-missing-destructor-override)
+      add_compile_options(-Winconsistent-missing-override)
+      add_compile_options(-Wnewline-eof)
+    endif()
+  endif()
+endif(MAINTAINER_MODE)
+
 if(WIN32)
   if(BUILD_TESTING)
     if(MSVC)
