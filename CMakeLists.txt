@@ -167,26 +167,41 @@ option(MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 if(MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    message("Building with gcc in maintainer mode.")
+
     add_compile_options(-Wall)
     add_compile_options(-Werror)
     add_compile_options(-Wextra)
 
     # Tested with GCC 9.4 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
+      message("Building with additional warnings for gcc.")
+
       # Relaxed warnings
 
       # Enforced warnings
+      add_compile_options(-Wcast-qual)
+      add_compile_options(-Wextra-semi)
+      add_compile_options(-Wformat-security)
+      add_compile_options(-Wlogical-op)
+      add_compile_options(-Wmissing-include-dirs)
+      add_compile_options(-Woverloaded-virtual)
+      add_compile_options(-Wstringop-truncation)
+      add_compile_options(-Wsuggest-override)
+      add_compile_options(-Wundef)
+      add_compile_options(-Wvla)
     endif()
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message("Building with clang in maintainer mode.")
 
-  endif()
-
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall)
     add_compile_options(-Werror)
     add_compile_options(-Wextra)
 
     # Tested with Clang 11.0 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
+      message("Building with additional warnings for clang.")
+
       # Relaxed warnings
       add_compile_options(-Wno-error=unused-private-field)
 
@@ -194,21 +209,32 @@ if(MAINTAINER_MODE)
       add_compile_options(-Wno-error=shadow-field)
 
       # Enforced warnings
+      add_compile_options(-Wcast-qual)
       add_compile_options(-Wconditional-uninitialized)
       add_compile_options(-Wextra-semi)
+      add_compile_options(-Wformat-security)
       add_compile_options(-Wheader-hygiene)
-      add_compile_options(-Wnon-virtual-dtor)
-      add_compile_options(-Wundefined-reinterpret-cast)
-      add_compile_options(-Wrange-loop-analysis)
       add_compile_options(-Winconsistent-missing-destructor-override)
       add_compile_options(-Winconsistent-missing-override)
       add_compile_options(-Wnewline-eof)
+      add_compile_options(-Wnon-virtual-dtor)
+      add_compile_options(-Woverloaded-virtual)
+      add_compile_options(-Wrange-loop-analysis)
+      add_compile_options(-Wundef)
+      add_compile_options(-Wundefined-reinterpret-cast)
+      add_compile_options(-Wvla)
     endif()
-  endif()
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    message("Building with msvc in maintainer mode.")
 
-  if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(/WX)
     add_compile_options(/W4)
+
+    # Relaxed warnings
+
+    # Enforced warnings
+  elseif()
+    message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()
 endif(MAINTAINER_MODE)
 

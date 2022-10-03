@@ -102,7 +102,7 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DMAINTAINER_MODE=ON \
         "${SRC_DIR}"
-  make
+  make -k
   make test
   exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
