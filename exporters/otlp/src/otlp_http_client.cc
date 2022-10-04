@@ -966,6 +966,7 @@ OtlpHttpClient::createSession(
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);
   request->ReplaceHeader("Content-Type", content_type);
+  request->ReplaceHeader("User-Agent", options_.user_agent);
 
   // Returns the created session data
   return HttpSessionData{
