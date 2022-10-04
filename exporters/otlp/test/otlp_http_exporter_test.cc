@@ -167,7 +167,7 @@ public:
           ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
           if (user_agent_header != mock_session->GetRequest()->headers_.end())
           {
-            EXPECT_EQ(kHttpUserAgent, user_agent_header->second);
+            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
           }
 
           // let the otlp_http_client to continue
@@ -258,7 +258,7 @@ public:
           ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
           if (user_agent_header != mock_session->GetRequest()->headers_.end())
           {
-            EXPECT_EQ(kHttpUserAgent, user_agent_header->second);
+            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
           }
 
           // let the otlp_http_client to continue

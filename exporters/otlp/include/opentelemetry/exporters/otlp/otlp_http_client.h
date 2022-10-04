@@ -13,7 +13,6 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/version/version.h"
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
@@ -39,8 +38,6 @@ constexpr char kDefaultMetricsPath[] = "/v1/metrics";
 // The HTTP header "Content-Type"
 constexpr char kHttpJsonContentType[]   = "application/json";
 constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
-// The HTTP header "User-Agent"
-constexpr char kHttpUserAgent[] = "OTel OTLP Exporter Cpp/" OPENTELEMETRY_SDK_VERSION;
 
 /**
  * Struct to hold OTLP HTTP client options.
@@ -75,8 +72,8 @@ struct OtlpHttpClientOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 
-  // Requests per connections
-  std::string user_agent = kHttpUserAgent;
+  // User agent
+  std::string user_agent = GetOtlpDefaultUserAgent();
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
@@ -87,7 +84,7 @@ struct OtlpHttpClientOptions
                                const OtlpHeaders &input_http_headers,
                                std::size_t input_concurrent_sessions         = 64,
                                std::size_t input_max_requests_per_connection = 8,
-                               nostd::string_view input_user_agent           = kHttpUserAgent)
+                               nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),

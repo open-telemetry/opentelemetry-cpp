@@ -8,6 +8,7 @@
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/sdk/version/version.h"
 
 #include <algorithm>
 #include <chrono>
@@ -20,6 +21,11 @@ namespace exporter
 {
 namespace otlp
 {
+
+inline const std::string GetOtlpDefaultUserAgent()
+{
+  return "OTel OTLP Exporter Cpp/" OPENTELEMETRY_SDK_VERSION;
+}
 
 inline const std::string GetOtlpDefaultGrpcEndpoint()
 {
