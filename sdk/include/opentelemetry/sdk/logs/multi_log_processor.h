@@ -36,10 +36,10 @@ public:
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
   /**
-   * OnReceive is called by the SDK once a log record has been successfully created.
+   * OnEmit is called by the SDK once a log record has been successfully created.
    * @param record the log record
    */
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.

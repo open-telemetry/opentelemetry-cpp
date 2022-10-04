@@ -48,7 +48,7 @@ std::unique_ptr<Recordable> MultiLogProcessor::MakeRecordable() noexcept
   return recordable;
 }
 
-void MultiLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
+void MultiLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (!record)
   {
@@ -61,7 +61,7 @@ void MultiLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
     auto recordable = multi_recordable->ReleaseRecordable(*processor);
     if (recordable)
     {
-      processor->OnReceive(std::move(recordable));
+      processor->OnEmit(std::move(recordable));
     }
   }
 }
