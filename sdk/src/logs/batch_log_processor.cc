@@ -53,7 +53,7 @@ std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
   return exporter_->MakeRecordable();
 }
 
-void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
+void BatchLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
