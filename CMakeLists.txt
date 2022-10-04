@@ -205,9 +205,6 @@ if(MAINTAINER_MODE)
       # Relaxed warnings
       add_compile_options(-Wno-error=unused-private-field)
 
-      # Relaxed warning, for GRPC generated code.
-      add_compile_options(-Wno-error=shadow-field)
-
       # Enforced warnings
       add_compile_options(-Wcast-qual)
       add_compile_options(-Wconditional-uninitialized)
@@ -231,6 +228,11 @@ if(MAINTAINER_MODE)
     add_compile_options(/W4)
 
     # Relaxed warnings
+    add_compile_options(/wd4100)
+    add_compile_options(/wd4125)
+    add_compile_options(/wd4566)
+    add_compile_options(/wd4127)
+    add_compile_options(/wd4512)
 
     # Enforced warnings
   elseif()

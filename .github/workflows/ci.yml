@@ -57,7 +57,7 @@ jobs:
 
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
       with:
