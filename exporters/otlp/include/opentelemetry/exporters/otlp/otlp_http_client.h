@@ -13,6 +13,7 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/version/version.h"
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
@@ -39,7 +40,7 @@ constexpr char kDefaultMetricsPath[] = "/v1/metrics";
 constexpr char kHttpJsonContentType[]   = "application/json";
 constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
 // The HTTP header "User-Agent"
-constexpr char kHttpUserAgent[] = "OTel OTLP Exporter Cpp/" OPENTELEMETRY_VERSION;
+constexpr char kHttpUserAgent[] = "OTel OTLP Exporter Cpp/" OPENTELEMETRY_SDK_VERSION;
 
 /**
  * Struct to hold OTLP HTTP client options.
