@@ -86,7 +86,7 @@ class DummyProcessor : public LogProcessor
     return std::unique_ptr<Recordable>(new LogRecord);
   }
 
-  void OnReceive(std::unique_ptr<Recordable> && /* record */) noexcept override {}
+  void OnEmit(std::unique_ptr<Recordable> && /* record */) noexcept override {}
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };

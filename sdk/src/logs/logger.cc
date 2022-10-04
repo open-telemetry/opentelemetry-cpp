@@ -111,7 +111,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   }
 
   // Send the log record to the processor
-  processor.OnReceive(std::move(recordable));
+  processor.OnEmit(std::move(recordable));
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
