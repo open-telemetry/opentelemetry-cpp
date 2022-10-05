@@ -9,6 +9,12 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/Agent.cpp thrift-gen/jaeger_types.cpp thrift-gen/Collector.cpp
     thrift-gen/zipkincore_types.cpp)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  # THRIFT generated code is not warning clean for gcc.
+  set_source_files_properties(
+    JAEGER_THRIFT_GENCPP_SOURCES PROPERTIES COMPILE_OPTIONS "-Wno-suggest-override")
+endif()
+
 set(JAEGER_EXPORTER_SOURCES
     src/jaeger_exporter.cc
     src/jaeger_exporter_factory.cc

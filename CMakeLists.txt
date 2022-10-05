@@ -166,7 +166,7 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 if(OTELCPP_MAINTAINER_MODE)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message("Building with gcc in maintainer mode.")
 
     add_compile_options(-Wall)
@@ -180,18 +180,22 @@ if(OTELCPP_MAINTAINER_MODE)
       # Relaxed warnings
 
       # Enforced warnings
+
+      # C++ options only
+      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wextra-semi>)
+      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
+      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
+
+      # C and C++
       add_compile_options(-Wcast-qual)
-      add_compile_options(-Wextra-semi)
       add_compile_options(-Wformat-security)
       add_compile_options(-Wlogical-op)
       add_compile_options(-Wmissing-include-dirs)
-      add_compile_options(-Woverloaded-virtual)
       add_compile_options(-Wstringop-truncation)
-      add_compile_options(-Wsuggest-override)
       add_compile_options(-Wundef)
       add_compile_options(-Wvla)
     endif()
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message("Building with clang in maintainer mode.")
 
     add_compile_options(-Wall)
@@ -221,7 +225,7 @@ if(OTELCPP_MAINTAINER_MODE)
       add_compile_options(-Wundefined-reinterpret-cast)
       add_compile_options(-Wvla)
     endif()
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message("Building with msvc in maintainer mode.")
 
     add_compile_options(/WX)

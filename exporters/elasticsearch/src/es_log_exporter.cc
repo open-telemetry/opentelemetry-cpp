@@ -107,7 +107,7 @@ public:
   }
 
   // Callback method when an http event occurs
-  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
@@ -160,9 +160,9 @@ public:
       std::shared_ptr<ext::http::client::Session> session,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
       bool console_debug = false)
-      : console_debug_{console_debug},
-        session_{std::move(session)},
-        result_callback_{std::move(result_callback)}
+      : session_{std::move(session)},
+        result_callback_{std::move(result_callback)},
+        console_debug_{console_debug}
   {}
 
   /**
@@ -197,7 +197,7 @@ public:
   }
 
   // Callback method when an http event occurs
-  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
     bool need_stop = false;
     switch (state)
@@ -364,7 +364,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
 #  endif
 }
 
-bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

@@ -32,10 +32,11 @@ public:
         map_and_reset_cell_(map_and_reset_cell)
   {}
 
-  void OfferMeasurement(long value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      long value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     if (!reservoir_cell_selector_)
     {
@@ -49,10 +50,11 @@ public:
     }
   }
 
-  void OfferMeasurement(double value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      double value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     if (!reservoir_cell_selector_)
     {
