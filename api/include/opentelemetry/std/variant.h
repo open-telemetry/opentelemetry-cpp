@@ -146,58 +146,58 @@ template <std::size_t I, class... Types>
 constexpr std::variant_alternative_t<I, std::variant<Types...>> &get(std::variant<Types...> &v)
 {
   return std::get<I, Types...>(v);
-};
+}
 
 template <std::size_t I, class... Types>
 constexpr std::variant_alternative_t<I, std::variant<Types...>> &&get(std::variant<Types...> &&v)
 {
   return std::get<I, Types...>(std::forward<decltype(v)>(v));
-};
+}
 
 template <std::size_t I, class... Types>
 constexpr const std::variant_alternative_t<I, std::variant<Types...>> &get(
     const std::variant<Types...> &v)
 {
   return std::get<I, Types...>(v);
-};
+}
 
 template <std::size_t I, class... Types>
 constexpr const std::variant_alternative_t<I, std::variant<Types...>> &&get(
     const std::variant<Types...> &&v)
 {
   return std::get<I, Types...>(std::forward<decltype(v)>(v));
-};
+}
 
 template <class T, class... Types>
 constexpr T &get(std::variant<Types...> &v)
 {
   return std::get<T, Types...>(v);
-};
+}
 
 template <class T, class... Types>
 constexpr T &&get(std::variant<Types...> &&v)
 {
   return std::get<T, Types...>(std::forward<decltype(v)>(v));
-};
+}
 
 template <class T, class... Types>
 constexpr const T &get(const std::variant<Types...> &v)
 {
   return std::get<T, Types...>(v);
-};
+}
 
 template <class T, class... Types>
 constexpr const T &&get(const std::variant<Types...> &&v)
 {
   return std::get<T, Types...>(std::forward<decltype(v)>(v));
-};
+}
 
 template <class _Callable, class... _Variants>
 constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
 {
   return std::visit<_Callable, _Variants...>(static_cast<_Callable &&>(_Obj),
                                              static_cast<_Variants &&>(_Args)...);
-};
+}
 
 #endif
 
