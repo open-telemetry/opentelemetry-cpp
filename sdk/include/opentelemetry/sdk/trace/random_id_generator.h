@@ -19,6 +19,5 @@ public:
 };
 
 }  // namespace trace
-
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

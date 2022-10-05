@@ -23,7 +23,7 @@ public:
       : attributes_processor_(attributes_processor)
   {}
 
-  virtual ~ObserverResultT() = default;
+  ~ObserverResultT() override = default;
 
   void Observe(T value) noexcept override { data_.insert({{}, value}); }
 

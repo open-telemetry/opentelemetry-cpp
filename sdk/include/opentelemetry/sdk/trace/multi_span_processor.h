@@ -134,7 +134,7 @@ public:
     return result;
   }
 
-  ~MultiSpanProcessor()
+  ~MultiSpanProcessor() override
   {
     Shutdown();
     Cleanup();
