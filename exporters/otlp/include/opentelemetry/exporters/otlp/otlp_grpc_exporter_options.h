@@ -32,6 +32,8 @@ struct OtlpGrpcExporterOptions
   std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
   // Additional HTTP headers
   OtlpHeaders metadata = GetOtlpDefaultHeaders();
+  // User agent
+  std::string user_agent = GetOtlpDefaultUserAgent();
 };
 
 }  // namespace otlp
