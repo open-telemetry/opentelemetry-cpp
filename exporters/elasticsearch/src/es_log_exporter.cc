@@ -168,7 +168,7 @@ public:
   /**
    * Cleans up the session in the destructor.
    */
-  ~AsyncResponseHandler() { session_->FinishSession(); }
+  ~AsyncResponseHandler() override { session_->FinishSession(); }
 
   /**
    * Automatically called when the response is received
