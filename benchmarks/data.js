@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1664996080828,
+  "lastUpdate": 1664996085713,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -79798,6 +79798,54 @@ window.BENCHMARK_DATA = {
             "value": 1931378.078944792,
             "unit": "ns/iter",
             "extra": "iterations: 394\ncpu: 314422.08121827414 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@free.fr",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1dc810d88200b7df11a5404bb76d65171ec5de1c",
+          "message": "Fix #1649 (#1658)\n\nFixed some warnings reported by clang.\r\n\r\n-Wnewline-eof\r\n  no newline at end of file\r\n\r\n-Wc++98-compat-extra-semi\r\n  extra ';' outside of a function is incompatible with C++98\r\n\r\n-Winconsistent-missing-destructor-override\r\n  '~XXX' overrides a destructor but is not marked 'override'\r\n\r\n-Wheader-hygiene\r\n  using namespace directive in global context in header\r\n\r\n-Wunused-parameter\r\n  unused parameter\r\n\r\nFixed some warnings reported by gcc.\r\n\r\n-Werror=missing-field-initializers\r\n  missing initializer for member ‘opentelemetry::v1::sdk::trace::SamplingResult::trace_state’\r\n\r\n-Werror=unused-variable\r\n  unused variable\r\n\r\n-Werror=unused-parameter\r\n  unused parameter",
+          "timestamp": "2022-10-05T11:41:58-07:00",
+          "tree_id": "84574e161f6083655ca80fecdc91426b522f1a71",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/1dc810d88200b7df11a5404bb76d65171ec5de1c"
+        },
+        "date": 1664996079921,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 147.66264292928906,
+            "unit": "ns/iter",
+            "extra": "iterations: 1152000\ncpu: 119.73125 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 262.42854131346445,
+            "unit": "ns/iter",
+            "extra": "iterations: 807000\ncpu: 174.55514250309793 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1043.4249499896625,
+            "unit": "ns/iter",
+            "extra": "iterations: 222000\ncpu: 637.4896396396397 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2141615.269715304,
+            "unit": "ns/iter",
+            "extra": "iterations: 386\ncpu: 366795.33678756474 ns\nthreads: 1"
           }
         ]
       }
