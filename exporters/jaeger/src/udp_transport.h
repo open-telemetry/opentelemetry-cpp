@@ -35,7 +35,7 @@ public:
   static constexpr auto kUDPPacketMaxLength = 65000;
 
   UDPTransport(const std::string &addr, uint16_t port);
-  virtual ~UDPTransport();
+  ~UDPTransport() override;
 
   int EmitBatch(const thrift::Batch &batch) override;
 

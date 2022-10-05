@@ -14,7 +14,7 @@ std::unique_ptr<SpanProcessor> SimpleSpanProcessorFactory::Create(
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
   return processor;
-};
+}
 
 }  // namespace trace
 }  // namespace sdk

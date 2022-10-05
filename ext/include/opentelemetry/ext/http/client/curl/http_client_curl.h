@@ -263,7 +263,7 @@ public:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
-  ~HttpClientSync() {}
+  ~HttpClientSync() override {}
 
 private:
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
@@ -274,7 +274,7 @@ class HttpClient : public opentelemetry::ext::http::client::HttpClient
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient();
-  ~HttpClient();
+  ~HttpClient() override;
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
       nostd::string_view url) noexcept override;

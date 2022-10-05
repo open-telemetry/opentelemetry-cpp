@@ -18,6 +18,9 @@ class MeterContext;
 class CollectorHandle
 {
 public:
+  CollectorHandle()          = default;
+  virtual ~CollectorHandle() = default;
+
   virtual AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept = 0;
 };
@@ -33,7 +36,7 @@ class MetricCollector : public MetricProducer, public CollectorHandle
 public:
   MetricCollector(MeterContext *context, std::unique_ptr<MetricReader> metric_reader);
 
-  virtual ~MetricCollector() = default;
+  ~MetricCollector() override = default;
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept override;

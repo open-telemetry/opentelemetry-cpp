@@ -15,7 +15,6 @@
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
 
-using namespace testing;
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {

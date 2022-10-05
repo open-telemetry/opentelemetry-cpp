@@ -14,6 +14,7 @@
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
+using namespace testing;
 
 //////////////////////////////////// TEST HELPER FUNCTIONS //////////////////////////////
 
