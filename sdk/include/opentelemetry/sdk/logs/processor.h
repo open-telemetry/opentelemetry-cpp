@@ -32,10 +32,10 @@ public:
   virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
 
   /**
-   * OnReceive is called by the SDK once a log record has been successfully created.
+   * OnEmit is called by the SDK once a log record has been successfully created.
    * @param record the log record
    */
-  virtual void OnReceive(std::unique_ptr<Recordable> &&record) noexcept = 0;
+  virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
