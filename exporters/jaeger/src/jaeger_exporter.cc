@@ -93,7 +93,7 @@ void JaegerExporter::InitializeEndpoint()
   assert(false);
 }
 
-bool JaegerExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool JaegerExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

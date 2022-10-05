@@ -20,7 +20,9 @@ class Resource;
 class ResourceDetector
 {
 public:
-  virtual Resource Detect() = 0;
+  ResourceDetector()          = default;
+  virtual ~ResourceDetector() = default;
+  virtual Resource Detect()   = 0;
 };
 
 /**

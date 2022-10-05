@@ -85,7 +85,7 @@ public:
    * shared ownership of the processor, and thus doesn't call Shutdown (as the processor might be
    * shared with other Tracers).
    */
-  virtual ~BatchSpanProcessor();
+  ~BatchSpanProcessor() override;
 
 protected:
   /**

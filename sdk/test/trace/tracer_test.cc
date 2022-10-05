@@ -48,13 +48,17 @@ public:
       return {Decision::RECORD_AND_SAMPLE,
               nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                   new const std::map<std::string, opentelemetry::common::AttributeValue>(
-                      {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
+                      {{"sampling_attr1", 123}, {"sampling_attr2", "string"}})),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
     }
     else
     {
       // we should never reach here
       assert(false);
-      return {Decision::DROP};
+      return {Decision::DROP,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  nullptr),
+              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
     }
   }
 
