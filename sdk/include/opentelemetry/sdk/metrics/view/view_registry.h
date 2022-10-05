@@ -96,7 +96,7 @@ private:
            (selector->GetInstrumentType() == instrument_descriptor.type_);
   }
 };
-};  // namespace metrics
+}  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 #endif

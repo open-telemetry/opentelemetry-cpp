@@ -111,7 +111,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
 
   // Test that shutting down the processor will first wait for the
@@ -146,7 +146,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
 
   EXPECT_TRUE(batch_processor->ForceFlush());
@@ -162,7 +162,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
 
   EXPECT_TRUE(batch_processor->ForceFlush());
@@ -191,7 +191,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
 
   EXPECT_TRUE(batch_processor->ForceFlush());
@@ -215,7 +215,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
 
   EXPECT_TRUE(batch_processor->ForceFlush());
@@ -248,7 +248,7 @@ TEST_F(BatchLogProcessorTest, TestScheduledDelayMillis)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetBody("Log" + std::to_string(i));
-    batch_processor->OnReceive(std::move(log));
+    batch_processor->OnEmit(std::move(log));
   }
   // Sleep for scheduled_delay_millis milliseconds
   std::this_thread::sleep_for(scheduled_delay_millis);

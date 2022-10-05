@@ -16,7 +16,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> InMemorySpanExporterFac
     std::shared_ptr<InMemorySpanData> &data)
 {
   return Create(data, MAX_BUFFER_SIZE);
-};
+}
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> InMemorySpanExporterFactory::Create(
     std::shared_ptr<InMemorySpanData> &data,

@@ -188,8 +188,8 @@ void Recordable::AddEvent(nostd::string_view name,
   span_["annotations"].push_back(annotation);
 }
 
-void Recordable::AddLink(const trace_api::SpanContext &span_context,
-                         const common::KeyValueIterable &attributes) noexcept
+void Recordable::AddLink(const trace_api::SpanContext & /* span_context */,
+                         const common::KeyValueIterable & /* attributes */) noexcept
 {
   // TODO: Currently not supported by specs:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk_exporters/zipkin.md

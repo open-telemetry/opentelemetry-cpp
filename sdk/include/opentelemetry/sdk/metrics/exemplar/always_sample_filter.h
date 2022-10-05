@@ -14,12 +14,6 @@ namespace metrics
 class AlwaysSampleFilter final : public ExemplarFilter
 {
 public:
-  static nostd::shared_ptr<ExemplarFilter> GetAlwaysSampleFilter()
-  {
-    static nostd::shared_ptr<ExemplarFilter> alwaysSampleFilter{new AlwaysSampleFilter{}};
-    return alwaysSampleFilter;
-  }
-
   bool ShouldSampleMeasurement(
       long /* value */,
       const MetricAttributes & /* attributes */,
@@ -36,7 +30,6 @@ public:
     return true;
   }
 
-private:
   explicit AlwaysSampleFilter() = default;
 };
 }  // namespace metrics

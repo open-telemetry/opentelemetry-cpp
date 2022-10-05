@@ -32,7 +32,7 @@ std::map<std::string, std::string> get_random_attr()
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void *state)
+  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void * /* state */)
   {
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};

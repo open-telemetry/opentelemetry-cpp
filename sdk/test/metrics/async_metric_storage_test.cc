@@ -31,7 +31,7 @@ class MockCollectorHandle : public CollectorHandle
 public:
   MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
 
-  virtual ~MockCollectorHandle() = default;
+  ~MockCollectorHandle() override = default;
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType /* instrument_type */) noexcept override
@@ -72,7 +72,6 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
   long get_count1                                                                  = 20l;
   long put_count1                                                                  = 10l;
-  size_t attribute_count                                                           = 2;
   std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
       {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
   storage.RecordLong(measurements1,

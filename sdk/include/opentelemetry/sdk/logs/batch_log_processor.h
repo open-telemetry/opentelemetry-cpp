@@ -64,7 +64,7 @@ public:
    * @param record the log record
    */
 
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Export all log records that have not been exported yet.
