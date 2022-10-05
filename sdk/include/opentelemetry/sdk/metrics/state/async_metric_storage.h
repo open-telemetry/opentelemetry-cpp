@@ -43,7 +43,9 @@ public:
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
-    // process the read measurements - aggregate and store in hashmap
+    // Async counter always record monotonically increasing values, and the
+    // exporter/reader can request either for delta or cumulative value.
+    // So we convert the async counter value to delta before passing it to temporal storage.
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
     for (auto &measurement : measurements)
     {
@@ -53,13 +55,14 @@ public:
       if (prev)
       {
         auto delta = prev->Diff(*aggr);
-        cumulative_hash_map_->Set(measurement.first,
-                                  DefaultAggregation::CloneAggregation(
-                                      aggregation_type_, instrument_descriptor_, *delta));
+        // store received value in cumulative map, and the diff in delta map (to pass it to temporal
+        // storage)
+        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
         delta_hash_map_->Set(measurement.first, std::move(delta));
       }
       else
       {
+        // store received value in cumulative and delta map.
         cumulative_hash_map_->Set(
             measurement.first,
             DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));

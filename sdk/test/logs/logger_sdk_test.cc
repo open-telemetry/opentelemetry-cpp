@@ -15,7 +15,7 @@ TEST(LoggerSDK, LogToNullProcessor)
 {
   // Confirm Logger::Log() does not have undefined behavior
   // even when there is no processor set
-  // since it calls Processor::OnReceive()
+  // since it calls Processor::OnEmit()
 
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
@@ -44,9 +44,10 @@ public:
   {
     return std::unique_ptr<Recordable>(new LogRecord);
   }
-  // OnReceive stores the record it receives into the shared_ptr recordable passed into its
+
+  // OnEmit stores the record it receives into the shared_ptr recordable passed into its
   // constructor
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
   {
     // Cast the recordable received into a concrete LogRecord type
     auto copy = std::shared_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));

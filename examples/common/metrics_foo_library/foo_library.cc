@@ -39,13 +39,16 @@ public:
     if (nostd::holds_alternative<
             nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer_result))
     {
-      double val = (rand() % 700) + 1.1;
+      double random_incr = (rand() % 5) + 1.1;
+      value_ += random_incr;
       nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
           observer_result)
-          ->Observe(val /*, labelkv */);
+          ->Observe(value_ /*, labelkv */);
     }
   }
+  static double value_;
 };
+double MeasurementFetcher::value_ = 0.0;
 }  // namespace
 
 void foo_library::counter_example(const std::string &name)
