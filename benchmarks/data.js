@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1665009057339,
+  "lastUpdate": 1665009059011,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -80170,6 +80170,54 @@ window.BENCHMARK_DATA = {
             "value": 2141615.269715304,
             "unit": "ns/iter",
             "extra": "iterations: 386\ncpu: 366795.33678756474 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "admin@owent.net",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "787d9c19088c8cd0eea19f4d920a498888fcc41d",
+          "message": "Add user agent for OTLP http/grpc client (#1657)",
+          "timestamp": "2022-10-05T15:15:21-07:00",
+          "tree_id": "8db57e0a887a5cd86cc496e73faf611120e0d60d",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/787d9c19088c8cd0eea19f4d920a498888fcc41d"
+        },
+        "date": 1665009054060,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 161.14530404113881,
+            "unit": "ns/iter",
+            "extra": "iterations: 1078000\ncpu: 131.25278293135437 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 263.7391104056022,
+            "unit": "ns/iter",
+            "extra": "iterations: 698000\ncpu: 204.77249283667618 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1339.8796904320811,
+            "unit": "ns/iter",
+            "extra": "iterations: 153000\ncpu: 867.0614379084968 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2719636.7581685386,
+            "unit": "ns/iter",
+            "extra": "iterations: 300\ncpu: 460964 ns\nthreads: 1"
           }
         ]
       }
