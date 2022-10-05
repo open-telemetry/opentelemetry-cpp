@@ -18,11 +18,6 @@ class NoExemplarReservoir final : public ExemplarReservoir
 {
 
 public:
-  static nostd::shared_ptr<ExemplarReservoir> GetNoExemplarReservoir()
-  {
-    return nostd::shared_ptr<ExemplarReservoir>{new NoExemplarReservoir{}};
-  }
-
   void OfferMeasurement(
       long /* value */,
       const MetricAttributes & /* attributes */,
@@ -41,13 +36,12 @@ public:
     // Stores nothing.
   }
 
-  std::vector<ExemplarData> CollectAndReset(
+  std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes & /* pointAttributes */) noexcept override
   {
-    return std::vector<ExemplarData>{};
+    return std::vector<std::shared_ptr<ExemplarData>>{};
   }
 
-private:
   explicit NoExemplarReservoir() = default;
 };
 
