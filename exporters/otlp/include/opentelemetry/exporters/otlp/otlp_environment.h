@@ -24,7 +24,7 @@ namespace otlp
 
 inline const std::string GetOtlpDefaultUserAgent()
 {
-  return "OTel OTLP Exporter Cpp/" OPENTELEMETRY_SDK_VERSION;
+  return "OTel-OTLP-Exporter-Cpp/" OPENTELEMETRY_SDK_VERSION;
 }
 
 inline const std::string GetOtlpDefaultGrpcEndpoint()
