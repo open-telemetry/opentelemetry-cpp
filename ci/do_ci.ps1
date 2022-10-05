@@ -51,7 +51,7 @@ switch ($action) {
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DMAINTAINER_MODE=ON `
+      -DOTELCPP_MAINTAINER_MODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

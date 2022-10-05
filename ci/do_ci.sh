@@ -100,7 +100,7 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DMAINTAINER_MODE=ON \
+        -DOTELCPP_MAINTAINER_MODE=ON \
         "${SRC_DIR}"
   make -k
   make test
