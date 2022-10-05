@@ -163,9 +163,9 @@ option(BUILD_TESTING "Whether to enable tests" ON)
 
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
-option(MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
+option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
-if(MAINTAINER_MODE)
+if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     message("Building with gcc in maintainer mode.")
 
@@ -238,7 +238,7 @@ if(MAINTAINER_MODE)
   elseif()
     message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()
-endif(MAINTAINER_MODE)
+endif(OTELCPP_MAINTAINER_MODE)
 
 if(WIN32)
   if(BUILD_TESTING)
