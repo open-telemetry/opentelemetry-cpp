@@ -8,9 +8,9 @@
 
 using namespace opentelemetry::sdk::metrics;
 
-TEST(NeverSampleFilter, SampleMeasurement)
+TEST(WithTraceSampleFilter, SampleMeasurement)
 {
-  auto filter = opentelemetry::sdk::metrics::ExemplarFilter::GetNeverSampleFilter();
+  auto filter = opentelemetry::sdk::metrics::ExemplarFilter::GetWithTraceSampleFilter();
   ASSERT_FALSE(
       filter->ShouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
   ASSERT_FALSE(
