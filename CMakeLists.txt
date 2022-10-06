@@ -442,3 +442,23 @@ install(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+if(BUILD_PACKAGE AND UNIX)
+  include(cmake/ParseOsRelease.cmake)
+  execute_process(
+    COMMAND lsb_release -si
+    OUTPUT_VARIABLE distribution
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(distribution STREQUAL "Debian" OR distribution STREQUAL "Ubuntu")
+    set(INSTALL_LIB_DIR
+        ${CMAKE_INSTALL_PREFIX}/lib/${CPACK_DEBIAN_ARCHITECTURE}-linux-gnu)
+    include(cmake/OTelMakeDeb.cmake)
+  elseif(
+    distribution MATCHES "RedHat.*"
+    OR distribution MATCHES "openSUSE.*"
+    OR distribution STREQUAL "Fedora")
+    set(INSTALL_LIB_DIR
+        ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+    include(cmake/OTelMakeRpm.cmake)
+  endif()
+endif()
