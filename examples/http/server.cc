@@ -29,8 +29,9 @@ public:
     std::string span_name = request.uri;
 
     // extract context from http header
-    const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(
-        (std::map<std::string, std::string> &)request.headers);
+    std::map<std::string, std::string> &request_headers =
+        const_cast<std::map<std::string, std::string> &>(request.headers);
+    const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(request_headers);
     auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);

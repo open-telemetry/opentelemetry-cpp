@@ -68,7 +68,7 @@ public:
     return true;
   }
 
-  ~SimpleSpanProcessor() { Shutdown(); }
+  ~SimpleSpanProcessor() override { Shutdown(); }
 
 private:
   std::unique_ptr<SpanExporter> exporter_;
