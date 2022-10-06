@@ -163,6 +163,13 @@ public:
             EXPECT_EQ("Custom-Header-Value", custom_header->second);
           }
 
+          auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
+          ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
+          if (user_agent_header != mock_session->GetRequest()->headers_.end())
+          {
+            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
+          }
+
           // let the otlp_http_client to continue
           http_client::nosend::Response response;
           response.Finish(*callback.get());
@@ -245,6 +252,13 @@ public:
           if (custom_header != mock_session->GetRequest()->headers_.end())
           {
             EXPECT_EQ("Custom-Header-Value", custom_header->second);
+          }
+
+          auto user_agent_header = mock_session->GetRequest()->headers_.find("User-Agent");
+          ASSERT_TRUE(user_agent_header != mock_session->GetRequest()->headers_.end());
+          if (user_agent_header != mock_session->GetRequest()->headers_.end())
+          {
+            EXPECT_EQ(GetOtlpDefaultUserAgent(), user_agent_header->second);
           }
 
           // let the otlp_http_client to continue
