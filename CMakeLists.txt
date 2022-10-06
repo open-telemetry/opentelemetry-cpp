@@ -69,7 +69,8 @@ else()
   else()
     message(
       FATAL_ERROR
-        "opentelemetry-cpp: unrecognized target processor ${CMAKE_SYSTEM_PROCESSOR} configuration!")
+        "opentelemetry-cpp: unrecognized target processor ${CMAKE_SYSTEM_PROCESSOR} configuration!"
+    )
   endif()
 endif()
 message(STATUS "Building for architecture ARCH=${ARCH}")
