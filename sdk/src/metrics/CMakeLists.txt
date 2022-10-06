@@ -13,6 +13,8 @@ add_library(
   aggregation/histogram_aggregation.cc
   aggregation/lastvalue_aggregation.cc
   aggregation/sum_aggregation.cc
+  exemplar/filter.cc
+  exemplar/reservoir.cc
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)

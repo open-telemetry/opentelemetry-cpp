@@ -89,4 +89,4 @@ private:
 };
 }  // namespace propagation
 }  // namespace context
-OPENTELEMETRY_END_NAMESPACE;
+OPENTELEMETRY_END_NAMESPACE
