@@ -64,10 +64,12 @@ else()
     set(ARCH riscv)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(s390x.*|S390X.*)")
     set(ARCH s390x)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(sparc.*|SPARC.*)")
+    set(ARCH sparc)
   else()
     message(
       FATAL_ERROR
-        "opentelemetry-cpp: unrecognized target processor configuration!")
+        "opentelemetry-cpp: unrecognized target processor ${CMAKE_SYSTEM_PROCESSOR} configuration!")
   endif()
 endif()
 message(STATUS "Building for architecture ARCH=${ARCH}")
