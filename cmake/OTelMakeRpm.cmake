@@ -5,7 +5,7 @@ set(CPACK_GENERATOR "RPM")
 
 set(CPACK_RPM_PACKAGE_DESCRIPTION "OpenTelemetry C++ for Linux")
 set(CPACK_RPM_PACKAGE_DESCRIPTION_SUMMARY "OpenTelemetry C++ for Linux - C++ Implementation of OpenTelemetry Specification")
-set(CPACK_RPM_PACKAGE_CONTACT "ifxdevs")
+set(CPACK_RPM_PACKAGE_CONTACT "OpenTelemetry C++")
 
 set(MAJOR_VERSION "1")
 set(MINOR_VERSION "6")
