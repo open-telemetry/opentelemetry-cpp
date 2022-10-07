@@ -34,6 +34,7 @@ void LongLastValueAggregation::Aggregate(long value,
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;
   point_data_.value_              = value;
+  point_data_.sample_ts_          = std::chrono::system_clock::now();
 }
 
 std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
@@ -93,6 +94,7 @@ void DoubleLastValueAggregation::Aggregate(double value,
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;
   point_data_.value_              = value;
+  point_data_.sample_ts_          = std::chrono::system_clock::now();
 }
 
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
@@ -102,12 +104,12 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
       nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
   {
     LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(merge_data)));
   }
   else
   {
     LastValuePointData merge_data = std::move(nostd::get<LastValuePointData>(delta.ToPoint()));
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(merge_data)));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(merge_data)));
   }
 }
 
@@ -118,12 +120,12 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
       nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
   {
     LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(ToPoint()));
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(diff_data)));
   }
   else
   {
     LastValuePointData diff_data = std::move(nostd::get<LastValuePointData>(next.ToPoint()));
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(std::move(diff_data)));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(std::move(diff_data)));
   }
 }
 

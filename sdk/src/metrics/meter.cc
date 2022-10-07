@@ -6,7 +6,7 @@
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -234,7 +234,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            NoExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
+            ExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         multi_storage->AddStorage(storage);
         return true;

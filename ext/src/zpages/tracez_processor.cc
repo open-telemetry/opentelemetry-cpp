@@ -11,7 +11,8 @@ namespace zpages
 namespace trace_sdk = opentelemetry::sdk::trace;
 
 void TracezSpanProcessor::OnStart(trace_sdk::Recordable &span,
-                                  const opentelemetry::trace::SpanContext &parent_context) noexcept
+                                  const opentelemetry::trace::SpanContext &
+                                  /* parent_context */) noexcept
 {
   shared_data_->OnStart(static_cast<ThreadsafeSpanData *>(&span));
 }
