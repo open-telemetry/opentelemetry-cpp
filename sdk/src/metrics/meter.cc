@@ -208,6 +208,7 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
 std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
   auto ctx = meter_context_.lock();
   if (!ctx)
   {
@@ -251,6 +252,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
   auto ctx = meter_context_.lock();
   if (!ctx)
   {
@@ -293,6 +295,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
   observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
   auto ctx = meter_context_.lock();
