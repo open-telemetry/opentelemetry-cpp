@@ -34,7 +34,7 @@ PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
 }
 
 sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporality(
-    sdk::metrics::InstrumentType instrument_type) const noexcept
+    sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
   // Prometheus exporter only support Cumulative
   return sdk::metrics::AggregationTemporality::kCumulative;
@@ -69,7 +69,7 @@ sdk::common::ExportResult PrometheusExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool PrometheusExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool PrometheusExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }
@@ -81,7 +81,7 @@ bool PrometheusExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
  * collection to to client an HTTP request being sent,
  * so we flush the data.
  */
-bool PrometheusExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool PrometheusExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   is_shutdown_ = true;
   return true;

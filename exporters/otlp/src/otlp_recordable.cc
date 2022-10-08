@@ -77,7 +77,7 @@ proto::common::v1::InstrumentationScope OtlpRecordable::GetProtoInstrumentationS
 void OtlpRecordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
-};
+}
 
 void OtlpRecordable::SetAttribute(nostd::string_view key,
                                   const common::AttributeValue &value) noexcept

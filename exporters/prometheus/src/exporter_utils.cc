@@ -230,7 +230,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
       metric.label[i++].value = AttributeValueToString(label.second);
     }
   }
-};
+}
 
 std::string PrometheusExporterUtils::AttributeValueToString(
     const opentelemetry::sdk::common::OwnedAttributeValue &value)

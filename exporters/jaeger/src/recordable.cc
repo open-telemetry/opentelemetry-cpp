@@ -191,7 +191,7 @@ void JaegerRecordable::SetInstrumentationScope(
 }
 
 void JaegerRecordable::AddLink(const trace::SpanContext &span_context,
-                               const common::KeyValueIterable &attributes) noexcept
+                               const common::KeyValueIterable & /* attributes */) noexcept
 {
   // Note: "The Link’s attributes cannot be represented in Jaeger explicitly."
   // -- https://opentelemetry.io/docs/reference/specification/trace/sdk_exporters/jaeger/#links

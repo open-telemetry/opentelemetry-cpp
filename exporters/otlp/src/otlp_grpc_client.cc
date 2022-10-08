@@ -55,6 +55,8 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
   }
 
   std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+  grpc::ChannelArguments grpc_arguments;
+  grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
   if (options.use_ssl_credentials)
   {
@@ -67,11 +69,13 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
     {
       ssl_opts.pem_root_certs = GetFileContents((options.ssl_credentials_cacert_path).c_str());
     }
-    channel = grpc::CreateChannel(grpc_target, grpc::SslCredentials(ssl_opts));
+    channel =
+        grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
   }
   else
   {
-    channel = grpc::CreateChannel(grpc_target, grpc::InsecureChannelCredentials());
+    channel =
+        grpc::CreateCustomChannel(grpc_target, grpc::InsecureChannelCredentials(), grpc_arguments);
   }
 
   return channel;

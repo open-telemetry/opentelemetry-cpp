@@ -64,8 +64,8 @@ public:
    * @param timeout an optional timeout. Currently, timeout does nothing.
    * @return return the status of the operation.
    */
-  bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  bool ForceFlush(std::chrono::microseconds timeout OPENTELEMETRY_MAYBE_UNUSED =
+                      std::chrono::microseconds::max()) noexcept override
   {
     return true;
   }
@@ -78,8 +78,8 @@ public:
    * timeout is applied. Currently, timeout does nothing.
    * @return return the status of the operation.
    */
-  bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout OPENTELEMETRY_MAYBE_UNUSED =
+                    std::chrono::microseconds::max()) noexcept override
   {
     return true;
   }

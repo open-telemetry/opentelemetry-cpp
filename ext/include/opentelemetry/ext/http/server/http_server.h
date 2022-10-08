@@ -54,6 +54,7 @@ protected:
 
 public:
   HttpRequestCallback() {}
+  virtual ~HttpRequestCallback() = default;
 
   HttpRequestCallback &operator=(HttpRequestCallback other)
   {
@@ -175,7 +176,7 @@ public:
     addListeningPort(port);
   }
 
-  ~HttpServer()
+  ~HttpServer() override
   {
     for (auto &sock : m_listeningSockets)
     {

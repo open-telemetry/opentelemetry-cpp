@@ -22,6 +22,9 @@ class CollectorHandle;
 class MetricStorage
 {
 public:
+  MetricStorage()          = default;
+  virtual ~MetricStorage() = default;
+
   /* collect the metrics from this storage */
   virtual bool Collect(CollectorHandle *collector,
                        nostd::span<std::shared_ptr<CollectorHandle>> collectors,

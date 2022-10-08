@@ -176,7 +176,7 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
   }
   else if (nostd::holds_alternative<std::vector<bool>>(value))
   {
-    for (const auto &val : nostd::get<std::vector<bool>>(value))
+    for (const auto val : nostd::get<std::vector<bool>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
     }

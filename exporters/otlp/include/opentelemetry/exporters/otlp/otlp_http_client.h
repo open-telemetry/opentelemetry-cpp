@@ -72,6 +72,9 @@ struct OtlpHttpClientOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 
+  // User agent
+  std::string user_agent = GetOtlpDefaultUserAgent();
+
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
@@ -80,7 +83,8 @@ struct OtlpHttpClientOptions
                                std::chrono::system_clock::duration input_timeout,
                                const OtlpHeaders &input_http_headers,
                                std::size_t input_concurrent_sessions         = 64,
-                               std::size_t input_max_requests_per_connection = 8)
+                               std::size_t input_max_requests_per_connection = 8,
+                               nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
@@ -89,7 +93,8 @@ struct OtlpHttpClientOptions
         timeout(input_timeout),
         http_headers(input_http_headers),
         max_concurrent_requests(input_concurrent_sessions),
-        max_requests_per_connection(input_max_requests_per_connection)
+        max_requests_per_connection(input_max_requests_per_connection),
+        user_agent(input_user_agent)
   {}
 };
 

@@ -40,6 +40,9 @@ struct ResourceMetrics
 class MetricProducer
 {
 public:
+  MetricProducer()          = default;
+  virtual ~MetricProducer() = default;
+
   /**
    * The callback to be called for each metric exporter. This will only be those
    * metrics that have been produced since the last time this method was called.

@@ -15,7 +15,7 @@ namespace trace
 std::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Create()
 {
   return Create(std::cout);
-};
+}
 
 std::unique_ptr<trace_sdk::SpanExporter> OStreamSpanExporterFactory::Create(std::ostream &sout)
 {
