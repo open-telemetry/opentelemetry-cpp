@@ -71,6 +71,7 @@ TEST(MeterTest, BasicAsyncTests)
     }
     return true;
   });
+  observable_counter->RemoveCallback(asyc_generate_measurements, nullptr);
 }
 
 constexpr static unsigned MAX_THREADS       = 25;
