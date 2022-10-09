@@ -105,7 +105,7 @@ TEST(MeterTest, StressMultiThread)
                 meter->CreateLongObservableGauge("test_gauge" + std::to_string(numIterations));
             observable_instrument->AddCallback(asyc_generate_measurements, nullptr);
             observable_instruments.push_back(std::move(observable_instrument));
-            do_sync_create.store(true);
+            do_collect.store(true);
           }
           if (do_collect.exchange(false))
           {
