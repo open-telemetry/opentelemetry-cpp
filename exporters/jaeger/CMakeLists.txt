@@ -9,6 +9,13 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/Agent.cpp thrift-gen/jaeger_types.cpp thrift-gen/Collector.cpp
     thrift-gen/zipkincore_types.cpp)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  message("Relaxing GCC warnings on thrift-gen")
+  # THRIFT generated code is not warning clean for gcc.
+  set_source_files_properties(
+    ${JAEGER_THRIFT_GENCPP_SOURCES} PROPERTIES COMPILE_OPTIONS "-Wno-suggest-override")
+endif()
+
 set(JAEGER_EXPORTER_SOURCES
     src/jaeger_exporter.cc
     src/jaeger_exporter_factory.cc
@@ -21,11 +28,6 @@ set(JAEGER_EXPORTER_SOURCES
 
 add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
                                                 ${JAEGER_THRIFT_GENCPP_SOURCES})
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # THRIFT generated code is not warning clean for gcc.
-  target_compile_options(opentelemetry_exporter_jaeger_trace PRIVATE "-Wno-suggest-override")
-endif()
 
 set_target_properties(opentelemetry_exporter_jaeger_trace
                       PROPERTIES EXPORT_NAME jaeger_trace_exporter)
