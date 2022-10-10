@@ -125,6 +125,7 @@ private:
 
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
   opentelemetry::common::SpinLockMutex forceflush_lock_;
+  opentelemetry::common::SpinLockMutex storage_lock_;
 };
 
 }  // namespace metrics
