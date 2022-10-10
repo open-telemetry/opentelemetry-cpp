@@ -118,6 +118,8 @@ TEST(MeterTest, StressMultiThread)
       }
     }
   }
+  // random wait for all callbacks to complete
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
 #endif
