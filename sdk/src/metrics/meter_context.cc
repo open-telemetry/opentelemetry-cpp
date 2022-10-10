@@ -31,6 +31,7 @@ ViewRegistry *MeterContext::GetViewRegistry() const noexcept
 
 nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
   return nostd::span<std::shared_ptr<Meter>>{meters_};
 }
 
@@ -59,6 +60,7 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
 
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
   meters_.push_back(meter);
 }
 
