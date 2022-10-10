@@ -86,6 +86,8 @@ TEST(MeterTest, StressMultiThread)
   std::atomic<bool> do_collect{false}, do_sync_create{true}, do_async_create{false};
   std::vector<nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>>
       observable_instruments;
+  std::vector<std::thread> meter_operation_threads;
+  size_t instrument_id = 0;
   while (numIterations--)
   {
     for (size_t i = 0; i < MAX_THREADS; i++)
@@ -96,17 +98,20 @@ TEST(MeterTest, StressMultiThread)
           std::this_thread::yield();
           if (do_sync_create.exchange(false))
           {
-            std::string instrument_name = "test_couter_" + std::to_string(numIterations);
+            std::string instrument_name = "test_couter_" + std::to_string(instrument_id);
             meter->CreateLongCounter(instrument_name, "", "");
             do_async_create.store(true);
+            instrument_id++;
           }
           if (do_async_create.exchange(false))
           {
+            std::cout << "\n creating async thread " << std::to_string(numIterations);
             auto observable_instrument =
-                meter->CreateLongObservableGauge("test_gauge" + std::to_string(numIterations));
+                meter->CreateLongObservableGauge("test_gauge_" + std::to_string(instrument_id));
             observable_instrument->AddCallback(asyc_generate_measurements, nullptr);
             observable_instruments.push_back(std::move(observable_instrument));
             do_collect.store(true);
+            instrument_id++;
           }
           if (do_collect.exchange(false))
           {
@@ -114,12 +119,17 @@ TEST(MeterTest, StressMultiThread)
             do_sync_create.store(true);
           }
         });
-        t.detach();
+        meter_operation_threads.push_back(std::move(t));
       }
     }
   }
-  // random wait for all callbacks to complete
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  for (auto &t : meter_operation_threads)
+  {
+    if (t.joinable())
+    {
+      t.join();
+    }
+  }
 }
 
 #endif
