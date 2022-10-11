@@ -112,20 +112,56 @@ public:
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
     {
-      case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
+      case http_client::SessionState::CreateFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to create session");
         cv_.notify_all();
         break;
+      case http_client::SessionState::Created:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session created");
+        break;
+      case http_client::SessionState::Destroyed:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session destroyed");
+        break;
+      case http_client::SessionState::Connecting:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connecting to peer");
+        break;
+      case http_client::SessionState::ConnectFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to connect to peer");
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::Connected:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connected to peer");
+        break;
+      case http_client::SessionState::Sending:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Sending request");
+        break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to sent request");
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::Response:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Received response");
+        break;
+      case http_client::SessionState::SSLHandshakeFailed:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed SSL Handshake");
         cv_.notify_all();
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request timed out");
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error");
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::ReadError:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Read error");
+        break;
+      case http_client::SessionState::WriteError:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Write error");
+        break;
+      case http_client::SessionState::Cancelled:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] (manually) cancelled");
         cv_.notify_all();
         break;
     }

@@ -378,8 +378,10 @@ if(OTELCPP_MAINTAINER_MODE)
 
       # C++ options only
       add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wextra-semi>)
-      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
-      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
 
       # C and C++
       add_compile_options(-Wcast-qual)

@@ -13,7 +13,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   message("Relaxing GCC warnings on thrift-gen")
   # THRIFT generated code is not warning clean for gcc.
   set_source_files_properties(
-    ${JAEGER_THRIFT_GENCPP_SOURCES} PROPERTIES COMPILE_OPTIONS "-Wno-suggest-override")
+    ${JAEGER_THRIFT_GENCPP_SOURCES} PROPERTIES COMPILE_OPTIONS
+                                               "-Wno-suggest-override")
 endif()
 
 set(JAEGER_EXPORTER_SOURCES

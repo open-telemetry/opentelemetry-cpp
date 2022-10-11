@@ -62,6 +62,8 @@ struct InstrumentDescriptor
 
 using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
 using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
+
+#if 0
 OPENTELEMETRY_MAYBE_UNUSED static InstrumentClass GetInstrumentClass(InstrumentType type)
 {
   if (type == InstrumentType::kCounter || type == InstrumentType::kHistogram ||
@@ -74,6 +76,7 @@ OPENTELEMETRY_MAYBE_UNUSED static InstrumentClass GetInstrumentClass(InstrumentT
     return InstrumentClass::kAsync;
   }
 }
+#endif
 
 /*class InstrumentSelector {
 public:
