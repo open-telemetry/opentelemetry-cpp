@@ -120,6 +120,7 @@ private:
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
+  opentelemetry::common::SpinLockMutex storage_lock_;
 };
 }  // namespace metrics
 }  // namespace sdk
