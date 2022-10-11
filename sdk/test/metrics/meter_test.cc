@@ -30,14 +30,15 @@ public:
 
 namespace
 {
-nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr)
+nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
+                                            std::string meter_name = "meter_name")
 {
   static std::shared_ptr<metrics::MeterProvider> provider(new MeterProvider());
   std::unique_ptr<MetricReader> metric_reader(new MockMetricReader());
   *metricReaderPtr = metric_reader.get();
   auto p           = std::static_pointer_cast<MeterProvider>(provider);
   p->AddMetricReader(std::move(metric_reader));
-  auto meter = provider->GetMeter("meter_name");
+  auto meter = provider->GetMeter(meter_name);
   return meter;
 }
 }  // namespace
@@ -70,6 +71,65 @@ TEST(MeterTest, BasicAsyncTests)
     }
     return true;
   });
+  observable_counter->RemoveCallback(asyc_generate_measurements, nullptr);
+}
+
+constexpr static unsigned MAX_THREADS       = 25;
+constexpr static unsigned MAX_ITERATIONS_MT = 1000;
+
+TEST(MeterTest, StressMultiThread)
+{
+  MetricReader *metric_reader_ptr = nullptr;
+  auto meter                      = InitMeter(&metric_reader_ptr, "stress_test_meter");
+  std::atomic<unsigned> threadCount(0);
+  size_t numIterations = MAX_ITERATIONS_MT;
+  std::atomic<bool> do_collect{false}, do_sync_create{true}, do_async_create{false};
+  std::vector<nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>>
+      observable_instruments;
+  std::vector<std::thread> meter_operation_threads;
+  size_t instrument_id = 0;
+  while (numIterations--)
+  {
+    for (size_t i = 0; i < MAX_THREADS; i++)
+    {
+      if (threadCount++ < MAX_THREADS)
+      {
+        auto t = std::thread([&]() {
+          std::this_thread::yield();
+          if (do_sync_create.exchange(false))
+          {
+            std::string instrument_name = "test_couter_" + std::to_string(instrument_id);
+            meter->CreateLongCounter(instrument_name, "", "");
+            do_async_create.store(true);
+            instrument_id++;
+          }
+          if (do_async_create.exchange(false))
+          {
+            std::cout << "\n creating async thread " << std::to_string(numIterations);
+            auto observable_instrument =
+                meter->CreateLongObservableGauge("test_gauge_" + std::to_string(instrument_id));
+            observable_instrument->AddCallback(asyc_generate_measurements, nullptr);
+            observable_instruments.push_back(std::move(observable_instrument));
+            do_collect.store(true);
+            instrument_id++;
+          }
+          if (do_collect.exchange(false))
+          {
+            metric_reader_ptr->Collect([](ResourceMetrics &metric_data) { return true; });
+            do_sync_create.store(true);
+          }
+        });
+        meter_operation_threads.push_back(std::move(t));
+      }
+    }
+  }
+  for (auto &t : meter_operation_threads)
+  {
+    if (t.joinable())
+    {
+      t.join();
+    }
+  }
 }
 
 #endif
