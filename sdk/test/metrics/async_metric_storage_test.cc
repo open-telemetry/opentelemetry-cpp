@@ -165,7 +165,6 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
   long freq_cpu0                                                                   = 3l;
   long freq_cpu1                                                                   = 5l;
-  size_t attribute_count                                                           = 2;
   std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,

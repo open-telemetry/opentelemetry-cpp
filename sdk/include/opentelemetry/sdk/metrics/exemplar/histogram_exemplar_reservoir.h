@@ -50,10 +50,10 @@ public:
       return ReservoirCellIndexFor(cells, (double)value, attributes, context);
     }
 
-    int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
                               double value,
-                              const MetricAttributes &attributes,
-                              const opentelemetry::context::Context &context) override
+                              const MetricAttributes & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
     {
       for (size_t i = 0; i < boundaries_.size(); ++i)
       {

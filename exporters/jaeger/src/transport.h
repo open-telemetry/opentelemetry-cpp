@@ -5,7 +5,11 @@
 
 #include <opentelemetry/version.h>
 
+#include <opentelemetry/exporters/jaeger/thrift_include_prefix.h>
+
 #include <jaeger_types.h>
+
+#include <opentelemetry/exporters/jaeger/thrift_include_suffix.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
