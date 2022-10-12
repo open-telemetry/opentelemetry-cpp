@@ -32,12 +32,15 @@ public:
     switch (instrument_descriptor.type_)
     {
       case InstrumentType::kCounter:
-      case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableCounter:
+        return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
+      case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableUpDownCounter:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation()))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation()));
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(false)))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(false)));
         break;
       case InstrumentType::kHistogram: {
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
@@ -88,16 +91,23 @@ public:
           return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
         }
         break;
-      case AggregationType::kSum:
+      case AggregationType::kSum: {
+        bool is_monotonic = true;
+        if (instrument_descriptor.type_ == InstrumentType::kUpDownCounter ||
+            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter)
+        {
+          is_monotonic = false;
+        }
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return std::unique_ptr<Aggregation>(new LongSumAggregation());
+          return std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic));
         }
         else
         {
-          return std::unique_ptr<Aggregation>(new DoubleSumAggregation());
+          return std::unique_ptr<Aggregation>(new DoubleSumAggregation(is_monotonic));
         }
         break;
+      }
       default:
         return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
     }

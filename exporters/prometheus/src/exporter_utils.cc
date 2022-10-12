@@ -54,8 +54,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         auto time          = metric_data.start_ts.time_since_epoch();
         for (const auto &point_data_attr : metric_data.point_data_attr_)
         {
-          auto kind                                = getAggregationType(point_data_attr.point_data);
-          const prometheus_client::MetricType type = TranslateType(kind);
+          auto kind         = getAggregationType(point_data_attr.point_data);
+          bool is_monotonic = true;
+          if (kind == sdk::metrics::AggregationType::kSum)
+          {
+            is_monotonic =
+                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
+          }
+          const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
           metric_family.type                       = type;
           if (type == prometheus_client::MetricType::Histogram)  // Histogram
           {
@@ -83,6 +89,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
               auto last_value_point_data =
                   nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
               std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
+              SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            }
+            else if (nostd::holds_alternative<sdk::metrics::SumPointData>(
+                         point_data_attr.point_data))
+            {
+              auto sum_point_data =
+                  nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+              std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
               SetData(values, point_data_attr.attributes, type, time, &metric_family);
             }
             else
@@ -159,12 +173,16 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
  * Translate the OTel metric type to Prometheus metric type
  */
 prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
-    metric_sdk::AggregationType kind)
+    metric_sdk::AggregationType kind,
+    bool is_monotonic)
 {
   switch (kind)
   {
     case metric_sdk::AggregationType::kSum:
-      return prometheus_client::MetricType::Counter;
+      if (!is_monotonic)
+        return prometheus_client::MetricType::Gauge;
+      else
+        return prometheus_client::MetricType::Counter;
     case metric_sdk::AggregationType::kHistogram:
       return prometheus_client::MetricType::Histogram;
     case metric_sdk::AggregationType::kLastValue:

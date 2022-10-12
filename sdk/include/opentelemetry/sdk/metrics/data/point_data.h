@@ -29,7 +29,8 @@ public:
   SumPointData &operator=(SumPointData &&) = default;
   SumPointData()                           = default;
 
-  ValueType value_ = {};
+  ValueType value_   = {};
+  bool is_monotonic_ = true;
 };
 
 class LastValuePointData

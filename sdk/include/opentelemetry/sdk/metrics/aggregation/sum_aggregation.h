@@ -17,7 +17,7 @@ namespace metrics
 class LongSumAggregation : public Aggregation
 {
 public:
-  LongSumAggregation();
+  LongSumAggregation(bool is_monotonic);
   LongSumAggregation(SumPointData &&);
   LongSumAggregation(const SumPointData &);
 
@@ -39,7 +39,7 @@ private:
 class DoubleSumAggregation : public Aggregation
 {
 public:
-  DoubleSumAggregation();
+  DoubleSumAggregation(bool is_monotonic);
   DoubleSumAggregation(SumPointData &&);
   DoubleSumAggregation(const SumPointData &);
 

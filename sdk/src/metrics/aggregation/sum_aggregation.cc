@@ -3,6 +3,7 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/version.h"
 
@@ -15,9 +16,10 @@ namespace sdk
 namespace metrics
 {
 
-LongSumAggregation::LongSumAggregation()
+LongSumAggregation::LongSumAggregation(bool is_monotonic)
 {
-  point_data_.value_ = 0l;
+  point_data_.value_        = 0l;
+  point_data_.is_monotonic_ = is_monotonic;
 }
 
 LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
@@ -26,6 +28,12 @@ LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{d
 
 void LongSumAggregation::Aggregate(long value, const PointAttributes & /* attributes */) noexcept
 {
+  if (point_data_.is_monotonic_ && value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(" Negative value ignored for Monotonic increasing measurement. Value"
+                           << value);
+    return;
+  }
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.value_ = nostd::get<long>(point_data_.value_) + value;
 }
@@ -37,7 +45,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta)
           nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
               .value_) +
       nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
+  std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
@@ -49,7 +57,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) c
                                          (static_cast<const LongSumAggregation &>(next).ToPoint()))
                                          .value_) -
                     nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
+  std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }
@@ -60,9 +68,10 @@ PointType LongSumAggregation::ToPoint() const noexcept
   return point_data_;
 }
 
-DoubleSumAggregation::DoubleSumAggregation()
+DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
 {
-  point_data_.value_ = 0.0;
+  point_data_.value_        = 0.0;
+  point_data_.is_monotonic_ = is_monotonic;
 }
 
 DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data)) {}
@@ -72,6 +81,12 @@ DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_dat
 void DoubleSumAggregation::Aggregate(double value,
                                      const PointAttributes & /* attributes */) noexcept
 {
+  if (point_data_.is_monotonic_ && value < 0)
+  {
+    OTEL_INTERNAL_LOG_WARN(" Negative value ignored for Monotonic increasing measurement. Value"
+                           << value);
+    return;
+  }
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.value_ = nostd::get<double>(point_data_.value_) + value;
 }
@@ -83,20 +98,19 @@ std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(const Aggregation &delt
           nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(delta).ToPoint()))
               .value_) +
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
+  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
   static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
 }
 
 std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(const Aggregation &next) const noexcept
 {
-
   double diff_value =
       nostd::get<double>(
           nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(next).ToPoint()))
               .value_) -
       nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation());
+  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
   static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;
 }

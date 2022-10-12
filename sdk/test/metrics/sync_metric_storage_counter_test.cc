@@ -38,7 +38,7 @@ private:
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
 
-TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
+TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
 {
   AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
@@ -173,7 +173,7 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
 
-TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
+TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
 {
   AggregationTemporality temporality = GetParam();
   auto sdk_start_ts                  = std::chrono::system_clock::now();
