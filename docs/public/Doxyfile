@@ -799,11 +799,13 @@ INPUT                  =  \
                          ../../api//include/opentelemetry/nostd/string_view.h \
                          ../../api/include/opentelemetry/nostd/unique_ptr.h \
                          ../../api/include/opentelemetry/nostd/variant.h \
+                         ../../api/include/opentelemetry/metrics \
                          ../../api/include/opentelemetry/trace \
                           ../../sdk/include/opentelemetry/sdk/instrumentationscope \
                           ../../sdk/include/opentelemetry/sdk/instrumentationlibrary \
                           ../../sdk/include/opentelemetry/sdk/resource \
-                          ../../sdk/include/opentelemetry/sdk/trace
+                          ../../sdk/include/opentelemetry/sdk/metrics \
+                          ../../sdk/include/opentelemetry/sdk/trace \
 
 
 # This tag can be used to specify the character encoding of the source files
