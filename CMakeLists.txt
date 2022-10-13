@@ -434,6 +434,7 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4566)
     add_compile_options(/wd4127)
     add_compile_options(/wd4512)
+    add_compile_options(/wd4267)
 
     # Enforced warnings
   elseif()
