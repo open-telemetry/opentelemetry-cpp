@@ -136,7 +136,7 @@ public:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Sending request");
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to sent request");
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to send request");
         cv_.notify_all();
         break;
       case http_client::SessionState::Response:
