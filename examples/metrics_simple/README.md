@@ -100,7 +100,7 @@ Ensure to keep the Instrument object active for the lifetime of collection.
 
     ```cpp
     auto meter = provider->GetMeter(name, "1.2.0");
-    auto counter                                = meter->CreateDoubleObservableCounter(counter_name);
+    auto counter = meter->CreateDoubleObservableCounter(counter_name);
     counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
     ```
 
