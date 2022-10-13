@@ -12,6 +12,12 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
+#if defined(__GNUC__)
+// GCC raises -Wsuggest-override warnings on GTest,
+// in code related to TYPED_TEST() .
+#  pragma GCC diagnostic ignored "-Wsuggest-override"
+#endif
+
 #include <gtest/gtest.h>
 
 namespace trace    = opentelemetry::trace;
