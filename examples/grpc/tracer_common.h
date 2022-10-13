@@ -29,7 +29,7 @@ public:
   GrpcClientCarrier(ClientContext *context) : context_(context) {}
   GrpcClientCarrier() = default;
   virtual opentelemetry::nostd::string_view Get(
-      opentelemetry::nostd::string_view key) const noexcept override
+      opentelemetry::nostd::string_view /* key */) const noexcept override
   {
     return "";
   }
@@ -60,8 +60,8 @@ public:
     return "";
   }
 
-  virtual void Set(opentelemetry::nostd::string_view key,
-                   opentelemetry::nostd::string_view value) noexcept override
+  virtual void Set(opentelemetry::nostd::string_view /* key */,
+                   opentelemetry::nostd::string_view /* value */) noexcept override
   {
     // Not required for server
   }
