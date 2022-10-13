@@ -1,7 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <opentelemetry/exporters/jaeger/thrift_include_prefix.h>
+
 #include <agent_types.h>
+
+#include <opentelemetry/exporters/jaeger/thrift_include_suffix.h>
+
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
 #include "opentelemetry/sdk_config.h"

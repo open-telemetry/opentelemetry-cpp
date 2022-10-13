@@ -29,7 +29,7 @@ class MultiLogProcessor : public LogProcessor
 {
 public:
   MultiLogProcessor(std::vector<std::unique_ptr<LogProcessor>> &&processors);
-  ~MultiLogProcessor();
+  ~MultiLogProcessor() override;
 
   void AddProcessor(std::unique_ptr<LogProcessor> &&processor);
 

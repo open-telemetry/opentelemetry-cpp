@@ -29,7 +29,7 @@ class SimpleLogProcessor : public LogProcessor
 
 public:
   explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
-  virtual ~SimpleLogProcessor() = default;
+  ~SimpleLogProcessor() override = default;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 

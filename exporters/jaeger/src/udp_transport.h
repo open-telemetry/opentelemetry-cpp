@@ -6,7 +6,12 @@
 #include "TUDPTransport.h"
 #include "transport.h"
 
+#include <opentelemetry/exporters/jaeger/thrift_include_prefix.h>
+
 #include <Agent.h>
+
+#include <opentelemetry/exporters/jaeger/thrift_include_suffix.h>
+
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TProtocol.h>
