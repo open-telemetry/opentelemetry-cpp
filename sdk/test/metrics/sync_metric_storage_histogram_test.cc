@@ -81,8 +81,8 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   auto collection_ts      = std::chrono::system_clock::now();
   size_t count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<HistogramPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
