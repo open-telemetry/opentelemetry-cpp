@@ -122,7 +122,12 @@ TEST(UniquePtrTest, Reset)
 {
   bool was_destructed1;
   unique_ptr<A> ptr{new A{was_destructed1}};
-  bool was_destructed2;
+  /*
+    MSVC reports:
+      warning C4701: potentially uninitialized local variable 'was_destructed2' used
+    so initializing explicitly.
+  */
+  bool was_destructed2 = true;
   ptr.reset(new A{was_destructed2});
   EXPECT_TRUE(was_destructed1);
   EXPECT_FALSE(was_destructed2);
