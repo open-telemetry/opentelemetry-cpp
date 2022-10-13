@@ -23,16 +23,16 @@ public:
   virtual ~ReservoirCellSelector() = default;
 
   /** Determine the index of the {@code cells} to record the measurement to. */
-  virtual size_t ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                                       long value,
-                                       const MetricAttributes &attributes,
-                                       const opentelemetry::context::Context &context) = 0;
+  virtual int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+                                    long value,
+                                    const MetricAttributes &attributes,
+                                    const opentelemetry::context::Context &context) = 0;
 
   /** Determine the index of the {@code cells} to record the measurement to. */
-  virtual size_t ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                                       double value,
-                                       const MetricAttributes &attributes,
-                                       const opentelemetry::context::Context &context) = 0;
+  virtual int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+                                    double value,
+                                    const MetricAttributes &attributes,
+                                    const opentelemetry::context::Context &context) = 0;
 
   /** Called when {@link FixedSizeExemplarReservoir#CollectAndReset(Attributes)}. */
   virtual void reset() = 0;
