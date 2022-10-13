@@ -105,8 +105,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
@@ -171,8 +171,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
@@ -197,8 +197,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
