@@ -46,7 +46,7 @@ void run_threads()
     // parent spans across threads.
     threads.push_back(std::thread([=] {
       trace_api::Scope scope(thread_span);
-      auto thread_span =
+      auto thread_span_2 =
           get_tracer()->StartSpan(std::string("thread ") + std::to_string(thread_num));
     }));
   }
