@@ -177,6 +177,8 @@ cc_library(
         "include/opentelemetry/exporters/jaeger/jaeger_exporter_factory.h",
         "include/opentelemetry/exporters/jaeger/jaeger_exporter_options.h",
         "include/opentelemetry/exporters/jaeger/recordable.h",
+        "include/opentelemetry/exporters/jaeger/thrift_include_prefix.h",
+        "include/opentelemetry/exporters/jaeger/thrift_include_suffix.h",
     ],
     copts = ["-fexceptions"],
     strip_include_prefix = "include",
