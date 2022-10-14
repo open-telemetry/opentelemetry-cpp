@@ -1,6 +1,6 @@
 # Simple Metrics Example
 
-This example initializes the metrics pipeline with 3 different instrument types -
+This example initializes the metrics pipeline with 3 different instrument types:
 
 - [Counter](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter)
 - [Histogram](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#histogram)
@@ -9,6 +9,15 @@ This example initializes the metrics pipeline with 3 different instrument types 
  Here are more detailed steps with explanation. Note that the steps 4, 6, and 8
  are done in Instrumentation library for creating and recording Instruments,
  and rest of the steps are done in application to configure SDK.
+
+ Namespace alias used in below steps
+
+ ```cpp
+using namespace metrics_api = opentelemetry::metrics;
+using namespace metric_sdk = opentelemetry::sdk::metrics;
+using namespace exportermetrics = opentelemetry::exporters;
+
+ ```
 
 1. Initialize an exporter and a reader. In this case, we initialize an OStream
 Exporter which will print to stdout by default.
@@ -24,7 +33,7 @@ The reader periodically collects metrics from the Aggregation Store and exports 
 We will use this to obtain Meter objects in the future.
 
     ```cpp
-    auto provider = std::shared_ptr<metrics_api::MeterProvider>(new opentelemetry::metrics::MeterProvider());
+    auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
     auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
     p->AddMetricReader(std::move(reader));
     ```
@@ -36,7 +45,7 @@ create a missing view with default mapping between Instrument and Aggregation.
 
     ```cpp
     std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
-        new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, "name_counter")};
+        new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, "counter_name")};
     std::unique_ptr<metric_sdk::MeterSelector> meter_selector{
         new metric_sdk::MeterSelector(name, version, schema)};
     std::unique_ptr<metric_sdk::View> sum_view{
@@ -82,10 +91,9 @@ different functions without having to constantly pass the Meter around the libra
 7. Optional: Create a view to map the Observable Counter Instrument to Sum Aggregation
 
     ```cpp
-    std::string observable_counter_name = name + "_observable_counter";
     std::unique_ptr<metric_sdk::InstrumentSelector> observable_instrument_selector{
         new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kObservableCounter,
-                                         observable_counter_name)};
+                                         "observable_counter_name")};
     std::unique_ptr<metric_sdk::MeterSelector> observable_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
     std::unique_ptr<metric_sdk::View> observable_sum_view{
