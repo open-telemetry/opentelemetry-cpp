@@ -55,19 +55,19 @@ void BM_NestedSpanCreationWithScope(benchmark::State &state)
   auto tracer = initTracer();
   while (state.KeepRunning())
   {
-    auto span  = tracer->StartSpan("outer");
-    auto scope = tracer->WithActiveSpan(span);
+    auto o_span  = tracer->StartSpan("outer");
+    auto o_scope = tracer->WithActiveSpan(o_span);
     {
-      auto span  = tracer->StartSpan("inner");
-      auto scope = tracer->WithActiveSpan(span);
+      auto i_span  = tracer->StartSpan("inner");
+      auto i_scope = tracer->WithActiveSpan(i_span);
       {
-        auto span  = tracer->StartSpan("innermost");
-        auto scope = tracer->WithActiveSpan(span);
-        span->End();
+        auto im_span  = tracer->StartSpan("innermost");
+        auto im_scope = tracer->WithActiveSpan(im_span);
+        im_span->End();
       }
-      span->End();
+      i_span->End();
     }
-    span->End();
+    o_span->End();
   }
 }
 

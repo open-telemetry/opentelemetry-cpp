@@ -115,7 +115,7 @@ TEST(MeterTest, StressMultiThread)
           }
           if (do_collect.exchange(false))
           {
-            metric_reader_ptr->Collect([](ResourceMetrics &metric_data) { return true; });
+            metric_reader_ptr->Collect([](ResourceMetrics & /* metric_data */) { return true; });
             do_sync_create.store(true);
           }
         });

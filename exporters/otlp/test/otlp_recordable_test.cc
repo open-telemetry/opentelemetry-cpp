@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+
+#if defined(__GNUC__)
+// GCC raises -Wsuggest-override warnings on GTest,
+// in code related to TYPED_TEST() .
+#  pragma GCC diagnostic ignored "-Wsuggest-override"
+#endif
+
 #include <gtest/gtest.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
