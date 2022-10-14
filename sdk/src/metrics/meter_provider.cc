@@ -88,6 +88,15 @@ bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
   return context_->ForceFlush(timeout);
 }
 
+/**
+ * Shutdown MeterContext when MeterProvider is destroyed.
+ *
+ */
+MeterProvider::~MeterProvider()
+{
+  context_->Shutdown();
+}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
