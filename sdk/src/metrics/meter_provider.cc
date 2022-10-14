@@ -94,7 +94,10 @@ bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
  */
 MeterProvider::~MeterProvider()
 {
-  context_->Shutdown();
+  if (context_)
+  {
+    context_->Shutdown();
+  }
 }
 
 }  // namespace metrics
