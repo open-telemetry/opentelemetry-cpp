@@ -28,7 +28,7 @@ public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
                      const AttributesProcessor *attributes_processor,
-                     nostd::shared_ptr<AggregationConfig> aggregation_config,
+                     std::shared_ptr<AggregationConfig> aggregation_config,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
@@ -49,7 +49,8 @@ public:
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
     for (auto &measurement : measurements)
     {
-      auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
+      auto aggr = DefaultAggregation::CreateAggregation(
+          aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
       auto prev = cumulative_hash_map_->Get(measurement.first);
       if (prev)

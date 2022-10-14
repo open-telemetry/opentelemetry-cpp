@@ -16,7 +16,6 @@ public:
   virtual ~AggregationConfig() = default;
 };
 
-template <typename T>
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:

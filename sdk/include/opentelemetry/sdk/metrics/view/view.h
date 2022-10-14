@@ -26,7 +26,7 @@ public:
   View(const std::string &name,
        const std::string &description                        = "",
        AggregationType aggregation_type                      = AggregationType::kDefault,
-       std::shared_ptr<AggregationConfig> aggregation_config = std::shared_ptr<AggregationConfig>{},
+       std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
@@ -45,7 +45,7 @@ public:
 
   virtual AggregationType GetAggregationType() const noexcept { return aggregation_type_; }
 
-  virtual nostd::shared_ptr<AggregationConfig> GetAggregationConfig() const noexcept
+  virtual std::shared_ptr<AggregationConfig> GetAggregationConfig() const noexcept
   {
     return aggregation_config_;
   }
@@ -60,7 +60,7 @@ private:
   std::string name_;
   std::string description_;
   AggregationType aggregation_type_;
-  nostd::shared_ptr<AggregationConfig> aggregation_config_;
+  std::shared_ptr<AggregationConfig> aggregation_config_;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor_;
 };
 }  // namespace metrics

@@ -31,7 +31,7 @@ public:
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
-                    nostd::shared_ptr<AggregationConfig> aggregation_config)
+                    std::shared_ptr<AggregationConfig> aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
@@ -40,8 +40,10 @@ public:
         temporal_metric_storage_(instrument_descriptor, aggregation_config)
 
   {
-    create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
-      return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
+    create_default_aggregation_ = [aggregation_type, aggregation_config,
+                                   instrument_descriptor]() -> std::unique_ptr<Aggregation> {
+      return DefaultAggregation::CreateAggregation(aggregation_type, instrument_descriptor,
+                                                   aggregation_config);
     };
   }
 
