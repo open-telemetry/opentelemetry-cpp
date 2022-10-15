@@ -45,6 +45,10 @@ public:
                 const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
+  void AddEvent(nostd::string_view /*name*/,
+                const common::KeyValueIterable & /*attributes*/) noexcept override
+  {}
+
   void SetStatus(trace::StatusCode /*code*/, nostd::string_view /*description*/) noexcept override
   {}
 

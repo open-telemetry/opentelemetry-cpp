@@ -3,7 +3,12 @@
 
 #pragma once
 
+#include <opentelemetry/exporters/jaeger/thrift_include_prefix.h>
+
 #include <Agent.h>
+
+#include <opentelemetry/exporters/jaeger/thrift_include_suffix.h>
+
 #include <atomic>
 #include <memory>
 #include <mutex>
