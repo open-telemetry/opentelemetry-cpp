@@ -136,7 +136,7 @@ TEST(Aggregation, LongHistogramAggregationBoundaries)
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;
-  LongHistogramAggregation aggr{aggregation_config};
+  LongHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
@@ -150,7 +150,7 @@ TEST(Aggregation, DoubleHistogramAggregationBoundaries)
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;
-  DoubleHistogramAggregation aggr{aggregation_config};
+  DoubleHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);

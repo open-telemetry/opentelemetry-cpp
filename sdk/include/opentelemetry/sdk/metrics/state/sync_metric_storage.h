@@ -40,9 +40,8 @@ public:
         temporal_metric_storage_(instrument_descriptor, aggregation_config)
 
   {
-    create_default_aggregation_ = [aggregation_type, aggregation_config,
-                                   instrument_descriptor]() -> std::unique_ptr<Aggregation> {
-      return DefaultAggregation::CreateAggregation(aggregation_type, instrument_descriptor,
+    create_default_aggregation_ = [&, aggregation_config]() -> std::unique_ptr<Aggregation> {
+      return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_,
                                                    aggregation_config);
     };
   }
