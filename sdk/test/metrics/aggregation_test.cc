@@ -18,12 +18,12 @@ TEST(Aggregation, LongSumAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
   auto sum_data = nostd::get<SumPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(sum_data.value_));
-  EXPECT_EQ(nostd::get<long>(sum_data.value_), 0l);
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(sum_data.value_));
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 0l);
   aggr.Aggregate(12l, {});
   aggr.Aggregate(0l, {});
   sum_data = nostd::get<SumPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(sum_data.value_), 12l);
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 12l);
 }
 
 TEST(Aggregation, DoubleSumAggregation)
@@ -46,12 +46,12 @@ TEST(Aggregation, LongLastValueAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<LastValuePointData>(data));
   auto lastvalue_data = nostd::get<LastValuePointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(lastvalue_data.value_));
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(lastvalue_data.value_));
   EXPECT_EQ(lastvalue_data.is_lastvalue_valid_, false);
   aggr.Aggregate(12l, {});
   aggr.Aggregate(1l, {});
   lastvalue_data = nostd::get<LastValuePointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(lastvalue_data.value_), 1.0);
+  EXPECT_EQ(nostd::get<int64_t>(lastvalue_data.value_), 1.0);
 }
 
 TEST(Aggregation, DoubleLastValueAggregation)
@@ -74,15 +74,15 @@ TEST(Aggregation, LongHistogramAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(histogram_data.sum_));
-  EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 0);
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(histogram_data.sum_));
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
   aggr.Aggregate(12l, {});   // lies in fourth bucket
   aggr.Aggregate(100l, {});  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 100);
-  EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 112);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 100);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[7], 1);
@@ -92,8 +92,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
   EXPECT_EQ(histogram_data.counts_[8], 1);
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 252);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 252);
 
   // Merge
   LongHistogramAggregation aggr1;
@@ -116,8 +116,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 2);  // 11, 13
   EXPECT_EQ(histogram_data.counts_[4], 2);  // 25, 28
   EXPECT_EQ(histogram_data.counts_[7], 1);  // 105
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 1);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 105);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 1);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 105);
 
   // Diff
   auto aggr4     = aggr1.Diff(aggr2);
@@ -131,8 +131,8 @@ TEST(Aggregation, LongHistogramAggregation)
 
 TEST(Aggregation, LongHistogramAggregationBoundaries)
 {
-  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<long>>
-      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<long>};
+  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<int64_t>>
+      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<int64_t>};
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;

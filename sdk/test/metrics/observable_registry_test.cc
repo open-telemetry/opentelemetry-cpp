@@ -62,8 +62,8 @@ public:
   }
 
   static size_t fetch_count1, fetch_count2;
-  static long number_of_get1, number_of_get2;
-  static long number_of_put1, number_of_put2;
+  static int64_t number_of_get1, number_of_get2;
+  static int64_t number_of_put1, number_of_put2;
   static const size_t number_of_attributes = 2;  // GET , PUT
 };
 

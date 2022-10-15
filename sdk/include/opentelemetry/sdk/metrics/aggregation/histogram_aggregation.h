@@ -18,11 +18,11 @@ namespace metrics
 class LongHistogramAggregation : public Aggregation
 {
 public:
-  LongHistogramAggregation(const HistogramAggregationConfig<long> *aggregation_config = nullptr);
+  LongHistogramAggregation(const HistogramAggregationConfig<int64_t> *aggregation_config = nullptr);
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
@@ -53,7 +53,7 @@ public:
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
+  void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 

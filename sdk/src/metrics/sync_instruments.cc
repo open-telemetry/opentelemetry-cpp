@@ -25,7 +25,7 @@ LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
   }
 }
 
-void LongCounter::Add(long value,
+void LongCounter::Add(int64_t value,
                       const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   if (!storage_)
@@ -36,7 +36,7 @@ void LongCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongCounter::Add(long value,
+void LongCounter::Add(int64_t value,
                       const opentelemetry::common::KeyValueIterable &attributes,
                       const opentelemetry::context::Context &context) noexcept
 {
@@ -47,7 +47,7 @@ void LongCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongCounter::Add(long value) noexcept
+void LongCounter::Add(int64_t value) noexcept
 {
   auto context = opentelemetry::context::Context{};
   if (!storage_)
@@ -57,7 +57,7 @@ void LongCounter::Add(long value) noexcept
   return storage_->RecordLong(value, context);
 }
 
-void LongCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
+void LongCounter::Add(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
   if (!storage_)
   {
@@ -133,7 +133,7 @@ LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
   }
 }
 
-void LongUpDownCounter::Add(long value,
+void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   auto context = opentelemetry::context::Context{};
@@ -144,7 +144,7 @@ void LongUpDownCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongUpDownCounter::Add(long value,
+void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes,
                             const opentelemetry::context::Context &context) noexcept
 {
@@ -155,7 +155,7 @@ void LongUpDownCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongUpDownCounter::Add(long value) noexcept
+void LongUpDownCounter::Add(int64_t value) noexcept
 {
   auto context = opentelemetry::context::Context{};
   if (!storage_)
@@ -165,7 +165,7 @@ void LongUpDownCounter::Add(long value) noexcept
   return storage_->RecordLong(value, context);
 }
 
-void LongUpDownCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
+void LongUpDownCounter::Add(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
   if (!storage_)
   {
@@ -238,7 +238,7 @@ LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
   }
 }
 
-void LongHistogram::Record(long value,
+void LongHistogram::Record(int64_t value,
                            const opentelemetry::common::KeyValueIterable &attributes,
                            const opentelemetry::context::Context &context) noexcept
 {
@@ -252,7 +252,7 @@ void LongHistogram::Record(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongHistogram::Record(long value, const opentelemetry::context::Context &context) noexcept
+void LongHistogram::Record(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
   if (value < 0)
   {

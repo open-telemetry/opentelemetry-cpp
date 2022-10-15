@@ -21,7 +21,7 @@ class ExemplarFilter
 {
 public:
   // Returns whether or not a reservoir should attempt to filter a measurement.
-  virtual bool ShouldSampleMeasurement(long value,
+  virtual bool ShouldSampleMeasurement(int64_t value,
                                        const MetricAttributes &attributes,
                                        const opentelemetry::context::Context &context) noexcept = 0;
 

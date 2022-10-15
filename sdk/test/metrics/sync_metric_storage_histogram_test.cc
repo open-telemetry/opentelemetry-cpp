@@ -41,11 +41,11 @@ class WritableMetricStorageHistogramTestFixture
 
 TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
 {
-  AggregationTemporality temporality = GetParam();
-  auto sdk_start_ts                  = std::chrono::system_clock::now();
-  long expected_total_get_requests   = 0;
-  long expected_total_put_requests   = 0;
-  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kHistogram,
+  AggregationTemporality temporality  = GetParam();
+  auto sdk_start_ts                   = std::chrono::system_clock::now();
+  int64_t expected_total_get_requests = 0;
+  int64_t expected_total_put_requests = 0;
+  InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kHistogram,
                                      InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
@@ -88,13 +88,13 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -121,13 +121,13 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_put_requests);
           }
         }
         return true;
@@ -154,13 +154,13 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.sum_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.sum_), expected_total_put_requests);
             count_attributes++;
           }
         }

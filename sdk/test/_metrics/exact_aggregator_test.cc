@@ -83,7 +83,7 @@ TEST(ExactAggregatorOrdered, Types)
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
   ExactAggregator<int> agg_int(metrics_api::InstrumentKind::Counter);
-  ExactAggregator<long> agg_long(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<int64_t> agg_long(metrics_api::InstrumentKind::Counter);
   ExactAggregator<float> agg_float(metrics_api::InstrumentKind::Counter);
   ExactAggregator<double> agg_double(metrics_api::InstrumentKind::Counter);
 
@@ -100,7 +100,7 @@ TEST(ExactAggregatorOrdered, Types)
   }
 
   std::vector<int> correct_int{1, 2, 3, 4, 5};
-  std::vector<long> correct_long{1, 2, 3, 4, 5};
+  std::vector<int64_t> correct_long{1, 2, 3, 4, 5};
   std::vector<float> correct_float{1.0, 2.0, 3.0, 4.0, 5.0};
   std::vector<double> correct_double{1.0, 2.0, 3.0, 4.0, 5.0};
 

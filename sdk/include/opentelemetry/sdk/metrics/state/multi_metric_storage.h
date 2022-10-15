@@ -23,7 +23,7 @@ public:
     storages_.push_back(storage);
   }
 
-  virtual void RecordLong(long value,
+  virtual void RecordLong(int64_t value,
                           const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
@@ -32,7 +32,7 @@ public:
     }
   }
 
-  virtual void RecordLong(long value,
+  virtual void RecordLong(int64_t value,
                           const opentelemetry::common::KeyValueIterable &attributes,
                           const opentelemetry::context::Context &context) noexcept override
   {
@@ -74,7 +74,7 @@ public:
   }
 
   void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)

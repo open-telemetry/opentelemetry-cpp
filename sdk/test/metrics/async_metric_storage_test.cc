@@ -70,9 +70,9 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
-  long get_count1                                                                  = 20l;
-  long put_count1                                                                  = 10l;
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
+  int64_t get_count1                                                                  = 20l;
+  int64_t put_count1                                                                  = 10l;
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -85,22 +85,22 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count1);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count1);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count1);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count1);
           }
         }
         return true;
       });
   // subsequent recording after collection shouldn't fail
   // monotonic increasing values;
-  long get_count2 = 50l;
-  long put_count2 = 70l;
+  int64_t get_count2 = 50l;
+  int64_t put_count2 = 70l;
 
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements2 = {
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -114,11 +114,11 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count2);
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count2 - get_count1);
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2 - get_count1);
             }
           }
           else if (opentelemetry::nostd::get<std::string>(
@@ -126,11 +126,11 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
           {
             if (temporality == AggregationTemporality::kCumulative)
             {
-              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count2);
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2);
             }
             else
             {
-              EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count2 - put_count1);
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2 - put_count1);
             }
           }
         }
@@ -163,9 +163,9 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
       std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
-  long freq_cpu0                                                                   = 3l;
-  long freq_cpu1                                                                   = 5l;
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
+  int64_t freq_cpu0                                                                   = 3l;
+  int64_t freq_cpu1                                                                   = 5l;
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -178,12 +178,12 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
               "0")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), freq_cpu0);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), freq_cpu0);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("CPU")->second) == "1")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), freq_cpu1);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), freq_cpu1);
           }
         }
         return true;
@@ -192,7 +192,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   freq_cpu0 = 6l;
   freq_cpu1 = 8l;
 
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements2 = {
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
@@ -204,12 +204,12 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
               "0")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), freq_cpu0);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), freq_cpu0);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("CPU")->second) == "1")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), freq_cpu1);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), freq_cpu1);
           }
         }
         return true;

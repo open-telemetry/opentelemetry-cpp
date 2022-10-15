@@ -16,7 +16,7 @@ namespace sdk
 namespace metrics
 {
 
-using ValueType = nostd::variant<long, double>;
+using ValueType = nostd::variant<int64_t, double>;
 
 // TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
 

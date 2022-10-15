@@ -15,7 +15,7 @@ class NeverSampleFilter final : public ExemplarFilter
 {
 public:
   bool ShouldSampleMeasurement(
-      long /* value */,
+      int64_t /* value */,
       const MetricAttributes & /* attributes */,
       const opentelemetry::context::Context & /* context */) noexcept override
   {

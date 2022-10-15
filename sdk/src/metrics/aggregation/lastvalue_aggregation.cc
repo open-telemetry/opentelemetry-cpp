@@ -28,7 +28,7 @@ LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &dat
     : point_data_{data}
 {}
 
-void LongLastValueAggregation::Aggregate(long value,
+void LongLastValueAggregation::Aggregate(int64_t value,
                                          const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

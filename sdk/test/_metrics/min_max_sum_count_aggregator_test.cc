@@ -138,7 +138,7 @@ TEST(MinMaxSumCountAggregator, Types)
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
   MinMaxSumCountAggregator<int> agg_int(metrics_api::InstrumentKind::Counter);
-  MinMaxSumCountAggregator<long> agg_long(metrics_api::InstrumentKind::Counter);
+  MinMaxSumCountAggregator<int64_t> agg_long(metrics_api::InstrumentKind::Counter);
   MinMaxSumCountAggregator<float> agg_float(metrics_api::InstrumentKind::Counter);
   MinMaxSumCountAggregator<double> agg_double(metrics_api::InstrumentKind::Counter);
 

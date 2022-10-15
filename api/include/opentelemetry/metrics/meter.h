@@ -36,7 +36,7 @@ public:
    * @return a shared pointer to the created Counter.
    */
 
-  virtual nostd::shared_ptr<Counter<long>> CreateLongCounter(
+  virtual nostd::shared_ptr<Counter<int64_t>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -72,7 +72,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @return a shared pointer to the created Histogram.
    */
-  virtual nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+  virtual nostd::shared_ptr<Histogram<int64_t>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -109,7 +109,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @return a shared pointer to the created UpDownCounter.
    */
-  virtual nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+  virtual nostd::shared_ptr<UpDownCounter<int64_t>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;

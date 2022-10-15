@@ -87,11 +87,12 @@ public:
 class NoopMeter final : public Meter
 {
 public:
-  nostd::shared_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
-                                                     nostd::string_view description = "",
-                                                     nostd::string_view unit = "") noexcept override
+  nostd::shared_ptr<Counter<int64_t>> CreateLongCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
+    return nostd::shared_ptr<Counter<int64_t>>{new NoopCounter<int64_t>(name, description, unit)};
   }
 
   nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
@@ -120,12 +121,13 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+  nostd::shared_ptr<Histogram<int64_t>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
+    return nostd::shared_ptr<Histogram<int64_t>>{
+        new NoopHistogram<int64_t>(name, description, unit)};
   }
 
   nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
@@ -154,13 +156,13 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::shared_ptr<UpDownCounter<int64_t>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<UpDownCounter<long>>{
-        new NoopUpDownCounter<long>(name, description, unit)};
+    return nostd::shared_ptr<UpDownCounter<int64_t>>{
+        new NoopUpDownCounter<int64_t>(name, description, unit)};
   }
 
   nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(

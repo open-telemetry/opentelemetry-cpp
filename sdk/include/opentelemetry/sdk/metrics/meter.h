@@ -35,7 +35,7 @@ public:
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
+  nostd::shared_ptr<opentelemetry::metrics::Counter<int64_t>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -55,7 +55,7 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
+  nostd::shared_ptr<opentelemetry::metrics::Histogram<int64_t>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -75,7 +75,7 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<int64_t>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;

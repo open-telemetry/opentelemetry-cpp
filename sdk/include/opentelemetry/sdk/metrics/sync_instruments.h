@@ -32,19 +32,20 @@ protected:
   std::unique_ptr<SyncWritableMetricStorage> storage_;
 };
 
-class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<long>
+class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<int64_t>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
               std::unique_ptr<SyncWritableMetricStorage> storage);
 
-  void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
-  void Add(long value,
+  void Add(int64_t value,
+           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+  void Add(int64_t value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
-  void Add(long value) noexcept override;
-  void Add(long value, const opentelemetry::context::Context &context) noexcept override;
+  void Add(int64_t value) noexcept override;
+  void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
 class DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
@@ -64,19 +65,20 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<long>
+class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
   LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
                     std::unique_ptr<SyncWritableMetricStorage> storage);
 
-  void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
-  void Add(long value,
+  void Add(int64_t value,
+           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+  void Add(int64_t value,
            const opentelemetry::common::KeyValueIterable &attributes,
            const opentelemetry::context::Context &context) noexcept override;
 
-  void Add(long value) noexcept override;
-  void Add(long value, const opentelemetry::context::Context &context) noexcept override;
+  void Add(int64_t value) noexcept override;
+  void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
 class DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
@@ -95,17 +97,17 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<long>
+class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<int64_t>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,
                 std::unique_ptr<SyncWritableMetricStorage> storage);
 
-  void Record(long value,
+  void Record(int64_t value,
               const opentelemetry::common::KeyValueIterable &attributes,
               const opentelemetry::context::Context &context) noexcept override;
 
-  void Record(long value, const opentelemetry::context::Context &context) noexcept override;
+  void Record(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
 class DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>

@@ -16,13 +16,13 @@ using namespace opentelemetry::sdk::metrics;
 class TestMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_long++;
   }
 
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::common::KeyValueIterable & /* attributes */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {

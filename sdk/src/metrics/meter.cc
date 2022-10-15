@@ -33,15 +33,16 @@ Meter::Meter(
       observable_registry_(new ObservableRegistry())
 {}
 
-nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
-                                                                   nostd::string_view description,
-                                                                   nostd::string_view unit) noexcept
+nostd::shared_ptr<metrics::Counter<int64_t>> Meter::CreateLongCounter(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::Counter<long>>(
+  return nostd::shared_ptr<metrics::Counter<int64_t>>(
       new LongCounter(instrument_descriptor, std::move(storage)));
 }
 
@@ -87,7 +88,7 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
+nostd::shared_ptr<metrics::Histogram<int64_t>> Meter::CreateLongHistogram(
     nostd::string_view name,
     nostd::string_view description,
     nostd::string_view unit) noexcept
@@ -97,7 +98,7 @@ nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::Histogram<long>>{
+  return nostd::shared_ptr<metrics::Histogram<int64_t>>{
       new LongHistogram(instrument_descriptor, std::move(storage))};
 }
 
@@ -143,7 +144,7 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
+nostd::shared_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateLongUpDownCounter(
     nostd::string_view name,
     nostd::string_view description,
     nostd::string_view unit) noexcept
@@ -153,7 +154,7 @@ nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::UpDownCounter<long>>{
+  return nostd::shared_ptr<metrics::UpDownCounter<int64_t>>{
       new LongUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 

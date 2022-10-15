@@ -42,9 +42,8 @@ public:
       case InstrumentType::kHistogram: {
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation(
-                         static_cast<
-                             const opentelemetry::sdk::metrics::HistogramAggregationConfig<long> *>(
-                             aggregation_config))))
+                         static_cast<const opentelemetry::sdk::metrics::HistogramAggregationConfig<
+                             int64_t> *>(aggregation_config))))
                    : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
                          static_cast<const opentelemetry::sdk::metrics::HistogramAggregationConfig<
                              double> *>(aggregation_config))));

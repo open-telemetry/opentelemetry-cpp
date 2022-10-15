@@ -33,7 +33,7 @@ public:
   {}
 
   void OfferMeasurement(
-      long value,
+      int64_t value,
       const MetricAttributes &attributes,
       const opentelemetry::context::Context &context,
       const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override

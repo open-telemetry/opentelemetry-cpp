@@ -46,7 +46,7 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
 void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void * /* state */)
 {
   auto observer_long =
-      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>>>(observer);
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
   observer_long->Observe(10l);
 }
 
