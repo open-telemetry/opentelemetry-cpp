@@ -28,7 +28,7 @@ public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
                      const AttributesProcessor *attributes_processor,
-                     std::shared_ptr<AggregationConfig> aggregation_config,
+                     const AggregationConfig *aggregation_config,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},

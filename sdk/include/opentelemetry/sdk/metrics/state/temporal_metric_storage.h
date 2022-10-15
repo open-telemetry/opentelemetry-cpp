@@ -26,7 +26,7 @@ class TemporalMetricStorage
 {
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
-                        std::shared_ptr<AggregationConfig> aggregation_config);
+                        const AggregationConfig *aggregation_config);
 
   bool buildMetrics(CollectorHandle *collector,
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,
@@ -46,7 +46,7 @@ private:
 
   // Lock while building metrics
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const std::shared_ptr<AggregationConfig> aggregation_config_;
+  const AggregationConfig *aggregation_config_;
 };
 }  // namespace metrics
 }  // namespace sdk

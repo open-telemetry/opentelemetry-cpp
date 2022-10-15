@@ -45,9 +45,9 @@ public:
 
   virtual AggregationType GetAggregationType() const noexcept { return aggregation_type_; }
 
-  virtual std::shared_ptr<AggregationConfig> GetAggregationConfig() const noexcept
+  virtual AggregationConfig *GetAggregationConfig() const noexcept
   {
-    return aggregation_config_;
+    return aggregation_config_.get();
   }
 
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()

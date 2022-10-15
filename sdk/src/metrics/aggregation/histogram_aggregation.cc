@@ -17,10 +17,9 @@ namespace sdk
 namespace metrics
 {
 
-LongHistogramAggregation::LongHistogramAggregation(
-    std::shared_ptr<AggregationConfig> aggregation_config)
+LongHistogramAggregation::LongHistogramAggregation(const AggregationConfig *aggregation_config)
 {
-  auto ac = std::dynamic_pointer_cast<HistogramAggregationConfig>(aggregation_config);
+  auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
   if (ac && ac->boundaries_.size())
   {
     point_data_.boundaries_ = ac->boundaries_;
@@ -101,10 +100,9 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
   return point_data_;
 }
 
-DoubleHistogramAggregation::DoubleHistogramAggregation(
-    std::shared_ptr<AggregationConfig> aggregation_config)
+DoubleHistogramAggregation::DoubleHistogramAggregation(const AggregationConfig *aggregation_config)
 {
-  auto ac = std::dynamic_pointer_cast<HistogramAggregationConfig>(aggregation_config);
+  auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
   if (ac && ac->boundaries_.size())
   {
     point_data_.boundaries_ = ac->boundaries_;
@@ -168,7 +166,7 @@ std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
       ->boundaries_ = curr_value.boundaries_;
   static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig *>(aggregation_config.get())
       ->record_min_max_            = record_min_max_;
-  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(aggregation_config);
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(aggregation_config.get());
   HistogramMerge<double>(curr_value, delta_value, aggr->point_data_);
   return std::unique_ptr<Aggregation>(aggr);
 }

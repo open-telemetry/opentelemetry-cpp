@@ -18,7 +18,7 @@ namespace metrics
 {
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
-                                             std::shared_ptr<AggregationConfig> aggregation_config)
+                                             const AggregationConfig *aggregation_config)
     : instrument_descriptor_(instrument_descriptor), aggregation_config_(aggregation_config)
 {}
 

@@ -27,7 +27,7 @@ class DefaultAggregation
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-      const std::shared_ptr<AggregationConfig> aggregation_config)
+      const AggregationConfig *aggregation_config)
   {
     switch (instrument_descriptor.type_)
     {
@@ -64,7 +64,7 @@ public:
   static std::unique_ptr<Aggregation> CreateAggregation(
       AggregationType aggregation_type,
       InstrumentDescriptor instrument_descriptor,
-      std::shared_ptr<AggregationConfig> aggregation_config = nullptr)
+      const AggregationConfig *aggregation_config = nullptr)
   {
     switch (aggregation_type)
     {

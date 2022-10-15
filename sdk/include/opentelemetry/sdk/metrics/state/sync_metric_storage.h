@@ -31,7 +31,7 @@ public:
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
-                    std::shared_ptr<AggregationConfig> aggregation_config)
+                    const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),

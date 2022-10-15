@@ -19,7 +19,7 @@ namespace metrics
 class LongHistogramAggregation : public Aggregation
 {
 public:
-  LongHistogramAggregation(std::shared_ptr<AggregationConfig> aggregation_config = nullptr);
+  LongHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
@@ -49,7 +49,7 @@ private:
 class DoubleHistogramAggregation : public Aggregation
 {
 public:
-  DoubleHistogramAggregation(std::shared_ptr<AggregationConfig> aggregation_config = nullptr);
+  DoubleHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
