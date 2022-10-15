@@ -42,13 +42,11 @@ public:
       case InstrumentType::kHistogram: {
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return (std::move(
-              std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config))));
+          return (std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config)));
         }
         else
         {
-          return (std::move(
-              std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config))));
+          return (std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config)));
         }
 
         break;
