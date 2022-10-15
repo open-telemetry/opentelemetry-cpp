@@ -85,6 +85,8 @@ public:
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+  ~MeterProvider() override;
+
 private:
   std::shared_ptr<sdk::metrics::MeterContext> context_;
   std::mutex lock_;
