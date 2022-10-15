@@ -52,7 +52,7 @@ public:
   /**
    * Retrieve the cell's {@link ExemplarData}.
    *
-   * <p>Must be used in tandem with {@link #recordLongMeasurement(long, Attributes, Context)}.
+   * <p>Must be used in tandem with {@link #recordLongMeasurement(int64_t, Attributes, Context)}.
    */
   std::shared_ptr<ExemplarData> GetAndResetLong(const MetricAttributes &point_attributes)
   {
@@ -65,7 +65,7 @@ public:
     point_data_attributes.attributes = filtered(attributes, point_attributes);
     if (nostd::holds_alternative<int64_t>(value_))
     {
-      point_data_attributes.point_data = ExemplarData::CreateSumPointData(nostd::get<long>(value_));
+      point_data_attributes.point_data = ExemplarData::CreateSumPointData(nostd::get<int64_t>(value_));
     }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
