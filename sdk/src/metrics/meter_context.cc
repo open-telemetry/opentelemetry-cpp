@@ -90,18 +90,58 @@ bool MeterContext::Shutdown() noexcept
 
 bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  // TODO - Implement timeout logic.
   bool result = true;
   // Simultaneous flush not allowed.
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
   for (auto &collector : collectors_)
   {
-    bool status = std::static_pointer_cast<MetricCollector>(collector)->ForceFlush(timeout);
-    result      = result && status;
-  }
-  if (!result)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to ForceFlush all metric readers");
+    // Convert to nanos to prevent overflow
+    auto timeout_ns = std::chrono::nanoseconds::max();
+    if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
+    {
+      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+    }
+
+    auto current_time = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point expire_time;
+    auto overflow_checker = std::chrono::system_clock::time_point::max();
+
+    // check if the expected expire time doesn't overflow.
+    if (overflow_checker - current_time > timeout_ns)
+    {
+      expire_time = current_time +
+                    std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+    }
+    else
+    {
+      // overflow happens, reset expire time to max.
+      expire_time = overflow_checker;
+    }
+
+    for (auto &collector : collectors_)
+    {
+      if (!std::static_pointer_cast<MetricCollector>(collector)->ForceFlush(
+              std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
+      {
+        result = false;
+      }
+
+      current_time = std::chrono::system_clock::now();
+
+      if (expire_time >= current_time)
+      {
+        timeout_ns =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - current_time);
+      }
+      else
+      {
+        timeout_ns = std::chrono::nanoseconds::zero();
+      }
+    }
+    if (!result)
+    {
+      OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to ForceFlush all metric readers");
+    }
   }
   return result;
 }

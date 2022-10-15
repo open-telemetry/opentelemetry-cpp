@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Add CMake OTELCPP_MAINTAINER_MODE [#1650](https://github.com/open-telemetry/opentelemetry-cpp/pull/1650)
+
 ## [1.6.1] 2022-09-22
 
 * [BUILD] Upgrade opentelemetry-proto to v0.19.0 [#1579](https://github.com/open-telemetry/opentelemetry-cpp/pull/1579)
