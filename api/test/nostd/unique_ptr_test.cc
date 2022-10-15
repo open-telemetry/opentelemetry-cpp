@@ -122,7 +122,7 @@ TEST(UniquePtrTest, Reset)
 {
   bool was_destructed1;
   unique_ptr<A> ptr{new A{was_destructed1}};
-  bool was_destructed2;
+  bool was_destructed2 = true;
   ptr.reset(new A{was_destructed2});
   EXPECT_TRUE(was_destructed1);
   EXPECT_FALSE(was_destructed2);
