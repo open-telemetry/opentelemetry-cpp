@@ -723,10 +723,10 @@ TEST(Tracer, SpanCleanupWithScope)
     auto span0 = tracer->StartSpan("Span0");
     auto span1 = tracer->StartSpan("span1");
     {
-      trace_api::Scope scope(span1);
+      trace_api::Scope scope1(span1);
       auto span2 = tracer->StartSpan("span2");
       {
-        trace_api::Scope scope(span2);
+        trace_api::Scope scope2(span2);
         auto span3 = tracer->StartSpan("span3");
       }
     }

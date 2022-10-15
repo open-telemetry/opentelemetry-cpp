@@ -89,6 +89,22 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.maintainer.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DWITH_METRICS_PREVIEW=OFF \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        "${SRC_DIR}"
+  make -k
+  make test
+  exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
