@@ -48,6 +48,27 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.maintainer.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DOTELCPP_MAINTAINER_MODE=ON `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build .
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.with_async_export.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `

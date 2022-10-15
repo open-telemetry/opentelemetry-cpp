@@ -55,7 +55,8 @@ public:
                               const MetricAttributes & /* attributes */,
                               const opentelemetry::context::Context & /* context */) override
     {
-      for (size_t i = 0; i < boundaries_.size(); ++i)
+      int max_size = boundaries_.size();
+      for (int i = 0; i < max_size; ++i)
       {
         if (value <= boundaries_[i])
         {

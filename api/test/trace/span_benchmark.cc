@@ -115,10 +115,10 @@ void BM_SpanCreationWitContextPropagation(benchmark::State &state)
         nostd::shared_ptr<trace_api::Span>(new trace_api::DefaultSpan(outer_span_context));
     trace_api::SetSpan(current_ctx, outer_span);
     auto inner_child = tracer->StartSpan("inner");
-    auto scope       = tracer->WithActiveSpan(inner_child);
+    auto inner_scope = tracer->WithActiveSpan(inner_child);
     {
       auto innermost_child = tracer->StartSpan("innermost");
-      auto scope           = tracer->WithActiveSpan(innermost_child);
+      auto innermost_scope = tracer->WithActiveSpan(innermost_child);
       innermost_child->End();
     }
     inner_child->End();
