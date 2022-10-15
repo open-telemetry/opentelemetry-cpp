@@ -81,7 +81,7 @@ TEST(MeterProvider, GetMeter)
   ASSERT_EQ(m4, m5);
   ASSERT_NE(m3, m6);
 
-  // Should be an sdk::trace::Tracer with the processor attached.
+  // Should be an sdk::metrics::Meter
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkMeter1 = dynamic_cast<Meter *>(m1.get());
 #  else
@@ -98,5 +98,9 @@ TEST(MeterProvider, GetMeter)
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
 
   mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  // cleanup properly without crash
+  mp1.ForceFlush();
+  mp1.Shutdown();
 }
 #endif
