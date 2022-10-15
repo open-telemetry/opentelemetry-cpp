@@ -17,7 +17,7 @@ namespace metrics
 LongLastValueAggregation::LongLastValueAggregation()
 {
   point_data_.is_lastvalue_valid_ = false;
-  point_data_.value_              = 0l;
+  point_data_.value_              = (int64_t)0;
 }
 
 LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)

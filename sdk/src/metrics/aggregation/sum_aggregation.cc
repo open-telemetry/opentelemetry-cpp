@@ -17,7 +17,7 @@ namespace metrics
 
 LongSumAggregation::LongSumAggregation()
 {
-  point_data_.value_ = 0l;
+  point_data_.value_ = (int64_t)0;
 }
 
 LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
