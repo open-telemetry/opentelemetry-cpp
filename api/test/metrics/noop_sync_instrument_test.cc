@@ -13,12 +13,12 @@ TEST(Counter, Add)
       new opentelemetry::metrics::NoopCounter<int64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
-  counter->Add(10l, labels);
-  counter->Add(10l, labels, opentelemetry::context::Context{});
-  counter->Add(2l);
-  counter->Add(2l, opentelemetry::context::Context{});
-  counter->Add(10l, {{"k1", "1"}, {"k2", 2}});
-  counter->Add(10l, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
+  counter->Add((int64_t)10, labels);
+  counter->Add((int64_t)10, labels, opentelemetry::context::Context{});
+  counter->Add((int64_t)2);
+  counter->Add((int64_t)2, opentelemetry::context::Context{});
+  counter->Add((int64_t)10, {{"k1", "1"}, {"k2", 2}});
+  counter->Add((int64_t)10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
 
 TEST(histogram, Record)
@@ -27,10 +27,10 @@ TEST(histogram, Record)
       new opentelemetry::metrics::NoopHistogram<int64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
-  counter->Record(10l, labels, opentelemetry::context::Context{});
-  counter->Record(2l, opentelemetry::context::Context{});
+  counter->Record((int64_t)10, labels, opentelemetry::context::Context{});
+  counter->Record((int64_t)2, opentelemetry::context::Context{});
 
-  counter->Record(10l, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
+  counter->Record((int64_t)10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
 
 TEST(UpDownCountr, Record)
@@ -39,12 +39,12 @@ TEST(UpDownCountr, Record)
       new opentelemetry::metrics::NoopUpDownCounter<int64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
-  counter->Add(10l, labels);
-  counter->Add(10l, labels, opentelemetry::context::Context{});
-  counter->Add(2l);
-  counter->Add(2l, opentelemetry::context::Context{});
-  counter->Add(10l, {{"k1", "1"}, {"k2", 2}});
-  counter->Add(10l, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
+  counter->Add((int64_t)10, labels);
+  counter->Add((int64_t)10, labels, opentelemetry::context::Context{});
+  counter->Add((int64_t)2);
+  counter->Add((int64_t)2, opentelemetry::context::Context{});
+  counter->Add((int64_t)10, {{"k1", "1"}, {"k2", 2}});
+  counter->Add((int64_t)10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
 
 #endif

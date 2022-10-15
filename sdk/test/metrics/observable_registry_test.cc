@@ -19,15 +19,15 @@ public:
     fetch_count1++;
     if (fetch_count1 == 1)
     {
-      std::get<observer_result.Observe(20l, {{"RequestType", "GET"}});
-      observer_result.Observe(10l, {{"RequestType", "PUT"}});
+      std::get<observer_result.Observe((int64_t)20, {{"RequestType", "GET"}});
+      observer_result.Observe((int64_t)10, {{"RequestType", "PUT"}});
       number_of_get1 += (int64_t)20;
       number_of_put1 += (int64_t)10;
     }
     else if (fetch_count1 == 2)
     {
-      observer_result.Observe(40l, {{"RequestType", "GET"}});
-      observer_result.Observe(20l, {{"RequestType", "PUT"}});
+      observer_result.Observe((int64_t)40, {{"RequestType", "GET"}});
+      observer_result.Observe((int64_t)20, {{"RequestType", "PUT"}});
       number_of_get1 += (int64_t)40;
       number_of_put1 += (int64_t)20;
     }
@@ -39,15 +39,15 @@ public:
     fetch_count2++;
     if (fetch_count2 == 1)
     {
-      observer_result.Observe(20l, {{"RequestType", "GET"}});
-      observer_result.Observe(10l, {{"RequestType", "PUT"}});
+      observer_result.Observe((int64_t)20, {{"RequestType", "GET"}});
+      observer_result.Observe((int64_t)10, {{"RequestType", "PUT"}});
       number_of_get2 += (int64_t)20;
       number_of_put2 += (int64_t)10;
     }
     else if (fetch_count2 == 2)
     {
-      observer_result.Observe(40l, {{"RequestType", "GET"}});
-      observer_result.Observe(20l, {{"RequestType", "PUT"}});
+      observer_result.Observe((int64_t)40, {{"RequestType", "GET"}});
+      observer_result.Observe((int64_t)20, {{"RequestType", "PUT"}});
       number_of_get2 += (int64_t)40;
       number_of_put2 += (int64_t)20;
     }
