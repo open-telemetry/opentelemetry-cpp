@@ -46,7 +46,7 @@ public:
         reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
     if (idx != -1)
     {
-      storage_[idx].RecordDoubleMeasurement(value, attributes, context);
+      storage_[idx].RecordLongMeasurement(value, attributes, context);
     }
   }
 
