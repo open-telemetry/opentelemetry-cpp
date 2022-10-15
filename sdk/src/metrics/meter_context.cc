@@ -67,6 +67,7 @@ void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 bool MeterContext::Shutdown() noexcept
 {
   bool result = true;
+  // Shutdown only once.
   if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
   {
 
@@ -80,61 +81,63 @@ bool MeterContext::Shutdown() noexcept
       OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
     }
   }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Shutdown can be invoked only once.");
+  }
   return result;
 }
 
 bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   bool result = true;
-  if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
+  // Simultaneous flush not allowed.
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
+  // Convert to nanos to prevent overflow
+  auto timeout_ns = std::chrono::nanoseconds::max();
+  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
   {
-    // Convert to nanos to prevent overflow
-    auto timeout_ns = std::chrono::nanoseconds::max();
-    if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
+    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+  }
+
+  auto current_time = std::chrono::system_clock::now();
+  std::chrono::system_clock::time_point expire_time;
+  auto overflow_checker = std::chrono::system_clock::time_point::max();
+
+  // check if the expected expire time doesn't overflow.
+  if (overflow_checker - current_time > timeout_ns)
+  {
+    expire_time =
+        current_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+  }
+  else
+  {
+    // overflow happens, reset expire time to max.
+    expire_time = overflow_checker;
+  }
+
+  for (auto &collector : collectors_)
+  {
+    if (!std::static_pointer_cast<MetricCollector>(collector)->ForceFlush(
+            std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
     {
-      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+      result = false;
     }
 
-    auto current_time = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point expire_time;
-    auto overflow_checker = std::chrono::system_clock::time_point::max();
+    current_time = std::chrono::system_clock::now();
 
-    // check if the expected expire time doesn't overflow.
-    if (overflow_checker - current_time > timeout_ns)
+    if (expire_time >= current_time)
     {
-      expire_time = current_time +
-                    std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - current_time);
     }
     else
     {
-      // overflow happens, reset expire time to max.
-      expire_time = overflow_checker;
+      timeout_ns = std::chrono::nanoseconds::zero();
     }
-
-    for (auto &collector : collectors_)
-    {
-      if (!std::static_pointer_cast<MetricCollector>(collector)->ForceFlush(
-              std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
-      {
-        result = false;
-      }
-
-      current_time = std::chrono::system_clock::now();
-
-      if (expire_time >= current_time)
-      {
-        timeout_ns =
-            std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - current_time);
-      }
-      else
-      {
-        timeout_ns = std::chrono::nanoseconds::zero();
-      }
-    }
-    if (!result)
-    {
-      OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to ForceFlush all metric readers");
-    }
+  }
+  if (!result)
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to ForceFlush all metric readers");
   }
   return result;
 }
