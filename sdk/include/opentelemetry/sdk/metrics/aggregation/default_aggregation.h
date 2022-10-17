@@ -27,7 +27,7 @@ class DefaultAggregation
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-      const opentelemetry::sdk::metrics::AggregationConfig *aggregation_config)
+      const AggregationConfig *aggregation_config)
   {
     switch (instrument_descriptor.type_)
     {
@@ -43,14 +43,15 @@ public:
                    : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(false)));
         break;
       case InstrumentType::kHistogram: {
-        return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation(
-                         static_cast<
-                             const opentelemetry::sdk::metrics::HistogramAggregationConfig<long> *>(
-                             aggregation_config))))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
-                         static_cast<const opentelemetry::sdk::metrics::HistogramAggregationConfig<
-                             double> *>(aggregation_config))));
+        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+        {
+          return (std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config)));
+        }
+        else
+        {
+          return (std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config)));
+        }
+
         break;
       }
       case InstrumentType::kObservableGauge:
@@ -63,8 +64,10 @@ public:
     };
   }
 
-  static std::unique_ptr<Aggregation> CreateAggregation(AggregationType aggregation_type,
-                                                        InstrumentDescriptor instrument_descriptor)
+  static std::unique_ptr<Aggregation> CreateAggregation(
+      AggregationType aggregation_type,
+      InstrumentDescriptor instrument_descriptor,
+      const AggregationConfig *aggregation_config = nullptr)
   {
     switch (aggregation_type)
     {
@@ -74,11 +77,11 @@ public:
       case AggregationType::kHistogram:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return std::unique_ptr<Aggregation>(new LongHistogramAggregation());
+          return std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config));
         }
         else
         {
-          return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation());
+          return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config));
         }
         break;
       case AggregationType::kLastValue:
@@ -109,7 +112,7 @@ public:
         break;
       }
       default:
-        return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
+        return DefaultAggregation::CreateAggregation(instrument_descriptor, aggregation_config);
     }
   }
 
