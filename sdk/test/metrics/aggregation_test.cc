@@ -131,8 +131,8 @@ TEST(Aggregation, LongHistogramAggregation)
 
 TEST(Aggregation, LongHistogramAggregationBoundaries)
 {
-  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<int64_t>>
-      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<int64_t>};
+  std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig> aggregation_config{
+      new opentelemetry::sdk::metrics::HistogramAggregationConfig};
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;
@@ -145,8 +145,8 @@ TEST(Aggregation, LongHistogramAggregationBoundaries)
 
 TEST(Aggregation, DoubleHistogramAggregationBoundaries)
 {
-  nostd::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig<double>>
-      aggregation_config{new opentelemetry::sdk::metrics::HistogramAggregationConfig<double>};
+  std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig> aggregation_config{
+      new opentelemetry::sdk::metrics::HistogramAggregationConfig};
   std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
                                        750.0, 1000.0, 2500.0, 5000.0, 10000.0};
   aggregation_config->boundaries_   = user_boundaries;

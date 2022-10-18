@@ -68,8 +68,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   std::unique_ptr<AttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      instr_desc, AggregationType::kSum, default_attributes_processor.get(), nullptr);
   int64_t get_count1                                                                  = (int64_t)20;
   int64_t put_count1                                                                  = (int64_t)10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -161,11 +160,10 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   std::unique_ptr<AttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
-  int64_t freq_cpu0                                                                   = (int64_t)3;
-  int64_t freq_cpu1                                                                   = (int64_t)5;
-  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
+  long freq_cpu0                                                                   = 3l;
+  long freq_cpu1                                                                   = 5l;
+  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));

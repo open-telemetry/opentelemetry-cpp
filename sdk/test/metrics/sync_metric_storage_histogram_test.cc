@@ -54,8 +54,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
-      NoExemplarReservoir::GetNoExemplarReservoir(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      NoExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordLong((int64_t)10,
                      KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -195,8 +194,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
-      NoExemplarReservoir::GetNoExemplarReservoir(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      NoExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
