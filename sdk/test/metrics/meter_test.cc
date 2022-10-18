@@ -99,7 +99,7 @@ TEST(MeterTest, StressMultiThread)
           if (do_sync_create.exchange(false))
           {
             std::string instrument_name = "test_couter_" + std::to_string(instrument_id);
-            meter->CreateLongCounter(instrument_name, "", "");
+            meter->CreateInt64Counter(instrument_name, "", "");
             do_async_create.store(true);
             instrument_id++;
           }

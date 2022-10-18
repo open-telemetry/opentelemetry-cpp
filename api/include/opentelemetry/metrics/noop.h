@@ -87,7 +87,7 @@ public:
 class NoopMeter final : public Meter
 {
 public:
-  nostd::shared_ptr<Counter<int64_t>> CreateLongCounter(
+  nostd::shared_ptr<Counter<int64_t>> CreateInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override

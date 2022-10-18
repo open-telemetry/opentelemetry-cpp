@@ -35,7 +35,7 @@ public:
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<int64_t>> CreateLongCounter(
+  nostd::shared_ptr<opentelemetry::metrics::Counter<int64_t>> CreateInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;

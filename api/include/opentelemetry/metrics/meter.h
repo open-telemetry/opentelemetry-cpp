@@ -36,7 +36,7 @@ public:
    * @return a shared pointer to the created Counter.
    */
 
-  virtual nostd::shared_ptr<Counter<int64_t>> CreateLongCounter(
+  virtual nostd::shared_ptr<Counter<int64_t>> CreateInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
