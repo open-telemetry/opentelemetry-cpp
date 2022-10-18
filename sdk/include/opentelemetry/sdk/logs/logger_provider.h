@@ -61,7 +61,7 @@ public:
    */
   explicit LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept;
 
-  ~LoggerProvider();
+  ~LoggerProvider() override;
 
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.

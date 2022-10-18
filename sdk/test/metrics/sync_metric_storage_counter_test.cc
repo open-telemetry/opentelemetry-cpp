@@ -53,8 +53,7 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      ExemplarReservoir::GetNoExemplarReservoir(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -80,10 +79,10 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   auto collection_ts      = std::chrono::system_clock::now();
   size_t count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -112,10 +111,10 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -146,10 +145,10 @@ TEST_P(WritableMetricStorageTestFixture, LongSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -188,8 +187,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      ExemplarReservoir::GetNoExemplarReservoir(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -219,10 +217,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   auto collection_ts      = std::chrono::system_clock::now();
   size_t count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -252,10 +250,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -288,10 +286,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {

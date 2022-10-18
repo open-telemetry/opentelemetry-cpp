@@ -68,7 +68,7 @@ void MultiLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 
 bool MultiLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  // Converto nanos to prevent overflow
+  // Convert to nanos to prevent overflow
   std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
   if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
   {

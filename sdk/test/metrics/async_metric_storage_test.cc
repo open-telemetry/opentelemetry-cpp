@@ -68,8 +68,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   std::unique_ptr<AttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      instr_desc, AggregationType::kSum, default_attributes_processor.get(), nullptr);
   long get_count1                                                                  = 20l;
   long put_count1                                                                  = 10l;
   std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
@@ -77,24 +76,24 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
-  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
-                    for (auto data_attr : data.point_data_attr_)
-                    {
-                      auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
-                      if (opentelemetry::nostd::get<std::string>(
-                              data_attr.attributes.find("RequestType")->second) == "GET")
-                      {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count1);
-                      }
-                      else if (opentelemetry::nostd::get<std::string>(
-                                   data_attr.attributes.find("RequestType")->second) == "PUT")
-                      {
-                        EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count1);
-                      }
-                    }
-                    return true;
-                  });
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), get_count1);
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), put_count1);
+          }
+        }
+        return true;
+      });
   // subsequent recording after collection shouldn't fail
   // monotonic increasing values;
   long get_count2 = 50l;
@@ -105,10 +104,10 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          auto data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
@@ -161,19 +160,17 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   std::unique_ptr<AttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
-      std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig>{});
+      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
   long freq_cpu0                                                                   = 3l;
   long freq_cpu1                                                                   = 5l;
-  size_t attribute_count                                                           = 2;
   std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
@@ -198,8 +195,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData data) {
-        for (auto data_attr : data.point_data_attr_)
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+        for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(data_attr.attributes.find("CPU")->second) ==
