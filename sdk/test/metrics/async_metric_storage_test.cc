@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cstdint>
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
@@ -10,6 +10,7 @@
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
+#  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
@@ -161,9 +162,9 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
-  long freq_cpu0                                                                   = 3l;
-  long freq_cpu1                                                                   = 5l;
-  std::unordered_map<MetricAttributes, long, AttributeHashGenerator> measurements1 = {
+  int64_t freq_cpu0                                                                   = (int64_t)3;
+  int64_t freq_cpu1                                                                   = (int64_t)5;
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
