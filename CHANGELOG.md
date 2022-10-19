@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Add CMake OTELCPP_MAINTAINER_MODE [#1650](https://github.com/open-telemetry/opentelemetry-cpp/pull/1650)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.14.0 [#1697](https://github.com/open-telemetry/opentelemetry-cpp/pull/1697)
 
 ## [1.6.1] 2022-09-22
 
