@@ -90,7 +90,7 @@ inline metric_sdk::ResourceMetrics CreateLastValuePointData()
   last_value_point_data.is_lastvalue_valid_ = true;
   last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::LastValuePointData last_value_point_data2{};
-  last_value_point_data2.value_              = 20;
+  last_value_point_data2.value_              = (int64_t)20;
   last_value_point_data2.is_lastvalue_valid_ = true;
   last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::MetricData metric_data{

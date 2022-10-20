@@ -296,7 +296,7 @@ public:
     last_value_point_data.is_lastvalue_valid_ = true;
     last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data2{};
-    last_value_point_data2.value_              = 20;
+    last_value_point_data2.value_              = (int64_t)20;
     last_value_point_data2.is_lastvalue_valid_ = true;
     last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::MetricData metric_data{
@@ -392,7 +392,7 @@ public:
     last_value_point_data.is_lastvalue_valid_ = true;
     last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data2{};
-    last_value_point_data2.value_              = 20;
+    last_value_point_data2.value_              = (int64_t)20;
     last_value_point_data2.is_lastvalue_valid_ = true;
     last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::MetricData metric_data{
@@ -492,7 +492,7 @@ public:
     histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
-    histogram_point_data2.sum_        = 900;
+    histogram_point_data2.sum_        = (int64_t)900;
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -627,7 +627,7 @@ public:
     histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
-    histogram_point_data2.sum_        = 900;
+    histogram_point_data2.sum_        = (int64_t)900;
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
