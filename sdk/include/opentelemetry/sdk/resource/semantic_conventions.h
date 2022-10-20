@@ -23,15 +23,15 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.13.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.14.0";
 
 /**
  * Array of brand name and version separated by a space
  *
  * <p>Notes:
   <ul> <li>This value is intended to be taken from the <a
- href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a>
- (navigator.userAgentData.brands).</li> </ul>
+ href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
+ navigator.userAgentData.brands}).</li> </ul>
  */
 static constexpr const char *BROWSER_BRANDS = "browser.brands";
 
@@ -40,17 +40,27 @@ static constexpr const char *BROWSER_BRANDS = "browser.brands";
  *
  * <p>Notes:
   <ul> <li>This value is intended to be taken from the <a
-href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a>
-(navigator.userAgentData.platform). If unavailable, the legacy {@code navigator.platform} API SHOULD
+href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
+navigator.userAgentData.platform}). If unavailable, the legacy {@code navigator.platform} API SHOULD
 NOT be used instead and this attribute SHOULD be left unset in order for the values to be
 consistent. The list of possible values is defined in the <a
 href="https://wicg.github.io/ua-client-hints/#sec-ch-ua-platform">W3C User-Agent Client Hints
 specification</a>. Note that some (but not all) of these values can overlap with values in the <a
-href="./os.md">os.type and os.name attributes</a>. However, for consistency, the values in the
-{@code browser.platform} attribute should capture the exact value that the user agent provides.</li>
-</ul>
+href="./os.md">{@code os.type} and {@code os.name} attributes</a>. However, for consistency, the
+values in the {@code browser.platform} attribute should capture the exact value that the user agent
+provides.</li> </ul>
  */
 static constexpr const char *BROWSER_PLATFORM = "browser.platform";
+
+/**
+ * A boolean that is true if the browser is running on a mobile device
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the <a
+ href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
+ navigator.userAgentData.mobile}). If unavailable, this attribute SHOULD be left unset.</li> </ul>
+ */
+static constexpr const char *BROWSER_MOBILE = "browser.mobile";
 
 /**
  * Full user-agent string provided by the browser
@@ -61,6 +71,15 @@ static constexpr const char *BROWSER_PLATFORM = "browser.platform";
  value, the legacy {@code navigator.userAgent} API can be used.</li> </ul>
  */
 static constexpr const char *BROWSER_USER_AGENT = "browser.user_agent";
+
+/**
+ * Preferred language of the user using the browser
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the Navigator API {@code
+ navigator.language}.</li> </ul>
+ */
+static constexpr const char *BROWSER_LANGUAGE = "browser.language";
 
 /**
  * Name of the cloud provider.
