@@ -33,7 +33,40 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.13.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.14.0";
+
+/**
+ * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
+ * the exception should be preferred over the static type in languages that support it.
+ */
+static constexpr const char *EXCEPTION_TYPE = "exception.type";
+
+/**
+ * The exception message.
+ */
+static constexpr const char *EXCEPTION_MESSAGE = "exception.message";
+
+/**
+ * A stacktrace as a string in the natural representation for the language runtime. The
+ * representation is to be determined and documented by each language SIG.
+ */
+static constexpr const char *EXCEPTION_STACKTRACE = "exception.stacktrace";
+
+/**
+ * The name identifies the event.
+ */
+static constexpr const char *EVENT_NAME = "event.name";
+
+/**
+ * The domain identifies the context in which an event happened. An event name is unique only within
+a domain.
+ *
+ * <p>Notes:
+  <ul> <li>An {@code event.name} is supposed to be unique only in the context of an
+{@code event.domain}, so this allows for two events in different domains to
+have same {@code event.name}, yet be unrelated events.</li> </ul>
+ */
+static constexpr const char *EVENT_DOMAIN = "event.domain";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -223,42 +256,6 @@ static constexpr const char *DB_MONGODB_COLLECTION = "db.mongodb.collection";
  set.</li> </ul>
  */
 static constexpr const char *DB_SQL_TABLE = "db.sql.table";
-
-/**
- * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
- * the exception should be preferred over the static type in languages that support it.
- */
-static constexpr const char *EXCEPTION_TYPE = "exception.type";
-
-/**
- * The exception message.
- */
-static constexpr const char *EXCEPTION_MESSAGE = "exception.message";
-
-/**
- * A stacktrace as a string in the natural representation for the language runtime. The
- * representation is to be determined and documented by each language SIG.
- */
-static constexpr const char *EXCEPTION_STACKTRACE = "exception.stacktrace";
-
-/**
- * SHOULD be set to true if the exception event is recorded at a point where it is known that the
-exception is escaping the scope of the span.
- *
- * <p>Notes:
-  <ul> <li>An exception is considered to have escaped (or left) the scope of a span,
-if that span is ended while the exception is still logically &quot;in flight&quot;.
-This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
-is passed to a Context manager's {@code __exit__} method in Python) but will
-usually be caught at the point of recording the exception in most languages.</li><li>It is usually
-not possible to determine at the point where an exception is thrown whether it will escape the scope
-of a span. However, it is trivial to know that an exception will escape, if one checks for an active
-exception just before ending the span, as done in the <a href="#recording-an-exception">example
-above</a>.</li><li>It follows that an exception may still escape the scope of the span even if the
-{@code exception.escaped} attribute was not set or set to false, since the event might have been
-recorded at a time where it was not clear whether the exception will escape.</li> </ul>
- */
-static constexpr const char *EXCEPTION_ESCAPED = "exception.escaped";
 
 /**
  * Type of the trigger which caused this function execution.
@@ -961,32 +958,17 @@ static constexpr const char *RPC_JSONRPC_ERROR_CODE = "rpc.jsonrpc.error_code";
  */
 static constexpr const char *RPC_JSONRPC_ERROR_MESSAGE = "rpc.jsonrpc.error_message";
 
-/**
- * Whether this is a received or sent message.
- */
-static constexpr const char *MESSAGE_TYPE = "message.type";
-
-/**
- * MUST be calculated as two different counters starting from {@code 1} one for sent messages and
- one for received message.
- *
- * <p>Notes:
-  <ul> <li>This way we guarantee that the values will be consistent between different
- implementations.</li> </ul>
- */
-static constexpr const char *MESSAGE_ID = "message.id";
-
-/**
- * Compressed size of the message in bytes.
- */
-static constexpr const char *MESSAGE_COMPRESSED_SIZE = "message.compressed_size";
-
-/**
- * Uncompressed size of the message in bytes.
- */
-static constexpr const char *MESSAGE_UNCOMPRESSED_SIZE = "message.uncompressed_size";
-
 // Enum definitions
+namespace EventDomainValues
+{
+/** Events from browser apps. */
+static constexpr const char *BROWSER = "browser";
+/** Events from mobile apps. */
+static constexpr const char *DEVICE = "device";
+/** Events from Kubernetes. */
+static constexpr const char *K8S = "k8s";
+}  // namespace EventDomainValues
+
 namespace OpentracingRefTypeValues
 {
 /** The parent Span depends on the child Span in some capacity. */
@@ -1354,14 +1336,6 @@ static constexpr const int DATA_LOSS = 15;
 /** UNAUTHENTICATED. */
 static constexpr const int UNAUTHENTICATED = 16;
 }  // namespace RpcGrpcStatusCodeValues
-
-namespace MessageTypeValues
-{
-/** sent. */
-static constexpr const char *SENT = "SENT";
-/** received. */
-static constexpr const char *RECEIVED = "RECEIVED";
-}  // namespace MessageTypeValues
 
 }  // namespace SemanticConventions
 }  // namespace trace
