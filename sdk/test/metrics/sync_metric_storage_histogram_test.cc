@@ -56,23 +56,19 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
       NoExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
-  storage.RecordLong((int64_t)10,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
-  storage.RecordLong((int64_t)30,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(30, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 30;
 
-  storage.RecordLong((int64_t)20,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(20, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
-  storage.RecordLong((int64_t)40,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(40, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
@@ -140,12 +136,10 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
     EXPECT_EQ(count_attributes, 2);  // GET AND PUT
   }
 
-  storage.RecordLong((int64_t)50,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(50, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 50;
-  storage.RecordLong((int64_t)40,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(40, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 

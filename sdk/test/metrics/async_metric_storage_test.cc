@@ -70,8 +70,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(), nullptr);
-  int64_t get_count1                                                                  = (int64_t)20;
-  int64_t put_count1                                                                  = (int64_t)10;
+  int64_t get_count1                                                                  = 20;
+  int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
   storage.RecordLong(measurements1,
@@ -97,8 +97,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
       });
   // subsequent recording after collection shouldn't fail
   // monotonic increasing values;
-  int64_t get_count2 = (int64_t)50;
-  int64_t put_count2 = (int64_t)70;
+  int64_t get_count2 = 50;
+  int64_t put_count2 = 70;
 
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
@@ -162,8 +162,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
-  int64_t freq_cpu0                                                                   = (int64_t)3;
-  int64_t freq_cpu1                                                                   = (int64_t)5;
+  int64_t freq_cpu0                                                                   = 3;
+  int64_t freq_cpu1                                                                   = 5;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};
   storage.RecordLong(measurements1,
@@ -188,8 +188,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
         return true;
       });
 
-  freq_cpu0 = (int64_t)6;
-  freq_cpu1 = (int64_t)8;
+  freq_cpu0 = 6;
+  freq_cpu1 = 8;
 
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"CPU", "0"}}, freq_cpu0}, {{{"CPU", "1"}}, freq_cpu1}};

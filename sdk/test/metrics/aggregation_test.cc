@@ -19,11 +19,11 @@ TEST(Aggregation, LongSumAggregation)
   ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
   auto sum_data = nostd::get<SumPointData>(data);
   ASSERT_TRUE(nostd::holds_alternative<int64_t>(sum_data.value_));
-  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), (int64_t)0);
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 0);
   aggr.Aggregate((int64_t)12, {});
   aggr.Aggregate((int64_t)0, {});
   sum_data = nostd::get<SumPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), (int64_t)12);
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 12);
 }
 
 TEST(Aggregation, DoubleSumAggregation)

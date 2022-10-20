@@ -50,7 +50,7 @@ public:
     }
   }
 
-  void Add(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept
+  void Add(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     if (!storage_)
     {
@@ -62,7 +62,7 @@ public:
 
   void Add(T value,
            const opentelemetry::common::KeyValueIterable &attributes,
-           const opentelemetry::context::Context &context) noexcept
+           const opentelemetry::context::Context &context) noexcept override
   {
     if (!storage_)
     {
@@ -71,7 +71,7 @@ public:
     return storage_->RecordLong(value, attributes, context);
   }
 
-  void Add(T value) noexcept
+  void Add(T value) noexcept override
   {
     auto context = opentelemetry::context::Context{};
     if (!storage_)
@@ -81,7 +81,7 @@ public:
     return storage_->RecordLong(value, context);
   }
 
-  void Add(T value, const opentelemetry::context::Context &context) noexcept
+  void Add(T value, const opentelemetry::context::Context &context) noexcept override
   {
     if (!storage_)
     {
@@ -159,7 +159,7 @@ public:
 
   void Record(T value,
               const opentelemetry::common::KeyValueIterable &attributes,
-              const opentelemetry::context::Context &context) noexcept
+              const opentelemetry::context::Context &context) noexcept override
   {
     if (value < 0)
     {
@@ -171,7 +171,7 @@ public:
     return storage_->RecordLong(value, attributes, context);
   }
 
-  void Record(T value, const opentelemetry::context::Context &context) noexcept
+  void Record(T value, const opentelemetry::context::Context &context) noexcept override
   {
     if (value < 0)
     {
