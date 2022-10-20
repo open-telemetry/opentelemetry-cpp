@@ -78,7 +78,7 @@ static metrics_sdk::MetricData CreateHistogramAggregationData()
   return data;
 }
 
-static metrics_sdk::MetricData CreateObservableGaugeAggregationData()
+static metrics_sdk::MetricData CreateUInt64ObservableGaugeAggregationData()
 {
   metrics_sdk::MetricData data;
   data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
@@ -140,7 +140,7 @@ TEST(OtlpMetricSerializationTest, Histogram)
 
 TEST(OtlpMetricSerializationTest, ObservableGauge)
 {
-  metrics_sdk::MetricData data = CreateObservableGaugeAggregationData();
+  metrics_sdk::MetricData data = CreateUInt64ObservableGaugeAggregationData();
   opentelemetry::proto::metrics::v1::Gauge gauge;
   otlp_exporter::OtlpMetricUtils::ConvertGaugeMetric(data, &gauge);
   for (size_t i = 0; i < 1; i++)

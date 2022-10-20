@@ -25,7 +25,7 @@ TEST(SyncInstruments, LongCounter)
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongCounter counter(instrument_descriptor, std::move(metric_storage));
+  LongCounter<int64_t> counter(instrument_descriptor, std::move(metric_storage));
   counter.Add((int64_t)10);
   counter.Add((int64_t)10, opentelemetry::context::Context{});
 
@@ -103,7 +103,7 @@ TEST(SyncInstruments, LongHistogram)
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongHistogram counter(instrument_descriptor, std::move(metric_storage));
+  LongHistogram<int64_t> counter(instrument_descriptor, std::move(metric_storage));
   counter.Record((int64_t)10, opentelemetry::context::Context{});
   counter.Record((int64_t)-10, opentelemetry::context::Context{});  // This is ignored
 
