@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <memory>
 #  include <thread>
-#  include "opentelemetry/exporters/ostream/push_metric_exporter.h"
+#  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
