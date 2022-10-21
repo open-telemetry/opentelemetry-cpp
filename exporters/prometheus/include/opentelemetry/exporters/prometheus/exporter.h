@@ -12,7 +12,7 @@
 #  include "opentelemetry/exporters/prometheus/collector.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/env_variables.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #  include "opentelemetry/version.h"
 
 /**
@@ -46,7 +46,7 @@ struct PrometheusExporterOptions
   std::string url = GetPrometheusDefaultHttpEndpoint();
 };
 
-class PrometheusExporter : public sdk::metrics::MetricExporter
+class PrometheusExporter : public sdk::metrics::PushMetricExporter
 {
 public:
   /**

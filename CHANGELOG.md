@@ -16,6 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [Metrics] Switch to explicit 64 bit integers [#1686](https://github.com/open-telemetry/opentelemetry-cpp/pull/1686)
+  which includes breaking change in the Metrics api and sdk.
+* [Metrics SDK] Add support for Pull Metric Exporter [#1701](https://github.com/open-telemetry/opentelemetry-cpp/pull/1701)
   which includes breaking change in the Metrics api.
 * [BUILD] Add CMake OTELCPP_MAINTAINER_MODE [#1650](https://github.com/open-telemetry/opentelemetry-cpp/pull/1650)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.14.0 [#1697](https://github.com/open-telemetry/opentelemetry-cpp/pull/1697)

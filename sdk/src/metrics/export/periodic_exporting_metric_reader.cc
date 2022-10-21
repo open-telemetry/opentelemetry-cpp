@@ -4,7 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #  include <chrono>
 #  include <future>
@@ -16,7 +16,7 @@ namespace metrics
 {
 
 PeriodicExportingMetricReader::PeriodicExportingMetricReader(
-    std::unique_ptr<MetricExporter> exporter,
+    std::unique_ptr<PushMetricExporter> exporter,
     const PeriodicExportingMetricReaderOptions &option)
     : exporter_{std::move(exporter)},
       export_interval_millis_{option.export_interval_millis},

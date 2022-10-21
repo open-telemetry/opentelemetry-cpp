@@ -17,8 +17,8 @@ namespace metrics
 {
 
 MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
-                                 std::unique_ptr<MetricReader> metric_reader)
-    : meter_context_{context}, metric_reader_{std::move(metric_reader)}
+                                 std::shared_ptr<MetricReader> metric_reader)
+    : meter_context_{context}, metric_reader_{metric_reader}
 {
   metric_reader_->SetMetricProducer(this);
 }

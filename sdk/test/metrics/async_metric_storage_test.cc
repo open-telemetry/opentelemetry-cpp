@@ -7,10 +7,10 @@
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/observer_result.h"
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 

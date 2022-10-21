@@ -6,14 +6,14 @@
 #  include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
 using namespace opentelemetry::sdk::metrics;
 
-class MockMetricExporter : public MetricExporter
+class MockMetricExporter : public PushMetricExporter
 {
 
 public:
@@ -38,7 +38,7 @@ public:
 class MockMetricReader : public MetricReader
 {
 public:
-  MockMetricReader(std::unique_ptr<MetricExporter> exporter) : exporter_(std::move(exporter)) {}
+  MockMetricReader(std::unique_ptr<PushMetricExporter> exporter) : exporter_(std::move(exporter)) {}
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept override
   {
@@ -55,7 +55,7 @@ public:
   virtual void OnInitialized() noexcept override {}
 
 private:
-  std::unique_ptr<MetricExporter> exporter_;
+  std::unique_ptr<PushMetricExporter> exporter_;
 };
 
 TEST(MeterProvider, GetMeter)

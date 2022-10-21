@@ -5,7 +5,7 @@
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include <gtest/gtest.h>
 #  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
