@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <future>
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/common/timestamp.h"
@@ -21,7 +22,7 @@ struct ObservableCallbackRecord
 {
   opentelemetry::metrics::ObservableCallbackPtr callback;
   void *state;
-  opentelemetry::metrics::ObservableInstrument *instrument;
+  std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument;
 };
 
 class ObservableRegistry
@@ -29,11 +30,11 @@ class ObservableRegistry
 public:
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                    void *state,
-                   opentelemetry::metrics::ObservableInstrument *instrument);
+                   std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument);
 
   void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                       void *state,
-                      opentelemetry::metrics::ObservableInstrument *instrument);
+                      std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument);
 
   void Observe(opentelemetry::common::SystemTimestamp collection_ts);
 

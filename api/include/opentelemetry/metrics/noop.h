@@ -87,19 +87,19 @@ public:
 class NoopMeter final : public Meter
 {
 public:
-  nostd::shared_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
+  nostd::unique_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
                                                      nostd::string_view description = "",
                                                      nostd::string_view unit = "") noexcept override
   {
-    return nostd::shared_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
+    return nostd::unique_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
   }
 
-  nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
+  nostd::unique_ptr<Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
+    return nostd::unique_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
   }
 
   nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
@@ -120,20 +120,20 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+  nostd::unique_ptr<Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
+    return nostd::unique_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
   }
 
-  nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
+  nostd::unique_ptr<Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
+    return nostd::unique_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
 
   nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
@@ -154,21 +154,21 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::unique_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<UpDownCounter<long>>{
+    return nostd::unique_ptr<UpDownCounter<long>>{
         new NoopUpDownCounter<long>(name, description, unit)};
   }
 
-  nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
+  nostd::unique_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<UpDownCounter<double>>{
+    return nostd::unique_ptr<UpDownCounter<double>>{
         new NoopUpDownCounter<double>(name, description, unit)};
   }
 

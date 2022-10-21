@@ -35,12 +35,12 @@ public:
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
+  nostd::unique_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
+  nostd::unique_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -55,12 +55,12 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
+  nostd::unique_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
+  nostd::unique_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -75,12 +75,12 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::unique_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
+  nostd::unique_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;

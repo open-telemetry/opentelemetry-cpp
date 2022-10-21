@@ -26,13 +26,13 @@ ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descr
 void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                                        void *state) noexcept
 {
-  observable_registry_->AddCallback(callback, state, this);
+  observable_registry_->AddCallback(callback, state, shared_from_this());
 }
 
 void ObservableInstrument::RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                                           void *state) noexcept
 {
-  observable_registry_->RemoveCallback(callback, state, this);
+  observable_registry_->RemoveCallback(callback, state, shared_from_this());
 }
 
 const InstrumentDescriptor &ObservableInstrument::GetInstrumentDescriptor()

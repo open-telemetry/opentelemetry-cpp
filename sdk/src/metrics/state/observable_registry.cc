@@ -15,9 +15,10 @@ namespace sdk
 namespace metrics
 {
 
-void ObservableRegistry::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
-                                     void *state,
-                                     opentelemetry::metrics::ObservableInstrument *instrument)
+void ObservableRegistry::AddCallback(
+    opentelemetry::metrics::ObservableCallbackPtr callback,
+    void *state,
+    std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument)
 {
   // TBD - Check if existing
   std::unique_ptr<ObservableCallbackRecord> record(
@@ -26,9 +27,10 @@ void ObservableRegistry::AddCallback(opentelemetry::metrics::ObservableCallbackP
   callbacks_.push_back(std::move(record));
 }
 
-void ObservableRegistry::RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
-                                        void *state,
-                                        opentelemetry::metrics::ObservableInstrument *instrument)
+void ObservableRegistry::RemoveCallback(
+    opentelemetry::metrics::ObservableCallbackPtr callback,
+    void *state,
+    std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument)
 {
   std::lock_guard<std::mutex> lock_guard{callbacks_m_};
   auto new_end = std::remove_if(
@@ -45,13 +47,13 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
   std::lock_guard<std::mutex> lock_guard{callbacks_m_};
   for (auto &callback_wrap : callbacks_)
   {
-    auto value_type =
-        static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
-            ->GetInstrumentDescriptor()
-            .value_type_;
-    auto storage =
-        static_cast<opentelemetry::sdk::metrics::ObservableInstrument *>(callback_wrap->instrument)
-            ->GetMetricStorage();
+    auto value_type = std::static_pointer_cast<opentelemetry::sdk::metrics::ObservableInstrument>(
+                          callback_wrap->instrument)
+                          ->GetInstrumentDescriptor()
+                          .value_type_;
+    auto storage = std::static_pointer_cast<opentelemetry::sdk::metrics::ObservableInstrument>(
+                       callback_wrap->instrument)
+                       ->GetMetricStorage();
     if (!storage)
     {
       OTEL_INTERNAL_LOG_ERROR("[ObservableRegistry::Observe] - Error during observe."
