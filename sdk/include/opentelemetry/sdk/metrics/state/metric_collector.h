@@ -34,7 +34,7 @@ public:
 class MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
-  MetricCollector(MeterContext *context, std::unique_ptr<MetricReader> metric_reader);
+  MetricCollector(MeterContext *context, std::shared_ptr<MetricReader> metric_reader);
 
   ~MetricCollector() override = default;
 

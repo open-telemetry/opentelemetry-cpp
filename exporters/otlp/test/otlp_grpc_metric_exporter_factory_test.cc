@@ -27,7 +27,7 @@ TEST(OtlpGrpcMetricExporterFactory, BuildTest)
   OtlpGrpcMetricExporterOptions opts;
   opts.endpoint = "localhost:45454";
 
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> exporter =
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter =
       OtlpGrpcMetricExporterFactory::Create(opts);
 
   EXPECT_TRUE(exporter != nullptr);
