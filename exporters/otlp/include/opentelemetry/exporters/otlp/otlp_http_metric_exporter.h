@@ -4,7 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
 #  include "opentelemetry/exporters/otlp/otlp_http_client.h"
@@ -24,7 +24,7 @@ namespace otlp
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in HTTP.
  */
-class OtlpHttpMetricExporter final : public opentelemetry::sdk::metrics::MetricExporter
+class OtlpHttpMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**

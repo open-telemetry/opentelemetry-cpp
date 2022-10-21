@@ -24,7 +24,7 @@ The main difference between the [ostream-metrics](../metrics_simple/README.md)
 example with this one is that the line below is replaced:
 
 ```cpp
-std::unique_ptr<metric_sdk::MetricExporter> exporter{
+std::unique_ptr<metric_sdk::PushMetricExporter> exporter{
     new exportermetrics::OStreamMetricExporter};
 
 ```
@@ -32,7 +32,7 @@ std::unique_ptr<metric_sdk::MetricExporter> exporter{
 with
 
 ```cpp
-std::unique_ptr<metrics_sdk::MetricExporter> exporter{
+std::unique_ptr<metrics_sdk::PushMetricExporter> exporter{
     new metrics_exporter::PrometheusExporter(opts)};
 ```
 

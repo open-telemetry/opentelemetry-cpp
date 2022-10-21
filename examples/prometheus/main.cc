@@ -36,7 +36,7 @@ void initMetrics(const std::string &name, const std::string &addr)
   }
   std::puts("PrometheusExporter example program running ...");
 
-  std::unique_ptr<metrics_sdk::MetricExporter> exporter{
+  std::unique_ptr<metrics_sdk::PushMetricExporter> exporter{
       new metrics_exporter::PrometheusExporter(opts)};
 
   std::string version{"1.2.0"};
