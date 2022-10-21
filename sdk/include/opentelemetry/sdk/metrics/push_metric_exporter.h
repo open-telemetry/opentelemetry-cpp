@@ -20,13 +20,13 @@ namespace metrics
 
 class MetricData;
 /**
- * MetricExporter defines the interface to be used by metrics libraries to
+ * PushMetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.
  */
-class MetricExporter
+class PushMetricExporter
 {
 public:
-  virtual ~MetricExporter() = default;
+  virtual ~PushMetricExporter() = default;
 
   /**
    * Exports a batch of metrics data. This method must not be called

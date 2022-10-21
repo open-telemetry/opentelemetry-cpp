@@ -78,10 +78,10 @@ namespace http_client = opentelemetry::ext::http::client;
 class OtlpHttpMetricExporterTestPeer : public ::testing::Test
 {
 public:
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> GetExporter(
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> GetExporter(
       std::unique_ptr<OtlpHttpClient> http_client)
   {
-    return std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>(
+    return std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
         new OtlpHttpMetricExporter(std::move(http_client)));
   }
 
@@ -734,8 +734,8 @@ public:
 
 TEST(OtlpHttpMetricExporterTest, Shutdown)
 {
-  auto exporter =
-      std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>(new OtlpHttpMetricExporter());
+  auto exporter = std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
+      new OtlpHttpMetricExporter());
   ASSERT_TRUE(exporter->Shutdown());
   auto result = exporter->Export(opentelemetry::sdk::metrics::ResourceMetrics{});
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);

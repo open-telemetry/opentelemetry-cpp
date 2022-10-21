@@ -24,7 +24,7 @@ Exporter which will print to stdout by default.
 The reader periodically collects metrics from the Aggregation Store and exports them.
 
     ```cpp
-    std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
+    std::unique_ptr<metric_sdk::PushMetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
     std::unique_ptr<metric_sdk::MetricReader> reader{
         new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
     ```
