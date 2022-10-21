@@ -10,7 +10,7 @@
 TEST(Counter, Add)
 {
   std::shared_ptr<opentelemetry::metrics::Counter<uint64_t>> counter{
-      new opentelemetry::metrics::NoopCounter<int64_t>("test", "none", "unitless")};
+      new opentelemetry::metrics::NoopCounter<uint64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
   counter->Add(10, labels);
