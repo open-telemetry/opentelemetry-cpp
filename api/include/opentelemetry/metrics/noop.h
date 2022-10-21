@@ -138,7 +138,7 @@ public:
     return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableInstrument> CreateUInt64ObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override

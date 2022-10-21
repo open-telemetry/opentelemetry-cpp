@@ -1,13 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cstdint>
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include <cstdint>
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -117,7 +117,7 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateUInt64ObservableGauge(
+nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt64ObservableGauge(
     nostd::string_view name,
     nostd::string_view description,
     nostd::string_view unit) noexcept

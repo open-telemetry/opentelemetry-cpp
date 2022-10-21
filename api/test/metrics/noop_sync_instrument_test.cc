@@ -9,7 +9,7 @@
 
 TEST(Counter, Add)
 {
-  std::shared_ptr<opentelemetry::metrics::Counter<int64_t>> counter{
+  std::shared_ptr<opentelemetry::metrics::Counter<uint64_t>> counter{
       new opentelemetry::metrics::NoopCounter<int64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
@@ -23,14 +23,14 @@ TEST(Counter, Add)
 
 TEST(histogram, Record)
 {
-  std::shared_ptr<opentelemetry::metrics::Histogram<int64_t>> counter{
-      new opentelemetry::metrics::NoopHistogram<int64_t>("test", "none", "unitless")};
+  std::shared_ptr<opentelemetry::metrics::Histogram<uint64_t>> histogram{
+      new opentelemetry::metrics::NoopHistogram<uint64_t>("test", "none", "unitless")};
 
   std::map<std::string, std::string> labels = {{"k1", "v1"}};
-  counter->Record(10, labels, opentelemetry::context::Context{});
-  counter->Record(2, opentelemetry::context::Context{});
+  histogram->Record(10, labels, opentelemetry::context::Context{});
+  histogram->Record(2, opentelemetry::context::Context{});
 
-  counter->Record(10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
+  histogram->Record(10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
 
 TEST(UpDownCountr, Record)

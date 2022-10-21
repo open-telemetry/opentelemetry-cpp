@@ -90,7 +90,7 @@ public:
    * @param description a brief description of what the Observable Gauge is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableInstrument> CreateUInt64ObservableGauge(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
