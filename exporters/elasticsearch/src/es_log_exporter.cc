@@ -35,10 +35,10 @@ public:
                                       const std::string &body) noexcept
   {
     std::stringstream ss;
-    ss << "Status:" << response.GetStatusCode() << "Header:";
+    ss << "Status:" << response.GetStatusCode() << ", Header:";
     response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
                                  opentelemetry::nostd::string_view header_value) {
-      ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
+      ss << "\t" << header_name.data() << ": " << header_value.data() << ",";
       return true;
     });
     ss << "Body:" << body;
