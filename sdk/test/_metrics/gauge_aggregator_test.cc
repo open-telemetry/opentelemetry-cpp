@@ -86,7 +86,7 @@ TEST(GaugeAggregator, Types)
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
   GaugeAggregator<int> agg_int(metrics_api::InstrumentKind::Counter);
-  GaugeAggregator<int64_t> agg_long(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<long> agg_long(metrics_api::InstrumentKind::Counter);
   GaugeAggregator<float> agg_float(metrics_api::InstrumentKind::Counter);
   GaugeAggregator<double> agg_double(metrics_api::InstrumentKind::Counter);
 
