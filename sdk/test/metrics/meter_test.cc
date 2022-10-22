@@ -82,12 +82,12 @@ TEST(MeterTest, StressMultiThread)
   MetricReader *metric_reader_ptr = nullptr;
   auto meter                      = InitMeter(&metric_reader_ptr, "stress_test_meter");
   std::atomic<unsigned> threadCount(0);
-  size_t numIterations = MAX_ITERATIONS_MT;
+  std::atomic<size_t> numIterations(MAX_ITERATIONS_MT);
   std::atomic<bool> do_collect{false}, do_sync_create{true}, do_async_create{false};
   std::vector<nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>>
       observable_instruments;
   std::vector<std::thread> meter_operation_threads;
-  size_t instrument_id = 0;
+  std::atomic<size_t> instrument_id(0);
   while (numIterations--)
   {
     for (size_t i = 0; i < MAX_THREADS; i++)
