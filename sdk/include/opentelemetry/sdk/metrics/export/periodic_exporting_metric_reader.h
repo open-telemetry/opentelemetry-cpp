@@ -18,7 +18,7 @@ namespace sdk
 namespace metrics
 {
 
-class MetricExporter;
+class PushMetricExporter;
 /**
  * Struct to hold PeriodicExortingMetricReader options.
  */
@@ -40,7 +40,7 @@ class PeriodicExportingMetricReader : public MetricReader
 {
 
 public:
-  PeriodicExportingMetricReader(std::unique_ptr<MetricExporter> exporter,
+  PeriodicExportingMetricReader(std::unique_ptr<PushMetricExporter> exporter,
                                 const PeriodicExportingMetricReaderOptions &option);
 
   AggregationTemporality GetAggregationTemporality(
@@ -53,7 +53,7 @@ private:
 
   void OnInitialized() noexcept override;
 
-  std::unique_ptr<MetricExporter> exporter_;
+  std::unique_ptr<PushMetricExporter> exporter_;
   std::chrono::milliseconds export_interval_millis_;
   std::chrono::milliseconds export_timeout_millis_;
 

@@ -9,7 +9,7 @@
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -21,7 +21,7 @@ namespace metrics
 /**
  * The OStreamMetricExporter exports record data through an ostream
  */
-class OStreamMetricExporter final : public opentelemetry::sdk::metrics::MetricExporter
+class OStreamMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**
