@@ -18,6 +18,8 @@ namespace metrics_api = opentelemetry::metrics;
 namespace
 {
 
+static nostd::shared_ptr<metrics_api::ObservableInstrument> double_observable_counter;
+
 std::map<std::string, std::string> get_random_attr()
 {
   static const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
@@ -71,8 +73,8 @@ void foo_library::observable_counter_example(const std::string &name)
   std::string counter_name                    = name + "_observable_counter";
   auto provider                               = metrics_api::Provider::GetMeterProvider();
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto counter                                = meter->CreateDoubleObservableCounter(counter_name);
-  counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
+  double_observable_counter                   = meter->CreateDoubleObservableCounter(counter_name);
+  double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   for (uint32_t i = 0; i < 20; ++i)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
