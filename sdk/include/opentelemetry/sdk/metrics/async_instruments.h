@@ -17,8 +17,7 @@ namespace metrics
 
 class AsyncWritableMetricStorage;
 
-class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument,
-                             public std::enable_shared_from_this<ObservableInstrument>
+class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,

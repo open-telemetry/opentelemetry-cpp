@@ -22,7 +22,7 @@ struct ObservableCallbackRecord
 {
   opentelemetry::metrics::ObservableCallbackPtr callback;
   void *state;
-  std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument;
+  opentelemetry::metrics::ObservableInstrument *instrument;
 };
 
 class ObservableRegistry
@@ -30,11 +30,11 @@ class ObservableRegistry
 public:
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                    void *state,
-                   std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument);
+                   opentelemetry::metrics::ObservableInstrument *instrument);
 
   void RemoveCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                       void *state,
-                      std::shared_ptr<opentelemetry::metrics::ObservableInstrument> instrument);
+                      opentelemetry::metrics::ObservableInstrument *instrument);
 
   void Observe(opentelemetry::common::SystemTimestamp collection_ts);
 
