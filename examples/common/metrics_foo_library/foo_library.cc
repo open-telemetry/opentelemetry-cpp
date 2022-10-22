@@ -22,11 +22,11 @@ static nostd::shared_ptr<metrics_api::ObservableInstrument> double_observable_co
 
 std::map<std::string, std::string> get_random_attr()
 {
-  static const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
-                                                                          {"key2", "value2"},
-                                                                          {"key3", "value3"},
-                                                                          {"key4", "value4"},
-                                                                          {"key5", "value5"}};
+  const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
+                                                                   {"key2", "value2"},
+                                                                   {"key3", "value3"},
+                                                                   {"key4", "value4"},
+                                                                   {"key5", "value5"}};
   return std::map<std::string, std::string>{labels[rand() % (labels.size() - 1)],
                                             labels[rand() % (labels.size() - 1)]};
 }
@@ -36,8 +36,6 @@ class MeasurementFetcher
 public:
   static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void * /* state */)
   {
-    std::map<std::string, std::string> labels = get_random_attr();
-    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     if (nostd::holds_alternative<
             nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer_result))
     {
