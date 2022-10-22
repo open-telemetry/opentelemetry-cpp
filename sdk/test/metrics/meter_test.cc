@@ -54,7 +54,7 @@ TEST(MeterTest, BasicAsyncTests)
 {
   MetricReader *metric_reader_ptr = nullptr;
   auto meter                      = InitMeter(&metric_reader_ptr);
-  auto observable_counter         = meter->CreateUInt64ObservableCounter("observable_counter");
+  auto observable_counter         = meter->CreateInt64ObservableCounter("observable_counter");
   observable_counter->AddCallback(asyc_generate_measurements, nullptr);
 
   size_t count = 0;

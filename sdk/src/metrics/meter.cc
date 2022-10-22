@@ -61,10 +61,10 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
       new DoubleCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
-Meter::CreateUInt64ObservableCounter(nostd::string_view name,
-                                     nostd::string_view description,
-                                     nostd::string_view unit) noexcept
+nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt64ObservableCounter(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit) noexcept
 {
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},

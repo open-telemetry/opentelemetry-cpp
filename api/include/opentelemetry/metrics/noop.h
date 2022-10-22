@@ -103,7 +103,7 @@ public:
     return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableInstrument> CreateUInt64ObservableCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
