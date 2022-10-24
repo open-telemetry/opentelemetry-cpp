@@ -71,3 +71,22 @@ cc_binary(
         "//sdk/src/trace",
     ],
 )
+
+cc_binary(
+    name = "example_otlp_grpc_metrics",
+    srcs = [
+        "grpc_metric_main.cc",
+    ],
+    tags = [
+        "examples",
+        "metrics",
+        "otlp",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
+        "//exporters/otlp:otlp_grpc_exporter",
+        "//exporters/otlp:otlp_grpc_metric_exporter",
+        "//sdk/src/metrics",
+    ],
+)
