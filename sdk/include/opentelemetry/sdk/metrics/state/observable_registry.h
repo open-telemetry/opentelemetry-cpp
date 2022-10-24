@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include <future>
 #ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/common/timestamp.h"
