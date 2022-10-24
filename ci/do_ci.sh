@@ -306,9 +306,13 @@ elif [[ "$1" == "bazel.nortti" ]]; then
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS run --config=asan $BAZEL_TEST_OPTIONS_ASYNC \
+  //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS run --config=tsan $BAZEL_TEST_OPTIONS_ASYNC \
+  //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
