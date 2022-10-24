@@ -94,4 +94,6 @@ int main(int argc, char *argv[])
     histogram_example.join();
   }
 }
+#else
+int main() {}
 #endif
