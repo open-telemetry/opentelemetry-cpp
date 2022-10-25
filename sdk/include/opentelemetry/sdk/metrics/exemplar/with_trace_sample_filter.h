@@ -15,7 +15,7 @@ namespace metrics
 class WithTraceSampleFilter final : public ExemplarFilter
 {
 public:
-  bool ShouldSampleMeasurement(long /* value */,
+  bool ShouldSampleMeasurement(int64_t /* value */,
                                const MetricAttributes & /* attributes */,
                                const opentelemetry::context::Context &context) noexcept override
   {

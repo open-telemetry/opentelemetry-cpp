@@ -72,14 +72,14 @@ public:
   }
 
   void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
       return;
     }
-    Record<long>(measurements, observation_time);
+    Record<int64_t>(measurements, observation_time);
   }
 
   void RecordDouble(

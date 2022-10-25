@@ -37,7 +37,7 @@ public:
    * @return a shared pointer to the created Counter.
    */
 
-  virtual nostd::unique_ptr<Counter<long>> CreateLongCounter(
+  virtual nostd::unique_ptr<Counter<uint64_t>> CreateUInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -55,7 +55,7 @@ public:
    * @param description a brief description of what the Observable Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -73,7 +73,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @return a shared pointer to the created Histogram.
    */
-  virtual nostd::unique_ptr<Histogram<long>> CreateLongHistogram(
+  virtual nostd::unique_ptr<Histogram<uint64_t>> CreateUInt64Histogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -91,7 +91,7 @@ public:
    * @param description a brief description of what the Observable Gauge is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -110,7 +110,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @return a shared pointer to the created UpDownCounter.
    */
-  virtual nostd::unique_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+  virtual nostd::unique_ptr<UpDownCounter<int64_t>> CreateInt64UpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
@@ -128,7 +128,7 @@ public:
    * @param description a brief description of what the Observable UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    */
-  virtual nostd::shared_ptr<ObservableInstrument> CreateLongObservableUpDownCounter(
+  virtual nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;

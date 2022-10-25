@@ -33,7 +33,7 @@ public:
   {}
 
   void OfferMeasurement(
-      long value,
+      int64_t value,
       const MetricAttributes &attributes,
       const opentelemetry::context::Context &context,
       const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
@@ -46,7 +46,7 @@ public:
         reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
     if (idx != -1)
     {
-      storage_[idx].RecordDoubleMeasurement(value, attributes, context);
+      storage_[idx].RecordLongMeasurement(value, attributes, context);
     }
   }
 

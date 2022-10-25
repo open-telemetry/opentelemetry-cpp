@@ -24,7 +24,7 @@ public:
 
   /** Determine the index of the {@code cells} to record the measurement to. */
   virtual int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                                    long value,
+                                    int64_t value,
                                     const MetricAttributes &attributes,
                                     const opentelemetry::context::Context &context) = 0;
 

@@ -25,16 +25,15 @@ TEST(SyncInstruments, LongCounter)
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongCounter counter(instrument_descriptor, std::move(metric_storage));
-  counter.Add(10l);
-  counter.Add(10l, opentelemetry::context::Context{});
+  LongCounter<int64_t> counter(instrument_descriptor, std::move(metric_storage));
+  counter.Add(10);
+  counter.Add(10, opentelemetry::context::Context{});
 
-  counter.Add(10l,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
               opentelemetry::context::Context{});
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({}));
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({}),
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}));
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}),
               opentelemetry::context::Context{});
 }
 
@@ -64,15 +63,14 @@ TEST(SyncInstruments, LongUpDownCounter)
                                                 InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
-  counter.Add(10l);
-  counter.Add(10l, opentelemetry::context::Context{});
+  counter.Add(10);
+  counter.Add(10, opentelemetry::context::Context{});
 
-  counter.Add(10l,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
               opentelemetry::context::Context{});
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({}));
-  counter.Add(10l, opentelemetry::common::KeyValueIterableView<M>({}),
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}));
+  counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}),
               opentelemetry::context::Context{});
 }
 
@@ -101,14 +99,14 @@ TEST(SyncInstruments, LongHistogram)
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongHistogram counter(instrument_descriptor, std::move(metric_storage));
-  counter.Record(10l, opentelemetry::context::Context{});
-  counter.Record(-10l, opentelemetry::context::Context{});  // This is ignored
+  LongHistogram<int64_t> counter(instrument_descriptor, std::move(metric_storage));
+  counter.Record(10, opentelemetry::context::Context{});
+  counter.Record(-10, opentelemetry::context::Context{});  // This is ignored
 
-  counter.Record(10l,
+  counter.Record(10,
                  opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
                  opentelemetry::context::Context{});
-  counter.Record(10l, opentelemetry::common::KeyValueIterableView<M>({}),
+  counter.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
                  opentelemetry::context::Context{});
 }
 
