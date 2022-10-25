@@ -96,3 +96,8 @@ endif()
 if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
 endif()
+
+if(WITH_METRICS_EXEMPLAR_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)
+endif()
