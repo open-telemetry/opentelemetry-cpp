@@ -30,7 +30,6 @@ void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* att
 {
   if (point_data_.is_monotonic_ && value < 0)
   {
-    auto instrument_name = nostd::get<SumPointData>(ToPoint());
     OTEL_INTERNAL_LOG_WARN(
         " LongSumAggregation::Aggregate Negative value ignored for Monotonic increasing "
         "measurement. Value"
