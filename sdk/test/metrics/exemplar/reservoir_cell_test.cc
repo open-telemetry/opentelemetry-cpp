@@ -13,9 +13,9 @@ namespace metrics
 class ReservoirCellTestPeer : public ::testing::Test
 {
 public:
-  long GetLongVal(const opentelemetry::sdk::metrics::ReservoirCell &reservoir_cell)
+  int64_t GetLongVal(const opentelemetry::sdk::metrics::ReservoirCell &reservoir_cell)
   {
-    return nostd::get<long>(reservoir_cell.value_);
+    return nostd::get<int64_t>(reservoir_cell.value_);
   }
 
   double GetDoubleVal(const opentelemetry::sdk::metrics::ReservoirCell &reservoir_cell)
@@ -42,7 +42,8 @@ public:
 TEST_F(ReservoirCellTestPeer, recordMeasurement)
 {
   opentelemetry::sdk::metrics::ReservoirCell reservoir_cell;
-  reservoir_cell.RecordLongMeasurement(1l, MetricAttributes{}, opentelemetry::context::Context{});
+  reservoir_cell.RecordLongMeasurement((int64_t)1, MetricAttributes{},
+                                       opentelemetry::context::Context{});
   ASSERT_TRUE(GetLongVal(reservoir_cell) == 1);
 
   reservoir_cell.RecordDoubleMeasurement(1.5, MetricAttributes{},

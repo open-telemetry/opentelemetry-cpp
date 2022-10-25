@@ -40,11 +40,11 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 
 TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
 {
-  AggregationTemporality temporality = GetParam();
-  auto sdk_start_ts                  = std::chrono::system_clock::now();
-  long expected_total_get_requests   = 0;
-  long expected_total_put_requests   = 0;
-  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
+  AggregationTemporality temporality  = GetParam();
+  auto sdk_start_ts                   = std::chrono::system_clock::now();
+  int64_t expected_total_get_requests = 0;
+  int64_t expected_total_put_requests = 0;
+  InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kCounter,
                                      InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
@@ -55,19 +55,19 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
       ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
-  storage.RecordLong(10l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 10;
 
-  storage.RecordLong(30l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(30, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 30;
 
-  storage.RecordLong(20l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(20, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 20;
 
-  storage.RecordLong(40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(40, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
@@ -86,13 +86,13 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -119,13 +119,13 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
           }
         }
         return true;
@@ -135,10 +135,10 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
     EXPECT_EQ(count_attributes, 2);  // GET AND PUT
   }
 
-  storage.RecordLong(50l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
+  storage.RecordLong(50, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
   expected_total_get_requests += 50;
-  storage.RecordLong(40l, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
+  storage.RecordLong(40, KeyValueIterableView<std::map<std::string, std::string>>(attributes_put),
                      opentelemetry::context::Context{});
   expected_total_put_requests += 40;
 
@@ -152,13 +152,13 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<long>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
             count_attributes++;
           }
         }

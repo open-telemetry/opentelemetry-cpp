@@ -21,7 +21,7 @@ public:
   LongSumAggregation(SumPointData &&);
   LongSumAggregation(const SumPointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
@@ -43,7 +43,7 @@ public:
   DoubleSumAggregation(SumPointData &&);
   DoubleSumAggregation(const SumPointData &);
 
-  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
+  void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 

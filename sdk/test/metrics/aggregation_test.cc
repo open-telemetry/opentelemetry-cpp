@@ -18,12 +18,12 @@ TEST(Aggregation, LongSumAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
   auto sum_data = nostd::get<SumPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(sum_data.value_));
-  EXPECT_EQ(nostd::get<long>(sum_data.value_), 0l);
-  aggr.Aggregate(12l, {});
-  aggr.Aggregate(0l, {});
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(sum_data.value_));
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 0);
+  aggr.Aggregate((int64_t)12, {});
+  aggr.Aggregate((int64_t)0, {});
   sum_data = nostd::get<SumPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(sum_data.value_), 12l);
+  EXPECT_EQ(nostd::get<int64_t>(sum_data.value_), 12);
 }
 
 TEST(Aggregation, DoubleSumAggregation)
@@ -46,12 +46,12 @@ TEST(Aggregation, LongLastValueAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<LastValuePointData>(data));
   auto lastvalue_data = nostd::get<LastValuePointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(lastvalue_data.value_));
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(lastvalue_data.value_));
   EXPECT_EQ(lastvalue_data.is_lastvalue_valid_, false);
-  aggr.Aggregate(12l, {});
-  aggr.Aggregate(1l, {});
+  aggr.Aggregate((int64_t)12, {});
+  aggr.Aggregate((int64_t)1, {});
   lastvalue_data = nostd::get<LastValuePointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(lastvalue_data.value_), 1.0);
+  EXPECT_EQ(nostd::get<int64_t>(lastvalue_data.value_), 1.0);
 }
 
 TEST(Aggregation, DoubleLastValueAggregation)
@@ -74,39 +74,39 @@ TEST(Aggregation, LongHistogramAggregation)
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
   auto histogram_data = nostd::get<HistogramPointData>(data);
-  ASSERT_TRUE(nostd::holds_alternative<long>(histogram_data.sum_));
-  EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 0);
+  ASSERT_TRUE(nostd::holds_alternative<int64_t>(histogram_data.sum_));
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
-  aggr.Aggregate(12l, {});   // lies in fourth bucket
-  aggr.Aggregate(100l, {});  // lies in eight bucket
+  aggr.Aggregate((int64_t)12, {});   // lies in fourth bucket
+  aggr.Aggregate((int64_t)100, {});  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 100);
-  EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 112);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 100);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[7], 1);
-  aggr.Aggregate(13l, {});   // lies in fourth bucket
-  aggr.Aggregate(252l, {});  // lies in ninth bucket
+  aggr.Aggregate((int64_t)13, {});   // lies in fourth bucket
+  aggr.Aggregate((int64_t)252, {});  // lies in ninth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
   EXPECT_EQ(histogram_data.counts_[8], 1);
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 12);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 252);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 12);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 252);
 
   // Merge
   LongHistogramAggregation aggr1;
-  aggr1.Aggregate(1l, {});
-  aggr1.Aggregate(11l, {});
-  aggr1.Aggregate(26l, {});
+  aggr1.Aggregate((int64_t)1, {});
+  aggr1.Aggregate((int64_t)11, {});
+  aggr1.Aggregate((int64_t)26, {});
 
   LongHistogramAggregation aggr2;
-  aggr2.Aggregate(2l, {});
-  aggr2.Aggregate(3l, {});
-  aggr2.Aggregate(13l, {});
-  aggr2.Aggregate(28l, {});
-  aggr2.Aggregate(105l, {});
+  aggr2.Aggregate((int64_t)2, {});
+  aggr2.Aggregate((int64_t)3, {});
+  aggr2.Aggregate((int64_t)13, {});
+  aggr2.Aggregate((int64_t)28, {});
+  aggr2.Aggregate((int64_t)105, {});
 
   auto aggr3     = aggr1.Merge(aggr2);
   histogram_data = nostd::get<HistogramPointData>(aggr3->ToPoint());
@@ -116,8 +116,8 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 2);  // 11, 13
   EXPECT_EQ(histogram_data.counts_[4], 2);  // 25, 28
   EXPECT_EQ(histogram_data.counts_[7], 1);  // 105
-  EXPECT_EQ(nostd::get<long>(histogram_data.min_), 1);
-  EXPECT_EQ(nostd::get<long>(histogram_data.max_), 105);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 1);
+  EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 105);
 
   // Diff
   auto aggr4     = aggr1.Diff(aggr2);

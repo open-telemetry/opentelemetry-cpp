@@ -26,14 +26,14 @@ TEST(AttributesHashMap, BasicTests)
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
   hash_map.Set(m1, std::move(aggregation1));
-  EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate(1l));
+  EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate((int64_t)1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
   hash_map.Set(m1, std::move(aggregation2));
-  EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate(1l));
+  EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate((int64_t)1));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
@@ -43,7 +43,7 @@ TEST(AttributesHashMap, BasicTests)
   hash_map.Set(m3, std::move(aggregation3));
   EXPECT_EQ(hash_map.Has(m1), true);
   EXPECT_EQ(hash_map.Has(m3), true);
-  EXPECT_NO_THROW(hash_map.Get(m3)->Aggregate(1l));
+  EXPECT_NO_THROW(hash_map.Get(m3)->Aggregate((int64_t)1));
   EXPECT_EQ(hash_map.Size(), 2);
 
   // GetOrSetDefault
@@ -52,7 +52,7 @@ TEST(AttributesHashMap, BasicTests)
     return std::unique_ptr<Aggregation>(new DropAggregation);
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  EXPECT_NO_THROW(hash_map.GetOrSetDefault(m4, create_default_aggregation)->Aggregate(1l));
+  EXPECT_NO_THROW(hash_map.GetOrSetDefault(m4, create_default_aggregation)->Aggregate((int64_t)1));
   EXPECT_EQ(hash_map.Size(), 3);
 
   // Set attributes with different order - shouldn't create a new entry.
