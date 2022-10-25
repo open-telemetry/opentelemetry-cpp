@@ -106,7 +106,6 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
     expected_total_get_requests = 0;
     expected_total_put_requests = 0;
   }
-
   // collect one more time.
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
