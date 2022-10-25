@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1666718203222,
+  "lastUpdate": 1666718205027,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -87262,6 +87262,54 @@ window.BENCHMARK_DATA = {
             "value": 2757444.353160744,
             "unit": "ns/iter",
             "extra": "iterations: 334\ncpu: 485597.00598802406 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "71217171+esigo@users.noreply.github.com",
+            "name": "Ehsan Saei",
+            "username": "esigo"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9b8a4dcdc7b863cfaa60f50ffc8f1f7ebd049b2a",
+          "message": "[Metrics API/SDK] Change Meter API/SDK to return nostd::unique_ptr for Sync Instruments (#1707)",
+          "timestamp": "2022-10-25T19:02:05+02:00",
+          "tree_id": "36d68ff267e64fa423d1f60277b9d52b598ce556",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/9b8a4dcdc7b863cfaa60f50ffc8f1f7ebd049b2a"
+        },
+        "date": 1666718199896,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 138.46115744793354,
+            "unit": "ns/iter",
+            "extra": "iterations: 965000\ncpu: 137.20860103626944 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 200.79344630720146,
+            "unit": "ns/iter",
+            "extra": "iterations: 747000\ncpu: 199.89585006693446 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 704.0655612945557,
+            "unit": "ns/iter",
+            "extra": "iterations: 200000\ncpu: 702.2775 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1840319.4844722748,
+            "unit": "ns/iter",
+            "extra": "iterations: 384\ncpu: 344662.49999999994 ns\nthreads: 1"
           }
         ]
       }
