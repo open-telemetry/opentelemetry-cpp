@@ -23,8 +23,9 @@ TEST_F(HistogramExemplarReservoirTestPeer, OfferMeasurement)
       boundaries.size(), HistogramExemplarReservoir::GetHistogramCellSelector(boundaries), nullptr);
   histogram_exemplar_reservoir->OfferMeasurement(
       1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
-  histogram_exemplar_reservoir->OfferMeasurement(
-      1l, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
+  histogram_exemplar_reservoir->OfferMeasurement((int64_t)1, MetricAttributes{},
+                                                 opentelemetry::context::Context{},
+                                                 std::chrono::system_clock::now());
   auto exemplar_data = histogram_exemplar_reservoir->CollectAndReset(MetricAttributes{});
   ASSERT_TRUE(exemplar_data.empty());
 }

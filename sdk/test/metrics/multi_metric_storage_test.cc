@@ -16,13 +16,13 @@ using namespace opentelemetry::sdk::metrics;
 class TestMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_long++;
   }
 
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::common::KeyValueIterable & /* attributes */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {
@@ -52,11 +52,11 @@ TEST(MultiMetricStorageTest, BasicTests)
       new TestMetricStorage());
   SyncMultiMetricStorage storages{};
   storages.AddStorage(storage);
-  storages.RecordLong(10l, opentelemetry::context::Context{});
-  storages.RecordLong(20l, opentelemetry::context::Context{});
+  storages.RecordLong(10, opentelemetry::context::Context{});
+  storages.RecordLong(20, opentelemetry::context::Context{});
 
   storages.RecordDouble(10.0, opentelemetry::context::Context{});
-  storages.RecordLong(30l, opentelemetry::context::Context{});
+  storages.RecordLong(30, opentelemetry::context::Context{});
 
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_long, 3);
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_double, 1);

@@ -23,7 +23,7 @@ public:
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
@@ -53,7 +53,7 @@ public:
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
+  void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 

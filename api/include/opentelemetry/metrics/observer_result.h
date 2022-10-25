@@ -46,7 +46,7 @@ public:
   }
 };
 
-using ObserverResult = nostd::variant<nostd::shared_ptr<ObserverResultT<long>>,
+using ObserverResult = nostd::variant<nostd::shared_ptr<ObserverResultT<int64_t>>,
                                       nostd::shared_ptr<ObserverResultT<double>>>;
 
 }  // namespace metrics

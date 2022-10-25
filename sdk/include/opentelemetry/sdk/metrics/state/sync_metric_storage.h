@@ -48,7 +48,7 @@ public:
     };
   }
 
-  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(int64_t value, const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -61,7 +61,7 @@ public:
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
-  void RecordLong(long value,
+  void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
                   const opentelemetry::context::Context &context) noexcept override
   {

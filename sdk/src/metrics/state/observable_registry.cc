@@ -70,11 +70,11 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
     }
     else
     {
-      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>> ob_res(
-          new opentelemetry::sdk::metrics::ObserverResultT<long>());
+      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>> ob_res(
+          new opentelemetry::sdk::metrics::ObserverResultT<int64_t>());
       callback_wrap->callback(ob_res, callback_wrap->state);
       storage->RecordLong(
-          static_cast<opentelemetry::sdk::metrics::ObserverResultT<long> *>(ob_res.get())
+          static_cast<opentelemetry::sdk::metrics::ObserverResultT<int64_t> *>(ob_res.get())
               ->GetMeasurements(),
           collection_ts);
     }

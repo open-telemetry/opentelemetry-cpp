@@ -33,7 +33,7 @@ void BM_AttributseHashMap(benchmark::State &state)
       return std::unique_ptr<Aggregation>(new DropAggregation);
     };
     m.lock();
-    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);
+    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate((int64_t)1);
     benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
     m.unlock();
   };
