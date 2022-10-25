@@ -18,7 +18,7 @@ namespace metrics
 
 LongSumAggregation::LongSumAggregation(bool is_monotonic)
 {
-  point_data_.value_ = (int64_t)0;
+  point_data_.value_        = (int64_t)0;
   point_data_.is_monotonic_ = is_monotonic;
 }
 
@@ -30,8 +30,11 @@ void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* att
 {
   if (point_data_.is_monotonic_ && value < 0)
   {
-    OTEL_INTERNAL_LOG_WARN(" Negative value ignored for Monotonic increasing measurement. Value"
-                           << value);
+    auto instrument_name = nostd::get<SumPointData>(ToPoint());
+    OTEL_INTERNAL_LOG_WARN(
+        " LongSumAggregation::Aggregate Negative value ignored for Monotonic increasing "
+        "measurement. Value"
+        << value);
     return;
   }
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
@@ -83,8 +86,10 @@ void DoubleSumAggregation::Aggregate(double value,
 {
   if (point_data_.is_monotonic_ && value < 0)
   {
-    OTEL_INTERNAL_LOG_WARN(" Negative value ignored for Monotonic increasing measurement. Value"
-                           << value);
+    OTEL_INTERNAL_LOG_WARN(
+        " DoubleSumAggregation::Aggregate Negative value ignored for Monotonic increasing "
+        "measurement. Value"
+        << value);
     return;
   }
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

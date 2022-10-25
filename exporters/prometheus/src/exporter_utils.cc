@@ -180,13 +180,20 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
   {
     case metric_sdk::AggregationType::kSum:
       if (!is_monotonic)
+      {
         return prometheus_client::MetricType::Gauge;
+      }
       else
+      {
         return prometheus_client::MetricType::Counter;
+      }
+      break;
     case metric_sdk::AggregationType::kHistogram:
       return prometheus_client::MetricType::Histogram;
+      break;
     case metric_sdk::AggregationType::kLastValue:
       return prometheus_client::MetricType::Gauge;
+      break;
     default:
       return prometheus_client::MetricType::Untyped;
   }
