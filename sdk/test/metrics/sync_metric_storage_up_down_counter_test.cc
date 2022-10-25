@@ -40,10 +40,10 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 
 TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
 {
-  AggregationTemporality temporality      = GetParam();
-  auto sdk_start_ts                       = std::chrono::system_clock::now();
-  long expected_total_active_get_requests = 0;
-  long expected_total_active_put_requests = 0;
+  AggregationTemporality temporality         = GetParam();
+  auto sdk_start_ts                          = std::chrono::system_clock::now();
+  int64_t expected_total_active_get_requests = 0;
+  int64_t expected_total_active_put_requests = 0;
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kUpDownCounter,
                                      InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
