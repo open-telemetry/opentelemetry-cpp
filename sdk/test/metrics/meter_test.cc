@@ -46,15 +46,15 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
 void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void * /* state */)
 {
   auto observer_long =
-      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<long>>>(observer);
-  observer_long->Observe(10l);
+      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+  observer_long->Observe(10);
 }
 
 TEST(MeterTest, BasicAsyncTests)
 {
   MetricReader *metric_reader_ptr = nullptr;
   auto meter                      = InitMeter(&metric_reader_ptr);
-  auto observable_counter         = meter->CreateLongObservableCounter("observable_counter");
+  auto observable_counter         = meter->CreateInt64ObservableCounter("observable_counter");
   observable_counter->AddCallback(asyc_generate_measurements, nullptr);
 
   size_t count = 0;
@@ -99,15 +99,15 @@ TEST(MeterTest, StressMultiThread)
           if (do_sync_create.exchange(false))
           {
             std::string instrument_name = "test_couter_" + std::to_string(instrument_id);
-            meter->CreateLongCounter(instrument_name, "", "");
+            meter->CreateUInt64Counter(instrument_name, "", "");
             do_async_create.store(true);
             instrument_id++;
           }
           if (do_async_create.exchange(false))
           {
             std::cout << "\n creating async thread " << std::to_string(numIterations);
-            auto observable_instrument =
-                meter->CreateLongObservableGauge("test_gauge_" + std::to_string(instrument_id));
+            auto observable_instrument = meter->CreateInt64ObservableUpDownCounter(
+                "test_gauge_" + std::to_string(instrument_id));
             observable_instrument->AddCallback(asyc_generate_measurements, nullptr);
             observable_instruments.push_back(std::move(observable_instrument));
             do_collect.store(true);

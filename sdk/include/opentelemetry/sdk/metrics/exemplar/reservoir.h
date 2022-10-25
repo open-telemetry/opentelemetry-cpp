@@ -25,7 +25,7 @@ public:
 
   /** Offers a long measurement to be sampled. */
   virtual void OfferMeasurement(
-      long value,
+      int64_t value,
       const MetricAttributes &attributes,
       const opentelemetry::context::Context &context,
       const opentelemetry::common::SystemTimestamp &timestamp) noexcept = 0;

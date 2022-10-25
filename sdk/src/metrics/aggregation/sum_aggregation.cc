@@ -17,26 +17,26 @@ namespace metrics
 
 LongSumAggregation::LongSumAggregation()
 {
-  point_data_.value_ = 0l;
+  point_data_.value_ = (int64_t)0;
 }
 
 LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
 
 LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data} {}
 
-void LongSumAggregation::Aggregate(long value, const PointAttributes & /* attributes */) noexcept
+void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-  point_data_.value_ = nostd::get<long>(point_data_.value_) + value;
+  point_data_.value_ = nostd::get<int64_t>(point_data_.value_) + value;
 }
 
 std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
-  long merge_value =
-      nostd::get<long>(
+  int64_t merge_value =
+      nostd::get<int64_t>(
           nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
               .value_) +
-      nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
+      nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
   return aggr;
@@ -45,10 +45,11 @@ std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta)
 std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) const noexcept
 {
 
-  long diff_value = nostd::get<long>(nostd::get<SumPointData>(
-                                         (static_cast<const LongSumAggregation &>(next).ToPoint()))
-                                         .value_) -
-                    nostd::get<long>(nostd::get<SumPointData>(ToPoint()).value_);
+  int64_t diff_value =
+      nostd::get<int64_t>(
+          nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(next).ToPoint()))
+              .value_) -
+      nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
   std::unique_ptr<Aggregation> aggr(new LongSumAggregation());
   static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
   return aggr;

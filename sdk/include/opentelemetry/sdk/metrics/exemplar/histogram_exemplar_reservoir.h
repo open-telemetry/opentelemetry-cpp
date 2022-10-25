@@ -43,7 +43,7 @@ public:
     HistogramCellSelector(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                              long value,
+                              int64_t value,
                               const MetricAttributes &attributes,
                               const opentelemetry::context::Context &context) override
     {

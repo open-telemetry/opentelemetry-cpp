@@ -14,7 +14,7 @@ namespace metrics
 class Aggregation
 {
 public:
-  virtual void Aggregate(long value, const PointAttributes &attributes = {}) noexcept = 0;
+  virtual void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept = 0;
 
   virtual void Aggregate(double value, const PointAttributes &attributes = {}) noexcept = 0;
 
