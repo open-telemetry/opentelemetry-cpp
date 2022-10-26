@@ -22,14 +22,19 @@ const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 // instrument-unit = It can have a maximum length of 63 ASCII chars
 
 InstrumentMetaDataValidator::InstrumentMetaDataValidator()
-    : name_reg_key_{kInstrumentNamePattern}, unit_reg_key_{kInstrumentUnitPattern}
+#  if HAVE_WORKING_REGEX
+    : name_reg_key_{kInstrumentNamePattern}, unit_reg_key_
+{
+  kInstrumentUnitPattern
+}
+#  endif
 {}
 
 bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 {
 #  if HAVE_WORKING_REGEX
   return std::regex_match(name.data(), name_reg_key_);
-#  endif
+#  else
   // size atmost 63 chars
   if (name.size() > kMaxSize)
   {
@@ -43,13 +48,14 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
   // subsequent chars should be either of alphabets, underscore, minus, dot
   return !std::any_of(std::next(name.begin()), name.end(),
                       [](char c) { return !isalpha(c) && c != '-' && c != '_' && c != '.'; });
+#  endif
 }
 
 bool InstrumentMetaDataValidator::ValidateUnit(nostd::string_view unit) const
 {
 #  if HAVE_WORKING_REGEX
   return std::regex_match(unit.data(), unit_reg_key_);
-#  endif
+#  else
   // length atmost 63 chars
   if (unit.size() > kMaxSize)
   {
@@ -58,6 +64,7 @@ bool InstrumentMetaDataValidator::ValidateUnit(nostd::string_view unit) const
   // all should be ascii chars.
   return !std::any_of(unit.begin(), unit.end(),
                       [](char c) { return static_cast<unsigned char>(c) > 127; });
+#  endif
 }
 
 bool InstrumentMetaDataValidator::ValidateDescription(nostd::string_view /*description*/) const

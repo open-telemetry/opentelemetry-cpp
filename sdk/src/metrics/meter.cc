@@ -43,7 +43,8 @@ nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Counter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::Counter<uint64_t>>(
         new metrics::NoopCounter<uint64_t>(name, description, unit));
   }
@@ -63,7 +64,8 @@ nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleCounter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::Counter<double>>(
         new metrics::NoopCounter<double>(name, description, unit));
   }
@@ -84,7 +86,8 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64ObservableCounter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -104,7 +107,8 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleObservableCounter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -124,7 +128,8 @@ nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Histogram - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::Histogram<uint64_t>>(
         new metrics::NoopHistogram<uint64_t>(name, description, unit));
   }
@@ -145,7 +150,8 @@ nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleHistogram - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::Histogram<double>>(
         new metrics::NoopHistogram<double>(name, description, unit));
   }
@@ -166,7 +172,8 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64ObservableGauge - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -186,7 +193,8 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleObservableGauge - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -206,7 +214,8 @@ nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateInt64UpDownCount
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64UpDownCounter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::UpDownCounter<int64_t>>(
         new metrics::NoopUpDownCounter<int64_t>(name, description, unit));
   }
@@ -227,7 +236,8 @@ nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleUpDownCounter - failed. Invalid parameters."
-                            << name << " " << description << " " << unit);
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
     return nostd::unique_ptr<metrics::UpDownCounter<double>>(
         new metrics::NoopUpDownCounter<double>(name, description, unit));
   }
@@ -248,8 +258,8 @@ Meter::CreateInt64ObservableUpDownCounter(nostd::string_view name,
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "Meter::CreateInt64ObservableUpDownCounter - failed. Invalid parameters."
-        << name << " " << description << " " << unit);
+        "Meter::CreateInt64ObservableUpDownCounter - failed. Invalid parameters -"
+        << name << " " << description << " " << unit << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -270,7 +280,7 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
   {
     OTEL_INTERNAL_LOG_ERROR(
         "Meter::CreateDoubleObservableUpDownCounter - failed. Invalid parameters."
-        << name << " " << description << " " << unit);
+        << name << " " << description << " " << unit << ". Measurements won't be recorded.");
     return GetNoopObservableInsrument();
   }
   InstrumentDescriptor instrument_descriptor = {
