@@ -23,10 +23,10 @@ const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 
 InstrumentMetaDataValidator::InstrumentMetaDataValidator()
 #  if HAVE_WORKING_REGEX
-    : name_reg_key_{kInstrumentNamePattern}, unit_reg_key_
-{
-  kInstrumentUnitPattern
-}
+    // clang-format off
+    : name_reg_key_{kInstrumentNamePattern},
+      unit_reg_key_{kInstrumentUnitPattern}
+// clang-format on
 #  endif
 {}
 
