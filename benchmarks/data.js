@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1666745541750,
+  "lastUpdate": 1666745543673,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -87832,6 +87832,54 @@ window.BENCHMARK_DATA = {
             "value": 2128948.951459497,
             "unit": "ns/iter",
             "extra": "iterations: 379\ncpu: 349225.06596306065 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "lalit_fin@yahoo.com",
+            "name": "Lalit Kumar Bhasin",
+            "username": "lalitb"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f17043f2ecc9fa419050bdce46fcd64694afc640",
+          "message": "Fix:1674, Add Monotonic Property to Sum Aggregation, and unit tests for Up Down Counter (#1675)",
+          "timestamp": "2022-10-25T17:40:09-07:00",
+          "tree_id": "904de8c9e2d23b8f96cd0647a59ae2bdcc933452",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/f17043f2ecc9fa419050bdce46fcd64694afc640"
+        },
+        "date": 1666745537604,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 119.33268699874813,
+            "unit": "ns/iter",
+            "extra": "iterations: 1167000\ncpu: 119.2560411311054 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 179.33577299118042,
+            "unit": "ns/iter",
+            "extra": "iterations: 800000\ncpu: 174.89050000000003 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 639.8526685578482,
+            "unit": "ns/iter",
+            "extra": "iterations: 224000\ncpu: 635.6308035714286 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2171047.716315963,
+            "unit": "ns/iter",
+            "extra": "iterations: 381\ncpu: 358112.33595800534 ns\nthreads: 1"
           }
         ]
       }
