@@ -28,15 +28,6 @@ class SyncWritableMetricStorage;
 class AsyncWritableMetricsStorge;
 class ObservableRegistry;
 
-inline bool ValidateInstrument(nostd::string_view name,
-                               nostd::string_view description,
-                               nostd::string_view unit)
-{
-  const static InstrumentMetaDataValidator instrument_validator;
-  return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
-         instrument_validator.ValidateDescription(description);
-}
-
 class Meter final : public opentelemetry::metrics::Meter
 {
 public:
@@ -140,6 +131,14 @@ private:
     static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> noop_instrument(
         new opentelemetry::metrics::NoopObservableInstrument("", "", ""));
     return noop_instrument;
+  }
+  static bool ValidateInstrument(nostd::string_view name,
+                                 nostd::string_view description,
+                                 nostd::string_view unit)
+  {
+    const static InstrumentMetaDataValidator instrument_validator;
+    return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
+           instrument_validator.ValidateDescription(description);
   }
 };
 }  // namespace metrics
