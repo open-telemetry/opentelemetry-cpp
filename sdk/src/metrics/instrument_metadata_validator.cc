@@ -32,9 +32,11 @@ InstrumentMetaDataValidator::InstrumentMetaDataValidator()
 
 bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 {
+
 #  if HAVE_WORKING_REGEX
   return std::regex_match(name.data(), name_reg_key_);
 #  else
+
   // size atmost 63 chars
   if (name.size() > kMaxSize)
   {
@@ -45,9 +47,9 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
   {
     return false;
   }
-  // subsequent chars should be either of alphabets, underscore, minus, dot
+  // subsequent chars should be either of alphabets, digits, underscore, minus, dot
   return !std::any_of(std::next(name.begin()), name.end(),
-                      [](char c) { return !isalpha(c) && c != '-' && c != '_' && c != '.'; });
+                      [](char c) { return !isalnum(c) && c != '-' && c != '_' && c != '.'; });
 #  endif
 }
 
