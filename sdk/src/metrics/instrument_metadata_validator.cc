@@ -42,7 +42,7 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
   {
     return false;
   }
-  // first char should be alphanumeric
+  // first char should be alpha
   if (!isalpha(name[0]))
   {
     return false;
