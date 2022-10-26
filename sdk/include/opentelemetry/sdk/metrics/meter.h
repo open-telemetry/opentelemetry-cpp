@@ -5,7 +5,9 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <chrono>
 #  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
@@ -25,6 +27,15 @@ class MetricStorage;
 class SyncWritableMetricStorage;
 class AsyncWritableMetricsStorge;
 class ObservableRegistry;
+
+inline bool ValidateInstrument(nostd::string_view name,
+                               nostd::string_view description,
+                               nostd::string_view unit)
+{
+  const static InstrumentMetaDataValidator instrument_validator;
+  return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
+         instrument_validator.ValidateDescription(description);
+}
 
 class Meter final : public opentelemetry::metrics::Meter
 {
@@ -121,6 +132,15 @@ private:
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   opentelemetry::common::SpinLockMutex storage_lock_;
+  const InstrumentMetaDataValidator instrument_metadata_validator;
+
+  static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+  GetNoopObservableInsrument()
+  {
+    static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> noop_instrument(
+        new opentelemetry::metrics::NoopObservableInstrument("", "", ""));
+    return noop_instrument;
+  }
 };
 }  // namespace metrics
 }  // namespace sdk
