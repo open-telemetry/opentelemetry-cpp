@@ -8,6 +8,7 @@ foreach(
   attributes_hashmap_test
   sync_metric_storage_counter_test
   sync_metric_storage_histogram_test
+  sync_metric_storage_up_down_counter_test
   async_metric_storage_test
   multi_metric_storage_test
   observer_result_test

@@ -49,7 +49,8 @@ private:
   /**
    * Translate the OTel metric type to Prometheus metric type
    */
-  static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregationType kind);
+  static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregationType kind,
+                                                bool is_monotonic = true);
 
   /**
    * Set metric data for:

@@ -14,7 +14,7 @@ using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
 TEST(Aggregation, LongSumAggregation)
 {
-  LongSumAggregation aggr;
+  LongSumAggregation aggr(true);
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
   auto sum_data = nostd::get<SumPointData>(data);
@@ -28,7 +28,7 @@ TEST(Aggregation, LongSumAggregation)
 
 TEST(Aggregation, DoubleSumAggregation)
 {
-  DoubleSumAggregation aggr;
+  DoubleSumAggregation aggr(true);
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<SumPointData>(data));
   auto sum_data = nostd::get<SumPointData>(data);
