@@ -6,6 +6,7 @@
 #  include <vector>
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

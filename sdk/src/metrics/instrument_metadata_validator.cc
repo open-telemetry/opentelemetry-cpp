@@ -60,7 +60,7 @@ bool InstrumentMetaDataValidator::ValidateUnit(nostd::string_view unit) const
                       [](char c) { return static_cast<unsigned char>(c) > 127; });
 }
 
-bool InstrumentMetaDataValidator::ValidateDescription(nostd::string_view description) const
+bool InstrumentMetaDataValidator::ValidateDescription(nostd::string_view /*description*/) const
 {
   return true;
 }
