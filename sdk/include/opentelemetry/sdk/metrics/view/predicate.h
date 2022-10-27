@@ -4,15 +4,9 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <vector>
-#  if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
-#    define HAVE_WORKING_REGEX 0
-#    include "opentelemetry/sdk/common/global_log_handler.h"
-#  else
-#    include <regex>
-#    define HAVE_WORKING_REGEX 1
-#  endif
-
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
