@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1666828905705,
+  "lastUpdate": 1666828947272,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -88204,6 +88204,54 @@ window.BENCHMARK_DATA = {
             "value": 2171047.716315963,
             "unit": "ns/iter",
             "extra": "iterations: 381\ncpu: 358112.33595800534 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Tom.Tan@microsoft.com",
+            "name": "Tom Tan",
+            "username": "ThomsonTan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e785f5f636b06f3895691675e6f966cad979e988",
+          "message": "Document libthrift 0.12.0 doesn't work with Jaeger exporter (#1714)\n\nCo-authored-by: Lalit Kumar Bhasin <lalit_fin@yahoo.com>",
+          "timestamp": "2022-10-26T16:48:56-07:00",
+          "tree_id": "f47513724b7e7361c2991dd3199b7c33919fb320",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/e785f5f636b06f3895691675e6f966cad979e988"
+        },
+        "date": 1666828942878,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 152.19346976574556,
+            "unit": "ns/iter",
+            "extra": "iterations: 1134000\ncpu: 122.40255731922399 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 174.30915595581814,
+            "unit": "ns/iter",
+            "extra": "iterations: 805000\ncpu: 173.87093167701863 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 633.6899740355356,
+            "unit": "ns/iter",
+            "extra": "iterations: 224000\ncpu: 632.790625 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2195821.6544120545,
+            "unit": "ns/iter",
+            "extra": "iterations: 372\ncpu: 346176.0752688172 ns\nthreads: 1"
           }
         ]
       }
