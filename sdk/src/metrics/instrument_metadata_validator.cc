@@ -14,7 +14,6 @@ namespace sdk
 {
 namespace metrics
 {
-const size_t kMaxSize = 63;
 // instrument-name = ALPHA 0*62 ("_" / "." / "-" / ALPHA / DIGIT)
 const std::string kInstrumentNamePattern = "[a-zA-Z][-_.a-zA-Z0-9]{0,62}";
 //
@@ -36,7 +35,7 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 #  if HAVE_WORKING_REGEX
   return std::regex_match(name.data(), name_reg_key_);
 #  else
-
+  const size_t kMaxSize = 63;
   // size atmost 63 chars
   if (name.size() > kMaxSize)
   {
@@ -58,6 +57,7 @@ bool InstrumentMetaDataValidator::ValidateUnit(nostd::string_view unit) const
 #  if HAVE_WORKING_REGEX
   return std::regex_match(unit.data(), unit_reg_key_);
 #  else
+  const size_t kMaxSize = 63;
   // length atmost 63 chars
   if (unit.size() > kMaxSize)
   {
