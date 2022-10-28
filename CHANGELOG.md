@@ -23,7 +23,7 @@ Increment the:
 unit tests for Up Down Counter [#1675](https://github.com/open-telemetry/opentelemetry-cpp/pull/1675)
 * [Metrics SDK] Move Metrics Exemplar processing behind feature flag [#1710](https://github.com/open-telemetry/opentelemetry-cpp/pull/1710)
 * [Metrics API/SDK] Change Meter API/SDK to return nostd::unique_ptr
- for Sync Instruments [#1707](https://github.com/open-telemetry/opentelemetry-cpp/pull/1707)
+ for Sync Instruments [#1707](https://github.com/open-telemetry/opentelemetry-cpp/pull/1707) which includes breaking change in the Metrics api and sdk.
 * [BUILD] Add e2e test to asan & tsan CI [#1670](https://github.com/open-telemetry/opentelemetry-cpp/pull/1670)
 * [BUILD] Add otlp-grpc example bazel [#1708](https://github.com/open-telemetry/opentelemetry-cpp/pull/1708)
 * Fix debug log of OTLP HTTP exporter and ES log exporter [#1703](https://github.com/open-telemetry/opentelemetry-cpp/pull/1703)
