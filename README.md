@@ -10,11 +10,11 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 ## Project Status
 
-| Signal  | Status                  |
-| ------- | ----------------------- |
-| Traces  | Public Release          |
-| Metrics | Public Release [1]      |
-| Logs    | Experimental [2]        |
+| Signal  | Status                  | Project                                                                  |
+| ------- | ----------------------- | ------------------------------------------------------------------------ |
+| Traces  | Public Release          | N/A                                                                      |
+| Metrics | Public Release [1]      | N/A                                                                      |
+| Logs    | Experimental [2]        | [Release Milestone](https://github.com/open-telemetry/opentelemetry-cpp/milestone/18)|
 
 * [1]: The older metrics implementation (based on old
       specification) is now deprecated, and would be removed soon.
