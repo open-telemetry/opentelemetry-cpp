@@ -23,7 +23,8 @@ Increment the:
 unit tests for Up Down Counter [#1675](https://github.com/open-telemetry/opentelemetry-cpp/pull/1675)
 * [Metrics SDK] Move Metrics Exemplar processing behind feature flag [#1710](https://github.com/open-telemetry/opentelemetry-cpp/pull/1710)
 * [Metrics API/SDK] Change Meter API/SDK to return nostd::unique_ptr
- for Sync Instruments [#1707](https://github.com/open-telemetry/opentelemetry-cpp/pull/1707) which includes breaking change in the Metrics api and sdk.
+ for Sync Instruments [#1707](https://github.com/open-telemetry/opentelemetry-cpp/pull/1707)
+which includes breaking change in the Metrics api and sdk.
 * [BUILD] Add e2e test to asan & tsan CI [#1670](https://github.com/open-telemetry/opentelemetry-cpp/pull/1670)
 * [BUILD] Add otlp-grpc example bazel [#1708](https://github.com/open-telemetry/opentelemetry-cpp/pull/1708)
 * Fix debug log of OTLP HTTP exporter and ES log exporter [#1703](https://github.com/open-telemetry/opentelemetry-cpp/pull/1703)
@@ -40,7 +41,7 @@ ReservoirCellIndexFor [#1696](https://github.com/open-telemetry/opentelemetry-cp
 * [METRICS SDK] Fix data race on MeterContext::meters_ [#1668](https://github.com/open-telemetry/opentelemetry-cpp/pull/1668)
 * [METRICS SDK] Fix observable Gauge metrics generation [#1651](https://github.com/open-telemetry/opentelemetry-cpp/pull/1651)
 * [BUILD] Detect ARCH=sparc in CMake [#1660](https://github.com/open-telemetry/opentelemetry-cpp/pull/1660)
-* Add user agent for OTLP http/grpc client [#1657](https://github.com/open-telemetry/opentelemetry-cpp/pull/1657)
+* [SDK] Add user agent for OTLP http/grpc client [#1657](https://github.com/open-telemetry/opentelemetry-cpp/pull/1657)
 * [BUILD] Fix clang and gcc warnings [#1658](https://github.com/open-telemetry/opentelemetry-cpp/pull/1658)
 * [Metrics SDK] Add Metrics ExemplarFilter and ExemplarReservoir [#1584](https://github.com/open-telemetry/opentelemetry-cpp/pull/1584)
 * [LOGS SDK] Rename OnReceive to OnEmit [#1652](https://github.com/open-telemetry/opentelemetry-cpp/pull/1652)
@@ -57,6 +58,13 @@ and change default bucket range [#1626](https://github.com/open-telemetry/opente
   which includes breaking change in the Metrics api.
 * [BUILD] Add CMake OTELCPP_MAINTAINER_MODE [#1650](https://github.com/open-telemetry/opentelemetry-cpp/pull/1650)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.14.0 [#1697](https://github.com/open-telemetry/opentelemetry-cpp/pull/1697)
+
+Notes:
+
+Metrics API/SDK GA release includes PRs [#1686](https://github.com/open-telemetry/opentelemetry-cpp/pull/1686),
+[#1701](https://github.com/open-telemetry/opentelemetry-cpp/pull/1701), and
+[#1707](https://github.com/open-telemetry/opentelemetry-cpp/pull/1707)
+with breaking changes in the Metrics API and SDK.
 
 ## [1.6.1] 2022-09-22
 
