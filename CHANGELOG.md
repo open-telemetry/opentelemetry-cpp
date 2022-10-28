@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [1.7.0] 2022-10-28
 
 * [Metrics] Switch to explicit 64 bit integers [#1686](https://github.com/open-telemetry/opentelemetry-cpp/pull/1686)
   which includes breaking change in the Metrics api and sdk.
