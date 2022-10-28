@@ -17,6 +17,48 @@ Increment the:
 
 ## [1.7.0] 2022-10-28
 
+* [METRICS SDK] Validate Instrument meta data (name, unit, description) [#1713]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1713)
+* [DOCS] Document libthrift 0.12.0 doesn't work with Jaeger exporter [#1714]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1714)
+* [Metrics SDK] Add Monotonic Property to Sum Aggregation, and unit tests for Up Down Counter [#1675]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1675)
+* [Metrics SDK] Move Metrics Exemplar processing behind feature flag [#1710](https://github.com/open-telemetry/opentelemetry-cpp/pull/1710)
+* [Metrics API/SDK] Change Meter API/SDK to return nostd::unique_ptr for Sync Instruments [#1707]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1707)
+* [BUILD] Add e2e test to asan & tsan CI [#1670](https://github.com/open-telemetry/opentelemetry-cpp/pull/1670)
+* [BUILD] Add otlp-grpc example bazel [#1708](https://github.com/open-telemetry/opentelemetry-cpp/pull/1708)
+* Fix debug log of OTLP HTTP exporter and ES log exporter [#1703](https://github.com/open-telemetry/opentelemetry-cpp/pull/1701)
+* [METRICS SDK] Fix a potential precision loss on integer in ReservoirCellIndexFor [#1696]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1696)
+* [METRICS SDK] Fix Histogram crash [#1685](https://github.com/open-telemetry/opentelemetry-cpp/pull/1685)
+* [METRICS SDK] Fix:1676 Segfault when short export period is used for metrics [#1682]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1682)
+* [METRICS SDK] Add timeout support to MeterContext::ForceFlush [#1673]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1673)
+* [DOCS] - Minor updates to OStream Metrics exporter documentation [#1679]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1679)
+* [DOCS] Fix:#1575 API Documentation for Metrics SDK and API [#1678]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1678)
+* [BUILD] Fixed compiler warnings [#1677](https://github.com/open-telemetry/opentelemetry-cpp/pull/1677)
+* [METRICS SDK] Fix threading issue between Meter::RegisterSyncMetricStorage and Meter::Collect [#1666]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1666)
+* [METRICS SDK] Fix data race on MeterContext::meters_ [#1668](https://github.com/open-telemetry/opentelemetry-cpp/pull/1668)
+* [METRICS SDK] Fix observable Gauge metrics generation [#1651](https://github.com/open-telemetry/opentelemetry-cpp/pull/1651)
+* [BUILD] Detect ARCH=sparc in CMake [#1660](https://github.com/open-telemetry/opentelemetry-cpp/pull/1660)
+* Add user agent for OTLP http/grpc client [#1657](https://github.com/open-telemetry/opentelemetry-cpp/pull/1657)
+* [BUILD] Fix clang and gcc warnings [#1658](https://github.com/open-telemetry/opentelemetry-cpp/pull/1658)
+* [Metrics SDK] Add Metrics ExemplarFilter and ExemplarReservoir [#1584]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1584)
+* [LOGS SDK] Rename OnReceive to OnEmit [#1652](https://github.com/open-telemetry/opentelemetry-cpp/pull/1652)
+* [METRICS SDK] Fix Observable Gauge does not reflect updated values, and send the old value always [#1641]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1641)
+* [Metrics SDK] Change boundry type to double for Explicit Bucket Histogram Aggregation,
+and change default bucket range [#1626](https://github.com/open-telemetry/opentelemetry-cpp/pull/1626)
+* [METRICS SDK] Fix occasional Segfault with LongCounter instrument [#1638]
+(https://github.com/open-telemetry/opentelemetry-cpp/pull/1638)
+* [BUILD] Bump vcpk to 2022.08.15 [#1633](https://github.com/open-telemetry/opentelemetry-cpp/pull/1633)
+* [BUILD] Bump gRPC to v1.48.1 for CMake Linux CI [#1608](https://github.com/open-telemetry/opentelemetry-cpp/pull/1608)
 * [Metrics] Switch to explicit 64 bit integers [#1686](https://github.com/open-telemetry/opentelemetry-cpp/pull/1686)
   which includes breaking change in the Metrics api and sdk.
 * [Metrics SDK] Add support for Pull Metric Exporter [#1701](https://github.com/open-telemetry/opentelemetry-cpp/pull/1701)
