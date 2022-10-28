@@ -10,35 +10,21 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 ## Project Status
 
-| Signal  | Status                  | Project                                                                  |
-| ------- | ----------------------- | ------------------------------------------------------------------------ |
-| Traces  | Public Release          | N/A                                                                      |
-| Metrics | Release Candidate [1,2] | N/A                                                                      |
-| Logs    | Experimental [3]        | N/A                                                                      |
+| Signal  | Status                  |
+| ------- | ----------------------- |
+| Traces  | Public Release          |
+| Metrics | Public Release [1]      |
+| Logs    | Experimental [2]        |
 
-* [1]: The metric implementation is in release candidate phase. There would be
-      few iterations of new feature additions, and bug fixes before it is
-      publically available. Few breaking changes in API and SDK are expected.
-* [2]: The earlier implementation (based on old
-      specification) is now deprecated, and would be removed once new implementation
-      is declared stable. The older implementation can be included in build by setting
+* [1]: The older metrics implementation (based on old
+      specification) is now deprecated, and would be removed soon.
+      This can be included in build by setting
       `ENABLE_METRICS_PREVIEW` preprocessor macro, and is included under
       `*/_metrics/*` directory.
-* [3]: The current Log Signal Implementation is Experimental, and will change as
+* [2]: The current Log Signal Implementation is Experimental, and will change as
       the current OpenTelemetry Log specification matures. The current
       implementation can be included in build by setting `ENABLE_LOGS_PREVIEW`
       preprocessor macro.
-
-## OpenTelemetry Specification Compatibility Matrix
-
-| API Version | Core Version | Contrib Version [1]     |
-| ----------- |--------------|-------------------------|
-| 1.0.0       | 1.0.0-rc4    | N/A                     |
-| 1.0.0       | 1.0.0        | N/A                     |
-| 1.9.0       | 1.6.0        | N/A                     |
-
-* [1]: We don't have releases for opentelemetry-cpp contrib repo. This may
-      change in future.
 
 ## Supported C++ Versions
 
