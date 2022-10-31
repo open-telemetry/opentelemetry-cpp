@@ -15,6 +15,10 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.5")
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
+
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
