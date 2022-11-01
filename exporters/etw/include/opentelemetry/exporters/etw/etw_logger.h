@@ -164,7 +164,7 @@ public:
 #  ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
-      auto nanos         = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
+      auto nanos          = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampNsAsISO8601(nanos);
     }
 #  endif
