@@ -20,23 +20,23 @@ namespace logs
 namespace nostd    = opentelemetry::nostd;
 namespace logs_api = opentelemetry::logs;
 
-LoggerProvider::LoggerProvider(std::unique_ptr<LogProcessor> &&processor,
+LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                                opentelemetry::sdk::resource::Resource resource) noexcept
 {
-  std::vector<std::unique_ptr<LogProcessor>> processors;
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
   context_ = std::make_shared<sdk::logs::LoggerContext>(std::move(processors), std::move(resource));
 }
 
-LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogProcessor>> &&processors,
+LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
                                opentelemetry::sdk::resource::Resource resource) noexcept
     : context_{
           std::make_shared<sdk::logs::LoggerContext>(std::move(processors), std::move(resource))}
 {}
 
 LoggerProvider::LoggerProvider() noexcept
-    : context_{
-          std::make_shared<sdk::logs::LoggerContext>(std::vector<std::unique_ptr<LogProcessor>>{})}
+    : context_{std::make_shared<sdk::logs::LoggerContext>(
+          std::vector<std::unique_ptr<LogRecordProcessor>>{})}
 {}
 
 LoggerProvider::LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept
@@ -116,7 +116,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   return GetLogger(logger_name, "", library_name, library_version, schema_url);
 }
 
-void LoggerProvider::AddProcessor(std::unique_ptr<LogProcessor> processor) noexcept
+void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
 {
   context_->AddProcessor(std::move(processor));
 }

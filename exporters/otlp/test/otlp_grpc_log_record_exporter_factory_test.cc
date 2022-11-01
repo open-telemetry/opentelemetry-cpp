@@ -6,7 +6,7 @@
 #  include <gtest/gtest.h>
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter_factory.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 
 /*
   Make sure OtlpGrpcLogExporterFactory does not require,
@@ -27,7 +27,7 @@ TEST(OtlpGrpcLogExporterFactoryTest, BuildTest)
   OtlpGrpcExporterOptions opts;
   opts.endpoint = "localhost:45454";
 
-  std::unique_ptr<opentelemetry::sdk::logs::LogExporter> exporter =
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter =
       OtlpGrpcLogExporterFactory::Create(opts);
 
   EXPECT_TRUE(exporter != nullptr);

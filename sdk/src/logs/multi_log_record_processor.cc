@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/logs/multi_log_processor.h"
+#  include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 
 #  include <chrono>
 #  include <memory>
@@ -15,7 +15,7 @@ namespace sdk
 namespace logs
 {
 
-MultiLogProcessor::MultiLogProcessor(std::vector<std::unique_ptr<LogProcessor>> &&processors)
+MultiLogProcessor::MultiLogProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
   for (auto &processor : processors)
   {
@@ -28,7 +28,7 @@ MultiLogProcessor::~MultiLogProcessor()
   Shutdown();
 }
 
-void MultiLogProcessor::AddProcessor(std::unique_ptr<LogProcessor> &&processor)
+void MultiLogProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor)
 {
   // Add preocessor to end of the list.
   if (processor)

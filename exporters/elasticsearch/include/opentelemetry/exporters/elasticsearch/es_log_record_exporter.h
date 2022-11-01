@@ -61,7 +61,7 @@ struct ElasticsearchExporterOptions
 /**
  * The ElasticsearchLogExporter exports logs to Elasticsearch in JSON format
  */
-class ElasticsearchLogExporter final : public opentelemetry::sdk::logs::LogExporter
+class ElasticsearchLogExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**

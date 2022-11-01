@@ -26,7 +26,7 @@ namespace otlp
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OtlpGrpcLogExporter : public opentelemetry::sdk::logs::LogExporter
+class OtlpGrpcLogExporter : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**

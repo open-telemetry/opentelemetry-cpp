@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <chrono>
 #  include <vector>
@@ -16,7 +16,7 @@ namespace logs
  * Initialize a simple log processor.
  * @param exporter the configured exporter where log records are sent
  */
-SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter)
+SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter)
     : exporter_(std::move(exporter)), is_shutdown_(false)
 {}
 

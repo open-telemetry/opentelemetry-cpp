@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
@@ -21,7 +21,7 @@ namespace nostd = opentelemetry::nostd;
  * A test exporter that can return a vector of all the records it has received,
  * and keep track of the number of times its Shutdown() function was called.
  */
-class TestExporter final : public LogExporter
+class TestExporter final : public LogRecordExporter
 {
 public:
   TestExporter(int *shutdown_counter,
@@ -122,7 +122,7 @@ TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
 }
 
 // A test exporter that always returns failure when shut down
-class FailShutDownExporter final : public LogExporter
+class FailShutDownExporter final : public LogRecordExporter
 {
 public:
   FailShutDownExporter() {}

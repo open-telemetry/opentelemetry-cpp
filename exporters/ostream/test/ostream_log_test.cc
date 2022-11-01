@@ -4,11 +4,11 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <array>
-#  include "opentelemetry/exporters/ostream/log_exporter.h"
+#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <gtest/gtest.h>
 #  include <iostream>
@@ -28,7 +28,7 @@ namespace logs
 // Test that when OStream Log exporter is shutdown, no logs should be sent to stream
 TEST(OStreamLogExporter, Shutdown)
 {
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter);
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -58,7 +58,7 @@ TEST(OStreamLogExporter, Shutdown)
 TEST(OstreamLogExporter, DefaultLogRecordToCout)
 {
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter(std::cout));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cout));
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -102,7 +102,7 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 {
   // Initialize an Ostream exporter to std::cout
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter(std::cout));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cout));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cout.rdbuf();
@@ -156,7 +156,7 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
 {
   // Initialize an Ostream exporter to cerr
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter(std::cerr));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cerr));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cerr.rdbuf();
@@ -213,7 +213,7 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 
   // Initialize an Ostream exporter to cerr
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter(std::clog));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::clog));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::clog.rdbuf();
@@ -273,10 +273,10 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 TEST(OStreamLogExporter, IntegrationTest)
 {
   // Initialize a logger
-  auto exporter    = std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter);
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
-  sdkProvider->AddProcessor(
-      std::unique_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter))));
+  sdkProvider->AddProcessor(std::unique_ptr<sdklogs::LogRecordProcessor>(
+      new sdklogs::SimpleLogProcessor(std::move(exporter))));
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);
