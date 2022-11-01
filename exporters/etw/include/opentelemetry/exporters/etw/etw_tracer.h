@@ -622,7 +622,7 @@ public:
 #ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
-      auto nanosecs         = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
+      auto nanosecs       = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampNsAsISO8601(nanosecs);
     }
 #endif
