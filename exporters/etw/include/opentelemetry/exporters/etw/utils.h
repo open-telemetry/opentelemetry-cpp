@@ -239,7 +239,7 @@ static inline int64_t getUtcSystemTimeinTicks()
  *
  * @param timestampNs   Milliseconds since epoch in system time
  *
- * @return ISO8601 UTC string with microseconds part set to 000
+ * @return ISO8601 UTC string with nanoseconds
  */
 static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
 {
