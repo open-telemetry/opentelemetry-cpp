@@ -164,8 +164,8 @@ public:
 #  ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
-      auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
-      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
+      auto nanos         = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
+      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampNsAsISO8601(nanos);
     }
 #  endif
     const auto &cfg = GetConfiguration(loggerProvider_);
@@ -189,9 +189,9 @@ public:
     }
     evt[ETW_FIELD_PAYLOAD_NAME]              = std::string(name.data(), name.size());
     std::chrono::system_clock::time_point ts = timestamp;
-    int64_t tsMs =
-        std::chrono::duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();
-    evt[ETW_FIELD_TIMESTAMP] = utils::formatUtcTimestampMsAsISO8601(tsMs);
+    int64_t tsNs =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(ts.time_since_epoch()).count();
+    evt[ETW_FIELD_TIMESTAMP] = utils::formatUtcTimestampNsAsISO8601(tsNs);
     int severity_index       = static_cast<int>(severity);
     if (severity_index < 0 ||
         severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)

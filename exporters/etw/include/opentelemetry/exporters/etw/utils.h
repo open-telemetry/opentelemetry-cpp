@@ -234,6 +234,7 @@ static inline int64_t getUtcSystemTimeinTicks()
 #endif
 }
 
+constexpr unsigned int NANOSECS_PRECISION = 1000000000;
 /**
  * @brief Convert local system nanoseconds time to ISO8601 string UTC time
  *
@@ -245,8 +246,8 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
 {
   char buf[sizeof("YYYY-MM-DDTHH:MM:SS.sssssssssZ") + 1] = {0};
 #ifdef _WIN32
-  __time64_t seconds = static_cast<__time64_t>(timestampNs / 1000000000);
-  int nanoseconds   = static_cast<int>(timestampNs % 1000000000);
+  __time64_t seconds = static_cast<__time64_t>(timestampNs / NANOSECS_PRECISION);
+  int nanoseconds   = static_cast<int>(timestampNs % NANOSECS_PRECISION);
   tm tm;
   if (::_gmtime64_s(&tm, &seconds) != 0)
   {
@@ -255,8 +256,8 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
   ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec,  nanoseconds);
 #else
-  time_t seconds   = static_cast<time_t>(timestampNs / 1000000000);
-  int nanoseconds = static_cast<int>(timestampNs % 1000000000);
+  time_t seconds   = static_cast<time_t>(timestampNs / NANOSECS_PRECISION);
+  int nanoseconds = static_cast<int>(timestampNs % NANOSECS_PRECISION);
   tm tm;
   bool valid = (gmtime_r(&seconds, &tm) != NULL);
   if (!valid)
