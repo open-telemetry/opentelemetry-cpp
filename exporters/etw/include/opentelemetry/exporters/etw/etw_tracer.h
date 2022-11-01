@@ -317,7 +317,7 @@ class Tracer : public opentelemetry::trace::Tracer,
       // However, in some scenarios it is easier to deal with ISO8601 strings.
       // In that case we convert the app-created timestamp and place it into
       // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
-      evt[ETW_FIELD_ENDTIME] = utils::formatUtcTimestampNsAsISO8601(endTimeNs);
+      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampNsAsISO8601(endTimeNs);
 #endif
       // Duration of Span in nanoseconds
       evt[ETW_FIELD_DURATION] = endTimeNs - startTimeNs;
