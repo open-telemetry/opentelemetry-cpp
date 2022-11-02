@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
+
 ## [1.7.0] 2022-10-28
 
 * [METRICS SDK] Validate Instrument meta data (name, unit, description) [#1713](https://github.com/open-telemetry/opentelemetry-cpp/pull/1713)

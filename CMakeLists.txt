@@ -168,7 +168,9 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
-set(OTELCPP_PROTO_PATH "" CACHE PATH "Path to opentelemetry-proto")
+set(OTELCPP_PROTO_PATH
+    ""
+    CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
   if(BUILD_TESTING)

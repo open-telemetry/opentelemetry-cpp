@@ -26,7 +26,7 @@
 #
 
 if(OTELCPP_PROTO_PATH)
-  message(STATUS "opentelemetry-proto dependency satisfied by: external proto path")
+  message(STATUS "opentelemetry-proto dependency satisfied by: external path")
   set(PROTO_PATH ${OTELCPP_PROTO_PATH})
   set(needs_proto_download FALSE)
 else()
