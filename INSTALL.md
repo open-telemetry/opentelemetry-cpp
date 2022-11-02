@@ -231,6 +231,11 @@ load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 opentelemetry_cpp_deps()
 
+# Load extra dependencies required for openTelemetry
+load("@io_opentelemetry_cpp//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
+
+opentelemetry_extra_deps()
+
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
