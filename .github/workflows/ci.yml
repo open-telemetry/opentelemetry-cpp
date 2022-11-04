@@ -69,22 +69,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
 
-  cmake_deprecated_metrics_test:
-    name: CMake test (without otlp-exporter and with deprecated metrics)
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
-    - name: run cmake tests (without otlp-exporter)
-      run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.deprecated_metrics.test
-
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
     runs-on: ubuntu-latest
@@ -227,28 +211,6 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
-
-  bazel_deprecated_metrics_test:
-    name: Bazel deprecated metrics
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
-    - name: Mount Bazel Cache
-      uses: actions/cache@v3
-      env:
-        cache-name: bazel_cache
-      with:
-        path: /home/runner/.cache/bazel
-        key: bazel_test
-    - name: setup
-      run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_bazelisk.sh
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.deprecated_metrics.test
 
   bazel_test_async:
     name: Bazel with async export
