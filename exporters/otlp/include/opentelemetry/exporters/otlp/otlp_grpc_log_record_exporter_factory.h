@@ -23,12 +23,12 @@ public:
   /**
    * Create a OtlpGrpcLogExporter.
    */
-  static std::unique_ptr<opentelemetry::sdk::logs::LogExporter> Create();
+  static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create();
 
   /**
    * Create a OtlpGrpcLogExporter.
    */
-  static std::unique_ptr<opentelemetry::sdk::logs::LogExporter> Create(
+  static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpGrpcExporterOptions &options);
 };
 

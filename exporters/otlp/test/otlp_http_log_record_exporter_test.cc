@@ -7,7 +7,7 @@
 #    include <chrono>
 #    include <thread>
 
-#    include "opentelemetry/exporters/otlp/otlp_http_log_exporter.h"
+#    include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 
 #    include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -20,7 +20,7 @@
 #    include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #    include "opentelemetry/ext/http/server/http_server.h"
 #    include "opentelemetry/logs/provider.h"
-#    include "opentelemetry/sdk/logs/batch_log_processor.h"
+#    include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #    include "opentelemetry/sdk/logs/exporter.h"
 #    include "opentelemetry/sdk/logs/log_record.h"
 #    include "opentelemetry/sdk/logs/logger_provider.h"
@@ -74,9 +74,11 @@ namespace http_client = opentelemetry::ext::http::client;
 class OtlpHttpLogExporterTestPeer : public ::testing::Test
 {
 public:
-  std::unique_ptr<sdk::logs::LogExporter> GetExporter(std::unique_ptr<OtlpHttpClient> http_client)
+  std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
+      std::unique_ptr<OtlpHttpClient> http_client)
   {
-    return std::unique_ptr<sdk::logs::LogExporter>(new OtlpHttpLogExporter(std::move(http_client)));
+    return std::unique_ptr<sdk::logs::LogRecordExporter>(
+        new OtlpHttpLogExporter(std::move(http_client)));
   }
 
   // Get the options associated with the given exporter.
@@ -111,7 +113,7 @@ public:
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
     provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogProcessor>(new sdk::logs::BatchLogProcessor(
+        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogProcessor(
             std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 
     std::string report_trace_id;
@@ -208,7 +210,7 @@ public:
     options.schedule_delay_millis = std::chrono::milliseconds(256);
     options.max_export_batch_size = 5;
 
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
         new sdk::logs::BatchLogProcessor(std::move(exporter), options)));
 
     std::string report_trace_id;
@@ -309,7 +311,7 @@ public:
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
         new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
@@ -404,7 +406,7 @@ public:
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
         new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
@@ -484,7 +486,8 @@ public:
 
 TEST(OtlpHttpLogExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::logs::LogExporter>(new OtlpHttpLogExporter());
+  auto exporter =
+      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(new OtlpHttpLogExporter());
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> logs = {};

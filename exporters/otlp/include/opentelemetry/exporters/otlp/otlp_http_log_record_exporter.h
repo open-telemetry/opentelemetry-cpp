@@ -9,7 +9,7 @@
 #  include "opentelemetry/exporters/otlp/otlp_http_client.h"
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter_options.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 
 #  include <chrono>
 #  include <cstddef>
@@ -25,7 +25,7 @@ namespace otlp
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpHttpLogExporter final : public opentelemetry::sdk::logs::LogExporter
+class OtlpHttpLogExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**

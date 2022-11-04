@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS SDK] Rename LogProcessor and LogExporter to LogRecordProcessor and LogRecordExporter
+  [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
 * [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
 
 ## [1.7.0] 2022-10-28

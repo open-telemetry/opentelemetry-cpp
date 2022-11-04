@@ -23,12 +23,13 @@ namespace logs
 class MultiRecordable final : public Recordable
 {
 public:
-  void AddRecordable(const LogProcessor &processor,
+  void AddRecordable(const LogRecordProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept;
 
-  const std::unique_ptr<Recordable> &GetRecordable(const LogProcessor &processor) const noexcept;
+  const std::unique_ptr<Recordable> &GetRecordable(
+      const LogRecordProcessor &processor) const noexcept;
 
-  std::unique_ptr<Recordable> ReleaseRecordable(const LogProcessor &processor) noexcept;
+  std::unique_ptr<Recordable> ReleaseRecordable(const LogRecordProcessor &processor) noexcept;
 
   /**
    * Set the timestamp for this log.

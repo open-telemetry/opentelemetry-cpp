@@ -25,13 +25,13 @@ namespace logs
  * Built-in log processors are responsible for batching and conversion of
  * logs to exportable representation and passing batches to exporters.
  */
-class MultiLogProcessor : public LogProcessor
+class MultiLogProcessor : public LogRecordProcessor
 {
 public:
-  MultiLogProcessor(std::vector<std::unique_ptr<LogProcessor>> &&processors);
+  MultiLogProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
   ~MultiLogProcessor() override;
 
-  void AddProcessor(std::unique_ptr<LogProcessor> &&processor);
+  void AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor);
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
@@ -60,7 +60,7 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
-  std::vector<std::unique_ptr<LogProcessor>> processors_;
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors_;
 };
 }  // namespace logs
 }  // namespace sdk

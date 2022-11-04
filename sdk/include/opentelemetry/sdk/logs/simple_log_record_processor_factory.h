@@ -5,9 +5,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <memory>
-#  include <vector>
-
+#  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,17 +15,18 @@ namespace logs
 {
 
 /**
- * Factory class for MultiLogProcessor.
+ * Factory class for SimpleLogProcessor.
  */
-class MultiLogProcessorFactory
+class SimpleLogProcessorFactory
 {
 public:
-  static std::unique_ptr<LogProcessor> Create(
-      std::vector<std::unique_ptr<LogProcessor>> &&processors);
+  /**
+   * Create a SimpleLogProcessor.
+   */
+  static std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter);
 };
 
 }  // namespace logs
 }  // namespace sdk
-
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* ENABLE_LOGS_PREVIEW */

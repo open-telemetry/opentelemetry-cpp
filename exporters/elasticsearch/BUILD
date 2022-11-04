@@ -1,12 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "es_log_exporter",
+    name = "es_log_record_exporter",
     srcs = [
-        "src/es_log_exporter.cc",
+        "src/es_log_record_exporter.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
+        "include/opentelemetry/exporters/elasticsearch/es_log_record_exporter.h",
         "include/opentelemetry/exporters/elasticsearch/es_log_recordable.h",
     ],
     linkopts = select({
@@ -29,14 +29,14 @@ cc_library(
 )
 
 cc_test(
-    name = "es_log_exporter_test",
-    srcs = ["test/es_log_exporter_test.cc"],
+    name = "es_log_record_exporter_test",
+    srcs = ["test/es_log_record_exporter_test.cc"],
     tags = [
         "es",
         "test",
     ],
     deps = [
-        ":es_log_exporter",
+        ":es_log_record_exporter",
         "@com_google_googletest//:gtest_main",
         "@curl",
     ],

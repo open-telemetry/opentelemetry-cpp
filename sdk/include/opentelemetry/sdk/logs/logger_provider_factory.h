@@ -31,26 +31,26 @@ public:
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
-      std::unique_ptr<LogProcessor> &&processor);
+      std::unique_ptr<LogRecordProcessor> &&processor);
 
   /**
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
-      std::unique_ptr<LogProcessor> &&processor,
+      std::unique_ptr<LogRecordProcessor> &&processor,
       const opentelemetry::sdk::resource::Resource &resource);
 
   /**
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
-      std::vector<std::unique_ptr<LogProcessor>> &&processors);
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
 
   /**
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
-      std::vector<std::unique_ptr<LogProcessor>> &&processors,
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource);
 
   /**

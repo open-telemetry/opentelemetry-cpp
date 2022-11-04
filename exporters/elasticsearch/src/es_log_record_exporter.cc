@@ -7,7 +7,7 @@
 
 #  include <condition_variable>
 #  include <mutex>
-#  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
+#  include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #  include "opentelemetry/sdk_config.h"
 

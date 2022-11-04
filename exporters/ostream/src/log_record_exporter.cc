@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/exporters/ostream/log_exporter.h"
+#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include <mutex>
 #  include "opentelemetry/exporters/ostream/common_utils.h"
 #  include "opentelemetry/sdk_config.h"

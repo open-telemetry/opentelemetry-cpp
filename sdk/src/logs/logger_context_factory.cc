@@ -15,14 +15,14 @@ namespace logs
 {
 
 std::unique_ptr<LoggerContext> LoggerContextFactory::Create(
-    std::vector<std::unique_ptr<LogProcessor>> &&processors)
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Create(std::move(processors), resource);
 }
 
 std::unique_ptr<LoggerContext> LoggerContextFactory::Create(
-    std::vector<std::unique_ptr<LogProcessor>> &&processors,
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
     const opentelemetry::sdk::resource::Resource &resource)
 {
   std::unique_ptr<LoggerContext> context(new LoggerContext(std::move(processors), resource));

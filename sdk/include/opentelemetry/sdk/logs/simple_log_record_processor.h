@@ -19,16 +19,16 @@ namespace logs
 /**
  * The simple log processor passes all log records
  * in a batch of 1 to the configured
- * LogExporter.
+ * LogRecordExporter.
  *
- * All calls to the configured LogExporter are synchronized using a
+ * All calls to the configured LogRecordExporter are synchronized using a
  * spin-lock on an atomic_flag.
  */
-class SimpleLogProcessor : public LogProcessor
+class SimpleLogProcessor : public LogRecordProcessor
 {
 
 public:
-  explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
+  explicit SimpleLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter);
   ~SimpleLogProcessor() override = default;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -45,7 +45,7 @@ public:
 
 private:
   // The configured exporter
-  std::unique_ptr<LogExporter> exporter_;
+  std::unique_ptr<LogRecordExporter> exporter_;
   // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
   // The atomic boolean to ensure the ShutDown() function is only called once
