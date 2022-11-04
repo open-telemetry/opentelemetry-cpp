@@ -7,7 +7,7 @@
 #  include <memory>
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/batch_log_processor.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 
 #  include <vector>
@@ -14,7 +14,7 @@ namespace sdk
 {
 namespace logs
 {
-BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                      const size_t max_queue_size,
                                      const std::chrono::milliseconds scheduled_delay_millis,
                                      const size_t max_export_batch_size)
@@ -32,7 +32,7 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
   synchronization_data_->is_shutdown.store(false);
 }
 
-BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                      const BatchLogProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),

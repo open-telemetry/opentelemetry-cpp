@@ -5,7 +5,7 @@
 
 #  include <unordered_map>
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -14,7 +14,7 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/logs/batch_log_processor.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
@@ -39,10 +39,10 @@ namespace otlp
 class OtlpGrpcLogExporterTestPeer : public ::testing::Test
 {
 public:
-  std::unique_ptr<sdk::logs::LogExporter> GetExporter(
+  std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
       std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> &stub_interface)
   {
-    return std::unique_ptr<sdk::logs::LogExporter>(
+    return std::unique_ptr<sdk::logs::LogRecordExporter>(
         new OtlpGrpcLogExporter(std::move(stub_interface)));
   }
 
@@ -121,7 +121,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))

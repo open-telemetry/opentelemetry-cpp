@@ -3,13 +3,13 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
+#  include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <gtest/gtest.h>
 #  include <iostream>
@@ -33,7 +33,7 @@ TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 
   // Create an elasticsearch exporter
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter(options));
 
   // Create a log record and send to the exporter
   auto record = exporter->MakeRecordable();
@@ -48,7 +48,7 @@ TEST(ElasticsearchLogsExporterTests, Shutdown)
 {
   // Create an elasticsearch exporter and immediately shut it down
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter);
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter);
   bool shutdownResult = exporter->Shutdown();
   ASSERT_TRUE(shutdownResult);
 
@@ -65,7 +65,7 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 {
   // Create an elasticsearch exporter
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter);
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter);
 
   // Create a recordable
   auto record = exporter->MakeRecordable();

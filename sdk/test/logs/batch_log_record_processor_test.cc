@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/logs/batch_log_processor.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
 
@@ -19,7 +19,7 @@ using namespace opentelemetry::sdk::common;
  * A sample log exporter
  * for testing the batch log processor
  */
-class MockLogExporter final : public LogExporter
+class MockLogExporter final : public LogRecordExporter
 {
 public:
   MockLogExporter(std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
@@ -78,7 +78,7 @@ class BatchLogProcessorTest : public testing::Test  // ::testing::Test
 public:
   // returns a batch log processor that received a batch of log records, a shared pointer to a
   // is_shutdown flag, and the processor configuration options (default if unspecified)
-  std::shared_ptr<LogProcessor> GetMockProcessor(
+  std::shared_ptr<LogRecordProcessor> GetMockProcessor(
       std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
@@ -88,8 +88,8 @@ public:
       const size_t max_queue_size                            = 2048,
       const size_t max_export_batch_size                     = 512)
   {
-    return std::shared_ptr<LogProcessor>(
-        new BatchLogProcessor(std::unique_ptr<LogExporter>(new MockLogExporter(
+    return std::shared_ptr<LogRecordProcessor>(
+        new BatchLogProcessor(std::unique_ptr<LogRecordExporter>(new MockLogExporter(
                                   logs_received, is_shutdown, is_export_completed, export_delay)),
                               max_queue_size, scheduled_delay_millis, max_export_batch_size));
   }

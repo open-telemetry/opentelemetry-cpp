@@ -41,11 +41,11 @@ public:
    * @param id_generator The custom id generator for this logger provider. This must
    * not be a nullptr
    */
-  explicit LoggerProvider(std::unique_ptr<LogProcessor> &&processor,
+  explicit LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                           opentelemetry::sdk::resource::Resource resource =
                               opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
-  explicit LoggerProvider(std::vector<std::unique_ptr<LogProcessor>> &&processors,
+  explicit LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
                           opentelemetry::sdk::resource::Resource resource =
                               opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
@@ -101,7 +101,7 @@ public:
    * @param processor The processor to be stored inside the logger provider.
    * This must not be a nullptr.
    */
-  void AddProcessor(std::unique_ptr<LogProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this logger provider.

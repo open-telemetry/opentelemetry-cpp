@@ -5,7 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/common/circular_buffer.h"
-#  include "opentelemetry/sdk/logs/batch_log_processor_options.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
 
@@ -23,10 +23,10 @@ namespace logs
 {
 
 /**
- * This is an implementation of the LogProcessor which creates batches of finished logs and passes
- * the export-friendly log data representations to the configured LogExporter.
+ * This is an implementation of the LogRecordProcessor which creates batches of finished logs and
+ * passes the export-friendly log data representations to the configured LogRecordExporter.
  */
-class BatchLogProcessor : public LogProcessor
+class BatchLogProcessor : public LogRecordProcessor
 {
 public:
   /**
@@ -41,7 +41,7 @@ public:
    * equal to max_queue_size
    */
   explicit BatchLogProcessor(
-      std::unique_ptr<LogExporter> &&exporter,
+      std::unique_ptr<LogRecordExporter> &&exporter,
       const size_t max_queue_size                            = 2048,
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
       const size_t max_export_batch_size                     = 512);
@@ -53,7 +53,7 @@ public:
    * @param exporter - The backend exporter to pass the logs to
    * @param options - The batch SpanProcessor options.
    */
-  explicit BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
+  explicit BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                              const BatchLogProcessorOptions &options);
 
   /** Makes a new recordable **/
@@ -134,7 +134,7 @@ protected:
                            std::chrono::time_point<std::chrono::system_clock> &start_time);
 
   /* The configured backend log exporter */
-  std::unique_ptr<LogExporter> exporter_;
+  std::unique_ptr<LogRecordExporter> exporter_;
 
   /* Configurable parameters as per the official *trace* specs */
   const size_t max_queue_size_;
