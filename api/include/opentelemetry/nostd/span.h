@@ -240,9 +240,6 @@ public:
   T *end() const noexcept { return data_ + extent_; }
 
 private:
-  // Note: matches libstdc++'s layout for std::span
-  // See
-  // https://github.com/gcc-mirror/gcc/blob/a60701e05b3878000ff9fdde1aecbc472b9dec5a/libstdc%2B%2B-v3/include/std/span#L402-L403
   size_t extent_;
   T *data_;
 };
