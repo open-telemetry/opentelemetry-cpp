@@ -26,6 +26,9 @@
 #
 
 if(OTELCPP_PROTO_PATH)
+  if(NOT EXISTS(${OTELCPP_PROTO_PATH}/opentelemetry/proto/common/v1/common.proto))
+    message(FATAL_ERROR "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
+  endif()
   message(STATUS "opentelemetry-proto dependency satisfied by: external path")
   set(PROTO_PATH ${OTELCPP_PROTO_PATH})
   set(needs_proto_download FALSE)
