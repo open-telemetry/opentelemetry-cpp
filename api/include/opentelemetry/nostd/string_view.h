@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef HAVE_CPP_STDLIB
+#ifdef OPENTELEMETRY_HAVE_CXX17
 #  include "opentelemetry/std/string_view.h"
 #else
 #  include <algorithm>

@@ -107,14 +107,60 @@ else()
   )
 endif()
 
-option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+set(WITH_STL "OFF" CACHE STRING "Which version of the Standard Library for C++ to use")
+
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
+if(WITH_STL STREQUAL "OFF")
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
+  # STL not used.
+elseif(WITH_STL STREQUAL "CXX11")
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX11)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
+elseif(WITH_STL STREQUAL "CXX14")
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX11)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX14)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 14)
+  endif()
+elseif(WITH_STL STREQUAL "CXX17")
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX11)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX14)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX17)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+  endif()
+elseif(WITH_STL STREQUAL "CXX20")
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX11)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX14)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX17)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX20)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+  endif()
+elseif(WITH_STL STREQUAL "ON")
+  # "ON" corresponds to "CXX20" at this time.
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX11)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX14)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX17)
+  add_definitions(-DOPENTELEMETRY_HAVE_CXX20)
+  if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 20)
+  endif()
+else()
+  message(FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17 or CXX20")
+endif()
+
+
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-  if(WITH_STL)
+  if(NOT WITH_STL STREQUAL "OFF")
     # Require at least C++17. C++20 is needed to avoid gsl::span
     if(CMAKE_VERSION VERSION_GREATER 3.11.999)
       # Ask for 20, may get anything below
@@ -128,7 +174,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   endif()
 endif()
 
-if(WITH_STL)
+if(NOT WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
   # opentelemetry-api library directly. We ensure that variant implementation
   # (absl::variant or std::variant) in variant unit test code is consistent with
