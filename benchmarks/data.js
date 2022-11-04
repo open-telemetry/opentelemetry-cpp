@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1667543111228,
+  "lastUpdate": 1667586479558,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -90286,6 +90286,54 @@ window.BENCHMARK_DATA = {
             "value": 1304956.3926285233,
             "unit": "ns/iter",
             "extra": "iterations: 482\ncpu: 257532.98755186732 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "admin@owent.net",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7634edf46180f3a36308e51b8f3f7b4049942a67",
+          "message": "[Logs SDK] LogProcessor, LogExporter changes (#1727)\n\n* + Rename `LogProcessor` to `LogRecordProcessor`\r\n+ Rename `LogExporter` to `LogRecordExporter`\r\n+ Move `*log_processor*` to `*log_record_processor*`\r\n+ Move `*log_exporter*` to `*log_record_exporter*`\r\n\r\nSigned-off-by: owent <admin@owent.net>\r\n\r\n* Add changelog\r\n\r\nSigned-off-by: owent <admin@owent.net>\r\n\r\nSigned-off-by: owent <admin@owent.net>\r\nCo-authored-by: Ehsan Saei <71217171+esigo@users.noreply.github.com>",
+          "timestamp": "2022-11-04T19:11:32+01:00",
+          "tree_id": "f23001726b2f68b61e309a5a4d48601f3fc99cee",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/7634edf46180f3a36308e51b8f3f7b4049942a67"
+        },
+        "date": 1667586474961,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 135.42011992572105,
+            "unit": "ns/iter",
+            "extra": "iterations: 1168000\ncpu: 119.7031678082192 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 174.49459426160485,
+            "unit": "ns/iter",
+            "extra": "iterations: 806000\ncpu: 173.66451612903222 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 648.370072177556,
+            "unit": "ns/iter",
+            "extra": "iterations: 219000\ncpu: 648.3648401826484 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1490615.9674514076,
+            "unit": "ns/iter",
+            "extra": "iterations: 373\ncpu: 342394.638069705 ns\nthreads: 1"
           }
         ]
       }
