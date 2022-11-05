@@ -51,3 +51,5 @@
 
 tags
 .cache/clangd/*
+
+e2e/bazel-*
