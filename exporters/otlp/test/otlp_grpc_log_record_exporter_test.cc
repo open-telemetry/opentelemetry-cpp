@@ -122,7 +122,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
   provider->AddProcessor(
-      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BachLogRecordProcessor(
+      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
           std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))

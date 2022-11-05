@@ -12,12 +12,12 @@ namespace sdk
 namespace logs
 {
 
-std::unique_ptr<LogRecordProcessor> BachLogRecordProcessorFactory::Create(
+std::unique_ptr<LogRecordProcessor> BatchLogRecordProcessorFactory::Create(
     std::unique_ptr<LogRecordExporter> &&exporter,
-    const BachLogRecordProcessorOptions &options)
+    const BatchLogRecordProcessorOptions &options)
 {
   std::unique_ptr<LogRecordProcessor> processor(
-      new BachLogRecordProcessor(std::move(exporter), options));
+      new BatchLogRecordProcessor(std::move(exporter), options));
   return processor;
 }
 

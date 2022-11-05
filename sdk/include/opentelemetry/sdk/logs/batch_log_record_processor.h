@@ -26,7 +26,7 @@ namespace logs
  * This is an implementation of the LogRecordProcessor which creates batches of finished logs and
  * passes the export-friendly log data representations to the configured LogRecordExporter.
  */
-class BachLogRecordProcessor : public LogRecordProcessor
+class BatchLogRecordProcessor : public LogRecordProcessor
 {
 public:
   /**
@@ -40,7 +40,7 @@ public:
    * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or
    * equal to max_queue_size
    */
-  explicit BachLogRecordProcessor(
+  explicit BatchLogRecordProcessor(
       std::unique_ptr<LogRecordExporter> &&exporter,
       const size_t max_queue_size                            = 2048,
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
@@ -53,8 +53,8 @@ public:
    * @param exporter - The backend exporter to pass the logs to
    * @param options - The batch SpanProcessor options.
    */
-  explicit BachLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                  const BachLogRecordProcessorOptions &options);
+  explicit BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
+                                  const BatchLogRecordProcessorOptions &options);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -87,7 +87,7 @@ public:
   /**
    * Class destructor which invokes the Shutdown() method.
    */
-  ~BachLogRecordProcessor() override;
+  ~BatchLogRecordProcessor() override;
 
 protected:
   /**

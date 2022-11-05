@@ -114,7 +114,7 @@ public:
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
     provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BachLogRecordProcessor(
+        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
             std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 
     std::string report_trace_id;
@@ -206,13 +206,13 @@ public:
     opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    sdk::logs::BachLogRecordProcessorOptions options;
+    sdk::logs::BatchLogRecordProcessorOptions options;
     options.max_queue_size        = 5;
     options.schedule_delay_millis = std::chrono::milliseconds(256);
     options.max_export_batch_size = 5;
 
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BachLogRecordProcessor(std::move(exporter), options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), options)));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -308,12 +308,12 @@ public:
     opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    sdk::logs::BachLogRecordProcessorOptions processor_options;
+    sdk::logs::BatchLogRecordProcessorOptions processor_options;
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BachLogRecordProcessor(std::move(exporter), processor_options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -403,12 +403,12 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
-    sdk::logs::BachLogRecordProcessorOptions processor_options;
+    sdk::logs::BatchLogRecordProcessorOptions processor_options;
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BachLogRecordProcessor(std::move(exporter), processor_options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
     std::string report_span_id;

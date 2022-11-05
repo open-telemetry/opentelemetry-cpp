@@ -14,7 +14,7 @@ namespace sdk
 {
 namespace logs
 {
-BachLogRecordProcessor::BachLogRecordProcessor(
+BatchLogRecordProcessor::BatchLogRecordProcessor(
     std::unique_ptr<LogRecordExporter> &&exporter,
     const size_t max_queue_size,
     const std::chrono::milliseconds scheduled_delay_millis,
@@ -25,7 +25,7 @@ BachLogRecordProcessor::BachLogRecordProcessor(
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BachLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -33,15 +33,15 @@ BachLogRecordProcessor::BachLogRecordProcessor(
   synchronization_data_->is_shutdown.store(false);
 }
 
-BachLogRecordProcessor::BachLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                               const BachLogRecordProcessorOptions &options)
+BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
+                                               const BatchLogRecordProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BachLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -49,12 +49,12 @@ BachLogRecordProcessor::BachLogRecordProcessor(std::unique_ptr<LogRecordExporter
   synchronization_data_->is_shutdown.store(false);
 }
 
-std::unique_ptr<Recordable> BachLogRecordProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
 
-void BachLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -77,7 +77,7 @@ void BachLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexce
   }
 }
 
-bool BachLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -147,7 +147,7 @@ bool BachLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexc
   return result;
 }
 
-void BachLogRecordProcessor::DoBackgroundWork()
+void BatchLogRecordProcessor::DoBackgroundWork()
 {
   auto timeout = scheduled_delay_millis_;
 
@@ -182,7 +182,7 @@ void BachLogRecordProcessor::DoBackgroundWork()
   }
 }
 
-void BachLogRecordProcessor::Export()
+void BatchLogRecordProcessor::Export()
 {
   do
   {
@@ -222,7 +222,7 @@ void BachLogRecordProcessor::Export()
   } while (true);
 }
 
-void BachLogRecordProcessor::NotifyCompletion(
+void BatchLogRecordProcessor::NotifyCompletion(
     bool notify_force_flush,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
@@ -238,7 +238,7 @@ void BachLogRecordProcessor::NotifyCompletion(
   }
 }
 
-void BachLogRecordProcessor::DrainQueue()
+void BatchLogRecordProcessor::DrainQueue()
 {
   while (true)
   {
@@ -252,7 +252,7 @@ void BachLogRecordProcessor::DrainQueue()
   }
 }
 
-void BachLogRecordProcessor::GetWaitAdjustedTime(
+void BatchLogRecordProcessor::GetWaitAdjustedTime(
     std::chrono::microseconds &timeout,
     std::chrono::time_point<std::chrono::system_clock> &start_time)
 {
@@ -272,7 +272,7 @@ void BachLogRecordProcessor::GetWaitAdjustedTime(
   }
 }
 
-bool BachLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
 
@@ -296,7 +296,7 @@ bool BachLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcep
   return true;
 }
 
-BachLogRecordProcessor::~BachLogRecordProcessor()
+BatchLogRecordProcessor::~BatchLogRecordProcessor()
 {
   if (synchronization_data_->is_shutdown.load() == false)
   {

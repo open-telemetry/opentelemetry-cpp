@@ -20,7 +20,7 @@ namespace logs
 /**
  * Struct to hold batch SpanProcessor options.
  */
-struct BachLogRecordProcessorOptions
+struct BatchLogRecordProcessorOptions
 {
   /**
    * The maximum buffer/queue size. After the size is reached, spans are

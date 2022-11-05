@@ -71,10 +71,10 @@ private:
 };
 
 /**
- * A fixture class for testing the BachLogRecordProcessor class that uses the TestExporter defined
+ * A fixture class for testing the BatchLogRecordProcessor class that uses the TestExporter defined
  * above.
  */
-class BachLogRecordProcessorTest : public testing::Test  // ::testing::Test
+class BatchLogRecordProcessorTest : public testing::Test  // ::testing::Test
 {
 public:
   // returns a batch log processor that received a batch of log records, a shared pointer to a
@@ -89,14 +89,14 @@ public:
       const size_t max_queue_size                            = 2048,
       const size_t max_export_batch_size                     = 512)
   {
-    return std::shared_ptr<LogRecordProcessor>(new BachLogRecordProcessor(
+    return std::shared_ptr<LogRecordProcessor>(new BatchLogRecordProcessor(
         std::unique_ptr<LogRecordExporter>(
             new MockLogExporter(logs_received, is_shutdown, is_export_completed, export_delay)),
         max_queue_size, scheduled_delay_millis, max_export_batch_size));
   }
 };
 
-TEST_F(BachLogRecordProcessorTest, TestShutdown)
+TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 {
   // initialize a batch log processor with the test exporter
   std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
@@ -134,7 +134,7 @@ TEST_F(BachLogRecordProcessorTest, TestShutdown)
   EXPECT_TRUE(is_shutdown->load());
 }
 
-TEST_F(BachLogRecordProcessorTest, TestForceFlush)
+TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
@@ -175,7 +175,7 @@ TEST_F(BachLogRecordProcessorTest, TestForceFlush)
   }
 }
 
-TEST_F(BachLogRecordProcessorTest, TestManyLogsLoss)
+TEST_F(BatchLogRecordProcessorTest, TestManyLogsLoss)
 {
   /* Test that when exporting more than max_queue_size logs, some are most likely lost*/
 
@@ -201,7 +201,7 @@ TEST_F(BachLogRecordProcessorTest, TestManyLogsLoss)
   EXPECT_GE(max_queue_size, logs_received->size());
 }
 
-TEST_F(BachLogRecordProcessorTest, TestManyLogsLossLess)
+TEST_F(BatchLogRecordProcessorTest, TestManyLogsLossLess)
 {
   /* Test that no logs are lost when sending max_queue_size logs */
 
@@ -228,7 +228,7 @@ TEST_F(BachLogRecordProcessorTest, TestManyLogsLossLess)
   }
 }
 
-TEST_F(BachLogRecordProcessorTest, TestScheduledDelayMillis)
+TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
 {
   /* Test that max_export_batch_size logs are exported every scheduled_delay_millis
      seconds */
