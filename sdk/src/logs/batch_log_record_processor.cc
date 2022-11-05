@@ -14,7 +14,7 @@ namespace sdk
 {
 namespace logs
 {
-BarchLogRecordProcessor::BarchLogRecordProcessor(
+BachLogRecordProcessor::BachLogRecordProcessor(
     std::unique_ptr<LogRecordExporter> &&exporter,
     const size_t max_queue_size,
     const std::chrono::milliseconds scheduled_delay_millis,
@@ -25,7 +25,7 @@ BarchLogRecordProcessor::BarchLogRecordProcessor(
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BarchLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BachLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -33,15 +33,15 @@ BarchLogRecordProcessor::BarchLogRecordProcessor(
   synchronization_data_->is_shutdown.store(false);
 }
 
-BarchLogRecordProcessor::BarchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                                 const BarchLogRecordProcessorOptions &options)
+BachLogRecordProcessor::BachLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
+                                               const BachLogRecordProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BarchLogRecordProcessor::DoBackgroundWork, this)
+      worker_thread_(&BachLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -49,12 +49,12 @@ BarchLogRecordProcessor::BarchLogRecordProcessor(std::unique_ptr<LogRecordExport
   synchronization_data_->is_shutdown.store(false);
 }
 
-std::unique_ptr<Recordable> BarchLogRecordProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> BachLogRecordProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
 
-void BarchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+void BachLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -77,7 +77,7 @@ void BarchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
   }
 }
 
-bool BarchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool BachLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -147,7 +147,7 @@ bool BarchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
   return result;
 }
 
-void BarchLogRecordProcessor::DoBackgroundWork()
+void BachLogRecordProcessor::DoBackgroundWork()
 {
   auto timeout = scheduled_delay_millis_;
 
@@ -182,7 +182,7 @@ void BarchLogRecordProcessor::DoBackgroundWork()
   }
 }
 
-void BarchLogRecordProcessor::Export()
+void BachLogRecordProcessor::Export()
 {
   do
   {
@@ -222,7 +222,7 @@ void BarchLogRecordProcessor::Export()
   } while (true);
 }
 
-void BarchLogRecordProcessor::NotifyCompletion(
+void BachLogRecordProcessor::NotifyCompletion(
     bool notify_force_flush,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
@@ -238,7 +238,7 @@ void BarchLogRecordProcessor::NotifyCompletion(
   }
 }
 
-void BarchLogRecordProcessor::DrainQueue()
+void BachLogRecordProcessor::DrainQueue()
 {
   while (true)
   {
@@ -252,7 +252,7 @@ void BarchLogRecordProcessor::DrainQueue()
   }
 }
 
-void BarchLogRecordProcessor::GetWaitAdjustedTime(
+void BachLogRecordProcessor::GetWaitAdjustedTime(
     std::chrono::microseconds &timeout,
     std::chrono::time_point<std::chrono::system_clock> &start_time)
 {
@@ -272,7 +272,7 @@ void BarchLogRecordProcessor::GetWaitAdjustedTime(
   }
 }
 
-bool BarchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool BachLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
 
@@ -296,7 +296,7 @@ bool BarchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   return true;
 }
 
-BarchLogRecordProcessor::~BarchLogRecordProcessor()
+BachLogRecordProcessor::~BachLogRecordProcessor()
 {
   if (synchronization_data_->is_shutdown.load() == false)
   {

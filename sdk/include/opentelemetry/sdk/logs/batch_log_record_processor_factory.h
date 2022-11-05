@@ -17,16 +17,16 @@ namespace logs
 {
 
 /**
- * Factory class for BarchLogRecordProcessor.
+ * Factory class for BachLogRecordProcessor.
  */
-class BarchLogRecordProcessorFactory
+class BachLogRecordProcessorFactory
 {
 public:
   /**
-   * Create a BarchLogRecordProcessor.
+   * Create a BachLogRecordProcessor.
    */
   std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter,
-                                             const BarchLogRecordProcessorOptions &options);
+                                             const BachLogRecordProcessorOptions &options);
 };
 
 }  // namespace logs
