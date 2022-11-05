@@ -14,21 +14,6 @@
 
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "prometheus_exporter_test_deprecated",
-    srcs = [
-        "test/prometheus_exporter_test.cc",
-    ],
-    tags = [
-        "prometheus",
-        "test",
-    ],
-    deps = [
-        ":prometheus_exporter_deprecated",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "prometheus_exporter",
     srcs = [
