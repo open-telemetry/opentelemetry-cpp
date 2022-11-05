@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
+
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -40,4 +40,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

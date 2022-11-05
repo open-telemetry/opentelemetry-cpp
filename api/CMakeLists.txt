@@ -74,10 +74,6 @@ if(WITH_GSL)
   endif()
 endif()
 
-if(WITH_METRICS_PREVIEW)
-  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_METRICS_PREVIEW)
-endif()
-
 if(WITH_LOGS_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_LOGS_PREVIEW)
 endif()

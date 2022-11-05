@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/observable_registry.h"
-#  include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
+#include "opentelemetry/metrics/observer_result.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 
-#  if 0
+#if 0
 class MeasurementFetcher
 {
 public:
@@ -67,11 +66,10 @@ public:
   static const size_t number_of_attributes = 2;  // GET , PUT
 };
 
-#  endif
+#endif
 
 TEST(ObservableRegistry, BasicTests)
 {
   ObservableRegistry registry;
   EXPECT_EQ(1, 1);
 }
-#endif

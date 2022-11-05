@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -82,11 +81,11 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NE(m3, m6);
 
   // Should be an sdk::metrics::Meter
-#  ifdef OPENTELEMETRY_RTTI_ENABLED
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkMeter1 = dynamic_cast<Meter *>(m1.get());
-#  else
+#else
   auto sdkMeter1 = static_cast<Meter *>(m1.get());
-#  endif
+#endif
   ASSERT_NE(nullptr, sdkMeter1);
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::unique_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
@@ -103,4 +102,3 @@ TEST(MeterProvider, GetMeter)
   mp1.ForceFlush();
   mp1.Shutdown();
 }
-#endif

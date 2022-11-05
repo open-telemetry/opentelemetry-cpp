@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "prometheus/metric_family.h"
-#  include "prometheus/metric_type.h"
+#include <gtest/gtest.h>
+#include "prometheus/metric_family.h"
+#include "prometheus/metric_type.h"
 
-#  include "opentelemetry/exporters/prometheus/exporter_utils.h"
-#  include "prometheus_test_helper.h"
+#include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "prometheus_test_helper.h"
 
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -152,4 +151,3 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 }
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

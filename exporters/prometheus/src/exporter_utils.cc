@@ -1,17 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <sstream>
-#  include <utility>
-#  include <vector>
-#  include "prometheus/metric_family.h"
+#include <sstream>
+#include <utility>
+#include <vector>
+#include "prometheus/metric_family.h"
 
-#  include <prometheus/metric_type.h>
-#  include "opentelemetry/exporters/prometheus/exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include <prometheus/metric_type.h>
+#include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -370,4 +369,3 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

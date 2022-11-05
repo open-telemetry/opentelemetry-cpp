@@ -1,15 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
-
-#  include "opentelemetry/exporters/prometheus/collector.h"
-#  include "opentelemetry/exporters/prometheus/exporter.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/version.h"
-#  include "prometheus_test_helper.h"
+#include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
+#include "opentelemetry/version.h"
+#include "prometheus_test_helper.h"
 
 /**
  * PrometheusExporterTest is a friend class of PrometheusExporter.
@@ -161,5 +159,3 @@ TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
   ExportResult code = ExportResult::kFailureInvalidArgument;
   ASSERT_EQ(res, code);
 }
-
-#endif  // ENABLE_METRICS_PREVIEW

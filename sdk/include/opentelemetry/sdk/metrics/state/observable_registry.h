@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/metrics/async_instruments.h"
 
-#  include <memory>
-#  include <mutex>
-#  include <vector>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -45,4 +44,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

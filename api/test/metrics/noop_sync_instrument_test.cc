@@ -1,11 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include <gtest/gtest.h>
-#  include <map>
-#  include "opentelemetry/metrics/noop.h"
+#include <gtest/gtest.h>
+#include <map>
+#include "opentelemetry/metrics/noop.h"
 
 TEST(Counter, Add)
 {
@@ -46,5 +44,3 @@ TEST(UpDownCountr, Record)
   counter->Add(10, {{"k1", "1"}, {"k2", 2}});
   counter->Add(10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
-
-#endif
