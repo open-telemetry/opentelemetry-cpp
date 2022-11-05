@@ -30,13 +30,13 @@ namespace exporter
 namespace otlp
 {
 
-TEST(OtlpHttpLogExporterFactoryTest, BuildTest)
+TEST(OtlpHttpLogRecordExporterFactoryTest, BuildTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpLogRecordExporterOptions opts;
   opts.url = "localhost:45454";
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter =
-      OtlpHttpLogExporterFactory::Create(opts);
+      OtlpHttpLogRecordExporterFactory::Create(opts);
 
   EXPECT_TRUE(exporter != nullptr);
 }

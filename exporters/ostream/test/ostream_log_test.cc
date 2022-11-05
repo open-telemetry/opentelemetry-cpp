@@ -26,9 +26,10 @@ namespace logs
 {
 
 // Test that when OStream Log exporter is shutdown, no logs should be sent to stream
-TEST(OStreamLogExporter, Shutdown)
+TEST(OStreamLogRecordExporter, Shutdown)
 {
-  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter);
+  auto exporter =
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogRecordExporter);
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -57,8 +58,8 @@ TEST(OStreamLogExporter, Shutdown)
 // This function tests MakeRecordable() as well as Export().
 TEST(OstreamLogExporter, DefaultLogRecordToCout)
 {
-  auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cout));
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new exporterlogs::OStreamLogRecordExporter(std::cout));
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -98,11 +99,11 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
 
 // Testing what a log record with only the "timestamp", "severity", "name" and "message" fields set,
 // will print out
-TEST(OStreamLogExporter, SimpleLogToCout)
+TEST(OStreamLogRecordExporter, SimpleLogToCout)
 {
   // Initialize an Ostream exporter to std::cout
-  auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cout));
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new exporterlogs::OStreamLogRecordExporter(std::cout));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cout.rdbuf();
@@ -152,11 +153,11 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
 // Testing what a log record with only the "resource" and "attributes" fields
 // (i.e. KeyValueIterable types) set with primitive types, will print out
-TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
+TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
 {
   // Initialize an Ostream exporter to cerr
-  auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::cerr));
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new exporterlogs::OStreamLogRecordExporter(std::cerr));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cerr.rdbuf();
@@ -208,12 +209,12 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
 
 // Testing what a log record with only the "resource", and "attributes" fields
 // (i.e. KeyValueIterable types), set with 2D arrays as values, will print out
-TEST(OStreamLogExporter, LogWithVariantTypesToClog)
+TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
 {
 
   // Initialize an Ostream exporter to cerr
-  auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter(std::clog));
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new exporterlogs::OStreamLogRecordExporter(std::clog));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::clog.rdbuf();
@@ -270,13 +271,14 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 
 // Test using the simple log processor and ostream exporter to cout
 // and use the rest of the logging pipeline (Logger, LoggerProvider, Provider) as well
-TEST(OStreamLogExporter, IntegrationTest)
+TEST(OStreamLogRecordExporter, IntegrationTest)
 {
   // Initialize a logger
-  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogExporter);
+  auto exporter =
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogRecordExporter);
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->AddProcessor(std::unique_ptr<sdklogs::LogRecordProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter))));
+      new sdklogs::SimpleLogRecordProcessor(std::move(exporter))));
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);

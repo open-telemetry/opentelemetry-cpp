@@ -36,24 +36,24 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpGrpcLogExporterTestPeer : public ::testing::Test
+class OtlpGrpcLogRecordExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
       std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> &stub_interface)
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
-        new OtlpGrpcLogExporter(std::move(stub_interface)));
+        new OtlpGrpcLogRecordExporter(std::move(stub_interface)));
   }
 
   // Get the options associated with the given exporter.
-  const OtlpGrpcExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcLogExporter> &exporter)
+  const OtlpGrpcExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcLogRecordExporter> &exporter)
   {
     return exporter->options_;
   }
 };
 
-TEST_F(OtlpGrpcLogExporterTestPeer, ShutdownTest)
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShutdownTest)
 {
   auto mock_stub = new proto::collector::logs::v1::MockLogsServiceStub();
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub_interface(mock_stub);
@@ -80,7 +80,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ShutdownTest)
 }
 
 // Call Export() directly
-TEST_F(OtlpGrpcLogExporterTestPeer, ExportUnitTest)
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportUnitTest)
 {
   auto mock_stub = new proto::collector::logs::v1::MockLogsServiceStub();
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub_interface(mock_stub);
@@ -105,7 +105,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportUnitTest)
 }
 
 // Create spans, let processor call Export()
-TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 {
   auto mock_stub = new proto::collector::logs::v1::MockLogsServiceStub();
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub_interface(mock_stub);
@@ -121,8 +121,9 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-      new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+  provider->AddProcessor(
+      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BarchLogRecordProcessor(
+          std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(AtLeast(1))

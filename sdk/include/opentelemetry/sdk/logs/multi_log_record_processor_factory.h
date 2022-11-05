@@ -17,9 +17,9 @@ namespace logs
 {
 
 /**
- * Factory class for MultiLogProcessor.
+ * Factory class for MultiLogRecordProcessor.
  */
-class MultiLogProcessorFactory
+class MultiLogRecordProcessorFactory
 {
 public:
   static std::unique_ptr<LogRecordProcessor> Create(

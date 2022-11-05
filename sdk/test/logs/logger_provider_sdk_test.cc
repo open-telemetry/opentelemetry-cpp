@@ -101,8 +101,8 @@ TEST(LoggerProviderSDK, GetResource)
 
 TEST(LoggerProviderSDK, Shutdown)
 {
-  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
-  SimpleLogProcessor *processor_ptr = processor.get();
+  std::unique_ptr<SimpleLogRecordProcessor> processor(new SimpleLogRecordProcessor(nullptr));
+  SimpleLogRecordProcessor *processor_ptr = processor.get();
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
@@ -117,7 +117,7 @@ TEST(LoggerProviderSDK, Shutdown)
 
 TEST(LoggerProviderSDK, ForceFlush)
 {
-  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
+  std::unique_ptr<SimpleLogRecordProcessor> processor(new SimpleLogRecordProcessor(nullptr));
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 

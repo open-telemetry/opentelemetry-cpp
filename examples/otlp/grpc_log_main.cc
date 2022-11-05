@@ -43,8 +43,8 @@ void InitTracer()
 void InitLogger()
 {
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpGrpcLogExporterFactory::Create(opts);
-  auto processor = logs_sdk::SimpleLogProcessorFactory::Create(std::move(exporter));
+  auto exporter  = otlp::OtlpGrpcLogRecordExporterFactory::Create(opts);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   nostd::shared_ptr<logs::LoggerProvider> provider(
       logs_sdk::LoggerProviderFactory::Create(std::move(processor)));
 

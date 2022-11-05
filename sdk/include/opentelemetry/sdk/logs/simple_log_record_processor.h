@@ -24,12 +24,12 @@ namespace logs
  * All calls to the configured LogRecordExporter are synchronized using a
  * spin-lock on an atomic_flag.
  */
-class SimpleLogProcessor : public LogRecordProcessor
+class SimpleLogRecordProcessor : public LogRecordProcessor
 {
 
 public:
-  explicit SimpleLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter);
-  ~SimpleLogProcessor() override = default;
+  explicit SimpleLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter);
+  ~SimpleLogRecordProcessor() override = default;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 

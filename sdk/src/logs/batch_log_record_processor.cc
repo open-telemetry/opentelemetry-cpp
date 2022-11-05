@@ -14,17 +14,18 @@ namespace sdk
 {
 namespace logs
 {
-BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                     const size_t max_queue_size,
-                                     const std::chrono::milliseconds scheduled_delay_millis,
-                                     const size_t max_export_batch_size)
+BarchLogRecordProcessor::BarchLogRecordProcessor(
+    std::unique_ptr<LogRecordExporter> &&exporter,
+    const size_t max_queue_size,
+    const std::chrono::milliseconds scheduled_delay_millis,
+    const size_t max_export_batch_size)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
+      worker_thread_(&BarchLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -32,15 +33,15 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&export
   synchronization_data_->is_shutdown.store(false);
 }
 
-BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                     const BatchLogProcessorOptions &options)
+BarchLogRecordProcessor::BarchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
+                                                 const BarchLogRecordProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
-      worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
+      worker_thread_(&BarchLogRecordProcessor::DoBackgroundWork, this)
 {
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
@@ -48,12 +49,12 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogRecordExporter> &&export
   synchronization_data_->is_shutdown.store(false);
 }
 
-std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> BarchLogRecordProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
 
-void BatchLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+void BarchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -76,7 +77,7 @@ void BatchLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
   }
 }
 
-bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool BarchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -146,7 +147,7 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   return result;
 }
 
-void BatchLogProcessor::DoBackgroundWork()
+void BarchLogRecordProcessor::DoBackgroundWork()
 {
   auto timeout = scheduled_delay_millis_;
 
@@ -181,7 +182,7 @@ void BatchLogProcessor::DoBackgroundWork()
   }
 }
 
-void BatchLogProcessor::Export()
+void BarchLogRecordProcessor::Export()
 {
   do
   {
@@ -221,7 +222,7 @@ void BatchLogProcessor::Export()
   } while (true);
 }
 
-void BatchLogProcessor::NotifyCompletion(
+void BarchLogRecordProcessor::NotifyCompletion(
     bool notify_force_flush,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
@@ -237,7 +238,7 @@ void BatchLogProcessor::NotifyCompletion(
   }
 }
 
-void BatchLogProcessor::DrainQueue()
+void BarchLogRecordProcessor::DrainQueue()
 {
   while (true)
   {
@@ -251,7 +252,7 @@ void BatchLogProcessor::DrainQueue()
   }
 }
 
-void BatchLogProcessor::GetWaitAdjustedTime(
+void BarchLogRecordProcessor::GetWaitAdjustedTime(
     std::chrono::microseconds &timeout,
     std::chrono::time_point<std::chrono::system_clock> &start_time)
 {
@@ -271,7 +272,7 @@ void BatchLogProcessor::GetWaitAdjustedTime(
   }
 }
 
-bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool BarchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   auto start_time = std::chrono::system_clock::now();
 
@@ -295,7 +296,7 @@ bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-BatchLogProcessor::~BatchLogProcessor()
+BarchLogRecordProcessor::~BarchLogRecordProcessor()
 {
   if (synchronization_data_->is_shutdown.load() == false)
   {
