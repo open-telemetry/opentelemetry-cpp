@@ -54,7 +54,7 @@ public:
    * @param options - The batch SpanProcessor options.
    */
   explicit BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                  const BatchLogRecordProcessorOptions &options);
+                                   const BatchLogRecordProcessorOptions &options);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;

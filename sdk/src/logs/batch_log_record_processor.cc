@@ -34,7 +34,7 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
 }
 
 BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
-                                               const BatchLogRecordProcessorOptions &options)
+                                                 const BatchLogRecordProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       scheduled_delay_millis_(options.schedule_delay_millis),
