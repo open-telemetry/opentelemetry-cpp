@@ -7,7 +7,6 @@
 #  include <map>
 #  include <thread>
 
-#  include "opentelemetry/_metrics/instrument.h"
 #  include "opentelemetry/exporters/prometheus/collector.h"
 #  include "opentelemetry/version.h"
 #  include "prometheus_test_helper.h"
