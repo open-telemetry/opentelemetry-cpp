@@ -30,21 +30,6 @@ cc_test(
 )
 
 cc_library(
-    name = "ostream_metrics_exporter_deprecated",
-    srcs = [
-        "src/metrics_exporter.cc",
-    ],
-    hdrs = [
-        "include/opentelemetry/exporters/ostream/metrics_exporter.h",
-    ],
-    strip_include_prefix = "include",
-    tags = ["ostream"],
-    deps = [
-        "//sdk/src/_metrics:metrics_deprecated",
-    ],
-)
-
-cc_library(
     name = "ostream_metric_exporter",
     srcs = [
         "src/metric_exporter.cc",
@@ -72,19 +57,6 @@ cc_test(
     ],
     deps = [
         ":ostream_metric_exporter",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "ostream_metrics_test_deprecated",
-    srcs = ["test/ostream_metrics_test.cc"],
-    tags = [
-        "ostream",
-        "test",
-    ],
-    deps = [
-        ":ostream_metrics_exporter_deprecated",
         "@com_google_googletest//:gtest_main",
     ],
 )
