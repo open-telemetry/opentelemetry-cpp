@@ -42,13 +42,13 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
-opentelemetry::exporter::otlp::OtlpHttpLogExporterOptions logger_opts;
+opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
 void InitLogger()
 {
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpHttpLogExporterFactory::Create(logger_opts);
-  auto processor = logs_sdk::SimpleLogProcessorFactory::Create(std::move(exporter));
+  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create(logger_opts);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   std::shared_ptr<logs::LoggerProvider> provider =
       logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 

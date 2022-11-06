@@ -68,7 +68,7 @@ private:
 
 // Tests whether the simple processor successfully creates a batch of size 1
 // and whether the contents of the record is sent to the exporter correctly
-TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
+TEST(SimpleLogRecordProcessorTest, SendReceivedLogsToExporter)
 {
   // Create a simple processor with a TestExporter attached
   std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
@@ -78,7 +78,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   std::unique_ptr<TestExporter> exporter(
       new TestExporter(nullptr, logs_received, &batch_size_received));
 
-  SimpleLogProcessor processor(std::move(exporter));
+  SimpleLogRecordProcessor processor(std::move(exporter));
 
   // Send some log records to the processor (which should then send to the TestExporter)
   const int num_logs = 5;
@@ -101,7 +101,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
 }
 
 // Tests behavior when calling the processor's ShutDown() multiple times
-TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
+TEST(SimpleLogRecordProcessorTest, ShutdownCalledOnce)
 {
   // Create a TestExporter
   int num_shutdowns = 0;
@@ -109,7 +109,7 @@ TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
   std::unique_ptr<TestExporter> exporter(new TestExporter(&num_shutdowns, nullptr, nullptr));
 
   // Create a processor with the previous test exporter
-  SimpleLogProcessor processor(std::move(exporter));
+  SimpleLogRecordProcessor processor(std::move(exporter));
 
   // The first time processor shutdown is called
   EXPECT_EQ(0, num_shutdowns);
@@ -142,10 +142,10 @@ public:
 };
 
 // Tests for when when processor should fail to shutdown
-TEST(SimpleLogProcessorTest, ShutDownFail)
+TEST(SimpleLogRecordProcessorTest, ShutDownFail)
 {
   std::unique_ptr<FailShutDownExporter> exporter(new FailShutDownExporter());
-  SimpleLogProcessor processor(std::move(exporter));
+  SimpleLogRecordProcessor processor(std::move(exporter));
 
   // Expect failure result when exporter fails to shutdown
   EXPECT_EQ(false, processor.Shutdown());

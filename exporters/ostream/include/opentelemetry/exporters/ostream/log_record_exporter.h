@@ -19,16 +19,16 @@ namespace exporter
 namespace logs
 {
 /**
- * The OStreamLogExporter exports logs through an ostream (default set to std::cout)
+ * The OStreamLogRecordExporter exports logs through an ostream (default set to std::cout)
  */
-class OStreamLogExporter final : public opentelemetry::sdk::logs::LogRecordExporter
+class OStreamLogRecordExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**
-   * Create an OStreamLogExporter. This constructor takes in a reference to an ostream that the
-   * Export() method will send log data into. The default ostream is set to stdout.
+   * Create an OStreamLogRecordExporter. This constructor takes in a reference to an ostream that
+   * the Export() method will send log data into. The default ostream is set to stdout.
    */
-  explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
+  explicit OStreamLogRecordExporter(std::ostream &sout = std::cout) noexcept;
 
   std::unique_ptr<sdk::logs::Recordable> MakeRecordable() noexcept override;
 

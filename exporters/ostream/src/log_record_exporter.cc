@@ -21,16 +21,16 @@ namespace logs
 
 /*********************** Constructor ***********************/
 
-OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout) {}
+OStreamLogRecordExporter::OStreamLogRecordExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 /*********************** Exporter methods ***********************/
 
-std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexcept
+std::unique_ptr<sdklogs::Recordable> OStreamLogRecordExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
 }
 
-sdk::common::ExportResult OStreamLogExporter::Export(
+sdk::common::ExportResult OStreamLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   if (isShutdown())
@@ -102,20 +102,20 @@ sdk::common::ExportResult OStreamLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OStreamLogExporter::Shutdown(std::chrono::microseconds) noexcept
+bool OStreamLogRecordExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
-bool OStreamLogExporter::isShutdown() const noexcept
+bool OStreamLogRecordExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 
-void OStreamLogExporter::printAttributes(
+void OStreamLogRecordExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
     const std::string prefix)
 {

@@ -59,21 +59,21 @@ struct ElasticsearchExporterOptions
 };
 
 /**
- * The ElasticsearchLogExporter exports logs to Elasticsearch in JSON format
+ * The ElasticsearchLogRecordExporter exports logs to Elasticsearch in JSON format
  */
-class ElasticsearchLogExporter final : public opentelemetry::sdk::logs::LogRecordExporter
+class ElasticsearchLogRecordExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**
-   * Create an ElasticsearchLogExporter with default exporter options.
+   * Create an ElasticsearchLogRecordExporter with default exporter options.
    */
-  ElasticsearchLogExporter();
+  ElasticsearchLogRecordExporter();
 
   /**
-   * Create an ElasticsearchLogExporter with user specified options.
+   * Create an ElasticsearchLogRecordExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  ElasticsearchLogExporter(const ElasticsearchExporterOptions &options);
+  ElasticsearchLogRecordExporter(const ElasticsearchExporterOptions &options);
 
   /**
    * Creates a recordable that stores the data in a JSON object

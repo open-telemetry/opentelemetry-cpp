@@ -16,10 +16,10 @@ namespace sdk
 namespace logs
 {
 
-std::unique_ptr<LogRecordProcessor> MultiLogProcessorFactory::Create(
+std::unique_ptr<LogRecordProcessor> MultiLogRecordProcessorFactory::Create(
     std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
-  std::unique_ptr<LogRecordProcessor> processor(new MultiLogProcessor(std::move(processors)));
+  std::unique_ptr<LogRecordProcessor> processor(new MultiLogRecordProcessor(std::move(processors)));
   return processor;
 }
 

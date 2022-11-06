@@ -54,7 +54,7 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
 OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type,
                                                 bool async_mode)
 {
-  OtlpHttpLogExporterOptions options;
+  OtlpHttpLogRecordExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
   options.http_headers.insert(
@@ -71,18 +71,19 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
 
 namespace http_client = opentelemetry::ext::http::client;
 
-class OtlpHttpLogExporterTestPeer : public ::testing::Test
+class OtlpHttpLogRecordExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
       std::unique_ptr<OtlpHttpClient> http_client)
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
-        new OtlpHttpLogExporter(std::move(http_client)));
+        new OtlpHttpLogRecordExporter(std::move(http_client)));
   }
 
   // Get the options associated with the given exporter.
-  const OtlpHttpLogExporterOptions &GetOptions(std::unique_ptr<OtlpHttpLogExporter> &exporter)
+  const OtlpHttpLogRecordExporterOptions &GetOptions(
+      std::unique_ptr<OtlpHttpLogRecordExporter> &exporter)
   {
     return exporter->options_;
   }
@@ -97,7 +98,7 @@ public:
   void ExportJsonIntegrationTest()
   {
     auto mock_otlp_client =
-        OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+        OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -113,7 +114,7 @@ public:
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
     provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogProcessor(
+        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
             std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 
     std::string report_trace_id;
@@ -190,8 +191,8 @@ public:
 #    ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
-    auto mock_otlp_client =
-        OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson, true);
+    auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
+        HttpRequestContentType::kJson, true);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -205,13 +206,13 @@ public:
     opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    sdk::logs::BatchLogProcessorOptions options;
+    sdk::logs::BatchLogRecordProcessorOptions options;
     options.max_queue_size        = 5;
     options.schedule_delay_millis = std::chrono::milliseconds(256);
     options.max_export_batch_size = 5;
 
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogProcessor(std::move(exporter), options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), options)));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -293,7 +294,7 @@ public:
   void ExportBinaryIntegrationTest()
   {
     auto mock_otlp_client =
-        OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+        OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -307,12 +308,12 @@ public:
     opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-    sdk::logs::BatchLogProcessorOptions processor_options;
+    sdk::logs::BatchLogRecordProcessorOptions processor_options;
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -386,8 +387,8 @@ public:
 #    ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
-    auto mock_otlp_client =
-        OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary, true);
+    auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
+        HttpRequestContentType::kBinary, true);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -402,12 +403,12 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
-    sdk::logs::BatchLogProcessorOptions processor_options;
+    sdk::logs::BatchLogRecordProcessorOptions processor_options;
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
     provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogProcessor(std::move(exporter), processor_options)));
+        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -484,10 +485,10 @@ public:
 #    endif
 };
 
-TEST(OtlpHttpLogExporterTest, Shutdown)
+TEST(OtlpHttpLogRecordExporterTest, Shutdown)
 {
   auto exporter =
-      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(new OtlpHttpLogExporter());
+      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(new OtlpHttpLogRecordExporter());
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> logs = {};
@@ -497,61 +498,61 @@ TEST(OtlpHttpLogExporterTest, Shutdown)
 }
 
 // Create log records, let processor call Export()
-TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTestSync)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
 {
   ExportJsonIntegrationTest();
 }
 
 #    ifdef ENABLE_ASYNC_EXPORT
-TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTestAsync)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
 }
 #    endif
 
 // Create log records, let processor call Export()
-TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTestSync)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
 {
   ExportBinaryIntegrationTest();
 }
 
 #    ifdef ENABLE_ASYNC_EXPORT
-TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTestAsync)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
 #    endif
 
 // Test exporter configuration options
-TEST_F(OtlpHttpLogExporterTestPeer, ConfigTest)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpLogRecordExporterOptions opts;
   opts.url = "http://localhost:45456/v1/logs";
-  std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45456/v1/logs");
 }
 
 // Test exporter configuration options with use_json_name
-TEST_F(OtlpHttpLogExporterTestPeer, ConfigUseJsonNameTest)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigUseJsonNameTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpLogRecordExporterOptions opts;
   opts.use_json_name = true;
-  std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
 }
 
 // Test exporter configuration options with json_bytes_mapping=JsonBytesMappingKind::kHex
-TEST_F(OtlpHttpLogExporterTestPeer, ConfigJsonBytesMappingTest)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpLogRecordExporterOptions opts;
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
-  std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
 #    ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
-TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
 {
   const std::string url = "http://localhost:9999/v1/logs";
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:9999", 1);
@@ -559,7 +560,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
 
-  std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -591,7 +592,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
 }
 
-TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
 {
   const std::string url = "http://localhost:9999/v1/logs";
   setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", url.c_str(), 1);
@@ -599,7 +600,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
 
-  std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -631,7 +632,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
 }
 
-TEST_F(OtlpHttpLogExporterTestPeer, DefaultEndpoint)
+TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
 {
   EXPECT_EQ("http://localhost:4318/v1/logs", GetOtlpDefaultHttpLogEndpoint());
   EXPECT_EQ("http://localhost:4318/v1/traces", GetOtlpDefaultHttpEndpoint());

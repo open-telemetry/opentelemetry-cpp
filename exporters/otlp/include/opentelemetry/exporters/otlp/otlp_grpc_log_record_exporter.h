@@ -26,19 +26,19 @@ namespace otlp
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OtlpGrpcLogExporter : public opentelemetry::sdk::logs::LogRecordExporter
+class OtlpGrpcLogRecordExporter : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**
-   * Create an OtlpGrpcLogExporter with default exporter options.
+   * Create an OtlpGrpcLogRecordExporter with default exporter options.
    */
-  OtlpGrpcLogExporter();
+  OtlpGrpcLogRecordExporter();
 
   /**
-   * Create an OtlpGrpcLogExporter with user specified options.
+   * Create an OtlpGrpcLogRecordExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  OtlpGrpcLogExporter(const OtlpGrpcExporterOptions &options);
+  OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options);
 
   /**
    * Creates a recordable that stores the data in protobuf.
@@ -67,17 +67,18 @@ private:
   const OtlpGrpcExporterOptions options_;
 
   // For testing
-  friend class OtlpGrpcLogExporterTestPeer;
+  friend class OtlpGrpcLogRecordExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> log_service_stub_;
 
   /**
-   * Create an OtlpGrpcLogExporter using the specified service stub.
+   * Create an OtlpGrpcLogRecordExporter using the specified service stub.
    * Only tests can call this constructor directly.
    * @param stub the service stub to be used for exporting
    */
-  OtlpGrpcLogExporter(std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub);
+  OtlpGrpcLogRecordExporter(
+      std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub);
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;

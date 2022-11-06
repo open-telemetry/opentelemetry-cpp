@@ -33,7 +33,7 @@ TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 
   // Create an elasticsearch exporter
   auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter(options));
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogRecordExporter(options));
 
   // Create a log record and send to the exporter
   auto record = exporter->MakeRecordable();
@@ -48,7 +48,7 @@ TEST(ElasticsearchLogsExporterTests, Shutdown)
 {
   // Create an elasticsearch exporter and immediately shut it down
   auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter);
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogRecordExporter);
   bool shutdownResult = exporter->Shutdown();
   ASSERT_TRUE(shutdownResult);
 
@@ -65,7 +65,7 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 {
   // Create an elasticsearch exporter
   auto exporter =
-      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogExporter);
+      std::unique_ptr<sdklogs::LogRecordExporter>(new logs_exporter::ElasticsearchLogRecordExporter);
 
   // Create a recordable
   auto record = exporter->MakeRecordable();
