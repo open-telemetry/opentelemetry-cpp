@@ -25,7 +25,6 @@ if(NOT WITH_LOGS_PREVIEW)
 endif()
 
 set(METRICS_EXCLUDE_PATTERN "")
-set(METRICS_EXCLUDE_PATTERN "_metrics")
 
 install(
   DIRECTORY include/opentelemetry/sdk

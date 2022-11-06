@@ -19,9 +19,7 @@ if(NOT WITH_LOGS_PREVIEW)
 endif()
 
 set(METRICS_EXCLUDE_PATTERN "")
-if(NOT WITH_METRICS_PREVIEW)
-  set(METRICS_EXCLUDE_PATTERN "metrics")
-endif()
+set(METRICS_EXCLUDE_PATTERN "metrics")
 
 install(
   DIRECTORY include/opentelemetry
