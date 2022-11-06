@@ -7,7 +7,6 @@
 
 #  include "opentelemetry/exporters/prometheus/collector.h"
 #  include "opentelemetry/exporters/prometheus/exporter.h"
-#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 #  include "opentelemetry/version.h"
 #  include "prometheus_test_helper.h"
 
