@@ -13,8 +13,6 @@
 
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
-#ifndef ENABLE_METRICS_PREVIEW
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -64,5 +62,3 @@ public:
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

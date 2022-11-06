@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/metrics/async_instruments.h"
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/metrics/meter_provider.h"
-#  include "opentelemetry/metrics/observer_result.h"
-#  include "opentelemetry/metrics/sync_instruments.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -213,4 +212,3 @@ private:
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#endif

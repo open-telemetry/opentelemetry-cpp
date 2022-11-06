@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/metrics/observer_result.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#  include <map>
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+
+#include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -53,4 +53,3 @@ private:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

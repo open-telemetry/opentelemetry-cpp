@@ -1,16 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/sync_instruments.h"
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
-#  include <gtest/gtest.h>
-#  include <cmath>
-#  include <limits>
+#include <gtest/gtest.h>
+#include <cmath>
+#include <limits>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -130,5 +129,3 @@ TEST(SyncInstruments, DoubleHistogram)
   counter.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
                  opentelemetry::context::Context{});
 }
-
-#endif

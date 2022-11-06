@@ -2,16 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_http.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include <chrono>
-#  include <cstddef>
-#  include <memory>
-#  include <string>
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -54,17 +53,16 @@ struct OtlpHttpMetricExporterOptions
   sdk::metrics::AggregationTemporality aggregation_temporality =
       sdk::metrics::AggregationTemporality::kDelta;
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
   std::size_t max_concurrent_requests = 64;
 
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
-#  endif
+#endif
 };
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

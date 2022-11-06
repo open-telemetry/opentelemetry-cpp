@@ -1,14 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/metrics/data/point_data.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/version.h"
 
-#  include <iostream>
-#  include <mutex>
+#include <iostream>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -128,4 +127,3 @@ PointType DoubleSumAggregation::ToPoint() const noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

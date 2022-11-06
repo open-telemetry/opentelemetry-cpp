@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include <future>
-#  include <map>
-#  include <thread>
+#include <gtest/gtest.h>
+#include <future>
+#include <map>
+#include <thread>
 
-#  include "opentelemetry/exporters/prometheus/collector.h"
-#  include "opentelemetry/version.h"
-#  include "prometheus_test_helper.h"
+#include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/version.h"
+#include "prometheus_test_helper.h"
 
 using opentelemetry::exporter::metrics::PrometheusCollector;
 namespace metric_api = opentelemetry::metrics;
@@ -351,4 +350,3 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
 }
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

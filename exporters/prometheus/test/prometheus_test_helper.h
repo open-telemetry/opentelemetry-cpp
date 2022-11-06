@@ -3,9 +3,7 @@
 
 #pragma once
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include "opentelemetry/version.h"
+#include "opentelemetry/version.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -241,4 +239,3 @@ inline bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::Metr
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif  // ENABLE_METRICS_PREVIEW

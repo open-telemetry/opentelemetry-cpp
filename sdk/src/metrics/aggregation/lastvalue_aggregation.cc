@@ -1,12 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/version.h"
 
-#  include <mutex>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -137,4 +136,3 @@ PointType DoubleLastValueAggregation::ToPoint() const noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif
