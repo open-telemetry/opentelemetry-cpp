@@ -18,15 +18,13 @@ if(NOT WITH_LOGS_PREVIEW)
   set(LOGS_EXCLUDE_PATTERN "logs")
 endif()
 
-set(METRICS_EXCLUDE_PATTERN "")
-set(METRICS_EXCLUDE_PATTERN "metrics")
 
 install(
   DIRECTORY include/opentelemetry
   DESTINATION include
   FILES_MATCHING
   PATTERN "*.h"
-  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE)
+  PATTERN "metrics" EXCLUDE)
 
 install(
   DIRECTORY include/opentelemetry
