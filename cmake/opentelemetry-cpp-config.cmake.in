@@ -41,7 +41,6 @@
 #   opentelemetry-cpp::ostream_log_record_exporter       - Imported target of opentelemetry-cpp::ostream_log_record_exporter
 #   opentelemetry-cpp::ostream_metrics_exporter          - Imported target of opentelemetry-cpp::ostream_metrics_exporter
 #   opentelemetry-cpp::ostream_span_exporter             - Imported target of opentelemetry-cpp::ostream_span_exporter
-#   opentelemetry-cpp::prometheus_exporter_deprecated    - Imported target of opentelemetry-cpp::prometheus_exporter_deprecated
 #   opentelemetry-cpp::elasticsearch_log_record_exporter - Imported target of opentelemetry-cpp::elasticsearch_log_record_exporter
 #   opentelemetry-cpp::etw_exporter                      - Imported target of opentelemetry-cpp::etw_exporter
 #   opentelemetry-cpp::jaeger_trace_exporter             - Imported target of opentelemetry-cpp::jaeger_trace_exporter
