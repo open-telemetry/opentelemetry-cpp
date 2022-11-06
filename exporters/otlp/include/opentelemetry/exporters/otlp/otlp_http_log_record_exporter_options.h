@@ -22,7 +22,7 @@ namespace otlp
 /**
  * Struct to hold OTLP exporter options.
  */
-struct OtlpHttpLogExporterOptions
+struct OtlpHttpLogRecordExporterOptions
 {
   // The endpoint to export to. By default
   // @see

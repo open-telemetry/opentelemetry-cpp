@@ -15,20 +15,21 @@ namespace sdk
 namespace logs
 {
 
-MultiLogProcessor::MultiLogProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
+MultiLogRecordProcessor::MultiLogRecordProcessor(
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
   for (auto &processor : processors)
   {
     AddProcessor(std::move(processor));
   }
 }
-MultiLogProcessor::~MultiLogProcessor()
+MultiLogRecordProcessor::~MultiLogRecordProcessor()
 {
   ForceFlush();
   Shutdown();
 }
 
-void MultiLogProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor)
+void MultiLogRecordProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor)
 {
   // Add preocessor to end of the list.
   if (processor)
@@ -37,7 +38,7 @@ void MultiLogProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &&proce
   }
 }
 
-std::unique_ptr<Recordable> MultiLogProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> MultiLogRecordProcessor::MakeRecordable() noexcept
 {
   auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
   auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
@@ -48,7 +49,7 @@ std::unique_ptr<Recordable> MultiLogProcessor::MakeRecordable() noexcept
   return recordable;
 }
 
-void MultiLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (!record)
   {
@@ -66,7 +67,7 @@ void MultiLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
   }
 }
 
-bool MultiLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   // Convert to nanos to prevent overflow
   std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
@@ -106,7 +107,7 @@ bool MultiLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   return result;
 }
 
-bool MultiLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   // Converto nanos to prevent overflow
   std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
