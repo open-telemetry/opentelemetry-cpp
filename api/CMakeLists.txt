@@ -18,7 +18,6 @@ if(NOT WITH_LOGS_PREVIEW)
   set(LOGS_EXCLUDE_PATTERN "logs")
 endif()
 
-
 install(
   DIRECTORY include/opentelemetry
   DESTINATION include
