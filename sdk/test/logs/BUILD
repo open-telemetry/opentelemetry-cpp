@@ -30,9 +30,9 @@ cc_test(
 )
 
 cc_test(
-    name = "simple_log_processor_test",
+    name = "simple_log_record_processor_test",
     srcs = [
-        "simple_log_processor_test.cc",
+        "simple_log_record_processor_test.cc",
     ],
     tags = [
         "logs",
@@ -60,9 +60,9 @@ cc_test(
 )
 
 cc_test(
-    name = "batch_log_processor_test",
+    name = "batch_log_record_processor_test",
     srcs = [
-        "batch_log_processor_test.cc",
+        "batch_log_record_processor_test.cc",
     ],
     tags = [
         "logs",

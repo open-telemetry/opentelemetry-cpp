@@ -4,8 +4,6 @@
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 
-#ifndef ENABLE_METRICS_PREVIEW
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace exporter
@@ -276,5 +274,3 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelec
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

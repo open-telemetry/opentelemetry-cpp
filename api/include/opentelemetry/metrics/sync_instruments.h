@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -196,4 +195,3 @@ public:
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#endif

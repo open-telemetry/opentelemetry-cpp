@@ -38,7 +38,7 @@ if(WITH_OTLP_HTTP)
   endif()
 endif()
 
-if(WITH_OTLP_GRPC AND NOT WITH_METRICS_PREVIEW)
+if(WITH_OTLP_GRPC)
   add_executable(example_otlp_metric_grpc grpc_metric_main.cc)
   target_link_libraries(
     example_otlp_metric_grpc ${CMAKE_THREAD_LIBS_INIT}

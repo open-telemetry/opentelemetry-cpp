@@ -189,7 +189,6 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
 # Exemplar specs status is experimental, so behind feature flag by default

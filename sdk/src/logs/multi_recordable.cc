@@ -17,21 +17,21 @@ namespace logs
 
 namespace
 {
-std::size_t MakeKey(const opentelemetry::sdk::logs::LogProcessor &processor)
+std::size_t MakeKey(const opentelemetry::sdk::logs::LogRecordProcessor &processor)
 {
   return reinterpret_cast<std::size_t>(&processor);
 }
 
 }  // namespace
 
-void MultiRecordable::AddRecordable(const LogProcessor &processor,
+void MultiRecordable::AddRecordable(const LogRecordProcessor &processor,
                                     std::unique_ptr<Recordable> recordable) noexcept
 {
   recordables_[MakeKey(processor)] = std::move(recordable);
 }
 
 const std::unique_ptr<Recordable> &MultiRecordable::GetRecordable(
-    const LogProcessor &processor) const noexcept
+    const LogRecordProcessor &processor) const noexcept
 {
   // TODO - return nullptr ref on failed lookup?
   auto i = recordables_.find(MakeKey(processor));
@@ -44,7 +44,7 @@ const std::unique_ptr<Recordable> &MultiRecordable::GetRecordable(
 }
 
 std::unique_ptr<Recordable> MultiRecordable::ReleaseRecordable(
-    const LogProcessor &processor) noexcept
+    const LogRecordProcessor &processor) noexcept
 {
   auto i = recordables_.find(MakeKey(processor));
   if (i != recordables_.end())

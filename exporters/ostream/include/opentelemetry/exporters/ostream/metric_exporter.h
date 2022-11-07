@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include <iostream>
-#  include <string>
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#  include "opentelemetry/version.h"
+#include <iostream>
+#include <string>
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -78,4 +77,3 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

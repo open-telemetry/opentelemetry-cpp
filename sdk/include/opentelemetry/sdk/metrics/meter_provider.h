@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <mutex>
-#  include <vector>
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/metrics/meter_provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+
+#include <memory>
+#include <mutex>
+#include <vector>
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -94,4 +94,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

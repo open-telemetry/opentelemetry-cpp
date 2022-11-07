@@ -1,9 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#  include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
@@ -45,5 +44,3 @@ TEST(AttributesProcessor, FilteringAllAttributesProcessor)
   auto filtered_attributes = attributes_processor.process(iterable);
   EXPECT_EQ(filter.size(), kNumFilterAttributes);
 }
-
-#endif

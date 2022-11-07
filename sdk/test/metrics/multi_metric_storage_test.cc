@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -61,4 +60,3 @@ TEST(MultiMetricStorageTest, BasicTests)
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_long, 3);
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_double, 1);
 }
-#endif

@@ -29,7 +29,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   logger->Debug("Test log");
 }
 
-class MockProcessor final : public LogProcessor
+class MockProcessor final : public LogRecordProcessor
 {
 private:
   std::shared_ptr<LogRecord> record_received_;
@@ -81,7 +81,7 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
   // Set a processor for the LoggerProvider
   auto shared_recordable = std::shared_ptr<LogRecord>(new LogRecord());
-  lp->AddProcessor(std::unique_ptr<LogProcessor>(new MockProcessor(shared_recordable)));
+  lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable)));
 
   // Check that the recordable created by the Log() statement is set properly
   logger->Log(logs_api::Severity::kWarn, "Log Message");

@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/view/view_registry.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/view/predicate.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/view/predicate.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -29,17 +28,17 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_scope.get(),
                          [&count](const View &view) {
                            count++;
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), "");
                            EXPECT_EQ(view.GetDescription(), "");
-#  endif
+#endif
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
                          });
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
-#  endif
+#endif
 }
 
 TEST(ViewRegistry, FindNonExistingView)
@@ -74,15 +73,14 @@ TEST(ViewRegistry, FindNonExistingView)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_scope.get(),
                          [&count, &view_name, &view_description](const View &view) {
                            count++;
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), view_name);
                            EXPECT_EQ(view.GetDescription(), view_description);
-#  endif
+#endif
                            return true;
                          });
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
-#  endif
-}
 #endif
+}

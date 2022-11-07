@@ -18,17 +18,12 @@ if(NOT WITH_LOGS_PREVIEW)
   set(LOGS_EXCLUDE_PATTERN "logs")
 endif()
 
-set(METRICS_EXCLUDE_PATTERN "")
-if(NOT WITH_METRICS_PREVIEW)
-  set(METRICS_EXCLUDE_PATTERN "metrics")
-endif()
-
 install(
   DIRECTORY include/opentelemetry
   DESTINATION include
   FILES_MATCHING
   PATTERN "*.h"
-  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE)
+  PATTERN "metrics" EXCLUDE)
 
 install(
   DIRECTORY include/opentelemetry
@@ -72,10 +67,6 @@ if(WITH_GSL)
     target_include_directories(
       opentelemetry_api INTERFACE "$<BUILD_INTERFACE:${GSL_DIR}/include>")
   endif()
-endif()
-
-if(WITH_METRICS_PREVIEW)
-  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_METRICS_PREVIEW)
 endif()
 
 if(WITH_LOGS_PREVIEW)

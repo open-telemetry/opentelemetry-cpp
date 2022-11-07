@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS SDK] Rename LogProcessor and LogExporter to LogRecordProcessor and LogRecordExporter
+  [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
+* [METRICS SDK] - Remove old metrics from Github CI
+  [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
+
 ## [1.7.0] 2022-10-28
 
 * [METRICS SDK] Validate Instrument meta data (name, unit, description) [#1713](https://github.com/open-telemetry/opentelemetry-cpp/pull/1713)

@@ -14,14 +14,14 @@ namespace logs
 {
 
 std::unique_ptr<opentelemetry::logs::LoggerProvider> LoggerProviderFactory::Create(
-    std::unique_ptr<LogProcessor> &&processor)
+    std::unique_ptr<LogRecordProcessor> &&processor)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Create(std::move(processor), resource);
 }
 
 std::unique_ptr<opentelemetry::logs::LoggerProvider> LoggerProviderFactory::Create(
-    std::unique_ptr<LogProcessor> &&processor,
+    std::unique_ptr<LogRecordProcessor> &&processor,
     const opentelemetry::sdk::resource::Resource &resource)
 {
   std::unique_ptr<opentelemetry::logs::LoggerProvider> provider(
@@ -30,14 +30,14 @@ std::unique_ptr<opentelemetry::logs::LoggerProvider> LoggerProviderFactory::Crea
 }
 
 std::unique_ptr<opentelemetry::logs::LoggerProvider> LoggerProviderFactory::Create(
-    std::vector<std::unique_ptr<LogProcessor>> &&processors)
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Create(std::move(processors), resource);
 }
 
 std::unique_ptr<opentelemetry::logs::LoggerProvider> LoggerProviderFactory::Create(
-    std::vector<std::unique_ptr<LogProcessor>> &&processors,
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
     const opentelemetry::sdk::resource::Resource &resource)
 {
   std::unique_ptr<opentelemetry::logs::LoggerProvider> provider(

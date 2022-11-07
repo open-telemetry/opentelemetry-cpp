@@ -1,17 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#  include <gtest/gtest.h>
-#  include <map>
-#  include <memory>
+#include <gtest/gtest.h>
+#include <map>
+#include <memory>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
@@ -326,5 +325,3 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
-
-#endif
