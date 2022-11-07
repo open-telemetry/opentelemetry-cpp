@@ -9,7 +9,7 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 
 /*
-  Make sure OtlpGrpcLogExporterFactory does not require,
+  Make sure OtlpGrpcLogRecordExporterFactory does not require,
   even indirectly, protobuf headers.
 */
 #  ifdef GOOGLE_PROTOBUF_VERSION
@@ -22,13 +22,13 @@ namespace exporter
 namespace otlp
 {
 
-TEST(OtlpGrpcLogExporterFactoryTest, BuildTest)
+TEST(OtlpGrpcLogRecordExporterFactoryTest, BuildTest)
 {
   OtlpGrpcExporterOptions opts;
   opts.endpoint = "localhost:45454";
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter =
-      OtlpGrpcLogExporterFactory::Create(opts);
+      OtlpGrpcLogRecordExporterFactory::Create(opts);
 
   EXPECT_TRUE(exporter != nullptr);
 }

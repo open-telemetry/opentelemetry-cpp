@@ -1,18 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace nostd = opentelemetry::nostd;
 
@@ -37,11 +35,11 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
                                                             options.console_debug,
                                                             options.timeout,
                                                             options.http_headers
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                             ,
                                                             options.max_concurrent_requests,
                                                             options.max_requests_per_connection
-#  endif
+#endif
                                                             )))
 {}
 
@@ -59,10 +57,10 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
   options.console_debug                  = http_client_->GetOptions().console_debug;
   options.timeout                        = http_client_->GetOptions().timeout;
   options.http_headers                   = http_client_->GetOptions().http_headers;
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   options.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
   options.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
-#  endif
+#endif
 }
 // ----------------------------- Exporter methods ------------------------------
 
@@ -91,7 +89,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   proto::collector::metrics::v1::ExportMetricsServiceRequest service_request;
   OtlpMetricUtils::PopulateRequest(data, &service_request);
   std::size_t metric_count = data.scope_metric_data_.size();
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(service_request, [metric_count](
                                             opentelemetry::sdk::common::ExportResult result) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
@@ -107,7 +105,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
     return true;
   });
   return opentelemetry::sdk::common::ExportResult::kSuccess;
-#  else
+#else
   opentelemetry::sdk::common::ExportResult result = http_client_->Export(service_request);
   if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
   {
@@ -120,7 +118,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
                                                                 << " metric(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
-#  endif
+#endif
 }
 
 bool OtlpHttpMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
@@ -136,5 +134,3 @@ bool OtlpHttpMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcep
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

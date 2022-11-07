@@ -15,13 +15,13 @@ namespace logs
 {
 
 /**
- * Factory class for SimpleLogProcessor.
+ * Factory class for SimpleLogRecordProcessor.
  */
-class SimpleLogProcessorFactory
+class SimpleLogRecordProcessorFactory
 {
 public:
   /**
-   * Create a SimpleLogProcessor.
+   * Create a SimpleLogRecordProcessor.
    */
   static std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter);
 };

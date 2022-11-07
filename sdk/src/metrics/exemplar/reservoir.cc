@@ -1,14 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#  include <vector>
-#  include "opentelemetry/sdk/metrics/exemplar/filtered_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include <vector>
+#include "opentelemetry/sdk/metrics/exemplar/filtered_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -41,4 +40,3 @@ nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetNoExemplarReservoir()
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

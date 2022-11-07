@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include <memory>
-#  include <mutex>
-#  include <vector>
+#include <memory>
+#include <mutex>
+#include <vector>
 
-#  include <prometheus/collectable.h>
-#  include <prometheus/metric_family.h>
-#  include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include <prometheus/collectable.h>
+#include <prometheus/metric_family.h>
+#include "opentelemetry/exporters/prometheus/exporter_utils.h"
 
 namespace prometheus_client = ::prometheus;
 
@@ -84,4 +83,3 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

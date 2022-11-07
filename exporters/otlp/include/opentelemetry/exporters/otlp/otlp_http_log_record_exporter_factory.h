@@ -16,21 +16,21 @@ namespace otlp
 {
 
 /**
- * Factory class for OtlpHttpLogExporter.
+ * Factory class for OtlpHttpLogRecordExporter.
  */
-class OtlpHttpLogExporterFactory
+class OtlpHttpLogRecordExporterFactory
 {
 public:
   /**
-   * Create a OtlpHttpLogExporter.
+   * Create a OtlpHttpLogRecordExporter.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create();
 
   /**
-   * Create a OtlpHttpLogExporter.
+   * Create a OtlpHttpLogRecordExporter.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
-      const OtlpHttpLogExporterOptions &options);
+      const OtlpHttpLogRecordExporterOptions &options);
 };
 
 }  // namespace otlp

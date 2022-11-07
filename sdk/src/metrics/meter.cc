@@ -1,22 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include <cstdint>
-#  include "opentelemetry/metrics/noop.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/async_instruments.h"
-#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-#  include "opentelemetry/sdk/metrics/state/observable_registry.h"
-#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include <cstdint>
+#include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
+#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/metrics/sync_instruments.h"
-#  include "opentelemetry/sdk_config.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include "opentelemetry/sdk_config.h"
 
-#  include <memory>
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -412,4 +411,3 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include <functional>
+#include <functional>
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
@@ -68,5 +67,3 @@ TEST(AttributesHashMap, BasicTests)
       });
   EXPECT_EQ(count, hash_map.Size());
 }
-
-#endif

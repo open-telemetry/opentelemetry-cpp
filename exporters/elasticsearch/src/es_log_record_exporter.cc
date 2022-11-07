@@ -289,21 +289,22 @@ private:
 };
 #  endif
 
-ElasticsearchLogExporter::ElasticsearchLogExporter()
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
     : options_{ElasticsearchExporterOptions()},
       http_client_{ext::http::client::HttpClientFactory::Create()}
 {}
 
-ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options)
     : options_{options}, http_client_{ext::http::client::HttpClientFactory::Create()}
 {}
 
-std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() noexcept
+std::unique_ptr<sdklogs::Recordable> ElasticsearchLogRecordExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdklogs::Recordable>(new ElasticSearchRecordable);
 }
 
-sdk::common::ExportResult ElasticsearchLogExporter::Export(
+sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   // Return failure if this exporter has been shutdown
@@ -400,7 +401,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
 #  endif
 }
 
-bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
@@ -412,7 +413,7 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds /* timeout */)
   return true;
 }
 
-bool ElasticsearchLogExporter::isShutdown() const noexcept
+bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

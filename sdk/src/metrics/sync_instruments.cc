@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
-#  include <cmath>
+#include <cmath>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -221,4 +220,3 @@ void DoubleHistogram::Record(double value, const opentelemetry::context::Context
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

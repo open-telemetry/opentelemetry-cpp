@@ -3,14 +3,12 @@
 
 #pragma once
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include <prometheus/metric_family.h>
-#  include <string>
-#  include <vector>
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/version.h"
+#include <prometheus/metric_family.h>
+#include <string>
+#include <vector>
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -113,4 +111,3 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

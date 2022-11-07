@@ -31,28 +31,31 @@ namespace otlp
 {
 // -------------------------------- Constructors --------------------------------
 
-OtlpGrpcLogExporter::OtlpGrpcLogExporter() : OtlpGrpcLogExporter(OtlpGrpcExporterOptions()) {}
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
+    : OtlpGrpcLogRecordExporter(OtlpGrpcExporterOptions())
+{}
 
-OtlpGrpcLogExporter::OtlpGrpcLogExporter(const OtlpGrpcExporterOptions &options)
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options)
     : options_(options),
       log_service_stub_(
           OtlpGrpcClient::MakeServiceStub<proto::collector::logs::v1::LogsService>(options))
 {}
 
-OtlpGrpcLogExporter::OtlpGrpcLogExporter(
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub)
     : options_(OtlpGrpcExporterOptions()), log_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
 
-std::unique_ptr<opentelemetry::sdk::logs::Recordable> OtlpGrpcLogExporter::MakeRecordable() noexcept
+std::unique_ptr<opentelemetry::sdk::logs::Recordable>
+OtlpGrpcLogRecordExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
       new exporter::otlp::OtlpLogRecordable());
 }
 
-opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
+opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
   if (isShutdown())
@@ -82,14 +85,14 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcLogExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool OtlpGrpcLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
-bool OtlpGrpcLogExporter::isShutdown() const noexcept
+bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

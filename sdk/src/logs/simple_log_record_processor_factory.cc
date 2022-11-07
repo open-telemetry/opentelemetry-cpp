@@ -12,10 +12,10 @@ namespace sdk
 namespace logs
 {
 
-std::unique_ptr<LogRecordProcessor> SimpleLogProcessorFactory::Create(
+std::unique_ptr<LogRecordProcessor> SimpleLogRecordProcessorFactory::Create(
     std::unique_ptr<LogRecordExporter> &&exporter)
 {
-  std::unique_ptr<LogRecordProcessor> processor(new SimpleLogProcessor(std::move(exporter)));
+  std::unique_ptr<LogRecordProcessor> processor(new SimpleLogRecordProcessor(std::move(exporter)));
   return processor;
 }
 
