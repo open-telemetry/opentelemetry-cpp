@@ -20,6 +20,27 @@ Increment the:
 * [METRICS SDK] - Remove old metrics from Github CI
   [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
 
+Deprecation notes:
+
+* The file
+  `api/include/opentelemetry/trace/experimental_semantic_conventions.h`
+  is deprecated, and will be removed in a future release.
+  Use file
+  `api/include/opentelemetry/trace/semantic_conventions.h`
+  instead.
+
+* The file
+  `sdk/include/opentelemetry/sdk/resource/experimental_semantic_conventions.h`
+  is deprecated, and will be removed in a future release.
+  Use file
+  `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+  instead.
+
+* The function
+  `uint32_t hashCode(const char *str, uint32_t h = 0)`
+  is deprecated, and will be removed in a future release.
+  No replacement will be provided.
+
 ## [1.7.0] 2022-10-28
 
 * [METRICS SDK] Validate Instrument meta data (name, unit, description) [#1713](https://github.com/open-telemetry/opentelemetry-cpp/pull/1713)
