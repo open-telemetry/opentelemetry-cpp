@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef HAVE_CPP_STDLIB
+#ifdef OPENTELEMETRY_HAVE_STL_CXX14
 #  include "opentelemetry/std/utility.h"
 #else
 
