@@ -19,6 +19,7 @@ Increment the:
   [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
 * [METRICS SDK] - Remove old metrics from Github CI
   [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
+* [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
 
 ## [1.7.0] 2022-10-28
 
