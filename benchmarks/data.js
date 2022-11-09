@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668030051970,
+  "lastUpdate": 1668030056401,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -93958,6 +93958,54 @@ window.BENCHMARK_DATA = {
             "value": 907180.9221695649,
             "unit": "ns/iter",
             "extra": "iterations: 673\ncpu: 206546.35958395246 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@free.fr",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "702a68c1293bef9e48025f931ecbbbdccb7f4acd",
+          "message": "[Deprecation] Deprecate experimental semantic conventions (#1742) (#1744)\n\nFixes https://github.com/open-telemetry/opentelemetry-cpp/issues/1742",
+          "timestamp": "2022-11-09T13:27:42-08:00",
+          "tree_id": "1cb2e8d38ceea7743772f5a913a95ddbae5df528",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/702a68c1293bef9e48025f931ecbbbdccb7f4acd"
+        },
+        "date": 1668030050715,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 119.57471424043692,
+            "unit": "ns/iter",
+            "extra": "iterations: 1162000\ncpu: 119.3960413080895 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 174.71461562636478,
+            "unit": "ns/iter",
+            "extra": "iterations: 805000\ncpu: 173.80198757763975 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 637.8103264778719,
+            "unit": "ns/iter",
+            "extra": "iterations: 223000\ncpu: 631.9354260089688 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1791863.949164468,
+            "unit": "ns/iter",
+            "extra": "iterations: 479\ncpu: 333638.8308977037 ns\nthreads: 1"
           }
         ]
       }
