@@ -39,10 +39,12 @@ Deprecation notes:
     `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
     instead.
 
-  * The function
+  * The function, declared in the global namespace
     `uint32_t hashCode(const char *str, uint32_t h = 0)`
     is deprecated, and will be removed in a future release.
     No replacement will be provided.
+    Note that function `opentelemetry::utils::hashCode`,
+    declared in the ETW exporter, is not affected by this deprecation.
 
 ## [1.7.0] 2022-10-28
 
