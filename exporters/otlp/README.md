@@ -44,34 +44,34 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 
 ### Configuration options ( OTLP GRPC Exporter )
 
-| Option       | Env Variable |Default          |   Description  |
-| ------------ |---------------|------------ |----------------|
-| `endpoint` | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`| The OTLP GRPC endpoint to connect to |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  |  | |
-| `use_ssl_credentials` | `OTEL_EXPORTER_OTLP_SSL_ENABLE`| `false` | Whether the endpoint is SSL enabled |
-|    | `OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE` | | |
-| `ssl_credentials_cacert_path`  |  `OTEL_EXPORTER_OTLP_CERTIFICATE` | `""`  | SSL Certificate file path |
-|    | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE` | | |
-| `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_CERTIFICATE_STRING` | `""`  |   SSL Certifcate as in-memory string |
-|  | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING` | | | |
-| `timeout`    | `OTEL_EXPORTER_OTLP_TIMEOUT` | `10s` | GRPC deadline |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`  |  | |
-| `metadata`   | `OTEL_EXPORTER_OTLP_HEADERS` |  | Custom metadata for GRPC |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_HEADERS`  |  | |
+| Option                           | Env Variable                                 | Default               | Description                          |
+|----------------------------------|----------------------------------------------|-----------------------|--------------------------------------|
+|`endpoint`                        |`OTEL_EXPORTER_OTLP_ENDPOINT`                 |`http://localhost:4317`| The OTLP GRPC endpoint to connect to |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`          |                       |                                      |
+|`use_ssl_credentials`             |`OTEL_EXPORTER_OTLP_SSL_ENABLE`               | `false`               | Whether the endpoint is SSL enabled  |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE`        |                       |                                      |
+|`ssl_credentials_cacert_path`     |`OTEL_EXPORTER_OTLP_CERTIFICATE`              | `""`                  | SSL Certificate file path            |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE`       |                       |                                      |
+|`ssl_credentials_cacert_as_string`|`OTEL_EXPORTER_OTLP_CERTIFICATE_STRING`       | `""`                  | SSL Certifcate as in-memory string   |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING`|                       |                                      |
+|`timeout`                         |`OTEL_EXPORTER_OTLP_TIMEOUT`                  | `10s`                 | GRPC deadline                        |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`           |                       |                                      |
+|`metadata`                        |`OTEL_EXPORTER_OTLP_HEADERS`                  |                       | Custom metadata for GRPC             |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_HEADERS`           |                       |                                      |
 
 ### Configuration options ( OTLP HTTP Exporter )
 
-| Option       | Env Variable |Default          | Description |
-| ------------ |-----|------------ |------|
-| `url`   | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318/v1/traces`  | The OTLP HTTP endpoint to connect to |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  |  | |
-| `content_type` | n/a  | `application/json`  |   Data format used - JSON or Binary |
-| `json_bytes_mapping`  |  n/a | `JsonBytesMappingKind::kHexId` | Encoding used for trace_id and span_id |
-| `use_json_name` | n/a | `false`  | Whether to use json name of protobuf field to set the key of json |
-| `timeout`    | `OTEL_EXPORTER_OTLP_TIMEOUT` | `10s` | http timeout |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`  |  |
-| `http_headers` | `OTEL_EXPORTER_OTLP_HEADERS` |  | http headers |
-|              |   `OTEL_EXPORTER_OTLP_TRACES_HEADERS`  |  | |
+| Option             | Env Variable                       | Default                         | Description                                                       |
+|--------------------|------------------------------------|---------------------------------|-------------------------------------------------------------------|
+|`url`               |`OTEL_EXPORTER_OTLP_ENDPOINT`       |`http://localhost:4318/v1/traces`| The OTLP HTTP endpoint to connect to                              |
+|                    |`OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`|                                 |                                                                   |
+|`content_type`      | n/a                                | `application/json`              | Data format used - JSON or Binary                                 |
+|`json_bytes_mapping`| n/a                                | `JsonBytesMappingKind::kHexId`  | Encoding used for trace_id and span_id                            |
+|`use_json_name`     | n/a                                | `false`                         | Whether to use json name of protobuf field to set the key of json |
+|`timeout`           |`OTEL_EXPORTER_OTLP_TIMEOUT`        | `10s`                           | http timeout                                                      |
+|                    |`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` |                                 |                                                                   |
+|`http_headers`      |`OTEL_EXPORTER_OTLP_HEADERS`        |                                 | http headers                                                      |
+|                    |`OTEL_EXPORTER_OTLP_TRACES_HEADERS` |                                 |                                                                   |
 
 ## Example
 
