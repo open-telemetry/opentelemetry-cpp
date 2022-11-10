@@ -33,7 +33,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.14.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.15.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -256,6 +256,17 @@ static constexpr const char *DB_MONGODB_COLLECTION = "db.mongodb.collection";
  set.</li> </ul>
  */
 static constexpr const char *DB_SQL_TABLE = "db.sql.table";
+
+/**
+ * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code
+ * is UNSET.
+ */
+static constexpr const char *OTEL_STATUS_CODE = "otel.status_code";
+
+/**
+ * Description of the Status if it has a value, otherwise not set.
+ */
+static constexpr const char *OTEL_STATUS_DESCRIPTION = "otel.status_description";
 
 /**
  * Type of the trigger which caused this function execution.
@@ -571,9 +582,14 @@ static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH = "http.response_conte
 static constexpr const char *HTTP_URL = "http.url";
 
 /**
- * The ordinal number of request re-sending attempt.
+ * The ordinal number of request resending attempt (for any reason, including redirects).
+ *
+ * <p>Notes:
+  <ul> <li>The resend count SHOULD be updated each time an HTTP request gets resent by the client,
+ regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503
+ Server Unavailable, network issues, or any other).</li> </ul>
  */
-static constexpr const char *HTTP_RETRY_COUNT = "http.retry_count";
+static constexpr const char *HTTP_RESEND_COUNT = "http.resend_count";
 
 /**
  * The URI scheme identifying the used protocol.
@@ -880,6 +896,24 @@ static constexpr const char *MESSAGING_ROCKETMQ_CLIENT_GROUP = "messaging.rocket
 static constexpr const char *MESSAGING_ROCKETMQ_CLIENT_ID = "messaging.rocketmq.client_id";
 
 /**
+ * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+ */
+static constexpr const char *MESSAGING_ROCKETMQ_DELIVERY_TIMESTAMP =
+    "messaging.rocketmq.delivery_timestamp";
+
+/**
+ * The delay time level for delay message, which determines the message delay time.
+ */
+static constexpr const char *MESSAGING_ROCKETMQ_DELAY_TIME_LEVEL =
+    "messaging.rocketmq.delay_time_level";
+
+/**
+ * It is essential for FIFO message. Messages that belong to the same message group are always
+ * processed one by one within the same consumer group.
+ */
+static constexpr const char *MESSAGING_ROCKETMQ_MESSAGE_GROUP = "messaging.rocketmq.message_group";
+
+/**
  * Type of message.
  */
 static constexpr const char *MESSAGING_ROCKETMQ_MESSAGE_TYPE = "messaging.rocketmq.message_type";
@@ -1102,6 +1136,15 @@ static constexpr const char *SERIAL = "serial";
 /** local_serial. */
 static constexpr const char *LOCAL_SERIAL = "local_serial";
 }  // namespace DbCassandraConsistencyLevelValues
+
+namespace OtelStatusCodeValues
+{
+/** The operation has been validated by an Application developer or Operator to have completed
+ * successfully. */
+static constexpr const char *OK = "OK";
+/** The operation contains an error. */
+static constexpr const char *ERROR = "ERROR";
+}  // namespace OtelStatusCodeValues
 
 namespace FaasTriggerValues
 {

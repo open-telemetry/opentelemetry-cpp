@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.14.0";
+static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.15.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -669,6 +669,26 @@ static constexpr const char *WEBENGINE_VERSION = "webengine.version";
  * Additional description of the web engine (e.g. detailed version and edition information).
  */
 static constexpr const char *WEBENGINE_DESCRIPTION = "webengine.description";
+
+/**
+ * The name of the instrumentation scope - ({@code InstrumentationScope.Name} in OTLP).
+ */
+static constexpr const char *OTEL_SCOPE_NAME = "otel.scope.name";
+
+/**
+ * The version of the instrumentation scope - ({@code InstrumentationScope.Version} in OTLP).
+ */
+static constexpr const char *OTEL_SCOPE_VERSION = "otel.scope.version";
+
+/**
+ * Deprecated, use the {@code otel.scope.name} attribute.
+ */
+static constexpr const char *OTEL_LIBRARY_NAME = "otel.library.name";
+
+/**
+ * Deprecated, use the {@code otel.scope.version} attribute.
+ */
+static constexpr const char *OTEL_LIBRARY_VERSION = "otel.library.version";
 
 // Enum definitions
 namespace CloudProviderValues
