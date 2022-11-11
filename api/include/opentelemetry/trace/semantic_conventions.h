@@ -23,6 +23,12 @@
 #    undef DELETE
 #  endif
 #endif
+#ifdef _WIN32
+#  ifdef ERROR
+#    pragma message(__FILE__ ": removing define on ERROR")
+#    undef ERROR
+#  endif
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
