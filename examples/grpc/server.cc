@@ -65,10 +65,10 @@ public:
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                              {{SemanticConventions::RPC_SYSTEM, "grpc"},
-                                               {SemanticConventions::RPC_SERVICE, "GreeterService"},
-                                               {SemanticConventions::RPC_METHOD, "Greet"},
-                                               {SemanticConventions::RPC_GRPC_STATUS_CODE, 0}},
+                                              {{SemanticConventions::kRpcSystem, "grpc"},
+                                               {SemanticConventions::kRpcService, "GreeterService"},
+                                               {SemanticConventions::kRpcMethod, "Greet"},
+                                               {SemanticConventions::kRpcGrpcStatusCode, 0}},
                                               options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 

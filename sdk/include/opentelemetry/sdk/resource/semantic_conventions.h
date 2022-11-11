@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.15.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.15.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -33,7 +33,7 @@ static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.15
  href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
  navigator.userAgentData.brands}).</li> </ul>
  */
-static constexpr const char *BROWSER_BRANDS = "browser.brands";
+static constexpr const char *kBrowserBrands = "browser.brands";
 
 /**
  * The platform on which the browser is running
@@ -50,7 +50,7 @@ href="./os.md">{@code os.type} and {@code os.name} attributes</a>. However, for 
 values in the {@code browser.platform} attribute should capture the exact value that the user agent
 provides.</li> </ul>
  */
-static constexpr const char *BROWSER_PLATFORM = "browser.platform";
+static constexpr const char *kBrowserPlatform = "browser.platform";
 
 /**
  * A boolean that is true if the browser is running on a mobile device
@@ -60,7 +60,7 @@ static constexpr const char *BROWSER_PLATFORM = "browser.platform";
  href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
  navigator.userAgentData.mobile}). If unavailable, this attribute SHOULD be left unset.</li> </ul>
  */
-static constexpr const char *BROWSER_MOBILE = "browser.mobile";
+static constexpr const char *kBrowserMobile = "browser.mobile";
 
 /**
  * Full user-agent string provided by the browser
@@ -70,7 +70,7 @@ static constexpr const char *BROWSER_MOBILE = "browser.mobile";
  to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the
  value, the legacy {@code navigator.userAgent} API can be used.</li> </ul>
  */
-static constexpr const char *BROWSER_USER_AGENT = "browser.user_agent";
+static constexpr const char *kBrowserUserAgent = "browser.user_agent";
 
 /**
  * Preferred language of the user using the browser
@@ -79,17 +79,17 @@ static constexpr const char *BROWSER_USER_AGENT = "browser.user_agent";
   <ul> <li>This value is intended to be taken from the Navigator API {@code
  navigator.language}.</li> </ul>
  */
-static constexpr const char *BROWSER_LANGUAGE = "browser.language";
+static constexpr const char *kBrowserLanguage = "browser.language";
 
 /**
  * Name of the cloud provider.
  */
-static constexpr const char *CLOUD_PROVIDER = "cloud.provider";
+static constexpr const char *kCloudProvider = "cloud.provider";
 
 /**
  * The cloud account ID the resource is assigned to.
  */
-static constexpr const char *CLOUD_ACCOUNT_ID = "cloud.account.id";
+static constexpr const char *kCloudAccountId = "cloud.account.id";
 
 /**
  * The geographical region the resource is running.
@@ -103,7 +103,7 @@ static constexpr const char *CLOUD_ACCOUNT_ID = "cloud.account.id";
  href="https://intl.cloud.tencent.com/document/product/213/6091">Tencent Cloud regions</a>.</li>
  </ul>
  */
-static constexpr const char *CLOUD_REGION = "cloud.region";
+static constexpr const char *kCloudRegion = "cloud.region";
 
 /**
  * Cloud regions often have multiple, isolated locations known as zones to increase availability.
@@ -113,7 +113,7 @@ static constexpr const char *CLOUD_REGION = "cloud.region";
   <ul> <li>Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.</li>
  </ul>
  */
-static constexpr const char *CLOUD_AVAILABILITY_ZONE = "cloud.availability_zone";
+static constexpr const char *kCloudAvailabilityZone = "cloud.availability_zone";
 
 /**
  * The cloud platform in use.
@@ -122,49 +122,49 @@ static constexpr const char *CLOUD_AVAILABILITY_ZONE = "cloud.availability_zone"
   <ul> <li>The prefix of the service SHOULD match the one specified in {@code cloud.provider}.</li>
  </ul>
  */
-static constexpr const char *CLOUD_PLATFORM = "cloud.platform";
+static constexpr const char *kCloudPlatform = "cloud.platform";
 
 /**
  * The Amazon Resource Name (ARN) of an <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html">ECS
  * container instance</a>.
  */
-static constexpr const char *AWS_ECS_CONTAINER_ARN = "aws.ecs.container.arn";
+static constexpr const char *kAwsEcsContainerArn = "aws.ecs.container.arn";
 
 /**
  * The ARN of an <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">ECS cluster</a>.
  */
-static constexpr const char *AWS_ECS_CLUSTER_ARN = "aws.ecs.cluster.arn";
+static constexpr const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
 
 /**
  * The <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html">launch
  * type</a> for an ECS task.
  */
-static constexpr const char *AWS_ECS_LAUNCHTYPE = "aws.ecs.launchtype";
+static constexpr const char *kAwsEcsLaunchtype = "aws.ecs.launchtype";
 
 /**
  * The ARN of an <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html">ECS task
  * definition</a>.
  */
-static constexpr const char *AWS_ECS_TASK_ARN = "aws.ecs.task.arn";
+static constexpr const char *kAwsEcsTaskArn = "aws.ecs.task.arn";
 
 /**
  * The task definition family this task definition is a member of.
  */
-static constexpr const char *AWS_ECS_TASK_FAMILY = "aws.ecs.task.family";
+static constexpr const char *kAwsEcsTaskFamily = "aws.ecs.task.family";
 
 /**
  * The revision for this task definition.
  */
-static constexpr const char *AWS_ECS_TASK_REVISION = "aws.ecs.task.revision";
+static constexpr const char *kAwsEcsTaskRevision = "aws.ecs.task.revision";
 
 /**
  * The ARN of an EKS cluster.
  */
-static constexpr const char *AWS_EKS_CLUSTER_ARN = "aws.eks.cluster.arn";
+static constexpr const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
 
 /**
  * The name(s) of the AWS log group(s) an application is writing to.
@@ -173,7 +173,7 @@ static constexpr const char *AWS_EKS_CLUSTER_ARN = "aws.eks.cluster.arn";
   <ul> <li>Multiple log groups must be supported for cases like multi-container applications, where
  a single application has sidecar containers, and each write to their own log group.</li> </ul>
  */
-static constexpr const char *AWS_LOG_GROUP_NAMES = "aws.log.group.names";
+static constexpr const char *kAwsLogGroupNames = "aws.log.group.names";
 
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
@@ -183,12 +183,12 @@ static constexpr const char *AWS_LOG_GROUP_NAMES = "aws.log.group.names";
  href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format">log
  group ARN format documentation</a>.</li> </ul>
  */
-static constexpr const char *AWS_LOG_GROUP_ARNS = "aws.log.group.arns";
+static constexpr const char *kAwsLogGroupArns = "aws.log.group.arns";
 
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
  */
-static constexpr const char *AWS_LOG_STREAM_NAMES = "aws.log.stream.names";
+static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
 
 /**
  * The ARN(s) of the AWS log stream(s).
@@ -199,40 +199,40 @@ static constexpr const char *AWS_LOG_STREAM_NAMES = "aws.log.stream.names";
  stream ARN format documentation</a>. One log group can contain several log streams, so these ARNs
  necessarily identify both a log group and a log stream.</li> </ul>
  */
-static constexpr const char *AWS_LOG_STREAM_ARNS = "aws.log.stream.arns";
+static constexpr const char *kAwsLogStreamArns = "aws.log.stream.arns";
 
 /**
  * Container name used by container runtime.
  */
-static constexpr const char *CONTAINER_NAME = "container.name";
+static constexpr const char *kContainerName = "container.name";
 
 /**
  * Container ID. Usually a UUID, as for example used to <a
  * href="https://docs.docker.com/engine/reference/run/#container-identification">identify Docker
  * containers</a>. The UUID might be abbreviated.
  */
-static constexpr const char *CONTAINER_ID = "container.id";
+static constexpr const char *kContainerId = "container.id";
 
 /**
  * The container runtime managing this container.
  */
-static constexpr const char *CONTAINER_RUNTIME = "container.runtime";
+static constexpr const char *kContainerRuntime = "container.runtime";
 
 /**
  * Name of the image the container was built on.
  */
-static constexpr const char *CONTAINER_IMAGE_NAME = "container.image.name";
+static constexpr const char *kContainerImageName = "container.image.name";
 
 /**
  * Container image tag.
  */
-static constexpr const char *CONTAINER_IMAGE_TAG = "container.image.tag";
+static constexpr const char *kContainerImageTag = "container.image.tag";
 
 /**
  * Name of the <a href="https://en.wikipedia.org/wiki/Deployment_environment">deployment
  * environment</a> (aka deployment tier).
  */
-static constexpr const char *DEPLOYMENT_ENVIRONMENT = "deployment.environment";
+static constexpr const char *kDeploymentEnvironment = "deployment.environment";
 
 /**
  * A unique identifier representing the device
@@ -250,7 +250,7 @@ static constexpr const char *DEPLOYMENT_ENVIRONMENT = "deployment.environment";
  can identify a user. GDPR and data protection laws may apply, ensure you do your own due
  diligence.</li> </ul>
  */
-static constexpr const char *DEVICE_ID = "device.id";
+static constexpr const char *kDeviceId = "device.id";
 
 /**
  * The model identifier for the device
@@ -259,7 +259,7 @@ static constexpr const char *DEVICE_ID = "device.id";
   <ul> <li>It's recommended this value represents a machine readable version of the model identifier
  rather than the market or consumer-friendly name of the device.</li> </ul>
  */
-static constexpr const char *DEVICE_MODEL_IDENTIFIER = "device.model.identifier";
+static constexpr const char *kDeviceModelIdentifier = "device.model.identifier";
 
 /**
  * The marketing name for the device model
@@ -268,7 +268,7 @@ static constexpr const char *DEVICE_MODEL_IDENTIFIER = "device.model.identifier"
   <ul> <li>It's recommended this value represents a human readable version of the device model
  rather than a machine readable alternative.</li> </ul>
  */
-static constexpr const char *DEVICE_MODEL_NAME = "device.model.name";
+static constexpr const char *kDeviceModelName = "device.model.name";
 
 /**
  * The name of the device manufacturer
@@ -278,7 +278,7 @@ static constexpr const char *DEVICE_MODEL_NAME = "device.model.name";
  href="https://developer.android.com/reference/android/os/Build#MANUFACTURER">Build</a>. iOS apps
  SHOULD hardcode the value {@code Apple}.</li> </ul>
  */
-static constexpr const char *DEVICE_MANUFACTURER = "device.manufacturer";
+static constexpr const char *kDeviceManufacturer = "device.manufacturer";
 
 /**
  * The name of the single function that this runtime instance executes.
@@ -298,7 +298,7 @@ Azure function app can host multiple functions that would usually share a Tracer
 the {@code faas.id} attribute).</li>
  </ul>
  */
-static constexpr const char *FAAS_NAME = "faas.name";
+static constexpr const char *kFaasName = "faas.name";
 
 /**
  * The unique ID of the single function that this runtime instance executes.
@@ -322,7 +322,7 @@ This means that a span attribute MUST be used, as an Azure function app can host
 that would usually share a TracerProvider.</li>
  </ul>
  */
-static constexpr const char *FAAS_ID = "faas.id";
+static constexpr const char *kFaasId = "faas.id";
 
 /**
  * The immutable version of the function being executed.
@@ -339,7 +339,7 @@ K_REVISION} environment variable</a>.</li> <li><strong>Azure Functions:</strong>
 not set this attribute.</li>
  </ul>
  */
-static constexpr const char *FAAS_VERSION = "faas.version";
+static constexpr const char *kFaasVersion = "faas.version";
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations
@@ -349,7 +349,7 @@ static constexpr const char *FAAS_VERSION = "faas.version";
   <ul> <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
  </ul>
  */
-static constexpr const char *FAAS_INSTANCE = "faas.instance";
+static constexpr const char *kFaasInstance = "faas.instance";
 
 /**
  * The amount of memory available to the serverless function in MiB.
@@ -359,205 +359,205 @@ static constexpr const char *FAAS_INSTANCE = "faas.instance";
  Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable {@code
  AWS_LAMBDA_FUNCTION_MEMORY_SIZE} provides this information.</li> </ul>
  */
-static constexpr const char *FAAS_MAX_MEMORY = "faas.max_memory";
+static constexpr const char *kFaasMaxMemory = "faas.max_memory";
 
 /**
  * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
  */
-static constexpr const char *HOST_ID = "host.id";
+static constexpr const char *kHostId = "host.id";
 
 /**
  * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully
  * qualified hostname, or another name specified by the user.
  */
-static constexpr const char *HOST_NAME = "host.name";
+static constexpr const char *kHostName = "host.name";
 
 /**
  * Type of host. For Cloud, this must be the machine type.
  */
-static constexpr const char *HOST_TYPE = "host.type";
+static constexpr const char *kHostType = "host.type";
 
 /**
  * The CPU architecture the host system is running on.
  */
-static constexpr const char *HOST_ARCH = "host.arch";
+static constexpr const char *kHostArch = "host.arch";
 
 /**
  * Name of the VM image or OS install the host was instantiated from.
  */
-static constexpr const char *HOST_IMAGE_NAME = "host.image.name";
+static constexpr const char *kHostImageName = "host.image.name";
 
 /**
  * VM image ID. For Cloud, this value is from the provider.
  */
-static constexpr const char *HOST_IMAGE_ID = "host.image.id";
+static constexpr const char *kHostImageId = "host.image.id";
 
 /**
  * The version string of the VM image as defined in <a href="README.md#version-attributes">Version
  * Attributes</a>.
  */
-static constexpr const char *HOST_IMAGE_VERSION = "host.image.version";
+static constexpr const char *kHostImageVersion = "host.image.version";
 
 /**
  * The name of the cluster.
  */
-static constexpr const char *K8S_CLUSTER_NAME = "k8s.cluster.name";
+static constexpr const char *kK8sClusterName = "k8s.cluster.name";
 
 /**
  * The name of the Node.
  */
-static constexpr const char *K8S_NODE_NAME = "k8s.node.name";
+static constexpr const char *kK8sNodeName = "k8s.node.name";
 
 /**
  * The UID of the Node.
  */
-static constexpr const char *K8S_NODE_UID = "k8s.node.uid";
+static constexpr const char *kK8sNodeUid = "k8s.node.uid";
 
 /**
  * The name of the namespace that the pod is running in.
  */
-static constexpr const char *K8S_NAMESPACE_NAME = "k8s.namespace.name";
+static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
 
 /**
  * The UID of the Pod.
  */
-static constexpr const char *K8S_POD_UID = "k8s.pod.uid";
+static constexpr const char *kK8sPodUid = "k8s.pod.uid";
 
 /**
  * The name of the Pod.
  */
-static constexpr const char *K8S_POD_NAME = "k8s.pod.name";
+static constexpr const char *kK8sPodName = "k8s.pod.name";
 
 /**
  * The name of the Container from Pod specification, must be unique within a Pod. Container runtime
  * usually uses different globally unique name ({@code container.name}).
  */
-static constexpr const char *K8S_CONTAINER_NAME = "k8s.container.name";
+static constexpr const char *kK8sContainerName = "k8s.container.name";
 
 /**
  * Number of times the container was restarted. This attribute can be used to identify a particular
  * container (running or stopped) within a container spec.
  */
-static constexpr const char *K8S_CONTAINER_RESTART_COUNT = "k8s.container.restart_count";
+static constexpr const char *kK8sContainerRestartCount = "k8s.container.restart_count";
 
 /**
  * The UID of the ReplicaSet.
  */
-static constexpr const char *K8S_REPLICASET_UID = "k8s.replicaset.uid";
+static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
 
 /**
  * The name of the ReplicaSet.
  */
-static constexpr const char *K8S_REPLICASET_NAME = "k8s.replicaset.name";
+static constexpr const char *kK8sReplicasetName = "k8s.replicaset.name";
 
 /**
  * The UID of the Deployment.
  */
-static constexpr const char *K8S_DEPLOYMENT_UID = "k8s.deployment.uid";
+static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
 
 /**
  * The name of the Deployment.
  */
-static constexpr const char *K8S_DEPLOYMENT_NAME = "k8s.deployment.name";
+static constexpr const char *kK8sDeploymentName = "k8s.deployment.name";
 
 /**
  * The UID of the StatefulSet.
  */
-static constexpr const char *K8S_STATEFULSET_UID = "k8s.statefulset.uid";
+static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
 
 /**
  * The name of the StatefulSet.
  */
-static constexpr const char *K8S_STATEFULSET_NAME = "k8s.statefulset.name";
+static constexpr const char *kK8sStatefulsetName = "k8s.statefulset.name";
 
 /**
  * The UID of the DaemonSet.
  */
-static constexpr const char *K8S_DAEMONSET_UID = "k8s.daemonset.uid";
+static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
 
 /**
  * The name of the DaemonSet.
  */
-static constexpr const char *K8S_DAEMONSET_NAME = "k8s.daemonset.name";
+static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
 
 /**
  * The UID of the Job.
  */
-static constexpr const char *K8S_JOB_UID = "k8s.job.uid";
+static constexpr const char *kK8sJobUid = "k8s.job.uid";
 
 /**
  * The name of the Job.
  */
-static constexpr const char *K8S_JOB_NAME = "k8s.job.name";
+static constexpr const char *kK8sJobName = "k8s.job.name";
 
 /**
  * The UID of the CronJob.
  */
-static constexpr const char *K8S_CRONJOB_UID = "k8s.cronjob.uid";
+static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
 
 /**
  * The name of the CronJob.
  */
-static constexpr const char *K8S_CRONJOB_NAME = "k8s.cronjob.name";
+static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
 
 /**
  * The operating system type.
  */
-static constexpr const char *OS_TYPE = "os.type";
+static constexpr const char *kOsType = "os.type";
 
 /**
  * Human readable (not intended to be parsed) OS version information, like e.g. reported by {@code
  * ver} or {@code lsb_release -a} commands.
  */
-static constexpr const char *OS_DESCRIPTION = "os.description";
+static constexpr const char *kOsDescription = "os.description";
 
 /**
  * Human readable operating system name.
  */
-static constexpr const char *OS_NAME = "os.name";
+static constexpr const char *kOsName = "os.name";
 
 /**
  * The version string of the operating system as defined in <a
  * href="../../resource/semantic_conventions/README.md#version-attributes">Version Attributes</a>.
  */
-static constexpr const char *OS_VERSION = "os.version";
+static constexpr const char *kOsVersion = "os.version";
 
 /**
  * Process identifier (PID).
  */
-static constexpr const char *PROCESS_PID = "process.pid";
+static constexpr const char *kProcessPid = "process.pid";
 
 /**
  * Parent Process identifier (PID).
  */
-static constexpr const char *PROCESS_PARENT_PID = "process.parent_pid";
+static constexpr const char *kProcessParentPid = "process.parent_pid";
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the {@code Name} in
  * {@code proc/[pid]/status}. On Windows, can be set to the base name of {@code
  * GetProcessImageFileNameW}.
  */
-static constexpr const char *PROCESS_EXECUTABLE_NAME = "process.executable.name";
+static constexpr const char *kProcessExecutableName = "process.executable.name";
 
 /**
  * The full path to the process executable. On Linux based systems, can be set to the target of
  * {@code proc/[pid]/exe}. On Windows, can be set to the result of {@code GetProcessImageFileNameW}.
  */
-static constexpr const char *PROCESS_EXECUTABLE_PATH = "process.executable.path";
+static constexpr const char *kProcessExecutablePath = "process.executable.path";
 
 /**
  * The command used to launch the process (i.e. the command name). On Linux based systems, can be
  * set to the zeroth string in {@code proc/[pid]/cmdline}. On Windows, can be set to the first
  * parameter extracted from {@code GetCommandLineW}.
  */
-static constexpr const char *PROCESS_COMMAND = "process.command";
+static constexpr const char *kProcessCommand = "process.command";
 
 /**
  * The full command used to launch the process as a single string representing the full command. On
  * Windows, can be set to the result of {@code GetCommandLineW}. Do not set this if you have to
  * assemble it just for monitoring; use {@code process.command_args} instead.
  */
-static constexpr const char *PROCESS_COMMAND_LINE = "process.command_line";
+static constexpr const char *kProcessCommandLine = "process.command_line";
 
 /**
  * All the command arguments (including the command/executable itself) as received by the process.
@@ -565,29 +565,29 @@ static constexpr const char *PROCESS_COMMAND_LINE = "process.command_line";
  * to the list of null-delimited strings extracted from {@code proc/[pid]/cmdline}. For libc-based
  * executables, this would be the full argv vector passed to {@code main}.
  */
-static constexpr const char *PROCESS_COMMAND_ARGS = "process.command_args";
+static constexpr const char *kProcessCommandArgs = "process.command_args";
 
 /**
  * The username of the user that owns the process.
  */
-static constexpr const char *PROCESS_OWNER = "process.owner";
+static constexpr const char *kProcessOwner = "process.owner";
 
 /**
  * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of
  * the compiler.
  */
-static constexpr const char *PROCESS_RUNTIME_NAME = "process.runtime.name";
+static constexpr const char *kProcessRuntimeName = "process.runtime.name";
 
 /**
  * The version of the runtime of this process, as returned by the runtime without modification.
  */
-static constexpr const char *PROCESS_RUNTIME_VERSION = "process.runtime.version";
+static constexpr const char *kProcessRuntimeVersion = "process.runtime.version";
 
 /**
  * An additional description about the runtime of the process, for example a specific vendor
  * customization of the runtime environment.
  */
-static constexpr const char *PROCESS_RUNTIME_DESCRIPTION = "process.runtime.description";
+static constexpr const char *kProcessRuntimeDescription = "process.runtime.description";
 
 /**
  * Logical name of the service.
@@ -599,7 +599,7 @@ static constexpr const char *PROCESS_RUNTIME_DESCRIPTION = "process.runtime.desc
  If {@code process.executable.name} is not available, the value MUST be set to {@code
  unknown_service}.</li> </ul>
  */
-static constexpr const char *SERVICE_NAME = "service.name";
+static constexpr const char *kServiceName = "service.name";
 
 /**
  * A namespace for {@code service.name}.
@@ -612,7 +612,7 @@ static constexpr const char *SERVICE_NAME = "service.name";
  defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length
  namespace string is assumed equal to unspecified namespace.</li> </ul>
  */
-static constexpr const char *SERVICE_NAMESPACE = "service.namespace";
+static constexpr const char *kServiceNamespace = "service.namespace";
 
 /**
  * The string ID of the service instance.
@@ -628,207 +628,207 @@ static constexpr const char *SERVICE_NAMESPACE = "service.namespace";
  recommended to generate a random Version 1 or Version 4 RFC 4122 UUID (services aiming for
  reproducible UUIDs may also use Version 5, see RFC 4122 for more recommendations).</li> </ul>
  */
-static constexpr const char *SERVICE_INSTANCE_ID = "service.instance.id";
+static constexpr const char *kServiceInstanceId = "service.instance.id";
 
 /**
  * The version string of the service API or implementation.
  */
-static constexpr const char *SERVICE_VERSION = "service.version";
+static constexpr const char *kServiceVersion = "service.version";
 
 /**
  * The name of the telemetry SDK as defined above.
  */
-static constexpr const char *TELEMETRY_SDK_NAME = "telemetry.sdk.name";
+static constexpr const char *kTelemetrySdkName = "telemetry.sdk.name";
 
 /**
  * The language of the telemetry SDK.
  */
-static constexpr const char *TELEMETRY_SDK_LANGUAGE = "telemetry.sdk.language";
+static constexpr const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
 
 /**
  * The version string of the telemetry SDK.
  */
-static constexpr const char *TELEMETRY_SDK_VERSION = "telemetry.sdk.version";
+static constexpr const char *kTelemetrySdkVersion = "telemetry.sdk.version";
 
 /**
  * The version string of the auto instrumentation agent, if used.
  */
-static constexpr const char *TELEMETRY_AUTO_VERSION = "telemetry.auto.version";
+static constexpr const char *kTelemetryAutoVersion = "telemetry.auto.version";
 
 /**
  * The name of the web engine.
  */
-static constexpr const char *WEBENGINE_NAME = "webengine.name";
+static constexpr const char *kWebengineName = "webengine.name";
 
 /**
  * The version of the web engine.
  */
-static constexpr const char *WEBENGINE_VERSION = "webengine.version";
+static constexpr const char *kWebengineVersion = "webengine.version";
 
 /**
  * Additional description of the web engine (e.g. detailed version and edition information).
  */
-static constexpr const char *WEBENGINE_DESCRIPTION = "webengine.description";
+static constexpr const char *kWebengineDescription = "webengine.description";
 
 /**
  * The name of the instrumentation scope - ({@code InstrumentationScope.Name} in OTLP).
  */
-static constexpr const char *OTEL_SCOPE_NAME = "otel.scope.name";
+static constexpr const char *kOtelScopeName = "otel.scope.name";
 
 /**
  * The version of the instrumentation scope - ({@code InstrumentationScope.Version} in OTLP).
  */
-static constexpr const char *OTEL_SCOPE_VERSION = "otel.scope.version";
+static constexpr const char *kOtelScopeVersion = "otel.scope.version";
 
 /**
  * Deprecated, use the {@code otel.scope.name} attribute.
  */
-static constexpr const char *OTEL_LIBRARY_NAME = "otel.library.name";
+static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
  * Deprecated, use the {@code otel.scope.version} attribute.
  */
-static constexpr const char *OTEL_LIBRARY_VERSION = "otel.library.version";
+static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 // Enum definitions
 namespace CloudProviderValues
 {
 /** Alibaba Cloud. */
-static constexpr const char *ALIBABA_CLOUD = "alibaba_cloud";
+static constexpr const char *kAlibabaCloud = "alibaba_cloud";
 /** Amazon Web Services. */
-static constexpr const char *AWS = "aws";
+static constexpr const char *kAws = "aws";
 /** Microsoft Azure. */
-static constexpr const char *AZURE = "azure";
+static constexpr const char *kAzure = "azure";
 /** Google Cloud Platform. */
-static constexpr const char *GCP = "gcp";
+static constexpr const char *kGcp = "gcp";
 /** Tencent Cloud. */
-static constexpr const char *TENCENT_CLOUD = "tencent_cloud";
+static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace CloudProviderValues
 
 namespace CloudPlatformValues
 {
 /** Alibaba Cloud Elastic Compute Service. */
-static constexpr const char *ALIBABA_CLOUD_ECS = "alibaba_cloud_ecs";
+static constexpr const char *kAlibabaCloudEcs = "alibaba_cloud_ecs";
 /** Alibaba Cloud Function Compute. */
-static constexpr const char *ALIBABA_CLOUD_FC = "alibaba_cloud_fc";
+static constexpr const char *kAlibabaCloudFc = "alibaba_cloud_fc";
 /** AWS Elastic Compute Cloud. */
-static constexpr const char *AWS_EC2 = "aws_ec2";
+static constexpr const char *kAwsEc2 = "aws_ec2";
 /** AWS Elastic Container Service. */
-static constexpr const char *AWS_ECS = "aws_ecs";
+static constexpr const char *kAwsEcs = "aws_ecs";
 /** AWS Elastic Kubernetes Service. */
-static constexpr const char *AWS_EKS = "aws_eks";
+static constexpr const char *kAwsEks = "aws_eks";
 /** AWS Lambda. */
-static constexpr const char *AWS_LAMBDA = "aws_lambda";
+static constexpr const char *kAwsLambda = "aws_lambda";
 /** AWS Elastic Beanstalk. */
-static constexpr const char *AWS_ELASTIC_BEANSTALK = "aws_elastic_beanstalk";
+static constexpr const char *kAwsElasticBeanstalk = "aws_elastic_beanstalk";
 /** AWS App Runner. */
-static constexpr const char *AWS_APP_RUNNER = "aws_app_runner";
+static constexpr const char *kAwsAppRunner = "aws_app_runner";
 /** Azure Virtual Machines. */
-static constexpr const char *AZURE_VM = "azure_vm";
+static constexpr const char *kAzureVm = "azure_vm";
 /** Azure Container Instances. */
-static constexpr const char *AZURE_CONTAINER_INSTANCES = "azure_container_instances";
+static constexpr const char *kAzureContainerInstances = "azure_container_instances";
 /** Azure Kubernetes Service. */
-static constexpr const char *AZURE_AKS = "azure_aks";
+static constexpr const char *kAzureAks = "azure_aks";
 /** Azure Functions. */
-static constexpr const char *AZURE_FUNCTIONS = "azure_functions";
+static constexpr const char *kAzureFunctions = "azure_functions";
 /** Azure App Service. */
-static constexpr const char *AZURE_APP_SERVICE = "azure_app_service";
+static constexpr const char *kAzureAppService = "azure_app_service";
 /** Google Cloud Compute Engine (GCE). */
-static constexpr const char *GCP_COMPUTE_ENGINE = "gcp_compute_engine";
+static constexpr const char *kGcpComputeEngine = "gcp_compute_engine";
 /** Google Cloud Run. */
-static constexpr const char *GCP_CLOUD_RUN = "gcp_cloud_run";
+static constexpr const char *kGcpCloudRun = "gcp_cloud_run";
 /** Google Cloud Kubernetes Engine (GKE). */
-static constexpr const char *GCP_KUBERNETES_ENGINE = "gcp_kubernetes_engine";
+static constexpr const char *kGcpKubernetesEngine = "gcp_kubernetes_engine";
 /** Google Cloud Functions (GCF). */
-static constexpr const char *GCP_CLOUD_FUNCTIONS = "gcp_cloud_functions";
+static constexpr const char *kGcpCloudFunctions = "gcp_cloud_functions";
 /** Google Cloud App Engine (GAE). */
-static constexpr const char *GCP_APP_ENGINE = "gcp_app_engine";
+static constexpr const char *kGcpAppEngine = "gcp_app_engine";
 /** Tencent Cloud Cloud Virtual Machine (CVM). */
-static constexpr const char *TENCENT_CLOUD_CVM = "tencent_cloud_cvm";
+static constexpr const char *kTencentCloudCvm = "tencent_cloud_cvm";
 /** Tencent Cloud Elastic Kubernetes Service (EKS). */
-static constexpr const char *TENCENT_CLOUD_EKS = "tencent_cloud_eks";
+static constexpr const char *kTencentCloudEks = "tencent_cloud_eks";
 /** Tencent Cloud Serverless Cloud Function (SCF). */
-static constexpr const char *TENCENT_CLOUD_SCF = "tencent_cloud_scf";
+static constexpr const char *kTencentCloudScf = "tencent_cloud_scf";
 }  // namespace CloudPlatformValues
 
 namespace AwsEcsLaunchtypeValues
 {
 /** ec2. */
-static constexpr const char *EC2 = "ec2";
+static constexpr const char *kEc2 = "ec2";
 /** fargate. */
-static constexpr const char *FARGATE = "fargate";
+static constexpr const char *kFargate = "fargate";
 }  // namespace AwsEcsLaunchtypeValues
 
 namespace HostArchValues
 {
 /** AMD64. */
-static constexpr const char *AMD64 = "amd64";
+static constexpr const char *kAmd64 = "amd64";
 /** ARM32. */
-static constexpr const char *ARM32 = "arm32";
+static constexpr const char *kArm32 = "arm32";
 /** ARM64. */
-static constexpr const char *ARM64 = "arm64";
+static constexpr const char *kArm64 = "arm64";
 /** Itanium. */
-static constexpr const char *IA64 = "ia64";
+static constexpr const char *kIa64 = "ia64";
 /** 32-bit PowerPC. */
-static constexpr const char *PPC32 = "ppc32";
+static constexpr const char *kPpc32 = "ppc32";
 /** 64-bit PowerPC. */
-static constexpr const char *PPC64 = "ppc64";
+static constexpr const char *kPpc64 = "ppc64";
 /** IBM z/Architecture. */
-static constexpr const char *S390X = "s390x";
+static constexpr const char *kS390x = "s390x";
 /** 32-bit x86. */
-static constexpr const char *X86 = "x86";
+static constexpr const char *kX86 = "x86";
 }  // namespace HostArchValues
 
 namespace OsTypeValues
 {
 /** Microsoft Windows. */
-static constexpr const char *WINDOWS = "windows";
+static constexpr const char *kWindows = "windows";
 /** Linux. */
-static constexpr const char *LINUX = "linux";
+static constexpr const char *kLinux = "linux";
 /** Apple Darwin. */
-static constexpr const char *DARWIN = "darwin";
+static constexpr const char *kDarwin = "darwin";
 /** FreeBSD. */
-static constexpr const char *FREEBSD = "freebsd";
+static constexpr const char *kFreebsd = "freebsd";
 /** NetBSD. */
-static constexpr const char *NETBSD = "netbsd";
+static constexpr const char *kNetbsd = "netbsd";
 /** OpenBSD. */
-static constexpr const char *OPENBSD = "openbsd";
+static constexpr const char *kOpenbsd = "openbsd";
 /** DragonFly BSD. */
-static constexpr const char *DRAGONFLYBSD = "dragonflybsd";
+static constexpr const char *kDragonflybsd = "dragonflybsd";
 /** HP-UX (Hewlett Packard Unix). */
-static constexpr const char *HPUX = "hpux";
+static constexpr const char *kHpux = "hpux";
 /** AIX (Advanced Interactive eXecutive). */
-static constexpr const char *AIX = "aix";
+static constexpr const char *kAix = "aix";
 /** SunOS, Oracle Solaris. */
-static constexpr const char *SOLARIS = "solaris";
+static constexpr const char *kSolaris = "solaris";
 /** IBM z/OS. */
-static constexpr const char *Z_OS = "z_os";
+static constexpr const char *kZOs = "z_os";
 }  // namespace OsTypeValues
 
 namespace TelemetrySdkLanguageValues
 {
 /** cpp. */
-static constexpr const char *CPP = "cpp";
+static constexpr const char *kCpp = "cpp";
 /** dotnet. */
-static constexpr const char *DOTNET = "dotnet";
+static constexpr const char *kDotnet = "dotnet";
 /** erlang. */
-static constexpr const char *ERLANG = "erlang";
+static constexpr const char *kErlang = "erlang";
 /** go. */
-static constexpr const char *GO = "go";
+static constexpr const char *kGo = "go";
 /** java. */
-static constexpr const char *JAVA = "java";
+static constexpr const char *kJava = "java";
 /** nodejs. */
-static constexpr const char *NODEJS = "nodejs";
+static constexpr const char *kNodejs = "nodejs";
 /** php. */
-static constexpr const char *PHP = "php";
+static constexpr const char *kPhp = "php";
 /** python. */
-static constexpr const char *PYTHON = "python";
+static constexpr const char *kPython = "python";
 /** ruby. */
-static constexpr const char *RUBY = "ruby";
+static constexpr const char *kRuby = "ruby";
 /** webjs. */
-static constexpr const char *WEBJS = "webjs";
+static constexpr const char *kWebjs = "webjs";
 /** swift. */
-static constexpr const char *SWIFT = "swift";
+static constexpr const char *kSwift = "swift";
 }  // namespace TelemetrySdkLanguageValues
 
 }  // namespace SemanticConventions

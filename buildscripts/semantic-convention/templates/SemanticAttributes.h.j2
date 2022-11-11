@@ -41,27 +41,6 @@
 
 #include "opentelemetry/version.h"
 
-{%- if semconv == "trace" %}
-/*
- * Special considerations for FaasDocumentOperationValues::DELETE.
- *
- * The winnt.h header file is known to define a DELETE symbol,
- * which collides with FaasDocumentOperationValues::DELETE.
- */
-#ifdef _WIN32
-#  ifdef DELETE
-#    pragma message(__FILE__ ": removing define on DELETE")
-#    undef DELETE
-#  endif
-#endif
-#ifdef _WIN32
-#  ifdef ERROR
-#    pragma message(__FILE__ ": removing define on ERROR")
-#    undef ERROR
-#  endif
-#endif
-{% endif %}
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 {{namespace_open}}
 
@@ -70,7 +49,7 @@ namespace {{class}}
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "{{schemaUrl}}";
+static constexpr const char *kSchemaUrl = "{{schemaUrl}}";
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 
 /**
@@ -88,7 +67,7 @@ static constexpr const char *SCHEMA_URL = "{{schemaUrl}}";
   {%- if attribute.deprecated %}
 @Deprecated
   {%- endif %}
-static constexpr const char *{{attribute.fqn | to_const_name}} = "{{attribute.fqn}}";
+static constexpr const char *k{{attribute.fqn | to_camelcase(True)}} = "{{attribute.fqn}}";
 {%- endfor %}
 
 // Enum definitions
@@ -100,7 +79,7 @@ namespace {{enum_name}}
 {
   {%- for member in attribute.attr_type.members %}
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
-  static constexpr const {{ type }} {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }};
+  static constexpr const {{ type }} k{{ member.member_id | to_camelcase(True) }} = {{ print_value(type, member.value) }};
   {%- endfor %}
 }
 {% endif %}

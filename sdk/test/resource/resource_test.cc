@@ -35,10 +35,10 @@ TEST(ResourceTest, create_without_servicename)
       {"service", "backend"},
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
-      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
-      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::SERVICE_NAME, "unknown_service"}};
+      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::kServiceName, "unknown_service"}};
 
   ResourceAttributes attributes = {
       {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -68,10 +68,10 @@ TEST(ResourceTest, create_with_servicename)
   ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
-      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
-      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::SERVICE_NAME, "backend"},
+      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::kServiceName, "backend"},
   };
   ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -99,10 +99,10 @@ TEST(ResourceTest, create_with_servicename)
 TEST(ResourceTest, create_with_emptyatrributes)
 {
   ResourceAttributes expected_attributes = {
-      {SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
-      {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
-      {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::SERVICE_NAME, "unknown_service"},
+      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::kServiceName, "unknown_service"},
   };
   ResourceAttributes attributes = {};
   auto resource                 = Resource::Create(attributes);
