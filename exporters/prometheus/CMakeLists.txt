@@ -17,14 +17,14 @@ if(NOT TARGET prometheus-cpp::core)
   find_package(prometheus-cpp CONFIG REQUIRED)
 endif()
 
-add_library(prometheus_exporter src/exporter.cc src/collector.cc
-                                src/exporter_utils.cc)
+add_library(opentelemetry_exporter_prometheus src/exporter.cc src/collector.cc
+                                              src/exporter_utils.cc)
 target_include_directories(
-  prometheus_exporter
+  opentelemetry_exporter_prometheus
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-set(PROMETHEUS_EXPORTER_TARGETS prometheus_exporter)
+set(PROMETHEUS_EXPORTER_TARGETS opentelemetry_exporter_prometheus)
 if(TARGET pull)
   list(APPEND PROMETHEUS_EXPORTER_TARGETS pull)
 endif()
@@ -32,8 +32,8 @@ if(TARGET core)
   list(APPEND PROMETHEUS_EXPORTER_TARGETS core)
 endif()
 target_link_libraries(
-  prometheus_exporter PUBLIC opentelemetry_metrics prometheus-cpp::pull
-                             prometheus-cpp::core)
+  opentelemetry_exporter_prometheus
+  PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core)
 install(
   TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
   EXPORT "${PROJECT_NAME}-target"
