@@ -57,7 +57,7 @@ Breaking changes:
     to camel case, like `SemanticConventions::kServiceName`.
     This is necessary to avoid collisions with macros in general,
     which breaks the build on some platforms.
-  * Semantic conventions are still flagged as unstable,
+  * Semantic conventions are flagged as experimental,
     which is why this change is done in this release.
 
 ## [1.7.0] 2022-10-28
