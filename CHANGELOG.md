@@ -48,6 +48,18 @@ Deprecation notes:
     Note that function `opentelemetry::utils::hashCode`,
     declared in the ETW exporter, is not affected by this deprecation.
 
+Breaking changes:
+
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.15.0
+  [#1761](https://github.com/open-telemetry/opentelemetry-cpp/pull/1761)
+  * Naming of semantic conventions has changed from uppercase constants,
+    like `SemanticConventions::SERVICE_NAME`,
+    to camel case, like `SemanticConventions::kServiceName`.
+    This is necessary to avoid collisions with macros in general,
+    which breaks the build on some platforms.
+  * Semantic conventions are still flagged as unstable,
+    which is why this change is done in this release.
+
 ## [1.7.0] 2022-10-28
 
 * [METRICS SDK] Validate Instrument meta data (name, unit, description) [#1713](https://github.com/open-telemetry/opentelemetry-cpp/pull/1713)
