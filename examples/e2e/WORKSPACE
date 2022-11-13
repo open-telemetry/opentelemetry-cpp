@@ -6,7 +6,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 http_archive(
     name = "io_opentelemetry_cpp",
-    repo_mapping = {"@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11"},
+    #repo_mapping = {"@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11"},
+    #repo_mapping = {"@com_github_grpc_grpc_latest11": "@com_github_grpc_grpc"},
     strip_prefix = "opentelemetry-cpp-grpc_e2e",
     urls = [
         "https://github.com/esigo/opentelemetry-cpp/archive/grpc_e2e.zip",
