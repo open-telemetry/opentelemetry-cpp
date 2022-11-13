@@ -1,5 +1,5 @@
 cc_binary(
-    name = "my_example_otlp_grpc",
+    name = "e2e_example_otlp_grpc",
     srcs = [
         "grpc_main.cc",
     ],

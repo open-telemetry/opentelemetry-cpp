@@ -6,12 +6,9 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "io_opentelemetry_cpp",
-    repo_mapping = {"@com_github_grpc_grpc": "@com_github_grpc_grpc_legacy"},
-    sha256 = "2ad0911cdc94fe84a93334773bef4789a38bd1f01e39560cabd4a5c267e823c3",
-    strip_prefix = "opentelemetry-cpp-1.7.0",
-    urls = [
-        "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.7.0.tar.gz",
-    ],
+    repo_mapping = {"@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11"},
+    remote = "https://github.com/esigo/opentelemetry-cpp.git",
+    commit = "6615d1ffee63d2809963d816596ff149707f9b3c",
 )
 
 # Load OpenTelemetry dependencies after load.
