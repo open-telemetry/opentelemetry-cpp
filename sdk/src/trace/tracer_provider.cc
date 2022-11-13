@@ -14,7 +14,9 @@ namespace trace_api = opentelemetry::trace;
 
 TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
     : context_{context}
-{}
+{
+  OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
+}
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                resource::Resource resource,

@@ -26,6 +26,7 @@ LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
   context_ = std::make_shared<sdk::logs::LoggerContext>(std::move(processors), std::move(resource));
+  OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
