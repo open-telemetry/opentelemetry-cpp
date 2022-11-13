@@ -4,11 +4,13 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-git_repository(
+http_archive(
     name = "io_opentelemetry_cpp",
     repo_mapping = {"@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11"},
-    remote = "https://github.com/esigo/opentelemetry-cpp.git",
-    commit = "6615d1ffee63d2809963d816596ff149707f9b3c",
+    strip_prefix = "opentelemetry-cpp-grpc_e2e",
+    urls = [
+        "https://github.com/esigo/opentelemetry-cpp/archive/grpc_e2e.zip",
+    ],
 )
 
 # Load OpenTelemetry dependencies after load.
