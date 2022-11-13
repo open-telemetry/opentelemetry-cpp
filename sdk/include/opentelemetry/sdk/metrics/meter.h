@@ -2,20 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/metrics/noop.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/version.h"
+#include <chrono>
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -144,4 +144,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

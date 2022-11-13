@@ -23,9 +23,12 @@ namespace exporter
 namespace otlp
 {
 
-OtlpHttpLogExporter::OtlpHttpLogExporter() : OtlpHttpLogExporter(OtlpHttpLogExporterOptions()) {}
+OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter()
+    : OtlpHttpLogRecordExporter(OtlpHttpLogRecordExporterOptions())
+{}
 
-OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &options)
+OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
+    const OtlpHttpLogRecordExporterOptions &options)
     : options_(options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
                                                             options.content_type,
@@ -42,17 +45,18 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
                                                             )))
 {}
 
-OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client)
-    : options_(OtlpHttpLogExporterOptions()), http_client_(std::move(http_client))
+OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(std::unique_ptr<OtlpHttpClient> http_client)
+    : options_(OtlpHttpLogRecordExporterOptions()), http_client_(std::move(http_client))
 {
-  OtlpHttpLogExporterOptions &options = const_cast<OtlpHttpLogExporterOptions &>(options_);
-  options.url                         = http_client_->GetOptions().url;
-  options.content_type                = http_client_->GetOptions().content_type;
-  options.json_bytes_mapping          = http_client_->GetOptions().json_bytes_mapping;
-  options.use_json_name               = http_client_->GetOptions().use_json_name;
-  options.console_debug               = http_client_->GetOptions().console_debug;
-  options.timeout                     = http_client_->GetOptions().timeout;
-  options.http_headers                = http_client_->GetOptions().http_headers;
+  OtlpHttpLogRecordExporterOptions &options =
+      const_cast<OtlpHttpLogRecordExporterOptions &>(options_);
+  options.url                = http_client_->GetOptions().url;
+  options.content_type       = http_client_->GetOptions().content_type;
+  options.json_bytes_mapping = http_client_->GetOptions().json_bytes_mapping;
+  options.use_json_name      = http_client_->GetOptions().use_json_name;
+  options.console_debug      = http_client_->GetOptions().console_debug;
+  options.timeout            = http_client_->GetOptions().timeout;
+  options.http_headers       = http_client_->GetOptions().http_headers;
 #  ifdef ENABLE_ASYNC_EXPORT
   options.max_concurrent_requests     = http_client_->GetOptions().max_concurrent_requests;
   options.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
@@ -60,13 +64,14 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_cl
 }
 // ----------------------------- Exporter methods ------------------------------
 
-std::unique_ptr<opentelemetry::sdk::logs::Recordable> OtlpHttpLogExporter::MakeRecordable() noexcept
+std::unique_ptr<opentelemetry::sdk::logs::Recordable>
+OtlpHttpLogRecordExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
       new exporter::otlp::OtlpLogRecordable());
 }
 
-opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
+opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
   if (http_client_->IsShutdown())
@@ -115,7 +120,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
 #  endif
 }
 
-bool OtlpHttpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpHttpLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   return http_client_->Shutdown(timeout);
 }

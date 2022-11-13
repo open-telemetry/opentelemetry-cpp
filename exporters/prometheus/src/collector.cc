@@ -1,9 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/exporters/prometheus/collector.h"
 
 namespace metric_sdk = opentelemetry::sdk::metrics;
 
@@ -87,4 +85,3 @@ int PrometheusCollector::GetMaxCollectionSize() const
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

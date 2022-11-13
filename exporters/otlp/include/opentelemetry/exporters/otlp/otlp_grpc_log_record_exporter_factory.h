@@ -15,18 +15,18 @@ namespace otlp
 {
 
 /**
- * Factory class for OtlpGrpcLogExporter.
+ * Factory class for OtlpGrpcLogRecordExporter.
  */
-class OtlpGrpcLogExporterFactory
+class OtlpGrpcLogRecordExporterFactory
 {
 public:
   /**
-   * Create a OtlpGrpcLogExporter.
+   * Create a OtlpGrpcLogRecordExporter.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create();
 
   /**
-   * Create a OtlpGrpcLogExporter.
+   * Create a OtlpGrpcLogRecordExporter.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpGrpcExporterOptions &options);

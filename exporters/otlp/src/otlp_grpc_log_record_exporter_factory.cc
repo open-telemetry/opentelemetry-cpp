@@ -15,17 +15,18 @@ namespace exporter
 namespace otlp
 {
 
-std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpGrpcLogExporterFactory::Create()
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+OtlpGrpcLogRecordExporterFactory::Create()
 {
   OtlpGrpcExporterOptions options;
   return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpGrpcLogExporterFactory::Create(
-    const OtlpGrpcExporterOptions &options)
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter(
-      new OtlpGrpcLogExporter(options));
+      new OtlpGrpcLogRecordExporter(options));
   return exporter;
 }
 

@@ -16,11 +16,11 @@ namespace logs
  * Initialize a simple log processor.
  * @param exporter the configured exporter where log records are sent
  */
-SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogRecordExporter> &&exporter)
+SimpleLogRecordProcessor::SimpleLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter)
     : exporter_(std::move(exporter)), is_shutdown_(false)
 {}
 
-std::unique_ptr<Recordable> SimpleLogProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> SimpleLogRecordProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
@@ -29,7 +29,7 @@ std::unique_ptr<Recordable> SimpleLogProcessor::MakeRecordable() noexcept
  * Batches the log record it receives in a batch of 1 and immediately sends it
  * to the configured exporter
  */
-void SimpleLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+void SimpleLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   nostd::span<std::unique_ptr<Recordable>> batch(&record, 1);
   // Get lock to ensure Export() is never called concurrently
@@ -43,12 +43,12 @@ void SimpleLogProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 /**
  *  The simple processor does not have any log records to flush so this method is not used
  */
-bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+bool SimpleLogRecordProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }
 
-bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool SimpleLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   // Should only shutdown exporter ONCE.
   if (!is_shutdown_.exchange(true, std::memory_order_acq_rel) && exporter_ != nullptr)
@@ -59,7 +59,7 @@ bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-bool SimpleLogProcessor::IsShutdown() const noexcept
+bool SimpleLogRecordProcessor::IsShutdown() const noexcept
 {
   return is_shutdown_.load(std::memory_order_acquire);
 }

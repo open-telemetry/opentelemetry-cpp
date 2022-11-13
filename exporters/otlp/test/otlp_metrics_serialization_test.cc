@@ -1,12 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
-#  include "opentelemetry/proto/metrics/v1/metrics.pb.h"
-
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -155,5 +153,3 @@ TEST(OtlpMetricSerializationTest, ObservableGauge)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

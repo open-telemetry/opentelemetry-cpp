@@ -20,7 +20,7 @@
 #  include <poll.h>
 #  include <unistd.h>
 #endif
-#include <curl/curl.h>
+#include "curl/curl.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

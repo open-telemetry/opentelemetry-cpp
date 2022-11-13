@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include <algorithm>
 #include <chrono>
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <algorithm>
-#  include <map>
-#  include "opentelemetry/exporters/ostream/common_utils.h"
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk_config.h"
+#include <map>
+#include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk_config.h"
 
 namespace
 {
@@ -18,15 +17,15 @@ std::string timeToString(opentelemetry::common::SystemTimestamp time_stamp)
   std::time_t epoch_time = std::chrono::system_clock::to_time_t(time_stamp);
 
   struct tm *tm_ptr = nullptr;
-#  if defined(_MSC_VER)
+#if defined(_MSC_VER)
   struct tm buf_tm;
   if (!gmtime_s(&buf_tm, &epoch_time))
   {
     tm_ptr = &buf_tm;
   }
-#  else
+#else
   tm_ptr = std::gmtime(&epoch_time);
-#  endif
+#endif
 
   char buf[100];
   char *date_str = nullptr;
@@ -262,4 +261,3 @@ bool OStreamMetricExporter::isShutdown() const noexcept
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

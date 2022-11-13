@@ -25,19 +25,19 @@ namespace otlp
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpHttpLogExporter final : public opentelemetry::sdk::logs::LogRecordExporter
+class OtlpHttpLogRecordExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**
-   * Create an OtlpHttpLogExporter with default exporter options.
+   * Create an OtlpHttpLogRecordExporter with default exporter options.
    */
-  OtlpHttpLogExporter();
+  OtlpHttpLogRecordExporter();
 
   /**
-   * Create an OtlpHttpLogExporter with user specified options.
+   * Create an OtlpHttpLogRecordExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &options);
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options);
 
   /**
    * Creates a recordable that stores the data in a JSON object
@@ -62,18 +62,18 @@ public:
 
 private:
   // Configuration options for the exporter
-  const OtlpHttpLogExporterOptions options_;
+  const OtlpHttpLogRecordExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;
   // For testing
-  friend class OtlpHttpLogExporterTestPeer;
+  friend class OtlpHttpLogRecordExporterTestPeer;
   /**
-   * Create an OtlpHttpLogExporter using the specified http client.
+   * Create an OtlpHttpLogRecordExporter using the specified http client.
    * Only tests can call this constructor directly.
    * @param http_client the http client to be used for exporting
    */
-  OtlpHttpLogExporter(std::unique_ptr<OtlpHttpClient> http_client);
+  OtlpHttpLogRecordExporter(std::unique_ptr<OtlpHttpClient> http_client);
 };
 }  // namespace otlp
 }  // namespace exporter

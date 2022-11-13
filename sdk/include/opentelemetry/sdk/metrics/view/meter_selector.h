@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/view/predicate_factory.h"
-#ifndef ENABLE_METRICS_PREVIEW
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -44,4 +45,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -1,16 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "foo_library.h"
-#  include <chrono>
-#  include <map>
-#  include <memory>
-#  include <thread>
-#  include <vector>
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
+#include "foo_library.h"
+#include <chrono>
+#include <map>
+#include <memory>
+#include <thread>
+#include <vector>
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
@@ -95,5 +94,3 @@ void foo_library::histogram_example(const std::string &name)
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
   }
 }
-
-#endif

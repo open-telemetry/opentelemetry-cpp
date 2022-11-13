@@ -19,6 +19,32 @@ Increment the:
   [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
 * [METRICS SDK] - Remove old metrics from Github CI
   [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
+* [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
+
+Deprecation notes:
+
+* [Deprecation] Deprecate experimental semantic conventions
+  [#1744](https://github.com/open-telemetry/opentelemetry-cpp/pull/1744)
+  * The file
+    `api/include/opentelemetry/trace/experimental_semantic_conventions.h`
+    is deprecated, and will be removed in a future release.
+    Use file
+    `api/include/opentelemetry/trace/semantic_conventions.h`
+    instead.
+
+  * The file
+    `sdk/include/opentelemetry/sdk/resource/experimental_semantic_conventions.h`
+    is deprecated, and will be removed in a future release.
+    Use file
+    `sdk/include/opentelemetry/sdk/resource/semantic_conventions.h`
+    instead.
+
+  * The function, declared in the global namespace
+    `uint32_t hashCode(const char *str, uint32_t h = 0)`
+    is deprecated, and will be removed in a future release.
+    No replacement will be provided.
+    Note that function `opentelemetry::utils::hashCode`,
+    declared in the ETW exporter, is not affected by this deprecation.
 
 ## [1.7.0] 2022-10-28
 
