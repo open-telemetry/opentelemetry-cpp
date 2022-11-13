@@ -300,7 +300,7 @@ elif [[ "$1" == "bazel.valgrind" ]]; then
   exit 0
 elif [[ "$1" == "bazel.e2e" ]]; then
   cd examples/e2e
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS --cxxopt='-std=c++14' build $BAZEL_OPTIONS //...
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
