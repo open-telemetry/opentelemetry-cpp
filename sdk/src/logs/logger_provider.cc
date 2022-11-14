@@ -4,6 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 
 #  include <memory>
 #  include <mutex>
