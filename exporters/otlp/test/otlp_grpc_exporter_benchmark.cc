@@ -138,50 +138,50 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 
 // ------------------------------ Benchmark tests ------------------------------
 
-// Benchmark Export() with empty spans
-void BM_OtlpExporterEmptySpans(benchmark::State &state)
-{
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+// // Benchmark Export() with empty spans
+// void BM_OtlpExporterEmptySpans(benchmark::State &state)
+// {
+//   std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
+//   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunningBatch(kNumIterations))
-  {
-    std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
-    CreateEmptySpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
-  }
-}
-BENCHMARK(BM_OtlpExporterEmptySpans);
+//   while (state.KeepRunningBatch(kNumIterations))
+//   {
+//     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
+//     CreateEmptySpans(recordables);
+//     exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+//   }
+// }
+// BENCHMARK(BM_OtlpExporterEmptySpans);
 
-// Benchmark Export() with sparse spans
-void BM_OtlpExporterSparseSpans(benchmark::State &state)
-{
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+// // Benchmark Export() with sparse spans
+// void BM_OtlpExporterSparseSpans(benchmark::State &state)
+// {
+//   std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
+//   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunningBatch(kNumIterations))
-  {
-    std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
-    CreateSparseSpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
-  }
-}
-BENCHMARK(BM_OtlpExporterSparseSpans);
+//   while (state.KeepRunningBatch(kNumIterations))
+//   {
+//     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
+//     CreateSparseSpans(recordables);
+//     exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+//   }
+// }
+// BENCHMARK(BM_OtlpExporterSparseSpans);
 
-// Benchmark Export() with dense spans
-void BM_OtlpExporterDenseSpans(benchmark::State &state)
-{
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+// // Benchmark Export() with dense spans
+// void BM_OtlpExporterDenseSpans(benchmark::State &state)
+// {
+//   std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
+//   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunningBatch(kNumIterations))
-  {
-    std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
-    CreateDenseSpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
-  }
-}
-BENCHMARK(BM_OtlpExporterDenseSpans);
+//   while (state.KeepRunningBatch(kNumIterations))
+//   {
+//     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
+//     CreateDenseSpans(recordables);
+//     exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+//   }
+// }
+// BENCHMARK(BM_OtlpExporterDenseSpans);
 
 }  // namespace otlp
 }  // namespace exporter
