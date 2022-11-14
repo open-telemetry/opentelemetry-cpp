@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,7 +15,9 @@ namespace trace_api = opentelemetry::trace;
 
 TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
     : context_{context}
-{}
+{
+  OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
+}
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                resource::Resource resource,
