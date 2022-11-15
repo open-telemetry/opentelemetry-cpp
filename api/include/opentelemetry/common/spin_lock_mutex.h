@@ -16,8 +16,10 @@
 #  define _WINSOCKAPI_  // stops including winsock.h
 #  include <windows.h>
 #elif defined(__i386__) || defined(__x86_64__)
-#  if defined(__clang__) || defined(__INTEL_COMPILER)
+#  if defined(__clang__) 
 #    include <emmintrin.h>
+#  elif defined(__INTEL_COMPILER)
+#    include <immintrin.h>
 #  endif
 #endif
 
