@@ -202,15 +202,15 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
-void BM_otlp_grpc_with_collector(benchmark::State &state)
-{
-  InitTracer();
-  while (state.KeepRunning())
-  {
-    foo_library();
-  }
-}
-BENCHMARK(BM_otlp_grpc_with_collector);
+// void BM_otlp_grpc_with_collector(benchmark::State &state)
+// {
+//   InitTracer();
+//   while (state.KeepRunning())
+//   {
+//     foo_library();
+//   }
+// }
+// BENCHMARK(BM_otlp_grpc_with_collector);
 }  // namespace
 
 BENCHMARK_MAIN();
