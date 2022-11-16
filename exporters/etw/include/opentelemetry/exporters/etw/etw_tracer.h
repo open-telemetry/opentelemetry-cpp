@@ -236,17 +236,17 @@ class Tracer : public opentelemetry::trace::Tracer,
                        const opentelemetry::trace::Span *parentSpan = nullptr,
                        const opentelemetry::trace::EndSpanOptions & = {})
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg          = GetConfiguration(tracerProvider_);
     const auto &tail_sampler = GetTailSampler(tracerProvider_);
     const opentelemetry::trace::Span &spanBase =
         reinterpret_cast<const opentelemetry::trace::Span &>(span);
 
     //  Sample span based on the decision of tail based sampler
-      auto sampling_result = const_cast<TailSampler *>(&tail_sampler)->ShouldSample(spanBase);
-      if (!sampling_result.IsRecording() || !sampling_result.IsSampled())
-      {
-        return;
-      }
+    auto sampling_result = const_cast<TailSampler *>(&tail_sampler)->ShouldSample(spanBase);
+    if (!sampling_result.IsRecording() || !sampling_result.IsSampled())
+    {
+      return;
+    }
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
@@ -835,11 +835,7 @@ public:
     status_description_ = description.data();
   }
 
-  opentelemetry::trace::StatusCode GetStatus() 
-  {
-    return status_code_;
-
-  }
+  opentelemetry::trace::StatusCode GetStatus() { return status_code_; }
 
   void SetAttributes(Properties attributes) { attributes_ = attributes; }
 
@@ -958,19 +954,20 @@ public:
    *
    */
   std::unique_ptr<sdk::trace::IdGenerator> id_generator_;
-          
+
   /**
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
    */
-  TracerProvider(TelemetryProviderOptions options,
-                 std::unique_ptr<sdk::trace::Sampler> sampler =
-                     std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
-                 std::unique_ptr<sdk::trace::IdGenerator> id_generator =
-                     std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-                         new sdk::trace::ETWRandomIdGenerator()),
-                 std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler = 
-                 std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler()))
+  TracerProvider(
+      TelemetryProviderOptions options,
+      std::unique_ptr<sdk::trace::Sampler> sampler =
+          std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
+      std::unique_ptr<sdk::trace::IdGenerator> id_generator =
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+              new sdk::trace::ETWRandomIdGenerator()),
+      std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler =
+          std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler()))
       : opentelemetry::trace::TracerProvider(),
         sampler_{std::move(sampler)},
         id_generator_{std::move(id_generator)},

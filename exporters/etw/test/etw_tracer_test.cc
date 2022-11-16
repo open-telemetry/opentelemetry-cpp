@@ -78,11 +78,13 @@ private:
   std::shared_ptr<Sampler> delegate_sampler_;
 };
 
-class AlwaysOffTailSampler: public TailSampler{
-  public:
-  opentelemetry::sdk::trace::SamplingResult ShouldSample(const opentelemetry::trace::Span& span) noexcept override
+class AlwaysOffTailSampler : public TailSampler
+{
+public:
+  opentelemetry::sdk::trace::SamplingResult ShouldSample(
+      const opentelemetry::trace::Span &span) noexcept override
   {
-    return { opentelemetry::sdk::trace::Decision::DROP };
+    return {opentelemetry::sdk::trace::Decision::DROP};
   }
 };
 
