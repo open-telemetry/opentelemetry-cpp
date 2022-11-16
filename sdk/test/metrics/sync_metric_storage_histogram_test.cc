@@ -45,7 +45,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   int64_t expected_total_get_requests = 0;
   int64_t expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kHistogram,
-                                         InstrumentValueType::kLong};
+                                     InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -179,7 +179,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kHistogram,
-                                        InstrumentValueType::kDouble};
+                                     InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 

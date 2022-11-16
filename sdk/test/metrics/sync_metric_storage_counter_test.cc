@@ -44,7 +44,7 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   int64_t expected_total_get_requests = 0;
   int64_t expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                         InstrumentValueType::kLong};
+                                     InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -177,7 +177,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                        InstrumentValueType::kDouble};
+                                     InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 

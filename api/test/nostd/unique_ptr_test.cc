@@ -115,7 +115,7 @@ TEST(UniquePtrTest, PointerOperators)
 
   EXPECT_EQ(&*ptr1, value);
   EXPECT_EQ(
-      unique_ptr<B> { new B } -> f(), 123);
+      unique_ptr<B> { new B }->f(), 123);
 }
 
 TEST(UniquePtrTest, Reset)

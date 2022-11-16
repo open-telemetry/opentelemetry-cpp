@@ -42,7 +42,7 @@ TEST(ParentBasedSampler, ShouldSample)
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
   auto sampling_result  = sampler_off.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
-                                                   "", span_kind, view, links);
+                                                  "", span_kind, view, links);
   auto sampling_result2 = sampler_on.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
                                                   "", span_kind, view, links);
 

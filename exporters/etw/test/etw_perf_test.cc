@@ -62,8 +62,8 @@ public:
   {
     std::string eventName = "MyEvent";
     Properties event      = {{"uint32Key", (uint32_t)1234},
-                             {"uint64Key", (uint64_t)1234567890},
-                             {"strKey", "someValue"}};
+                        {"uint64Key", (uint64_t)1234567890},
+                        {"strKey", "someValue"}};
     span_->AddEvent(eventName, event);
     return true;
   }

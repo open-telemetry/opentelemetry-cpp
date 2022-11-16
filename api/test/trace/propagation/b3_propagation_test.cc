@@ -138,8 +138,8 @@ TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
 {
   TextMapCarrierTest carrier;
   carrier.headers_      = {{"X-B3-TraceId", "80f198ee56343ba864fe8b2a57d3eff7"},
-                           {"X-B3-SpanId", "e457b5a2e4d86bd1"},
-                           {"X-B3-Sampled", "1"}};
+                      {"X-B3-SpanId", "e457b5a2e4d86bd1"},
+                      {"X-B3-Sampled", "1"}};
   context::Context ctx1 = context::Context{};
   context::Context ctx2 = format.Extract(carrier, ctx1);
 

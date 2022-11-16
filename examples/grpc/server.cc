@@ -65,11 +65,11 @@ public:
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                                          {{SemanticConventions::RPC_SYSTEM, "grpc"},
-                                                           {SemanticConventions::RPC_SERVICE, "GreeterService"},
-                                                           {SemanticConventions::RPC_METHOD, "Greet"},
-                                                           {SemanticConventions::RPC_GRPC_STATUS_CODE, 0}},
-                                                          options);
+                                              {{SemanticConventions::RPC_SYSTEM, "grpc"},
+                                               {SemanticConventions::RPC_SERVICE, "GreeterService"},
+                                               {SemanticConventions::RPC_METHOD, "Greet"},
+                                               {SemanticConventions::RPC_GRPC_STATUS_CODE, 0}},
+                                              options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
     // Fetch and parse whatever HTTP headers we can from the gRPC request.
