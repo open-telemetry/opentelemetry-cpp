@@ -28,10 +28,10 @@ ViewRegistry *MeterContext::GetViewRegistry() const noexcept
   return views_.get();
 }
 
-nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
+std::vector<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
-  return nostd::span<std::shared_ptr<Meter>>{meters_};
+  return meters_;
 }
 
 nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept

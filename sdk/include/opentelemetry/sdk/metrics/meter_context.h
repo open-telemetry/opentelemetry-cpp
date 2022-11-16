@@ -59,7 +59,7 @@ public:
    * Obtain the  configured meters.
    *
    */
-  nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
+  std::vector<std::shared_ptr<Meter>> GetMeters() noexcept;
 
   /**
    * Obtain the configured collectors.
