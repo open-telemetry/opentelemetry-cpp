@@ -13,13 +13,21 @@ Increment the:
 * MINOR version when you add functionality in a backwards compatible manner, and
 * PATCH version when you make backwards compatible bug fixes.
 
-## [Unreleased]
-
+## [Unreleased] 
+* [METRICS SDK] Change return type of MeterContext::GetMeters from span to
+  vector to prevent segfaults during MetricsCollector::Collect
+  [#1777](https://github.com/open-telemetry/opentelemetry-cpp/pull/1777)
 * [LOGS SDK] Rename LogProcessor and LogExporter to LogRecordProcessor and LogRecordExporter
   [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
 * [METRICS SDK] - Remove old metrics from Github CI
   [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
 * [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
+
+Notes:
+
+Metrics SDK changes include PR
+[#1777](https://github.com/open-telemetry/opentelemetry-cpp/pull/1777)
+introducing a breaking change.
 
 Deprecation notes:
 
