@@ -216,9 +216,9 @@ void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(SemanticConventions::SERVICE_NAME) != attributes.end())
+  if (attributes.find(SemanticConventions::kServiceName) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes[SemanticConventions::SERVICE_NAME]);
+    service_name_ = nostd::get<std::string>(attributes[SemanticConventions::kServiceName]);
   }
 }
 
