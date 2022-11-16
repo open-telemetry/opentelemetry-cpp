@@ -12,6 +12,7 @@
 
 #include "opentelemetry//sdk/trace/sampler.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
+#include "opentelemetry/exporters/etw/etw_tail_sampler.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -169,8 +170,8 @@ sdk::trace::Sampler &GetSampler(T &t)
 /**
  * @brief Utility function to obtain etw::TracerProvider.tail_sampler_
  */
-template <class T, class U>
-U &GetTailSampler(T &t)
+template <class T>
+TailSampler &GetTailSampler(T &t)
 {
   return *t.tail_sampler_;
 }

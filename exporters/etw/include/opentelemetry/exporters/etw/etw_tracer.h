@@ -40,6 +40,7 @@
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_random_id_generator.h"
+#include "opentelemetry/exporters/etw/etw_tail_sampler.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -236,9 +237,16 @@ class Tracer : public opentelemetry::trace::Tracer,
                        const opentelemetry::trace::EndSpanOptions & = {})
   {
     const auto &cfg = GetConfiguration(tracerProvider_);
-    const opentelemetry::exporter::etw::TailSampler &tail_sampler = GetTailSampler<TailSampler, >(tracerProvider_);
+    const auto &tail_sampler = GetTailSampler(tracerProvider_);
     const opentelemetry::trace::Span &spanBase =
         reinterpret_cast<const opentelemetry::trace::Span &>(span);
+
+    //  Sample span based on the decision of tail based sampler
+      auto sampling_result = const_cast<TailSampler *>(&tail_sampler)->ShouldSample(spanBase);
+      if (!sampling_result.IsRecording() || !sampling_result.IsSampled())
+      {
+        return;
+      }
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
@@ -922,12 +930,6 @@ public:
   opentelemetry::trace::Tracer &tracer() const noexcept { return this->owner_; }
 };
 
-class TailSampler
-{
-public:
-    virtual opentelemetry::sdk::trace::SamplingResult ShouldSample(opentelemetry::exporter::etw::Span &span) noexcept = 0;
-};
-
 /**
  * @brief ETW TracerProvider
  */
@@ -956,7 +958,7 @@ public:
    *
    */
   std::unique_ptr<sdk::trace::IdGenerator> id_generator_;
-
+          
   /**
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
@@ -967,10 +969,12 @@ public:
                  std::unique_ptr<sdk::trace::IdGenerator> id_generator =
                      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
                          new sdk::trace::ETWRandomIdGenerator()),
-                 std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler = nullptr)
+                 std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler = 
+                 std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler()))
       : opentelemetry::trace::TracerProvider(),
         sampler_{std::move(sampler)},
-        id_generator_{std::move(id_generator)}
+        id_generator_{std::move(id_generator)},
+        tail_sampler_{std::move(tail_sampler)}
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
