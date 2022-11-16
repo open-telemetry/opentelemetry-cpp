@@ -30,16 +30,16 @@ Resource Resource::Create(const ResourceAttributes &attributes, const std::strin
   auto resource =
       Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url});
 
-  if (resource.attributes_.find(SemanticConventions::SERVICE_NAME) == resource.attributes_.end())
+  if (resource.attributes_.find(SemanticConventions::kServiceName) == resource.attributes_.end())
   {
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
-        resource.attributes_.find(SemanticConventions::PROCESS_EXECUTABLE_NAME);
+        resource.attributes_.find(SemanticConventions::kProcessExecutableName);
     if (it_process_executable_name != resource.attributes_.end())
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }
-    resource.attributes_[SemanticConventions::SERVICE_NAME] = default_service_name;
+    resource.attributes_[SemanticConventions::kServiceName] = default_service_name;
   }
   return resource;
 }
@@ -53,9 +53,9 @@ Resource &Resource::GetEmpty()
 Resource &Resource::GetDefault()
 {
   static Resource default_resource(
-      {{SemanticConventions::TELEMETRY_SDK_LANGUAGE, "cpp"},
-       {SemanticConventions::TELEMETRY_SDK_NAME, "opentelemetry"},
-       {SemanticConventions::TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION}},
+      {{SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+       {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+       {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION}},
       std::string{});
   return default_resource;
 }
