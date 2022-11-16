@@ -230,7 +230,7 @@ private:
 
   // For testing
   friend class OtlpHttpExporterTestPeer;
-  friend class OtlpHttpLogExporterTestPeer;
+  friend class OtlpHttpLogRecordExporterTestPeer;
   friend class OtlpHttpMetricExporterTestPeer;
 
   /**

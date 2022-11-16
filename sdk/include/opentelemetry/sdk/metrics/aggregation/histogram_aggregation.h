@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include <memory>
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 
-#  include <mutex>
+#include <memory>
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -111,4 +111,3 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

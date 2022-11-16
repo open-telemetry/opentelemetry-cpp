@@ -3,10 +3,10 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter_factory.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/simple_log_processor_factory.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
@@ -43,8 +43,8 @@ void InitTracer()
 void InitLogger()
 {
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpGrpcLogExporterFactory::Create(opts);
-  auto processor = logs_sdk::SimpleLogProcessorFactory::Create(std::move(exporter));
+  auto exporter  = otlp::OtlpGrpcLogRecordExporterFactory::Create(opts);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   nostd::shared_ptr<logs::LoggerProvider> provider(
       logs_sdk::LoggerProviderFactory::Create(std::move(processor)));
 

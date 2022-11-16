@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <cstddef>
-#  include <memory>
-#  include <utility>
-#  include "opentelemetry/nostd/shared_ptr.h"
+#include <cstddef>
+#include <memory>
+#include <utility>
+#include "opentelemetry/nostd/shared_ptr.h"
 
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -137,4 +136,3 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
 
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

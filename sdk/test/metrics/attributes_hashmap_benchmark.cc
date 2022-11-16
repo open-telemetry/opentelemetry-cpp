@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
-#  include <functional>
-#  include <vector>
+#include <functional>
+#include <vector>
 
 using namespace opentelemetry::sdk::metrics;
 constexpr size_t MAX_THREADS = 500;
@@ -53,5 +52,5 @@ void BM_AttributseHashMap(benchmark::State &state)
 
 BENCHMARK(BM_AttributseHashMap);
 }  // namespace
-#endif
+
 BENCHMARK_MAIN();

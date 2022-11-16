@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <vector>
-#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+
+#include <vector>
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -66,4 +66,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

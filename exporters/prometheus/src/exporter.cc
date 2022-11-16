@@ -1,8 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/exporters/prometheus/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -109,4 +108,3 @@ bool PrometheusExporter::IsShutdown() const
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif  // ENABLE_METRICS_PREVIEW

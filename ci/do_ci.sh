@@ -82,7 +82,6 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
@@ -99,7 +98,6 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
@@ -115,25 +113,8 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        "${SRC_DIR}"
-  make
-  make test
-  exit 0
-elif [[ "$1" == "cmake.deprecated_metrics.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_ZIPKIN=OFF \
-        -DWITH_JAEGER=OFF \
-        -DWITH_ELASTICSEARCH=OFF \
-        -DWITH_METRICS_PREVIEW=ON \
-        -DWITH_LOGS_PREVIEW=OFF \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -144,7 +125,6 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
@@ -169,7 +149,6 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_METRICS_PREVIEW=OFF \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
@@ -275,10 +254,6 @@ EOF
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
-  exit 0
-elif [[ "$1" == "bazel.deprecated_metrics.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --copt=-DENABLE_METRICS_PREVIEW //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS --copt=-DENABLE_METRICS_PREVIEW //...
   exit 0
 elif [[ "$1" == "bazel.with_async_export.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...

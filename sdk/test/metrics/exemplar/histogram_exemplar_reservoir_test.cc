@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+#include <gtest/gtest.h>
 #include <vector>
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -33,4 +32,3 @@ TEST_F(HistogramExemplarReservoirTestPeer, OfferMeasurement)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

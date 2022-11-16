@@ -168,6 +168,10 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
+set(OTELCPP_PROTO_PATH
+    ""
+    CACHE PATH "Path to opentelemetry-proto")
+
 if(WIN32)
   if(BUILD_TESTING)
     if(MSVC)
@@ -189,7 +193,6 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
 # Exemplar specs status is experimental, so behind feature flag by default

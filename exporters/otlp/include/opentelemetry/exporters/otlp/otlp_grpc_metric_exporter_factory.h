@@ -3,10 +3,8 @@
 
 #pragma once
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
-#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -35,5 +33,3 @@ public:
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif /* ENABLE_METRICS_PREVIEW */

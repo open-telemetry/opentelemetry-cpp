@@ -2,21 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <utility>
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
-#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include <utility>
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
-#  include <list>
-#  include <memory>
+#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+
+#include <list>
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -36,9 +36,9 @@ public:
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor},
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(exemplar_reservoir),
-#  endif
+#endif
         temporal_metric_storage_(instrument_descriptor, aggregation_config)
 
   {
@@ -54,9 +54,9 @@ public:
     {
       return;
     }
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
-#  endif
+#endif
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
@@ -69,10 +69,10 @@ public:
     {
       return;
     }
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
-#  endif
+#endif
     auto attr = attributes_processor_->process(attributes);
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
@@ -84,9 +84,9 @@ public:
     {
       return;
     }
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
-#  endif
+#endif
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
@@ -95,18 +95,18 @@ public:
                     const opentelemetry::common::KeyValueIterable &attributes,
                     const opentelemetry::context::Context &context) noexcept override
   {
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
-#  endif
+#endif
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
-#  endif
+#endif
     auto attr = attributes_processor_->process(attributes);
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
@@ -131,9 +131,9 @@ private:
   std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
   const AttributesProcessor *attributes_processor_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
-#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
-#  endif
+#endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
 };
@@ -141,4 +141,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -311,25 +311,25 @@ class Tracer : public opentelemetry::trace::Tracer,
       // local time, but rather UTC time (Z=0).
       std::chrono::system_clock::time_point startTime = GetStartTime(currentSpan);
       std::chrono::system_clock::time_point endTime   = GetEndTime(currentSpan);
-      int64_t startTimeMs =
-          std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch())
+      int64_t startTimeNs =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(startTime.time_since_epoch())
               .count();
-      int64_t endTimeMs =
-          std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+      int64_t endTimeNs =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(endTime.time_since_epoch()).count();
 
-      // It may be more optimal to enable passing timestamps as UTC milliseconds
+      // It may be more optimal to enable passing timestamps as UTC nanoseconds
       // since Unix epoch instead of string, but that implies additional tooling
       // is needed to convert it, rendering it NOT human-readable.
-      evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampMsAsISO8601(startTimeMs);
+      evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampNsAsISO8601(startTimeNs);
 #ifdef ETW_FIELD_ENDTTIME
       // ETW has its own precise timestamp at envelope layer for every event.
       // However, in some scenarios it is easier to deal with ISO8601 strings.
       // In that case we convert the app-created timestamp and place it into
       // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
-      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampMsAsISO8601(endTimeMs);
+      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampNsAsISO8601(endTimeNs);
 #endif
-      // Duration of Span in milliseconds
-      evt[ETW_FIELD_DURATION] = endTimeMs - startTimeMs;
+      // Duration of Span in nanoseconds
+      evt[ETW_FIELD_DURATION] = endTimeNs - startTimeNs;
       // Presently we assume that all spans are server spans
       evt[ETW_FIELD_SPAN_KIND] = uint32_t(opentelemetry::trace::SpanKind::kServer);
       UpdateStatus(currentSpan, evt);
@@ -631,8 +631,8 @@ public:
 #ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
-      auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
-      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
+      auto nanosecs       = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
+      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampNsAsISO8601(nanosecs);
     }
 #endif
 

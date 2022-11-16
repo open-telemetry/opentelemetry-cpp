@@ -1,20 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include <gtest/gtest.h>
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/resource/resource_detector.h"
-#  include "opentelemetry/sdk/version/version.h"
+#include <gtest/gtest.h>
+#include <memory>
+#include <vector>
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/version/version.h"
 
-#  include <iostream>
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/resource/resource.h"
+#include <iostream>
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -296,5 +295,3 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
-
-#endif

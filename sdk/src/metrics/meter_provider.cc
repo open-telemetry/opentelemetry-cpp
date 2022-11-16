@@ -1,16 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
-#  include <vector>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -25,7 +24,9 @@ MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : c
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(views), resource))
-{}
+{
+  OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
+}
 
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
@@ -103,4 +104,3 @@ MeterProvider::~MeterProvider()
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif
