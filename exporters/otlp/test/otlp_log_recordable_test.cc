@@ -104,17 +104,17 @@ TEST(OtlpLogRecordable, DefaultResource)
   for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
     auto attr = proto_resource.attributes(static_cast<int>(i));
-    if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_LANGUAGE)
+    if (attr.key() == resource::SemanticConventions::kTelemetrySdkLanguage)
     {
       EXPECT_EQ(attr.value().string_value(), "cpp");
       ++found_resource_count;
     }
-    else if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_NAME)
+    else if (attr.key() == resource::SemanticConventions::kTelemetrySdkName)
     {
       EXPECT_EQ(attr.value().string_value(), "opentelemetry");
       ++found_resource_count;
     }
-    else if (attr.key() == resource::SemanticConventions::TELEMETRY_SDK_VERSION)
+    else if (attr.key() == resource::SemanticConventions::kTelemetrySdkVersion)
     {
       EXPECT_EQ(attr.value().string_value(), OPENTELEMETRY_SDK_VERSION);
       ++found_resource_count;
