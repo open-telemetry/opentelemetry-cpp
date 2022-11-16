@@ -167,6 +167,15 @@ sdk::trace::Sampler &GetSampler(T &t)
 }
 
 /**
+ * @brief Utility function to obtain etw::TracerProvider.tail_sampler_
+ */
+template <class T, class U>
+U &GetTailSampler(T &t)
+{
+  return *t.tail_sampler_;
+}
+
+/**
  * @brief Utility template to convert SpanId or TraceId to hex.
  * @param id - value of SpanId or TraceId
  * @return Hexadecimal representation of Id as string.
