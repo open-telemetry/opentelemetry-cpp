@@ -7,8 +7,11 @@
 #include "opentelemetry/nostd/detail/void.h"
 #include "opentelemetry/version.h"
 
-#define OPENTELEMETRY_RETURN(...) \
-  noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) { return __VA_ARGS__; }
+#define OPENTELEMETRY_RETURN(...)                        \
+  noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) \
+  {                                                      \
+    return __VA_ARGS__;                                  \
+  }
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -31,7 +34,7 @@ template <>
 struct Invoke<true /* pmf */, 0 /* is_base_of */>
 {
   template <typename R, typename T, typename Arg, typename... Args>
-  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
+  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&...args)
       OPENTELEMETRY_RETURN((std::forward<Arg>(arg).*pmf)(std::forward<Args>(args)...))
 };
 
@@ -39,7 +42,7 @@ template <>
 struct Invoke<true /* pmf */, 1 /* is_reference_wrapper */>
 {
   template <typename R, typename T, typename Arg, typename... Args>
-  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
+  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&...args)
       OPENTELEMETRY_RETURN((std::forward<Arg>(arg).get().*pmf)(std::forward<Args>(args)...))
 };
 
@@ -47,7 +50,7 @@ template <>
 struct Invoke<true /* pmf */, 2 /* otherwise */>
 {
   template <typename R, typename T, typename Arg, typename... Args>
-  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&... args)
+  inline static constexpr auto invoke(R T::*pmf, Arg &&arg, Args &&...args)
       OPENTELEMETRY_RETURN(((*std::forward<Arg>(arg)).*pmf)(std::forward<Args>(args)...))
 };
 
@@ -76,20 +79,21 @@ struct Invoke<false /* pmo */, 2 /* otherwise */>
 };
 
 template <typename R, typename T, typename Arg, typename... Args>
-inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&... args)
-    OPENTELEMETRY_RETURN(Invoke<std::is_function<R>::value,
-                                (std::is_base_of<T, decay_t<Arg>>::value
-                                     ? 0
-                                     : is_reference_wrapper<decay_t<Arg>>::value ? 1 : 2)>::
-                             invoke(f, std::forward<Arg>(arg), std::forward<Args>(args)...))
+inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&...args) OPENTELEMETRY_RETURN(
+    Invoke<std::is_function<R>::value,
+           (std::is_base_of<T, decay_t<Arg>>::value     ? 0
+            : is_reference_wrapper<decay_t<Arg>>::value ? 1
+                                                        : 2)>::invoke(f,
+                                                                      std::forward<Arg>(arg),
+                                                                      std::forward<Args>(args)...))
 
 #ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable : 4100)
 #endif
-        template <typename F, typename... Args>
-        inline constexpr auto invoke_impl(F &&f, Args &&... args)
-            OPENTELEMETRY_RETURN(std::forward<F>(f)(std::forward<Args>(args)...))
+    template <typename F, typename... Args>
+    inline constexpr auto invoke_impl(F &&f, Args &&...args)
+        OPENTELEMETRY_RETURN(std::forward<F>(f)(std::forward<Args>(args)...))
 #ifdef _MSC_VER
 #  pragma warning(pop)
 #endif

@@ -63,7 +63,7 @@ struct HttpCurlEasyResource
     return *this;
   }
 
-  HttpCurlEasyResource(const HttpCurlEasyResource &other) = delete;
+  HttpCurlEasyResource(const HttpCurlEasyResource &other)            = delete;
   HttpCurlEasyResource &operator=(const HttpCurlEasyResource &other) = delete;
 };
 

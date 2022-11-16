@@ -48,10 +48,10 @@ public:
     auto span             = get_tracer("grpc")->StartSpan(
         span_name,
         {{SemanticConventions::RPC_SYSTEM, "grpc"},
-         {SemanticConventions::RPC_SERVICE, "grpc-example.GreetService"},
-         {SemanticConventions::RPC_METHOD, "Greet"},
-         {SemanticConventions::NET_SOCK_PEER_ADDR, ip},
-         {SemanticConventions::NET_PEER_PORT, port}},
+                     {SemanticConventions::RPC_SERVICE, "grpc-example.GreetService"},
+                     {SemanticConventions::RPC_METHOD, "Greet"},
+                     {SemanticConventions::NET_SOCK_PEER_ADDR, ip},
+                     {SemanticConventions::NET_PEER_PORT, port}},
         options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);

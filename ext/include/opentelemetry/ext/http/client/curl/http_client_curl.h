@@ -37,7 +37,7 @@ private:
   HttpCurlGlobalInitializer(HttpCurlGlobalInitializer &&)      = delete;
 
   HttpCurlGlobalInitializer &operator=(const HttpCurlGlobalInitializer &) = delete;
-  HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&) = delete;
+  HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&)      = delete;
 
   HttpCurlGlobalInitializer();
 

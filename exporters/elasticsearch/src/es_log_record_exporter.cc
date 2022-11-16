@@ -350,13 +350,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
           OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
-                                  << span_count
-                                  << " trace span(s) error: " << static_cast<int>(result));
+                                            << span_count
+                                            << " trace span(s) error: " << static_cast<int>(result));
         }
         else
         {
           OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] DEBUG: Export " << span_count
-                                                                     << " trace span(s) success");
+                                                                               << " trace span(s) success");
         }
         return true;
       },
