@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668640863710,
+  "lastUpdate": 1668640865945,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -95668,6 +95668,54 @@ window.BENCHMARK_DATA = {
             "value": 1723735.8904899436,
             "unit": "ns/iter",
             "extra": "iterations: 470\ncpu: 289172.1276595746 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@free.fr",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8da88df80d796c9626dcd7c871f2810de6adcb86",
+          "message": "[BUILD] Upgrade bazel build to use abseil-cpp-20220623.1 (#1779)",
+          "timestamp": "2022-11-16T15:11:03-08:00",
+          "tree_id": "ac5a8d565e0bfebcda9f598bf9871220459df055",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/8da88df80d796c9626dcd7c871f2810de6adcb86"
+        },
+        "date": 1668640860605,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 106.39620776563473,
+            "unit": "ns/iter",
+            "extra": "iterations: 1306000\ncpu: 106.25589586523736 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 152.09915839668986,
+            "unit": "ns/iter",
+            "extra": "iterations: 922000\ncpu: 152.09869848156183 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 549.4949900505626,
+            "unit": "ns/iter",
+            "extra": "iterations: 259000\ncpu: 549.225482625483 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1433704.8386082505,
+            "unit": "ns/iter",
+            "extra": "iterations: 429\ncpu: 321752.21445221436 ns\nthreads: 1"
           }
         ]
       }
