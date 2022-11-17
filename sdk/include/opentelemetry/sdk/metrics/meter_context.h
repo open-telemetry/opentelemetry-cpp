@@ -59,12 +59,12 @@ public:
    * NOTE - INTERNAL method, can change in future.
    * Process callback for each meter in thread-safe manner
    */
- bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
+  bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
 
-  /** 
+  /**
    * NOTE - INTERNAL method, can change in future.
-   * Obtain the  configured meters. 
-   * This method is NOT thread-safe.
+   * Get the configured meters.
+   * This method is NOT thread safe, and only called through MeterProvider
    *
    */
   nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
@@ -104,8 +104,8 @@ public:
                std::unique_ptr<View> view) noexcept;
 
   /**
-   * Adds a meter to the list of configured meters.
-   * Note: This method is INTERNAL to sdk not thread safe.
+   * NOTE - INTERNAL method, can change in future.
+   * Adds a meter to the list of configured meters in thread safe manner.
    *
    * @param meter
    */
