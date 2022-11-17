@@ -18,6 +18,7 @@ public:
   // Decision based on
   //      Span::GetStatus()
   //      Span::GetProperties()
+  //      Span::GetContext()
   virtual opentelemetry::sdk::trace::SamplingResult ShouldSample(
       const opentelemetry::trace::Span &span) noexcept = 0;
 };
