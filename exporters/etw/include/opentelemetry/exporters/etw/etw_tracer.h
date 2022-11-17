@@ -1006,7 +1006,8 @@ public:
       : opentelemetry::trace::TracerProvider(),
         sampler_{std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler)},
         id_generator_{std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-            new sdk::trace::ETWRandomIdGenerator())}
+            new sdk::trace::ETWRandomIdGenerator())},
+        tail_sampler_{std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler())}
   {
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
