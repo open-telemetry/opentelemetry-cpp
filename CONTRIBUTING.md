@@ -87,6 +87,12 @@ git submodule init
 git submodule update
 ```
 
+The source code is automatically formatted using clang-format.
+
+The output can vary between versions, so make sure to install `clang-format`
+version `10.0`, and have `clang-format-10` in your execution path,
+so that the helper script `tools/format.sh` can find it.
+
 Check out a new branch, make modifications and push the branch to your fork:
 
 ```sh
