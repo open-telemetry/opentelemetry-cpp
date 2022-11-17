@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668640867704,
+  "lastUpdate": 1668648989102,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -83449,6 +83449,156 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/8da88df80d796c9626dcd7c871f2810de6adcb86"
         },
         "date": 1668640861905,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_AttributseProcessorFilter",
+            "value": 159.32134588914425,
+            "unit": "ns/iter",
+            "extra": "iterations: 884380\ncpu: 158.02313485153442 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AttributseHashMap",
+            "value": 17282629.013061523,
+            "unit": "ns/iter",
+            "extra": "iterations: 10\ncpu: 10008970 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AttributeMapHash",
+            "value": 149.7938049535644,
+            "unit": "ns/iter",
+            "extra": "iterations: 934579\ncpu: 149.58328830414553 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomIdGeneration",
+            "value": 3.2332560222495403,
+            "unit": "ns/iter",
+            "extra": "iterations: 42250503\ncpu: 3.229937877899347 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomIdStdGeneration",
+            "value": 9.178903228605343,
+            "unit": "ns/iter",
+            "extra": "iterations: 15360225\ncpu: 9.118284400130857 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/1",
+            "value": 1336207.628250122,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000\ncpu: 19304.500000000004 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/2",
+            "value": 12533831.596374512,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 199353 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/4",
+            "value": 13174512.386322021,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 360758 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/1",
+            "value": 329634.87987140083,
+            "unit": "ns/iter",
+            "extra": "iterations: 8825\ncpu: 16909.881019830027 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/2",
+            "value": 2981123.8589352123,
+            "unit": "ns/iter",
+            "extra": "iterations: 876\ncpu: 167884.36073059367 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/4",
+            "value": 8074498.176574707,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 370215.00000000035 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOffSamplerConstruction",
+            "value": 3.042946915188446,
+            "unit": "ns/iter",
+            "extra": "iterations: 45462664\ncpu: 3.03754087090013 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOnSamplerConstruction",
+            "value": 3.093778893490253,
+            "unit": "ns/iter",
+            "extra": "iterations: 45281652\ncpu: 3.0904769110455605 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ParentBasedSamplerConstruction",
+            "value": 75.80851511623634,
+            "unit": "ns/iter",
+            "extra": "iterations: 1864834\ncpu: 75.21345063421198 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_TraceIdRatioBasedSamplerConstruction",
+            "value": 335.65389301465507,
+            "unit": "ns/iter",
+            "extra": "iterations: 416978\ncpu: 335.4236914177725 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOffSamplerShouldSample",
+            "value": 37.813438604298824,
+            "unit": "ns/iter",
+            "extra": "iterations: 3706312\ncpu: 37.76891961604959 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOnSamplerShouldSample",
+            "value": 37.9513790817026,
+            "unit": "ns/iter",
+            "extra": "iterations: 3705556\ncpu: 37.80077807486915 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ParentBasedSamplerShouldSample",
+            "value": 43.15440627850063,
+            "unit": "ns/iter",
+            "extra": "iterations: 3252841\ncpu: 43.03115338253544 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_TraceIdRatioBasedSamplerShouldSample",
+            "value": 23.36348005336689,
+            "unit": "ns/iter",
+            "extra": "iterations: 6451405\ncpu: 21.730413762583524 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreation",
+            "value": 830.2858877579706,
+            "unit": "ns/iter",
+            "extra": "iterations: 173374\ncpu: 801.4073621188871 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NoopSpanCreation",
+            "value": 369.2303279672558,
+            "unit": "ns/iter",
+            "extra": "iterations: 415644\ncpu: 338.20432870437213 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@free.fr",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d0571d8ac78f536098addac4288e5dce28f93da1",
+          "message": "Fixes #1781 (#1782)",
+          "timestamp": "2022-11-16T17:26:03-08:00",
+          "tree_id": "e65dc33f0ee72c71928de457201b68afa22f5e44",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/d0571d8ac78f536098addac4288e5dce28f93da1"
+        },
+        "date": 1668648984916,
         "tool": "googlecpp",
         "benches": [
           {
