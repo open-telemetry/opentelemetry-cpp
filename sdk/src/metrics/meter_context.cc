@@ -28,9 +28,22 @@ ViewRegistry *MeterContext::GetViewRegistry() const noexcept
   return views_.get();
 }
 
+bool MeterContext::ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept
+{
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+    for (auto &meter: meters_)
+    {
+      if (!callback(meter))
+      {
+        return false;
+      }
+    }
+    return true;
+}
+
 nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
+  // no lock required, as this is called by MeterProvider in thread-safe manner.
   return nostd::span<std::shared_ptr<Meter>>{meters_};
 }
 
@@ -59,7 +72,7 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
 
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
   meters_.push_back(meter);
 }
 
