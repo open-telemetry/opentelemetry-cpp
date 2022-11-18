@@ -56,7 +56,15 @@ public:
   ViewRegistry *GetViewRegistry() const noexcept;
 
   /**
-   * Obtain the  configured meters.
+   * NOTE - INTERNAL method, can change in future.
+   * Process callback for each meter in thread-safe manner
+   */
+  bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
+
+  /**
+   * NOTE - INTERNAL method, can change in future.
+   * Get the configured meters.
+   * This method is NOT thread safe, and only called through MeterProvider
    *
    */
   nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
@@ -96,8 +104,8 @@ public:
                std::unique_ptr<View> view) noexcept;
 
   /**
-   * Adds a meter to the list of configured meters.
-   * Note: This method is INTERNAL to sdk not thread safe.
+   * NOTE - INTERNAL method, can change in future.
+   * Adds a meter to the list of configured meters in thread safe manner.
    *
    * @param meter
    */
@@ -124,7 +132,7 @@ private:
 
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
   opentelemetry::common::SpinLockMutex forceflush_lock_;
-  opentelemetry::common::SpinLockMutex storage_lock_;
+  opentelemetry::common::SpinLockMutex meter_lock_;
 };
 
 }  // namespace metrics
