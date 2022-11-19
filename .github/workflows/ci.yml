@@ -366,6 +366,27 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
+  bazel_e2e:
+    name: Bazel e2e gRPC C++11
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_tsan
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.e2e
+
   bazel_osx:
     name: Bazel on MacOS
     runs-on: macos-latest
