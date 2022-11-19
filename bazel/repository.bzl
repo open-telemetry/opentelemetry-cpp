@@ -60,6 +60,7 @@ def opentelemetry_cpp_deps():
             "https://github.com/abseil/abseil-cpp/archive/20211102.0.tar.gz",
         ],
     )
+
     # Load abseil dependency(optional)
     maybe(
         http_archive,
