@@ -50,6 +50,16 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    maybe(
+         http_archive
+        name = "com_google_absl_latest11",
+        sha256 = "dcf71b9cba8dc0ca9940c4b316a0c796be8fab42b070bb6b7cab62b48f0e66c4",
+        strip_prefix = "abseil-cpp-20211102.0",
+        urls = [
+            "https://storage.googleapis.com/grpc-bazel-mirror/github.com/abseil/abseil-cpp/archive/20211102.0.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/20211102.0.tar.gz",
+        ],
+    )
     # Load abseil dependency(optional)
     maybe(
         http_archive,
@@ -75,6 +85,7 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc_latest11",
+        sha256 = "e266aa0d9d9cddb876484a370b94f468248594a96ca0b6f87c21f969db2b8c5b"
         strip_prefix = "grpc-1.46.4",
         urls = [
             "https://github.com/grpc/grpc/archive/v1.46.4.tar.gz",
