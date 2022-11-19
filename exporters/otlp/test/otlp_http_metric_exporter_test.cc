@@ -23,6 +23,7 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
+#include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
 
@@ -845,6 +846,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigJsonBytesMappingTest)
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
   std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
+  google::protobuf::ShutdownProtobufLibrary();
 }
 
 #ifndef NO_GETENV
