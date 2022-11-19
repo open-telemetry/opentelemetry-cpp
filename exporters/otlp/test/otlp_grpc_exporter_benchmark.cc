@@ -187,6 +187,7 @@ BENCHMARK(BM_OtlpExporterDenseSpans);
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 
+#ifdef NDEBUG
 namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
@@ -212,5 +213,6 @@ void BM_otlp_grpc_with_collector(benchmark::State &state)
 }
 BENCHMARK(BM_otlp_grpc_with_collector);
 }  // namespace
+#endif
 
 BENCHMARK_MAIN();
