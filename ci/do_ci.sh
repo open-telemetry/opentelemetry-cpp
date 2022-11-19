@@ -60,7 +60,7 @@ mkdir -p "${BUILD_DIR}"
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
-BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT --cxxopt=-std=c++14"
+BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
@@ -296,12 +296,8 @@ elif [[ "$1" == "bazel.tsan" ]]; then
   //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
-  docker run -d --rm -it -p 4317:4317 -p 4318:4318 -v \
-    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 \
-    --config=/cfg/opentelemetry-collector-config/config.dev.yaml
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
   bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
-  docker kill $(docker ps -q)
   exit 0
 elif [[ "$1" == "bazel.e2e" ]]; then
   cd examples/e2e
