@@ -1,0 +1,37 @@
+workspace(name = "otel_e2e")
+
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+http_archive(
+    name = "io_opentelemetry_cpp",
+    repo_mapping = {
+        "@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11",
+        "@com_google_absl": "@com_google_absl_latest11",
+    },
+    strip_prefix = "opentelemetry-cpp-grpc_e2e",
+    urls = [
+        "https://github.com/esigo/opentelemetry-cpp/archive/grpc_e2e.zip",
+    ],
+)
+
+# Load OpenTelemetry dependencies after load.
+load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
+
+opentelemetry_cpp_deps()
+
+# Load gRPC dependencies after load.
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+# Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
+grpc_extra_deps()
+
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("@upb//bazel:workspace_deps.bzl", "upb_deps")
+
+upb_deps()
