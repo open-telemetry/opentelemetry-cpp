@@ -8,7 +8,7 @@ http_archive(
     name = "io_opentelemetry_cpp",
     repo_mapping = {
         "@com_github_grpc_grpc": "@com_github_grpc_grpc_latest11",
-        "@com_google_absl": "@com_google_absl_latest11"
+        "@com_google_absl": "@com_google_absl_latest11",
     },
     strip_prefix = "opentelemetry-cpp-grpc_e2e",
     urls = [
