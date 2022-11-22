@@ -64,7 +64,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
   if (!status.ok())
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with statuc_code: \""
+    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with status_code: \""
                             << grpc_utils::grpc_status_code_to_string(status.error_code())
                             << "\" error_message: \"" << status.error_message() << "\"");
     return sdk::common::ExportResult::kFailure;
