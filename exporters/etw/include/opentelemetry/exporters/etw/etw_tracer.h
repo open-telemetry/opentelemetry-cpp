@@ -403,7 +403,6 @@ public:
 #endif
   }
 
-
   /**
    * @brief Start Span
    * @param name Span name
