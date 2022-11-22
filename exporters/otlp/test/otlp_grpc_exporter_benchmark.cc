@@ -188,6 +188,9 @@ BENCHMARK(BM_OtlpExporterDenseSpans);
 OPENTELEMETRY_END_NAMESPACE
 
 #ifdef NDEBUG
+// disabled as valgrind reports a memroy leak at absl::lts_20220623::random_internal::(anonymous
+// namespace)::PoolAlignedAlloc()
+// see PR #1737
 namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
