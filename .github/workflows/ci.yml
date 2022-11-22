@@ -9,7 +9,7 @@ on:
 jobs:
   cmake_test:
     name: CMake test (without otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -25,7 +25,7 @@ jobs:
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -41,7 +41,7 @@ jobs:
 
   cmake_clang_maintainer_test:
     name: CMake clang (maintainer mode)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -71,7 +71,7 @@ jobs:
 
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -87,7 +87,7 @@ jobs:
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -146,7 +146,7 @@ jobs:
 
   cmake_test_cxx20:
     name: CMake C++20 test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -162,7 +162,7 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -178,7 +178,7 @@ jobs:
 
   plugin_test:
     name: Plugin -> CMake
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -192,7 +192,7 @@ jobs:
 
   bazel_test:
     name: Bazel
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -214,7 +214,7 @@ jobs:
 
   bazel_test_async:
     name: Bazel with async export
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -236,7 +236,7 @@ jobs:
 
   bazel_with_abseil:
     name: Bazel with external abseil
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -258,7 +258,7 @@ jobs:
 
   bazel_valgrind:
     name: Bazel valgrind
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -280,7 +280,7 @@ jobs:
 
   bazel_noexcept:
     name: Bazel noexcept
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -302,7 +302,7 @@ jobs:
 
   bazel_nortti:
     name: Bazel nortti
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -324,7 +324,7 @@ jobs:
 
   bazel_asan:
     name: Bazel asan config
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -346,7 +346,7 @@ jobs:
 
   bazel_tsan:
     name: Bazel tsan config
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -385,7 +385,7 @@ jobs:
 
   benchmark:
     name: Benchmark
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -413,7 +413,7 @@ jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - name: setup
@@ -486,7 +486,7 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -503,7 +503,7 @@ jobs:
         file: /home/runner/build/coverage.info
 
   markdown-lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: check out code
@@ -516,7 +516,7 @@ jobs:
       run: markdownlint .
 
   misspell:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: check out code
       uses: actions/checkout@v3
