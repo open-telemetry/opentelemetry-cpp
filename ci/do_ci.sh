@@ -54,9 +54,9 @@ function run_benchmarks
 }
 
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
-[ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
+[ -z "${BUILD_DIR}" ] && export BUILD_DIR=/opt/build
 mkdir -p "${BUILD_DIR}"
-[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
+[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=/opt/plugin
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
@@ -84,6 +84,7 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
+        -DWITH_PROMETHEUS=OFF \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make

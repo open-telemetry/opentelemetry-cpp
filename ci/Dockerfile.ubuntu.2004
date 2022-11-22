@@ -1,0 +1,11 @@
+FROM ubuntu:20.04
+
+WORKDIR /setup-ci
+
+ADD setup_ci_environment.sh /setup-ci
+ADD setup_cmake.sh /setup-ci
+ADD setup_thrift.sh /setup-ci/
+
+RUN apt update && /setup-ci/setup_ci_environment.sh \
+  && /setup-ci/setup_cmake.sh \
+  && /setup-ci/setup_thrift.sh

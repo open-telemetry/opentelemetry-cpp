@@ -5,9 +5,9 @@
 
 set -e
 
-BUILD_IMAGE=opentelemetry-cpp-build
+BUILD_IMAGE=opentelemetry-cpp-build-2004
 docker image inspect "$BUILD_IMAGE" &> /dev/null || {
-  docker build -t "$BUILD_IMAGE" ci
+  docker build -t "$BUILD_IMAGE" ci -f ci/Dockerfile.ubuntu.2004
 }
 
 if [[ $# -ge 1 ]]; then
