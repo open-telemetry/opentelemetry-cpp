@@ -9,7 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
 export CMAKE_VERSION=3.15.2
-export GOOGLETEST_VERSION=1.10.0
+export GOOGLETEST_VERSION=1.12.1
 
 cmake_install() {
     tmp_dir=$(mktemp -d)

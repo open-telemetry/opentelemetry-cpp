@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, gtest ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
