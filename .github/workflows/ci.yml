@@ -9,7 +9,7 @@ on:
 jobs:
   cmake_test:
     name: CMake test (without otlp-exporter)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -25,7 +25,7 @@ jobs:
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -41,7 +41,7 @@ jobs:
 
   cmake_clang_maintainer_test:
     name: CMake clang (maintainer mode)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -71,7 +71,7 @@ jobs:
 
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -87,18 +87,18 @@ jobs:
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
@@ -110,7 +110,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
       run: |
@@ -146,15 +146,15 @@ jobs:
 
   cmake_test_cxx20:
     name: CMake C++20 test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
@@ -162,15 +162,15 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -178,21 +178,21 @@ jobs:
 
   plugin_test:
     name: Plugin -> CMake
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
     - name: run tests
       run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
     name: Bazel
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -207,14 +207,14 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh bazel.test
 
   bazel_test_async:
     name: Bazel with async export
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -228,15 +228,15 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
 
   bazel_with_abseil:
     name: Bazel with external abseil
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -250,15 +250,15 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_abseil
 
   bazel_valgrind:
     name: Bazel valgrind
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -272,15 +272,15 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
 
   bazel_noexcept:
     name: Bazel noexcept
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -294,15 +294,15 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
 
   bazel_nortti:
     name: Bazel nortti
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -316,15 +316,15 @@ jobs:
         key: bazel_nortti
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
 
   bazel_asan:
     name: Bazel asan config
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -338,15 +338,15 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
 
   bazel_tsan:
     name: Bazel tsan config
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -360,8 +360,8 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh dependencies_only
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -385,7 +385,7 @@ jobs:
 
   benchmark:
     name: Benchmark
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -399,7 +399,7 @@ jobs:
         key: bazel_benchmark
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: |
@@ -413,7 +413,7 @@ jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
     - name: setup
@@ -486,15 +486,15 @@ jobs:
 
   code_coverage:
     name: Code coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
     - name: run tests and generate report
       run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
     - name: upload report
@@ -503,7 +503,7 @@ jobs:
         file: /home/runner/build/coverage.info
 
   markdown-lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: check out code
@@ -516,7 +516,7 @@ jobs:
       run: markdownlint .
 
   misspell:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
     - name: check out code
       uses: actions/checkout@v3
