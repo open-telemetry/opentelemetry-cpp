@@ -54,9 +54,9 @@ function run_benchmarks
 }
 
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
-[ -z "${BUILD_DIR}" ] && export BUILD_DIR=/opt/build
+[ -z "${BUILD_DIR}" ] && export BUILD_DIR=.build
 mkdir -p "${BUILD_DIR}"
-[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=/opt/plugin
+[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=.plugin
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
