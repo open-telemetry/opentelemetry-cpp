@@ -570,7 +570,14 @@ public:
                 common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+    // If RTTI is enabled by compiler, the below code modifies the attributes object passed as arg,
+    // which is sometime not desirable, set OPENTELEMETRY_NOT_USE_RTTI in application
+    // to avoid using RTTI in that case in below set of code.
+#if !defined OPENTELEMETRY_RTTI_ENABLED || defined OPENTELEMETRY_NOT_USE_RTTI
+    // Pass a copy converted to Properties object on stack
+    Properties evtCopy = attributes;
+    return AddEvent(span, name, timestamp, evtCopy);
+#else  // OPENTELEMETRY_RTTI_ENABLED is defined
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
@@ -579,9 +586,6 @@ public:
       return AddEvent(span, name, timestamp, *evt);
     }
 #endif
-    // Pass a copy converted to Properties object on stack
-    Properties evtCopy = attributes;
-    return AddEvent(span, name, timestamp, evtCopy);
   }
 
   /**
