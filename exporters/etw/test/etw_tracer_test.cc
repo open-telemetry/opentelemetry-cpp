@@ -6,7 +6,6 @@
 #  include <gtest/gtest.h>
 #  include <map>
 #  include <string>
-
 #  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
