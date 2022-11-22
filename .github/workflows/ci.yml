@@ -16,12 +16,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
@@ -78,12 +78,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.with_async_export.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
@@ -94,12 +94,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.abseil.test
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
@@ -110,11 +110,11 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
       run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+        ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.test
       env:
@@ -130,7 +130,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
       run: |
@@ -153,8 +153,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
@@ -169,12 +169,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
-        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   plugin_test:
     name: Plugin -> CMake
@@ -185,10 +185,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
     - name: run tests
-      run: ./ci/do_ci.sh cmake.test_example_plugin
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
     name: Bazel
@@ -207,10 +207,10 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
-      run: ./ci/do_ci.sh bazel.test
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh bazel.test
 
   bazel_test_async:
     name: Bazel with async export
@@ -228,8 +228,8 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
@@ -250,8 +250,8 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_abseil
@@ -272,8 +272,8 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
@@ -294,8 +294,8 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
@@ -316,8 +316,8 @@ jobs:
         key: bazel_nortti
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.nortti
@@ -338,8 +338,8 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
@@ -360,8 +360,8 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_thrift.sh dependencies_only
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
@@ -399,12 +399,12 @@ jobs:
         key: bazel_benchmark
     - name: setup
       run: |
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: |
         env BENCHMARK_DIR=/benchmark
-        ./ci/do_ci.sh benchmark
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh benchmark
     - name: Upload benchmark results
       uses: actions/upload-artifact@v3
       with:
@@ -493,10 +493,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 sudo ./ci/setup_cmake.sh
     - name: run tests and generate report
-      run: ./ci/do_ci.sh code.coverage
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v3
       with:
