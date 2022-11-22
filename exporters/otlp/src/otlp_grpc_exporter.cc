@@ -11,7 +11,7 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/sdk_config.h"
 
-#include <grpcpp/grpcpp.h>
+#include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -64,9 +64,9 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
   if (!status.ok())
   {
-
-    OTEL_INTERNAL_LOG_ERROR(
-        "[OTLP TRACE GRPC Exporter] Export() failed: " << status.error_message());
+    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with statuc_code: \""
+                            << grpc_utils::grpc_status_code_to_string(status.error_code())
+                            << "\" error_message: \"" << status.error_message() << "\"");
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;
