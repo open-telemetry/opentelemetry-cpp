@@ -398,8 +398,11 @@ public:
       // Pass as a reference to original modifyable collection without creating a copy
       return StartSpan(name, *evt, links, options);
     }
+    Properties evtCopy = attributes;
+    return StartSpan(name, evtCopy, links, options);
 #endif
   }
+
 
   /**
    * @brief Start Span
@@ -585,6 +588,8 @@ public:
       // Pass as a reference to original modifyable collection without creating a copy
       return AddEvent(span, name, timestamp, *evt);
     }
+    Properties evtCopy = attributes;
+    return AddEvent(span, name, timestamp, evtCopy);
 #endif
   }
 
