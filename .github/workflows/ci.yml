@@ -399,10 +399,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: setup
-      run: sudo ./ci/install_format_tools.sh
     - name: run tests
-      run: ./ci/do_ci.sh format
+      run: ci/run_docker.sh ./ci/do_ci.sh format
 
 
   windows:

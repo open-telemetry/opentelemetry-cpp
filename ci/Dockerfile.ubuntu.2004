@@ -5,7 +5,9 @@ WORKDIR /setup-ci
 ADD setup_ci_environment.sh /setup-ci
 ADD setup_cmake.sh /setup-ci
 ADD setup_thrift.sh /setup-ci/
+ADD install_format_tools.sh /setup-ci
 
 RUN apt update && /setup-ci/setup_ci_environment.sh \
   && /setup-ci/setup_cmake.sh \
-  && /setup-ci/setup_thrift.sh
+  && /setup-ci/setup_thrift.sh \
+  && /setup-ci/install_format_tools.sh
