@@ -14,14 +14,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.test
+        ci/run_docker.sh ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
