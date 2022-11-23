@@ -11,7 +11,7 @@ permissions:
 jobs:
   benchmark:
     name: Run OpenTelemetry-cpp benchmarks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -45,7 +45,7 @@ jobs:
       matrix:
         components: ["api", "sdk", "exporters"]
     name: Store benchmark result
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@master
