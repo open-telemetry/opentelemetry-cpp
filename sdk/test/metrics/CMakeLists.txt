@@ -29,10 +29,11 @@ foreach(
 endforeach()
 
 if(WITH_BENCHMARK)
-  add_executable(attributes_processor_benchmark attributes_processor_benchmark.cc)
+  add_executable(attributes_processor_benchmark
+                 attributes_processor_benchmark.cc)
   target_link_libraries(attributes_processor_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
-  
+ 
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
   target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
