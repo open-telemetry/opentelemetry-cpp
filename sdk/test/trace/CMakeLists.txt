@@ -24,7 +24,9 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
-add_executable(sampler_benchmark sampler_benchmark.cc)
-target_link_libraries(
-  sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
-  opentelemetry_trace opentelemetry_resources opentelemetry_exporter_in_memory)
+if(WITH_BENCHMARK)
+  add_executable(sampler_benchmark sampler_benchmark.cc)
+  target_link_libraries(
+    sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_trace opentelemetry_resources opentelemetry_exporter_in_memory)
+endif()
