@@ -18,7 +18,6 @@ cc_library(
     name = "random",
     srcs = [
         "core.cc",
-        "env_variables.cc",
         "random.cc",
     ],
     hdrs = [
@@ -30,6 +29,18 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common/platform:fork",
+    ],
+)
+
+cc_library(
+    name = "env_variables",
+    srcs = [
+        "env_variables.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:global_log_handler",
     ],
 )
 
