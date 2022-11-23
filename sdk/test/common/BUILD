@@ -27,7 +27,7 @@ cc_test(
 otel_cc_benchmark(
     name = "random_benchmark",
     srcs = ["random_benchmark.cc"],
-    tags = ["test"],
+    tags = ["benchmark", "test"],
     deps = ["//sdk/src/common:random"],
 )
 
@@ -82,7 +82,7 @@ cc_library(
 otel_cc_benchmark(
     name = "circular_buffer_benchmark",
     srcs = ["circular_buffer_benchmark.cc"],
-    tags = ["test"],
+    tags = ["benchmark", "test"],
     deps = [
         ":baseline_circular_buffer",
         "//sdk:headers",
@@ -145,7 +145,7 @@ cc_test(
 otel_cc_benchmark(
     name = "attributemap_hash_benchmark",
     srcs = ["attributemap_hash_benchmark.cc"],
-    tags = ["test"],
+    tags = ["benchmark", "test"],
     deps = [
         "//api",
         "//sdk:headers",
