@@ -87,19 +87,19 @@ jobs:
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/install_abseil.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.abseil.test
+        sudo ./ci/install_abseil.sh
+        ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
@@ -162,19 +162,19 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_grpc.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.exporter.otprotocol.test
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   plugin_test:
     name: Plugin -> CMake
