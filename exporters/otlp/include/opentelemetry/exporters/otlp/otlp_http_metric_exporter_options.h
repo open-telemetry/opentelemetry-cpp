@@ -61,6 +61,18 @@ struct OtlpHttpMetricExporterOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 #endif
+
+#ifdef ENABLE_OTLP_HTTP_SSL
+  std::string ssl_cert_path = GetOtlpDefaultMetricsSslCertificatePath();
+  std::string ssl_cert_string = GetOtlpDefaultMetricsSslCertificateString();
+
+  std::string ssl_client_key_path = GetOtlpDefaultMetricsSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultMetricsSslClientKeyString();
+
+  std::string ssl_client_cert_path = GetOtlpDefaultMetricsSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultMetricsSslClientCertificateString();
+#endif
+
 };
 
 }  // namespace otlp

@@ -46,6 +46,15 @@ struct OtlpHttpClientOptions
 {
   std::string url;
 
+  std::string ssl_cert_path;
+  std::string ssl_cert_string;
+
+  std::string ssl_client_key_path;
+  std::string ssl_client_key_string;
+
+  std::string ssl_client_cert_path;
+  std::string ssl_client_cert_string;
+
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
 
@@ -60,11 +69,10 @@ struct OtlpHttpClientOptions
   // Whether to print the status of the HTTP client in the console
   bool console_debug = false;
 
-  // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  std::chrono::system_clock::duration timeout;
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+  OtlpHeaders http_headers;
 
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
@@ -73,9 +81,15 @@ struct OtlpHttpClientOptions
   std::size_t max_requests_per_connection = 8;
 
   // User agent
-  std::string user_agent = GetOtlpDefaultUserAgent();
+  std::string user_agent;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
+                               nostd::string_view input_ssl_cert_path,
+                               nostd::string_view input_ssl_cert_string,
+                               nostd::string_view input_ssl_client_key_path,
+                               nostd::string_view input_ssl_client_key_string,
+                               nostd::string_view input_ssl_client_cert_path,
+                               nostd::string_view input_ssl_client_cert_string,
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
                                bool input_use_json_name,
@@ -86,6 +100,12 @@ struct OtlpHttpClientOptions
                                std::size_t input_max_requests_per_connection = 8,
                                nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
+        ssl_cert_path(input_ssl_cert_path),
+        ssl_cert_string(input_ssl_cert_string),
+        ssl_client_key_path(input_ssl_client_key_path),
+        ssl_client_key_string(input_ssl_client_key_string),
+        ssl_client_cert_path(input_ssl_client_cert_path),
+        ssl_client_cert_string(input_ssl_client_cert_string),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),

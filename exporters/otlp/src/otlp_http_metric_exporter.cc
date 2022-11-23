@@ -29,6 +29,22 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
+#ifdef ENABLE_OTLP_HTTP_SSL
+                                                            options.ssl_cert_path,
+                                                            options.ssl_cert_string,
+                                                            options.ssl_client_key_path,
+                                                            options.ssl_client_key_string,
+                                                            options.ssl_client_cert_path,
+                                                            options.ssl_client_cert_string,
+#else
+                                                            "" /* ssl_cert_path */,
+                                                            "" /* ssl_cert_string */,
+                                                            "" /* ssl_client_key_path */,
+                                                            "" /* ssl_client_key_string */,
+                                                            "" /* ssl_client_cert_path */,
+                                                            "" /* ssl_client_cert_string */,
+#endif
+
                                                             options.content_type,
                                                             options.json_bytes_mapping,
                                                             options.use_json_name,

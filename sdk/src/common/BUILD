@@ -18,6 +18,7 @@ cc_library(
     name = "random",
     srcs = [
         "core.cc",
+        "env_variables.cc",
         "random.cc",
     ],
     hdrs = [

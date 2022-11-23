@@ -43,7 +43,6 @@ struct OtlpHttpExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug = false;
 
-  // TODO: Enable/disable to verify SSL certificate
   std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
 
   // Additional HTTP headers
@@ -56,6 +55,17 @@ struct OtlpHttpExporterOptions
 
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
+#endif
+
+#ifdef ENABLE_OTLP_HTTP_SSL
+  std::string ssl_cert_path = GetOtlpDefaultTracesSslCertificatePath();
+  std::string ssl_cert_string = GetOtlpDefaultTracesSslCertificateString();
+
+  std::string ssl_client_key_path = GetOtlpDefaultTracesSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultTracesSslClientKeyString();
+
+  std::string ssl_client_cert_path = GetOtlpDefaultTracesSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 #endif
 };
 
