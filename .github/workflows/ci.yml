@@ -16,12 +16,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
@@ -78,16 +78,16 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.with_async_export.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -162,7 +162,7 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -185,10 +185,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run tests
-      run: ./ci/do_ci.sh cmake.test_example_plugin
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
     name: Bazel
@@ -346,7 +346,7 @@ jobs:
 
   bazel_tsan:
     name: Bazel tsan config
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
@@ -413,7 +413,7 @@ jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
     - name: setup
@@ -493,10 +493,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run tests and generate report
-      run: ./ci/do_ci.sh code.coverage
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v3
       with:
