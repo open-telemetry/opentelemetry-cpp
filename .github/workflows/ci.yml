@@ -16,12 +16,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
@@ -78,12 +78,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo ./ci/setup_thrift.sh
-        ./ci/do_ci.sh cmake.with_async_export.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
@@ -94,12 +94,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
-        sudo ./ci/install_abseil.sh
-        ./ci/do_ci.sh cmake.abseil.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/install_abseil.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
@@ -169,12 +169,12 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
-        sudo ./ci/setup_grpc.sh
-        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_grpc.sh
+        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   plugin_test:
     name: Plugin -> CMake
@@ -185,10 +185,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run tests
-      run: ./ci/do_ci.sh cmake.test_example_plugin
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
     name: Bazel
@@ -493,10 +493,10 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run tests and generate report
-      run: ./ci/do_ci.sh code.coverage
+      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v3
       with:
