@@ -58,16 +58,16 @@ struct OtlpHttpLogRecordExporterOptions
   std::size_t max_requests_per_connection = 8;
 #  endif
 
-#ifdef ENABLE_OTLP_HTTP_SSL
-  std::string ssl_cert_path = GetOtlpDefaultLogsSslCertificatePath();
+#  ifdef ENABLE_OTLP_HTTP_SSL
+  std::string ssl_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
   std::string ssl_cert_string = GetOtlpDefaultLogsSslCertificateString();
 
-  std::string ssl_client_key_path = GetOtlpDefaultLogsSslClientKeyPath();
+  std::string ssl_client_key_path   = GetOtlpDefaultLogsSslClientKeyPath();
   std::string ssl_client_key_string = GetOtlpDefaultLogsSslClientKeyString();
 
-  std::string ssl_client_cert_path = GetOtlpDefaultLogsSslClientCertificatePath();
+  std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
-#endif
+#  endif
 };
 
 }  // namespace otlp

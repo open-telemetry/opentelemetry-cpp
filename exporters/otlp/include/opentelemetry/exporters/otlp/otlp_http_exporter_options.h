@@ -58,13 +58,13 @@ struct OtlpHttpExporterOptions
 #endif
 
 #ifdef ENABLE_OTLP_HTTP_SSL
-  std::string ssl_cert_path = GetOtlpDefaultTracesSslCertificatePath();
+  std::string ssl_cert_path   = GetOtlpDefaultTracesSslCertificatePath();
   std::string ssl_cert_string = GetOtlpDefaultTracesSslCertificateString();
 
-  std::string ssl_client_key_path = GetOtlpDefaultTracesSslClientKeyPath();
+  std::string ssl_client_key_path   = GetOtlpDefaultTracesSslClientKeyPath();
   std::string ssl_client_key_string = GetOtlpDefaultTracesSslClientKeyString();
 
-  std::string ssl_client_cert_path = GetOtlpDefaultTracesSslClientCertificatePath();
+  std::string ssl_client_cert_path   = GetOtlpDefaultTracesSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 #endif
 };

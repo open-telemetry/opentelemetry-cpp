@@ -620,8 +620,8 @@ std::string GetOtlpDefaultLogsSslClientCertificateString()
 
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout()
 {
-  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
-  constexpr char kGenericEnv[]       = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists;
@@ -632,15 +632,14 @@ std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout()
     return value;
   }
 
-  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
-        std::chrono::seconds{10});
+  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
   return value;
 }
 
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout()
 {
-  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
-  constexpr char kGenericEnv[]       = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists;
@@ -651,15 +650,14 @@ std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout()
     return value;
   }
 
-  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
-        std::chrono::seconds{10});
+  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
   return value;
 }
 
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
 {
-  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
-  constexpr char kGenericEnv[]       = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists;
@@ -670,8 +668,7 @@ std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
     return value;
   }
 
-  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
-        std::chrono::seconds{10});
+  value = std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
   return value;
 }
 
@@ -698,8 +695,8 @@ static void DumpOtlpHeaders(OtlpHeaders &output,
   {
     if (header_valid)
     {
-      std::string key (header_key);
-      std::string value (header_value);
+      std::string key(header_key);
+      std::string value(header_value);
       if (remove_cache.end() == remove_cache.find(key))
       {
         remove_cache.insert(key);
@@ -715,7 +712,7 @@ static void DumpOtlpHeaders(OtlpHeaders &output,
   }
 }
 
-static OtlpHeaders GetHeaders(const char* signal_name, const char* generic_name)
+static OtlpHeaders GetHeaders(const char *signal_name, const char *generic_name)
 {
   OtlpHeaders result;
   std::unordered_set<std::string> trace_remove_cache;

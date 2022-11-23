@@ -53,7 +53,6 @@ inline std::string GetOtlpDefaultMetricsEndpoint()
   return GetOtlpDefaultHttpMetricsEndpoint();
 }
 
-
 bool GetOtlpDefaultTracesIsInsecure();
 bool GetOtlpDefaultMetricsIsInsecure();
 bool GetOtlpDefaultLogsIsInsecure();

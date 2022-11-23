@@ -3,8 +3,11 @@
 
 #include "opentelemetry/sdk/common/env_variables.h"
 
-#include "opentelemetry/version.h"
+#include <strings.h>
+#include <memory>
+
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
