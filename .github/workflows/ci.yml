@@ -17,6 +17,7 @@ jobs:
     - name: run cmake tests (without otlp-exporter)
       run: |
         ci/run_docker.sh ./ci/do_ci.sh cmake.test
+        docker rmi $(docker images -a -q)
 
   cmake_gcc_maintainer_test:
     name: CMake gcc (maintainer mode)
@@ -90,6 +91,7 @@ jobs:
     - name: run cmake tests (enable abseil-cpp)
       run: |
         ci/run_docker.sh ./ci/do_ci.sh cmake.abseil.test
+        docker rmi $(docker images -a -q)
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
@@ -162,6 +164,7 @@ jobs:
         sudo ./ci/setup_grpc.sh
       run: |
         ci/run_docker.sh ./ci/do_ci.sh cmake.exporter.otprotocol.test
+        docker rmi $(docker images -a -q)
 
   plugin_test:
     name: Plugin -> CMake
@@ -171,7 +174,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: run tests
-      run: ci/run_docker.sh ./ci/do_ci.sh cmake.test_example_plugin
+      run: |
+        ci/run_docker.sh ./ci/do_ci.sh cmake.test_example_plugin
+        docker rmi $(docker images -a -q)
 
   bazel_test:
     name: Bazel
@@ -400,7 +405,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: run tests
-      run: ci/run_docker.sh ./ci/do_ci.sh format
+      run: |
+        ci/run_docker.sh ./ci/do_ci.sh format
+        docker rmi $(docker images -a -q)
 
 
   windows:
