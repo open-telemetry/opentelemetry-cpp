@@ -9,7 +9,10 @@ foreach(testname baggage_test)
     TEST_PREFIX baggage.
     TEST_LIST ${testname})
 endforeach()
-add_executable(baggage_benchmark baggage_benchmark.cc)
-target_link_libraries(baggage_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+
+if(WITH_BENCHMARK)
+  add_executable(baggage_benchmark baggage_benchmark.cc)
+  target_link_libraries(baggage_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+endif()
 add_subdirectory(propagation)
