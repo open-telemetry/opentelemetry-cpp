@@ -223,10 +223,23 @@ public:
   virtual ~Session() = default;
 };
 
+struct HttpSslOptions
+{
+  bool use_ssl{false};
+  std::string ssl_cert_path{};
+  std::string ssl_cert_string{};
+  std::string ssl_client_key_path{};
+  std::string ssl_client_key_string{};
+  std::string ssl_client_cert_path{};
+  std::string ssl_client_cert_string{};
+  // TODO: TLS, cipher
+};
+
 class HttpClient
 {
 public:
-  virtual std::shared_ptr<Session> CreateSession(nostd::string_view url) noexcept = 0;
+  virtual std::shared_ptr<Session> CreateSession(nostd::string_view url,
+                                                 const HttpSslOptions &ssl_options) noexcept = 0;
 
   virtual bool CancelAllSessions() noexcept = 0;
 
@@ -240,9 +253,12 @@ public:
 class HttpClientSync
 {
 public:
-  virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;
+  virtual Result Get(const nostd::string_view &url,
+                     const HttpSslOptions &ssl_options,
+                     const Headers & = {{}}) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
+                      const HttpSslOptions &ssl_options,
                       const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 

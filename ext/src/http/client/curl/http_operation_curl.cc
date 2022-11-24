@@ -229,6 +229,7 @@ void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState
 
 HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              std::string url,
+                             const HttpSslOptions &ssl_options,
                              opentelemetry::ext::http::client::EventHandler *event_handle,
                              // Default empty headers and empty request body
                              const opentelemetry::ext::http::client::Headers &request_headers,
@@ -249,6 +250,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       event_handle_(event_handle),
       method_(method),
       url_(url),
+      ssl_options_(ssl_options),
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
@@ -410,9 +412,65 @@ CURLcode HttpOperation::Setup()
   // Specify target URL
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_URL, url_.c_str());
 
-  // TODO: support ssl cert verification for https request
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0);  // 1L
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+  if (ssl_options_.use_ssl)
+  {
+    // TODO: support ssl cert verification for https request
+
+    if (!ssl_options_.ssl_cert_path.empty())
+    {
+      const char *path = ssl_options_.ssl_cert_path.c_str();
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT, path);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
+    }
+    else
+    {
+#ifdef LATER
+      // See curl minimum version required.
+
+      // FIXME: raw getenv() string usable as is,
+      // or need to escape 0xAABBCCDD into bytes somewhere,
+      // and pass a blob to here ?
+      struct curl_blob stblob;
+      stblob.data  = ssl_options_.ssl_cert_string.c_str();
+      stblob.len   = ssl_options_.ssl_cert_string.length();
+      stblob.flags = CURL_BLOB_COPY;
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT_BLOB, &stblob);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
+#endif
+    }
+
+#ifdef LATER
+    if (!ssl_options_.ssl_client_key_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_key_path.c_str();
+      // FIXME: CURLOPT_ to use ?
+    }
+    else
+    {
+      const char *data = ssl_options_.ssl_client_key_string.c_str();
+      // FIXME: CURLOPT_ to use ?
+    }
+
+    if (!ssl_options_.ssl_client_key_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_key_path.c_str();
+      // FIXME: CURLOPT_ to use ?
+    }
+    else
+    {
+      const char *data = ssl_options_.ssl_client_key_string.c_str();
+      // FIXME: CURLOPT_ to use ?
+    }
+#endif
+
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
+  }
+  else
+  {
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0);  // 1L
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+  }
 
   if (curl_resource_.headers_chunk != nullptr)
   {

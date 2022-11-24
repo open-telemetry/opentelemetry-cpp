@@ -953,7 +953,28 @@ OtlpHttpClient::createSession(
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  auto session = http_client_->CreateSession(options_.url);
+  // FIXME: make a member for that ?
+  ext::http::client::HttpSslOptions ssl_options;
+
+  // std::string starts_with is C++20
+  std::string candidate_scheme = options_.url.substr(0, 6);
+
+  if (candidate_scheme == "https:")
+  {
+    ssl_options.use_ssl                = true;
+    ssl_options.ssl_cert_path          = options_.ssl_cert_path;
+    ssl_options.ssl_cert_string        = options_.ssl_cert_string;
+    ssl_options.ssl_client_key_path    = options_.ssl_client_key_path;
+    ssl_options.ssl_client_key_string  = options_.ssl_client_key_string;
+    ssl_options.ssl_client_cert_path   = options_.ssl_client_cert_path;
+    ssl_options.ssl_client_cert_string = options_.ssl_client_cert_string;
+  }
+  else
+  {
+    ssl_options.use_ssl = false;
+  }
+
+  auto session = http_client_->CreateSession(options_.url, ssl_options);
   auto request = session->CreateRequest();
 
   for (auto &header : options_.http_headers)

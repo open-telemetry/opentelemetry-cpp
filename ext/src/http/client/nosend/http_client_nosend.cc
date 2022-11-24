@@ -69,7 +69,8 @@ HttpClient::HttpClient()
 }
 
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
-    nostd::string_view) noexcept
+    nostd::string_view,
+    const opentelemetry::ext::http::client::HttpSslOptions & /* ssl_options */) noexcept
 {
   return session_;
 }

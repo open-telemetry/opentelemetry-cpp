@@ -48,9 +48,12 @@ void Session::SendRequest(
     reuse_connection = session_id_ % http_client_.GetMaxSessionsPerConnection() != 0;
   }
 
-  curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr,
-                                          http_request_->headers_, http_request_->body_, false,
-                                          http_request_->timeout_ms_, reuse_connection));
+  HttpSslOptions FIXME;
+  curl_operation_.reset(new HttpOperation(http_request_->method_, url, FIXME,
+
+                                          callback_ptr, http_request_->headers_,
+                                          http_request_->body_, false, http_request_->timeout_ms_,
+                                          reuse_connection));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())
@@ -153,7 +156,8 @@ HttpClient::~HttpClient()
 }
 
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
-    nostd::string_view url) noexcept
+    nostd::string_view url,
+    const opentelemetry::ext::http::client::HttpSslOptions & /* TODO: ssl_options */) noexcept
 {
   auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)

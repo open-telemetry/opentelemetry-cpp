@@ -214,11 +214,12 @@ public:
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     opentelemetry::ext::http::client::Body body;
-    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(), nullptr,
-                                 headers, body);
+    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
+                                 ssl_options, nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -239,11 +240,12 @@ public:
 
   opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
       const Body &body,
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-                                 nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -277,7 +279,8 @@ public:
   ~HttpClient() override;
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
-      nostd::string_view url) noexcept override;
+      nostd::string_view url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options) noexcept override;
 
   bool CancelAllSessions() noexcept override;
 

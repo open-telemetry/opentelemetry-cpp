@@ -158,7 +158,9 @@ public:
   HttpClient();
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
-      nostd::string_view) noexcept override;
+      nostd::string_view,
+      const opentelemetry::ext::http::client::HttpSslOptions &
+      /* ssl_options */) noexcept override;
 
   bool CancelAllSessions() noexcept override;
 
