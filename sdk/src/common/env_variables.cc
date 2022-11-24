@@ -3,7 +3,13 @@
 
 #include "opentelemetry/sdk/common/env_variables.h"
 
-#include <strings.h>
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strcasecmp _stricmp
+#else
+#  include <strings.h>
+#endif
+
 #include <memory>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
