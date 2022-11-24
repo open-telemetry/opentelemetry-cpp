@@ -144,6 +144,7 @@ otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
     tags = [
+        "benchmark",
         "test",
         "trace",
     ],
