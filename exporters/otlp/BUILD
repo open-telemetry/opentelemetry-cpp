@@ -57,6 +57,7 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["otlp"],
     deps = [
+        "//api",
         "//sdk:headers",
         "@com_github_grpc_grpc//:grpc++",
     ],
