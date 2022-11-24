@@ -505,6 +505,7 @@ otel_cc_benchmark(
     name = "otlp_grpc_exporter_benchmark",
     srcs = ["test/otlp_grpc_exporter_benchmark.cc"],
     tags = [
+        "benchmark",
         "otlp",
         "otlp_grpc",
         "test",

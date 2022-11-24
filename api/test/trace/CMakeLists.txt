@@ -21,9 +21,11 @@ foreach(
     TEST_LIST api_${testname})
 endforeach()
 
-add_executable(span_id_benchmark span_id_benchmark.cc)
-target_link_libraries(span_id_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
-add_executable(span_benchmark span_benchmark.cc)
-target_link_libraries(span_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+if(WITH_BENCHMARK)
+  add_executable(span_id_benchmark span_id_benchmark.cc)
+  target_link_libraries(span_id_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+  add_executable(span_benchmark span_benchmark.cc)
+  target_link_libraries(span_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+endif()
