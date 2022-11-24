@@ -19,7 +19,6 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_library(
     name = "otlp_recordable",
     srcs = [
-        "src/otlp_grpc_utils.cc",
         "src/otlp_log_recordable.cc",
         "src/otlp_metric_utils.cc",
         "src/otlp_populate_attribute_utils.cc",
@@ -27,7 +26,6 @@ cc_library(
         "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
@@ -45,6 +43,21 @@ cc_library(
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+    ],
+)
+
+cc_library(
+    name = "otlp_grpc_utils",
+    srcs = [
+        "src/otlp_grpc_utils.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["otlp"],
+    deps = [
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -84,6 +97,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -95,6 +109,7 @@ cc_library(
     deps = [
         ":otlp_recordable",
         ":otlp_grpc_client",
+        ":otlp_grpc_utils",
         "//ext:headers",
         "//sdk/src/trace",
 
