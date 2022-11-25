@@ -164,7 +164,7 @@ option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
-option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+option(WITH_BENCHMARK "Whether to build benchmark program" ON)
 
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
