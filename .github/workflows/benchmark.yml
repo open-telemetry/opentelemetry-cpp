@@ -11,7 +11,7 @@ permissions:
 jobs:
   benchmark:
     name: Run OpenTelemetry-cpp benchmarks
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,7 +30,7 @@ jobs:
       - name: Run benchmark
         id: run_benchmarks
         run: |
-          ci/do_ci.sh bazel.benchmark
+          CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ci/do_ci.sh bazel.benchmark
           mkdir -p benchmarks
           mv api-benchmark_result.json benchmarks
           mv sdk-benchmark_result.json benchmarks
@@ -45,7 +45,7 @@ jobs:
       matrix:
         components: ["api", "sdk", "exporters"]
     name: Store benchmark result
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@master
