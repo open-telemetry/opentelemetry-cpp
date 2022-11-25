@@ -61,12 +61,15 @@ public:
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
+               const ext::http::client::HttpSslOptions &,
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
   MOCK_METHOD(ext::http::client::Result,
               Get,
-              (const nostd::string_view &, const ext::http::client::Headers &),
+              (const nostd::string_view &,
+               const ext::http::client::HttpSslOptions &,
+               const ext::http::client::Headers &),
               (noexcept, override));
 };
 
@@ -92,9 +95,42 @@ private:
   std::string trace_id_;
 };
 
+class IsValidSslOptionsMatcher
+{
+public:
+  IsValidSslOptionsMatcher(const ext::http::client::HttpSslOptions &ssl_options)
+      : ssl_options_(ssl_options)
+  {}
+  bool MatchAndExplain(const ext::http::client::HttpSslOptions &opt,
+                       MatchResultListener * /* listener */) const
+  {
+    bool use_match = (ssl_options_.use_ssl == opt.use_ssl);
+
+    if (!ssl_options_.use_ssl)
+    {
+      return use_match;
+    }
+
+    return (use_match && (opt.ssl_cert_path == ssl_options_.ssl_cert_path));
+  }
+
+  void DescribeTo(std::ostream *os) const { *os << "ssl_options matches"; }
+
+  void DescribeNegationTo(std::ostream *os) const { *os << "ssl_options does not matche"; }
+
+private:
+  ext::http::client::HttpSslOptions ssl_options_;
+};
+
 PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
 {
   return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
+}
+
+PolymorphicMatcher<IsValidSslOptionsMatcher> IsValidSslOptions(
+    const ext::http::client::HttpSslOptions &ssl_options)
+{
+  return MakePolymorphicMatcher(IsValidSslOptionsMatcher(ssl_options));
 }
 
 // Create spans, let processor call Export()
@@ -145,8 +181,12 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
 
+  ext::http::client::HttpSslOptions expected_ssl_options;
+  expected_ssl_options.use_ssl = false;
+
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
-  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
+  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidSslOptions(expected_ssl_options),
+                                      IsValidMessage(report_trace_id), _))
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
@@ -168,9 +208,9 @@ TEST_F(ZipkinExporterTestPeer, ShutdownTest)
   auto recordable_2 = exporter->MakeRecordable();
   recordable_2->SetName("Test span 2");
 
-  // exporter shuold not be shutdown by default
+  // exporter should not be shutdown by default
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_http_client, Post(_, _, _))
+  EXPECT_CALL(*mock_http_client, Post(_, _, _, _))
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
