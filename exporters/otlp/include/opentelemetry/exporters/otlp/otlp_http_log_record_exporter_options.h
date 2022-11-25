@@ -59,8 +59,8 @@ struct OtlpHttpLogRecordExporterOptions
 #  endif
 
 #  ifdef ENABLE_OTLP_HTTP_SSL
-  std::string ssl_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
-  std::string ssl_cert_string = GetOtlpDefaultLogsSslCertificateString();
+  std::string ssl_ca_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
+  std::string ssl_ca_cert_string = GetOtlpDefaultLogsSslCertificateString();
 
   std::string ssl_client_key_path   = GetOtlpDefaultLogsSslClientKeyPath();
   std::string ssl_client_key_string = GetOtlpDefaultLogsSslClientKeyString();

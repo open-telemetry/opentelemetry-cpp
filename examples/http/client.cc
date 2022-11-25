@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   ssl_options.use_ssl = with_ssl;
   if (with_ssl)
   {
-    ssl_options.ssl_cert_path = "/path/to/cert.pem";
+    ssl_options.ssl_ca_cert_path = "/path/to/cert.pem";
   }
 
   sendRequest(url, ssl_options);

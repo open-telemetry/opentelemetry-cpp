@@ -226,8 +226,8 @@ public:
 struct HttpSslOptions
 {
   bool use_ssl{false};
-  std::string ssl_cert_path{};
-  std::string ssl_cert_string{};
+  std::string ssl_ca_cert_path{};
+  std::string ssl_ca_cert_string{};
   std::string ssl_client_key_path{};
   std::string ssl_client_key_string{};
   std::string ssl_client_cert_path{};

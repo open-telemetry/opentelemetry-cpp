@@ -63,8 +63,8 @@ struct OtlpHttpMetricExporterOptions
 #endif
 
 #ifdef ENABLE_OTLP_HTTP_SSL
-  std::string ssl_cert_path   = GetOtlpDefaultMetricsSslCertificatePath();
-  std::string ssl_cert_string = GetOtlpDefaultMetricsSslCertificateString();
+  std::string ssl_ca_cert_path   = GetOtlpDefaultMetricsSslCertificatePath();
+  std::string ssl_ca_cert_string = GetOtlpDefaultMetricsSslCertificateString();
 
   std::string ssl_client_key_path   = GetOtlpDefaultMetricsSslClientKeyPath();
   std::string ssl_client_key_string = GetOtlpDefaultMetricsSslClientKeyString();

@@ -59,10 +59,12 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, "" /* ssl_cert_path */, "" /* ssl_cert_string */, "" /* ssl_client_key_path */,
-      "" /* ssl_client_key_string */, "" /* ssl_client_cert_path */,
-      "" /* ssl_client_cert_string */, options.content_type, options.json_bytes_mapping,
-      options.use_json_name, options.console_debug, options.timeout, options.http_headers);
+      options.url, "", /* ssl_ca_cert_path */ "", /* ssl_ca_cert_string */
+      "",                                         /* ssl_client_key_path */
+      "", /* ssl_client_key_string */ "",         /* ssl_client_cert_path */
+      "",                                         /* ssl_client_cert_string */
+      options.content_type, options.json_bytes_mapping, options.use_json_name,
+      options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
   {
     otlp_http_client_options.max_concurrent_requests = 0;

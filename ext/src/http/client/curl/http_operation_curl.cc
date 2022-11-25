@@ -414,54 +414,73 @@ CURLcode HttpOperation::Setup()
 
   if (ssl_options_.use_ssl)
   {
-    // TODO: support ssl cert verification for https request
+    // TODO: See curl minimum version required, adjust find_package(CURL)
 
-    if (!ssl_options_.ssl_cert_path.empty())
+    /* 1 - CA CERT */
+
+    if (!ssl_options_.ssl_ca_cert_path.empty())
     {
-      const char *path = ssl_options_.ssl_cert_path.c_str();
+      const char *path = ssl_options_.ssl_ca_cert_path.c_str();
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT, path);
+      // Assuming PEM format.
+    }
+    else if (!ssl_options_.ssl_ca_cert_string.empty())
+    {
+
+      const char *data = ssl_options_.ssl_ca_cert_string.c_str();
+      size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
+
+      struct curl_blob stblob;
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
+      stblob.flags = CURL_BLOB_COPY;
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT_BLOB, &stblob);
+      // Assuming PEM format.
+    }
+
+    /* 2 - CLIENT KEY */
+
+    if (!ssl_options_.ssl_client_key_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_key_path.c_str();
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEY, path);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEYTYPE, "PEM");
+    }
+    else if (!ssl_options_.ssl_client_key_string.empty())
+    {
+      const char *data = ssl_options_.ssl_client_key_string.c_str();
+      size_t data_len  = ssl_options_.ssl_client_key_string.length();
+
+      struct curl_blob stblob;
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
+      stblob.flags = CURL_BLOB_COPY;
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEY_BLOB, &stblob);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEYTYPE, "PEM");
+    }
+
+    /* 3 - CLIENT CERT */
+
+    if (!ssl_options_.ssl_client_cert_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_cert_path.c_str();
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT, path);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
     }
-    else
+    else if (!ssl_options_.ssl_client_cert_string.empty())
     {
-#ifdef LATER
-      // See curl minimum version required.
+      const char *data = ssl_options_.ssl_client_cert_string.c_str();
+      size_t data_len  = ssl_options_.ssl_client_cert_string.length();
 
-      // FIXME: raw getenv() string usable as is,
-      // or need to escape 0xAABBCCDD into bytes somewhere,
-      // and pass a blob to here ?
       struct curl_blob stblob;
-      stblob.data  = ssl_options_.ssl_cert_string.c_str();
-      stblob.len   = ssl_options_.ssl_cert_string.length();
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT_BLOB, &stblob);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
-#endif
     }
 
-#ifdef LATER
-    if (!ssl_options_.ssl_client_key_path.empty())
-    {
-      const char *path = ssl_options_.ssl_client_key_path.c_str();
-      // FIXME: CURLOPT_ to use ?
-    }
-    else
-    {
-      const char *data = ssl_options_.ssl_client_key_string.c_str();
-      // FIXME: CURLOPT_ to use ?
-    }
-
-    if (!ssl_options_.ssl_client_key_path.empty())
-    {
-      const char *path = ssl_options_.ssl_client_key_path.c_str();
-      // FIXME: CURLOPT_ to use ?
-    }
-    else
-    {
-      const char *data = ssl_options_.ssl_client_key_string.c_str();
-      // FIXME: CURLOPT_ to use ?
-    }
-#endif
+    /* 4 - ENFORCE VERIFICATION */
 
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);

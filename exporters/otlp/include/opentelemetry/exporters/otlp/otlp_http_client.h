@@ -46,8 +46,8 @@ struct OtlpHttpClientOptions
 {
   std::string url;
 
-  std::string ssl_cert_path;
-  std::string ssl_cert_string;
+  std::string ssl_ca_cert_path;
+  std::string ssl_ca_cert_string;
 
   std::string ssl_client_key_path;
   std::string ssl_client_key_string;
@@ -84,8 +84,8 @@ struct OtlpHttpClientOptions
   std::string user_agent;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
-                               nostd::string_view input_ssl_cert_path,
-                               nostd::string_view input_ssl_cert_string,
+                               nostd::string_view input_ssl_ca_cert_path,
+                               nostd::string_view input_ssl_ca_cert_string,
                                nostd::string_view input_ssl_client_key_path,
                                nostd::string_view input_ssl_client_key_string,
                                nostd::string_view input_ssl_client_cert_path,
@@ -100,8 +100,8 @@ struct OtlpHttpClientOptions
                                std::size_t input_max_requests_per_connection = 8,
                                nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
-        ssl_cert_path(input_ssl_cert_path),
-        ssl_cert_string(input_ssl_cert_string),
+        ssl_ca_cert_path(input_ssl_ca_cert_path),
+        ssl_ca_cert_string(input_ssl_ca_cert_string),
         ssl_client_key_path(input_ssl_client_key_path),
         ssl_client_key_string(input_ssl_client_key_string),
         ssl_client_cert_path(input_ssl_client_cert_path),
