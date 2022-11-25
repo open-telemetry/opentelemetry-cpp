@@ -71,14 +71,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.with_async_export.test
+        THRIFT=ON bash ci/ci_run_docker.sh ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
@@ -90,7 +85,6 @@ jobs:
     - name: run cmake tests (enable abseil-cpp)
       run: |
         ABSEIL=ON bash ci/ci_run_docker.sh ./ci/do_ci.sh cmake.abseil.test
-        docker rmi --force opentelemetry-cpp-build-2004
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
@@ -472,12 +466,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
-    - name: setup
-      run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
     - name: run tests and generate report
-      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
+      run: |
+        bash ci/ci_run_docker.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v3
       with:
