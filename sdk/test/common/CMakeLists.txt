@@ -24,14 +24,16 @@ add_executable(random_fork_test random_fork_test.cc)
 target_link_libraries(random_fork_test opentelemetry_common)
 add_test(random_fork_test random_fork_test)
 
-add_executable(random_benchmark random_benchmark.cc)
-target_link_libraries(random_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+if(WITH_BENCHMARK)
+  add_executable(random_benchmark random_benchmark.cc)
+  target_link_libraries(random_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
-add_executable(circular_buffer_benchmark circular_buffer_benchmark.cc)
-target_link_libraries(circular_buffer_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+  add_executable(circular_buffer_benchmark circular_buffer_benchmark.cc)
+  target_link_libraries(circular_buffer_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
 
-add_executable(attributemap_hash_benchmark attributemap_hash_benchmark.cc)
-target_link_libraries(attributemap_hash_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(attributemap_hash_benchmark attributemap_hash_benchmark.cc)
+  target_link_libraries(attributemap_hash_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+endif()

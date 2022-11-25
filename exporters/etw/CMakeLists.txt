@@ -32,8 +32,6 @@ if(BUILD_TESTING)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
   add_executable(etw_logger_test test/etw_logger_test.cc)
 
-  add_executable(etw_perf_test test/etw_perf_test.cc)
-
   target_link_libraries(etw_provider_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
@@ -43,9 +41,12 @@ if(BUILD_TESTING)
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
-  target_link_libraries(
-    etw_perf_test benchmark::benchmark ${GTEST_BOTH_LIBRARIES}
-    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  if(WITH_BENCHMARK)
+    add_executable(etw_perf_test test/etw_perf_test.cc)
+    target_link_libraries(
+      etw_perf_test benchmark::benchmark ${GTEST_BOTH_LIBRARIES}
+      opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  endif()
 
   gtest_add_tests(
     TARGET etw_provider_test

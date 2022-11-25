@@ -187,6 +187,10 @@ BENCHMARK(BM_OtlpExporterDenseSpans);
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 
+#ifdef NDEBUG
+// disabled as valgrind reports a memroy leak at absl::lts_20220623::random_internal::(anonymous
+// namespace)::PoolAlignedAlloc()
+// see PR #1737
 namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
@@ -212,5 +216,6 @@ void BM_otlp_grpc_with_collector(benchmark::State &state)
 }
 BENCHMARK(BM_otlp_grpc_with_collector);
 }  // namespace
+#endif
 
 BENCHMARK_MAIN();

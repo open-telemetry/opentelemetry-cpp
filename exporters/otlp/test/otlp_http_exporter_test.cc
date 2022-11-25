@@ -21,6 +21,7 @@
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
+#  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
 
@@ -468,6 +469,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
+  google::protobuf::ShutdownProtobufLibrary();
 }
 #  endif
 
