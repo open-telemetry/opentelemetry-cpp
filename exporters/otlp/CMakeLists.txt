@@ -306,7 +306,7 @@ if(BUILD_TESTING)
         ${GMOCK_LIB}
         opentelemetry_exporter_otlp_http_log
         opentelemetry_logs
-        http_client_nosend)
+        opentelemetry_http_client_nosend)
       gtest_add_tests(
         TARGET otlp_http_log_record_exporter_test
         TEST_PREFIX exporter.otlp.
@@ -333,7 +333,7 @@ if(BUILD_TESTING)
       ${GMOCK_LIB}
       opentelemetry_exporter_otlp_http_metric
       opentelemetry_metrics
-      http_client_nosend)
+      opentelemetry_http_client_nosend)
     gtest_add_tests(
       TARGET otlp_http_metric_exporter_test
       TEST_PREFIX exporter.otlp.
