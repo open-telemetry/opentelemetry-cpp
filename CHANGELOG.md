@@ -14,7 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [1.8.0] 2022-11-27
 
 * [LOGS SDK] Rename LogProcessor and LogExporter to LogRecordProcessor and LogRecordExporter
