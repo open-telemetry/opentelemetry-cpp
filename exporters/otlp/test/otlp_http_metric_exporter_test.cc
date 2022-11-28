@@ -15,13 +15,13 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #include <google/protobuf/message_lite.h>
 #include <gtest/gtest.h>
