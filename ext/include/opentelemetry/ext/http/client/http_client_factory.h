@@ -18,7 +18,9 @@ public:
 
   static std::shared_ptr<HttpClient> Create();
 
+#ifdef ENABLE_TEST
   static std::shared_ptr<HttpClient> CreateNoSend();
+#endif
 };
 }  // namespace client
 }  // namespace http

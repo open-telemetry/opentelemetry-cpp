@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_TEST
-#  include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
