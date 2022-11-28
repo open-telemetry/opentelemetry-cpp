@@ -56,7 +56,9 @@ private:
               typename std::enable_if<std::is_convertible<pointer, U *>::value>::type * = nullptr>
     void MoveTo(typename shared_ptr<U>::PlacementBuffer &buffer) noexcept
     {
-      new (buffer.data) shared_ptr_wrapper{std::move(this->ptr_)};
+      using other_shared_ptr_wrapper = typename shared_ptr<U>::shared_ptr_wrapper;
+      new (buffer.data)
+          other_shared_ptr_wrapper{std::move(std::static_pointer_cast<U>(this->ptr_))};
     }
 
     virtual pointer Get() const noexcept { return ptr_.get(); }
