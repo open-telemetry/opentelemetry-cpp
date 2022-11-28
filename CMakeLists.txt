@@ -164,9 +164,15 @@ option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
+option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
+
+set(OTELCPP_PROTO_PATH
+    ""
+    CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
   if(BUILD_TESTING)
@@ -474,8 +480,10 @@ if(BUILD_TESTING)
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
-  # Benchmark respects the CMAKE_PREFIX_PATH
-  find_package(benchmark CONFIG REQUIRED)
+  if(WITH_BENCHMARK)
+    # Benchmark respects the CMAKE_PREFIX_PATH
+    find_package(benchmark CONFIG REQUIRED)
+  endif()
 endif()
 
 include(CMakePackageConfigHelpers)

@@ -26,6 +26,7 @@
 #    include "opentelemetry/sdk/logs/logger_provider.h"
 #    include "opentelemetry/sdk/resource/resource.h"
 
+#    include <google/protobuf/message_lite.h>
 #    include <gtest/gtest.h>
 #    include "gmock/gmock.h"
 
@@ -507,6 +508,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
+  google::protobuf::ShutdownProtobufLibrary();
 }
 #    endif
 

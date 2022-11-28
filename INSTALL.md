@@ -12,7 +12,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
 ## Build instructions using CMake
 
-### Prerequisites for CMake
+### Prerequisites for CMake build
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
   Supported](./README.md#supported-development-platforms) for more information.
@@ -38,9 +38,9 @@ You can link OpenTelemetry C++ SDK with libraries provided in
   [GoogleBenchmark Build
   Instructions](https://github.com/google/benchmark#installation).
 - Apart from above core requirements, the Exporters and Propagators have their
-  build dependencies which are not covered here. E.g, Otlp Exporter needs
-  grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW
-  exporter need nlohmann-json to build. This is covered in the build
+  build dependencies which are not covered here. E.g, the OTLP Exporter needs
+  grpc/protobuf library, the Zipkin exporter needs nlohmann-json and libcurl,
+  the ETW exporter needs nlohmann-json to build. This is covered in the build
   instructions for each of these components.
 
 ### Building as standalone CMake Project
@@ -50,8 +50,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    ```console
    # Change to the directory where you want to create the code repository
    $ cd ~
-   $ mkdir source && cd source
-   $ git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp
+   $ mkdir source && cd source && git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp
    Cloning into 'opentelemetry-cpp'...
    ...
    Resolving deltas: 100% (3225/3225), done.
@@ -63,8 +62,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
    ```console
    $ cd opentelemetry-cpp
-   $ mkdir build && cd build
-   $ cmake ..
+   $ mkdir build && cd build && cmake ..
    -- The C compiler identification is GNU 9.3.0
    -- The CXX compiler identification is GNU 9.3.0
    ...
@@ -83,12 +81,12 @@ You can link OpenTelemetry C++ SDK with libraries provided in
      inclusion in shared libraries, this variable is used.
    - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
       Please refer to note [below](#building-shared-libs-for-windows) for
-      Windows DLL support
-   - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
+      Windows DLL support.
+   - `-DWITH_OTLP=ON` : To enable building OTLP exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
-3. Once build configuration is created, build the CMake targets - this includes
-   building SDKs, and building unittests for API and SDK. Note that since API is
+3. Once the build configuration is created, build the CMake targets - this
+   includes building SDKs and unittests for API and SDK. Note that since API is
    header only library, no separate build is triggered for it.
 
    ```console
@@ -121,7 +119,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    files for SDK at custom/default install location.
 
    ```console
-   $ cmake --install . --prefix /<install_root>/
+   $ cmake --install . --prefix /<install-root>/
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config.cmake
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config-version.cmake
    ...
@@ -155,7 +153,7 @@ NOTE: Experimental, and not supported for all the components. Make sure the
 there is a different version of googletest already installed in system-defined
 path.
 
-### Prerequisites for Bazel
+### Prerequisites for Bazel build
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
 Supported](./README.md#supported-development-platforms) for more information.
@@ -230,6 +228,11 @@ http_archive(
 load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 opentelemetry_cpp_deps()
+
+# Load extra dependencies required for OpenTelemetry
+load("@io_opentelemetry_cpp//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
+
+opentelemetry_extra_deps()
 
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")

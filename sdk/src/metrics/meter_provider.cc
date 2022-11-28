@@ -24,7 +24,9 @@ MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : c
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(views), resource))
-{}
+{
+  OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
+}
 
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,

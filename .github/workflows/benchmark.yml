@@ -30,7 +30,7 @@ jobs:
       - name: Run benchmark
         id: run_benchmarks
         run: |
-          ci/do_ci.sh bazel.benchmark
+          CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ci/do_ci.sh bazel.benchmark
           mkdir -p benchmarks
           mv api-benchmark_result.json benchmarks
           mv sdk-benchmark_result.json benchmarks
