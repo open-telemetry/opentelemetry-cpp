@@ -370,7 +370,7 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -386,7 +386,7 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -402,7 +402,7 @@ cc_test(
     deps = [
         ":otlp_http_log_record_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -418,7 +418,7 @@ cc_test(
     deps = [
         ":otlp_http_log_record_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -481,7 +481,7 @@ cc_test(
     deps = [
         ":otlp_http_metric_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -497,7 +497,7 @@ cc_test(
     deps = [
         ":otlp_http_metric_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )

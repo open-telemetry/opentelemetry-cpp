@@ -3,7 +3,7 @@
 
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 
