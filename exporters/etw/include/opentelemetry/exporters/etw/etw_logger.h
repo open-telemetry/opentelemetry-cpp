@@ -6,6 +6,7 @@
 
 #  include <algorithm>
 
+#  include <chrono>
 #  include <cstdint>
 #  include <cstdio>
 #  include <cstdlib>
@@ -15,6 +16,7 @@
 #  include <fstream>
 
 #  include <map>
+#  include <unordered_map>
 
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
@@ -23,6 +25,7 @@
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
 
+#  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_id.h"
@@ -40,6 +43,88 @@ namespace etw
 {
 
 class LoggerProvider;
+
+class LogRecord : public opentelemetry::logs::LogRecord
+{
+public:
+  ~LogRecord() override = default;
+
+  void SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept override
+  {
+    timestamp_ = timestamp;
+  }
+
+  opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept override
+  {
+    observed_timestamp_ = timestamp;
+  }
+
+  opentelemetry::common::SystemTimestamp GetObservedTimestamp() const noexcept
+  {
+    return observed_timestamp_;
+  }
+
+  void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
+  {
+    severity_ = severity;
+  }
+
+  opentelemetry::logs::Severity GetSeverity() const noexcept { return severity_; }
+
+  void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override
+  {
+    body_ = message;
+  }
+
+  const opentelemetry::common::AttributeValue &GetBody() const noexcept { return body_; }
+
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
+  {
+    attributes_map_[static_cast<std::string>(key)] = value;
+  }
+
+  const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
+      const noexcept
+  {
+    return attributes_map_;
+  }
+
+  void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
+  {
+    trace_id_ = trace_id;
+  }
+
+  const opentelemetry::trace::TraceId &GetTraceId() const noexcept { return trace_id_; }
+
+  void SetSpanId(const opentelemetry::trace::SpanId &span_id) noexcept override
+  {
+    span_id_ = span_id;
+  }
+
+  const opentelemetry::trace::SpanId &GetSpanId() const noexcept { return span_id_; }
+
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept override
+  {
+    trace_flags_ = trace_flags;
+  }
+
+  const opentelemetry::trace::TraceFlags &GetTraceFlags() const noexcept { return trace_flags_; }
+
+private:
+  opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
+
+  std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes_map_;
+  opentelemetry::common::AttributeValue body_ = opentelemetry::nostd::string_view();
+  opentelemetry::common::SystemTimestamp timestamp_;
+  opentelemetry::common::SystemTimestamp observed_timestamp_ = std::chrono::system_clock::now();
+
+  opentelemetry::trace::TraceId trace_id_;
+  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::TraceFlags trace_flags_;
+};
 
 /**
  * @brief Logger  class that allows to send logs to ETW Provider.
@@ -100,53 +185,38 @@ public:
         provHandle(initProvHandle())
   {}
 
-  void Log(opentelemetry::logs::Severity severity,
-           nostd::string_view body,
-           const common::KeyValueIterable &attributes,
-           opentelemetry::trace::TraceId trace_id,
-           opentelemetry::trace::SpanId span_id,
-           opentelemetry::trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept override
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept
   {
-
-#  ifdef OPENTELEMETRY_RTTI_ENABLED
-    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
-    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
-    // Properties *res                   = dynamic_cast<Properties *>(&resr);
-
-    if (evt != nullptr)
-    {
-      // Pass as a reference to original modifyable collection without creating a copy
-      return Log(severity, provId, body, *evt, trace_id, span_id, trace_flags, timestamp);
-    }
-#  endif
-    Properties evtCopy = attributes;
-    return Log(severity, provId, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
+    return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new LogRecord());
   }
 
-  void Log(opentelemetry::logs::Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           const common::KeyValueIterable &attributes,
-           opentelemetry::trace::TraceId trace_id,
-           opentelemetry::trace::SpanId span_id,
-           opentelemetry::trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept override
+  using opentelemetry::logs::Logger::EmitLogRecord;
+
+  void EmitLogRecord(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
   {
-
-#  ifdef OPENTELEMETRY_RTTI_ENABLED
-    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
-    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
-    // Properties *res                   = dynamic_cast<Properties *>(&resr);
-
-    if (evt != nullptr)
+    if (!log_record)
     {
-      // Pass as a reference to original modifyable collection without creating a copy
-      return Log(severity, name, body, *evt, trace_id, span_id, trace_flags, timestamp);
+      return;
     }
-#  endif
-    Properties evtCopy = attributes;
-    return Log(severity, name, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
+    LogRecord *readable_record = static_cast<LogRecord *>(log_record.get());
+
+    nostd::string_view body;
+    if (nostd::holds_alternative<const char *>(readable_record->GetBody()))
+    {
+      body = nostd::get<const char *>(readable_record->GetBody());
+    }
+    else if (nostd::holds_alternative<nostd::string_view>(readable_record->GetBody()))
+    {
+      body = nostd::get<nostd::string_view>(readable_record->GetBody());
+    }
+    // TODO: More body types?
+
+    Properties evtCopy{
+        opentelemetry::common::MakeKeyValueIterableView(readable_record->GetAttributes())};
+    return Log(readable_record->GetSeverity(), provId, body, evtCopy, readable_record->GetTraceId(),
+               readable_record->GetSpanId(), readable_record->GetTraceFlags(),
+               readable_record->GetTimestamp());
   }
 
   virtual void Log(opentelemetry::logs::Severity severity,

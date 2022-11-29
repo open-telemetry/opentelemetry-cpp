@@ -9,7 +9,7 @@
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 
 #  include <time.h>
 #  include <iostream>
@@ -77,6 +77,7 @@ public:
 
   /**
    * Creates a recordable that stores the data in a JSON object
+   * @return a newly initialized Recordable object.
    */
   std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override;
 

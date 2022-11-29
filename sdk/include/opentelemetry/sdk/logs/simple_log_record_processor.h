@@ -5,6 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <atomic>
+#  include <memory>
 #  include <mutex>
 
 #  include "opentelemetry/common/spin_lock_mutex.h"

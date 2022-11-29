@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
@@ -73,5 +74,12 @@ public:
 private:
   const T *container_;
 };
+
+template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+KeyValueIterableView<T> MakeKeyValueIterableView(const T &container) noexcept
+{
+  return KeyValueIterableView<T>(container);
+}
+
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE

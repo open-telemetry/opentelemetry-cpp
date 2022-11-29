@@ -69,6 +69,8 @@ exporters [#1828](https://github.com/open-telemetry/opentelemetry-cpp/pull/1828)
 * [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.15.0
   [#1761](https://github.com/open-telemetry/opentelemetry-cpp/pull/1761)
+* [LOGS SDK] New LogRecord and logs::Recordable implementations.
+  [#1766](https://github.com/open-telemetry/opentelemetry-cpp/pull/1766)
 
 Deprecation notes:
 

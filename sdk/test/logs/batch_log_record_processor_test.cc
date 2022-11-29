@@ -5,7 +5,7 @@
 
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 
 #  include <gtest/gtest.h>
 #  include <chrono>
@@ -15,6 +15,53 @@
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
 
+namespace nostd = opentelemetry::nostd;
+
+class MockLogRecordable final : public opentelemetry::sdk::logs::Recordable
+{
+public:
+  void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetSeverity(opentelemetry::logs::Severity) noexcept override {}
+
+  nostd::string_view GetBody() const noexcept { return body_; }
+
+  void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override
+  {
+    if (nostd::holds_alternative<const char *>(message))
+    {
+      body_ = nostd::get<const char *>(message);
+    }
+    else if (nostd::holds_alternative<nostd::string_view>(message))
+    {
+      body_ = static_cast<std::string>(nostd::get<nostd::string_view>(message));
+    }
+  }
+
+  void SetBody(const std::string &message) noexcept { body_ = message; }
+
+  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
+
+  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
+
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
+
+  void SetAttribute(nostd::string_view,
+                    const opentelemetry::common::AttributeValue &) noexcept override
+  {}
+
+  void SetResource(const opentelemetry::sdk::resource::Resource &) noexcept override {}
+
+  void SetInstrumentationScope(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &) noexcept override
+  {}
+
+private:
+  std::string body_;
+};
+
 /**
  * A sample log exporter
  * for testing the batch log processor
@@ -22,7 +69,7 @@ using namespace opentelemetry::sdk::common;
 class MockLogExporter final : public LogRecordExporter
 {
 public:
-  MockLogExporter(std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
+  MockLogExporter(std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received,
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
                   const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
@@ -34,7 +81,7 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new LogRecord());
+    return std::unique_ptr<Recordable>(new MockLogRecordable());
   }
 
   // Export method stores the logs received into a shared list of record names
@@ -45,11 +92,17 @@ public:
 
     for (auto &record : records)
     {
-      auto log = std::unique_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));
+      auto log =
+          std::unique_ptr<MockLogRecordable>(static_cast<MockLogRecordable *>(record.release()));
       if (log != nullptr)
       {
         logs_received_->push_back(std::move(log));
       }
+    }
+
+    if (export_delay_ > std::chrono::milliseconds::zero())
+    {
+      std::this_thread::sleep_for(export_delay_);
     }
 
     *is_export_completed_ = true;
@@ -64,7 +117,7 @@ public:
   }
 
 private:
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received_;
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   const std::chrono::milliseconds export_delay_;
@@ -80,7 +133,7 @@ public:
   // returns a batch log processor that received a batch of log records, a shared pointer to a
   // is_shutdown flag, and the processor configuration options (default if unspecified)
   std::shared_ptr<LogRecordProcessor> GetMockProcessor(
-      std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
+      std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
@@ -99,8 +152,8 @@ public:
 TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 {
   // initialize a batch log processor with the test exporter
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<MockLogRecordable>>);
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
@@ -111,7 +164,7 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
   for (int i = 0; i < num_logs; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
 
@@ -137,8 +190,8 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<MockLogRecordable>>);
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
   const int num_logs   = 2048;
@@ -146,7 +199,7 @@ TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
   for (int i = 0; i < num_logs; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
 
@@ -162,7 +215,7 @@ TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
   for (int i = 0; i < num_logs; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
 
@@ -180,8 +233,8 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLoss)
   /* Test that when exporting more than max_queue_size logs, some are most likely lost*/
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<MockLogRecordable>>);
 
   const int max_queue_size = 4096;
 
@@ -191,7 +244,7 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLoss)
   for (int i = 0; i < max_queue_size; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
 
@@ -206,8 +259,8 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLossLess)
   /* Test that no logs are lost when sending max_queue_size logs */
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<MockLogRecordable>>);
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
 
   const int num_logs = 2048;
@@ -215,7 +268,7 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLossLess)
   for (int i = 0; i < num_logs; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
 
@@ -235,8 +288,8 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<MockLogRecordable>>);
 
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds scheduled_delay_millis(2000);
@@ -248,7 +301,7 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
   for (std::size_t i = 0; i < max_export_batch_size; ++i)
   {
     auto log = batch_processor->MakeRecordable();
-    log->SetBody("Log" + std::to_string(i));
+    static_cast<MockLogRecordable *>(log.get())->SetBody("Log" + std::to_string(i));
     batch_processor->OnEmit(std::move(log));
   }
   // Sleep for scheduled_delay_millis milliseconds
@@ -257,7 +310,7 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
   // small delay to give time to export, which is being performed
   // asynchronously by the worker thread (this thread will not
   // forcibly join() the main thread unless processor's shutdown() is called).
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   // Logs should be exported by now
   EXPECT_TRUE(is_export_completed->load());
