@@ -39,10 +39,7 @@ void THttpTransport::write(const uint8_t *buf, uint32_t len)
 
 bool THttpTransport::sendSpans()
 {
-  ext::http::client::HttpSslOptions no_ssl;
-  no_ssl.use_ssl = false;
-
-  auto result = client->Post(endpoint, no_ssl, request_buffer, headers);
+  auto result = client->Post(endpoint, request_buffer, headers);
   request_buffer.clear();
 
   // TODO: Add logging once global log handling is available.

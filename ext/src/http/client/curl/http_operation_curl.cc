@@ -414,8 +414,6 @@ CURLcode HttpOperation::Setup()
 
   if (ssl_options_.use_ssl)
   {
-    // TODO: See curl minimum version required, adjust find_package(CURL)
-
     /* 1 - CA CERT */
 
     if (!ssl_options_.ssl_ca_cert_path.empty())
@@ -426,7 +424,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
-
+#if LIBCURL_VERSION_NUM >= 0x077100
       const char *data = ssl_options_.ssl_ca_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
 
@@ -436,6 +434,10 @@ CURLcode HttpOperation::Setup()
       stblob.flags = CURL_BLOB_COPY;
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT_BLOB, &stblob);
       // Assuming PEM format.
+#else
+      // CURL 7.71.0 required for CURLOPT_ISSUERCERT_BLOB.
+      return CURLE_UNKNOWN_OPTION;
+#endif
     }
 
     /* 2 - CLIENT KEY */
@@ -448,6 +450,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_key_string.empty())
     {
+#if LIBCURL_VERSION_NUM >= 0x077100
       const char *data = ssl_options_.ssl_client_key_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_key_string.length();
 
@@ -457,6 +460,10 @@ CURLcode HttpOperation::Setup()
       stblob.flags = CURL_BLOB_COPY;
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEY_BLOB, &stblob);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEYTYPE, "PEM");
+#else
+      // CURL 7.71.0 required for CURLOPT_SSLKEY_BLOB.
+      return CURLE_UNKNOWN_OPTION;
+#endif
     }
 
     /* 3 - CLIENT CERT */
@@ -469,6 +476,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_cert_string.empty())
     {
+#if LIBCURL_VERSION_NUM >= 0x077100
       const char *data = ssl_options_.ssl_client_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_cert_string.length();
 
@@ -478,10 +486,15 @@ CURLcode HttpOperation::Setup()
       stblob.flags = CURL_BLOB_COPY;
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT_BLOB, &stblob);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
+#else
+      // CURL 7.71.0 required for CURLOPT_SSLCERT_BLOB.
+      return CURLE_UNKNOWN_OPTION;
+#endif
     }
 
     /* 4 - ENFORCE VERIFICATION */
 
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
   }

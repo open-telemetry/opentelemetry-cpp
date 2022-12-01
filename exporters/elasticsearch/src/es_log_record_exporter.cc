@@ -315,12 +315,8 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     return sdk::common::ExportResult::kFailure;
   }
 
-  ext::http::client::HttpSslOptions no_ssl;
-  no_ssl.use_ssl = false;
-
   // Create a connection to the ElasticSearch instance
-  auto session =
-      http_client_->CreateSession(options_.host_ + std::to_string(options_.port_), no_ssl);
+  auto session = http_client_->CreateSession(options_.host_ + std::to_string(options_.port_));
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods

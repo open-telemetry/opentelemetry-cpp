@@ -75,12 +75,9 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
   }
 
-  http_client::HttpSslOptions no_ssl;
-  no_ssl.use_ssl = false;
-
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
-  auto result = http_client_->Post(url_parser_.url_, no_ssl, body_v, options_.headers);
+  auto result = http_client_->Post(url_parser_.url_, body_v, options_.headers);
   if (result &&
       (result.GetResponse().GetStatusCode() == 200 || result.GetResponse().GetStatusCode() == 202))
   {

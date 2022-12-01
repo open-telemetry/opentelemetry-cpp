@@ -19,16 +19,10 @@ inline const std::string GetDefaultZipkinEndpoint()
   const char *kZipkinEndpointDefault            = "http://localhost:9411/api/v2/spans";
 
   std::string endpoint;
-  bool exists;
 
-  exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
+  auto exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
       otel_exporter_zipkin_endpoint_env, endpoint);
-  if (!exists || endpoint.empty())
-  {
-    endpoint = kZipkinEndpointDefault;
-  }
-
-  return endpoint;
+  return exists ? endpoint : kZipkinEndpointDefault;
 }
 
 enum class TransportFormat

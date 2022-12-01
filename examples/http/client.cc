@@ -39,7 +39,12 @@ void sendRequest(const std::string &url, http_client::HttpSslOptions &ssl_option
   prop->Inject(carrier, current_ctx);
 
   // send http request
+#ifdef ENABLE_OTLP_HTTP_SSL
   http_client::Result result = http_client->Get(url, ssl_options, carrier.headers_);
+#else
+  http_client::Result result = http_client->Get(url, carrier.headers_);
+#endif
+
   if (result)
   {
     // set span attributes

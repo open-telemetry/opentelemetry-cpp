@@ -61,16 +61,33 @@ public:
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
+               const ext::http::client::Body &,
+               const ext::http::client::Headers &),
+              (noexcept, override));
+
+#  ifdef ENABLE_OTLP_HTTP_SSL
+  MOCK_METHOD(ext::http::client::Result,
+              Post,
+              (const nostd::string_view &,
                const ext::http::client::HttpSslOptions &,
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
+#  endif
+
+  MOCK_METHOD(ext::http::client::Result,
+              Get,
+              (const nostd::string_view &, const ext::http::client::Headers &),
+              (noexcept, override));
+
+#  ifdef ENABLE_OTLP_HTTP_SSL
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &,
                const ext::http::client::HttpSslOptions &,
                const ext::http::client::Headers &),
               (noexcept, override));
+#  endif
 };
 
 class IsValidMessageMatcher
@@ -94,6 +111,8 @@ public:
 private:
   std::string trace_id_;
 };
+
+// FIXME: Use in OTLP tests
 
 class IsValidSslOptionsMatcher
 {
@@ -186,12 +205,10 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
 
-  ext::http::client::HttpSslOptions expected_ssl_options;
-  expected_ssl_options.use_ssl = false;
-
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
-  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidSslOptions(expected_ssl_options),
-                                      IsValidMessage(report_trace_id), _))
+
+  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
+
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
@@ -215,7 +232,7 @@ TEST_F(ZipkinExporterTestPeer, ShutdownTest)
 
   // exporter should not be shutdown by default
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_http_client, Post(_, _, _, _))
+  EXPECT_CALL(*mock_http_client, Post(_, _, _))
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},

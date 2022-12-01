@@ -107,10 +107,7 @@ void send_request(curl::HttpClient &client, const std::string &url, const std::s
 
   Uri uri{url};
 
-  http_client::HttpSslOptions no_ssl;
-  no_ssl.use_ssl = false;
-
-  auto session = client.CreateSession(url, no_ssl);
+  auto session = client.CreateSession(url);
   auto request = session->CreateRequest();
 
   request->SetMethod(http_client::Method::Post);

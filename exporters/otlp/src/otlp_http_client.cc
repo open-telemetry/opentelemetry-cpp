@@ -953,6 +953,7 @@ OtlpHttpClient::createSession(
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
+#ifdef ENABLE_OTLP_HTTP_SSL
   // FIXME: make a member for that ?
   ext::http::client::HttpSslOptions ssl_options;
 
@@ -975,6 +976,10 @@ OtlpHttpClient::createSession(
   }
 
   auto session = http_client_->CreateSession(options_.url, ssl_options);
+#else
+  auto session = http_client_->CreateSession(options_.url);
+#endif
+
   auto request = session->CreateRequest();
 
   for (auto &header : options_.http_headers)

@@ -214,12 +214,53 @@ public:
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+  {
+    HttpSslOptions no_ssl;
+    return GetImpl(url, no_ssl, headers);
+  }
+
+#ifdef ENABLE_OTLP_HTTP_SSL
+  opentelemetry::ext::http::client::Result Get(
+      const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
+    return GetImpl(url, ssl_options, headers);
+  }
+#endif
+
+  opentelemetry::ext::http::client::Result Post(
+      const nostd::string_view &url,
+      const Body &body,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+  {
+    HttpSslOptions no_ssl;
+    return PostImpl(url, no_ssl, body, headers);
+  }
+
+#ifdef ENABLE_OTLP_HTTP_SSL
+  opentelemetry::ext::http::client::Result Post(
+      const nostd::string_view &url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+      const Body &body,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+  {
+    return PostImpl(url, ssl_options, body, headers);
+  }
+#endif
+
+private:
+  opentelemetry::ext::http::client::Result GetImpl(
+      const nostd::string_view &url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept
+  {
     opentelemetry::ext::http::client::Body body;
+
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
                                  ssl_options, nullptr, headers, body);
+
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -238,11 +279,11 @@ public:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
-  opentelemetry::ext::http::client::Result Post(
+  opentelemetry::ext::http::client::Result PostImpl(
       const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
       const Body &body,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+      const opentelemetry::ext::http::client::Headers &headers) noexcept
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
                                  ssl_options, nullptr, headers, body);
@@ -265,6 +306,7 @@ public:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
+public:
   ~HttpClientSync() override {}
 
 private:
@@ -279,8 +321,13 @@ public:
   ~HttpClient() override;
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
+      nostd::string_view url) noexcept override;
+
+#ifdef ENABLE_OTLP_HTTP_SSL
+  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
       nostd::string_view url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options) noexcept override;
+#endif
 
   bool CancelAllSessions() noexcept override;
 
@@ -320,6 +367,10 @@ public:
 #endif
 
 private:
+  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSessionImpl(
+      nostd::string_view url,
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options) noexcept;
+
   void wakeupBackgroundThread();
   bool doAddSessions();
   bool doAbortSessions();

@@ -236,8 +236,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  http_client::HttpSslOptions ssl_options;
-  auto session = session_manager->CreateSession("http://127.0.0.1:19000", ssl_options);
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<GetEventHandler>();
@@ -254,8 +253,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  http_client::HttpSslOptions ssl_options;
-  auto session = session_manager->CreateSession("http://127.0.0.1:19000", ssl_options);
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("post/");
   request->SetMethod(http_client::Method::Post);
@@ -281,9 +279,7 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  http_client::HttpSslOptions ssl_options;
-  auto session = session_manager->CreateSession("222.222.222.200:19000",
-                                                ssl_options);  // Non Existing address
+  auto session = session_manager->CreateSession("222.222.222.200:19000");  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<GetEventHandler>();
@@ -295,7 +291,7 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 {
-  http_client::HttpSslOptions ssl_options;
+  http_client::HttpSslOptions no_ssl;
   GetEventHandler *handler = new GetEventHandler();
 
   const char *b          = "test-data";
@@ -304,40 +300,38 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
 
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", ssl_options, handler,
-                                       headers, body, true);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", no_ssl, handler, headers,
+                                       body, true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", ssl_options, handler,
-                                       headers, body, true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", no_ssl, handler, headers,
+                                       body, true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", ssl_options, handler,
-                                       headers, body, false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", no_ssl, handler, headers,
+                                       body, false);
   http_operations3.Send();
   delete handler;
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
-  http_client::HttpSslOptions ssl_options;
   received_requests_.clear();
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result             = http_client.Get("http://127.0.0.1:19000/get/", ssl_options, m1);
+  auto result             = http_client.Get("http://127.0.0.1:19000/get/", m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
 {
-  http_client::HttpSslOptions ssl_options;
   received_requests_.clear();
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result             = http_client.Get("https://192.0.2.0:19000/get/", ssl_options, m1);
+  auto result             = http_client.Get("https://192.0.2.0:19000/get/", m1);
   EXPECT_EQ(result, false);
 
   // When network is under proxy, it may connect success but closed by peer when send data
@@ -347,13 +341,12 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
 
 TEST_F(BasicCurlHttpTests, SendPostRequestSync)
 {
-  http_client::HttpSslOptions ssl_options;
   received_requests_.clear();
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
   http_client::Body body  = {};
-  auto result             = http_client.Post("http://127.0.0.1:19000/post/", ssl_options, body, m1);
+  auto result             = http_client.Post("http://127.0.0.1:19000/post/", body, m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
@@ -362,15 +355,14 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
 {
   curl::HttpClient session_manager;
 
-  http_client::HttpSslOptions ssl_options;
-  auto session = session_manager.CreateSession("127.0.0.1:80", ssl_options);
+  auto session = session_manager.CreateSession("127.0.0.1:80");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(), "http://127.0.0.1:80/");
 
-  session = session_manager.CreateSession("https://127.0.0.1:443", ssl_options);
+  session = session_manager.CreateSession("https://127.0.0.1:443");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
             "https://127.0.0.1:443/");
 
-  session = session_manager.CreateSession("http://127.0.0.1:31339", ssl_options);
+  session = session_manager.CreateSession("http://127.0.0.1:31339");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
             "http://127.0.0.1:31339/");
 }
@@ -378,7 +370,6 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
 TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
 {
   curl::HttpClient http_client;
-  http_client::HttpSslOptions ssl_options;
 
   for (int round = 0; round < 2; ++round)
   {
@@ -388,7 +379,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsync)
     std::shared_ptr<GetEventHandler> handlers[batch_count];
     for (unsigned i = 0; i < batch_count; ++i)
     {
-      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/", ssl_options);
+      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/");
       auto request = sessions[i]->CreateRequest();
       request->SetMethod(http_client::Method::Get);
       request->SetUri("get/");
@@ -420,14 +411,13 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
 {
   received_requests_.clear();
   curl::HttpClient http_client;
-  http_client::HttpSslOptions ssl_options;
 
   static constexpr const unsigned batch_count = 5;
   std::shared_ptr<http_client::Session> sessions[batch_count];
   std::shared_ptr<GetEventHandler> handlers[batch_count];
   for (unsigned i = 0; i < batch_count; ++i)
   {
-    sessions[i]  = http_client.CreateSession("https://192.0.2.0:19000/get/", ssl_options);
+    sessions[i]  = http_client.CreateSession("https://192.0.2.0:19000/get/");
     auto request = sessions[i]->CreateRequest();
     request->SetMethod(http_client::Method::Get);
     request->SetUri("get/");
@@ -454,7 +444,6 @@ TEST_F(BasicCurlHttpTests, SendGetRequestAsyncTimeout)
 TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
 {
   curl::HttpClient http_client;
-  http_client::HttpSslOptions ssl_options;
 
   for (int round = 0; round < 2; ++round)
   {
@@ -465,7 +454,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
     std::shared_ptr<http_client::Session> sessions[batch_count];
     for (auto &session : sessions)
     {
-      session      = http_client.CreateSession("http://127.0.0.1:19000/post/", ssl_options);
+      session      = http_client.CreateSession("http://127.0.0.1:19000/post/");
       auto request = session->CreateRequest();
       request->SetMethod(http_client::Method::Post);
       request->SetUri("post/");
@@ -494,7 +483,6 @@ TEST_F(BasicCurlHttpTests, SendPostRequestAsync)
 TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
 {
   curl::HttpClient http_client;
-  http_client::HttpSslOptions ssl_options;
 
   for (int round = 0; round < 2; ++round)
   {
@@ -504,7 +492,7 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
     std::shared_ptr<FinishInCallbackHandler> handlers[batch_count];
     for (unsigned i = 0; i < batch_count; ++i)
     {
-      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/", ssl_options);
+      sessions[i]  = http_client.CreateSession("http://127.0.0.1:19000/get/");
       auto request = sessions[i]->CreateRequest();
       request->SetMethod(http_client::Method::Get);
       request->SetUri("get/");
