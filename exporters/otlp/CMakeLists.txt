@@ -49,6 +49,10 @@ if(WITH_OTLP_GRPC)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_grpc_client)
 
+  add_library(opentelemetry_exporter_otlp_grpc_utils src/otlp_grpc_utils.cc)
+  set_target_properties(opentelemetry_exporter_otlp_grpc_utils
+                        PROPERTIES EXPORT_NAME otlp_grpc_utils)
+
   add_library(opentelemetry_exporter_otlp_grpc
               src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc)
 
