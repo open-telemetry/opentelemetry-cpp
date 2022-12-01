@@ -14,6 +14,7 @@ cc_library(
         "//api",
         "//ext:headers",
         "//sdk:headers",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
