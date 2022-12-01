@@ -2,7 +2,7 @@ add_library(
   opentelemetry_otlp_recordable
   src/otlp_log_recordable.cc src/otlp_recordable.cc
   src/otlp_populate_attribute_utils.cc src/otlp_recordable_utils.cc
-  src/otlp_metric_utils.cc src/otlp_grpc_utils.cc)
+  src/otlp_metric_utils.cc)
 set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
                                                                otlp_recordable)
 
@@ -24,7 +24,8 @@ target_link_libraries(opentelemetry_otlp_recordable
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
-  add_library(opentelemetry_exporter_otlp_grpc_client src/otlp_grpc_client.cc)
+  add_library(opentelemetry_exporter_otlp_grpc_client src/otlp_grpc_client.cc
+                                                      src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   target_link_libraries(
