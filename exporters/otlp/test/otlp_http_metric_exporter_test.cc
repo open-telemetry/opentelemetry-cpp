@@ -936,7 +936,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultMetricsEndpoint());
 }
 
-TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefultTemporality)
+TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
 {
   std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
   EXPECT_EQ(
