@@ -96,7 +96,6 @@ cc_library(
     deps = [
         ":otlp_recordable",
         ":otlp_grpc_client",
-        ":otlp_grpc_utils",
         "//ext:headers",
         "//sdk/src/trace",
 
