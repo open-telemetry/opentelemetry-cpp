@@ -936,6 +936,28 @@ TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultMetricsEndpoint());
 }
 
+TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefultTemporality)
+{
+  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kHistogram));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableCounter));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableGauge));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter));
+}
 #endif
 
 }  // namespace otlp
