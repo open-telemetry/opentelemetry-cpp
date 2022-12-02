@@ -41,7 +41,7 @@ target_include_directories(
   opentelemetry_exporter_ostream_metrics
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 target_link_libraries(opentelemetry_exporter_ostream_metrics
-                      PUBLIC opentelemetry_metrics)
+                      PUBLIC opentelemetry_metrics opentelemetry_resources)
 install(
   TARGETS opentelemetry_exporter_ostream_metrics
   EXPORT "${PROJECT_NAME}-target"
@@ -56,7 +56,7 @@ if(BUILD_TESTING)
   add_executable(ostream_metric_test test/ostream_metric_test.cc)
   target_link_libraries(
     ostream_metric_test ${GTEST_BOTH_LIBRARIES}
-    opentelemetry_exporter_ostream_metrics opentelemetry_resources)
+    opentelemetry_exporter_ostream_metrics)
   gtest_add_tests(
     TARGET ostream_metric_test
     TEST_PREFIX exporter.
