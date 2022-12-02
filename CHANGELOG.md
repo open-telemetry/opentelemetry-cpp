@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Fix opentelemetry-proto file exists check [#1824](https://github.com/open-telemetry/opentelemetry-cpp/pull/1824)
+* [BUILD] Generate binary package with CPack [#1834](https://github.com/open-telemetry/opentelemetry-cpp/pull/1834)
 
 ## [1.8.0] 2022-11-27
 

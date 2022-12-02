@@ -10,7 +10,14 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
-project(opentelemetry-cpp)
+project(opentelemetry-cpp VERSION 1.8.0)
+
+set(CPACK_PACKAGE_VENDOR "OpenTelemetry")
+set(CPACK_PACKAGE_DESCRIPTION "The C++ OpenTelemetry client.")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://opentelemetry.io/")
+set(CPACK_RPM_PACKAGE_LICENSE "Apache-2.0")
+
+include(CPack)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
