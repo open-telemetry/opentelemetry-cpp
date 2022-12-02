@@ -19,14 +19,9 @@ load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 opentelemetry_cpp_deps()
 
-# Load prometheus C++ dependencies.
-load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
+load("//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
 
-prometheus_cpp_repositories()
-
-load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
-
-bazel_skylib_workspace()
+opentelemetry_extra_deps()
 
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -37,12 +32,3 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
-
-load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-load("@upb//bazel:workspace_deps.bzl", "upb_deps")
-
-upb_deps()
-
-load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
-
-rules_foreign_cc_dependencies()

@@ -164,6 +164,8 @@ option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
+option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
@@ -478,8 +480,10 @@ if(BUILD_TESTING)
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
-  # Benchmark respects the CMAKE_PREFIX_PATH
-  find_package(benchmark CONFIG REQUIRED)
+  if(WITH_BENCHMARK)
+    # Benchmark respects the CMAKE_PREFIX_PATH
+    find_package(benchmark CONFIG REQUIRED)
+  endif()
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -497,6 +501,9 @@ if(NOT WITH_API_ONLY)
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
+  if(BUILD_TESTING)
+    add_subdirectory(test_common)
+  endif()
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
