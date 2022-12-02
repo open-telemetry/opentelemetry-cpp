@@ -51,7 +51,7 @@ struct OtlpHttpMetricExporterOptions
 
   // Preferred Aggregation Temporality
   sdk::metrics::AggregationTemporality aggregation_temporality =
-      sdk::metrics::AggregationTemporality::kDelta;
+      sdk::metrics::AggregationTemporality::kCumulative;
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests

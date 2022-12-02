@@ -22,7 +22,7 @@ struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
 
   // Preferred Aggregation Temporality
   sdk::metrics::AggregationTemporality aggregation_temporality =
-      sdk::metrics::AggregationTemporality::kDelta;
+      sdk::metrics::AggregationTemporality::kCumulative;
 };
 
 }  // namespace otlp

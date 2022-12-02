@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix opentelemetry-proto file exists check [#1824](https://github.com/open-telemetry/opentelemetry-cpp/pull/1824)
+
 ## [1.8.0] 2022-11-27
 
 * [DOC] Update Metrics status in README.md [#1722](https://github.com/open-telemetry/opentelemetry-cpp/pull/1722)
