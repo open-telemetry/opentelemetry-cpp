@@ -16,39 +16,39 @@ const char *grpc_status_code_to_string(::grpc::StatusCode status_code)
 {
   switch (status_code)
   {
-    case GRPC_STATUS_OK:
+    case ::grpc::StatusCode::OK:
       return "OK";
-    case GRPC_STATUS_CANCELLED:
+    case ::grpc::StatusCode::CANCELLED:
       return "CANCELLED";
-    case GRPC_STATUS_UNKNOWN:
+    case ::grpc::StatusCode::UNKNOWN:
       return "UNKNOWN";
-    case GRPC_STATUS_INVALID_ARGUMENT:
+    case ::grpc::StatusCode::INVALID_ARGUMENT:
       return "INVALID_ARGUMENT";
-    case GRPC_STATUS_DEADLINE_EXCEEDED:
+    case ::grpc::StatusCode::DEADLINE_EXCEEDED:
       return "DEADLINE_EXCEEDED";
-    case GRPC_STATUS_NOT_FOUND:
+    case ::grpc::StatusCode::NOT_FOUND:
       return "NOT_FOUND";
-    case GRPC_STATUS_ALREADY_EXISTS:
+    case ::grpc::StatusCode::ALREADY_EXISTS:
       return "ALREADY_EXISTS";
-    case GRPC_STATUS_PERMISSION_DENIED:
+    case ::grpc::StatusCode::PERMISSION_DENIED:
       return "PERMISSION_DENIED";
-    case GRPC_STATUS_UNAUTHENTICATED:
+    case ::grpc::StatusCode::UNAUTHENTICATED:
       return "UNAUTHENTICATED";
-    case GRPC_STATUS_RESOURCE_EXHAUSTED:
+    case ::grpc::StatusCode::RESOURCE_EXHAUSTED:
       return "RESOURCE_EXHAUSTED";
-    case GRPC_STATUS_FAILED_PRECONDITION:
+    case ::grpc::StatusCode::FAILED_PRECONDITION:
       return "FAILED_PRECONDITION";
-    case GRPC_STATUS_ABORTED:
+    case ::grpc::StatusCode::ABORTED:
       return "ABORTED";
-    case GRPC_STATUS_OUT_OF_RANGE:
+    case ::grpc::StatusCode::OUT_OF_RANGE:
       return "OUT_OF_RANGE";
-    case GRPC_STATUS_UNIMPLEMENTED:
+    case ::grpc::StatusCode::UNIMPLEMENTED:
       return "UNIMPLEMENTED";
-    case GRPC_STATUS_INTERNAL:
+    case ::grpc::StatusCode::INTERNAL:
       return "INTERNAL";
-    case GRPC_STATUS_UNAVAILABLE:
+    case ::grpc::StatusCode::UNAVAILABLE:
       return "UNAVAILABLE";
-    case GRPC_STATUS_DATA_LOSS:
+    case ::grpc::StatusCode::DATA_LOSS:
       return "DATA_LOSS";
     default:
       return "UNKNOWN";
