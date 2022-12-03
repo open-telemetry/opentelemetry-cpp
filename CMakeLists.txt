@@ -446,6 +446,6 @@ install(
   NAMESPACE "${PROJECT_NAME}::"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
-if (BUILD_PACKAGE AND UNIX AND NOT APPLE)
-  include (cmake/package.cmake)
+if(BUILD_PACKAGE)
+  include(cmake/package.cmake)
 endif()
