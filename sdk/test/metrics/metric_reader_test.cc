@@ -1,11 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -46,4 +45,3 @@ TEST(MetricReaderTest, BasicTests)
       new MetricCollector(meter_context2.get(), std::move(metric_reader2))};
   metric_producer->Collect([](ResourceMetrics & /* metric_data */) { return true; });
 }
-#endif

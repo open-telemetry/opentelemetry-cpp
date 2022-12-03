@@ -42,6 +42,7 @@ ignore:
   - "cmake/**/*"
   - "buildscripts/**/*"
   - "third_party/**/*"
+  - "test_common/**/*"
   - "tools/**/*"
   - ".vscode/**/*"
   - ".github/**/*"

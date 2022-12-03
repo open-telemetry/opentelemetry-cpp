@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <vector>
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+
+#include <vector>
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -19,7 +19,7 @@ class NoExemplarReservoir final : public ExemplarReservoir
 
 public:
   void OfferMeasurement(
-      long /* value */,
+      int64_t /* value */,
       const MetricAttributes & /* attributes */,
       const opentelemetry::context::Context & /* context */,
       const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
@@ -48,4 +48,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

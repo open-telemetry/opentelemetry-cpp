@@ -5,7 +5,7 @@ $action = $args[0]
 
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
-$BAZEL_OPTIONS = "--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
@@ -31,6 +31,27 @@ switch ($action) {
   "cmake.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build .
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
+  "cmake.maintainer.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DOTELCPP_MAINTAINER_MODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

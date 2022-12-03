@@ -26,13 +26,13 @@ public:
    * Create a LoggerContext.
    */
   static std::unique_ptr<LoggerContext> Create(
-      std::vector<std::unique_ptr<LogProcessor>> &&processors);
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
 
   /**
    * Create a LoggerContext.
    */
   static std::unique_ptr<LoggerContext> Create(
-      std::vector<std::unique_ptr<LogProcessor>> &&processors,
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource);
 };
 

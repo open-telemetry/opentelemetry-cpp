@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+#include <gtest/gtest.h>
 #include <vector>
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -23,8 +22,9 @@ TEST_F(HistogramExemplarReservoirTestPeer, OfferMeasurement)
       boundaries.size(), HistogramExemplarReservoir::GetHistogramCellSelector(boundaries), nullptr);
   histogram_exemplar_reservoir->OfferMeasurement(
       1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
-  histogram_exemplar_reservoir->OfferMeasurement(
-      1l, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
+  histogram_exemplar_reservoir->OfferMeasurement((int64_t)1, MetricAttributes{},
+                                                 opentelemetry::context::Context{},
+                                                 std::chrono::system_clock::now());
   auto exemplar_data = histogram_exemplar_reservoir->CollectAndReset(MetricAttributes{});
   ASSERT_TRUE(exemplar_data.empty());
 }
@@ -32,4 +32,3 @@ TEST_F(HistogramExemplarReservoirTestPeer, OfferMeasurement)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/observer_result.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
-#  include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#  include <memory>
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/observer_result.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -28,7 +28,7 @@ public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
                      const AttributesProcessor *attributes_processor,
-                     nostd::shared_ptr<AggregationConfig> aggregation_config,
+                     const AggregationConfig *aggregation_config,
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
@@ -72,14 +72,14 @@ public:
   }
 
   void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
       return;
     }
-    Record<long>(measurements, observation_time);
+    Record<int64_t>(measurements, observation_time);
   }
 
   void RecordDouble(
@@ -127,4 +127,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

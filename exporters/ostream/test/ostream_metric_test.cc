@@ -1,20 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include <gtest/gtest.h>
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/resource/resource_detector.h"
-#  include "opentelemetry/sdk/version/version.h"
+#include <gtest/gtest.h>
+#include <memory>
+#include <vector>
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/version/version.h"
 
-#  include <iostream>
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/resource/resource.h"
+#include <iostream>
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -23,7 +22,7 @@ namespace exportermetrics = opentelemetry::exporter::metrics;
 TEST(OStreamMetricsExporter, Shutdown)
 {
   auto exporter =
-      std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
+      std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
   ASSERT_TRUE(exporter->Shutdown());
   auto result = exporter->Export(metric_sdk::ResourceMetrics{});
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
@@ -32,7 +31,7 @@ TEST(OStreamMetricsExporter, Shutdown)
 TEST(OStreamMetricsExporter, ExportSumPointData)
 {
   auto exporter =
-      std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
+      std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
   metric_sdk::SumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
@@ -95,7 +94,7 @@ TEST(OStreamMetricsExporter, ExportSumPointData)
 TEST(OStreamMetricsExporter, ExportHistogramPointData)
 {
   auto exporter =
-      std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
+      std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
   metric_sdk::HistogramPointData histogram_point_data{};
   histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
@@ -108,7 +107,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   histogram_point_data2.boundaries_ = std::list<double>{10.0, 20.0, 30.0};
   histogram_point_data2.count_      = 3;
   histogram_point_data2.counts_     = {200, 300, 400, 500};
-  histogram_point_data2.sum_        = 900l;
+  histogram_point_data2.sum_        = (int64_t)900;
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
@@ -177,7 +176,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
 TEST(OStreamMetricsExporter, ExportLastValuePointData)
 {
   auto exporter =
-      std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
+      std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -190,7 +189,7 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   last_value_point_data.is_lastvalue_valid_ = true;
   last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::LastValuePointData last_value_point_data2{};
-  last_value_point_data2.value_              = 20l;
+  last_value_point_data2.value_              = (int64_t)20;
   last_value_point_data2.is_lastvalue_valid_ = true;
   last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::MetricData metric_data{
@@ -246,7 +245,7 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
 TEST(OStreamMetricsExporter, ExportDropPointData)
 {
   auto exporter =
-      std::unique_ptr<metric_sdk::MetricExporter>(new exportermetrics::OStreamMetricExporter);
+      std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -296,5 +295,3 @@ TEST(OStreamMetricsExporter, ExportDropPointData)
 
   ASSERT_EQ(stdoutOutput.str(), expected_output);
 }
-
-#endif

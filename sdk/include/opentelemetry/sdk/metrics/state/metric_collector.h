@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -34,7 +34,7 @@ public:
 class MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
-  MetricCollector(MeterContext *context, std::unique_ptr<MetricReader> metric_reader);
+  MetricCollector(MeterContext *context, std::shared_ptr<MetricReader> metric_reader);
 
   ~MetricCollector() override = default;
 
@@ -60,4 +60,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

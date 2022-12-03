@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
+
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -15,7 +15,7 @@ class NeverSampleFilter final : public ExemplarFilter
 {
 public:
   bool ShouldSampleMeasurement(
-      long /* value */,
+      int64_t /* value */,
       const MetricAttributes & /* attributes */,
       const opentelemetry::context::Context & /* context */) noexcept override
   {
@@ -35,4 +35,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

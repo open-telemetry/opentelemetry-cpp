@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,7 +26,7 @@ public:
   View(const std::string &name,
        const std::string &description                        = "",
        AggregationType aggregation_type                      = AggregationType::kDefault,
-       std::shared_ptr<AggregationConfig> aggregation_config = std::shared_ptr<AggregationConfig>{},
+       std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
@@ -45,9 +45,9 @@ public:
 
   virtual AggregationType GetAggregationType() const noexcept { return aggregation_type_; }
 
-  virtual nostd::shared_ptr<AggregationConfig> GetAggregationConfig() const noexcept
+  virtual AggregationConfig *GetAggregationConfig() const noexcept
   {
-    return aggregation_config_;
+    return aggregation_config_.get();
   }
 
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
@@ -60,10 +60,9 @@ private:
   std::string name_;
   std::string description_;
   AggregationType aggregation_type_;
-  nostd::shared_ptr<AggregationConfig> aggregation_config_;
+  std::shared_ptr<AggregationConfig> aggregation_config_;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor_;
 };
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

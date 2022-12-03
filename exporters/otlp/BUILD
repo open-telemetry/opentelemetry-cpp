@@ -50,11 +50,13 @@ cc_library(
     name = "otlp_grpc_client",
     srcs = [
         "src/otlp_grpc_client.cc",
+        "src/otlp_grpc_utils.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_client.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -82,6 +84,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -224,16 +227,16 @@ cc_library(
 )
 
 cc_library(
-    name = "otlp_http_log_exporter",
+    name = "otlp_http_log_record_exporter",
     srcs = [
-        "src/otlp_http_log_exporter.cc",
-        "src/otlp_http_log_exporter_factory.cc",
+        "src/otlp_http_log_record_exporter.cc",
+        "src/otlp_http_log_record_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
-        "include/opentelemetry/exporters/otlp/otlp_http_log_exporter.h",
-        "include/opentelemetry/exporters/otlp/otlp_http_log_exporter_factory.h",
-        "include/opentelemetry/exporters/otlp/otlp_http_log_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -251,16 +254,16 @@ cc_library(
 )
 
 cc_library(
-    name = "otlp_grpc_log_exporter",
+    name = "otlp_grpc_log_record_exporter",
     srcs = [
-        "src/otlp_grpc_log_exporter.cc",
-        "src/otlp_grpc_log_exporter_factory.cc",
+        "src/otlp_grpc_log_record_exporter.cc",
+        "src/otlp_grpc_log_record_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
-        "include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h",
-        "include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -351,7 +354,7 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -367,53 +370,53 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
-    name = "otlp_http_log_exporter_test",
-    srcs = ["test/otlp_http_log_exporter_test.cc"],
+    name = "otlp_http_log_record_exporter_test",
+    srcs = ["test/otlp_http_log_record_exporter_test.cc"],
     tags = [
         "otlp",
         "otlp_http_log",
         "test",
     ],
     deps = [
-        ":otlp_http_log_exporter",
+        ":otlp_http_log_record_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
-    name = "otlp_http_log_exporter_factory_test",
-    srcs = ["test/otlp_http_log_exporter_factory_test.cc"],
+    name = "otlp_http_log_record_exporter_factory_test",
+    srcs = ["test/otlp_http_log_record_exporter_factory_test.cc"],
     tags = [
         "otlp",
         "otlp_http_log",
         "test",
     ],
     deps = [
-        ":otlp_http_log_exporter",
+        ":otlp_http_log_record_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
 
 cc_test(
-    name = "otlp_grpc_log_exporter_test",
-    srcs = ["test/otlp_grpc_log_exporter_test.cc"],
+    name = "otlp_grpc_log_record_exporter_test",
+    srcs = ["test/otlp_grpc_log_record_exporter_test.cc"],
     tags = [
         "otlp",
         "otlp_grpc_log",
         "test",
     ],
     deps = [
-        ":otlp_grpc_log_exporter",
+        ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
@@ -421,15 +424,15 @@ cc_test(
 )
 
 cc_test(
-    name = "otlp_grpc_log_exporter_factory_test",
-    srcs = ["test/otlp_grpc_log_exporter_factory_test.cc"],
+    name = "otlp_grpc_log_record_exporter_factory_test",
+    srcs = ["test/otlp_grpc_log_record_exporter_factory_test.cc"],
     tags = [
         "otlp",
         "otlp_grpc_log",
         "test",
     ],
     deps = [
-        ":otlp_grpc_log_exporter",
+        ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
@@ -462,7 +465,7 @@ cc_test(
     deps = [
         ":otlp_http_metric_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -478,7 +481,7 @@ cc_test(
     deps = [
         ":otlp_http_metric_exporter",
         "//api",
-        "//ext/src/http/client/nosend:http_client_nosend",
+        "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -487,6 +490,7 @@ otel_cc_benchmark(
     name = "otlp_grpc_exporter_benchmark",
     srcs = ["test/otlp_grpc_exporter_benchmark.cc"],
     tags = [
+        "benchmark",
         "otlp",
         "otlp_grpc",
         "test",

@@ -1,22 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <thread>
-#  include "opentelemetry/exporters/prometheus/exporter.h"
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#include <memory>
+#include <thread>
+#include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 
-#  ifdef BAZEL_BUILD
-#    include "examples/common/metrics_foo_library/foo_library.h"
-#  else
-#    include "metrics_foo_library/foo_library.h"
-#  endif
+#ifdef BAZEL_BUILD
+#  include "examples/common/metrics_foo_library/foo_library.h"
+#else
+#  include "metrics_foo_library/foo_library.h"
+#endif
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
 namespace nostd            = opentelemetry::nostd;
@@ -36,7 +35,7 @@ void initMetrics(const std::string &name, const std::string &addr)
   }
   std::puts("PrometheusExporter example program running ...");
 
-  std::unique_ptr<metrics_sdk::MetricExporter> exporter{
+  std::unique_ptr<metrics_sdk::PushMetricExporter> exporter{
       new metrics_exporter::PrometheusExporter(opts)};
 
   std::string version{"1.2.0"};
@@ -113,6 +112,3 @@ int main(int argc, char **argv)
     histogram_example.join();
   }
 }
-#else
-int main() {}
-#endif

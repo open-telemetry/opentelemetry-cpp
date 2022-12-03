@@ -1,40 +1,39 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
+#include <chrono>
+#include <cstdlib>
+#include <thread>
 
-#  include <chrono>
-#  include <cstdlib>
-#  include <thread>
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
-#  include "opentelemetry/ext/http/server/http_server.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/resource/resource.h"
+#include <google/protobuf/message_lite.h>
+#include <gtest/gtest.h>
+#include "gmock/gmock.h"
 
-#  include <gtest/gtest.h>
-#  include "gmock/gmock.h"
+#include "nlohmann/json.hpp"
 
-#  include "nlohmann/json.hpp"
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -78,10 +77,10 @@ namespace http_client = opentelemetry::ext::http::client;
 class OtlpHttpMetricExporterTestPeer : public ::testing::Test
 {
 public:
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> GetExporter(
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> GetExporter(
       std::unique_ptr<OtlpHttpClient> http_client)
   {
-    return std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>(
+    return std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
         new OtlpHttpMetricExporter(std::move(http_client)));
   }
 
@@ -99,17 +98,17 @@ public:
   }
 
   void ExportJsonIntegrationTestExportSumPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -180,17 +179,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportSumPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -275,17 +274,17 @@ public:
   }
 
   void ExportJsonIntegrationTestExportLastValuePointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -296,7 +295,7 @@ public:
     last_value_point_data.is_lastvalue_valid_ = true;
     last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data2{};
-    last_value_point_data2.value_              = 20l;
+    last_value_point_data2.value_              = (int64_t)20;
     last_value_point_data2.is_lastvalue_valid_ = true;
     last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::MetricData metric_data{
@@ -361,17 +360,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportLastValuePointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -392,7 +391,7 @@ public:
     last_value_point_data.is_lastvalue_valid_ = true;
     last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::LastValuePointData last_value_point_data2{};
-    last_value_point_data2.value_              = 20l;
+    last_value_point_data2.value_              = (int64_t)20;
     last_value_point_data2.is_lastvalue_valid_ = true;
     last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
     opentelemetry::sdk::metrics::MetricData metric_data{
@@ -465,17 +464,17 @@ public:
   }
 
   void ExportJsonIntegrationTestExportHistogramPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -492,7 +491,7 @@ public:
     histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
-    histogram_point_data2.sum_        = 900l;
+    histogram_point_data2.sum_        = (int64_t)900;
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -591,17 +590,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportHistogramPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -627,7 +626,7 @@ public:
     histogram_point_data2.boundaries_ = {10.0, 20.0, 30.0};
     histogram_point_data2.count_      = 3;
     histogram_point_data2.counts_     = {200, 300, 400, 500};
-    histogram_point_data2.sum_        = 900l;
+    histogram_point_data2.sum_        = (int64_t)900;
 
     opentelemetry::sdk::metrics::MetricData metric_data{
         opentelemetry::sdk::metrics::InstrumentDescriptor{
@@ -734,14 +733,14 @@ public:
 
 TEST(OtlpHttpMetricExporterTest, Shutdown)
 {
-  auto exporter =
-      std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter>(new OtlpHttpMetricExporter());
+  auto exporter = std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
+      new OtlpHttpMetricExporter());
   ASSERT_TRUE(exporter->Shutdown());
   auto result = exporter->Export(opentelemetry::sdk::metrics::ResourceMetrics{});
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonIntegrationTestSumPointDataAsync)
 {
   ExportJsonIntegrationTestExportSumPointData(true);
@@ -793,7 +792,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportBinaryIntegrationTestHistogramPoint
   ExportBinaryIntegrationTestExportHistogramPointData(false);
 }
 
-#  else
+#else
 TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonIntegrationTestSumPointData)
 {
   ExportJsonIntegrationTestExportSumPointData();
@@ -820,7 +819,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportBinaryIntegrationTestHistogramPoint
 {
   ExportBinaryIntegrationTestExportHistogramPointData();
 }
-#  endif
+#endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigTest)
@@ -847,9 +846,10 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigJsonBytesMappingTest)
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
   std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
+  google::protobuf::ShutdownProtobufLibrary();
 }
 
-#  ifndef NO_GETENV
+#ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromEnv)
 {
@@ -936,10 +936,30 @@ TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4318/v1/metrics", GetOtlpDefaultMetricsEndpoint());
 }
 
-#  endif
+TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
+{
+  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+  EXPECT_EQ(
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      exporter->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kHistogram));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableCounter));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableGauge));
+  EXPECT_EQ(opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+            exporter->GetAggregationTemporality(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter));
+}
+#endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

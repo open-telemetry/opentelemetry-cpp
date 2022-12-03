@@ -10,7 +10,7 @@
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <gtest/gtest.h>
 
@@ -79,7 +79,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 }
 
-class DummyProcessor : public LogProcessor
+class DummyProcessor : public LogRecordProcessor
 {
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
@@ -101,9 +101,9 @@ TEST(LoggerProviderSDK, GetResource)
 
 TEST(LoggerProviderSDK, Shutdown)
 {
-  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
-  SimpleLogProcessor *processor_ptr = processor.get();
-  std::vector<std::unique_ptr<LogProcessor>> processors;
+  std::unique_ptr<SimpleLogRecordProcessor> processor(new SimpleLogRecordProcessor(nullptr));
+  SimpleLogRecordProcessor *processor_ptr = processor.get();
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
   LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
@@ -117,8 +117,8 @@ TEST(LoggerProviderSDK, Shutdown)
 
 TEST(LoggerProviderSDK, ForceFlush)
 {
-  std::unique_ptr<SimpleLogProcessor> processor(new SimpleLogProcessor(nullptr));
-  std::vector<std::unique_ptr<LogProcessor>> processors;
+  std::unique_ptr<SimpleLogRecordProcessor> processor(new SimpleLogRecordProcessor(nullptr));
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
   LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));

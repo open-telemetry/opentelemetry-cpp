@@ -134,11 +134,10 @@ private:
 OPENTELEMETRY_END_NAMESPACE
 
 /**
- * We can not decide the destroying order of signaltons.
- * Which means, the destructors of other singletons (GlobalLogHandler,TracerProvider and etc.)
- * may be called after destroying of global LogHandler and use OTEL_INTERNAL_LOG_* in it.We can do
- * nothing but ignore the log in this situation.
- */
+ * GlobalLogHandler and TracerProvider/MeterProvider/LoggerProvider are lazy sigletons.
+ * To ensure that GlobalLogHandler is the first one to be initialized (and so last to be
+ * destroyed), it is first used inside the constructors of TraceProvider, MeterProvider
+ * and LoggerProvider for debug logging. */
 #define OTEL_INTERNAL_LOG_DISPATCH(level, message, attributes)                            \
   do                                                                                      \
   {                                                                                       \

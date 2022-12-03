@@ -83,10 +83,10 @@ public:
                                       const std::string &body) noexcept
   {
     std::stringstream ss;
-    ss << "Status:" << response.GetStatusCode() << "Header:";
+    ss << "Status:" << response.GetStatusCode() << ", Header:";
     response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
                                  opentelemetry::nostd::string_view header_value) {
-      ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
+      ss << "\t" << header_name.data() << ": " << header_value.data() << ",";
       return true;
     });
     ss << "Body:" << body;
@@ -116,8 +116,7 @@ public:
         OTEL_INTERNAL_LOG_ERROR("OTLP HTTP Client] Export failed, " << log_message);
         result = sdk::common::ExportResult::kFailure;
       }
-
-      if (console_debug_)
+      else if (console_debug_)
       {
         if (log_message.empty())
         {
@@ -982,16 +981,19 @@ void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
     return;
   }
 
-  opentelemetry::ext::http::client::Session *key = session_data.session.get();
-  ResponseHandler *handle = static_cast<ResponseHandler *>(session_data.event_handle.get());
+  std::shared_ptr<opentelemetry::ext::http::client::Session> session = session_data.session;
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> handle =
+      session_data.event_handle;
+  {
+    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+    static_cast<ResponseHandler *>(handle.get())->Bind(this, *session);
 
-  handle->Bind(this, *key);
-
-  HttpSessionData &store_session_data = running_sessions_[key];
-  store_session_data                  = std::move(session_data);
+    HttpSessionData &store_session_data = running_sessions_[session.get()];
+    store_session_data                  = std::move(session_data);
+  }
 
   // Send request after the session is added
-  key->SendRequest(store_session_data.event_handle);
+  session->SendRequest(handle);
 }
 
 bool OtlpHttpClient::cleanupGCSessions() noexcept

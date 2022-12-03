@@ -34,4 +34,5 @@
 #  pragma clang diagnostic push
 #  pragma clang diagnostic ignored "-Wunused-parameter"
 #  pragma clang diagnostic ignored "-Wtype-limits"
+#  pragma clang diagnostic ignored "-Wshadow-field"
 #endif

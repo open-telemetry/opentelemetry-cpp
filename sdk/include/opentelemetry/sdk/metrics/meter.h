@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/version.h"
+#include <chrono>
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -35,17 +37,17 @@ public:
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
+  nostd::unique_ptr<opentelemetry::metrics::Counter<uint64_t>> CreateUInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
+  nostd::unique_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateLongObservableCounter(
+  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateInt64ObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -55,17 +57,17 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Histogram<long>> CreateLongHistogram(
+  nostd::unique_ptr<opentelemetry::metrics::Histogram<uint64_t>> CreateUInt64Histogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
+  nostd::unique_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateLongObservableGauge(
+  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
@@ -75,20 +77,20 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::unique_ptr<opentelemetry::metrics::UpDownCounter<int64_t>> CreateInt64UpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
+  nostd::unique_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
-  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateLongObservableUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description = "",
-      nostd::string_view unit        = "") noexcept override;
+  nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+  CreateInt64ObservableUpDownCounter(nostd::string_view name,
+                                     nostd::string_view description = "",
+                                     nostd::string_view unit        = "") noexcept override;
 
   nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
   CreateDoubleObservableUpDownCounter(nostd::string_view name,
@@ -120,8 +122,25 @@ private:
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
+  opentelemetry::common::SpinLockMutex storage_lock_;
+  const InstrumentMetaDataValidator instrument_metadata_validator;
+
+  static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+  GetNoopObservableInsrument()
+  {
+    static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> noop_instrument(
+        new opentelemetry::metrics::NoopObservableInstrument("", "", ""));
+    return noop_instrument;
+  }
+  static bool ValidateInstrument(nostd::string_view name,
+                                 nostd::string_view description,
+                                 nostd::string_view unit)
+  {
+    const static InstrumentMetaDataValidator instrument_validator;
+    return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
+           instrument_validator.ValidateDescription(description);
+  }
 };
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

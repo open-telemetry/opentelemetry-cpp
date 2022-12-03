@@ -1,27 +1,65 @@
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
-  set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+#
+# The dependency on opentelemetry-proto can be provided different ways.
+# By order of decreasing priority, options are:
+#
+# 1 - Use a provided package
+#
+# This is useful to build opentelemetry-cpp as part of a super project.
+#
+# The super project provides the path to the opentelemetry-proto
+# source code using variable ${OTELCPP_PROTO_PATH}
+#
+# 2 - Search for a opentelemetry-proto git submodule
+#
+# When git submodule is used,
+# the opentelemetry-proto code is located in:
+# third_party/opentelemetry-proto
+#
+# 3 - Download opentelemetry-proto from github
+#
+# Code from the required version is used,
+# unless a specific release tag is provided
+# in variable ${opentelemetry-proto}
+#
+
+if(OTELCPP_PROTO_PATH)
+  if(NOT EXISTS "${OTELCPP_PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
+    message(FATAL_ERROR "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
+  endif()
+  message(STATUS "opentelemetry-proto dependency satisfied by: external path")
+  set(PROTO_PATH ${OTELCPP_PROTO_PATH})
   set(needs_proto_download FALSE)
 else()
-  if("${opentelemetry-proto}" STREQUAL "")
-    set(opentelemetry-proto "v0.19.0")
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
+    message(STATUS "opentelemetry-proto dependency satisfied by: git submodule")
+    set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
+    set(needs_proto_download FALSE)
+  else()
+    message(STATUS "opentelemetry-proto dependency satisfied by: github download")
+    if("${opentelemetry-proto}" STREQUAL "")
+      set(opentelemetry-proto "v0.19.0")
+    endif()
+    include(ExternalProject)
+    ExternalProject_Add(
+      opentelemetry-proto
+      GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-proto.git
+      GIT_TAG "${opentelemetry-proto}"
+      UPDATE_COMMAND ""
+      BUILD_COMMAND ""
+      INSTALL_COMMAND ""
+      CONFIGURE_COMMAND ""
+      TEST_AFTER_INSTALL 0
+      DOWNLOAD_NO_PROGRESS 1
+      LOG_CONFIGURE 1
+      LOG_BUILD 1
+      LOG_INSTALL 1)
+    ExternalProject_Get_Property(opentelemetry-proto INSTALL_DIR)
+    set(PROTO_PATH "${INSTALL_DIR}/src/opentelemetry-proto")
+    set(needs_proto_download TRUE)
   endif()
-  include(ExternalProject)
-  ExternalProject_Add(
-    opentelemetry-proto
-    GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-proto.git
-    GIT_TAG "${opentelemetry-proto}"
-    UPDATE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    CONFIGURE_COMMAND ""
-    TEST_AFTER_INSTALL 0
-    DOWNLOAD_NO_PROGRESS 1
-    LOG_CONFIGURE 1
-    LOG_BUILD 1
-    LOG_INSTALL 1)
-  ExternalProject_Get_Property(opentelemetry-proto INSTALL_DIR)
-  set(PROTO_PATH "${INSTALL_DIR}/src/opentelemetry-proto")
-  set(needs_proto_download TRUE)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)

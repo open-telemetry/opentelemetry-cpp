@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/metrics/async_instruments.h"
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/metrics/meter_provider.h"
-#  include "opentelemetry/metrics/observer_result.h"
-#  include "opentelemetry/metrics/sync_instruments.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -87,22 +86,23 @@ public:
 class NoopMeter final : public Meter
 {
 public:
-  nostd::shared_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
-                                                     nostd::string_view description = "",
-                                                     nostd::string_view unit = "") noexcept override
-  {
-    return nostd::shared_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
-  }
-
-  nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
+  nostd::unique_ptr<Counter<uint64_t>> CreateUInt64Counter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
+    return nostd::unique_ptr<Counter<uint64_t>>{new NoopCounter<uint64_t>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableInstrument> CreateLongObservableCounter(
+  nostd::unique_ptr<Counter<double>> CreateDoubleCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::unique_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
@@ -120,23 +120,24 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+  nostd::unique_ptr<Histogram<uint64_t>> CreateUInt64Histogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
+    return nostd::unique_ptr<Histogram<uint64_t>>{
+        new NoopHistogram<uint64_t>(name, description, unit)};
   }
 
-  nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
+  nostd::unique_ptr<Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
+    return nostd::unique_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableInstrument> CreateLongObservableGauge(
+  nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
@@ -154,25 +155,25 @@ public:
         new NoopObservableInstrument(name, description, unit));
   }
 
-  nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+  nostd::unique_ptr<UpDownCounter<int64_t>> CreateInt64UpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<UpDownCounter<long>>{
-        new NoopUpDownCounter<long>(name, description, unit)};
+    return nostd::unique_ptr<UpDownCounter<int64_t>>{
+        new NoopUpDownCounter<int64_t>(name, description, unit)};
   }
 
-  nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
+  nostd::unique_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
   {
-    return nostd::shared_ptr<UpDownCounter<double>>{
+    return nostd::unique_ptr<UpDownCounter<double>>{
         new NoopUpDownCounter<double>(name, description, unit)};
   }
 
-  nostd::shared_ptr<ObservableInstrument> CreateLongObservableUpDownCounter(
+  nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override
@@ -211,4 +212,3 @@ private:
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#endif

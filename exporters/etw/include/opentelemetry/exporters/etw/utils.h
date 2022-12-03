@@ -234,37 +234,38 @@ static inline int64_t getUtcSystemTimeinTicks()
 #endif
 }
 
+constexpr unsigned int NANOSECS_PRECISION = 1000000000;
 /**
- * @brief Convert local system milliseconds time to ISO8601 string UTC time
+ * @brief Convert local system nanoseconds time to ISO8601 string UTC time
  *
- * @param timestampMs   Milliseconds since epoch in system time
+ * @param timestampNs   Milliseconds since epoch in system time
  *
- * @return ISO8601 UTC string with microseconds part set to 000
+ * @return ISO8601 UTC string with nanoseconds
  */
-static inline std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
+static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
 {
-  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.ssssssZ") + 1] = {0};
+  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.sssssssssZ") + 1] = {0};
 #ifdef _WIN32
-  __time64_t seconds = static_cast<__time64_t>(timestampMs / 1000);
-  int milliseconds   = static_cast<int>(timestampMs % 1000);
+  __time64_t seconds = static_cast<__time64_t>(timestampNs / NANOSECS_PRECISION);
+  int nanoseconds    = static_cast<int>(timestampNs % NANOSECS_PRECISION);
   tm tm;
   if (::_gmtime64_s(&tm, &seconds) != 0)
   {
     memset(&tm, 0, sizeof(tm));
   }
-  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ", 1900 + tm.tm_year,
-                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 1000 * milliseconds);
+  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
+                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
 #else
-  time_t seconds   = static_cast<time_t>(timestampMs / 1000);
-  int milliseconds = static_cast<int>(timestampMs % 1000);
+  time_t seconds  = static_cast<time_t>(timestampNs / NANOSECS_PRECISION);
+  int nanoseconds = static_cast<int>(timestampNs % NANOSECS_PRECISION);
   tm tm;
   bool valid = (gmtime_r(&seconds, &tm) != NULL);
   if (!valid)
   {
     memset(&tm, 0, sizeof(tm));
   }
-  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ", 1900 + tm.tm_year,
-                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 1000 * milliseconds);
+  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
+                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
 #endif
   return buf;
 }

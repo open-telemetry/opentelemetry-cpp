@@ -1,19 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
 using namespace opentelemetry::sdk::metrics;
 
-class MockMetricExporter : public MetricExporter
+class MockMetricExporter : public PushMetricExporter
 {
 
 public:
@@ -38,7 +37,7 @@ public:
 class MockMetricReader : public MetricReader
 {
 public:
-  MockMetricReader(std::unique_ptr<MetricExporter> exporter) : exporter_(std::move(exporter)) {}
+  MockMetricReader(std::unique_ptr<PushMetricExporter> exporter) : exporter_(std::move(exporter)) {}
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) const noexcept override
   {
@@ -55,7 +54,7 @@ public:
   virtual void OnInitialized() noexcept override {}
 
 private:
-  std::unique_ptr<MetricExporter> exporter_;
+  std::unique_ptr<PushMetricExporter> exporter_;
 };
 
 TEST(MeterProvider, GetMeter)
@@ -81,12 +80,12 @@ TEST(MeterProvider, GetMeter)
   ASSERT_EQ(m4, m5);
   ASSERT_NE(m3, m6);
 
-  // Should be an sdk::trace::Tracer with the processor attached.
-#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  // Should be an sdk::metrics::Meter
+#ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkMeter1 = dynamic_cast<Meter *>(m1.get());
-#  else
+#else
   auto sdkMeter1 = static_cast<Meter *>(m1.get());
-#  endif
+#endif
   ASSERT_NE(nullptr, sdkMeter1);
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::unique_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
@@ -98,5 +97,8 @@ TEST(MeterProvider, GetMeter)
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
 
   mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  // cleanup properly without crash
+  mp1.ForceFlush();
+  mp1.Shutdown();
 }
-#endif

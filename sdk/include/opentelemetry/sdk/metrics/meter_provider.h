@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <mutex>
-#  include <vector>
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/metrics/meter_provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+
+#include <memory>
+#include <mutex>
+#include <vector>
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -61,7 +61,7 @@ public:
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept;
+  void AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.
@@ -85,6 +85,8 @@ public:
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+  ~MeterProvider() override;
+
 private:
   std::shared_ptr<sdk::metrics::MeterContext> context_;
   std::mutex lock_;
@@ -92,4 +94,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

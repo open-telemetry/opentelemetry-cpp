@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <string>
-#  include <vector>
 
-#  include <prometheus/exposer.h>
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/exporters/prometheus/collector.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/sdk/common/env_variables.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
-#  include "opentelemetry/version.h"
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <prometheus/exposer.h>
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/version.h"
 
 /**
  * This class is an implementation of the MetricsExporter interface and
@@ -46,7 +46,7 @@ struct PrometheusExporterOptions
   std::string url = GetPrometheusDefaultHttpEndpoint();
 };
 
-class PrometheusExporter : public sdk::metrics::MetricExporter
+class PrometheusExporter : public sdk::metrics::PushMetricExporter
 {
 public:
   /**
@@ -131,4 +131,3 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif  // ENABLE_METRICS_PREVIEW

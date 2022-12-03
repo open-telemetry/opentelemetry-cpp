@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -16,13 +15,13 @@ using namespace opentelemetry::sdk::metrics;
 class TestMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {
     num_calls_long++;
   }
 
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::common::KeyValueIterable & /* attributes */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {
@@ -52,13 +51,12 @@ TEST(MultiMetricStorageTest, BasicTests)
       new TestMetricStorage());
   SyncMultiMetricStorage storages{};
   storages.AddStorage(storage);
-  storages.RecordLong(10l, opentelemetry::context::Context{});
-  storages.RecordLong(20l, opentelemetry::context::Context{});
+  storages.RecordLong(10, opentelemetry::context::Context{});
+  storages.RecordLong(20, opentelemetry::context::Context{});
 
   storages.RecordDouble(10.0, opentelemetry::context::Context{});
-  storages.RecordLong(30l, opentelemetry::context::Context{});
+  storages.RecordLong(30, opentelemetry::context::Context{});
 
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_long, 3);
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_double, 1);
 }
-#endif

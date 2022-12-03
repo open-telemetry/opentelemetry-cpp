@@ -2,19 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
-#  include "opentelemetry/sdk/metrics/view/view_registry.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
-#  include <chrono>
-#  include <memory>
-#  include <vector>
+#include <chrono>
+#include <memory>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -57,7 +56,15 @@ public:
   ViewRegistry *GetViewRegistry() const noexcept;
 
   /**
-   * Obtain the  configured meters.
+   * NOTE - INTERNAL method, can change in future.
+   * Process callback for each meter in thread-safe manner
+   */
+  bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
+
+  /**
+   * NOTE - INTERNAL method, can change in future.
+   * Get the configured meters.
+   * This method is NOT thread safe, and only called through MeterProvider
    *
    */
   nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
@@ -82,7 +89,7 @@ public:
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept;
+  void AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter context.
@@ -97,8 +104,8 @@ public:
                std::unique_ptr<View> view) noexcept;
 
   /**
-   * Adds a meter to the list of configured meters.
-   * Note: This method is INTERNAL to sdk not thread safe.
+   * NOTE - INTERNAL method, can change in future.
+   * Adds a meter to the list of configured meters in thread safe manner.
    *
    * @param meter
    */
@@ -125,9 +132,9 @@ private:
 
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
   opentelemetry::common::SpinLockMutex forceflush_lock_;
+  opentelemetry::common::SpinLockMutex meter_lock_;
 };
 
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

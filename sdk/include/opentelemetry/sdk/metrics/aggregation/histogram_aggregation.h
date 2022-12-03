@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 
-#  include <mutex>
+#include <memory>
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -18,11 +19,11 @@ namespace metrics
 class LongHistogramAggregation : public Aggregation
 {
 public:
-  LongHistogramAggregation(const HistogramAggregationConfig<long> *aggregation_config = nullptr);
+  LongHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
@@ -48,12 +49,11 @@ private:
 class DoubleHistogramAggregation : public Aggregation
 {
 public:
-  DoubleHistogramAggregation(
-      const HistogramAggregationConfig<double> *aggregation_config = nullptr);
+  DoubleHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(long /* value */, const PointAttributes & /* attributes */) noexcept override {}
+  void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
@@ -111,4 +111,3 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

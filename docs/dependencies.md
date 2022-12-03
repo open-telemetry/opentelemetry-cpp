@@ -77,7 +77,9 @@ Both these dependencies are listed here:
     framework.
     - `thrift` compiler to generate C++ stubs for IDL data model for Jaeger.
     - `libthrift`  library to generate serialised trace/metrics/log data to be
-      sent to remote Jaeger service.
+      sent to remote Jaeger service. Note: libthrift **0.12.0** doesn't work
+      with this Jaeger exporter. See
+      [#1680](https://github.com/open-telemetry/opentelemetry-cpp/issues/1680).
     - License: `Apache License 2.0`
 
 - [ETW](/exporters/etw)

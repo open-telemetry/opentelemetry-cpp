@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
-#  include "opentelemetry/sdk/metrics/data/point_data.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
 
-#  include <mutex>
+#include <memory>
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -27,27 +27,31 @@ class DefaultAggregation
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-      const opentelemetry::sdk::metrics::AggregationConfig *aggregation_config)
+      const AggregationConfig *aggregation_config)
   {
     switch (instrument_descriptor.type_)
     {
       case InstrumentType::kCounter:
-      case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableCounter:
+        return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
+      case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableUpDownCounter:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation()))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation()));
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(false)))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(false)));
         break;
       case InstrumentType::kHistogram: {
-        return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation(
-                         static_cast<
-                             const opentelemetry::sdk::metrics::HistogramAggregationConfig<long> *>(
-                             aggregation_config))))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(
-                         static_cast<const opentelemetry::sdk::metrics::HistogramAggregationConfig<
-                             double> *>(aggregation_config))));
+        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+        {
+          return (std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config)));
+        }
+        else
+        {
+          return (std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config)));
+        }
+
         break;
       }
       case InstrumentType::kObservableGauge:
@@ -60,8 +64,10 @@ public:
     };
   }
 
-  static std::unique_ptr<Aggregation> CreateAggregation(AggregationType aggregation_type,
-                                                        InstrumentDescriptor instrument_descriptor)
+  static std::unique_ptr<Aggregation> CreateAggregation(
+      AggregationType aggregation_type,
+      InstrumentDescriptor instrument_descriptor,
+      const AggregationConfig *aggregation_config = nullptr)
   {
     switch (aggregation_type)
     {
@@ -71,11 +77,11 @@ public:
       case AggregationType::kHistogram:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return std::unique_ptr<Aggregation>(new LongHistogramAggregation());
+          return std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config));
         }
         else
         {
-          return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation());
+          return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config));
         }
         break;
       case AggregationType::kLastValue:
@@ -88,18 +94,25 @@ public:
           return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
         }
         break;
-      case AggregationType::kSum:
+      case AggregationType::kSum: {
+        bool is_monotonic = true;
+        if (instrument_descriptor.type_ == InstrumentType::kUpDownCounter ||
+            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter)
+        {
+          is_monotonic = false;
+        }
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
-          return std::unique_ptr<Aggregation>(new LongSumAggregation());
+          return std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic));
         }
         else
         {
-          return std::unique_ptr<Aggregation>(new DoubleSumAggregation());
+          return std::unique_ptr<Aggregation>(new DoubleSumAggregation(is_monotonic));
         }
         break;
+      }
       default:
-        return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
+        return DefaultAggregation::CreateAggregation(instrument_descriptor, aggregation_config);
     }
   }
 
@@ -154,4 +167,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

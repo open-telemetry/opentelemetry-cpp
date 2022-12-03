@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -46,9 +45,8 @@ public:
   }
 };
 
-using ObserverResult = nostd::variant<nostd::shared_ptr<ObserverResultT<long>>,
+using ObserverResult = nostd::variant<nostd::shared_ptr<ObserverResultT<int64_t>>,
                                       nostd::shared_ptr<ObserverResultT<double>>>;
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#endif

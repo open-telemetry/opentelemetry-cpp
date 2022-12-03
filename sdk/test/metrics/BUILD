@@ -1,6 +1,21 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
+    name = "meter_test",
+    srcs = [
+        "meter_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "meter_provider_sdk_test",
     srcs = [
         "meter_provider_sdk_test.cc",
@@ -81,6 +96,22 @@ cc_test(
 )
 
 cc_test(
+    name = "sync_metric_storage_up_down_counter_test",
+    srcs = [
+        "sync_metric_storage_up_down_counter_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "sync_metric_storage_histogram_test",
     srcs = [
         "sync_metric_storage_histogram_test.cc",
@@ -108,6 +139,21 @@ cc_test(
     deps = [
         "//sdk/src/metrics",
         "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "async_instruments_test",
+    srcs = [
+        "async_instruments_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -196,6 +242,7 @@ otel_cc_benchmark(
         "attributes_processor_benchmark.cc",
     ],
     tags = [
+        "benchmark",
         "metrics",
         "test",
     ],
@@ -210,6 +257,7 @@ otel_cc_benchmark(
         "attributes_hashmap_benchmark.cc",
     ],
     tags = [
+        "benchmark",
         "metrics",
         "test",
     ],

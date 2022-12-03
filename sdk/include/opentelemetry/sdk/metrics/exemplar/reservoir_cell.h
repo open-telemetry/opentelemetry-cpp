@@ -2,17 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <cstddef>
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
-#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#  include "opentelemetry/sdk/metrics/exemplar/filter.h"
-#  include "opentelemetry/trace/context.h"
+
+#include <cstddef>
+#include <memory>
+#include <vector>
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/trace/context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -30,7 +30,7 @@ public:
   /**
    * Record the long measurement to the cell.
    */
-  void RecordLongMeasurement(long value,
+  void RecordLongMeasurement(int64_t value,
                              const MetricAttributes &attributes,
                              const opentelemetry::context::Context &context)
   {
@@ -52,7 +52,7 @@ public:
   /**
    * Retrieve the cell's {@link ExemplarData}.
    *
-   * <p>Must be used in tandem with {@link #recordLongMeasurement(long, Attributes, Context)}.
+   * <p>Must be used in tandem with {@link #recordLongMeasurement(int64_t, Attributes, Context)}.
    */
   std::shared_ptr<ExemplarData> GetAndResetLong(const MetricAttributes &point_attributes)
   {
@@ -63,9 +63,10 @@ public:
     auto attributes = attributes_;
     PointDataAttributes point_data_attributes;
     point_data_attributes.attributes = filtered(attributes, point_attributes);
-    if (nostd::holds_alternative<long>(value_))
+    if (nostd::holds_alternative<int64_t>(value_))
     {
-      point_data_attributes.point_data = ExemplarData::CreateSumPointData(nostd::get<long>(value_));
+      point_data_attributes.point_data =
+          ExemplarData::CreateSumPointData(nostd::get<int64_t>(value_));
     }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
@@ -139,7 +140,7 @@ private:
 
   // Cell stores either long or double values, but must not store both
   std::shared_ptr<trace::SpanContext> context_;
-  nostd::variant<long, double> value_;
+  nostd::variant<int64_t, double> value_;
   opentelemetry::common::SystemTimestamp record_time_;
   MetricAttributes attributes_;
   // For testing
@@ -149,4 +150,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

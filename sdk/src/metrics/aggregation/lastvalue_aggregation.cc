@@ -1,12 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/version.h"
 
-#  include <mutex>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,7 +16,7 @@ namespace metrics
 LongLastValueAggregation::LongLastValueAggregation()
 {
   point_data_.is_lastvalue_valid_ = false;
-  point_data_.value_              = 0l;
+  point_data_.value_              = (int64_t)0;
 }
 
 LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)
@@ -28,7 +27,7 @@ LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &dat
     : point_data_{data}
 {}
 
-void LongLastValueAggregation::Aggregate(long value,
+void LongLastValueAggregation::Aggregate(int64_t value,
                                          const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
@@ -137,4 +136,3 @@ PointType DoubleLastValueAggregation::ToPoint() const noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

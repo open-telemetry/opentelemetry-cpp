@@ -2,16 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/nostd/function_ref.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+
+#include <memory>
+#include <vector>
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -32,10 +32,11 @@ public:
         map_and_reset_cell_(map_and_reset_cell)
   {}
 
-  void OfferMeasurement(long value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      int64_t value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     if (!reservoir_cell_selector_)
     {
@@ -45,14 +46,15 @@ public:
         reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
     if (idx != -1)
     {
-      storage_[idx].RecordDoubleMeasurement(value, attributes, context);
+      storage_[idx].RecordLongMeasurement(value, attributes, context);
     }
   }
 
-  void OfferMeasurement(double value,
-                        const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+  void OfferMeasurement(
+      double value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
     if (!reservoir_cell_selector_)
     {
@@ -99,4 +101,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

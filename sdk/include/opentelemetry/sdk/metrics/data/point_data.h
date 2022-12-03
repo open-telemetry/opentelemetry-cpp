@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/version.h"
 
-#  include <list>
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
+
+#include <list>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,7 +16,7 @@ namespace sdk
 namespace metrics
 {
 
-using ValueType = nostd::variant<long, double>;
+using ValueType = nostd::variant<int64_t, double>;
 
 // TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
 
@@ -29,7 +29,8 @@ public:
   SumPointData &operator=(SumPointData &&) = default;
   SumPointData()                           = default;
 
-  ValueType value_ = {};
+  ValueType value_   = {};
+  bool is_monotonic_ = true;
 };
 
 class LastValuePointData
@@ -77,4 +78,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

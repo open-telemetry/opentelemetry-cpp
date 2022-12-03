@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/context/context.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -37,9 +37,10 @@ public:
 class SyncWritableMetricStorage
 {
 public:
-  virtual void RecordLong(long value, const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void RecordLong(int64_t value,
+                          const opentelemetry::context::Context &context) noexcept = 0;
 
-  virtual void RecordLong(long value,
+  virtual void RecordLong(int64_t value,
                           const opentelemetry::common::KeyValueIterable &attributes,
                           const opentelemetry::context::Context &context) noexcept = 0;
 
@@ -62,7 +63,7 @@ public:
 
   /* Records a batch of measurements */
   virtual void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 
   virtual void RecordDouble(
@@ -87,9 +88,10 @@ public:
 class NoopWritableMetricStorage : public SyncWritableMetricStorage
 {
 public:
-  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override = 0;
+  void RecordLong(int64_t value,
+                  const opentelemetry::context::Context &context) noexcept override = 0;
 
-  void RecordLong(long /* value */,
+  void RecordLong(int64_t /* value */,
                   const opentelemetry::common::KeyValueIterable & /* attributes */,
                   const opentelemetry::context::Context & /* context */) noexcept override
   {}
@@ -107,9 +109,9 @@ public:
 class NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
 {
 public:
-  void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> & /* measurements */,
-      opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
+  void RecordLong(const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator>
+                      & /* measurements */,
+                  opentelemetry::common::SystemTimestamp /* observation_time */) noexcept override
   {}
 
   void RecordDouble(const std::unordered_map<MetricAttributes, double, AttributeHashGenerator>
@@ -121,4 +123,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

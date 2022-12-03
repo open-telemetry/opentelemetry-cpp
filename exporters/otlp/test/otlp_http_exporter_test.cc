@@ -15,12 +15,13 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/trace/provider.h"
 
+#  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
 
@@ -466,6 +467,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
+  google::protobuf::ShutdownProtobufLibrary();
 }
 #  endif
 

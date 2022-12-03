@@ -1,23 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#include <memory>
+#include <thread>
 
-#  include <memory>
-#  include <thread>
-
-#  ifdef BAZEL_BUILD
-#    include "examples/common/metrics_foo_library/foo_library.h"
-#  else
-#    include "metrics_foo_library/foo_library.h"
-#  endif
+#ifdef BAZEL_BUILD
+#  include "examples/common/metrics_foo_library/foo_library.h"
+#else
+#  include "metrics_foo_library/foo_library.h"
+#endif
 
 namespace metric_sdk    = opentelemetry::sdk::metrics;
 namespace nostd         = opentelemetry::nostd;
@@ -94,4 +92,3 @@ int main(int argc, char *argv[])
     histogram_example.join();
   }
 }
-#endif

@@ -5,6 +5,7 @@ add_library(
   meter.cc
   meter_context.cc
   metric_reader.cc
+  instrument_metadata_validator.cc
   export/periodic_exporting_metric_reader.cc
   state/metric_collector.cc
   state/observable_registry.cc

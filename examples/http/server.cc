@@ -40,13 +40,13 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{SemanticConventions::NET_HOST_NAME, server_name},
-                                 {SemanticConventions::NET_HOST_PORT, server_port},
-                                 {SemanticConventions::HTTP_METHOD, request.method},
-                                 {SemanticConventions::HTTP_SCHEME, "http"},
-                                 {SemanticConventions::HTTP_REQUEST_CONTENT_LENGTH,
+                                {{SemanticConventions::kNetHostName, server_name},
+                                 {SemanticConventions::kNetHostPort, server_port},
+                                 {SemanticConventions::kHttpMethod, request.method},
+                                 {SemanticConventions::kHttpScheme, "http"},
+                                 {SemanticConventions::kHttpRequestContentLength,
                                   static_cast<uint64_t>(request.content.length())},
-                                 {SemanticConventions::HTTP_CLIENT_IP, request.client}},
+                                 {SemanticConventions::kHttpClientIp, request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);

@@ -3,11 +3,11 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter_options.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/simple_log_processor_factory.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
@@ -42,13 +42,13 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
-opentelemetry::exporter::otlp::OtlpHttpLogExporterOptions logger_opts;
+opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
 void InitLogger()
 {
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpHttpLogExporterFactory::Create(logger_opts);
-  auto processor = logs_sdk::SimpleLogProcessorFactory::Create(std::move(exporter));
+  auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create(logger_opts);
+  auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   std::shared_ptr<logs::LoggerProvider> provider =
       logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 

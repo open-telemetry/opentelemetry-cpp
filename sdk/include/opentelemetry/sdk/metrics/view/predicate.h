@@ -2,17 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <vector>
-#  if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
-#    define HAVE_WORKING_REGEX 0
-#    include "opentelemetry/sdk/common/global_log_handler.h"
-#  else
-#    include <regex>
-#    define HAVE_WORKING_REGEX 1
-#  endif
 
-#  include "opentelemetry/nostd/string_view.h"
+#include <vector>
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -32,22 +26,22 @@ public:
   PatternPredicate(opentelemetry::nostd::string_view pattern) : reg_key_{pattern.data()} {}
   bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
     return std::regex_match(str.data(), reg_key_);
-#  else
+#else
     // TBD - Support regex match for GCC4.8
     OTEL_INTERNAL_LOG_ERROR(
         "PatternPredicate::Match - failed. std::regex not fully supported for this compiler.");
     return false;  // not supported
-#  endif
+#endif
   }
 
 private:
-#  if HAVE_WORKING_REGEX
+#if HAVE_WORKING_REGEX
   std::regex reg_key_;
-#  else
+#else
   std::string reg_key_;
-#  endif
+#endif
 };
 
 class ExactPredicate : public Predicate
@@ -79,4 +73,3 @@ class MatchNothingPattern : public Predicate
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

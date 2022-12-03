@@ -1,11 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -13,16 +11,17 @@ namespace exporter
 namespace otlp
 {
 
-std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> OtlpHttpMetricExporterFactory::Create()
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpHttpMetricExporterFactory::Create()
 {
   OtlpHttpMetricExporterOptions options;
   return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> OtlpHttpMetricExporterFactory::Create(
-    const OtlpHttpMetricExporterOptions &options)
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpHttpMetricExporterFactory::Create(const OtlpHttpMetricExporterOptions &options)
 {
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> exporter(
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter(
       new OtlpHttpMetricExporter(options));
   return exporter;
 }
@@ -30,5 +29,3 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> OtlpHttpMetricExpor
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

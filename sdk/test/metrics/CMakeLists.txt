@@ -8,6 +8,7 @@ foreach(
   attributes_hashmap_test
   sync_metric_storage_counter_test
   sync_metric_storage_histogram_test
+  sync_metric_storage_up_down_counter_test
   async_metric_storage_test
   multi_metric_storage_test
   observer_result_test
@@ -15,7 +16,8 @@ foreach(
   async_instruments_test
   metric_reader_test
   observable_registry_test
-  periodic_exporting_metric_reader_test)
+  periodic_exporting_metric_reader_test
+  instrument_metadata_validator_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -26,12 +28,15 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
-add_executable(attributes_processor_benchmark attributes_processor_benchmark.cc)
-target_link_libraries(attributes_processor_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+if(WITH_BENCHMARK)
+  add_executable(attributes_processor_benchmark
+                 attributes_processor_benchmark.cc)
+  target_link_libraries(attributes_processor_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
-add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
-target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
+  target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+endif()
 
 add_subdirectory(exemplar)

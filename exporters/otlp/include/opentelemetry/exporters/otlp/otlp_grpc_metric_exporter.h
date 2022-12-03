@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
 
 // clang-format off
 
@@ -13,9 +12,9 @@
 
 // clang-format on
 
-#  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
-#  include "opentelemetry/sdk/metrics/metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -26,7 +25,7 @@ namespace otlp
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OtlpGrpcMetricExporter : public opentelemetry::sdk::metrics::MetricExporter
+class OtlpGrpcMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**
@@ -84,4 +83,3 @@ private:
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

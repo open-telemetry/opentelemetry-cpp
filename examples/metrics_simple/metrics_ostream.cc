@@ -1,22 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <memory>
-#  include <thread>
-#  include "opentelemetry/exporters/ostream/metric_exporter.h"
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#include <memory>
+#include <thread>
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 
-#  ifdef BAZEL_BUILD
-#    include "examples/common/metrics_foo_library/foo_library.h"
-#  else
-#    include "metrics_foo_library/foo_library.h"
-#  endif
+#ifdef BAZEL_BUILD
+#  include "examples/common/metrics_foo_library/foo_library.h"
+#else
+#  include "metrics_foo_library/foo_library.h"
+#endif
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -29,7 +28,8 @@ namespace
 
 void initMetrics(const std::string &name)
 {
-  std::unique_ptr<metric_sdk::MetricExporter> exporter{new exportermetrics::OStreamMetricExporter};
+  std::unique_ptr<metric_sdk::PushMetricExporter> exporter{
+      new exportermetrics::OStreamMetricExporter};
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -73,11 +73,10 @@ void initMetrics(const std::string &name)
   std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
       new metric_sdk::MeterSelector(name, version, schema)};
   std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config{
-      new opentelemetry::sdk::metrics::HistogramAggregationConfig<double>};
-  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig<double> *>(
-      aggregation_config.get())
-      ->boundaries_ =
-      std::list<double>{0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+      new opentelemetry::sdk::metrics::HistogramAggregationConfig};
+  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig *>(aggregation_config.get())
+      ->boundaries_ = std::list<double>{0.0,    50.0,   100.0,  250.0,   500.0,  750.0,
+                                        1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
   std::unique_ptr<metric_sdk::View> histogram_view{new metric_sdk::View{
       name, "description", metric_sdk::AggregationType::kHistogram, aggregation_config}};
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
@@ -120,6 +119,3 @@ int main(int argc, char **argv)
     histogram_example.join();
   }
 }
-#else
-int main() {}
-#endif

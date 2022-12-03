@@ -164,7 +164,15 @@ option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
+option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+
 option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
+
+option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
+
+set(OTELCPP_PROTO_PATH
+    ""
+    CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
   if(BUILD_TESTING)
@@ -187,9 +195,11 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
+# Exemplar specs status is experimental, so behind feature flag by default
+option(WITH_METRICS_EXEMPLAR_PREVIEW
+       "Whethere to enable exemplar within metrics" OFF)
 
 find_package(Threads)
 
@@ -358,6 +368,88 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   endif()
 endif()
 
+if(OTELCPP_MAINTAINER_MODE)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message("Building with gcc in maintainer mode.")
+
+    add_compile_options(-Wall)
+    add_compile_options(-Werror)
+    add_compile_options(-Wextra)
+
+    # Tested with GCC 9.4 on github.
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
+      message("Building with additional warnings for gcc.")
+
+      # Relaxed warnings
+
+      # Enforced warnings
+
+      # C++ options only
+      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wextra-semi>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
+
+      # C and C++
+      add_compile_options(-Wcast-qual)
+      add_compile_options(-Wformat-security)
+      add_compile_options(-Wlogical-op)
+      add_compile_options(-Wmissing-include-dirs)
+      add_compile_options(-Wstringop-truncation)
+      add_compile_options(-Wundef)
+      add_compile_options(-Wvla)
+    endif()
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message("Building with clang in maintainer mode.")
+
+    add_compile_options(-Wall)
+    add_compile_options(-Werror)
+    add_compile_options(-Wextra)
+
+    # Tested with Clang 11.0 on github.
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
+      message("Building with additional warnings for clang.")
+
+      # Relaxed warnings
+      add_compile_options(-Wno-error=unused-private-field)
+
+      # Enforced warnings
+      add_compile_options(-Wcast-qual)
+      add_compile_options(-Wconditional-uninitialized)
+      add_compile_options(-Wextra-semi)
+      add_compile_options(-Wformat-security)
+      add_compile_options(-Wheader-hygiene)
+      add_compile_options(-Winconsistent-missing-destructor-override)
+      add_compile_options(-Winconsistent-missing-override)
+      add_compile_options(-Wnewline-eof)
+      add_compile_options(-Wnon-virtual-dtor)
+      add_compile_options(-Woverloaded-virtual)
+      add_compile_options(-Wrange-loop-analysis)
+      add_compile_options(-Wundef)
+      add_compile_options(-Wundefined-reinterpret-cast)
+      add_compile_options(-Wvla)
+    endif()
+  elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    message("Building with msvc in maintainer mode.")
+
+    add_compile_options(/WX)
+    add_compile_options(/W4)
+
+    # Relaxed warnings
+    add_compile_options(/wd4100)
+    add_compile_options(/wd4125)
+    add_compile_options(/wd4566)
+    add_compile_options(/wd4127)
+    add_compile_options(/wd4512)
+    add_compile_options(/wd4267)
+
+    # Enforced warnings
+  elseif()
+    message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
+  endif()
+endif(OTELCPP_MAINTAINER_MODE)
+
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
@@ -388,8 +480,10 @@ if(BUILD_TESTING)
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
-  # Benchmark respects the CMAKE_PREFIX_PATH
-  find_package(benchmark CONFIG REQUIRED)
+  if(WITH_BENCHMARK)
+    # Benchmark respects the CMAKE_PREFIX_PATH
+    find_package(benchmark CONFIG REQUIRED)
+  endif()
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -407,6 +501,9 @@ if(NOT WITH_API_ONLY)
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
+  if(BUILD_TESTING)
+    add_subdirectory(test_common)
+  endif()
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()

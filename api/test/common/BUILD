@@ -5,6 +5,7 @@ otel_cc_benchmark(
     srcs = ["spinlock_benchmark.cc"],
     tags = [
         "api",
+        "benchmark",
         "test",
     ],
     deps = ["//api"],

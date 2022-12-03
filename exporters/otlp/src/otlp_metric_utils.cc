@@ -4,8 +4,6 @@
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 
-#ifndef ENABLE_METRICS_PREVIEW
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace exporter
@@ -62,9 +60,9 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
     proto_sum_point_data->set_time_unix_nano(ts);
     auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
 
-    if ((nostd::holds_alternative<long>(sum_data.value_)))
+    if ((nostd::holds_alternative<int64_t>(sum_data.value_)))
     {
-      proto_sum_point_data->set_as_int(nostd::get<long>(sum_data.value_));
+      proto_sum_point_data->set_as_int(nostd::get<int64_t>(sum_data.value_));
     }
     else
     {
@@ -96,9 +94,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     auto histogram_data =
         nostd::get<sdk::metrics::HistogramPointData>(point_data_with_attributes.point_data);
     // sum
-    if ((nostd::holds_alternative<long>(histogram_data.sum_)))
+    if ((nostd::holds_alternative<int64_t>(histogram_data.sum_)))
     {
-      proto_histogram_point_data->set_sum(nostd::get<long>(histogram_data.sum_));
+      proto_histogram_point_data->set_sum(nostd::get<int64_t>(histogram_data.sum_));
     }
     else
     {
@@ -108,17 +106,17 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     proto_histogram_point_data->set_count(histogram_data.count_);
     if (histogram_data.record_min_max_)
     {
-      if (nostd::holds_alternative<long>(histogram_data.min_))
+      if (nostd::holds_alternative<int64_t>(histogram_data.min_))
       {
-        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.min_));
+        proto_histogram_point_data->set_min(nostd::get<int64_t>(histogram_data.min_));
       }
       else
       {
         proto_histogram_point_data->set_min(nostd::get<double>(histogram_data.min_));
       }
-      if (nostd::holds_alternative<long>(histogram_data.max_))
+      if (nostd::holds_alternative<int64_t>(histogram_data.max_))
       {
-        proto_histogram_point_data->set_min(nostd::get<long>(histogram_data.max_));
+        proto_histogram_point_data->set_max(nostd::get<int64_t>(histogram_data.max_));
       }
       else
       {
@@ -158,9 +156,9 @@ void OtlpMetricUtils::ConvertGaugeMetric(const opentelemetry::sdk::metrics::Metr
     auto gauge_data =
         nostd::get<sdk::metrics::LastValuePointData>(point_data_with_attributes.point_data);
 
-    if ((nostd::holds_alternative<long>(gauge_data.value_)))
+    if ((nostd::holds_alternative<int64_t>(gauge_data.value_)))
     {
-      proto_gauge_point_data->set_as_int(nostd::get<long>(gauge_data.value_));
+      proto_gauge_point_data->set_as_int(nostd::get<int64_t>(gauge_data.value_));
     }
     else
     {
@@ -276,5 +274,3 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelec
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

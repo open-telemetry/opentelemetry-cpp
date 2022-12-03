@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
-#  include <memory>
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -23,7 +23,7 @@ public:
     storages_.push_back(storage);
   }
 
-  virtual void RecordLong(long value,
+  virtual void RecordLong(int64_t value,
                           const opentelemetry::context::Context &context) noexcept override
   {
     for (auto &s : storages_)
@@ -32,7 +32,7 @@ public:
     }
   }
 
-  virtual void RecordLong(long value,
+  virtual void RecordLong(int64_t value,
                           const opentelemetry::common::KeyValueIterable &attributes,
                           const opentelemetry::context::Context &context) noexcept override
   {
@@ -74,7 +74,7 @@ public:
   }
 
   void RecordLong(
-      const std::unordered_map<MetricAttributes, long, AttributeHashGenerator> &measurements,
+      const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
       opentelemetry::common::SystemTimestamp observation_time) noexcept override
   {
     for (auto &s : storages_)
@@ -100,4 +100,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

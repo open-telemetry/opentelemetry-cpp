@@ -1,71 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/sync_instruments.h"
-#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
-#  include "opentelemetry/sdk_config.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
-#  include <cmath>
+#include <cmath>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
-                         std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
-{
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[LongCounter::LongCounter] - Error during constructing LongCounter."
-                            << "The metric storage is invalid"
-                            << "No value will be added");
-  }
-}
-
-void LongCounter::Add(long value,
-                      const opentelemetry::common::KeyValueIterable &attributes) noexcept
-{
-  if (!storage_)
-  {
-    return;
-  }
-  auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(value, attributes, context);
-}
-
-void LongCounter::Add(long value,
-                      const opentelemetry::common::KeyValueIterable &attributes,
-                      const opentelemetry::context::Context &context) noexcept
-{
-  if (!storage_)
-  {
-    return;
-  }
-  return storage_->RecordLong(value, attributes, context);
-}
-
-void LongCounter::Add(long value) noexcept
-{
-  auto context = opentelemetry::context::Context{};
-  if (!storage_)
-  {
-    return;
-  }
-  return storage_->RecordLong(value, context);
-}
-
-void LongCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
-{
-  if (!storage_)
-  {
-    return;
-  }
-  return storage_->RecordLong(value, context);
-}
-
 DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
                              std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
@@ -133,7 +77,7 @@ LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
   }
 }
 
-void LongUpDownCounter::Add(long value,
+void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   auto context = opentelemetry::context::Context{};
@@ -144,7 +88,7 @@ void LongUpDownCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongUpDownCounter::Add(long value,
+void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes,
                             const opentelemetry::context::Context &context) noexcept
 {
@@ -155,7 +99,7 @@ void LongUpDownCounter::Add(long value,
   return storage_->RecordLong(value, attributes, context);
 }
 
-void LongUpDownCounter::Add(long value) noexcept
+void LongUpDownCounter::Add(int64_t value) noexcept
 {
   auto context = opentelemetry::context::Context{};
   if (!storage_)
@@ -165,7 +109,7 @@ void LongUpDownCounter::Add(long value) noexcept
   return storage_->RecordLong(value, context);
 }
 
-void LongUpDownCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
+void LongUpDownCounter::Add(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
   if (!storage_)
   {
@@ -225,45 +169,6 @@ void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Contex
   return storage_->RecordDouble(value, context);
 }
 
-LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
-                             std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
-{
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[LongHistogram::LongHistogram] - Error during constructing LongHistogram."
-        << "The metric storage is invalid"
-        << "No value will be added");
-  }
-}
-
-void LongHistogram::Record(long value,
-                           const opentelemetry::common::KeyValueIterable &attributes,
-                           const opentelemetry::context::Context &context) noexcept
-{
-  if (value < 0)
-  {
-    OTEL_INTERNAL_LOG_WARN(
-        "[LongHistogram::Record(value, attributes)] negative value provided to histogram Name:"
-        << instrument_descriptor_.name_ << " Value:" << value);
-    return;
-  }
-  return storage_->RecordLong(value, attributes, context);
-}
-
-void LongHistogram::Record(long value, const opentelemetry::context::Context &context) noexcept
-{
-  if (value < 0)
-  {
-    OTEL_INTERNAL_LOG_WARN(
-        "[LongHistogram::Record(value)] negative value provided to histogram Name:"
-        << instrument_descriptor_.name_ << " Value:" << value);
-    return;
-  }
-  return storage_->RecordLong(value, context);
-}
-
 DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
                                  std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
@@ -315,4 +220,3 @@ void DoubleHistogram::Record(double value, const opentelemetry::context::Context
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

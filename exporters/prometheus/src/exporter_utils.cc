@@ -1,17 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <sstream>
-#  include <utility>
-#  include <vector>
-#  include "prometheus/metric_family.h"
+#include <sstream>
+#include <utility>
+#include <vector>
+#include "prometheus/metric_family.h"
 
-#  include <prometheus/metric_type.h>
-#  include "opentelemetry/exporters/prometheus/exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include <prometheus/metric_type.h>
+#include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -54,8 +53,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         auto time          = metric_data.start_ts.time_since_epoch();
         for (const auto &point_data_attr : metric_data.point_data_attr_)
         {
-          auto kind                                = getAggregationType(point_data_attr.point_data);
-          const prometheus_client::MetricType type = TranslateType(kind);
+          auto kind         = getAggregationType(point_data_attr.point_data);
+          bool is_monotonic = true;
+          if (kind == sdk::metrics::AggregationType::kSum)
+          {
+            is_monotonic =
+                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
+          }
+          const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
           metric_family.type                       = type;
           if (type == prometheus_client::MetricType::Histogram)  // Histogram
           {
@@ -70,7 +75,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             }
             else
             {
-              sum = nostd::get<long>(histogram_point_data.sum_);
+              sum = nostd::get<int64_t>(histogram_point_data.sum_);
             }
             SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
                     counts, point_data_attr.attributes, time, &metric_family);
@@ -83,6 +88,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
               auto last_value_point_data =
                   nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
               std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
+              SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            }
+            else if (nostd::holds_alternative<sdk::metrics::SumPointData>(
+                         point_data_attr.point_data))
+            {
+              auto sum_point_data =
+                  nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+              std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
               SetData(values, point_data_attr.attributes, type, time, &metric_family);
             }
             else
@@ -159,16 +172,27 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
  * Translate the OTel metric type to Prometheus metric type
  */
 prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
-    metric_sdk::AggregationType kind)
+    metric_sdk::AggregationType kind,
+    bool is_monotonic)
 {
   switch (kind)
   {
     case metric_sdk::AggregationType::kSum:
-      return prometheus_client::MetricType::Counter;
+      if (!is_monotonic)
+      {
+        return prometheus_client::MetricType::Gauge;
+      }
+      else
+      {
+        return prometheus_client::MetricType::Counter;
+      }
+      break;
     case metric_sdk::AggregationType::kHistogram:
       return prometheus_client::MetricType::Histogram;
+      break;
     case metric_sdk::AggregationType::kLastValue:
       return prometheus_client::MetricType::Gauge;
+      break;
     default:
       return prometheus_client::MetricType::Untyped;
   }
@@ -283,9 +307,9 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   double value          = 0.0;
   const auto &value_var = values[0];
-  if (nostd::holds_alternative<long>(value_var))
+  if (nostd::holds_alternative<int64_t>(value_var))
   {
-    value = nostd::get<long>(value_var);
+    value = nostd::get<int64_t>(value_var);
   }
   else
   {
@@ -345,4 +369,3 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif
