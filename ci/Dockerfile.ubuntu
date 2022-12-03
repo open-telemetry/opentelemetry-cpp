@@ -1,0 +1,43 @@
+ARG BASE=ubuntu:20.04
+FROM ${BASE}
+
+WORKDIR /setup-ci
+
+ADD setup_ci_environment.sh /setup-ci
+ADD setup_cmake.sh /setup-ci
+ADD setup_thrift.sh /setup-ci/
+ADD install_format_tools.sh /setup-ci
+ADD install_abseil.sh /setup-ci
+ADD setup_grpc.sh /setup-ci
+ADD install_bazelisk.sh /setup-ci
+
+ARG FMT=OFF
+ARG THFT=OFF
+ARG ABSL=OFF
+ARG GRPC=OFF
+ARG BZL=OFF
+
+RUN apt update && /setup-ci/setup_ci_environment.sh \
+  && /setup-ci/setup_cmake.sh
+
+RUN bash -c \
+  "if [[ "$BZL" == "ON" ]]; then \
+    /setup-ci/install_bazelisk.sh; \
+    /setup-ci/setup_thrift.sh dependencies_only; \
+  fi"
+
+RUN bash -c "if [[ "$BZL" == "OFF" ]]; then /setup-ci/setup_cmake.sh; fi"
+
+RUN bash -c "if [[ "$FMT" == "ON" ]]; then /setup-ci/install_format_tools.sh; fi"
+
+RUN bash -c "if [[ "$THFT" == "ON" ]]; then /setup-ci/setup_thrift.sh; fi"
+
+RUN bash -c "if [[ "$ABSL" == "ON" ]]; then /setup-ci/install_abseil.sh; fi"
+
+RUN bash -c "if [[ "$GRPC" == "ON" ]]; then /setup-ci/setup_grpc.sh; fi"
+
+RUN rm -rf /tmp/*
+
+RUN mkdir -p /home/runner/.cache && chmod -R 777 /home/runner/
+
+ENV HOME="/home/runner"
