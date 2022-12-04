@@ -18,7 +18,7 @@ Increment the:
 ## [1.8.1] 2022-12-04
 
 * [ETW Exporter] Tail based sampling support [#1780](https://github.com/open-telemetry/opentelemetry-cpp/pull/1780)
-* [EXPORTERS] fix typo [affecting otlp exported histogram metrics max<uint>] [#1827](https://github.com/open-telemetry/opentelemetry-cpp/pull/1827)
+* [EXPORTERS] fix typo [affecting otlp exported histogram metrics max uint] [#1827](https://github.com/open-telemetry/opentelemetry-cpp/pull/1827)
 * [EXPORTERS] fix enum-compare-switch warning [#1833](https://github.com/open-telemetry/opentelemetry-cpp/pull/1833)
 * [METRICS] Change default temporality as "Cumulative" for OTLP metrics
 exporters [#1828](https://github.com/open-telemetry/opentelemetry-cpp/pull/1828)
