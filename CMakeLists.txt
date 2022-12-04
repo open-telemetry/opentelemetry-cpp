@@ -545,4 +545,5 @@ install(
 
 if(BUILD_PACKAGE)
   include(cmake/package.cmake)
+  include(CPack)
 endif()
