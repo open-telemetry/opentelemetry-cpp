@@ -14,9 +14,21 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [1.8.1] 2022-12-04
 
+* [ETW Exporter] Tail based sampling support [#1780](https://github.com/open-telemetry/opentelemetry-cpp/pull/1780)
+* [EXPORTERS] fix typo [affecting otlp exported histogram metrics max<uint>] [#1827](https://github.com/open-telemetry/opentelemetry-cpp/pull/1827)
+* [EXPORTERS] fix enum-compare-switch warning [#1833](https://github.com/open-telemetry/opentelemetry-cpp/pull/1833)
+* [METRICS] Change default temporality as "Cumulative" for OTLP metrics
+exporters [#1828](https://github.com/open-telemetry/opentelemetry-cpp/pull/1828)
+* [BUILD] Moved otlp_grpc_utils.cc to opentelemetry_exporter_otlp_grpc_client.
+[#1829](https://github.com/open-telemetry/opentelemetry-cpp/pull/1829)
+* Fix type mismatch when move nostd::shared_ptr [#1815](https://github.com/open-telemetry/opentelemetry-cpp/pull/1815)
+* [BUILD] Fix Prometheus target name [#1820](https://github.com/open-telemetry/opentelemetry-cpp/pull/1820)
+* Clean unused docker files [#1817](https://github.com/open-telemetry/opentelemetry-cpp/pull/1817)
+* [BUILD] Fix default bazel build [#1816](https://github.com/open-telemetry/opentelemetry-cpp/pull/1816)
+* [BUILD] move client::nosend under test_common [#1811](https://github.com/open-telemetry/opentelemetry-cpp/pull/1811)
 * [BUILD] Fix opentelemetry-proto file exists check [#1824](https://github.com/open-telemetry/opentelemetry-cpp/pull/1824)
 
 ## [1.8.0] 2022-11-27
