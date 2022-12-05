@@ -60,3 +60,33 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "in_memory_metric_exporter",
+    srcs = ["src/in_memory_metric_exporter.cc"],
+    hdrs = ["include/opentelemetry/exporters/memory/in_memory_metric_exporter.h"],
+    strip_include_prefix = "include",
+    tags = [
+        "memory",
+        "test",
+    ],
+    deps = [
+        ":in_memory_data",
+        "//exporters/otlp:otlp_metric_utils",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:metrics_proto_cc",
+    ],
+)
+
+cc_test(
+    name = "in_memory_metric_exporter_test",
+    srcs = ["test/in_memory_metric_exporter_test.cc"],
+    tags = [
+        "memory",
+        "test",
+    ],
+    deps = [
+        ":in_memory_metric_exporter",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
