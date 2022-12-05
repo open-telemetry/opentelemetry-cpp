@@ -32,7 +32,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 GOOGLETEST_VERSION=1.12.1 ./ci/setup_cmake.sh
         sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 ./ci/setup_ci_environment.sh
     - name: run cmake gcc (maintainer mode)
       run: |
@@ -48,7 +48,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 GOOGLETEST_VERSION=1.12.1 ./ci/setup_cmake.sh
         sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 ./ci/setup_ci_environment.sh
     - name: run cmake clang (maintainer mode)
       run: |
