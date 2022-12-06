@@ -232,7 +232,11 @@ struct HttpSslOptions
   std::string ssl_client_key_string{};
   std::string ssl_client_cert_path{};
   std::string ssl_client_cert_string{};
-  // TODO: TLS, cipher
+
+  /** RESERVED. */
+  std::string ssl_tls{};
+  /** RESERVED. */
+  std::string ssl_cipher{};
 };
 
 class HttpClient

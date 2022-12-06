@@ -424,7 +424,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x077100
+#if LIBCURL_VERSION_NUM >= 0x074700
       const char *data = ssl_options_.ssl_ca_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
 
@@ -435,7 +435,7 @@ CURLcode HttpOperation::Setup()
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT_BLOB, &stblob);
       // Assuming PEM format.
 #else
-      // CURL 7.71.0 required for CURLOPT_ISSUERCERT_BLOB.
+      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_ISSUERCERT_BLOB.
       return CURLE_UNKNOWN_OPTION;
 #endif
     }
@@ -450,7 +450,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_key_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x077100
+#if LIBCURL_VERSION_NUM >= 0x074700
       const char *data = ssl_options_.ssl_client_key_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_key_string.length();
 
@@ -461,7 +461,7 @@ CURLcode HttpOperation::Setup()
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEY_BLOB, &stblob);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLKEYTYPE, "PEM");
 #else
-      // CURL 7.71.0 required for CURLOPT_SSLKEY_BLOB.
+      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_SSLKEY_BLOB.
       return CURLE_UNKNOWN_OPTION;
 #endif
     }
@@ -476,7 +476,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_cert_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x077100
+#if LIBCURL_VERSION_NUM >= 0x074700
       const char *data = ssl_options_.ssl_client_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_cert_string.length();
 
@@ -487,7 +487,7 @@ CURLcode HttpOperation::Setup()
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERT_BLOB, &stblob);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLCERTTYPE, "PEM");
 #else
-      // CURL 7.71.0 required for CURLOPT_SSLCERT_BLOB.
+      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_SSLCERT_BLOB.
       return CURLE_UNKNOWN_OPTION;
 #endif
     }

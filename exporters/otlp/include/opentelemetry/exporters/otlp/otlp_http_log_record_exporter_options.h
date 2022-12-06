@@ -20,7 +20,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP exporter options.
+ * Struct to hold OTLP HTTP logs exporter options.
  */
 struct OtlpHttpLogRecordExporterOptions
 {
@@ -67,6 +67,11 @@ struct OtlpHttpLogRecordExporterOptions
 
   std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
+
+  /** RESERVED. */
+  std::string ssl_tls{};
+  /** RESERVED. */
+  std::string ssl_cipher{};
 #  endif
 };
 

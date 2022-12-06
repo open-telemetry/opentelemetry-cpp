@@ -14,7 +14,7 @@ namespace http_client = opentelemetry::ext::http::client;
 namespace context     = opentelemetry::context;
 namespace nostd       = opentelemetry::nostd;
 
-void sendRequest(const std::string &url, http_client::HttpSslOptions &ssl_options)
+void sendRequest(const std::string &url)
 {
   auto http_client = http_client::HttpClientFactory::CreateSync();
 
@@ -39,12 +39,7 @@ void sendRequest(const std::string &url, http_client::HttpSslOptions &ssl_option
   prop->Inject(carrier, current_ctx);
 
   // send http request
-#ifdef ENABLE_OTLP_HTTP_SSL
-  http_client::Result result = http_client->Get(url, ssl_options, carrier.headers_);
-#else
   http_client::Result result = http_client->Get(url, carrier.headers_);
-#endif
-
   if (result)
   {
     // set span attributes
@@ -94,31 +89,7 @@ int main(int argc, char *argv[])
     port = default_port;
   }
 
-  // DEBUG CODE FOR TESTING, not to merge.
-
-  bool with_ssl = true;
-
-  std::string scheme;
-
-  if (with_ssl)
-  {
-    scheme = "https://";
-  }
-  else
-  {
-    scheme = "http://";
-  }
-
-  std::string url =
-      scheme + std::string(default_host) + ":" + std::to_string(port) + std::string(default_path);
-
-  http_client::HttpSslOptions ssl_options;
-
-  ssl_options.use_ssl = with_ssl;
-  if (with_ssl)
-  {
-    ssl_options.ssl_ca_cert_path = "/path/to/cert.pem";
-  }
-
-  sendRequest(url, ssl_options);
+  std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +
+                    std::string(default_path);
+  sendRequest(url);
 }

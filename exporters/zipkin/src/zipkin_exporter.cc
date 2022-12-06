@@ -74,7 +74,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
       json_spans.push_back(json_span);
     }
   }
-
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
   auto result = http_client_->Post(url_parser_.url_, body_v, options_.headers);
