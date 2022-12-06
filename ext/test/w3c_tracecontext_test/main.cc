@@ -89,7 +89,9 @@ struct Uri
 class NoopEventHandler : public http_client::EventHandler
 {
 public:
-  void OnEvent(http_client::SessionState /* state */, nostd::string_view /* reason */) noexcept override {}
+  void OnEvent(http_client::SessionState /* state */,
+               nostd::string_view /* reason */) noexcept override
+  {}
 
   void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
 

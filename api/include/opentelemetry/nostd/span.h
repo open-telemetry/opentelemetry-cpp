@@ -143,7 +143,7 @@ public:
 
   span(const span &) noexcept = default;
 
-  span& operator=(const span &) noexcept = default;
+  span &operator=(const span &) noexcept = default;
 
   bool empty() const noexcept { return Extent == 0; }
 
@@ -225,7 +225,7 @@ public:
 
   span(const span &) noexcept = default;
 
-  span& operator=(const span &) noexcept = default;
+  span &operator=(const span &) noexcept = default;
 
   bool empty() const noexcept { return extent_ == 0; }
 
