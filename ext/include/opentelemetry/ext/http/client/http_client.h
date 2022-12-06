@@ -110,12 +110,32 @@ struct cmp_ic
 };
 using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
+struct HttpSslOptions
+{
+  bool use_ssl{false};
+  std::string ssl_ca_cert_path{};
+  std::string ssl_ca_cert_string{};
+  std::string ssl_client_key_path{};
+  std::string ssl_client_key_string{};
+  std::string ssl_client_cert_path{};
+  std::string ssl_client_cert_string{};
+
+  /** RESERVED. */
+  std::string ssl_min_tls{};
+  /** RESERVED. */
+  std::string ssl_max_tls{};
+  /** RESERVED. */
+  std::string ssl_cipher{};
+};
+
 class Request
 {
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
   virtual void SetUri(nostd::string_view uri) noexcept = 0;
+
+  virtual void SetSslOptions(const HttpSslOptions &options) noexcept = 0;
 
   virtual void SetBody(Body &body) noexcept = 0;
 
@@ -221,22 +241,6 @@ public:
   virtual bool FinishSession() noexcept = 0;
 
   virtual ~Session() = default;
-};
-
-struct HttpSslOptions
-{
-  bool use_ssl{false};
-  std::string ssl_ca_cert_path{};
-  std::string ssl_ca_cert_string{};
-  std::string ssl_client_key_path{};
-  std::string ssl_client_key_string{};
-  std::string ssl_client_cert_path{};
-  std::string ssl_client_cert_string{};
-
-  /** RESERVED. */
-  std::string ssl_tls{};
-  /** RESERVED. */
-  std::string ssl_cipher{};
 };
 
 class HttpClient

@@ -68,7 +68,9 @@ struct OtlpHttpExporterOptions
   std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 
   /** RESERVED. */
-  std::string ssl_tls{};
+  std::string ssl_min_tls{};
+  /** RESERVED. */
+  std::string ssl_max_tls{};
   /** RESERVED. */
   std::string ssl_cipher{};
 #endif

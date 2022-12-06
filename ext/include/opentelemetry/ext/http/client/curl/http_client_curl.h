@@ -57,6 +57,11 @@ public:
     method_ = method;
   }
 
+  void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
+  {
+    ssl_options_ = ssl_options;
+  }
+
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
     body_ = std::move(body);
@@ -85,6 +90,7 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
+  opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
