@@ -40,6 +40,7 @@
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_random_id_generator.h"
+#include "opentelemetry/exporters/etw/etw_tail_sampler.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -235,9 +236,17 @@ class Tracer : public opentelemetry::trace::Tracer,
                        const opentelemetry::trace::Span *parentSpan = nullptr,
                        const opentelemetry::trace::EndSpanOptions & = {})
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg          = GetConfiguration(tracerProvider_);
+    const auto &tail_sampler = GetTailSampler(tracerProvider_);
     const opentelemetry::trace::Span &spanBase =
         reinterpret_cast<const opentelemetry::trace::Span &>(span);
+
+    //  Sample span based on the decision of tail based sampler
+    auto sampling_result = const_cast<TailSampler *>(&tail_sampler)->ShouldSample(spanBase);
+    if (!sampling_result.IsRecording() || !sampling_result.IsSampled())
+    {
+      return;
+    }
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
@@ -375,7 +384,13 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override
   {
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+    // If RTTI is enabled by compiler, the below code modifies the attributes object passed as arg,
+    // which is sometime not desirable, set OPENTELEMETRY_NOT_USE_RTTI in application
+    // to avoid using RTTI in that case in below set of code.
+#if !defined OPENTELEMETRY_RTTI_ENABLED || defined OPENTELEMETRY_NOT_USE_RTTI
+    Properties evtCopy = attributes;
+    return StartSpan(name, evtCopy, links, options);
+#else  // OPENTELEMETRY_RTTI_ENABLED is defined
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
@@ -383,9 +398,9 @@ public:
       // Pass as a reference to original modifyable collection without creating a copy
       return StartSpan(name, *evt, links, options);
     }
-#endif
     Properties evtCopy = attributes;
     return StartSpan(name, evtCopy, links, options);
+#endif
   }
 
   /**
@@ -557,7 +572,14 @@ public:
                 common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+    // If RTTI is enabled by compiler, the below code modifies the attributes object passed as arg,
+    // which is sometime not desirable, set OPENTELEMETRY_NOT_USE_RTTI in application
+    // to avoid using RTTI in that case in below set of code.
+#if !defined OPENTELEMETRY_RTTI_ENABLED || defined OPENTELEMETRY_NOT_USE_RTTI
+    // Pass a copy converted to Properties object on stack
+    Properties evtCopy = attributes;
+    return AddEvent(span, name, timestamp, evtCopy);
+#else  // OPENTELEMETRY_RTTI_ENABLED is defined
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
@@ -565,10 +587,9 @@ public:
       // Pass as a reference to original modifyable collection without creating a copy
       return AddEvent(span, name, timestamp, *evt);
     }
-#endif
-    // Pass a copy converted to Properties object on stack
     Properties evtCopy = attributes;
     return AddEvent(span, name, timestamp, evtCopy);
+#endif
   }
 
   /**
@@ -826,6 +847,8 @@ public:
     status_description_ = description.data();
   }
 
+  opentelemetry::trace::StatusCode GetStatus() { return status_code_; }
+
   void SetAttributes(Properties attributes) { attributes_ = attributes; }
 
   /**
@@ -933,6 +956,12 @@ public:
   std::unique_ptr<sdk::trace::Sampler> sampler_;
 
   /**
+   * @brief Sampler configured
+   *
+   */
+  std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler_;
+
+  /**
    * @brief IdGenerator for trace_id and span_id
    *
    */
@@ -942,15 +971,19 @@ public:
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
    */
-  TracerProvider(TelemetryProviderOptions options,
-                 std::unique_ptr<sdk::trace::Sampler> sampler =
-                     std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
-                 std::unique_ptr<sdk::trace::IdGenerator> id_generator =
-                     std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-                         new sdk::trace::ETWRandomIdGenerator()))
+  TracerProvider(
+      TelemetryProviderOptions options,
+      std::unique_ptr<sdk::trace::Sampler> sampler =
+          std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler),
+      std::unique_ptr<sdk::trace::IdGenerator> id_generator =
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+              new sdk::trace::ETWRandomIdGenerator()),
+      std::unique_ptr<opentelemetry::exporter::etw::TailSampler> tail_sampler =
+          std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler()))
       : opentelemetry::trace::TracerProvider(),
         sampler_{std::move(sampler)},
-        id_generator_{std::move(id_generator)}
+        id_generator_{std::move(id_generator)},
+        tail_sampler_{std::move(tail_sampler)}
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
@@ -985,7 +1018,9 @@ public:
       : opentelemetry::trace::TracerProvider(),
         sampler_{std::unique_ptr<sdk::trace::AlwaysOnSampler>(new sdk::trace::AlwaysOnSampler)},
         id_generator_{std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-            new sdk::trace::ETWRandomIdGenerator())}
+            new sdk::trace::ETWRandomIdGenerator())},
+        tail_sampler_{
+            std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler())}
   {
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
