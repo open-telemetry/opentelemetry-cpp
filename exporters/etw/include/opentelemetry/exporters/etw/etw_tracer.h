@@ -879,10 +879,11 @@ public:
     if (options.end_steady_time == opentelemetry::common::SteadyTimestamp())
     {
       end_time_ = std::chrono::system_clock::now();
-    } 
-    else 
+    }
+    else
     {
-      end_time_ = opentelemetry::common::SystemTimestamp(options.end_steady_time.time_since_epoch());
+      end_time_ =
+          opentelemetry::common::SystemTimestamp(options.end_steady_time.time_since_epoch());
     }
 
     if (!has_ended_.exchange(true))
