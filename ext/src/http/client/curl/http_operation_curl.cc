@@ -419,12 +419,11 @@ CURLcode HttpOperation::Setup()
     if (!ssl_options_.ssl_ca_cert_path.empty())
     {
       const char *path = ssl_options_.ssl_ca_cert_path.c_str();
-      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT, path);
-      // Assuming PEM format.
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_CAINFO, path);
     }
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x074700
+#if LIBCURL_VERSION_NUM >= 0x074D00
       const char *data = ssl_options_.ssl_ca_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
 
@@ -432,10 +431,10 @@ CURLcode HttpOperation::Setup()
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
-      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ISSUERCERT_BLOB, &stblob);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_CAINFO_BLOB, &stblob);
       // Assuming PEM format.
 #else
-      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_ISSUERCERT_BLOB.
+      // CURL 7.77.0 (0x07 0x4D 0x00) required for CURLOPT_CAINFO_BLOB.
       return CURLE_UNKNOWN_OPTION;
 #endif
     }
@@ -495,7 +494,10 @@ CURLcode HttpOperation::Setup()
     /* 4 - ENFORCE VERIFICATION */
 
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+
+    // FIXME: Need to get a real CERT, not self signed, for testing:
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
+
     curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
   }
   else
