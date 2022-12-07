@@ -6,7 +6,6 @@
 #  include <gtest/gtest.h>
 #  include <map>
 #  include <string>
-
 #  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
@@ -76,6 +75,16 @@ public:
 
 private:
   std::shared_ptr<Sampler> delegate_sampler_;
+};
+
+class AlwaysOffTailSampler : public TailSampler
+{
+public:
+  opentelemetry::sdk::trace::SamplingResult ShouldSample(
+      const opentelemetry::trace::Span &span) noexcept override
+  {
+    return {opentelemetry::sdk::trace::Decision::DROP};
+  }
 };
 
 /* clang-format off */
@@ -457,6 +466,26 @@ TEST(ETWTracer, AlwayOffSampler)
   auto span = tracer->StartSpan("span_off");
   EXPECT_EQ(span->GetContext().IsValid(), true);
   EXPECT_EQ(span->GetContext().IsSampled(), false);
+}
+
+TEST(ETWTracer, AlwayOffTailSampler)
+{
+  std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
+  std::unique_ptr<sdk::trace::Sampler> always_on{new sdk::trace::AlwaysOnSampler()};
+  sdk::trace::IdGenerator *id_generator = new MockIdGenerator();
+  std::unique_ptr<TailSampler> always_off_tail{new AlwaysOffTailSampler()};
+  exporter::etw::TracerProvider tp
+    ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+     },
+     std::move(always_on),
+     std::unique_ptr<sdk::trace::IdGenerator>(id_generator),
+     std::move(always_off_tail));
+  auto tracer = tp.GetTracer(providerName);
 }
 
 TEST(ETWTracer, CustomIdGenerator)

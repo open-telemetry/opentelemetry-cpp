@@ -116,7 +116,7 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       }
       if (nostd::holds_alternative<int64_t>(histogram_data.max_))
       {
-        proto_histogram_point_data->set_min(nostd::get<int64_t>(histogram_data.max_));
+        proto_histogram_point_data->set_max(nostd::get<int64_t>(histogram_data.max_));
       }
       else
       {
