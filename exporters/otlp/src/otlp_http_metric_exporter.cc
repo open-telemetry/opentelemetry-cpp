@@ -115,8 +115,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
     }
     else
     {
-      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << metric_count
-                                                                  << " metric(s) success");
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << metric_count << " metric(s) success");
     }
     return true;
   });
@@ -130,8 +129,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << metric_count
-                                                                << " metric(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << metric_count << " metric(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif

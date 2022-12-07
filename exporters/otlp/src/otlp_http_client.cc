@@ -113,7 +113,7 @@ public:
       {
         log_message = BuildResponseLogMessage(response, body_);
 
-        OTEL_INTERNAL_LOG_ERROR("OTLP HTTP Client] Export failed, " << log_message);
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Export failed, " << log_message);
         result = sdk::common::ExportResult::kFailure;
       }
       else if (console_debug_)
@@ -289,7 +289,7 @@ public:
       case http_client::SessionState::WriteError:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG:Session state: error writing request");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Session state: error writing request");
         }
         break;
 
@@ -760,7 +760,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   if (options_.console_debug)
   {
     OTEL_INTERNAL_LOG_DEBUG(
-        "[OTLP HTTP Client] DEBUG: Waiting for response from "
+        "[OTLP HTTP Client] Waiting for response from "
         << options_.url << " (timeout = "
         << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
         << " milliseconds)");

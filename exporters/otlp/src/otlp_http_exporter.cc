@@ -109,8 +109,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
         }
         else
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
-                                                                      << " trace span(s) success");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << span_count
+                                                               << " trace span(s) success");
         }
         return true;
       });
@@ -124,8 +124,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
-                                                                << " trace span(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << span_count << " trace span(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
