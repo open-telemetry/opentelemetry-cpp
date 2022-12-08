@@ -293,7 +293,8 @@ configuration
    $
    ```
 
-Once build is complete, the package can be generated using as below.
+Once build is complete as specified in [standalone build section](#building-as-standalone-cmake-project),
+the package can be generated as below.
 
    ```console
    $ cpack -C debug
