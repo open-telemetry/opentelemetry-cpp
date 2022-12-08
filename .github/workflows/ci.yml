@@ -113,13 +113,17 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
-    - name: run tests
-      run: ./ci/do_ci.sh cmake.legacy.test
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: ./ci/do_ci.sh cmake.legacy.test
 
   cmake_gcc_48_otlp_exporter_test:
     name: CMake gcc 4.8 (with otlp exporter)
@@ -133,31 +137,75 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
-    - name: setup grpc
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
-    - name: run tests
-      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: sudo -E ./ci/setup_cmake.sh
+    - name: setup grpc
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: sudo -E ./ci/setup_grpc.sh -v 4.8
+    - name: run tests
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
 
-  cmake_test_cxx20:
-    name: CMake C++20 test
+  cmake_test_cxx20_gcc:
+    name: CMake C++20 test(GCC)
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CMAKE_VERSION: "3.20.6"
       run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
     - name: run tests
+      env:
+        CMAKE_VERSION: "3.20.6"
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
+      env:
+        CMAKE_VERSION: "3.20.6"
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
+
+  cmake_test_cxx20_clang:
+    name: CMake C++20 test(Clang with libc++)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: "3.20.6"
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: "3.20.6"
+      run: ./ci/do_ci.sh cmake.c++20.test
+    - name: run tests (enable stl)
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: "3.20.6"
       run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_otprotocol_test:

@@ -103,7 +103,12 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 // SpinLock thrashing with thread::yield().
 static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
 {
+#if defined(__cpp_lib_atomic_value_initialization) && \
+    __cpp_lib_atomic_value_initialization >= 201911L
+  std::atomic_flag mutex{};
+#else
   std::atomic_flag mutex = ATOMIC_FLAG_INIT;
+#endif
   SpinThrash<std::atomic_flag>(
       s, mutex,
       [](std::atomic_flag &l) {

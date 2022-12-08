@@ -5,7 +5,27 @@
 
 // Try to use either `std::span` or `gsl::span`
 #ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/span.h"
+#  include <array>
+#  include <cstddef>
+#  include <iterator>
+#  include <type_traits>
+
+/**
+ * @brief Clang 14.0.0 with libc++ do not support implicitly construct a span for a range.We just
+ * use our fallback version.
+ *
+ */
+#  if defined(_LIBCPP_VERSION)
+#    if _LIBCPP_VERSION <= 14000
+#      define OPENTELEMETRY_OPTION_USE_STD_SPAN 0
+#    endif
+#  endif
+#  ifndef OPENTELEMETRY_OPTION_USE_STD_SPAN
+#    define OPENTELEMETRY_OPTION_USE_STD_SPAN 1
+#  endif
+#  if OPENTELEMETRY_OPTION_USE_STD_SPAN
+#    include "opentelemetry/std/span.h"
+#  endif
 #endif
 
 // Fallback to `nostd::span` if necessary
