@@ -1,9 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
-#  include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
+#include <gtest/gtest.h>
 
 static std::string CreateVeryLargeString(size_t multiple)
 {
@@ -72,4 +71,3 @@ TEST(InstrumentMetadataValidator, TestUnit)
     EXPECT_TRUE(validator.ValidateName(str));
   }
 }
-#endif

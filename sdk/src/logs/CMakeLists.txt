@@ -3,14 +3,14 @@ add_library(
   logger_provider.cc
   logger_provider_factory.cc
   logger.cc
-  simple_log_processor.cc
-  simple_log_processor_factory.cc
-  batch_log_processor.cc
-  batch_log_processor_factory.cc
+  simple_log_record_processor.cc
+  simple_log_record_processor_factory.cc
+  batch_log_record_processor.cc
+  batch_log_record_processor_factory.cc
   logger_context.cc
   logger_context_factory.cc
-  multi_log_processor.cc
-  multi_log_processor_factory.cc
+  multi_log_record_processor.cc
+  multi_log_record_processor_factory.cc
   multi_recordable.cc)
 
 set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)

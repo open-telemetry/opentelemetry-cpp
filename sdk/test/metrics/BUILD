@@ -242,6 +242,7 @@ otel_cc_benchmark(
         "attributes_processor_benchmark.cc",
     ],
     tags = [
+        "benchmark",
         "metrics",
         "test",
     ],
@@ -256,6 +257,7 @@ otel_cc_benchmark(
         "attributes_hashmap_benchmark.cc",
     ],
     tags = [
+        "benchmark",
         "metrics",
         "test",
     ],

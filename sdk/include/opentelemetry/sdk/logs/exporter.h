@@ -17,16 +17,16 @@ namespace sdk
 namespace logs
 {
 /**
- * LogExporter defines the interface that log exporters must implement.
+ * LogRecordExporter defines the interface that log exporters must implement.
  */
-class LogExporter
+class LogRecordExporter
 {
 public:
-  virtual ~LogExporter() = default;
+  virtual ~LogRecordExporter() = default;
 
   /**
    * Create a log recordable. This object will be used to record log data and
-   * will subsequently be passed to LogExporter::Export. Vendors can implement
+   * will subsequently be passed to LogRecordExporter::Export. Vendors can implement
    * custom recordables or use the default LogRecord recordable provided by the
    * SDK.
    * @return a newly initialized Recordable object

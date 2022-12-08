@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <unordered_map>
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
-#  include "opentelemetry/sdk/metrics/view/view.h"
+
+#include <unordered_map>
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -99,4 +99,3 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

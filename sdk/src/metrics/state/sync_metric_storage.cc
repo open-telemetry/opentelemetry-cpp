@@ -1,9 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-
-#  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -34,4 +32,3 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

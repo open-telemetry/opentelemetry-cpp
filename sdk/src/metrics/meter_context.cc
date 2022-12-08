@@ -1,12 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/meter_context.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -29,9 +28,23 @@ ViewRegistry *MeterContext::GetViewRegistry() const noexcept
   return views_.get();
 }
 
+bool MeterContext::ForEachMeter(
+    nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept
+{
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+  for (auto &meter : meters_)
+  {
+    if (!callback(meter))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
+  // no lock required, as this is called by MeterProvider in thread-safe manner.
   return nostd::span<std::shared_ptr<Meter>>{meters_};
 }
 
@@ -60,7 +73,7 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
 
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(storage_lock_);
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
   meters_.push_back(meter);
 }
 
@@ -145,4 +158,3 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

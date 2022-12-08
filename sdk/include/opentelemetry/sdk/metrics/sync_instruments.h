@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/metrics/sync_instruments.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/state/metric_storage.h"
-#  include "opentelemetry/sdk_config.h"
 
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk_config.h"
+
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -200,4 +200,3 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

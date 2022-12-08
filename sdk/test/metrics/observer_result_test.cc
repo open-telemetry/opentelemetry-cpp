@@ -1,11 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/observer_result.h"
-#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/sdk/metrics/observer_result.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 TEST(ObserverResult, BasicTests)
@@ -34,5 +33,3 @@ TEST(ObserverResult, BasicTests)
 
   delete attributes_processor;
 }
-
-#endif

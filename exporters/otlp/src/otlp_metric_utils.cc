@@ -4,8 +4,6 @@
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 
-#ifndef ENABLE_METRICS_PREVIEW
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace exporter
@@ -118,7 +116,7 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       }
       if (nostd::holds_alternative<int64_t>(histogram_data.max_))
       {
-        proto_histogram_point_data->set_min(nostd::get<int64_t>(histogram_data.max_));
+        proto_histogram_point_data->set_max(nostd::get<int64_t>(histogram_data.max_));
       }
       else
       {
@@ -276,5 +274,3 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelec
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

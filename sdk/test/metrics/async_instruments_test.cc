@@ -1,11 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/async_instruments.h"
-#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::metrics;
@@ -27,5 +26,3 @@ TEST(AsyncInstruments, ObservableInstrument)
                                                observable_registry);
   observable_counter_long.AddCallback(asyc_generate_measurements, nullptr);
 }
-
-#endif

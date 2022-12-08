@@ -1,14 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#  include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
@@ -218,4 +217,3 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[4], 0);  // aggr2(28.1) - aggr1(25.1)
   EXPECT_EQ(histogram_data.counts_[7], 1);  // aggr2(105.0) - aggr1(0)
 }
-#endif

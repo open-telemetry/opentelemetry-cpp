@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#  include <algorithm>
-#  include <iomanip>
-#  include <limits>
-#  include <memory>
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include <algorithm>
+#include <iomanip>
+#include <limits>
+#include <memory>
+#include "opentelemetry/version.h"
 
-#  include <mutex>
+#include <mutex>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -190,4 +189,3 @@ PointType DoubleHistogramAggregation::ToPoint() const noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

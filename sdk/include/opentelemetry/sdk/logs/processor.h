@@ -17,10 +17,10 @@ namespace logs
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
  */
-class LogProcessor
+class LogRecordProcessor
 {
 public:
-  virtual ~LogProcessor() = default;
+  virtual ~LogRecordProcessor() = default;
 
   /**
    * Create a log recordable. This requests a new log recordable from the
