@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef OPENTELEMETRY_HAVE_STL_CXX14
+#if OPENTELEMETRY_STL_VERSION >= 2014
 #  include "opentelemetry/std/utility.h"
 #else
 
