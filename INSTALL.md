@@ -269,6 +269,40 @@ work on Windows, specifically we can't safely allocate memory in one DLL and
 free it in another. For now, OpenTelemetry C++ targets need to be statically
 linked into the Windows applications.
 
+## Generatring binary packages
+
+OpenTelemetry C++ supports generating plateform specific binary packages from CMake
+configuration:
+
+- Linux : deb, rpm, tgz
+- MacOS : tgz
+- Windows : NuGet, zip
+
+This requires platform specific package generators already installed. The package
+generation can subsequently be enabled by using BUILD_PACKAGE option during cmake
+configuration
+
+   ```console
+   $ cd opentelemetry-cpp
+   $ mkdir build && cd build && cmake -DBUILD_PACKAGE ..
+
+   -- Package name: opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb
+   -- Configuring done
+   -- Generating done
+   ...
+   $
+   ```
+
+Once build is complete, the package can be generated using as below.
+
+   ```console
+   $ cpack -C debug
+   CPack: Create package using DEB
+   ...
+   CPack: - package: /home/labhas/obs/ot/lalitb/deb-rpm/opentelemetry-cpp/build/opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb generated.
+   $
+   ```
+
 ## Using Package Managers
 
 If you are using [Conan](https://www.conan.io/) to manage your dependencies, add
