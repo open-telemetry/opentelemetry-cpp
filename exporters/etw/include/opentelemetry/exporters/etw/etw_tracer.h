@@ -899,7 +899,7 @@ public:
    */
   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override
   {
-    // TODO - explicity setting end_time as 0 is not supported, and would be changed to
+    // TODO - explicitly setting end_time as 0 is not supported, and would be changed to
     // current_time.
     if (options.end_steady_time.time_since_epoch().count() == 0)
     {
