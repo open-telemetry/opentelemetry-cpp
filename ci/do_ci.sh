@@ -97,6 +97,7 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
