@@ -537,6 +537,20 @@ TEST(ETWTracer, CustomSampler)
   }
 }
 
+TEST(ETWTracer, EndWithCustomTime)
+{
+  // Obtain a global tracer using C++11 magic static.
+  auto& globalTracer = GetGlobalTracer();
+  auto s1 = globalTracer.StartSpan("Span1");
+  auto traceId1 = s1->GetContext().trace_id();
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time =  opentelemetry::common::SteadyTimestamp(std::chrono::nanoseconds(40));
+  s1->End(end);
+  auto end_time = static_cast<opentelemetry::exporter::etw::Span *>(s1.get())->GetEndTime();
+  EXPECT_EQ(end.end_steady_time.time_since_epoch(), end_time.time_since_epoch());
+
+}
+
 /* clang-format on */
 
 #endif
