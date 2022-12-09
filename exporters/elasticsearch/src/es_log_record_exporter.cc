@@ -355,8 +355,8 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
         }
         else
         {
-          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] DEBUG: Export " << span_count
-                                                                     << " trace span(s) success");
+          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
+                                                              << " trace span(s) success");
         }
         return true;
       },

@@ -3,6 +3,3 @@ if(WITH_ZPAGES)
 endif()
 
 add_subdirectory(http/client/curl)
-if(BUILD_TESTING)
-  add_subdirectory(http/client/nosend)
-endif()

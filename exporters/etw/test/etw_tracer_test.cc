@@ -6,7 +6,6 @@
 #  include <gtest/gtest.h>
 #  include <map>
 #  include <string>
-
 #  include "opentelemetry//sdk/trace/sampler.h"
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/samplers/always_off.h"
@@ -76,6 +75,16 @@ public:
 
 private:
   std::shared_ptr<Sampler> delegate_sampler_;
+};
+
+class AlwaysOffTailSampler : public TailSampler
+{
+public:
+  opentelemetry::sdk::trace::SamplingResult ShouldSample(
+      const opentelemetry::trace::Span &span) noexcept override
+  {
+    return {opentelemetry::sdk::trace::Decision::DROP};
+  }
 };
 
 /* clang-format off */
@@ -459,6 +468,26 @@ TEST(ETWTracer, AlwayOffSampler)
   EXPECT_EQ(span->GetContext().IsSampled(), false);
 }
 
+TEST(ETWTracer, AlwayOffTailSampler)
+{
+  std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
+  std::unique_ptr<sdk::trace::Sampler> always_on{new sdk::trace::AlwaysOnSampler()};
+  sdk::trace::IdGenerator *id_generator = new MockIdGenerator();
+  std::unique_ptr<TailSampler> always_off_tail{new AlwaysOffTailSampler()};
+  exporter::etw::TracerProvider tp
+    ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+     },
+     std::move(always_on),
+     std::unique_ptr<sdk::trace::IdGenerator>(id_generator),
+     std::move(always_off_tail));
+  auto tracer = tp.GetTracer(providerName);
+}
+
 TEST(ETWTracer, CustomIdGenerator)
 {
   std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
@@ -506,6 +535,20 @@ TEST(ETWTracer, CustomSampler)
       EXPECT_EQ(child_span->GetContext().trace_id(), trace_id);
     }
   }
+}
+
+TEST(ETWTracer, EndWithCustomTime)
+{
+  // Obtain a global tracer using C++11 magic static.
+  auto& globalTracer = GetGlobalTracer();
+  auto s1 = globalTracer.StartSpan("Span1");
+  auto traceId1 = s1->GetContext().trace_id();
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time =  opentelemetry::common::SteadyTimestamp(std::chrono::nanoseconds(40));
+  s1->End(end);
+  auto end_time = static_cast<opentelemetry::exporter::etw::Span *>(s1.get())->GetEndTime();
+  EXPECT_EQ(end.end_steady_time.time_since_epoch(), end_time.time_since_epoch());
+
 }
 
 /* clang-format on */
