@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.15.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.16.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -46,13 +46,11 @@ static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 static constexpr const char *kEventName = "event.name";
 
 /**
- * The domain identifies the context in which an event happened. An event name is unique only within
-a domain.
+ * The domain identifies the business context for the events.
  *
  * <p>Notes:
-  <ul> <li>An {@code event.name} is supposed to be unique only in the context of an
-{@code event.domain}, so this allows for two events in different domains to
-have same {@code event.name}, yet be unrelated events.</li> </ul>
+  <ul> <li>Events across different domains may have same {@code event.name}, yet be
+unrelated events.</li> </ul>
  */
 static constexpr const char *kEventDomain = "event.domain";
 
@@ -860,6 +858,11 @@ static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_i
  * Partition the message is sent to.
  */
 static constexpr const char *kMessagingKafkaPartition = "messaging.kafka.partition";
+
+/**
+ * The offset of a record in the corresponding Kafka partition.
+ */
+static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.message.offset";
 
 /**
  * A boolean that is true if the message is a tombstone.
