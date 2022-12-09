@@ -899,7 +899,17 @@ public:
    */
   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override
   {
-    end_time_ = std::chrono::system_clock::now();
+    // TODO - explicitly setting end_time as 0 is not supported, and would be changed to
+    // current_time.
+    if (options.end_steady_time.time_since_epoch().count() == 0)
+    {
+      end_time_ = std::chrono::system_clock::now();
+    }
+    else
+    {
+      end_time_ =
+          opentelemetry::common::SystemTimestamp(options.end_steady_time.time_since_epoch());
+    }
 
     if (!has_ended_.exchange(true))
     {
