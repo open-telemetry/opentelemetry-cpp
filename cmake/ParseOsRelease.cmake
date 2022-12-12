@@ -12,7 +12,7 @@ foreach(NameAndValue ${OS_RELEASE})
   # Strip quotes from value
   string(REPLACE "\"" "" Value ${Value})
   # Set the variable
-  message("-- /etc/os_release : ${Name}=${Value}")
+  message("-- /etc/os-release : ${Name}=${Value}")
   set("OS_RELEASE_${Name}" "${Value}")
 endforeach()
 else()
