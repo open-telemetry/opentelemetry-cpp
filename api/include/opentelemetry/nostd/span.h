@@ -11,8 +11,8 @@
 #  include <type_traits>
 
 /**
- * @brief Clang 14.0.0 with libc++ do not support implicitly construct a span for a range.We just
- * use our fallback version.
+ * @brief Clang 14.0.0 with libc++ do not support implicitly construct a span
+ * for a range. We just use our fallback version.
  *
  */
 #  if defined(_LIBCPP_VERSION)
