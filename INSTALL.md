@@ -45,12 +45,12 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
 ### Building as standalone CMake Project
 
-1. Getting the opentelementry-cpp source:
+1. Getting the opentelementry-cpp source with its submodules:
 
    ```console
    # Change to the directory where you want to create the code repository
    $ cd ~
-   $ mkdir source && cd source && git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp
+   $ mkdir source && cd source && git clone --recurse-submodules https://github.com/open-telemetry/opentelemetry-cpp
    Cloning into 'opentelemetry-cpp'...
    ...
    Resolving deltas: 100% (3225/3225), done.
