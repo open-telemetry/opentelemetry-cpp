@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.15.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.16.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -362,7 +362,9 @@ static constexpr const char *kFaasInstance = "faas.instance";
 static constexpr const char *kFaasMaxMemory = "faas.max_memory";
 
 /**
- * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
+ * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
+ * non-containerized Linux systems, the {@code machine-id} located in {@code /etc/machine-id} or
+ * {@code /var/lib/dbus/machine-id} may be used.
  */
 static constexpr const char *kHostId = "host.id";
 
@@ -701,6 +703,8 @@ static constexpr const char *kAws = "aws";
 static constexpr const char *kAzure = "azure";
 /** Google Cloud Platform. */
 static constexpr const char *kGcp = "gcp";
+/** IBM Cloud. */
+static constexpr const char *kIbmCloud = "ibm_cloud";
 /** Tencent Cloud. */
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace CloudProviderValues
@@ -711,6 +715,8 @@ namespace CloudPlatformValues
 static constexpr const char *kAlibabaCloudEcs = "alibaba_cloud_ecs";
 /** Alibaba Cloud Function Compute. */
 static constexpr const char *kAlibabaCloudFc = "alibaba_cloud_fc";
+/** Red Hat OpenShift on Alibaba Cloud. */
+static constexpr const char *kAlibabaCloudOpenshift = "alibaba_cloud_openshift";
 /** AWS Elastic Compute Cloud. */
 static constexpr const char *kAwsEc2 = "aws_ec2";
 /** AWS Elastic Container Service. */
@@ -723,6 +729,8 @@ static constexpr const char *kAwsLambda = "aws_lambda";
 static constexpr const char *kAwsElasticBeanstalk = "aws_elastic_beanstalk";
 /** AWS App Runner. */
 static constexpr const char *kAwsAppRunner = "aws_app_runner";
+/** Red Hat OpenShift on AWS (ROSA). */
+static constexpr const char *kAwsOpenshift = "aws_openshift";
 /** Azure Virtual Machines. */
 static constexpr const char *kAzureVm = "azure_vm";
 /** Azure Container Instances. */
@@ -733,6 +741,8 @@ static constexpr const char *kAzureAks = "azure_aks";
 static constexpr const char *kAzureFunctions = "azure_functions";
 /** Azure App Service. */
 static constexpr const char *kAzureAppService = "azure_app_service";
+/** Azure Red Hat OpenShift. */
+static constexpr const char *kAzureOpenshift = "azure_openshift";
 /** Google Cloud Compute Engine (GCE). */
 static constexpr const char *kGcpComputeEngine = "gcp_compute_engine";
 /** Google Cloud Run. */
@@ -743,6 +753,10 @@ static constexpr const char *kGcpKubernetesEngine = "gcp_kubernetes_engine";
 static constexpr const char *kGcpCloudFunctions = "gcp_cloud_functions";
 /** Google Cloud App Engine (GAE). */
 static constexpr const char *kGcpAppEngine = "gcp_app_engine";
+/** Red Hat OpenShift on Google Cloud. */
+static constexpr const char *kGoogleCloudOpenshift = "google_cloud_openshift";
+/** Red Hat OpenShift on IBM Cloud. */
+static constexpr const char *kIbmCloudOpenshift = "ibm_cloud_openshift";
 /** Tencent Cloud Cloud Virtual Machine (CVM). */
 static constexpr const char *kTencentCloudCvm = "tencent_cloud_cvm";
 /** Tencent Cloud Elastic Kubernetes Service (EKS). */
