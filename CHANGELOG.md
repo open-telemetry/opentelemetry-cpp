@@ -16,6 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.16.0
+  [#1854](https://github.com/open-telemetry/opentelemetry-cpp/pull/1854)
 
 ## [1.8.1] 2022-12-04
 
