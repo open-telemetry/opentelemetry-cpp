@@ -89,11 +89,13 @@ struct Uri
 class NoopEventHandler : public http_client::EventHandler
 {
 public:
-  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override {}
+  void OnEvent(http_client::SessionState /* state */,
+               nostd::string_view /* reason */) noexcept override
+  {}
 
   void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
 
-  void OnResponse(http_client::Response &response) noexcept override {}
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
 };
 }  // namespace
 
@@ -165,7 +167,9 @@ int main(int argc, char *argv[])
 
         for (auto &part : body)
         {
-          const TextMapCarrierTest carrier((std::map<std::string, std::string> &)req.headers);
+          auto headers_2 = const_cast<std::map<std::string, std::string> &>(req.headers);
+
+          const TextMapCarrierTest carrier(headers_2);
           auto current_ctx = context::RuntimeContext::GetCurrent();
           auto ctx         = propagator_format.Extract(carrier, current_ctx);
           auto token       = context::RuntimeContext::Attach(ctx);
