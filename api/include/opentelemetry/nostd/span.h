@@ -15,7 +15,7 @@
  * for a range. We just use our fallback version.
  *
  */
-#  if defined(_LIBCPP_VERSION)
+#  if !defined(OPENTELEMETRY_OPTION_USE_STD_SPAN) && defined(_LIBCPP_VERSION)
 #    if _LIBCPP_VERSION <= 14000
 #      define OPENTELEMETRY_OPTION_USE_STD_SPAN 0
 #    endif
