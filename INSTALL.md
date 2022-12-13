@@ -272,7 +272,8 @@ linked into the Windows applications.
 ## Generatring binary packages
 
 OpenTelemetry C++ supports generating plateform specific binary packages from CMake
-configuration:
+configuration. The packages generated through this mayn't be production ready, and user
+may have to customize it further before using it as distribution.
 
 - Linux : deb, rpm, tgz
 - MacOS : tgz
@@ -300,7 +301,7 @@ the package can be generated as below.
    $ cpack -C debug
    CPack: Create package using DEB
    ...
-   CPack: - package: /home/labhas/obs/ot/lalitb/deb-rpm/opentelemetry-cpp/build/opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb generated.
+   CPack: - package: /home/<user>/opentelemetry-cpp/build/opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb generated.
    $
    ```
 
