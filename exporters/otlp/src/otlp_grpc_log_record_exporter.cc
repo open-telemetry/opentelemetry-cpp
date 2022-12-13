@@ -51,8 +51,7 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
 std::unique_ptr<opentelemetry::sdk::logs::Recordable>
 OtlpGrpcLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
-      new exporter::otlp::OtlpLogRecordable());
+  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(new OtlpLogRecordable());
 }
 
 opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(

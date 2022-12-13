@@ -6,6 +6,8 @@
 
 #  include <chrono>
 #  include <memory>
+
+#  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -25,6 +27,7 @@ public:
   /**
    * Create a log recordable. This requests a new log recordable from the
    * associated exporter.
+   *
    * @return a newly initialized recordable
    *
    * Note: This method must be callable from multiple threads.
@@ -33,7 +36,7 @@ public:
 
   /**
    * OnEmit is called by the SDK once a log record has been successfully created.
-   * @param record the log record
+   * @param record the log recordable object
    */
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 

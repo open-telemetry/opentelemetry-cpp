@@ -301,7 +301,7 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdklogs::Recordable>(new ElasticSearchRecordable);
+  return std::unique_ptr<sdklogs::Recordable>(new ElasticSearchRecordable());
 }
 
 sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(

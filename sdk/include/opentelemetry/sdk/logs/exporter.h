@@ -6,6 +6,7 @@
 
 #  include <memory>
 #  include <vector>
+
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
 #  include "opentelemetry/sdk/logs/processor.h"
@@ -27,7 +28,7 @@ public:
   /**
    * Create a log recordable. This object will be used to record log data and
    * will subsequently be passed to LogRecordExporter::Export. Vendors can implement
-   * custom recordables or use the default LogRecord recordable provided by the
+   * custom recordables or use the default ReadWriteLogRecord recordable provided by the
    * SDK.
    * @return a newly initialized Recordable object
    *
