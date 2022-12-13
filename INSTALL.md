@@ -272,8 +272,8 @@ linked into the Windows applications.
 ## Generatring binary packages
 
 OpenTelemetry C++ supports generating plateform specific binary packages from CMake
-configuration. The packages generated through this mayn't be production ready, and user
-may have to customize it further before using it as distribution.
+configuration. The packages generated through this mayn't be production ready,
+and user may have to customize it further before using it as distribution.
 
 - Linux : deb, rpm, tgz
 - MacOS : tgz
