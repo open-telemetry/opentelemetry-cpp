@@ -41,24 +41,11 @@ class NoopLogger final : public Logger
 public:
   const nostd::string_view GetName() noexcept override { return "noop logger"; }
 
-  void Log(Severity /* severity */,
-           nostd::string_view /* body */,
-           const common::KeyValueIterable & /* attributes */,
-           trace::TraceId /* trace_id */,
-           trace::SpanId /* span_id */,
-           trace::TraceFlags /* trace_flags */,
-           common::SystemTimestamp /* timestamp */) noexcept override
-  {}
+  nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept override { return nullptr; }
 
-  void Log(Severity /* severity */,
-           nostd::string_view /* name */,
-           nostd::string_view /* body */,
-           const common::KeyValueIterable & /* attributes */,
-           trace::TraceId /* trace_id */,
-           trace::SpanId /* span_id */,
-           trace::TraceFlags /* trace_flags */,
-           common::SystemTimestamp /* timestamp */) noexcept override
-  {}
+  using Logger::EmitLogRecord;
+
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&) noexcept override {}
 };
 
 /**

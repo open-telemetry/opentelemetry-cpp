@@ -91,7 +91,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   */
 
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
-  opentelemetry::nostd::unique_ptr<instrumentationscope::InstrumentationScope> lib;
+  std::unique_ptr<instrumentationscope::InstrumentationScope> lib;
   if (library_name.empty())
   {
     lib = instrumentationscope::InstrumentationScope::Create(logger_name, library_version,

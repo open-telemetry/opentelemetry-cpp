@@ -67,8 +67,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(std::unique_ptr<OtlpHttpCli
 std::unique_ptr<opentelemetry::sdk::logs::Recordable>
 OtlpHttpLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
-      new exporter::otlp::OtlpLogRecordable());
+  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(new OtlpLogRecordable());
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
