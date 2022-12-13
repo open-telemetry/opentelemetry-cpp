@@ -961,13 +961,14 @@ OtlpHttpClient::createSession(
 
   if (candidate_scheme == "https:")
   {
-    ssl_options.use_ssl                = true;
-    ssl_options.ssl_ca_cert_path       = options_.ssl_ca_cert_path;
-    ssl_options.ssl_ca_cert_string     = options_.ssl_ca_cert_string;
-    ssl_options.ssl_client_key_path    = options_.ssl_client_key_path;
-    ssl_options.ssl_client_key_string  = options_.ssl_client_key_string;
-    ssl_options.ssl_client_cert_path   = options_.ssl_client_cert_path;
-    ssl_options.ssl_client_cert_string = options_.ssl_client_cert_string;
+    ssl_options.use_ssl                  = true;
+    ssl_options.ssl_insecure_skip_verify = options_.ssl_insecure_skip_verify;
+    ssl_options.ssl_ca_cert_path         = options_.ssl_ca_cert_path;
+    ssl_options.ssl_ca_cert_string       = options_.ssl_ca_cert_string;
+    ssl_options.ssl_client_key_path      = options_.ssl_client_key_path;
+    ssl_options.ssl_client_key_string    = options_.ssl_client_key_string;
+    ssl_options.ssl_client_cert_path     = options_.ssl_client_cert_path;
+    ssl_options.ssl_client_cert_string   = options_.ssl_client_cert_string;
   }
   else
   {

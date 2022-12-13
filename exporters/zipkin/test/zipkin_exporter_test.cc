@@ -130,7 +130,8 @@ public:
       return use_match;
     }
 
-    return (use_match && (opt.ssl_ca_cert_path == ssl_options_.ssl_ca_cert_path) &&
+    return (use_match && (opt.ssl_insecure_skip_verify == ssl_options_.ssl_insecure_skip_verify) &&
+            (opt.ssl_ca_cert_path == ssl_options_.ssl_ca_cert_path) &&
             (opt.ssl_ca_cert_string == ssl_options_.ssl_ca_cert_string) &&
             (opt.ssl_client_key_path == ssl_options_.ssl_client_key_path) &&
             (opt.ssl_client_key_string == ssl_options_.ssl_client_key_string) &&

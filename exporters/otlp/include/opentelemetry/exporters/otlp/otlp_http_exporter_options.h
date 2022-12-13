@@ -58,6 +58,8 @@ struct OtlpHttpExporterOptions
 #endif
 
 #ifdef ENABLE_OTLP_HTTP_SSL
+  bool ssl_insecure_skip_verify{false};
+
   std::string ssl_ca_cert_path   = GetOtlpDefaultTracesSslCertificatePath();
   std::string ssl_ca_cert_string = GetOtlpDefaultTracesSslCertificateString();
 

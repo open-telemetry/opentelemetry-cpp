@@ -1,12 +1,13 @@
-# Testing with SSL
+# Testing with SSL/TLS
 
 ## Required software
 
-The opentelemetry-collector [documentation](https://opentelemetry.io/docs/collector/configuration/#setting-up-certificates)
-uses [cfssl](https://github.com/cloudflare/cfssl), so we are using cfssl as
-well here.
+The opentelemetry-collector
+[documentation](https://opentelemetry.io/docs/collector/configuration/#setting-up-certificates)
+uses [cfssl](https://github.com/cloudflare/cfssl),
+so we are using cfssl as well here.
 
-In addition, install openssl, which provides tooling for testing.
+In addition, install `openssl`, which provides tooling for testing.
 
 ## Generating CERT
 
@@ -73,7 +74,7 @@ shell> cat client_csr.json
 
 Note that the name ("OpenTelemetry Client Example") should be different
 from the CA authority name ("OpenTelemetry CA Example"),
-otherwise the client certificate will be self-signed, and rejected later in SSL.
+otherwise the client certificate will be self-signed, and rejected later in SSL/TLS.
 
 Now, use the CA certificate generated in the previous step
 to create and sign a new client certificate.
@@ -129,7 +130,7 @@ This will create three files, `server_cert.csr`, `server_cert.pem` and `server_c
 
 ### Verify certificates
 
-Verify the certificates generated, using openssl:
+Verify the certificates generated, using `openssl`:
 
 ```
 shell> openssl verify -CAfile ca.pem server_cert.pem client_cert.pem
@@ -137,7 +138,7 @@ server_cert.pem: OK
 client_cert.pem: OK
 ```
 
-Useful commands, to inspect certificates if needed:
+Useful commands, to inspect certificates if needed (output not shown here)
 
 ```
 shell> openssl x509 -in ca.pem -text
@@ -151,11 +152,11 @@ shell> openssl x509 -in client_cert.pem -text
 shell> openssl x509 -in server_cert.pem -text
 ```
 
-## Opentelemetry SSL clients
+## OpenTelemetry SSL clients
 
 ### Simulated client, for testing
 
-Use openssl to simulate an opentelemetry-cpp client connecting to port 4318:
+Use `openssl` to simulate an opentelemetry-cpp client connecting to port 4318:
 
 ```
 shell> openssl s_client -connect localhost:4318 -CAfile ca.pem -cert client_cert.pem -key client_cert-key.pem
@@ -173,11 +174,11 @@ shell> export OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY=client_cert-key.pem
 shell> example_otlp_http
 ```
 
-## Opentelemetry SSL servers
+## OpenTelemetry SSL servers
 
 ### Simulated server, for testing
 
-Use openssl to simulate an opentelemetry-collector process serving port 4318:
+Use `openssl` to simulate an opentelemetry-collector process serving port 4318:
 
 ```
 shell> openssl s_server -accept 4318 -CAfile ca.pem -cert server_cert.pem -key server_cert-key.pem
@@ -269,14 +270,14 @@ The opentelemetry-collector process receives data, as seen in logs:
 ```
 2022-12-13T18:05:36.611+0100	info	TracesExporter	{"kind": "exporter", "data_type": "traces", "name": "logging", "#spans": 4}
 2022-12-13T18:05:36.611+0100	info	ResourceSpans #0
-Resource SchemaURL: 
+Resource SchemaURL:
 Resource attributes:
      -> service.name: Str(unknown_service)
      -> telemetry.sdk.version: Str(1.8.1)
      -> telemetry.sdk.name: Str(opentelemetry)
      -> telemetry.sdk.language: Str(cpp)
 ScopeSpans #0
-ScopeSpans SchemaURL: 
+ScopeSpans SchemaURL:
 InstrumentationScope foo_library 1.8.1
 Span #0
     Trace ID       : ebbd7e13e9cdfb05f0ca9ed4b0cdf6c0
@@ -287,16 +288,16 @@ Span #0
     Start time     : 2022-12-13 17:05:36.482165738 +0000 UTC
     End time       : 2022-12-13 17:05:36.482170938 +0000 UTC
     Status code    : Unset
-    Status message : 
+    Status message :
 ResourceSpans #1
-Resource SchemaURL: 
+Resource SchemaURL:
 Resource attributes:
      -> service.name: Str(unknown_service)
      -> telemetry.sdk.version: Str(1.8.1)
      -> telemetry.sdk.name: Str(opentelemetry)
      -> telemetry.sdk.language: Str(cpp)
 ScopeSpans #0
-ScopeSpans SchemaURL: 
+ScopeSpans SchemaURL:
 InstrumentationScope foo_library 1.8.1
 Span #0
     Trace ID       : ebbd7e13e9cdfb05f0ca9ed4b0cdf6c0
@@ -307,16 +308,16 @@ Span #0
     Start time     : 2022-12-13 17:05:36.487636362 +0000 UTC
     End time       : 2022-12-13 17:05:36.487641983 +0000 UTC
     Status code    : Unset
-    Status message : 
+    Status message :
 ResourceSpans #2
-Resource SchemaURL: 
+Resource SchemaURL:
 Resource attributes:
      -> service.name: Str(unknown_service)
      -> telemetry.sdk.version: Str(1.8.1)
      -> telemetry.sdk.name: Str(opentelemetry)
      -> telemetry.sdk.language: Str(cpp)
 ScopeSpans #0
-ScopeSpans SchemaURL: 
+ScopeSpans SchemaURL:
 InstrumentationScope foo_library 1.8.1
 Span #0
     Trace ID       : ebbd7e13e9cdfb05f0ca9ed4b0cdf6c0
@@ -327,27 +328,27 @@ Span #0
     Start time     : 2022-12-13 17:05:36.482154908 +0000 UTC
     End time       : 2022-12-13 17:05:36.488641122 +0000 UTC
     Status code    : Unset
-    Status message : 
+    Status message :
 ResourceSpans #3
-Resource SchemaURL: 
+Resource SchemaURL:
 Resource attributes:
      -> service.name: Str(unknown_service)
      -> telemetry.sdk.version: Str(1.8.1)
      -> telemetry.sdk.name: Str(opentelemetry)
      -> telemetry.sdk.language: Str(cpp)
 ScopeSpans #0
-ScopeSpans SchemaURL: 
+ScopeSpans SchemaURL:
 InstrumentationScope foo_library 1.8.1
 Span #0
     Trace ID       : ebbd7e13e9cdfb05f0ca9ed4b0cdf6c0
-    Parent ID      : 
+    Parent ID      :
     ID             : 6489f2ada8d95da0
     Name           : library
     Kind           : Internal
     Start time     : 2022-12-13 17:05:36.482136052 +0000 UTC
     End time       : 2022-12-13 17:05:36.489263125 +0000 UTC
     Status code    : Unset
-    Status message : 
+    Status message :
 	{"kind": "exporter", "data_type": "traces", "name": "logging"}
 ```
 

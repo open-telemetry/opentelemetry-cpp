@@ -32,6 +32,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
     : options_(options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
 #  ifdef ENABLE_OTLP_HTTP_SSL
+                                                            options.ssl_insecure_skip_verify,
                                                             options.ssl_ca_cert_path,
                                                             options.ssl_ca_cert_string,
                                                             options.ssl_client_key_path,
@@ -39,6 +40,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                                             options.ssl_client_cert_path,
                                                             options.ssl_client_cert_string,
 #  else
+                                                            false /* ssl_insecure_skip_verify */,
                                                             "" /* ssl_ca_cert_path */,
                                                             "" /* ssl_ca_cert_string */,
                                                             "" /* ssl_client_key_path */,

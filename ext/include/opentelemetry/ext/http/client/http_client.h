@@ -112,12 +112,41 @@ using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
 struct HttpSslOptions
 {
+  /**
+    Use HTTPS (true) or HTTP (false).
+  */
   bool use_ssl{false};
+  /**
+    Skip SSL/TLS verifications.
+    Setting this flag to true is insecure.
+  */
+  bool ssl_insecure_skip_verify{false};
+  /**
+    Path to the CA CERT file.
+  */
   std::string ssl_ca_cert_path{};
+  /**
+    CA CERT.
+    Used only if @p ssl_ca_cert_path is empty.
+  */
   std::string ssl_ca_cert_string{};
+  /**
+    Path to the client key file.
+  */
   std::string ssl_client_key_path{};
+  /**
+    Client key.
+    Used only if @p ssl_client_key_path is empty.
+  */
   std::string ssl_client_key_string{};
+  /**
+    Path to the client cert file.
+  */
   std::string ssl_client_cert_path{};
+  /**
+    Client cert.
+    Used only if @p ssl_client_cert_path is empty.
+  */
   std::string ssl_client_cert_string{};
 
   /** RESERVED. */

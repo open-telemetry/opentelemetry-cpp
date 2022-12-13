@@ -59,6 +59,8 @@ struct OtlpHttpLogRecordExporterOptions
 #  endif
 
 #  ifdef ENABLE_OTLP_HTTP_SSL
+  bool ssl_insecure_skip_verify{false};
+
   std::string ssl_ca_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
   std::string ssl_ca_cert_string = GetOtlpDefaultLogsSslCertificateString();
 

@@ -46,6 +46,8 @@ struct OtlpHttpClientOptions
 {
   std::string url;
 
+  bool ssl_insecure_skip_verify;
+
   std::string ssl_ca_cert_path;
   std::string ssl_ca_cert_string;
 
@@ -84,6 +86,7 @@ struct OtlpHttpClientOptions
   std::string user_agent;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
+                               bool input_ssl_insecure_skip_verify,
                                nostd::string_view input_ssl_ca_cert_path,
                                nostd::string_view input_ssl_ca_cert_string,
                                nostd::string_view input_ssl_client_key_path,
@@ -100,6 +103,7 @@ struct OtlpHttpClientOptions
                                std::size_t input_max_requests_per_connection = 8,
                                nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
+        ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
         ssl_ca_cert_path(input_ssl_ca_cert_path),
         ssl_ca_cert_string(input_ssl_ca_cert_string),
         ssl_client_key_path(input_ssl_client_key_path),

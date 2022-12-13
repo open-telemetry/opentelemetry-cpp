@@ -432,7 +432,6 @@ CURLcode HttpOperation::Setup()
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_CAINFO_BLOB, &stblob);
-      // Assuming PEM format.
 #else
       // CURL 7.77.0 (0x07 0x4D 0x00) required for CURLOPT_CAINFO_BLOB.
       return CURLE_UNKNOWN_OPTION;
@@ -491,19 +490,25 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
-    /* 4 - ENFORCE VERIFICATION */
-
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
-
-    // FIXME: Need to get a real CERT, not self signed, for testing:
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
-
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
+    if (ssl_options_.ssl_insecure_skip_verify)
+    {
+      /* 4 - DO NOT ENFORCE VERIFICATION, This is not secure. */
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_NONE);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0L);
+    }
+    else
+    {
+      /* 4 - ENFORCE VERIFICATION */
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
+    }
   }
   else
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0);  // 1L
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0L);
   }
 
   if (curl_resource_.headers_chunk != nullptr)
