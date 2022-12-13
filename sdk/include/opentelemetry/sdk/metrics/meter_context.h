@@ -130,7 +130,12 @@ private:
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
   std::vector<std::shared_ptr<Meter>> meters_;
 
+#if defined(__cpp_lib_atomic_value_initialization) && \
+    __cpp_lib_atomic_value_initialization >= 201911L
+  std::atomic_flag shutdown_latch_{};
+#else
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+#endif
   opentelemetry::common::SpinLockMutex forceflush_lock_;
   opentelemetry::common::SpinLockMutex meter_lock_;
 };
