@@ -70,7 +70,6 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
         return false;
       }
       this->exporter_->Export(metric_data);
-      std::cout << "\n Export done\n";
       return true;
     });
   });
