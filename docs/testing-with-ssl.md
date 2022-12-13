@@ -17,7 +17,7 @@ First, write a CA request file in json, named `ca_csr.json`
 
 It should contains the following data:
 
-```
+```console
 shell> cat ca_csr.json
 {
   "hosts": ["localhost", "127.0.0.1"],
@@ -35,7 +35,7 @@ shell> cat ca_csr.json
 
 Then, generate a CA certificate:
 
-```
+```console
 shell> cfssl genkey -initca ca_csr.json | cfssljson -bare ca
 2022/12/13 16:42:57 [INFO] generate received request
 2022/12/13 16:42:57 [INFO] received CSR
@@ -56,7 +56,7 @@ for the opentelemetry-cpp client.
 
 It should contains the following data:
 
-```
+```console
 shell> cat client_csr.json
 {
   "hosts": ["localhost", "127.0.0.1"],
@@ -79,7 +79,7 @@ otherwise the client certificate will be self-signed, and rejected later in SSL/
 Now, use the CA certificate generated in the previous step
 to create and sign a new client certificate.
 
-```
+```console
 shell> cfssl gencert -ca ca.pem -ca-key ca-key.pem client_csr.json | cfssljson -bare client_cert
 2022/12/13 16:50:18 [INFO] generate received request
 2022/12/13 16:50:18 [INFO] received CSR
@@ -97,8 +97,8 @@ for the opentelemetry server (the opentelemetry-collector)
 
 It should contains the following data:
 
-```
-malff@localhost.localdomain:CERT-LAB> cat server_csr.json
+```console
+shell> cat server_csr.json
 {
   "hosts": ["localhost", "127.0.0.1"],
   "key": {
@@ -117,7 +117,7 @@ Likewise, use a different name from the CA authority name.
 
 Use the CA certificate to create and sign a new server certificate.
 
-```
+```console
 shell> cfssl gencert -ca ca.pem -ca-key ca-key.pem server_csr.json | cfssljson -bare server_cert
 2022/12/13 17:04:40 [INFO] generate received request
 2022/12/13 17:04:40 [INFO] received CSR
@@ -132,7 +132,7 @@ This will create three files, `server_cert.csr`, `server_cert.pem` and `server_c
 
 Verify the certificates generated, using `openssl`:
 
-```
+```console
 shell> openssl verify -CAfile ca.pem server_cert.pem client_cert.pem
 server_cert.pem: OK
 client_cert.pem: OK
@@ -140,15 +140,15 @@ client_cert.pem: OK
 
 Useful commands, to inspect certificates if needed (output not shown here)
 
-```
+```console
 shell> openssl x509 -in ca.pem -text
 ```
 
-```
+```console
 shell> openssl x509 -in client_cert.pem -text
 ```
 
-```
+```console
 shell> openssl x509 -in server_cert.pem -text
 ```
 
@@ -158,7 +158,7 @@ shell> openssl x509 -in server_cert.pem -text
 
 Use `openssl` to simulate an opentelemetry-cpp client connecting to port 4318:
 
-```
+```console
 shell> openssl s_client -connect localhost:4318 -CAfile ca.pem -cert client_cert.pem -key client_cert-key.pem
 ```
 
@@ -166,7 +166,7 @@ shell> openssl s_client -connect localhost:4318 -CAfile ca.pem -cert client_cert
 
 Use the example `example_otlp_http` client to connect to an OTLP HTTP server:
 
-```
+```console
 shell> export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://localhost:4318/v1/traces
 shell> export OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE=ca.pem
 shell> export OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE=client_cert.pem
@@ -180,7 +180,7 @@ shell> example_otlp_http
 
 Use `openssl` to simulate an opentelemetry-collector process serving port 4318:
 
-```
+```console
 shell> openssl s_server -accept 4318 -CAfile ca.pem -cert server_cert.pem -key server_cert-key.pem
 Using default temp DH parameters
 ACCEPT
@@ -199,7 +199,7 @@ To use a server that:
 use the opentelemetry-collector,
 configured to use SSL/TLS for receivers:
 
-```
+```console
 shell> cat otel-collector-config-ssl.yaml
 receivers:
   otlp:
@@ -214,13 +214,12 @@ receivers:
 
 For example:
 
-```
+```console
 shell> /path/to/bin/otelcorecol_linux_amd64 --config /path/to/otel-config-ssl.yaml
 ```
 
 Note, the `example/http/http_example` can not be used (it understands neither SSL
 nor OTLP HTTP).
-
 
 ## Testing SSL on the wire
 
@@ -245,7 +244,7 @@ This can be used to verify the client keys are working properly.
 
 Start an opentelemetry-collector, configured to use SSL/TLS.
 
-```
+```console
 shell> /path/to/bin/otelcorecol_linux_amd64 --config /path/to/otel-config-ssl.yaml
 ...
 2022-12-13T18:03:21.140+0100    info    otlpreceiver@v0.66.0/otlp.go:89 Starting HTTP server    {"kind": "receiver", "name": "otlp", "pipeline": "metrics", "endpoint": "0.0.0.0:4318"}
@@ -257,7 +256,7 @@ shell> /path/to/bin/otelcorecol_linux_amd64 --config /path/to/otel-config-ssl.ya
 
 Start the example_otlp_http client, configured to use SSL/TLS.
 
-```
+```console
 shell> export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://localhost:4318/v1/traces
 shell> export OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE=ca.pem
 shell> export OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE=client_cert.pem
@@ -267,9 +266,9 @@ shell> example_otlp_http
 
 The opentelemetry-collector process receives data, as seen in logs:
 
-```
-2022-12-13T18:05:36.611+0100	info	TracesExporter	{"kind": "exporter", "data_type": "traces", "name": "logging", "#spans": 4}
-2022-12-13T18:05:36.611+0100	info	ResourceSpans #0
+```console
+2022-12-13T18:05:36.611+0100 info TracesExporter {"kind": "exporter", "data_type": "traces", "name": "logging", "#spans": 4}
+2022-12-13T18:05:36.611+0100 info ResourceSpans #0
 Resource SchemaURL:
 Resource attributes:
      -> service.name: Str(unknown_service)
@@ -349,6 +348,4 @@ Span #0
     End time       : 2022-12-13 17:05:36.489263125 +0000 UTC
     Status code    : Unset
     Status message :
-	{"kind": "exporter", "data_type": "traces", "name": "logging"}
 ```
-
