@@ -61,7 +61,7 @@ void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     return;
   }
 
-  if (buffer_.Add(record) == false)
+  if (buffer_.Add(std::unique_ptr<Recordable>(record.release())) == false)
   {
     return;
   }

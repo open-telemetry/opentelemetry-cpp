@@ -7,9 +7,9 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <gtest/gtest.h>
@@ -79,11 +79,39 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 }
 
+class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
+{
+public:
+  void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetSeverity(opentelemetry::logs::Severity) noexcept override {}
+
+  void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
+
+  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
+
+  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
+
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
+
+  void SetAttribute(nostd::string_view,
+                    const opentelemetry::common::AttributeValue &) noexcept override
+  {}
+
+  void SetResource(const opentelemetry::sdk::resource::Resource &) noexcept override {}
+
+  void SetInstrumentationScope(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &) noexcept override
+  {}
+};
+
 class DummyProcessor : public LogRecordProcessor
 {
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new LogRecord);
+    return std::unique_ptr<Recordable>(new DummyLogRecordable());
   }
 
   void OnEmit(std::unique_ptr<Recordable> && /* record */) noexcept override {}

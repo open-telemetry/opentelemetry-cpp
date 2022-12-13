@@ -60,7 +60,22 @@ void MultiRecordable::SetTimestamp(opentelemetry::common::SystemTimestamp timest
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetTimestamp(timestamp);
+    if (recordable.second)
+    {
+      recordable.second->SetTimestamp(timestamp);
+    }
+  }
+}
+
+void MultiRecordable::SetObservedTimestamp(
+    opentelemetry::common::SystemTimestamp timestamp) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetObservedTimestamp(timestamp);
+    }
   }
 }
 
@@ -68,23 +83,54 @@ void MultiRecordable::SetSeverity(opentelemetry::logs::Severity severity) noexce
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetSeverity(severity);
+    if (recordable.second)
+    {
+      recordable.second->SetSeverity(severity);
+    }
   }
 }
 
-void MultiRecordable::SetBody(nostd::string_view message) noexcept
+void MultiRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetBody(message);
+    if (recordable.second)
+    {
+      recordable.second->SetBody(message);
+    }
   }
 }
 
-void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void MultiRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetResource(resource);
+    if (recordable.second)
+    {
+      recordable.second->SetTraceId(trace_id);
+    }
+  }
+}
+
+void MultiRecordable::SetSpanId(const opentelemetry::trace::SpanId &span_id) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetSpanId(span_id);
+    }
+  }
+}
+
+void MultiRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetTraceFlags(trace_flags);
+    }
   }
 }
 
@@ -93,31 +139,21 @@ void MultiRecordable::SetAttribute(nostd::string_view key,
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetAttribute(key, value);
+    if (recordable.second)
+    {
+      recordable.second->SetAttribute(key, value);
+    }
   }
 }
 
-void MultiRecordable::SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept
+void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetTraceId(trace_id);
-  }
-}
-
-void MultiRecordable::SetSpanId(opentelemetry::trace::SpanId span_id) noexcept
-{
-  for (auto &recordable : recordables_)
-  {
-    recordable.second->SetSpanId(span_id);
-  }
-}
-
-void MultiRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept
-{
-  for (auto &recordable : recordables_)
-  {
-    recordable.second->SetTraceFlags(trace_flags);
+    if (recordable.second)
+    {
+      recordable.second->SetResource(resource);
+    }
   }
 }
 
@@ -125,14 +161,15 @@ void MultiRecordable::SetInstrumentationScope(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope
         &instrumentation_scope) noexcept
 {
-  instrumentation_scope_ = &instrumentation_scope;
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetInstrumentationScope(instrumentation_scope);
+    }
+  }
 }
 
-const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-MultiRecordable::GetInstrumentationScope() const noexcept
-{
-  return *instrumentation_scope_;
-}
 }  // namespace logs
 }  // namespace sdk
 

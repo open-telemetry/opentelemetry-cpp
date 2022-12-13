@@ -15,13 +15,19 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test
+        sudo -E ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_test:
     name: CMake gcc 12 (maintainer mode)
@@ -31,13 +37,20 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+        GOOGLETEST_VERSION: 1.12.1
       run: |
-        sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 GOOGLETEST_VERSION=1.12.1 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake gcc (maintainer mode)
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
       run: |
-        sudo CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 ./ci/setup_thrift.sh
-        CC=/usr/bin/gcc-12 CXX=/usr/bin/g++-12 ./ci/do_ci.sh cmake.maintainer.test
+        sudo -E ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.maintainer.test
 
   cmake_clang_maintainer_test:
     name: CMake clang 14 (maintainer mode)
@@ -47,13 +60,20 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        GOOGLETEST_VERSION: 1.12.1
       run: |
-        sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 GOOGLETEST_VERSION=1.12.1 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake clang (maintainer mode)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
       run: |
-        sudo CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 ./ci/setup_thrift.sh
-        CC=/usr/bin/clang-14 CXX=/usr/bin/clang++-14 ./ci/do_ci.sh cmake.maintainer.test
+        sudo -E ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.maintainer.test
 
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
@@ -77,13 +97,19 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_thrift.sh
-        CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.with_async_export.test
+        sudo -E ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
     name: CMake test (with abseil)
@@ -113,13 +139,16 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
     - name: setup cmake
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
-    - name: run tests
-      run: ./ci/do_ci.sh cmake.legacy.test
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+      run: ./ci/do_ci.sh cmake.legacy.test
 
   cmake_gcc_48_otlp_exporter_test:
     name: CMake gcc 4.8 (with otlp exporter)
@@ -132,32 +161,65 @@ jobs:
       run: |
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
-    - name: setup cmake
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
-    - name: setup grpc
-      run: |
-        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
-    - name: run tests
-      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
+    - name: setup cmake and grpc
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: "1.10.0"
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_grpc.sh -v 4.8
+    - name: run tests
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
 
-  cmake_test_cxx20:
-    name: CMake C++20 test
+  cmake_test_cxx20_gcc:
+    name: CMake C++20 test(GCC)
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CMAKE_VERSION: "3.20.6"
       run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
+
+  cmake_test_cxx20_clang:
+    name: CMake C++20 test(Clang with libc++)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: "3.20.6"
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+      run: ./ci/do_ci.sh cmake.c++20.test
+    - name: run tests (enable stl)
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
       run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_otprotocol_test:
@@ -184,11 +246,17 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run tests
-      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh cmake.test_example_plugin
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: ./ci/do_ci.sh cmake.test_example_plugin
 
   bazel_test:
     name: Bazel
@@ -492,11 +560,17 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run tests and generate report
-      run: CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/do_ci.sh code.coverage
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: ./ci/do_ci.sh code.coverage
     - name: upload report
       uses: codecov/codecov-action@v3
       with:

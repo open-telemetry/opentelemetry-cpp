@@ -13,7 +13,7 @@ if [ "x$CMAKE_VERSION" = "x" ]; then
 fi
 
 if [ "x$GOOGLETEST_VERSION" = "x" ]; then
-  export GOOGLETEST_VERSION=1.10.0
+  export GOOGLETEST_VERSION=1.12.1
 fi
 
 cmake_install() {

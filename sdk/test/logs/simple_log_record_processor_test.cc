@@ -6,7 +6,7 @@
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 
 #  include <gtest/gtest.h>
 
@@ -17,6 +17,51 @@ using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
 namespace nostd = opentelemetry::nostd;
 
+class TestLogRecordable final : public opentelemetry::sdk::logs::Recordable
+{
+public:
+  void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+
+  void SetSeverity(opentelemetry::logs::Severity) noexcept override {}
+
+  nostd::string_view GetBody() const noexcept { return body_; }
+
+  void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override
+  {
+    if (nostd::holds_alternative<const char *>(message))
+    {
+      body_ = nostd::get<const char *>(message);
+    }
+    else if (nostd::holds_alternative<nostd::string_view>(message))
+    {
+      body_ = static_cast<std::string>(nostd::get<nostd::string_view>(message));
+    }
+  }
+
+  void SetBody(const char *message) noexcept { body_ = message; }
+
+  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
+
+  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
+
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
+
+  void SetAttribute(nostd::string_view,
+                    const opentelemetry::common::AttributeValue &) noexcept override
+  {}
+
+  void SetResource(const opentelemetry::sdk::resource::Resource &) noexcept override {}
+
+  void SetInstrumentationScope(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &) noexcept override
+  {}
+
+private:
+  std::string body_;
+};
+
 /*
  * A test exporter that can return a vector of all the records it has received,
  * and keep track of the number of times its Shutdown() function was called.
@@ -25,7 +70,7 @@ class TestExporter final : public LogRecordExporter
 {
 public:
   TestExporter(int *shutdown_counter,
-               std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
+               std::shared_ptr<std::vector<std::unique_ptr<TestLogRecordable>>> logs_received,
                size_t *batch_size_received)
       : shutdown_counter_(shutdown_counter),
         logs_received_(logs_received),
@@ -34,7 +79,7 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new LogRecord());
+    return std::unique_ptr<Recordable>(new TestLogRecordable());
   }
 
   // Stores the names of the log records this exporter receives to an internal list
@@ -43,7 +88,8 @@ public:
     *batch_size_received = records.size();
     for (auto &record : records)
     {
-      auto log_record = std::unique_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));
+      auto log_record =
+          std::unique_ptr<TestLogRecordable>(static_cast<TestLogRecordable *>(record.release()));
 
       if (log_record != nullptr)
       {
@@ -62,7 +108,7 @@ public:
 
 private:
   int *shutdown_counter_;
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received_;
+  std::shared_ptr<std::vector<std::unique_ptr<TestLogRecordable>>> logs_received_;
   size_t *batch_size_received;
 };
 
@@ -71,8 +117,8 @@ private:
 TEST(SimpleLogRecordProcessorTest, SendReceivedLogsToExporter)
 {
   // Create a simple processor with a TestExporter attached
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
-      new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<TestLogRecordable>>> logs_received(
+      new std::vector<std::unique_ptr<TestLogRecordable>>);
   size_t batch_size_received = 0;
 
   std::unique_ptr<TestExporter> exporter(
@@ -85,7 +131,7 @@ TEST(SimpleLogRecordProcessorTest, SendReceivedLogsToExporter)
   for (int i = 0; i < num_logs; i++)
   {
     auto recordable = processor.MakeRecordable();
-    recordable->SetBody("Log Body");
+    static_cast<TestLogRecordable *>(recordable.get())->SetBody("Log Body");
     processor.OnEmit(std::move(recordable));
 
     // Verify that the batch of 1 log record sent by processor matches what exporter received
@@ -129,7 +175,7 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<Recordable>(new LogRecord());
+    return std::unique_ptr<Recordable>(new TestLogRecordable());
   }
 
   ExportResult Export(

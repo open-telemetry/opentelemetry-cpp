@@ -7,7 +7,6 @@
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
