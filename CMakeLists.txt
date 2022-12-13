@@ -543,3 +543,8 @@ install(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+if(BUILD_PACKAGE)
+  include(cmake/package.cmake)
+  include(CPack)
+endif()
