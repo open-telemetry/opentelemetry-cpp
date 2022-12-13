@@ -5,6 +5,8 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <memory>
+
 #  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"

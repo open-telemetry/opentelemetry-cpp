@@ -8,6 +8,7 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/read_write_log_record.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
 #  include <gtest/gtest.h>
@@ -42,7 +43,7 @@ TEST(OStreamLogRecordExporter, Shutdown)
 
   // After processor/exporter is shutdown, no logs should be sent to stream
   auto record = exporter->MakeRecordable();
-  record->SetBody("Log record not empty");
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetBody("Log record not empty");
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Restore original stringstream buffer
@@ -77,18 +78,18 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
 
   std::vector<std::string> expected_output{
       "{\n"
-      "  timestamp     : 0\n"
-      "  severity_num  : 0\n"
-      "  severity_text : INVALID\n"
-      "  body          : \n",
-      "  resource      : \n",
+      "  timestamp          : 0\n",
+      "  severity_num       : 0\n"
+      "  severity_text      : INVALID\n"
+      "  body               : \n",
+      "  resource           : \n",
       "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "telemetry.sdk.name: opentelemetry\n",
       "telemetry.sdk.language: cpp\n",
-      "  attributes    : \n"
-      "  trace_id      : 00000000000000000000000000000000\n"
-      "  span_id       : 0000000000000000\n"
-      "  trace_flags   : 00\n"
+      "  attributes         : \n"
+      "  trace_id           : 00000000000000000000000000000000\n"
+      "  span_id            : 0000000000000000\n"
+      "  trace_flags        : 00\n"
       "}\n"};
 
   for (auto &expected : expected_output)
@@ -114,10 +115,12 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
   // Create a log record and manually timestamp, severity, name, message
   common::SystemTimestamp now(std::chrono::system_clock::now());
 
-  auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
-  record->SetTimestamp(now);
-  record->SetSeverity(logs_api::Severity::kTrace);  // kTrace has enum value of 1
-  record->SetBody("Message");
+  auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::ReadWriteLogRecord());
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetTimestamp(now);
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetObservedTimestamp(now);
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())
+      ->SetSeverity(logs_api::Severity::kTrace);  // kTrace has enum value of 1
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetBody("Message");
 
   // Log a record to cout
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
@@ -127,20 +130,23 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
 
   std::vector<std::string> expected_output{
       "{\n"
-      "  timestamp     : " +
+      "  timestamp          : " +
           std::to_string(now.time_since_epoch().count()) +
           "\n"
-          "  severity_num  : 1\n"
-          "  severity_text : TRACE\n"
-          "  body          : Message\n",
-      "  resource      : \n",
+          "  observed_timestamp : " +
+          std::to_string(now.time_since_epoch().count()) +
+          "\n"
+          "  severity_num       : 1\n"
+          "  severity_text      : TRACE\n"
+          "  body               : Message\n",
+      "  resource           : \n",
       "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "telemetry.sdk.name: opentelemetry\n",
       "telemetry.sdk.language: cpp\n",
-      "  attributes    : \n"
-      "  trace_id      : 00000000000000000000000000000000\n"
-      "  span_id       : 0000000000000000\n"
-      "  trace_flags   : 00\n"
+      "  attributes         : \n"
+      "  trace_id           : 00000000000000000000000000000000\n"
+      "  span_id            : 0000000000000000\n"
+      "  trace_flags        : 00\n"
       "}\n"};
 
   for (auto &expected : expected_output)
@@ -169,10 +175,10 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
 
   // Set resources for this log record only of type <string, string>
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"key1", "val1"}});
-  record->SetResource(resource);
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetResource(resource);
 
   // Set attributes to this log record of type <string, AttributeValue>
-  record->SetAttribute("a", true);
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetAttribute("a", true);
 
   // Log record to cerr
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
@@ -182,21 +188,21 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
 
   std::vector<std::string> expected_output{
       "{\n"
-      "  timestamp     : 0\n"
-      "  severity_num  : 0\n"
-      "  severity_text : INVALID\n"
-      "  body          : \n",
-      "  resource      : \n",
+      "  timestamp          : 0\n",
+      "  severity_num       : 0\n"
+      "  severity_text      : INVALID\n"
+      "  body               : \n",
+      "  resource           : \n",
       "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "telemetry.sdk.name: opentelemetry\n",
       "telemetry.sdk.language: cpp\n",
       "service.name: unknown_service\n",
       "key1: val1\n",
-      "  attributes    : \n",
+      "  attributes         : \n",
       "\ta: 1\n",
-      "  trace_id      : 00000000000000000000000000000000\n"
-      "  span_id       : 0000000000000000\n"
-      "  trace_flags   : 00\n"
+      "  trace_id           : 00000000000000000000000000000000\n"
+      "  span_id            : 0000000000000000\n"
+      "  trace_flags        : 00\n"
       "}\n"};
 
   for (auto &expected : expected_output)
@@ -229,12 +235,13 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
   nostd::span<int> data1{array1.data(), array1.size()};
 
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"res1", data1}});
-  record->SetResource(resource);
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())->SetResource(resource);
 
   // Set resources for this log record of bool types as the value
   // e.g. key/value is a par of type <string, array of bools>
   std::array<bool, 3> array = {false, true, false};
-  record->SetAttribute("attr1", nostd::span<bool>{array.data(), array.size()});
+  static_cast<sdklogs::ReadWriteLogRecord *>(record.get())
+      ->SetAttribute("attr1", nostd::span<bool>{array.data(), array.size()});
 
   // Log a record to clog
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
@@ -244,21 +251,21 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
 
   std::vector<std::string> expected_output{
       "{\n"
-      "  timestamp     : 0\n"
-      "  severity_num  : 0\n"
-      "  severity_text : INVALID\n"
-      "  body          : \n",
-      "  resource      : \n",
+      "  timestamp          : 0\n",
+      "  severity_num       : 0\n"
+      "  severity_text      : INVALID\n"
+      "  body               : \n",
+      "  resource           : \n",
       "service.name: unknown_service\n",
       "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "telemetry.sdk.name: opentelemetry\n",
       "telemetry.sdk.language: cpp\n",
       "res1: [1,2,3]\n",
-      "attributes    : \n",
+      "attributes         : \n",
       "\tattr1: [0,1,0]\n"
-      "  trace_id      : 00000000000000000000000000000000\n"
-      "  span_id       : 0000000000000000\n"
-      "  trace_flags   : 00\n"
+      "  trace_id           : 00000000000000000000000000000000\n"
+      "  span_id            : 0000000000000000\n"
+      "  trace_flags        : 00\n"
       "}\n"};
 
   for (auto &expected : expected_output)
@@ -303,21 +310,20 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   // Compare actual vs expected outputs
   std::vector<std::string> expected_output{
       "{\n"
-      "  timestamp     : " +
-          std::to_string(now.time_since_epoch().count()) +
-          "\n"
-          "  severity_num  : 5\n"
-          "  severity_text : DEBUG\n"
-          "  body          : Hello\n",
-      "  resource      : \n",
+      "  timestamp          : " +
+          std::to_string(now.time_since_epoch().count()) + "\n",
+      "  severity_num       : 5\n"
+      "  severity_text      : DEBUG\n"
+      "  body               : Hello\n",
+      "  resource           : \n",
       "telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
       "service.name: unknown_service\n",
       "telemetry.sdk.name: opentelemetry\n",
       "telemetry.sdk.language: cpp\n",
-      "  attributes    : \n"
-      "  trace_id      : 00000000000000000000000000000000\n"
-      "  span_id       : 0000000000000000\n"
-      "  trace_flags   : 00\n"
+      "  attributes         : \n"
+      "  trace_id           : 00000000000000000000000000000000\n"
+      "  span_id            : 0000000000000000\n"
+      "  trace_flags        : 00\n"
       "}\n"};
 
   for (auto &expected : expected_output)

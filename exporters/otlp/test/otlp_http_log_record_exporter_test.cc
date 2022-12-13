@@ -21,7 +21,6 @@
 #    include "opentelemetry/logs/provider.h"
 #    include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #    include "opentelemetry/sdk/logs/exporter.h"
-#    include "opentelemetry/sdk/logs/log_record.h"
 #    include "opentelemetry/sdk/logs/logger_provider.h"
 #    include "opentelemetry/sdk/resource/resource.h"
 #    include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"

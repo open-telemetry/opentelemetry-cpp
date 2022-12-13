@@ -11,6 +11,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <list>
@@ -109,7 +110,8 @@ void OtlpRecordableUtils::PopulateRequest(
       {
         if (!output_resource_log->has_resource())
         {
-          *output_resource_log->mutable_resource() = input_log_record->ProtoResource();
+          OtlpPopulateAttributeUtils::PopulateAttribute(output_resource_log->mutable_resource(),
+                                                        *input_resource_log.first);
           output_resource_log->set_schema_url(input_resource_log.first->GetSchemaURL());
         }
 

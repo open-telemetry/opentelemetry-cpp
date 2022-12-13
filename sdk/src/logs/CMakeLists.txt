@@ -11,7 +11,9 @@ add_library(
   logger_context_factory.cc
   multi_log_record_processor.cc
   multi_log_record_processor_factory.cc
-  multi_recordable.cc)
+  multi_recordable.cc
+  read_write_log_record.cc
+  readable_log_record.cc)
 
 set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)
 
