@@ -57,6 +57,7 @@ private:
   std::chrono::milliseconds export_timeout_millis_;
 
   void DoBackgroundWork();
+  bool CollectAndExportOnce();
 
   /* The background worker thread */
   std::thread worker_thread_;
