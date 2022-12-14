@@ -139,8 +139,8 @@ inline bool operator==(string_view lhs, string_view rhs) noexcept
 {
   return lhs.length() == rhs.length() &&
 #  if defined(_MSC_VER)
-#    if _MSC_VER == 1900
-         // Avoid SCL error in Visual Studio 2015
+#    if _MSC_VER >= 1900 && _MSC_VER <= 1911
+         // Avoid SCL error in Visual Studio 2015, VS2017 update 1 to update 4
          (std::memcmp(lhs.data(), rhs.data(), lhs.length()) == 0);
 #    else
          std::equal(lhs.data(), lhs.data() + lhs.length(), rhs.data());
