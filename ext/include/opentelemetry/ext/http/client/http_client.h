@@ -277,12 +277,6 @@ class HttpClient
 public:
   virtual std::shared_ptr<Session> CreateSession(nostd::string_view url) noexcept = 0;
 
-#ifdef ENABLE_OTLP_HTTP_SSL
-  // ABI change, new virtual method
-  virtual std::shared_ptr<Session> CreateSession(nostd::string_view url,
-                                                 const HttpSslOptions &ssl_options) noexcept = 0;
-#endif
-
   virtual bool CancelAllSessions() noexcept = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;

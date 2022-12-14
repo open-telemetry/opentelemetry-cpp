@@ -975,12 +975,7 @@ OtlpHttpClient::createSession(
     ssl_options.use_ssl = false;
   }
 
-#ifdef ENABLE_OTLP_HTTP_SSL
-  // FIXME: revise this
-  auto session = http_client_->CreateSession(options_.url, ssl_options);
-#else
   auto session = http_client_->CreateSession(options_.url);
-#endif
 
   auto request = session->CreateRequest();
 

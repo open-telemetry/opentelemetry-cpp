@@ -74,16 +74,6 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   return session_;
 }
 
-#  ifdef ENABLE_OTLP_HTTP_SSL
-std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
-    nostd::string_view,
-    const opentelemetry::ext::http::client::HttpSslOptions & /* ssl_options */
-    ) noexcept
-{
-  return session_;
-}
-#  endif
-
 bool HttpClient::CancelAllSessions() noexcept
 {
   session_->CancelSession();

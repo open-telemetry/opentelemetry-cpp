@@ -156,25 +156,6 @@ HttpClient::~HttpClient()
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
     nostd::string_view url) noexcept
 {
-  HttpSslOptions no_ssl;
-  return CreateSessionImpl(url, no_ssl);
-}
-
-#ifdef ENABLE_OTLP_HTTP_SSL
-std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
-    nostd::string_view url,
-    const opentelemetry::ext::http::client::HttpSslOptions &ssl_options) noexcept
-{
-  return CreateSessionImpl(url, ssl_options);
-}
-#endif
-
-std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSessionImpl(
-    nostd::string_view url,
-    const opentelemetry::ext::http::client::HttpSslOptions & /* TODO: ssl_options */
-
-    ) noexcept
-{
   auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
