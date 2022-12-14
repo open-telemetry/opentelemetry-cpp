@@ -61,8 +61,6 @@ private:
 
 TEST(PeriodicExporingMetricReader, BasicTests)
 {
-  size_t num_of_iterations = 20;
-
   std::unique_ptr<PushMetricExporter> exporter(new MockPushMetricExporter());
   PeriodicExportingMetricReaderOptions options;
   options.export_timeout_millis  = std::chrono::milliseconds(200);
