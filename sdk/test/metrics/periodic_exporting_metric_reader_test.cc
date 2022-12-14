@@ -63,23 +63,16 @@ TEST(PeriodicExporingMetricReader, BasicTests)
 {
   size_t num_of_iterations = 20;
 
-  for (size_t i = 0; i < num_of_iterations; i++)
-  {
-    std::unique_ptr<PushMetricExporter> exporter(new MockPushMetricExporter());
-    PeriodicExportingMetricReaderOptions options;
-    size_t lowest_ms               = 100;
-    size_t range_ms                = 200;
-    options.export_timeout_millis  = std::chrono::milliseconds(200);
-    options.export_interval_millis = std::chrono::milliseconds(500);
-    auto exporter_ptr              = exporter.get();
-
-    auto sleep_ms = lowest_ms + rand() % range_ms;
-    PeriodicExportingMetricReader reader(std::move(exporter), options);
-    MockMetricProducer producer;
-    reader.SetMetricProducer(&producer);
-    std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
-    reader.Shutdown();
-    EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
-              static_cast<MockMetricProducer *>(&producer)->GetDataCount());
-  }
+  std::unique_ptr<PushMetricExporter> exporter(new MockPushMetricExporter());
+  PeriodicExportingMetricReaderOptions options;
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(500);
+  auto exporter_ptr              = exporter.get();
+  PeriodicExportingMetricReader reader(std::move(exporter), options);
+  MockMetricProducer producer;
+  reader.SetMetricProducer(&producer);
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  reader.Shutdown();
+  EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
+            static_cast<MockMetricProducer *>(&producer)->GetDataCount());
 }
