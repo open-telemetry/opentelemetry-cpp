@@ -46,15 +46,23 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
   std::unique_lock<std::mutex> lk(cv_m_);
   do
   {
-    auto start = std::chrono::steady_clock::now();
-    CollectAndExportOnce();
+    auto start  = std::chrono::steady_clock::now();
+    auto status = CollectAndExportOnce();
+    if (!status)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
+    }
     auto end            = std::chrono::steady_clock::now();
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
     cv_.wait_for(lk, remaining_wait_interval_ms);
   } while (IsShutdown() != true);
   // One last Collect and Export before shutdown
-  CollectAndExportOnce();
+  auto status = CollectAndExportOnce();
+  if (!status)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
+  }
 }
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
