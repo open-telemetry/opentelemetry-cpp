@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/version.h"
+
 #include <algorithm>
 #include <iomanip>
 #include <limits>
 #include <memory>
-#include "opentelemetry/version.h"
-
-#include <iostream>
 #include <mutex>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
