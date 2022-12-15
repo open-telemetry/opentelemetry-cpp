@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
@@ -51,6 +52,7 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 
   if (buffer_.Add(span) == false)
   {
+    OTEL_INTERNAL_LOG_WARN("BatchSpanProcessor queue is full - dropping span.");
     return;
   }
 
