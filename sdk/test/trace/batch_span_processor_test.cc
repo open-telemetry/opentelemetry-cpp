@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <chrono>
 #include <list>
 #include <memory>
@@ -182,9 +184,30 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   }
 }
 
+// A mock log handler to check whether log messages with a specific level were emitted.
+struct MockLogHandler : public sdk::common::internal_log::LogHandler
+{
+  using Message = std::pair<sdk::common::internal_log::LogLevel, std::string>;
+
+  void Handle(sdk::common::internal_log::LogLevel level,
+              const char *file,
+              int line,
+              const char *msg,
+              const sdk::common::AttributeMap &attributes) noexcept
+  {
+    messages.emplace_back(level, msg);
+  }
+
+  std::vector<Message> messages;
+};
+
 TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
 {
   /* Test that when exporting more than max_queue_size spans, some are most likely lost*/
+
+  // Set up a log handler to verify a warning is generated.
+  auto log_handler = nostd::shared_ptr<sdk::common::internal_log::LogHandler>(new MockLogHandler());
+  sdk::common::internal_log::GlobalLogHandler::SetLogHandler(log_handler);
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
@@ -211,6 +234,13 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
 
   // Span should be exported by now
   EXPECT_GE(max_queue_size, spans_received->size());
+
+  // At least one log message warning about the dropped span should have been emitted by now.
+  auto &vec = dynamic_cast<MockLogHandler *>(log_handler.get())->messages;
+  EXPECT_TRUE(std::find(vec.begin(), vec.end(),
+                        MockLogHandler::Message(
+                            sdk::common::internal_log::LogLevel::Warning,
+                            "BatchSpanProcessor queue is full - dropping span.")) != vec.end());
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
