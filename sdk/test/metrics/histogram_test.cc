@@ -188,7 +188,7 @@ TEST(Histogram, UInt64)
   h->Record(40, {});
   h->Record(45, {});
   h->Record(50, {});
-  h->Record(1e6, {});
+  h->Record(1000000, {});
 
   std::vector<HistogramPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
