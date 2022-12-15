@@ -86,7 +86,7 @@ TEST(Aggregation, LongHistogramAggregation)
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[6], 1);
   aggr.Aggregate((int64_t)13, {});   // lies in third bucket
-  aggr.Aggregate((int64_t)252, {});  // lies in eigth bucket
+  aggr.Aggregate((int64_t)252, {});  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
