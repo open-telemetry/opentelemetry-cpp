@@ -70,7 +70,8 @@ void LongHistogramAggregation::Aggregate(int64_t value,
     }
     index++;
   }
-  point_data_.counts_[point_data_.boundaries_.size()] += 1;
+  // value belongs to the last bucket.
+  point_data_.counts_[index] += 1;
 }
 
 std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
@@ -153,7 +154,8 @@ void DoubleHistogramAggregation::Aggregate(double value,
     }
     index++;
   }
-  point_data_.counts_[point_data_.boundaries_.size()] += 1;
+  // value belongs to the last bucket.
+  point_data_.counts_[index] += 1;
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
