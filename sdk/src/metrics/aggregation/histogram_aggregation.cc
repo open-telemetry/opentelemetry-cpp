@@ -8,6 +8,7 @@
 #include <memory>
 #include "opentelemetry/version.h"
 
+#include <iostream>
 #include <mutex>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -62,13 +63,14 @@ void LongHistogramAggregation::Aggregate(int64_t value,
   size_t index = 0;
   for (auto it = point_data_.boundaries_.begin(); it != point_data_.boundaries_.end(); ++it)
   {
-    if (value < *it)
+    if (value <= *it)
     {
       point_data_.counts_[index] += 1;
       return;
     }
     index++;
   }
+  point_data_.counts_[point_data_.boundaries_.size()] += 1;
 }
 
 std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
@@ -107,8 +109,8 @@ DoubleHistogramAggregation::DoubleHistogramAggregation(const AggregationConfig *
   }
   else
   {
-    point_data_.boundaries_ =
-        std::list<double>{0.0, 5.0, 10.0, 25.0, 50.0, 75.0, 100.0, 250.0, 500.0, 1000.0};
+    point_data_.boundaries_ = {0.0,   5.0,   10.0,   25.0,   50.0,   75.0,   100.0,  250.0,
+                               500.0, 750.0, 1000.0, 2500.0, 5000.0, 7500.0, 10000.0};
   }
   if (ac)
   {
@@ -144,13 +146,14 @@ void DoubleHistogramAggregation::Aggregate(double value,
   size_t index = 0;
   for (auto it = point_data_.boundaries_.begin(); it != point_data_.boundaries_.end(); ++it)
   {
-    if (value < *it)
+    if (value <= *it)
     {
       point_data_.counts_[index] += 1;
       return;
     }
     index++;
   }
+  point_data_.counts_[point_data_.boundaries_.size()] += 1;
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(

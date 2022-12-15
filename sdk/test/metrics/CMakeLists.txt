@@ -6,6 +6,7 @@ foreach(
   aggregation_test
   attributes_processor_test
   attributes_hashmap_test
+  histogram_test
   sync_metric_storage_counter_test
   sync_metric_storage_histogram_test
   sync_metric_storage_up_down_counter_test
