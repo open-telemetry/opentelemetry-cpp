@@ -241,6 +241,11 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
                         MockLogHandler::Message(
                             sdk::common::internal_log::LogLevel::Warning,
                             "BatchSpanProcessor queue is full - dropping span.")) != vec.end());
+
+  // Reinstate the default log handler.
+  sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
+      nostd::shared_ptr<sdk::common::internal_log::LogHandler>(
+          new sdk::common::internal_log::DefaultLogHandler()));
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
