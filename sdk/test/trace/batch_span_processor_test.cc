@@ -190,10 +190,10 @@ struct MockLogHandler : public sdk::common::internal_log::LogHandler
   using Message = std::pair<sdk::common::internal_log::LogLevel, std::string>;
 
   void Handle(sdk::common::internal_log::LogLevel level,
-              const char *file,
-              int line,
+              const char * /*file*/,
+              int /*line*/,
               const char *msg,
-              const sdk::common::AttributeMap &attributes) noexcept
+              const sdk::common::AttributeMap & /*attributes*/) noexcept
   {
     messages.emplace_back(level, msg);
   }
