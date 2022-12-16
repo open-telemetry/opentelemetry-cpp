@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -110,6 +111,8 @@ TEST(Histogram, Double)
             actual.counts_);
 }
 
+#if (HAVE_WORKING_REGEX)
+// FIXME - View Preficate search is only supported through regex
 TEST(Histogram, DoubleCustomBuckets)
 {
   MeterProvider mp;
@@ -166,6 +169,7 @@ TEST(Histogram, DoubleCustomBuckets)
   ASSERT_EQ(std::list<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }
+#endif
 
 TEST(Histogram, UInt64)
 {
@@ -219,6 +223,8 @@ TEST(Histogram, UInt64)
             actual.counts_);
 }
 
+#if (HAVE_WORKING_REGEX)
+// FIXME - View Preficate search is only supported through regex
 TEST(Histogram, UInt64CustomBuckets)
 {
   MeterProvider mp;
@@ -275,3 +281,4 @@ TEST(Histogram, UInt64CustomBuckets)
   ASSERT_EQ(std::list<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }
+#endif
