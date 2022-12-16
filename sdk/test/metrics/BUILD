@@ -281,3 +281,19 @@ otel_cc_benchmark(
         "//sdk/src/metrics",
     ],
 )
+
+otel_cc_benchmark(
+    name = "histogram_aggregation_benchmark",
+    srcs = [
+        "histogram_aggregation_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)

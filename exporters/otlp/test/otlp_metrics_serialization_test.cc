@@ -5,6 +5,7 @@
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 
 #include <gtest/gtest.h>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -54,11 +55,11 @@ static metrics_sdk::MetricData CreateHistogramAggregationData()
   s_data_1.sum_        = 100.2;
   s_data_1.count_      = 22;
   s_data_1.counts_     = {2, 9, 4, 7};
-  s_data_1.boundaries_ = std::list<double>({0.0, 10.0, 20.0, 30.0});
+  s_data_1.boundaries_ = std::vector<double>({0.0, 10.0, 20.0, 30.0});
   s_data_2.sum_        = 200.2;
   s_data_2.count_      = 20;
   s_data_2.counts_     = {0, 8, 5, 7};
-  s_data_2.boundaries_ = std::list<double>({0.0, 10.0, 20.0, 30.0});
+  s_data_2.boundaries_ = std::vector<double>({0.0, 10.0, 20.0, 30.0});
 
   data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
   data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());

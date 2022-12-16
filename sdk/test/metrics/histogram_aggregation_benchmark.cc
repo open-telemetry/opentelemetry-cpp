@@ -64,7 +64,6 @@ namespace
 {
 void BM_HistogramAggregation(benchmark::State &state)
 {
-
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
