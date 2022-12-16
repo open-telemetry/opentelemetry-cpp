@@ -104,9 +104,9 @@ TEST(Histogram, Double)
   ASSERT_EQ(11, actual.count_);
   ASSERT_EQ(5.0, opentelemetry::nostd::get<double>(actual.min_));
   ASSERT_EQ(1e6, opentelemetry::nostd::get<double>(actual.max_));
-  ASSERT_EQ(
-      std::list<double>({0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000}),
-      actual.boundaries_);
+  ASSERT_EQ(std::vector<double>(
+                {0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000}),
+            actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({0, 1, 1, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}),
             actual.counts_);
 }
@@ -166,7 +166,7 @@ TEST(Histogram, DoubleCustomBuckets)
   ASSERT_EQ(10, actual.count_);
   ASSERT_EQ(5.0, opentelemetry::nostd::get<double>(actual.min_));
   ASSERT_EQ(50.0, opentelemetry::nostd::get<double>(actual.max_));
-  ASSERT_EQ(std::list<double>({10, 20, 30, 40}), actual.boundaries_);
+  ASSERT_EQ(std::vector<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }
 #endif
@@ -216,9 +216,9 @@ TEST(Histogram, UInt64)
   ASSERT_EQ(11, actual.count_);
   ASSERT_EQ(5, opentelemetry::nostd::get<int64_t>(actual.min_));
   ASSERT_EQ(1000000, opentelemetry::nostd::get<int64_t>(actual.max_));
-  ASSERT_EQ(
-      std::list<double>({0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000}),
-      actual.boundaries_);
+  ASSERT_EQ(std::vector<double>(
+                {0, 5, 10, 25, 50, 75, 100, 250, 500, 750, 1000, 2500, 5000, 7500, 10000}),
+            actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({0, 1, 1, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}),
             actual.counts_);
 }
@@ -278,7 +278,7 @@ TEST(Histogram, UInt64CustomBuckets)
   ASSERT_EQ(10, actual.count_);
   ASSERT_EQ(5, opentelemetry::nostd::get<int64_t>(actual.min_));
   ASSERT_EQ(50, opentelemetry::nostd::get<int64_t>(actual.max_));
-  ASSERT_EQ(std::list<double>({10, 20, 30, 40}), actual.boundaries_);
+  ASSERT_EQ(std::vector<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }
 #endif

@@ -108,6 +108,26 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
   diff.record_min_max_ = false;
 }
 
+template <class T>
+size_t BucketBinarySearch(T value, std::vector<double> &boundaries)
+{
+  size_t lower_bound = 0;
+  size_t upper_bound = boundaries.size();
+  while (lower_bound != upper_bound)
+  {
+    size_t mid = (lower_bound + upper_bound) / 2;
+    if (value > boundaries[mid])
+    {
+      lower_bound = mid + 1;
+    }
+    else
+    {
+      upper_bound = mid;
+    }
+  }
+  return lower_bound;
+}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

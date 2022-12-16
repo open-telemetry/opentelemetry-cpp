@@ -60,17 +60,7 @@ void LongHistogramAggregation::Aggregate(int64_t value,
     point_data_.min_ = std::min(nostd::get<int64_t>(point_data_.min_), value);
     point_data_.max_ = std::max(nostd::get<int64_t>(point_data_.max_), value);
   }
-  size_t index = 0;
-  for (auto it = point_data_.boundaries_.begin(); it != point_data_.boundaries_.end(); ++it)
-  {
-    if (value <= *it)
-    {
-      point_data_.counts_[index] += 1;
-      return;
-    }
-    index++;
-  }
-  // value belongs to the last bucket.
+  size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
 }
 
@@ -150,17 +140,7 @@ void DoubleHistogramAggregation::Aggregate(double value,
     point_data_.min_ = std::min(nostd::get<double>(point_data_.min_), value);
     point_data_.max_ = std::max(nostd::get<double>(point_data_.max_), value);
   }
-  size_t index = 0;
-  for (auto it = point_data_.boundaries_.begin(); it != point_data_.boundaries_.end(); ++it)
-  {
-    if (value <= *it)
-    {
-      point_data_.counts_[index] += 1;
-      return;
-    }
-    index++;
-  }
-  // value belongs to the last bucket.
+  size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
 }
 

@@ -38,6 +38,13 @@ if(WITH_BENCHMARK)
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
   target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+
+  add_executable(histogram_aggregation_benchmark
+                 histogram_aggregation_benchmark.cc)
+  target_link_libraries(
+    histogram_aggregation_benchmark benchmark::benchmark
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common opentelemetry_metrics
+    opentelemetry_resources)
 endif()
 
 add_subdirectory(exemplar)
