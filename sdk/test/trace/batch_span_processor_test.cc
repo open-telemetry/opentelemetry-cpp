@@ -236,12 +236,14 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   EXPECT_GE(max_queue_size, spans_received->size());
 
   // At least one log message warning about the dropped span should have been emitted by now.
-  auto &vec = dynamic_cast<MockLogHandler *>(log_handler.get())->messages;
-  EXPECT_TRUE(std::find(vec.begin(), vec.end(),
-                        MockLogHandler::Message(
-                            sdk::common::internal_log::LogLevel::Warning,
-                            "BatchSpanProcessor queue is full - dropping span.")) != vec.end());
-
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_WARN
+  auto &messages = static_cast<MockLogHandler *>(log_handler.get())->messages;
+  EXPECT_TRUE(
+      std::find(messages.begin(), messages.end(),
+                MockLogHandler::Message(sdk::common::internal_log::LogLevel::Warning,
+                                        "BatchSpanProcessor queue is full - dropping span.")) !=
+      messages.end());
+#endif
   // Reinstate the default log handler.
   sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
       nostd::shared_ptr<sdk::common::internal_log::LogHandler>(
