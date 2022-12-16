@@ -273,6 +273,5 @@ TEST(Histogram, UInt64CustomBuckets)
   ASSERT_EQ(5, opentelemetry::nostd::get<int64_t>(actual.min_));
   ASSERT_EQ(50, opentelemetry::nostd::get<int64_t>(actual.max_));
   ASSERT_EQ(std::list<double>({10, 20, 30, 40}), actual.boundaries_);
-  ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
-            actual.counts_);
+  ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }

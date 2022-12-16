@@ -80,7 +80,10 @@ std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
   auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
   auto delta_value = nostd::get<HistogramPointData>(
       (static_cast<const LongHistogramAggregation &>(delta).ToPoint()));
-  LongHistogramAggregation *aggr = new LongHistogramAggregation();
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_         = curr_value.boundaries_;
+  agg_config.record_min_max_     = record_min_max_;
+  LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
   HistogramMerge<int64_t>(curr_value, delta_value, aggr->point_data_);
   return std::unique_ptr<Aggregation>(aggr);
 }
@@ -90,7 +93,10 @@ std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(const Aggregation &n
   auto curr_value = nostd::get<HistogramPointData>(ToPoint());
   auto next_value = nostd::get<HistogramPointData>(
       (static_cast<const LongHistogramAggregation &>(next).ToPoint()));
-  LongHistogramAggregation *aggr = new LongHistogramAggregation();
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_         = curr_value.boundaries_;
+  agg_config.record_min_max_     = record_min_max_;
+  LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
   HistogramDiff<int64_t>(curr_value, next_value, aggr->point_data_);
   return std::unique_ptr<Aggregation>(aggr);
 }
@@ -164,12 +170,10 @@ std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
   auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
   auto delta_value = nostd::get<HistogramPointData>(
       (static_cast<const DoubleHistogramAggregation &>(delta).ToPoint()));
-  std::shared_ptr<AggregationConfig> aggregation_config(new HistogramAggregationConfig);
-  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig *>(aggregation_config.get())
-      ->boundaries_ = curr_value.boundaries_;
-  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig *>(aggregation_config.get())
-      ->record_min_max_            = record_min_max_;
-  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(aggregation_config.get());
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_           = curr_value.boundaries_;
+  agg_config.record_min_max_       = record_min_max_;
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
   HistogramMerge<double>(curr_value, delta_value, aggr->point_data_);
   return std::unique_ptr<Aggregation>(aggr);
 }
@@ -180,7 +184,10 @@ std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(
   auto curr_value = nostd::get<HistogramPointData>(ToPoint());
   auto next_value = nostd::get<HistogramPointData>(
       (static_cast<const DoubleHistogramAggregation &>(next).ToPoint()));
-  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation();
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_           = curr_value.boundaries_;
+  agg_config.record_min_max_       = record_min_max_;
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
   HistogramDiff<double>(curr_value, next_value, aggr->point_data_);
   return std::unique_ptr<Aggregation>(aggr);
 }
