@@ -75,9 +75,7 @@ void BM_HistogramAggregation(benchmark::State &state)
   std::uniform_int_distribution<int> distribution(0, 1000000);
   while (state.KeepRunning())
   {
-    auto num     = distribution(generator);
-    double value = (double)std::rand();
-
+    auto value = (double)distribution(generator);
     h->Record(value, {});
   }
 }
