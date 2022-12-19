@@ -126,6 +126,17 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    # bazel platforms
+    maybe(
+        http_archive,
+        name = "platforms",
+        sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+            "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+        ],
+    )
+
     # libcurl (optional)
     maybe(
         http_archive,
