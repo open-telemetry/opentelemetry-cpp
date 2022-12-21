@@ -193,7 +193,7 @@ struct MockLogHandler : public sdk::common::internal_log::LogHandler
               const char * /*file*/,
               int /*line*/,
               const char *msg,
-              const sdk::common::AttributeMap & /*attributes*/) noexcept
+              const sdk::common::AttributeMap & /*attributes*/) noexcept override
   {
     messages.emplace_back(level, msg);
   }
