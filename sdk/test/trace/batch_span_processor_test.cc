@@ -215,10 +215,13 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
 
   const int max_queue_size = 4096;
 
+  sdk::trace::BatchSpanProcessorOptions bsp_options;
+  bsp_options.max_export_batch_size = 16;
+
   auto batch_processor =
       std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
           std::unique_ptr<MockSpanExporter>(new MockSpanExporter(spans_received, is_shutdown)),
-          sdk::trace::BatchSpanProcessorOptions()));
+          bsp_options));
 
   auto test_spans = GetTestSpans(batch_processor, max_queue_size);
 
@@ -226,9 +229,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   {
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
-
-  // Give some time to export the spans
-  std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
   EXPECT_TRUE(batch_processor->ForceFlush());
 
