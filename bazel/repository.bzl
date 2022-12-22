@@ -43,10 +43,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "a03a7b24b3a0766dc823c9008dd32c56a1183889c04f084653266af22289ab0c",
-        strip_prefix = "googletest-a6dfd3aca7f2f91f95fc7ab650c95a48420d513d",
+        sha256 = "81964fe578e9bd7c94dfdb09c8e4d6e6759e19967e397dbea48d1c10e45d0df2",
+        strip_prefix = "googletest-release-1.12.1",
         urls = [
-            "https://github.com/google/googletest/archive/a6dfd3aca7f2f91f95fc7ab650c95a48420d513d.tar.gz",
+            "https://github.com/google/googletest/archive/release-1.12.1.tar.gz",
         ],
     )
 
@@ -85,10 +85,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "320366665d19027cda87b2368c03939006a37e0388bfd1091c8d2a96fbc93bd8",
-        strip_prefix = "grpc-1.48.1",
+        sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
+        strip_prefix = "grpc-1.49.2",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.48.1.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
         ],
     )
 
