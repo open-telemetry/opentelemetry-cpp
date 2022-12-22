@@ -24,7 +24,7 @@ Increment the:
 * [SDK] BatchSpanProcessor now logs a warning when dropping a span because the
   queue is full
   [1871](https://github.com/open-telemetry/opentelemetry-cpp/pull/1871)
-  
+
 ## [1.8.1] 2022-12-04
 
 * [ETW Exporter] Tail based sampling support [#1780](https://github.com/open-telemetry/opentelemetry-cpp/pull/1780)
