@@ -49,7 +49,7 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   lp->GetLogger("NoopLoggerWithOptions", "options", "opentelelemtry_library", "", schema_url);
 }
 
-// Test the Log() overloads
+// Test the EmitLogRecord() overloads
 TEST(Logger, LogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
@@ -114,6 +114,34 @@ TEST(Logger, LogMethodOverloads)
   logger->Fatal("Test log message", {{"key1", "value 1"}, {"key2", 2}});
   logger->Fatal(m);
   logger->Fatal({{"key1", "value 1"}, {"key2", 2}});
+}
+
+TEST(Logger, EventLogMethodOverloads)
+{
+  auto lp = Provider::GetLoggerProvider();
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+
+  auto elp          = Provider::GetEventLoggerProvider();
+  auto event_logger = elp->CreateEventLogger(logger, "otel-cpp.test");
+
+  std::map<std::string, std::string> m = {{"key1", "value1"}};
+
+  event_logger->EmitEvent(Severity::kTrace, "event name", "Test log message");
+  event_logger->EmitEvent(Severity::kInfo, "event name", "Test log message");
+  event_logger->EmitEvent(Severity::kDebug, "event name", m);
+  event_logger->EmitEvent(Severity::kWarn, "event name", "Logging a map", m);
+  event_logger->EmitEvent(Severity::kError, "event name",
+                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent(Severity::kFatal, "event name", "Logging an initializer list",
+                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(m));
+  event_logger->EmitEvent(Severity::kDebug, "event name",
+                          common::KeyValueIterableView<std::map<std::string, std::string>>(m));
+  std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
+  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(array));
+  std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
+  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(vec));
 }
 
 // Define a basic Logger class

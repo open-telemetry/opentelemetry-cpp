@@ -644,7 +644,7 @@ public:
     this->Log(Severity::kFatal, message, attributes);
   }
 
-protected:
+private:
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}

@@ -56,7 +56,7 @@ public:
   /**
    * @return the number of key-value pairs
    */
-  size_t size() const noexcept override { return 0; };
+  size_t size() const noexcept override { return 0; }
 };
 
 }  // namespace common

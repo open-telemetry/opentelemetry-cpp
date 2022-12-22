@@ -9,6 +9,8 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
+using opentelemetry::logs::EventLogger;
+using opentelemetry::logs::EventLoggerProvider;
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
@@ -80,4 +82,47 @@ TEST(Provider, GetLogger)
   auto logger2 = tf->GetLogger("logger2", args, "opentelelemtry_library", "", schema_url);
   EXPECT_EQ(nullptr, logger2);
 }
+
+class TestEventLoggerProvider : public EventLoggerProvider
+{
+public:
+  nostd::shared_ptr<EventLogger> CreateEventLogger(
+      nostd::shared_ptr<Logger> /*delegate_logger*/,
+      nostd::string_view /*event_domain*/) noexcept override
+  {
+    return nostd::shared_ptr<EventLogger>(nullptr);
+  }
+};
+
+TEST(Provider, GetEventLoggerProviderDefault)
+{
+  auto tf = Provider::GetEventLoggerProvider();
+  EXPECT_NE(nullptr, tf);
+}
+
+TEST(Provider, SetEventLoggerProvider)
+{
+  auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
+  Provider::SetEventLoggerProvider(tf);
+  ASSERT_EQ(tf, Provider::GetEventLoggerProvider());
+}
+
+TEST(Provider, MultipleEventLoggerProviders)
+{
+  auto tf = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
+  Provider::SetEventLoggerProvider(tf);
+  auto tf2 = nostd::shared_ptr<EventLoggerProvider>(new TestEventLoggerProvider());
+  Provider::SetEventLoggerProvider(tf2);
+
+  ASSERT_NE(Provider::GetEventLoggerProvider(), tf);
+}
+
+TEST(Provider, CreateEventLogger)
+{
+  auto tf     = nostd::shared_ptr<TestEventLoggerProvider>(new TestEventLoggerProvider());
+  auto logger = tf->CreateEventLogger(nostd::shared_ptr<Logger>(nullptr), "domain");
+
+  EXPECT_EQ(nullptr, logger);
+}
+
 #endif

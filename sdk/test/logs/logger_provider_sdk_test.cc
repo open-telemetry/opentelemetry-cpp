@@ -9,6 +9,7 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
@@ -86,6 +87,17 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
   auto logger4 = lp->GetLogger("logger4", "", "opentelelemtry_library", "", schema_url, true,
                                scope_attributes);
+}
+
+TEST(LoggerProviderSDK, EventLoggerProviderFactory)
+{
+  auto elp = opentelemetry::sdk::logs::EventLoggerProviderFactory::Create();
+  auto lp  = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger1 = lp->GetLogger("logger1", "", "opentelelemtry_library", "", schema_url);
+
+  auto event_logger = elp->CreateEventLogger(logger1, "otel-cpp.test");
 }
 
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable

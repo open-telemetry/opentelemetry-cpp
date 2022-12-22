@@ -7,6 +7,8 @@
 
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/logs/event_logger.h"
+#  include "opentelemetry/sdk/logs/event_logger_provider.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -89,9 +91,27 @@ public:
     return trace_flags_;
   }
 
-  void SetAttribute(nostd::string_view,
-                    const opentelemetry::common::AttributeValue &) noexcept override
-  {}
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
+  {
+    if (!nostd::holds_alternative<nostd::string_view>(value))
+    {
+      return;
+    }
+
+    if (key == "event.domain")
+    {
+      event_domain_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
+    }
+    else if (key == "event.name")
+    {
+      event_name_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
+    }
+  }
+
+  inline const std::string &GetEventName() const noexcept { return event_name_; }
+
+  inline const std::string &GetEventDomain() const noexcept { return event_domain_; }
 
   void SetResource(const opentelemetry::sdk::resource::Resource &) noexcept override {}
 
@@ -99,12 +119,25 @@ public:
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &) noexcept override
   {}
 
+  void CopyFrom(const MockLogRecordable &other)
+  {
+    severity_     = other.severity_;
+    body_         = other.body_;
+    trace_id_     = other.trace_id_;
+    span_id_      = other.span_id_;
+    trace_flags_  = other.trace_flags_;
+    event_name_   = other.event_name_;
+    event_domain_ = other.event_domain_;
+  }
+
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;
+  std::string event_name_;
+  std::string event_domain_;
 };
 
 class MockProcessor final : public LogRecordProcessor
@@ -133,11 +166,7 @@ public:
 
     // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor
-    record_received_->SetSeverity(copy->GetSeverity());
-    record_received_->SetBody(copy->GetBody());
-    record_received_->SetTraceId(copy->GetTraceId());
-    record_received_->SetTraceFlags(copy->GetTraceFlags());
-    record_received_->SetSpanId(copy->GetSpanId());
+    record_received_->CopyFrom(*copy);
   }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
@@ -198,4 +227,34 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(trace_id_text_in_logger, trace_id_text_in_span);
   ASSERT_EQ(span_id_text_in_logger, span_id_text_in_span);
 }
+
+TEST(LoggerSDK, EventLog)
+{
+  // Create an API LoggerProvider and logger
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = api_lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url, false);
+
+  auto api_elp      = std::shared_ptr<logs_api::EventLoggerProvider>(new EventLoggerProvider());
+  auto event_logger = api_elp->CreateEventLogger(logger, "otel-cpp.event_domain");
+
+  auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetSchemaURL(), schema_url);
+  // Set a processor for the LoggerProvider
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto sdk_lp            = static_cast<LoggerProvider *>(api_lp.get());
+  sdk_lp->AddProcessor(std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>(
+      new MockProcessor(shared_recordable)));
+
+  // Check that the recordable created by the EmitEvent() statement is set properly
+  event_logger->EmitEvent(logs_api::Severity::kWarn, "otel-cpp.event_name", "Event Log Message");
+
+  ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
+  ASSERT_EQ(shared_recordable->GetBody(), "Event Log Message");
+  ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
+  ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
+}
+
 #endif
