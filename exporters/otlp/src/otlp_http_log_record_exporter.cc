@@ -67,8 +67,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(std::unique_ptr<OtlpHttpCli
 std::unique_ptr<opentelemetry::sdk::logs::Recordable>
 OtlpHttpLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
-      new exporter::otlp::OtlpLogRecordable());
+  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(new OtlpLogRecordable());
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
@@ -99,8 +98,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
         }
         else
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << log_count
-                                                                      << " log(s) success");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << log_count << " log(s) success");
         }
         return true;
       });
@@ -114,7 +112,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << log_count << " log(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << log_count << " log(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #  endif

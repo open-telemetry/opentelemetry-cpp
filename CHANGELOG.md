@@ -15,11 +15,65 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
+* [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
+* [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and
+  cmake when using C++20 [#1852](https://github.com/open-telemetry/opentelemetry-cpp/pull/1852)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.16.0
+  [#1854](https://github.com/open-telemetry/opentelemetry-cpp/pull/1854)
+
+## [1.8.1] 2022-12-04
+
+* [ETW Exporter] Tail based sampling support [#1780](https://github.com/open-telemetry/opentelemetry-cpp/pull/1780)
+* [EXPORTERS] fix typo [affecting otlp exported histogram metrics max uint] [#1827](https://github.com/open-telemetry/opentelemetry-cpp/pull/1827)
+* [EXPORTERS] fix enum-compare-switch warning [#1833](https://github.com/open-telemetry/opentelemetry-cpp/pull/1833)
+* [METRICS] Change default temporality as "Cumulative" for OTLP metrics
+exporters [#1828](https://github.com/open-telemetry/opentelemetry-cpp/pull/1828)
+* [BUILD] Moved otlp_grpc_utils.cc to opentelemetry_exporter_otlp_grpc_client.
+[#1829](https://github.com/open-telemetry/opentelemetry-cpp/pull/1829)
+* Fix type mismatch when move nostd::shared_ptr [#1815](https://github.com/open-telemetry/opentelemetry-cpp/pull/1815)
+* [BUILD] Fix Prometheus target name [#1820](https://github.com/open-telemetry/opentelemetry-cpp/pull/1820)
+* Clean unused docker files [#1817](https://github.com/open-telemetry/opentelemetry-cpp/pull/1817)
+* [BUILD] Fix default bazel build [#1816](https://github.com/open-telemetry/opentelemetry-cpp/pull/1816)
+* [BUILD] move client::nosend under test_common [#1811](https://github.com/open-telemetry/opentelemetry-cpp/pull/1811)
+* [BUILD] Fix opentelemetry-proto file exists check [#1824](https://github.com/open-telemetry/opentelemetry-cpp/pull/1824)
+
+## [1.8.0] 2022-11-27
+
+* [DOC] Update Metrics status in README.md [#1722](https://github.com/open-telemetry/opentelemetry-cpp/pull/1722)
+* [DOC] Remove misleading comments about ABI compatibility for nostd::span [#1731](https://github.com/open-telemetry/opentelemetry-cpp/pull/1731)
+* [BUILD] Bump abseil-cpp for cmake CI [#1807](https://github.com/open-telemetry/opentelemetry-cpp/pull/1807)
+* [Exporter] Add status code to OTLP grpc trace log [#1792](https://github.com/open-telemetry/opentelemetry-cpp/pull/1792)
+* [Exporter] add fix for prometheus exporter build [#1795](https://github.com/open-telemetry/opentelemetry-cpp/pull/1795)
+* [BUILD] Add option WITH_BENCHMARK to disable building benchmarks [#1794](https://github.com/open-telemetry/opentelemetry-cpp/pull/1794)
+* [BUILD] Fix CI benchmark [#1799](https://github.com/open-telemetry/opentelemetry-cpp/pull/1799)
+* [BUILD] bump to gRPC v1.48.1 for bazel CIs [#1786](https://github.com/open-telemetry/opentelemetry-cpp/pull/1786)
+* [BUILD] Fix CI build [#1798](https://github.com/open-telemetry/opentelemetry-cpp/pull/1798)
+* [BUILD] Fix clang-format in CI [#1796](https://github.com/open-telemetry/opentelemetry-cpp/pull/1796)
+* Fix session lock of OtlpHttpClient [#1760](https://github.com/open-telemetry/opentelemetry-cpp/pull/1760)
+* [Metrics SDK] Add MeterContext::ForEachMeter() method to process callbacks on
+ Meter in thread-safe manner [#1783](https://github.com/open-telemetry/opentelemetry-cpp/pull/1783)
+* [DOC] Document that clang-format version 10.0 is used. [#1782](https://github.com/open-telemetry/opentelemetry-cpp/pull/1782)
+* [BUILD] Upgrade bazel build to use abseil-cpp-20220623.1 [#1779](https://github.com/open-telemetry/opentelemetry-cpp/pull/1779)
+* Fix GlobalLogHandler singleton creation order [#1767](https://github.com/open-telemetry/opentelemetry-cpp/pull/1767)
+* [Metrics SDK] Change Prometheus CMake target name [#1765](https://github.com/open-telemetry/opentelemetry-cpp/pull/1765)
+* [DOC] Cleanup INSTALL.md [#1757](https://github.com/open-telemetry/opentelemetry-cpp/pull/1757)
+* [DOC] Format config options in OTLP exporter readme [#1748](https://github.com/open-telemetry/opentelemetry-cpp/pull/1748)
+* [DOC] Cleanup ENABLE_METRICS_PREVIEW [#1745](https://github.com/open-telemetry/opentelemetry-cpp/pull/1745)
+* [Build] Multiple CURL packages leads to invalid build (#1738) [#1739](https://github.com/open-telemetry/opentelemetry-cpp/pull/1739)
+* [Metrics SDK] Cleanup ENABLE_METRICS_PREVIEW [#1735](https://github.com/open-telemetry/opentelemetry-cpp/pull/1735)
+* [Logs SDK] LogProcessor, LogExporter class name [#1736](https://github.com/open-telemetry/opentelemetry-cpp/pull/1736)
+* [Metrics SDK] Cleanup of old _metric api/sdk [#1734](https://github.com/open-telemetry/opentelemetry-cpp/pull/1734)
+* [ETW Exporter] Fix span timestamp(s) precision to nanoseconds [#1726](https://github.com/open-telemetry/opentelemetry-cpp/pull/1726)
 * [LOGS SDK] Rename LogProcessor and LogExporter to LogRecordProcessor and LogRecordExporter
   [#1727](https://github.com/open-telemetry/opentelemetry-cpp/pull/1727)
 * [METRICS SDK] - Remove old metrics from Github CI
   [#1733](https://github.com/open-telemetry/opentelemetry-cpp/pull/1733)
 * [BUILD] Add CMake OTELCPP_PROTO_PATH [#1730](https://github.com/open-telemetry/opentelemetry-cpp/pull/1730)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.15.0
+  [#1761](https://github.com/open-telemetry/opentelemetry-cpp/pull/1761)
+* [LOGS SDK] New LogRecord and logs::Recordable implementations.
+  [#1766](https://github.com/open-telemetry/opentelemetry-cpp/pull/1766)
 
 Deprecation notes:
 
@@ -45,6 +99,18 @@ Deprecation notes:
     No replacement will be provided.
     Note that function `opentelemetry::utils::hashCode`,
     declared in the ETW exporter, is not affected by this deprecation.
+
+Breaking changes:
+
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.15.0
+  [#1761](https://github.com/open-telemetry/opentelemetry-cpp/pull/1761)
+  * Naming of semantic conventions has changed from uppercase constants,
+    like `SemanticConventions::SERVICE_NAME`,
+    to camel case, like `SemanticConventions::kServiceName`.
+    This is necessary to avoid collisions with macros in general,
+    which breaks the build on some platforms.
+  * Semantic conventions are flagged as experimental,
+    which is why this change is done in this release.
 
 ## [1.7.0] 2022-10-28
 

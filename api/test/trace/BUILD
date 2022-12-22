@@ -53,6 +53,7 @@ otel_cc_benchmark(
     srcs = ["span_id_benchmark.cc"],
     tags = [
         "api",
+        "benchmark",
         "test",
         "trace",
     ],
@@ -64,6 +65,7 @@ otel_cc_benchmark(
     srcs = ["span_benchmark.cc"],
     tags = [
         "api",
+        "benchmark",
         "test",
         "trace",
     ],

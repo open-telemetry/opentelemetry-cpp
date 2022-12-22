@@ -5,20 +5,6 @@
 
 #include "opentelemetry/nostd/string_view.h"
 
-/** DJB2 hash function below is near-perfect hash used by several systems.
- * Ref. http://www.cse.yorku.ca/~oz/hash.html
- * </summary>
- * <param name="str">String to hash</param>
- * <param name="h">Initial offset</param>
- * <returns>32 bit code</returns>
- */
-constexpr uint32_t hashCode(const char *str, uint32_t h = 0)
-{
-  return (uint32_t)(!str[h] ? 5381 : ((uint32_t)hashCode(str, h + 1) * (uint32_t)33) ^ str[h]);
-}
-#define OTEL_CPP_CONST_UINT32_T(x) std::integral_constant<uint32_t, (uint32_t)x>::value
-#define OTEL_CPP_CONST_HASHCODE(name) OTEL_CPP_CONST_UINT32_T(hashCode(#name))
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {

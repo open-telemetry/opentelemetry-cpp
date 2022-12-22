@@ -1,5 +1,5 @@
 add_library(opentelemetry_exporter_elasticsearch_logs
-            src/es_log_record_exporter.cc)
+            src/es_log_record_exporter.cc src/es_log_recordable.cc)
 
 set_target_properties(opentelemetry_exporter_elasticsearch_logs
                       PROPERTIES EXPORT_NAME elasticsearch_log_record_exporter)

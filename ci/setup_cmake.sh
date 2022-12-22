@@ -8,8 +8,13 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
-export CMAKE_VERSION=3.15.2
-export GOOGLETEST_VERSION=1.10.0
+if [ "x$CMAKE_VERSION" = "x" ]; then
+  export CMAKE_VERSION=3.15.2
+fi
+
+if [ "x$GOOGLETEST_VERSION" = "x" ]; then
+  export GOOGLETEST_VERSION=1.12.1
+fi
 
 cmake_install() {
     tmp_dir=$(mktemp -d)

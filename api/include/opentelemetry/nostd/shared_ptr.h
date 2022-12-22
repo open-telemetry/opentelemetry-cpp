@@ -9,6 +9,7 @@
 #  include <memory>
 #  include <utility>
 
+#  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,7 +57,8 @@ private:
               typename std::enable_if<std::is_convertible<pointer, U *>::value>::type * = nullptr>
     void MoveTo(typename shared_ptr<U>::PlacementBuffer &buffer) noexcept
     {
-      new (buffer.data) shared_ptr_wrapper{std::move(this->ptr_)};
+      using other_shared_ptr_wrapper = typename shared_ptr<U>::shared_ptr_wrapper;
+      new (buffer.data) other_shared_ptr_wrapper{std::move(this->ptr_)};
     }
 
     virtual pointer Get() const noexcept { return ptr_.get(); }
@@ -94,6 +96,20 @@ public:
   }
 
   shared_ptr(const shared_ptr &other) noexcept { other.wrapper().CopyTo(buffer_); }
+
+  shared_ptr(unique_ptr<T> &&other) noexcept
+  {
+    std::shared_ptr<T> ptr_(other.release());
+    new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
+  }
+
+#  ifndef HAVE_CPP_STDLIB
+  shared_ptr(std::unique_ptr<T> &&other) noexcept
+  {
+    std::shared_ptr<T> ptr_(other.release());
+    new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
+  }
+#  endif
 
   ~shared_ptr() { wrapper().~shared_ptr_wrapper(); }
 

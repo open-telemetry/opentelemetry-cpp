@@ -113,7 +113,7 @@ public:
       {
         log_message = BuildResponseLogMessage(response, body_);
 
-        OTEL_INTERNAL_LOG_ERROR("OTLP HTTP Client] Export failed, " << log_message);
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Export failed, " << log_message);
         result = sdk::common::ExportResult::kFailure;
       }
       else if (console_debug_)
@@ -289,7 +289,7 @@ public:
       case http_client::SessionState::WriteError:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG:Session state: error writing request");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Session state: error writing request");
         }
         break;
 
@@ -760,7 +760,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   if (options_.console_debug)
   {
     OTEL_INTERNAL_LOG_DEBUG(
-        "[OTLP HTTP Client] DEBUG: Waiting for response from "
+        "[OTLP HTTP Client] Waiting for response from "
         << options_.url << " (timeout = "
         << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
         << " milliseconds)");
@@ -981,16 +981,19 @@ void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
     return;
   }
 
-  opentelemetry::ext::http::client::Session *key = session_data.session.get();
-  ResponseHandler *handle = static_cast<ResponseHandler *>(session_data.event_handle.get());
+  std::shared_ptr<opentelemetry::ext::http::client::Session> session = session_data.session;
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> handle =
+      session_data.event_handle;
+  {
+    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+    static_cast<ResponseHandler *>(handle.get())->Bind(this, *session);
 
-  handle->Bind(this, *key);
-
-  HttpSessionData &store_session_data = running_sessions_[key];
-  store_session_data                  = std::move(session_data);
+    HttpSessionData &store_session_data = running_sessions_[session.get()];
+    store_session_data                  = std::move(session_data);
+  }
 
   // Send request after the session is added
-  key->SendRequest(store_session_data.event_handle);
+  session->SendRequest(handle);
 }
 
 bool OtlpHttpClient::cleanupGCSessions() noexcept

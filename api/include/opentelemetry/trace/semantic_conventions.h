@@ -11,18 +11,6 @@
 #pragma once
 
 #include "opentelemetry/version.h"
-/*
- * Special considerations for FaasDocumentOperationValues::DELETE.
- *
- * The winnt.h header file is known to define a DELETE symbol,
- * which collides with FaasDocumentOperationValues::DELETE.
- */
-#ifdef _WIN32
-#  ifdef DELETE
-#    pragma message(__FILE__ ": removing define on DELETE")
-#    undef DELETE
-#  endif
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -33,40 +21,38 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *SCHEMA_URL = "https://opentelemetry.io/schemas/1.14.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.16.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
  * the exception should be preferred over the static type in languages that support it.
  */
-static constexpr const char *EXCEPTION_TYPE = "exception.type";
+static constexpr const char *kExceptionType = "exception.type";
 
 /**
  * The exception message.
  */
-static constexpr const char *EXCEPTION_MESSAGE = "exception.message";
+static constexpr const char *kExceptionMessage = "exception.message";
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The
  * representation is to be determined and documented by each language SIG.
  */
-static constexpr const char *EXCEPTION_STACKTRACE = "exception.stacktrace";
+static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 
 /**
  * The name identifies the event.
  */
-static constexpr const char *EVENT_NAME = "event.name";
+static constexpr const char *kEventName = "event.name";
 
 /**
- * The domain identifies the context in which an event happened. An event name is unique only within
-a domain.
+ * The domain identifies the business context for the events.
  *
  * <p>Notes:
-  <ul> <li>An {@code event.name} is supposed to be unique only in the context of an
-{@code event.domain}, so this allows for two events in different domains to
-have same {@code event.name}, yet be unrelated events.</li> </ul>
+  <ul> <li>Events across different domains may have same {@code event.name}, yet be
+unrelated events.</li> </ul>
  */
-static constexpr const char *EVENT_DOMAIN = "event.domain";
+static constexpr const char *kEventDomain = "event.domain";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -75,41 +61,41 @@ static constexpr const char *EVENT_DOMAIN = "event.domain";
  * <p>Notes:
   <ul> <li>This may be different from {@code faas.id} if an alias is involved.</li> </ul>
  */
-static constexpr const char *AWS_LAMBDA_INVOKED_ARN = "aws.lambda.invoked_arn";
+static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
 
 /**
  * The <a href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#id">event_id</a>
  * uniquely identifies the event.
  */
-static constexpr const char *CLOUDEVENTS_EVENT_ID = "cloudevents.event_id";
+static constexpr const char *kCloudeventsEventId = "cloudevents.event_id";
 
 /**
  * The <a
  * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#source-1">source</a>
  * identifies the context in which an event happened.
  */
-static constexpr const char *CLOUDEVENTS_EVENT_SOURCE = "cloudevents.event_source";
+static constexpr const char *kCloudeventsEventSource = "cloudevents.event_source";
 
 /**
  * The <a
  * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#specversion">version of
  * the CloudEvents specification</a> which the event uses.
  */
-static constexpr const char *CLOUDEVENTS_EVENT_SPEC_VERSION = "cloudevents.event_spec_version";
+static constexpr const char *kCloudeventsEventSpecVersion = "cloudevents.event_spec_version";
 
 /**
  * The <a
  * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#type">event_type</a>
  * contains a value describing the type of event related to the originating occurrence.
  */
-static constexpr const char *CLOUDEVENTS_EVENT_TYPE = "cloudevents.event_type";
+static constexpr const char *kCloudeventsEventType = "cloudevents.event_type";
 
 /**
  * The <a
  * href="https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/spec.md#subject">subject</a> of
  * the event in the context of the event producer (identified by source).
  */
-static constexpr const char *CLOUDEVENTS_EVENT_SUBJECT = "cloudevents.event_subject";
+static constexpr const char *kCloudeventsEventSubject = "cloudevents.event_subject";
 
 /**
  * Parent-child Reference type
@@ -117,31 +103,31 @@ static constexpr const char *CLOUDEVENTS_EVENT_SUBJECT = "cloudevents.event_subj
  * <p>Notes:
   <ul> <li>The causal relationship between a child Span and a parent Span.</li> </ul>
  */
-static constexpr const char *OPENTRACING_REF_TYPE = "opentracing.ref_type";
+static constexpr const char *kOpentracingRefType = "opentracing.ref_type";
 
 /**
  * An identifier for the database management system (DBMS) product being used. See below for a list
  * of well-known identifiers.
  */
-static constexpr const char *DB_SYSTEM = "db.system";
+static constexpr const char *kDbSystem = "db.system";
 
 /**
  * The connection string used to connect to the database. It is recommended to remove embedded
  * credentials.
  */
-static constexpr const char *DB_CONNECTION_STRING = "db.connection_string";
+static constexpr const char *kDbConnectionString = "db.connection_string";
 
 /**
  * Username for accessing the database.
  */
-static constexpr const char *DB_USER = "db.user";
+static constexpr const char *kDbUser = "db.user";
 
 /**
  * The fully-qualified class name of the <a
  * href="https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/">Java Database Connectivity
  * (JDBC)</a> driver used to connect.
  */
-static constexpr const char *DB_JDBC_DRIVER_CLASSNAME = "db.jdbc.driver_classname";
+static constexpr const char *kDbJdbcDriverClassname = "db.jdbc.driver_classname";
 
 /**
  * This attribute is used to report the name of the database being accessed. For commands that
@@ -153,7 +139,7 @@ static constexpr const char *DB_JDBC_DRIVER_CLASSNAME = "db.jdbc.driver_classnam
  name and schema name), the database name to be used is the more specific layer (e.g. Oracle schema
  name).</li> </ul>
  */
-static constexpr const char *DB_NAME = "db.name";
+static constexpr const char *kDbName = "db.name";
 
 /**
  * The database statement being executed.
@@ -161,7 +147,7 @@ static constexpr const char *DB_NAME = "db.name";
  * <p>Notes:
   <ul> <li>The value may be sanitized to exclude sensitive information.</li> </ul>
  */
-static constexpr const char *DB_STATEMENT = "db.statement";
+static constexpr const char *kDbStatement = "db.statement";
 
 /**
  * The name of the operation being executed, e.g. the <a
@@ -174,7 +160,7 @@ static constexpr const char *DB_STATEMENT = "db.statement";
  name is provided by the library being instrumented. If the SQL statement has an ambiguous
  operation, or performs more than one operation, this value may be omitted.</li> </ul>
  */
-static constexpr const char *DB_OPERATION = "db.operation";
+static constexpr const char *kDbOperation = "db.operation";
 
 /**
  * The Microsoft SQL Server <a
@@ -185,18 +171,18 @@ static constexpr const char *DB_OPERATION = "db.operation";
   <ul> <li>If setting a {@code db.mssql.instance_name}, {@code net.peer.port} is no longer required
  (but still recommended if non-standard).</li> </ul>
  */
-static constexpr const char *DB_MSSQL_INSTANCE_NAME = "db.mssql.instance_name";
+static constexpr const char *kDbMssqlInstanceName = "db.mssql.instance_name";
 
 /**
  * The fetch size used for paging, i.e. how many rows will be returned at once.
  */
-static constexpr const char *DB_CASSANDRA_PAGE_SIZE = "db.cassandra.page_size";
+static constexpr const char *kDbCassandraPageSize = "db.cassandra.page_size";
 
 /**
  * The consistency level of the query. Based on consistency values from <a
  * href="https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html">CQL</a>.
  */
-static constexpr const char *DB_CASSANDRA_CONSISTENCY_LEVEL = "db.cassandra.consistency_level";
+static constexpr const char *kDbCassandraConsistencyLevel = "db.cassandra.consistency_level";
 
 /**
  * The name of the primary table that the operation is acting upon, including the keyspace name (if
@@ -209,41 +195,41 @@ static constexpr const char *DB_CASSANDRA_CONSISTENCY_LEVEL = "db.cassandra.cons
  operation is acting upon an anonymous table, or more than one table, this value MUST NOT be
  set.</li> </ul>
  */
-static constexpr const char *DB_CASSANDRA_TABLE = "db.cassandra.table";
+static constexpr const char *kDbCassandraTable = "db.cassandra.table";
 
 /**
  * Whether or not the query is idempotent.
  */
-static constexpr const char *DB_CASSANDRA_IDEMPOTENCE = "db.cassandra.idempotence";
+static constexpr const char *kDbCassandraIdempotence = "db.cassandra.idempotence";
 
 /**
  * The number of times a query was speculatively executed. Not set or {@code 0} if the query was not
  * executed speculatively.
  */
-static constexpr const char *DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT =
+static constexpr const char *kDbCassandraSpeculativeExecutionCount =
     "db.cassandra.speculative_execution_count";
 
 /**
  * The ID of the coordinating node for a query.
  */
-static constexpr const char *DB_CASSANDRA_COORDINATOR_ID = "db.cassandra.coordinator.id";
+static constexpr const char *kDbCassandraCoordinatorId = "db.cassandra.coordinator.id";
 
 /**
  * The data center of the coordinating node for a query.
  */
-static constexpr const char *DB_CASSANDRA_COORDINATOR_DC = "db.cassandra.coordinator.dc";
+static constexpr const char *kDbCassandraCoordinatorDc = "db.cassandra.coordinator.dc";
 
 /**
  * The index of the database being accessed as used in the <a
  * href="https://redis.io/commands/select">{@code SELECT} command</a>, provided as an integer. To be
  * used instead of the generic {@code db.name} attribute.
  */
-static constexpr const char *DB_REDIS_DATABASE_INDEX = "db.redis.database_index";
+static constexpr const char *kDbRedisDatabaseIndex = "db.redis.database_index";
 
 /**
  * The collection being accessed within the database stated in {@code db.name}.
  */
-static constexpr const char *DB_MONGODB_COLLECTION = "db.mongodb.collection";
+static constexpr const char *kDbMongodbCollection = "db.mongodb.collection";
 
 /**
  * The name of the primary table that the operation is acting upon, including the database name (if
@@ -255,7 +241,18 @@ static constexpr const char *DB_MONGODB_COLLECTION = "db.mongodb.collection";
  operation is acting upon an anonymous table, or more than one table, this value MUST NOT be
  set.</li> </ul>
  */
-static constexpr const char *DB_SQL_TABLE = "db.sql.table";
+static constexpr const char *kDbSqlTable = "db.sql.table";
+
+/**
+ * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code
+ * is UNSET.
+ */
+static constexpr const char *kOtelStatusCode = "otel.status_code";
+
+/**
+ * Description of the Status if it has a value, otherwise not set.
+ */
+static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
 /**
  * Type of the trigger which caused this function execution.
@@ -268,56 +265,56 @@ If clients set it, it should be the same as the trigger that corresponding incom
 (i.e., this has nothing to do with the underlying transport used to make the API call to invoke the
 lambda, which is often HTTP).</li> </ul>
  */
-static constexpr const char *FAAS_TRIGGER = "faas.trigger";
+static constexpr const char *kFaasTrigger = "faas.trigger";
 
 /**
  * The execution ID of the current function execution.
  */
-static constexpr const char *FAAS_EXECUTION = "faas.execution";
+static constexpr const char *kFaasExecution = "faas.execution";
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud
  * Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
  */
-static constexpr const char *FAAS_DOCUMENT_COLLECTION = "faas.document.collection";
+static constexpr const char *kFaasDocumentCollection = "faas.document.collection";
 
 /**
  * Describes the type of the operation that was performed on the data.
  */
-static constexpr const char *FAAS_DOCUMENT_OPERATION = "faas.document.operation";
+static constexpr const char *kFaasDocumentOperation = "faas.document.operation";
 
 /**
  * A string containing the time when the data was accessed in the <a
  * href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
  * href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
  */
-static constexpr const char *FAAS_DOCUMENT_TIME = "faas.document.time";
+static constexpr const char *kFaasDocumentTime = "faas.document.time";
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the
  * name of the file, and in Cosmos DB the table name.
  */
-static constexpr const char *FAAS_DOCUMENT_NAME = "faas.document.name";
+static constexpr const char *kFaasDocumentName = "faas.document.name";
 
 /**
  * A string containing the function invocation time in the <a
  * href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
  * href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
  */
-static constexpr const char *FAAS_TIME = "faas.time";
+static constexpr const char *kFaasTime = "faas.time";
 
 /**
  * A string containing the schedule period as <a
  * href="https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm">Cron
  * Expression</a>.
  */
-static constexpr const char *FAAS_CRON = "faas.cron";
+static constexpr const char *kFaasCron = "faas.cron";
 
 /**
  * A boolean that is true if the serverless function is executed for the first time (aka
  * cold-start).
  */
-static constexpr const char *FAAS_COLDSTART = "faas.coldstart";
+static constexpr const char *kFaasColdstart = "faas.coldstart";
 
 /**
  * The name of the invoked function.
@@ -326,7 +323,7 @@ static constexpr const char *FAAS_COLDSTART = "faas.coldstart";
   <ul> <li>SHOULD be equal to the {@code faas.name} resource attribute of the invoked function.</li>
  </ul>
  */
-static constexpr const char *FAAS_INVOKED_NAME = "faas.invoked_name";
+static constexpr const char *kFaasInvokedName = "faas.invoked_name";
 
 /**
  * The cloud provider of the invoked function.
@@ -335,7 +332,7 @@ static constexpr const char *FAAS_INVOKED_NAME = "faas.invoked_name";
   <ul> <li>SHOULD be equal to the {@code cloud.provider} resource attribute of the invoked
  function.</li> </ul>
  */
-static constexpr const char *FAAS_INVOKED_PROVIDER = "faas.invoked_provider";
+static constexpr const char *kFaasInvokedProvider = "faas.invoked_provider";
 
 /**
  * The cloud region of the invoked function.
@@ -344,17 +341,17 @@ static constexpr const char *FAAS_INVOKED_PROVIDER = "faas.invoked_provider";
   <ul> <li>SHOULD be equal to the {@code cloud.region} resource attribute of the invoked
  function.</li> </ul>
  */
-static constexpr const char *FAAS_INVOKED_REGION = "faas.invoked_region";
+static constexpr const char *kFaasInvokedRegion = "faas.invoked_region";
 
 /**
  * Transport protocol used. See note below.
  */
-static constexpr const char *NET_TRANSPORT = "net.transport";
+static constexpr const char *kNetTransport = "net.transport";
 
 /**
  * Application layer protocol used. The value SHOULD be normalized to lowercase.
  */
-static constexpr const char *NET_APP_PROTOCOL_NAME = "net.app.protocol.name";
+static constexpr const char *kNetAppProtocolName = "net.app.protocol.name";
 
 /**
  * Version of the application layer protocol used. See note below.
@@ -365,29 +362,29 @@ static constexpr const char *NET_APP_PROTOCOL_NAME = "net.app.protocol.name";
  0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
  </ul>
  */
-static constexpr const char *NET_APP_PROTOCOL_VERSION = "net.app.protocol.version";
+static constexpr const char *kNetAppProtocolVersion = "net.app.protocol.version";
 
 /**
  * Remote socket peer name.
  */
-static constexpr const char *NET_SOCK_PEER_NAME = "net.sock.peer.name";
+static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
 
 /**
  * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, <a
  * href="https://man7.org/linux/man-pages/man7/address_families.7.html">etc</a>.
  */
-static constexpr const char *NET_SOCK_PEER_ADDR = "net.sock.peer.addr";
+static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
 
 /**
  * Remote socket peer port.
  */
-static constexpr const char *NET_SOCK_PEER_PORT = "net.sock.peer.port";
+static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
 
 /**
  * Protocol <a href="https://man7.org/linux/man-pages/man7/address_families.7.html">address
  * family</a> which is used for communication.
  */
-static constexpr const char *NET_SOCK_FAMILY = "net.sock.family";
+static constexpr const char *kNetSockFamily = "net.sock.family";
 
 /**
  * Logical remote hostname, see note below.
@@ -396,83 +393,83 @@ static constexpr const char *NET_SOCK_FAMILY = "net.sock.family";
   <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
  lookup.</li> </ul>
  */
-static constexpr const char *NET_PEER_NAME = "net.peer.name";
+static constexpr const char *kNetPeerName = "net.peer.name";
 
 /**
  * Logical remote port number
  */
-static constexpr const char *NET_PEER_PORT = "net.peer.port";
+static constexpr const char *kNetPeerPort = "net.peer.port";
 
 /**
  * Logical local hostname or similar, see note below.
  */
-static constexpr const char *NET_HOST_NAME = "net.host.name";
+static constexpr const char *kNetHostName = "net.host.name";
 
 /**
  * Logical local port number, preferably the one that the peer used to connect
  */
-static constexpr const char *NET_HOST_PORT = "net.host.port";
+static constexpr const char *kNetHostPort = "net.host.port";
 
 /**
  * Local socket address. Useful in case of a multi-IP host.
  */
-static constexpr const char *NET_SOCK_HOST_ADDR = "net.sock.host.addr";
+static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
 
 /**
  * Local socket port number.
  */
-static constexpr const char *NET_SOCK_HOST_PORT = "net.sock.host.port";
+static constexpr const char *kNetSockHostPort = "net.sock.host.port";
 
 /**
  * The internet connection type currently being used by the host.
  */
-static constexpr const char *NET_HOST_CONNECTION_TYPE = "net.host.connection.type";
+static constexpr const char *kNetHostConnectionType = "net.host.connection.type";
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology
  * connection, but it could be used for describing details about a wifi connection.
  */
-static constexpr const char *NET_HOST_CONNECTION_SUBTYPE = "net.host.connection.subtype";
+static constexpr const char *kNetHostConnectionSubtype = "net.host.connection.subtype";
 
 /**
  * The name of the mobile carrier.
  */
-static constexpr const char *NET_HOST_CARRIER_NAME = "net.host.carrier.name";
+static constexpr const char *kNetHostCarrierName = "net.host.carrier.name";
 
 /**
  * The mobile carrier country code.
  */
-static constexpr const char *NET_HOST_CARRIER_MCC = "net.host.carrier.mcc";
+static constexpr const char *kNetHostCarrierMcc = "net.host.carrier.mcc";
 
 /**
  * The mobile carrier network code.
  */
-static constexpr const char *NET_HOST_CARRIER_MNC = "net.host.carrier.mnc";
+static constexpr const char *kNetHostCarrierMnc = "net.host.carrier.mnc";
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  */
-static constexpr const char *NET_HOST_CARRIER_ICC = "net.host.carrier.icc";
+static constexpr const char *kNetHostCarrierIcc = "net.host.carrier.icc";
 
 /**
  * The <a href="../../resource/semantic_conventions/README.md#service">{@code service.name}</a> of
  * the remote service. SHOULD be equal to the actual {@code service.name} resource attribute of the
  * remote service if any.
  */
-static constexpr const char *PEER_SERVICE = "peer.service";
+static constexpr const char *kPeerService = "peer.service";
 
 /**
  * Username or client_id extracted from the access token or <a
  * href="https://tools.ietf.org/html/rfc7235#section-4.2">Authorization</a> header in the inbound
  * request from outside the system.
  */
-static constexpr const char *ENDUSER_ID = "enduser.id";
+static constexpr const char *kEnduserId = "enduser.id";
 
 /**
  * Actual/assumed role the client is making the request under extracted from token or application
  * security context.
  */
-static constexpr const char *ENDUSER_ROLE = "enduser.role";
+static constexpr const char *kEnduserRole = "enduser.role";
 
 /**
  * Scopes or granted authorities the client currently possesses extracted from token or application
@@ -482,51 +479,51 @@ static constexpr const char *ENDUSER_ROLE = "enduser.role";
  * href="http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html">SAML 2.0
  * Assertion</a>.
  */
-static constexpr const char *ENDUSER_SCOPE = "enduser.scope";
+static constexpr const char *kEnduserScope = "enduser.scope";
 
 /**
  * Current &quot;managed&quot; thread ID (as opposed to OS thread ID).
  */
-static constexpr const char *THREAD_ID = "thread.id";
+static constexpr const char *kThreadId = "thread.id";
 
 /**
  * Current thread name.
  */
-static constexpr const char *THREAD_NAME = "thread.name";
+static constexpr const char *kThreadName = "thread.name";
 
 /**
  * The method or function name, or equivalent (usually rightmost part of the code unit's name).
  */
-static constexpr const char *CODE_FUNCTION = "code.function";
+static constexpr const char *kCodeFunction = "code.function";
 
 /**
  * The &quot;namespace&quot; within which {@code code.function} is defined. Usually the qualified
  * class or module name, such that {@code code.namespace} + some separator + {@code code.function}
  * form a unique identifier for the code unit.
  */
-static constexpr const char *CODE_NAMESPACE = "code.namespace";
+static constexpr const char *kCodeNamespace = "code.namespace";
 
 /**
  * The source code file name that identifies the code unit as uniquely as possible (preferably an
  * absolute file path).
  */
-static constexpr const char *CODE_FILEPATH = "code.filepath";
+static constexpr const char *kCodeFilepath = "code.filepath";
 
 /**
  * The line number in {@code code.filepath} best representing the operation. It SHOULD point within
  * the code unit named in {@code code.function}.
  */
-static constexpr const char *CODE_LINENO = "code.lineno";
+static constexpr const char *kCodeLineno = "code.lineno";
 
 /**
  * HTTP request method.
  */
-static constexpr const char *HTTP_METHOD = "http.method";
+static constexpr const char *kHttpMethod = "http.method";
 
 /**
  * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
  */
-static constexpr const char *HTTP_STATUS_CODE = "http.status_code";
+static constexpr const char *kHttpStatusCode = "http.status_code";
 
 /**
  * Kind of HTTP protocol used.
@@ -535,13 +532,13 @@ static constexpr const char *HTTP_STATUS_CODE = "http.status_code";
   <ul> <li>If {@code net.transport} is not specified, it can be assumed to be {@code IP.TCP} except
  if {@code http.flavor} is {@code QUIC}, in which case {@code IP.UDP} is assumed.</li> </ul>
  */
-static constexpr const char *HTTP_FLAVOR = "http.flavor";
+static constexpr const char *kHttpFlavor = "http.flavor";
 
 /**
  * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
  * User-Agent</a> header sent by the client.
  */
-static constexpr const char *HTTP_USER_AGENT = "http.user_agent";
+static constexpr const char *kHttpUserAgent = "http.user_agent";
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
@@ -549,7 +546,7 @@ static constexpr const char *HTTP_USER_AGENT = "http.user_agent";
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *HTTP_REQUEST_CONTENT_LENGTH = "http.request_content_length";
+static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding
@@ -557,7 +554,7 @@ static constexpr const char *HTTP_REQUEST_CONTENT_LENGTH = "http.request_content
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH = "http.response_content_length";
+static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
 
 /**
  * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
@@ -568,22 +565,27 @@ static constexpr const char *HTTP_RESPONSE_CONTENT_LENGTH = "http.response_conte
  https://username:password@www.example.com/}. In such case the attribute's value should be {@code
  https://www.example.com/}.</li> </ul>
  */
-static constexpr const char *HTTP_URL = "http.url";
+static constexpr const char *kHttpUrl = "http.url";
 
 /**
- * The ordinal number of request re-sending attempt.
+ * The ordinal number of request resending attempt (for any reason, including redirects).
+ *
+ * <p>Notes:
+  <ul> <li>The resend count SHOULD be updated each time an HTTP request gets resent by the client,
+ regardless of what was the cause of the resending (e.g. redirection, authorization failure, 503
+ Server Unavailable, network issues, or any other).</li> </ul>
  */
-static constexpr const char *HTTP_RETRY_COUNT = "http.retry_count";
+static constexpr const char *kHttpResendCount = "http.resend_count";
 
 /**
  * The URI scheme identifying the used protocol.
  */
-static constexpr const char *HTTP_SCHEME = "http.scheme";
+static constexpr const char *kHttpScheme = "http.scheme";
 
 /**
  * The full request target as passed in a HTTP request line or equivalent.
  */
-static constexpr const char *HTTP_TARGET = "http.target";
+static constexpr const char *kHttpTarget = "http.target";
 
 /**
  * The matched route (path template in the format used by the respective server framework). See note
@@ -594,7 +596,7 @@ static constexpr const char *HTTP_TARGET = "http.target";
  framework as the route attribute should have low-cardinality and the URI path can NOT substitute
  it.</li> </ul>
  */
-static constexpr const char *HTTP_ROUTE = "http.route";
+static constexpr const char *kHttpRoute = "http.route";
 
 /**
  * The IP address of the original client behind all proxies, if known (e.g. from <a
@@ -611,136 +613,135 @@ the actual client. Setting
 one is at least somewhat confident that the address is not that of
 the closest proxy.</li> </ul>
  */
-static constexpr const char *HTTP_CLIENT_IP = "http.client_ip";
+static constexpr const char *kHttpClientIp = "http.client_ip";
 
 /**
  * The keys in the {@code RequestItems} object field.
  */
-static constexpr const char *AWS_DYNAMODB_TABLE_NAMES = "aws.dynamodb.table_names";
+static constexpr const char *kAwsDynamodbTableNames = "aws.dynamodb.table_names";
 
 /**
  * The JSON-serialized value of each item in the {@code ConsumedCapacity} response field.
  */
-static constexpr const char *AWS_DYNAMODB_CONSUMED_CAPACITY = "aws.dynamodb.consumed_capacity";
+static constexpr const char *kAwsDynamodbConsumedCapacity = "aws.dynamodb.consumed_capacity";
 
 /**
  * The JSON-serialized value of the {@code ItemCollectionMetrics} response field.
  */
-static constexpr const char *AWS_DYNAMODB_ITEM_COLLECTION_METRICS =
+static constexpr const char *kAwsDynamodbItemCollectionMetrics =
     "aws.dynamodb.item_collection_metrics";
 
 /**
  * The value of the {@code ProvisionedThroughput.ReadCapacityUnits} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_PROVISIONED_READ_CAPACITY =
+static constexpr const char *kAwsDynamodbProvisionedReadCapacity =
     "aws.dynamodb.provisioned_read_capacity";
 
 /**
  * The value of the {@code ProvisionedThroughput.WriteCapacityUnits} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY =
+static constexpr const char *kAwsDynamodbProvisionedWriteCapacity =
     "aws.dynamodb.provisioned_write_capacity";
 
 /**
  * The value of the {@code ConsistentRead} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_CONSISTENT_READ = "aws.dynamodb.consistent_read";
+static constexpr const char *kAwsDynamodbConsistentRead = "aws.dynamodb.consistent_read";
 
 /**
  * The value of the {@code ProjectionExpression} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_PROJECTION = "aws.dynamodb.projection";
+static constexpr const char *kAwsDynamodbProjection = "aws.dynamodb.projection";
 
 /**
  * The value of the {@code Limit} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_LIMIT = "aws.dynamodb.limit";
+static constexpr const char *kAwsDynamodbLimit = "aws.dynamodb.limit";
 
 /**
  * The value of the {@code AttributesToGet} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_ATTRIBUTES_TO_GET = "aws.dynamodb.attributes_to_get";
+static constexpr const char *kAwsDynamodbAttributesToGet = "aws.dynamodb.attributes_to_get";
 
 /**
  * The value of the {@code IndexName} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_INDEX_NAME = "aws.dynamodb.index_name";
+static constexpr const char *kAwsDynamodbIndexName = "aws.dynamodb.index_name";
 
 /**
  * The value of the {@code Select} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_SELECT = "aws.dynamodb.select";
+static constexpr const char *kAwsDynamodbSelect = "aws.dynamodb.select";
 
 /**
  * The JSON-serialized value of each item of the {@code GlobalSecondaryIndexes} request field
  */
-static constexpr const char *AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES =
+static constexpr const char *kAwsDynamodbGlobalSecondaryIndexes =
     "aws.dynamodb.global_secondary_indexes";
 
 /**
  * The JSON-serialized value of each item of the {@code LocalSecondaryIndexes} request field.
  */
-static constexpr const char *AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES =
+static constexpr const char *kAwsDynamodbLocalSecondaryIndexes =
     "aws.dynamodb.local_secondary_indexes";
 
 /**
  * The value of the {@code ExclusiveStartTableName} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_EXCLUSIVE_START_TABLE =
-    "aws.dynamodb.exclusive_start_table";
+static constexpr const char *kAwsDynamodbExclusiveStartTable = "aws.dynamodb.exclusive_start_table";
 
 /**
  * The the number of items in the {@code TableNames} response parameter.
  */
-static constexpr const char *AWS_DYNAMODB_TABLE_COUNT = "aws.dynamodb.table_count";
+static constexpr const char *kAwsDynamodbTableCount = "aws.dynamodb.table_count";
 
 /**
  * The value of the {@code ScanIndexForward} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_SCAN_FORWARD = "aws.dynamodb.scan_forward";
+static constexpr const char *kAwsDynamodbScanForward = "aws.dynamodb.scan_forward";
 
 /**
  * The value of the {@code Segment} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_SEGMENT = "aws.dynamodb.segment";
+static constexpr const char *kAwsDynamodbSegment = "aws.dynamodb.segment";
 
 /**
  * The value of the {@code TotalSegments} request parameter.
  */
-static constexpr const char *AWS_DYNAMODB_TOTAL_SEGMENTS = "aws.dynamodb.total_segments";
+static constexpr const char *kAwsDynamodbTotalSegments = "aws.dynamodb.total_segments";
 
 /**
  * The value of the {@code Count} response parameter.
  */
-static constexpr const char *AWS_DYNAMODB_COUNT = "aws.dynamodb.count";
+static constexpr const char *kAwsDynamodbCount = "aws.dynamodb.count";
 
 /**
  * The value of the {@code ScannedCount} response parameter.
  */
-static constexpr const char *AWS_DYNAMODB_SCANNED_COUNT = "aws.dynamodb.scanned_count";
+static constexpr const char *kAwsDynamodbScannedCount = "aws.dynamodb.scanned_count";
 
 /**
  * The JSON-serialized value of each item in the {@code AttributeDefinitions} request field.
  */
-static constexpr const char *AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS =
+static constexpr const char *kAwsDynamodbAttributeDefinitions =
     "aws.dynamodb.attribute_definitions";
 
 /**
  * The JSON-serialized value of each item in the the {@code GlobalSecondaryIndexUpdates} request
  * field.
  */
-static constexpr const char *AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES =
+static constexpr const char *kAwsDynamodbGlobalSecondaryIndexUpdates =
     "aws.dynamodb.global_secondary_index_updates";
 
 /**
  * The name of the operation being executed.
  */
-static constexpr const char *GRAPHQL_OPERATION_NAME = "graphql.operation.name";
+static constexpr const char *kGraphqlOperationName = "graphql.operation.name";
 
 /**
  * The type of the operation being executed.
  */
-static constexpr const char *GRAPHQL_OPERATION_TYPE = "graphql.operation.type";
+static constexpr const char *kGraphqlOperationType = "graphql.operation.type";
 
 /**
  * The GraphQL document being executed.
@@ -748,65 +749,65 @@ static constexpr const char *GRAPHQL_OPERATION_TYPE = "graphql.operation.type";
  * <p>Notes:
   <ul> <li>The value may be sanitized to exclude sensitive information.</li> </ul>
  */
-static constexpr const char *GRAPHQL_DOCUMENT = "graphql.document";
+static constexpr const char *kGraphqlDocument = "graphql.document";
 
 /**
  * A string identifying the messaging system.
  */
-static constexpr const char *MESSAGING_SYSTEM = "messaging.system";
+static constexpr const char *kMessagingSystem = "messaging.system";
 
 /**
  * The message destination name. This might be equal to the span name but is required nevertheless.
  */
-static constexpr const char *MESSAGING_DESTINATION = "messaging.destination";
+static constexpr const char *kMessagingDestination = "messaging.destination";
 
 /**
  * The kind of message destination
  */
-static constexpr const char *MESSAGING_DESTINATION_KIND = "messaging.destination_kind";
+static constexpr const char *kMessagingDestinationKind = "messaging.destination_kind";
 
 /**
  * A boolean that is true if the message destination is temporary.
  */
-static constexpr const char *MESSAGING_TEMP_DESTINATION = "messaging.temp_destination";
+static constexpr const char *kMessagingTempDestination = "messaging.temp_destination";
 
 /**
  * The name of the transport protocol.
  */
-static constexpr const char *MESSAGING_PROTOCOL = "messaging.protocol";
+static constexpr const char *kMessagingProtocol = "messaging.protocol";
 
 /**
  * The version of the transport protocol.
  */
-static constexpr const char *MESSAGING_PROTOCOL_VERSION = "messaging.protocol_version";
+static constexpr const char *kMessagingProtocolVersion = "messaging.protocol_version";
 
 /**
  * Connection string.
  */
-static constexpr const char *MESSAGING_URL = "messaging.url";
+static constexpr const char *kMessagingUrl = "messaging.url";
 
 /**
  * A value used by the messaging system as an identifier for the message, represented as a string.
  */
-static constexpr const char *MESSAGING_MESSAGE_ID = "messaging.message_id";
+static constexpr const char *kMessagingMessageId = "messaging.message_id";
 
 /**
  * The <a href="#conversations">conversation ID</a> identifying the conversation to which the
  * message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
  */
-static constexpr const char *MESSAGING_CONVERSATION_ID = "messaging.conversation_id";
+static constexpr const char *kMessagingConversationId = "messaging.conversation_id";
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown
  * whether the compressed or uncompressed payload size is reported.
  */
-static constexpr const char *MESSAGING_MESSAGE_PAYLOAD_SIZE_BYTES =
+static constexpr const char *kMessagingMessagePayloadSizeBytes =
     "messaging.message_payload_size_bytes";
 
 /**
  * The compressed size of the message payload in bytes.
  */
-static constexpr const char *MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
+static constexpr const char *kMessagingMessagePayloadCompressedSizeBytes =
     "messaging.message_payload_compressed_size_bytes";
 
 /**
@@ -815,7 +816,7 @@ static constexpr const char *MESSAGING_MESSAGE_PAYLOAD_COMPRESSED_SIZE_BYTES =
  * this attribute MUST NOT be set, since the operation can be inferred from the span kind in that
  * case.
  */
-static constexpr const char *MESSAGING_OPERATION = "messaging.operation";
+static constexpr const char *kMessagingOperation = "messaging.operation";
 
 /**
  * The identifier for the consumer receiving a message. For Kafka, set it to {@code
@@ -823,12 +824,12 @@ static constexpr const char *MESSAGING_OPERATION = "messaging.operation";
  * {@code messaging.kafka.consumer_group}. For brokers, such as RabbitMQ and Artemis, set it to the
  * {@code client_id} of the client consuming the message.
  */
-static constexpr const char *MESSAGING_CONSUMER_ID = "messaging.consumer_id";
+static constexpr const char *kMessagingConsumerId = "messaging.consumer_id";
 
 /**
  * RabbitMQ message routing key.
  */
-static constexpr const char *MESSAGING_RABBITMQ_ROUTING_KEY = "messaging.rabbitmq.routing_key";
+static constexpr const char *kMessagingRabbitmqRoutingKey = "messaging.rabbitmq.routing_key";
 
 /**
  * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the
@@ -840,70 +841,93 @@ static constexpr const char *MESSAGING_RABBITMQ_ROUTING_KEY = "messaging.rabbitm
  attribute. If the key has no unambiguous, canonical string form, don't include its value.</li>
  </ul>
  */
-static constexpr const char *MESSAGING_KAFKA_MESSAGE_KEY = "messaging.kafka.message_key";
+static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message_key";
 
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not
  * producers.
  */
-static constexpr const char *MESSAGING_KAFKA_CONSUMER_GROUP = "messaging.kafka.consumer_group";
+static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer_group";
 
 /**
  * Client Id for the Consumer or Producer that is handling the message.
  */
-static constexpr const char *MESSAGING_KAFKA_CLIENT_ID = "messaging.kafka.client_id";
+static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_id";
 
 /**
  * Partition the message is sent to.
  */
-static constexpr const char *MESSAGING_KAFKA_PARTITION = "messaging.kafka.partition";
+static constexpr const char *kMessagingKafkaPartition = "messaging.kafka.partition";
+
+/**
+ * The offset of a record in the corresponding Kafka partition.
+ */
+static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.message.offset";
 
 /**
  * A boolean that is true if the message is a tombstone.
  */
-static constexpr const char *MESSAGING_KAFKA_TOMBSTONE = "messaging.kafka.tombstone";
+static constexpr const char *kMessagingKafkaTombstone = "messaging.kafka.tombstone";
 
 /**
  * Namespace of RocketMQ resources, resources in different namespaces are individual.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_NAMESPACE = "messaging.rocketmq.namespace";
+static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.namespace";
 
 /**
  * Name of the RocketMQ producer/consumer group that is handling the message. The client type is
  * identified by the SpanKind.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_CLIENT_GROUP = "messaging.rocketmq.client_group";
+static constexpr const char *kMessagingRocketmqClientGroup = "messaging.rocketmq.client_group";
 
 /**
  * The unique identifier for each client.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_CLIENT_ID = "messaging.rocketmq.client_id";
+static constexpr const char *kMessagingRocketmqClientId = "messaging.rocketmq.client_id";
+
+/**
+ * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
+ */
+static constexpr const char *kMessagingRocketmqDeliveryTimestamp =
+    "messaging.rocketmq.delivery_timestamp";
+
+/**
+ * The delay time level for delay message, which determines the message delay time.
+ */
+static constexpr const char *kMessagingRocketmqDelayTimeLevel =
+    "messaging.rocketmq.delay_time_level";
+
+/**
+ * It is essential for FIFO message. Messages that belong to the same message group are always
+ * processed one by one within the same consumer group.
+ */
+static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message_group";
 
 /**
  * Type of message.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_MESSAGE_TYPE = "messaging.rocketmq.message_type";
+static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message_type";
 
 /**
  * The secondary classifier of message besides topic.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_MESSAGE_TAG = "messaging.rocketmq.message_tag";
+static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message_tag";
 
 /**
  * Key(s) of message, another way to mark message besides message id.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_MESSAGE_KEYS = "messaging.rocketmq.message_keys";
+static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message_keys";
 
 /**
  * Model of message consumption. This only applies to consumer spans.
  */
-static constexpr const char *MESSAGING_ROCKETMQ_CONSUMPTION_MODEL =
+static constexpr const char *kMessagingRocketmqConsumptionModel =
     "messaging.rocketmq.consumption_model";
 
 /**
  * A string identifying the remoting system. See below for a list of well-known identifiers.
  */
-static constexpr const char *RPC_SYSTEM = "rpc.system";
+static constexpr const char *kRpcSystem = "rpc.system";
 
 /**
  * The full (logical) name of the service being called, including its package name, if applicable.
@@ -915,7 +939,7 @@ static constexpr const char *RPC_SYSTEM = "rpc.system";
  method actually executing the call on the server side, RPC client stub class on the client
  side).</li> </ul>
  */
-static constexpr const char *RPC_SERVICE = "rpc.service";
+static constexpr const char *kRpcService = "rpc.service";
 
 /**
  * The name of the (logical) method being called, must be equal to the $method part in the span
@@ -927,414 +951,423 @@ static constexpr const char *RPC_SERVICE = "rpc.service";
  may be used to store the latter (e.g., method actually executing the call on the server side, RPC
  client stub method on the client side).</li> </ul>
  */
-static constexpr const char *RPC_METHOD = "rpc.method";
+static constexpr const char *kRpcMethod = "rpc.method";
 
 /**
  * The <a href="https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md">numeric status
  * code</a> of the gRPC request.
  */
-static constexpr const char *RPC_GRPC_STATUS_CODE = "rpc.grpc.status_code";
+static constexpr const char *kRpcGrpcStatusCode = "rpc.grpc.status_code";
 
 /**
  * Protocol version as in {@code jsonrpc} property of request/response. Since JSON-RPC 1.0 does not
  * specify this, the value can be omitted.
  */
-static constexpr const char *RPC_JSONRPC_VERSION = "rpc.jsonrpc.version";
+static constexpr const char *kRpcJsonrpcVersion = "rpc.jsonrpc.version";
 
 /**
  * {@code id} property of request or response. Since protocol allows id to be int, string, {@code
  * null} or missing (for notifications), value is expected to be cast to string for simplicity. Use
  * empty string in case of {@code null} value. Omit entirely if this is a notification.
  */
-static constexpr const char *RPC_JSONRPC_REQUEST_ID = "rpc.jsonrpc.request_id";
+static constexpr const char *kRpcJsonrpcRequestId = "rpc.jsonrpc.request_id";
 
 /**
  * {@code error.code} property of response if it is an error response.
  */
-static constexpr const char *RPC_JSONRPC_ERROR_CODE = "rpc.jsonrpc.error_code";
+static constexpr const char *kRpcJsonrpcErrorCode = "rpc.jsonrpc.error_code";
 
 /**
  * {@code error.message} property of response if it is an error response.
  */
-static constexpr const char *RPC_JSONRPC_ERROR_MESSAGE = "rpc.jsonrpc.error_message";
+static constexpr const char *kRpcJsonrpcErrorMessage = "rpc.jsonrpc.error_message";
 
 // Enum definitions
 namespace EventDomainValues
 {
 /** Events from browser apps. */
-static constexpr const char *BROWSER = "browser";
+static constexpr const char *kBrowser = "browser";
 /** Events from mobile apps. */
-static constexpr const char *DEVICE = "device";
+static constexpr const char *kDevice = "device";
 /** Events from Kubernetes. */
-static constexpr const char *K8S = "k8s";
+static constexpr const char *kK8s = "k8s";
 }  // namespace EventDomainValues
 
 namespace OpentracingRefTypeValues
 {
 /** The parent Span depends on the child Span in some capacity. */
-static constexpr const char *CHILD_OF = "child_of";
+static constexpr const char *kChildOf = "child_of";
 /** The parent Span does not depend in any way on the result of the child Span. */
-static constexpr const char *FOLLOWS_FROM = "follows_from";
+static constexpr const char *kFollowsFrom = "follows_from";
 }  // namespace OpentracingRefTypeValues
 
 namespace DbSystemValues
 {
 /** Some other SQL database. Fallback only. See notes. */
-static constexpr const char *OTHER_SQL = "other_sql";
+static constexpr const char *kOtherSql = "other_sql";
 /** Microsoft SQL Server. */
-static constexpr const char *MSSQL = "mssql";
+static constexpr const char *kMssql = "mssql";
 /** MySQL. */
-static constexpr const char *MYSQL = "mysql";
+static constexpr const char *kMysql = "mysql";
 /** Oracle Database. */
-static constexpr const char *ORACLE = "oracle";
+static constexpr const char *kOracle = "oracle";
 /** IBM Db2. */
-static constexpr const char *DB2 = "db2";
+static constexpr const char *kDb2 = "db2";
 /** PostgreSQL. */
-static constexpr const char *POSTGRESQL = "postgresql";
+static constexpr const char *kPostgresql = "postgresql";
 /** Amazon Redshift. */
-static constexpr const char *REDSHIFT = "redshift";
+static constexpr const char *kRedshift = "redshift";
 /** Apache Hive. */
-static constexpr const char *HIVE = "hive";
+static constexpr const char *kHive = "hive";
 /** Cloudscape. */
-static constexpr const char *CLOUDSCAPE = "cloudscape";
+static constexpr const char *kCloudscape = "cloudscape";
 /** HyperSQL DataBase. */
-static constexpr const char *HSQLDB = "hsqldb";
+static constexpr const char *kHsqldb = "hsqldb";
 /** Progress Database. */
-static constexpr const char *PROGRESS = "progress";
+static constexpr const char *kProgress = "progress";
 /** SAP MaxDB. */
-static constexpr const char *MAXDB = "maxdb";
+static constexpr const char *kMaxdb = "maxdb";
 /** SAP HANA. */
-static constexpr const char *HANADB = "hanadb";
+static constexpr const char *kHanadb = "hanadb";
 /** Ingres. */
-static constexpr const char *INGRES = "ingres";
+static constexpr const char *kIngres = "ingres";
 /** FirstSQL. */
-static constexpr const char *FIRSTSQL = "firstsql";
+static constexpr const char *kFirstsql = "firstsql";
 /** EnterpriseDB. */
-static constexpr const char *EDB = "edb";
+static constexpr const char *kEdb = "edb";
 /** InterSystems Caché. */
-static constexpr const char *CACHE = "cache";
+static constexpr const char *kCache = "cache";
 /** Adabas (Adaptable Database System). */
-static constexpr const char *ADABAS = "adabas";
+static constexpr const char *kAdabas = "adabas";
 /** Firebird. */
-static constexpr const char *FIREBIRD = "firebird";
+static constexpr const char *kFirebird = "firebird";
 /** Apache Derby. */
-static constexpr const char *DERBY = "derby";
+static constexpr const char *kDerby = "derby";
 /** FileMaker. */
-static constexpr const char *FILEMAKER = "filemaker";
+static constexpr const char *kFilemaker = "filemaker";
 /** Informix. */
-static constexpr const char *INFORMIX = "informix";
+static constexpr const char *kInformix = "informix";
 /** InstantDB. */
-static constexpr const char *INSTANTDB = "instantdb";
+static constexpr const char *kInstantdb = "instantdb";
 /** InterBase. */
-static constexpr const char *INTERBASE = "interbase";
+static constexpr const char *kInterbase = "interbase";
 /** MariaDB. */
-static constexpr const char *MARIADB = "mariadb";
+static constexpr const char *kMariadb = "mariadb";
 /** Netezza. */
-static constexpr const char *NETEZZA = "netezza";
+static constexpr const char *kNetezza = "netezza";
 /** Pervasive PSQL. */
-static constexpr const char *PERVASIVE = "pervasive";
+static constexpr const char *kPervasive = "pervasive";
 /** PointBase. */
-static constexpr const char *POINTBASE = "pointbase";
+static constexpr const char *kPointbase = "pointbase";
 /** SQLite. */
-static constexpr const char *SQLITE = "sqlite";
+static constexpr const char *kSqlite = "sqlite";
 /** Sybase. */
-static constexpr const char *SYBASE = "sybase";
+static constexpr const char *kSybase = "sybase";
 /** Teradata. */
-static constexpr const char *TERADATA = "teradata";
+static constexpr const char *kTeradata = "teradata";
 /** Vertica. */
-static constexpr const char *VERTICA = "vertica";
+static constexpr const char *kVertica = "vertica";
 /** H2. */
-static constexpr const char *H2 = "h2";
+static constexpr const char *kH2 = "h2";
 /** ColdFusion IMQ. */
-static constexpr const char *COLDFUSION = "coldfusion";
+static constexpr const char *kColdfusion = "coldfusion";
 /** Apache Cassandra. */
-static constexpr const char *CASSANDRA = "cassandra";
+static constexpr const char *kCassandra = "cassandra";
 /** Apache HBase. */
-static constexpr const char *HBASE = "hbase";
+static constexpr const char *kHbase = "hbase";
 /** MongoDB. */
-static constexpr const char *MONGODB = "mongodb";
+static constexpr const char *kMongodb = "mongodb";
 /** Redis. */
-static constexpr const char *REDIS = "redis";
+static constexpr const char *kRedis = "redis";
 /** Couchbase. */
-static constexpr const char *COUCHBASE = "couchbase";
+static constexpr const char *kCouchbase = "couchbase";
 /** CouchDB. */
-static constexpr const char *COUCHDB = "couchdb";
+static constexpr const char *kCouchdb = "couchdb";
 /** Microsoft Azure Cosmos DB. */
-static constexpr const char *COSMOSDB = "cosmosdb";
+static constexpr const char *kCosmosdb = "cosmosdb";
 /** Amazon DynamoDB. */
-static constexpr const char *DYNAMODB = "dynamodb";
+static constexpr const char *kDynamodb = "dynamodb";
 /** Neo4j. */
-static constexpr const char *NEO4J = "neo4j";
+static constexpr const char *kNeo4j = "neo4j";
 /** Apache Geode. */
-static constexpr const char *GEODE = "geode";
+static constexpr const char *kGeode = "geode";
 /** Elasticsearch. */
-static constexpr const char *ELASTICSEARCH = "elasticsearch";
+static constexpr const char *kElasticsearch = "elasticsearch";
 /** Memcached. */
-static constexpr const char *MEMCACHED = "memcached";
+static constexpr const char *kMemcached = "memcached";
 /** CockroachDB. */
-static constexpr const char *COCKROACHDB = "cockroachdb";
+static constexpr const char *kCockroachdb = "cockroachdb";
 /** OpenSearch. */
-static constexpr const char *OPENSEARCH = "opensearch";
+static constexpr const char *kOpensearch = "opensearch";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
 {
 /** all. */
-static constexpr const char *ALL = "all";
+static constexpr const char *kAll = "all";
 /** each_quorum. */
-static constexpr const char *EACH_QUORUM = "each_quorum";
+static constexpr const char *kEachQuorum = "each_quorum";
 /** quorum. */
-static constexpr const char *QUORUM = "quorum";
+static constexpr const char *kQuorum = "quorum";
 /** local_quorum. */
-static constexpr const char *LOCAL_QUORUM = "local_quorum";
+static constexpr const char *kLocalQuorum = "local_quorum";
 /** one. */
-static constexpr const char *ONE = "one";
+static constexpr const char *kOne = "one";
 /** two. */
-static constexpr const char *TWO = "two";
+static constexpr const char *kTwo = "two";
 /** three. */
-static constexpr const char *THREE = "three";
+static constexpr const char *kThree = "three";
 /** local_one. */
-static constexpr const char *LOCAL_ONE = "local_one";
+static constexpr const char *kLocalOne = "local_one";
 /** any. */
-static constexpr const char *ANY = "any";
+static constexpr const char *kAny = "any";
 /** serial. */
-static constexpr const char *SERIAL = "serial";
+static constexpr const char *kSerial = "serial";
 /** local_serial. */
-static constexpr const char *LOCAL_SERIAL = "local_serial";
+static constexpr const char *kLocalSerial = "local_serial";
 }  // namespace DbCassandraConsistencyLevelValues
+
+namespace OtelStatusCodeValues
+{
+/** The operation has been validated by an Application developer or Operator to have completed
+ * successfully. */
+static constexpr const char *kOk = "OK";
+/** The operation contains an error. */
+static constexpr const char *kError = "ERROR";
+}  // namespace OtelStatusCodeValues
 
 namespace FaasTriggerValues
 {
 /** A response to some data source operation such as a database or filesystem read/write. */
-static constexpr const char *DATASOURCE = "datasource";
+static constexpr const char *kDatasource = "datasource";
 /** To provide an answer to an inbound HTTP request. */
-static constexpr const char *HTTP = "http";
+static constexpr const char *kHttp = "http";
 /** A function is set to be executed when messages are sent to a messaging system. */
-static constexpr const char *PUBSUB = "pubsub";
+static constexpr const char *kPubsub = "pubsub";
 /** A function is scheduled to be executed regularly. */
-static constexpr const char *TIMER = "timer";
+static constexpr const char *kTimer = "timer";
 /** If none of the others apply. */
-static constexpr const char *OTHER = "other";
+static constexpr const char *kOther = "other";
 }  // namespace FaasTriggerValues
 
 namespace FaasDocumentOperationValues
 {
 /** When a new object is created. */
-static constexpr const char *INSERT = "insert";
+static constexpr const char *kInsert = "insert";
 /** When an object is modified. */
-static constexpr const char *EDIT = "edit";
+static constexpr const char *kEdit = "edit";
 /** When an object is deleted. */
-static constexpr const char *DELETE = "delete";
+static constexpr const char *kDelete = "delete";
 }  // namespace FaasDocumentOperationValues
 
 namespace FaasInvokedProviderValues
 {
 /** Alibaba Cloud. */
-static constexpr const char *ALIBABA_CLOUD = "alibaba_cloud";
+static constexpr const char *kAlibabaCloud = "alibaba_cloud";
 /** Amazon Web Services. */
-static constexpr const char *AWS = "aws";
+static constexpr const char *kAws = "aws";
 /** Microsoft Azure. */
-static constexpr const char *AZURE = "azure";
+static constexpr const char *kAzure = "azure";
 /** Google Cloud Platform. */
-static constexpr const char *GCP = "gcp";
+static constexpr const char *kGcp = "gcp";
 /** Tencent Cloud. */
-static constexpr const char *TENCENT_CLOUD = "tencent_cloud";
+static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace FaasInvokedProviderValues
 
 namespace NetTransportValues
 {
 /** ip_tcp. */
-static constexpr const char *IP_TCP = "ip_tcp";
+static constexpr const char *kIpTcp = "ip_tcp";
 /** ip_udp. */
-static constexpr const char *IP_UDP = "ip_udp";
+static constexpr const char *kIpUdp = "ip_udp";
 /** Named or anonymous pipe. See note below. */
-static constexpr const char *PIPE = "pipe";
+static constexpr const char *kPipe = "pipe";
 /** In-process communication. */
-static constexpr const char *INPROC = "inproc";
+static constexpr const char *kInproc = "inproc";
 /** Something else (non IP-based). */
-static constexpr const char *OTHER = "other";
+static constexpr const char *kOther = "other";
 }  // namespace NetTransportValues
 
 namespace NetSockFamilyValues
 {
 /** IPv4 address. */
-static constexpr const char *INET = "inet";
+static constexpr const char *kInet = "inet";
 /** IPv6 address. */
-static constexpr const char *INET6 = "inet6";
+static constexpr const char *kInet6 = "inet6";
 /** Unix domain socket path. */
-static constexpr const char *UNIX = "unix";
+static constexpr const char *kUnix = "unix";
 }  // namespace NetSockFamilyValues
 
 namespace NetHostConnectionTypeValues
 {
 /** wifi. */
-static constexpr const char *WIFI = "wifi";
+static constexpr const char *kWifi = "wifi";
 /** wired. */
-static constexpr const char *WIRED = "wired";
+static constexpr const char *kWired = "wired";
 /** cell. */
-static constexpr const char *CELL = "cell";
+static constexpr const char *kCell = "cell";
 /** unavailable. */
-static constexpr const char *UNAVAILABLE = "unavailable";
+static constexpr const char *kUnavailable = "unavailable";
 /** unknown. */
-static constexpr const char *UNKNOWN = "unknown";
+static constexpr const char *kUnknown = "unknown";
 }  // namespace NetHostConnectionTypeValues
 
 namespace NetHostConnectionSubtypeValues
 {
 /** GPRS. */
-static constexpr const char *GPRS = "gprs";
+static constexpr const char *kGprs = "gprs";
 /** EDGE. */
-static constexpr const char *EDGE = "edge";
+static constexpr const char *kEdge = "edge";
 /** UMTS. */
-static constexpr const char *UMTS = "umts";
+static constexpr const char *kUmts = "umts";
 /** CDMA. */
-static constexpr const char *CDMA = "cdma";
+static constexpr const char *kCdma = "cdma";
 /** EVDO Rel. 0. */
-static constexpr const char *EVDO_0 = "evdo_0";
+static constexpr const char *kEvdo0 = "evdo_0";
 /** EVDO Rev. A. */
-static constexpr const char *EVDO_A = "evdo_a";
+static constexpr const char *kEvdoA = "evdo_a";
 /** CDMA2000 1XRTT. */
-static constexpr const char *CDMA2000_1XRTT = "cdma2000_1xrtt";
+static constexpr const char *kCdma20001xrtt = "cdma2000_1xrtt";
 /** HSDPA. */
-static constexpr const char *HSDPA = "hsdpa";
+static constexpr const char *kHsdpa = "hsdpa";
 /** HSUPA. */
-static constexpr const char *HSUPA = "hsupa";
+static constexpr const char *kHsupa = "hsupa";
 /** HSPA. */
-static constexpr const char *HSPA = "hspa";
+static constexpr const char *kHspa = "hspa";
 /** IDEN. */
-static constexpr const char *IDEN = "iden";
+static constexpr const char *kIden = "iden";
 /** EVDO Rev. B. */
-static constexpr const char *EVDO_B = "evdo_b";
+static constexpr const char *kEvdoB = "evdo_b";
 /** LTE. */
-static constexpr const char *LTE = "lte";
+static constexpr const char *kLte = "lte";
 /** EHRPD. */
-static constexpr const char *EHRPD = "ehrpd";
+static constexpr const char *kEhrpd = "ehrpd";
 /** HSPAP. */
-static constexpr const char *HSPAP = "hspap";
+static constexpr const char *kHspap = "hspap";
 /** GSM. */
-static constexpr const char *GSM = "gsm";
+static constexpr const char *kGsm = "gsm";
 /** TD-SCDMA. */
-static constexpr const char *TD_SCDMA = "td_scdma";
+static constexpr const char *kTdScdma = "td_scdma";
 /** IWLAN. */
-static constexpr const char *IWLAN = "iwlan";
+static constexpr const char *kIwlan = "iwlan";
 /** 5G NR (New Radio). */
-static constexpr const char *NR = "nr";
+static constexpr const char *kNr = "nr";
 /** 5G NRNSA (New Radio Non-Standalone). */
-static constexpr const char *NRNSA = "nrnsa";
+static constexpr const char *kNrnsa = "nrnsa";
 /** LTE CA. */
-static constexpr const char *LTE_CA = "lte_ca";
+static constexpr const char *kLteCa = "lte_ca";
 }  // namespace NetHostConnectionSubtypeValues
 
 namespace HttpFlavorValues
 {
 /** HTTP/1.0. */
-static constexpr const char *HTTP_1_0 = "1.0";
+static constexpr const char *kHttp10 = "1.0";
 /** HTTP/1.1. */
-static constexpr const char *HTTP_1_1 = "1.1";
+static constexpr const char *kHttp11 = "1.1";
 /** HTTP/2. */
-static constexpr const char *HTTP_2_0 = "2.0";
+static constexpr const char *kHttp20 = "2.0";
 /** HTTP/3. */
-static constexpr const char *HTTP_3_0 = "3.0";
+static constexpr const char *kHttp30 = "3.0";
 /** SPDY protocol. */
-static constexpr const char *SPDY = "SPDY";
+static constexpr const char *kSpdy = "SPDY";
 /** QUIC protocol. */
-static constexpr const char *QUIC = "QUIC";
+static constexpr const char *kQuic = "QUIC";
 }  // namespace HttpFlavorValues
 
 namespace GraphqlOperationTypeValues
 {
 /** GraphQL query. */
-static constexpr const char *QUERY = "query";
+static constexpr const char *kQuery = "query";
 /** GraphQL mutation. */
-static constexpr const char *MUTATION = "mutation";
+static constexpr const char *kMutation = "mutation";
 /** GraphQL subscription. */
-static constexpr const char *SUBSCRIPTION = "subscription";
+static constexpr const char *kSubscription = "subscription";
 }  // namespace GraphqlOperationTypeValues
 
 namespace MessagingDestinationKindValues
 {
 /** A message sent to a queue. */
-static constexpr const char *QUEUE = "queue";
+static constexpr const char *kQueue = "queue";
 /** A message sent to a topic. */
-static constexpr const char *TOPIC = "topic";
+static constexpr const char *kTopic = "topic";
 }  // namespace MessagingDestinationKindValues
 
 namespace MessagingOperationValues
 {
 /** receive. */
-static constexpr const char *RECEIVE = "receive";
+static constexpr const char *kReceive = "receive";
 /** process. */
-static constexpr const char *PROCESS = "process";
+static constexpr const char *kProcess = "process";
 }  // namespace MessagingOperationValues
 
 namespace MessagingRocketmqMessageTypeValues
 {
 /** Normal message. */
-static constexpr const char *NORMAL = "normal";
+static constexpr const char *kNormal = "normal";
 /** FIFO message. */
-static constexpr const char *FIFO = "fifo";
+static constexpr const char *kFifo = "fifo";
 /** Delay message. */
-static constexpr const char *DELAY = "delay";
+static constexpr const char *kDelay = "delay";
 /** Transaction message. */
-static constexpr const char *TRANSACTION = "transaction";
+static constexpr const char *kTransaction = "transaction";
 }  // namespace MessagingRocketmqMessageTypeValues
 
 namespace MessagingRocketmqConsumptionModelValues
 {
 /** Clustering consumption model. */
-static constexpr const char *CLUSTERING = "clustering";
+static constexpr const char *kClustering = "clustering";
 /** Broadcasting consumption model. */
-static constexpr const char *BROADCASTING = "broadcasting";
+static constexpr const char *kBroadcasting = "broadcasting";
 }  // namespace MessagingRocketmqConsumptionModelValues
 
 namespace RpcSystemValues
 {
 /** gRPC. */
-static constexpr const char *GRPC = "grpc";
+static constexpr const char *kGrpc = "grpc";
 /** Java RMI. */
-static constexpr const char *JAVA_RMI = "java_rmi";
+static constexpr const char *kJavaRmi = "java_rmi";
 /** .NET WCF. */
-static constexpr const char *DOTNET_WCF = "dotnet_wcf";
+static constexpr const char *kDotnetWcf = "dotnet_wcf";
 /** Apache Dubbo. */
-static constexpr const char *APACHE_DUBBO = "apache_dubbo";
+static constexpr const char *kApacheDubbo = "apache_dubbo";
 }  // namespace RpcSystemValues
 
 namespace RpcGrpcStatusCodeValues
 {
 /** OK. */
-static constexpr const int OK = 0;
+static constexpr const int kOk = 0;
 /** CANCELLED. */
-static constexpr const int CANCELLED = 1;
+static constexpr const int kCancelled = 1;
 /** UNKNOWN. */
-static constexpr const int UNKNOWN = 2;
+static constexpr const int kUnknown = 2;
 /** INVALID_ARGUMENT. */
-static constexpr const int INVALID_ARGUMENT = 3;
+static constexpr const int kInvalidArgument = 3;
 /** DEADLINE_EXCEEDED. */
-static constexpr const int DEADLINE_EXCEEDED = 4;
+static constexpr const int kDeadlineExceeded = 4;
 /** NOT_FOUND. */
-static constexpr const int NOT_FOUND = 5;
+static constexpr const int kNotFound = 5;
 /** ALREADY_EXISTS. */
-static constexpr const int ALREADY_EXISTS = 6;
+static constexpr const int kAlreadyExists = 6;
 /** PERMISSION_DENIED. */
-static constexpr const int PERMISSION_DENIED = 7;
+static constexpr const int kPermissionDenied = 7;
 /** RESOURCE_EXHAUSTED. */
-static constexpr const int RESOURCE_EXHAUSTED = 8;
+static constexpr const int kResourceExhausted = 8;
 /** FAILED_PRECONDITION. */
-static constexpr const int FAILED_PRECONDITION = 9;
+static constexpr const int kFailedPrecondition = 9;
 /** ABORTED. */
-static constexpr const int ABORTED = 10;
+static constexpr const int kAborted = 10;
 /** OUT_OF_RANGE. */
-static constexpr const int OUT_OF_RANGE = 11;
+static constexpr const int kOutOfRange = 11;
 /** UNIMPLEMENTED. */
-static constexpr const int UNIMPLEMENTED = 12;
+static constexpr const int kUnimplemented = 12;
 /** INTERNAL. */
-static constexpr const int INTERNAL = 13;
+static constexpr const int kInternal = 13;
 /** UNAVAILABLE. */
-static constexpr const int UNAVAILABLE = 14;
+static constexpr const int kUnavailable = 14;
 /** DATA_LOSS. */
-static constexpr const int DATA_LOSS = 15;
+static constexpr const int kDataLoss = 15;
 /** UNAUTHENTICATED. */
-static constexpr const int UNAUTHENTICATED = 16;
+static constexpr const int kUnauthenticated = 16;
 }  // namespace RpcGrpcStatusCodeValues
 
 }  // namespace SemanticConventions

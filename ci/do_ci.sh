@@ -25,7 +25,7 @@ function run_benchmarks
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   mkdir -p $BENCHMARK_DIR
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -59,7 +59,8 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-BAZEL_OPTIONS="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
@@ -84,7 +85,7 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make
   make test
@@ -96,6 +97,7 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
@@ -115,7 +117,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   make
@@ -127,7 +129,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
         "${SRC_DIR}"
@@ -138,7 +140,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=20 \
         "${SRC_DIR}"
@@ -151,7 +153,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=ON \
         "${SRC_DIR}"
@@ -162,10 +164,9 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
-  ${SRC_DIR}/tools/build-gtest.sh
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_CXX_STANDARD=11 \
         "${SRC_DIR}"
   make
@@ -175,7 +176,6 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
-  ${SRC_DIR}/tools/build-gtest.sh
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
@@ -235,7 +235,7 @@ EOF
     -Wl,--version-script=${PWD}/export.map \
   "
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
         -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
         "${SRC_DIR}"
@@ -246,7 +246,7 @@ EOF
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make load_plugin_example
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
@@ -298,9 +298,13 @@ elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
   bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
+elif [[ "$1" == "bazel.e2e" ]]; then
+  cd examples/e2e
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_DEFAULT //...
+  exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -325,7 +329,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror --coverage" \
+        -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
         "${SRC_DIR}"
   make
   make test
@@ -335,9 +339,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   cp tmp_coverage.info coverage.info
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
-  echo "gRPC=v1.43.2" > third_party_release
+  echo "gRPC=v1.48.1" > third_party_release
   echo "thrift=0.14.1" >> third_party_release
-  echo "abseil=20210324.0" >> third_party_release
+  echo "abseil=20220623.1" >> third_party_release
   git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi
