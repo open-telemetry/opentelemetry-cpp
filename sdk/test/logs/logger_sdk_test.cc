@@ -9,6 +9,8 @@
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#  include "opentelemetry/trace/scope.h"
 
 #  include <gtest/gtest.h>
 
@@ -18,7 +20,7 @@ namespace nostd    = opentelemetry::nostd;
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
-  // Confirm Logger::Log() does not have undefined behavior
+  // Confirm Logger::EmitLogRecord() does not have undefined behavior
   // even when there is no processor set
   // since it calls Processor::OnEmit()
 
@@ -64,11 +66,28 @@ public:
 
   void SetBody(const std::string &message) noexcept { body_ = message; }
 
-  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
+  void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
+  {
+    trace_id_ = trace_id;
+  }
+  inline const opentelemetry::trace::TraceId &GetTraceId() const noexcept { return trace_id_; }
 
-  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
+  void SetSpanId(const opentelemetry::trace::SpanId &span_id) noexcept override
+  {
+    span_id_ = span_id;
+  }
 
-  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
+  inline const opentelemetry::trace::SpanId &GetSpanId() const noexcept { return span_id_; }
+
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept override
+  {
+    trace_flags_ = trace_flags;
+  }
+
+  inline const opentelemetry::trace::TraceFlags &GetTraceFlags() const noexcept
+  {
+    return trace_flags_;
+  }
 
   void SetAttribute(nostd::string_view,
                     const opentelemetry::common::AttributeValue &) noexcept override
@@ -83,6 +102,9 @@ public:
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
+  opentelemetry::trace::TraceId trace_id_;
+  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::TraceFlags trace_flags_;
 };
 
 class MockProcessor final : public LogRecordProcessor
@@ -113,6 +135,9 @@ public:
     // passed in the constructor
     record_received_->SetSeverity(copy->GetSeverity());
     record_received_->SetBody(copy->GetBody());
+    record_received_->SetTraceId(copy->GetTraceId());
+    record_received_->SetTraceFlags(copy->GetTraceFlags());
+    record_received_->SetSpanId(copy->GetSpanId());
   }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
@@ -124,14 +149,23 @@ TEST(LoggerSDK, LogToAProcessor)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = api_lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url, true);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
+  auto logger2 = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url, true);
   ASSERT_EQ(logger, logger2);
+
+  nostd::shared_ptr<opentelemetry::trace::Span> include_span;
+  {
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> span_processors;
+    auto trace_provider =
+        opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(span_processors));
+    include_span = trace_provider->GetTracer("logger")->StartSpan("test_logger");
+  }
+  opentelemetry::trace::Scope trace_scope{include_span};
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
@@ -142,10 +176,26 @@ TEST(LoggerSDK, LogToAProcessor)
   lp->AddProcessor(std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>(
       new MockProcessor(shared_recordable)));
 
-  // Check that the recordable created by the Log() statement is set properly
-  logger->Log(logs_api::Severity::kWarn, "Log Message");
+  // Check that the recordable created by the EmitLogRecord() statement is set properly
+  logger->EmitLogRecord(logs_api::Severity::kWarn, "Log Message");
 
   ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
+  ASSERT_EQ(shared_recordable->GetTraceFlags().flags(),
+            include_span->GetContext().trace_flags().flags());
+  char trace_id_in_logger[opentelemetry::trace::TraceId::kSize * 2];
+  char trace_id_in_span[opentelemetry::trace::TraceId::kSize * 2];
+  char span_id_in_logger[opentelemetry::trace::SpanId::kSize * 2];
+  char span_id_in_span[opentelemetry::trace::SpanId::kSize * 2];
+  shared_recordable->GetTraceId().ToLowerBase16(trace_id_in_logger);
+  include_span->GetContext().trace_id().ToLowerBase16(trace_id_in_span);
+  shared_recordable->GetSpanId().ToLowerBase16(span_id_in_logger);
+  include_span->GetContext().span_id().ToLowerBase16(span_id_in_span);
+  std::string trace_id_text_in_logger{trace_id_in_logger, sizeof(trace_id_in_logger)};
+  std::string trace_id_text_in_span{trace_id_in_span, sizeof(trace_id_in_span)};
+  std::string span_id_text_in_logger{span_id_in_logger, sizeof(span_id_in_logger)};
+  std::string span_id_text_in_span{span_id_in_span, sizeof(span_id_in_span)};
+  ASSERT_EQ(trace_id_text_in_logger, trace_id_text_in_span);
+  ASSERT_EQ(span_id_text_in_logger, span_id_text_in_span);
 }
 #endif

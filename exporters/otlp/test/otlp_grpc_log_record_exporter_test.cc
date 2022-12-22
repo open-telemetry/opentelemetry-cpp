@@ -153,9 +153,10 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   attributes["vec_uint64_value"] = attribute_storage_uint64_value;
   attributes["vec_double_value"] = attribute_storage_double_value;
   attributes["vec_string_value"] = attribute_storage_string_value;
-  logger->Log(opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
-              opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-              std::chrono::system_clock::now());
+  logger->EmitLogRecord(
+      opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+      std::chrono::system_clock::now());
 }
 
 }  // namespace otlp

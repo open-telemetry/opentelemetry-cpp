@@ -63,7 +63,9 @@ public:
                                       nostd::string_view /* options */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+                                      nostd::string_view /* schema_url */,
+                                      bool /* include_trace_context */,
+                                      const common::KeyValueIterable & /* attributes */) override
   {
     return logger_;
   }
@@ -72,7 +74,9 @@ public:
                                       nostd::span<nostd::string_view> /* args */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+                                      nostd::string_view /* schema_url */,
+                                      bool /* include_trace_context */,
+                                      const common::KeyValueIterable & /* attributes */) override
   {
     return logger_;
   }

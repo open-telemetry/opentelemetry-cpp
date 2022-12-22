@@ -78,7 +78,11 @@ public:
       nostd::string_view options,
       nostd::string_view library_name,
       nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view schema_url      = "",
+      bool include_trace_context         = true,
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::NoopKeyValueIterable()) noexcept override;
+
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
@@ -94,7 +98,10 @@ public:
       nostd::span<nostd::string_view> args,
       nostd::string_view library_name,
       nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view schema_url      = "",
+      bool include_trace_context         = true,
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::NoopKeyValueIterable()) noexcept override;
 
   /**
    * Add the processor that is stored internally in the logger provider.

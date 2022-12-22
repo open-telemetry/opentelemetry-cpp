@@ -5,6 +5,7 @@
 
 #  include <gtest/gtest.h>
 #  include <array>
+#  include <vector>
 
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/logger.h"
@@ -66,6 +67,22 @@ TEST(Logger, LogMethodOverloads)
   logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
   logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
 
+  logger->EmitLogRecord(Severity::kTrace, "Test log message");
+  logger->EmitLogRecord(Severity::kInfo, "Test log message");
+  logger->EmitLogRecord(Severity::kDebug, m);
+  logger->EmitLogRecord(Severity::kWarn, "Logging a map", m);
+  logger->EmitLogRecord(Severity::kError,
+                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->EmitLogRecord(Severity::kFatal, "Logging an initializer list",
+                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(m));
+  logger->EmitLogRecord(Severity::kDebug,
+                        common::KeyValueIterableView<std::map<std::string, std::string>>(m));
+  std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(array));
+  std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(vec));
+
   // Severity methods
   logger->Trace("Test log message");
   logger->Trace("Test log message", m);
@@ -121,7 +138,9 @@ class TestProvider : public LoggerProvider
                                       nostd::string_view /* options */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+                                      nostd::string_view /* schema_url */,
+                                      bool /* include_trace_context */,
+                                      const common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
@@ -130,7 +149,9 @@ class TestProvider : public LoggerProvider
                                       nostd::span<nostd::string_view> /* args */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+                                      nostd::string_view /* schema_url */,
+                                      bool /* include_trace_context */,
+                                      const common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(new TestLogger());
   }

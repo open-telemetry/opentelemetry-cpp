@@ -165,25 +165,27 @@ public:
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::logs::Logger::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
@@ -274,25 +276,27 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::logs::Logger::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
@@ -372,25 +376,27 @@ public:
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::logs::Logger::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
@@ -471,25 +477,27 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::logs::Logger::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }

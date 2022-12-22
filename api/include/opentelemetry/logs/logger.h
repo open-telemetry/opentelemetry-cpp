@@ -14,6 +14,7 @@
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/log_record.h"
+#  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
@@ -35,6 +36,48 @@ namespace logs
 class Logger
 {
 public:
+  /**
+   * Utility function to help to make a attribute view from initializer_list
+   *
+   * @param attributes
+   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
+   */
+  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
+  MakeAttributes(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+                     attributes) noexcept
+  {
+    return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+        attributes.begin(), attributes.end()};
+  }
+
+  /**
+   * Utility function to help to make a attribute view from a span
+   *
+   * @param attributes
+   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
+   */
+  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
+  MakeAttributes(
+      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept
+  {
+    return attributes;
+  }
+
+  /**
+   * Utility function to help to make a attribute view from a key-value iterable object
+   *
+   * @param attributes
+   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
+   */
+  template <
+      class ArgumentType,
+      nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
+  inline static common::KeyValueIterableView<ArgumentType> MakeAttributes(
+      const ArgumentType &arg) noexcept
+  {
+    return common::KeyValueIterableView<ArgumentType>(arg);
+  }
+
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
@@ -55,23 +98,42 @@ public:
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
   /**
-   * Emit a Log Record object with custom span context
+   * Emit a Log Record object with arguments
    *
-   * @param log_record
+   * @param log_record Log record
+   * @tparam args Arguments
    */
-  virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record,
-                             const trace::SpanContext &trace_context)
+  template <class... ArgumentType>
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&... args)
   {
     if (!log_record)
     {
       return;
     }
 
-    log_record->SetSpanId(trace_context.span_id());
-    log_record->SetTraceId(trace_context.trace_id());
-    log_record->SetTraceFlags(trace_context.trace_flags());
+    IgnoreTraitResult(
+        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
+            log_record.get(), std::forward<ArgumentType>(args))...);
 
     EmitLogRecord(std::move(log_record));
+  }
+
+  /**
+   * Emit a Log Record object with arguments
+   *
+   * @param log_record
+   */
+  template <class... ArgumentType>
+  void EmitLogRecord(Severity severity, ArgumentType &&... args)
+  {
+    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+    if (!log_record)
+    {
+      return;
+    }
+
+    log_record->SetSeverity(severity);
+    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**
@@ -94,34 +156,24 @@ public:
                    trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
-    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
-    if (!log_record)
+    bool trace_id_valid = trace_id.IsValid();
+    bool span_id_valid  = span_id.IsValid();
+    if (trace_id_valid && span_id_valid)
     {
-      return;
+      EmitLogRecord(severity, body, attributes, trace_id, trace_flags, span_id, timestamp);
     }
-
-    log_record->SetSeverity(severity);
-    log_record->SetBody(body);
-    log_record->SetTimestamp(timestamp);
-
-    if (trace_id.IsValid())
+    else if (trace_id_valid)
     {
-      log_record->SetTraceId(trace_id);
-      log_record->SetTraceFlags(trace_flags);
+      EmitLogRecord(severity, body, attributes, trace_id, trace_flags, timestamp);
     }
-
-    if (span_id.IsValid())
+    else if (span_id_valid)
     {
-      log_record->SetSpanId(span_id);
+      EmitLogRecord(severity, body, attributes, span_id, timestamp);
     }
-
-    attributes.ForEachKeyValue(
-        [&log_record](nostd::string_view key, common::AttributeValue value) noexcept {
-          log_record->SetAttribute(key, value);
-          return true;
-        });
-
-    EmitLogRecord(std::move(log_record));
+    else
+    {
+      EmitLogRecord(severity, body, attributes, timestamp);
+    }
   }
 
   /**
@@ -138,23 +190,7 @@ public:
                    const common::KeyValueIterable &attributes,
                    common::SystemTimestamp timestamp) noexcept
   {
-    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
-    if (!log_record)
-    {
-      return;
-    }
-
-    log_record->SetSeverity(severity);
-    log_record->SetBody(body);
-    log_record->SetTimestamp(timestamp);
-
-    attributes.ForEachKeyValue(
-        [&log_record](nostd::string_view key, common::AttributeValue value) noexcept {
-          log_record->SetAttribute(key, value);
-          return true;
-        });
-
-    EmitLogRecord(std::move(log_record));
+    EmitLogRecord(severity, body, attributes, timestamp);
   }
 
   /*** Overloaded methods for KeyValueIterables ***/
@@ -607,6 +643,11 @@ public:
   {
     this->Log(Severity::kFatal, message, attributes);
   }
+
+protected:
+  template <class... ValueType>
+  void IgnoreTraitResult(ValueType &&...)
+  {}
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

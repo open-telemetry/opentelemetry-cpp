@@ -17,20 +17,26 @@ namespace nostd = opentelemetry::nostd;
 
 class TestProvider : public LoggerProvider
 {
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::string_view /* options */,
-                                      nostd::string_view /* library_name */,
-                                      nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+  nostd::shared_ptr<Logger> GetLogger(
+      nostd::string_view /* logger_name */,
+      nostd::string_view /* options */,
+      nostd::string_view /* library_name */,
+      nostd::string_view /* library_version */,
+      nostd::string_view /* schema_url */,
+      bool /* include_trace_context */,
+      const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(nullptr);
   }
 
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::span<nostd::string_view> /* args */,
-                                      nostd::string_view /* library_name */,
-                                      nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+  nostd::shared_ptr<Logger> GetLogger(
+      nostd::string_view /* logger_name */,
+      nostd::span<nostd::string_view> /* args */,
+      nostd::string_view /* library_name */,
+      nostd::string_view /* library_version */,
+      nostd::string_view /* schema_url */,
+      bool /* include_trace_context */,
+      const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(nullptr);
   }

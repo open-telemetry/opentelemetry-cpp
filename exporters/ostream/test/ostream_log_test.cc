@@ -302,7 +302,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
 
   // Write a log to ostream exporter
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(logs_api::Severity::kDebug, "Hello", {}, {}, {}, {}, now);
+  logger->EmitLogRecord(logs_api::Severity::kDebug, "Hello", now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);
