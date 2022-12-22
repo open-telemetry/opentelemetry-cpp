@@ -5,7 +5,6 @@
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 
 #include <gtest/gtest.h>
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
