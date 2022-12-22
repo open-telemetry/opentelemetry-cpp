@@ -87,7 +87,7 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 #if defined(_MSC_VER)
           YieldProcessor();
 #elif defined(__i386__) || defined(__x86_64__)
-#  if defined(__clang__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
           _mm_pause();
 #  else
           __builtin_ia32_pause();
