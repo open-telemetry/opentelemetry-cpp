@@ -116,8 +116,8 @@ public:
   {}
 
   nostd::shared_ptr<EventLogger> CreateEventLogger(
-      nostd::shared_ptr<Logger> delegate_logger,
-      nostd::string_view event_domain) noexcept override
+      nostd::shared_ptr<Logger> /*delegate_logger*/,
+      nostd::string_view /*event_domain*/) noexcept override
   {
     return event_logger_;
   }
