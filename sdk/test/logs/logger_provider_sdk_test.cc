@@ -4,6 +4,8 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <array>
+#  include <unordered_map>
+
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
@@ -77,6 +79,13 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   auto sdk_logger1 = static_cast<opentelemetry::sdk::logs::Logger *>(logger1.get());
   auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
+
+  auto logger3 = lp->GetLogger("logger3", "", "opentelelemtry_library", "", schema_url, true,
+                               {{"scope_key1", "scope_value"}, {"scope_key1", 2}});
+
+  std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
+  auto logger4 = lp->GetLogger("logger4", "", "opentelelemtry_library", "", schema_url, true,
+                               scope_attributes);
 }
 
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
