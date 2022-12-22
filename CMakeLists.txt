@@ -467,7 +467,7 @@ if(BUILD_TESTING)
         ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest REQUIRED)
+    find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
       find_package(GTest REQUIRED)
