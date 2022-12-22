@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include "opentelemetry/nostd/unique_ptr.h"
+
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
@@ -15,8 +19,6 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/recordable.h"
 #endif
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

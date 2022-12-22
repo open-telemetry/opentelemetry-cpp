@@ -40,7 +40,7 @@ void MultiLogRecordProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &
 
 std::unique_ptr<Recordable> MultiLogRecordProcessor::MakeRecordable() noexcept
 {
-  auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
+  auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable());
   auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
   for (auto &processor : processors_)
   {

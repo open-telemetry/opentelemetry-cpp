@@ -45,12 +45,12 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
 ### Building as standalone CMake Project
 
-1. Getting the opentelementry-cpp source:
+1. Getting the opentelementry-cpp source with its submodules:
 
    ```console
    # Change to the directory where you want to create the code repository
    $ cd ~
-   $ mkdir source && cd source && git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp
+   $ mkdir source && cd source && git clone --recurse-submodules https://github.com/open-telemetry/opentelemetry-cpp
    Cloning into 'opentelemetry-cpp'...
    ...
    Resolving deltas: 100% (3225/3225), done.
@@ -268,6 +268,42 @@ Windows DLL build is not supported. There are some constraints on how C++ DLLs
 work on Windows, specifically we can't safely allocate memory in one DLL and
 free it in another. For now, OpenTelemetry C++ targets need to be statically
 linked into the Windows applications.
+
+## Generatring binary packages
+
+OpenTelemetry C++ supports generating plateform specific binary packages from CMake
+configuration. The packages generated through this mayn't be production ready,
+and user may have to customize it further before using it as distribution.
+
+- Linux : deb, rpm, tgz
+- MacOS : tgz
+- Windows : NuGet, zip
+
+This requires platform specific package generators already installed. The package
+generation can subsequently be enabled by using BUILD_PACKAGE option during cmake
+configuration
+
+   ```console
+   $ cd opentelemetry-cpp
+   $ mkdir build && cd build && cmake -DBUILD_PACKAGE ..
+
+   -- Package name: opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb
+   -- Configuring done
+   -- Generating done
+   ...
+   $
+   ```
+
+Once build is complete as specified in [standalone build section](#building-as-standalone-cmake-project),
+the package can be generated as below.
+
+   ```console
+   $ cpack -C debug
+   CPack: Create package using DEB
+   ...
+   CPack: - package: /home/<user>/opentelemetry-cpp/build/opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb generated.
+   $
+   ```
 
 ## Using Package Managers
 
