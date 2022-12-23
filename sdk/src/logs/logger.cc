@@ -48,12 +48,17 @@ void Logger::EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&l
     return;
   }
 
+  std::unique_ptr<Recordable> recordable =
+      std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release()));
+  recordable->SetResource(context_->GetResource());
+  recordable->SetInstrumentationScope(GetInstrumentationScope());
+
   auto &processor = context_->GetProcessor();
 
   // TODO: Sampler (should include check for minSeverity)
 
   // Send the log recordable to the processor
-  processor.OnEmit(std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release())));
+  processor.OnEmit(std::move(recordable));
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
