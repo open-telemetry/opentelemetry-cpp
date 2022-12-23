@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1671785053312,
+  "lastUpdate": 1671785055657,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -99910,6 +99910,54 @@ window.BENCHMARK_DATA = {
             "value": 1790924.275175054,
             "unit": "ns/iter",
             "extra": "iterations: 376\ncpu: 363530.85106382985 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "admin@owent.net",
+            "name": "WenTao Ou",
+            "username": "owent"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "94a6783025bfc0723dc1dfb3eb5839727e815abe",
+          "message": "Fix resource and scope of new Logs SDK implementation. (#1881)",
+          "timestamp": "2022-12-23T08:31:44Z",
+          "tree_id": "a87c413d9a9fe312725e0c04039dcb51ea224b30",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/94a6783025bfc0723dc1dfb3eb5839727e815abe"
+        },
+        "date": 1671785048973,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 113.93684976494694,
+            "unit": "ns/iter",
+            "extra": "iterations: 1217000\ncpu: 113.83229252259655 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 173.17184944996376,
+            "unit": "ns/iter",
+            "extra": "iterations: 814000\ncpu: 172.6874692874693 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 626.9127261796186,
+            "unit": "ns/iter",
+            "extra": "iterations: 227000\ncpu: 626.6162995594715 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1747347.6904409903,
+            "unit": "ns/iter",
+            "extra": "iterations: 486\ncpu: 343093.2098765431 ns\nthreads: 1"
           }
         ]
       }
