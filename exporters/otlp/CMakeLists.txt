@@ -36,7 +36,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_common opentelemetry_sdk opentelemetry_ext opentelemetry_proto)
 
   target_link_libraries(opentelemetry_exporter_otlp_grpc_client
-                        PRIVATE gRPC::grpc++)
+                        PUBLIC gRPC::grpc++)
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
@@ -61,8 +61,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_grpc_client
-    PRIVATE gRPC::grpc++)
+           opentelemetry_exporter_otlp_grpc_client)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc)
 
@@ -91,8 +90,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_metrics
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_grpc_client
-    PRIVATE gRPC::grpc++)
+           opentelemetry_exporter_otlp_grpc_client)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_grpc_metrics)
