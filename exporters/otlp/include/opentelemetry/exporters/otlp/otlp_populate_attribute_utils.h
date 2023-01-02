@@ -3,8 +3,11 @@
 
 #pragma once
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -26,6 +29,13 @@ class OtlpPopulateAttributeUtils
 public:
   static void PopulateAttribute(opentelemetry::proto::resource::v1::Resource *proto,
                                 const opentelemetry::sdk::resource::Resource &resource) noexcept;
+
+  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
+                               const opentelemetry::common::AttributeValue &value) noexcept;
+
+  static void PopulateAnyValue(
+      opentelemetry::proto::common::v1::AnyValue *proto_value,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept;
 
   static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                                 nostd::string_view key,
