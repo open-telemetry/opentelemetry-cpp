@@ -6,10 +6,10 @@
 #include "span_context_shim.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace opentracingshim 
+namespace opentracingshim
 {
 
-SpanContextShim SpanContextShim::newWithKeyValue(const nostd::string_view &key, const nostd::string_view &value) const noexcept
+SpanContextShim SpanContextShim::newWithKeyValue(nostd::string_view key, nostd::string_view value) const noexcept
 {
   return SpanContextShim{context_, baggage_->Set(key, value)};
 }
@@ -22,8 +22,8 @@ bool SpanContextShim::BaggageItem(nostd::string_view key, std::string& value) co
 void SpanContextShim::ForeachBaggageItem(VisitBaggageItem f) const
 {
   baggage_->GetAllEntries([&f](nostd::string_view key, nostd::string_view value)
-    { 
-      return f(key.data(), value.data()); 
+    {
+      return f(key.data(), value.data());
     }
   );
 }

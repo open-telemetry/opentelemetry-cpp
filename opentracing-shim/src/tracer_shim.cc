@@ -14,7 +14,7 @@
 #include <opentracing/ext/tags.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace opentracingshim 
+namespace opentracingshim
 {
 
 namespace detail
@@ -28,30 +28,30 @@ static opentelemetry::trace::StartSpanOptions makeOptionsShim(const opentracing:
   using opentracing::SpanReferenceType;
 
   opentelemetry::trace::StartSpanOptions options_shim;
-  // If an explicit start timestamp is specified, a conversion MUST 
+  // If an explicit start timestamp is specified, a conversion MUST
   // be done to match the OpenTracing and OpenTelemetry units.
   options_shim.start_system_time = opentelemetry::common::SystemTimestamp{options.start_system_timestamp};
   options_shim.start_steady_time = opentelemetry::common::SteadyTimestamp{options.start_steady_timestamp};
-  
+
   const auto& refs = options.references;
 
   // If a list of Span references is specified...
   if (!refs.empty())
   {
-    auto first_child_of = std::find_if(refs.cbegin(), refs.cend(), 
-      [](const std::pair<SpanReferenceType, const opentracing::SpanContext*>& entry){ 
-        return entry.first == SpanReferenceType::ChildOfRef; 
+    auto first_child_of = std::find_if(refs.cbegin(), refs.cend(),
+      [](const std::pair<SpanReferenceType, const opentracing::SpanContext*>& entry){
+        return entry.first == SpanReferenceType::ChildOfRef;
       });
-    // The first SpanContext with Child Of type in the entire list is used as parent, 
+    // The first SpanContext with Child Of type in the entire list is used as parent,
     // else the first SpanContext is used as parent
     auto context = (first_child_of != refs.cend()) ? first_child_of->second : refs.cbegin()->second;
-    
-    if (auto context_shim = dynamic_cast<const SpanContextShim*>(context)) 
+
+    if (auto context_shim = dynamic_cast<const SpanContextShim*>(context))
     {
       options_shim.parent = context_shim->context();
     }
   }
-  
+
   return options_shim;
 }
 
@@ -59,17 +59,17 @@ static LinksList makeReferenceLinks(const opentracing::StartSpanOptions& options
 {
   using opentracing::SpanReferenceType;
   using namespace opentelemetry::trace::SemanticConventions;
-  
+
   LinksList links;
   links.reserve(options.references.size());
 
   // All values in the list MUST be added as Links with the reference type value
   // as a Link attribute, i.e. opentracing.ref_type set to follows_from or child_of
-  for (const auto& entry : options.references) 
+  for (const auto& entry : options.references)
   {
     auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second);
     nostd::string_view span_kind;
-    
+
     if (entry.first == SpanReferenceType::ChildOfRef)
     {
       span_kind = OpentracingRefTypeValues::kChildOf;
@@ -79,7 +79,7 @@ static LinksList makeReferenceLinks(const opentracing::StartSpanOptions& options
       span_kind = OpentracingRefTypeValues::kFollowsFrom;
     }
 
-    if (context_shim && !span_kind.empty()) 
+    if (context_shim && !span_kind.empty())
     {
       // links.push_back({ context_shim->context(), {{ opentracing::ext::span_kind.data(), span_kind }} });
       links.emplace_back(std::piecewise_construct,
@@ -98,7 +98,7 @@ static BaggagePtr makeBaggage(const opentracing::StartSpanOptions& options) noex
   std::unordered_map<std::string, std::string> baggage_items;
 
   // If a list of Span references is specified...
-  for (const auto& entry : options.references) 
+  for (const auto& entry : options.references)
   {
     if (auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second))
     {
@@ -114,7 +114,7 @@ static BaggagePtr makeBaggage(const opentracing::StartSpanOptions& options) noex
     }
   }
 
-  // If no such lisf of references is specified, the current Baggage 
+  // If no such lisf of references is specified, the current Baggage
   // MUST be used as the initial value of the newly created Span.
   return baggage_items.empty()
     ? GetBaggage(opentelemetry::context::RuntimeContext::GetCurrent())
@@ -126,7 +126,7 @@ static std::vector<std::pair<std::string, common::AttributeValue>> makeTags(cons
   std::vector<std::pair<std::string, common::AttributeValue>> tags;
   tags.reserve(options.tags.size());
 
-  // If an initial set of tags is specified, the values MUST 
+  // If an initial set of tags is specified, the values MUST
   // be set at the creation time of the OpenTelemetry Span.
   for (const auto& entry : options.tags)
   {
@@ -138,26 +138,25 @@ static std::vector<std::pair<std::string, common::AttributeValue>> makeTags(cons
 
 } // namespace opentracingshim::detail
 
-std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(opentracing::string_view operation_name, 
+std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(opentracing::string_view operation_name,
                                                                     const opentracing::StartSpanOptions& options) const noexcept
 {
   if (is_closed_) return nullptr;
-  
+
   const auto& opts = detail::makeOptionsShim(options);
   const auto& links = detail::makeReferenceLinks(options);
   const auto& baggage = detail::makeBaggage(options);
   const auto& attributes = detail::makeTags(options);
-  
+
   auto span = tracer_->StartSpan(operation_name.data(), attributes, links, opts);
   auto span_shim = new SpanShim(*this, span, baggage);
 
   // If an initial set of tags is specified and the OpenTracing error tag
   // is included after the OpenTelemetry Span was created.
-  const auto& error_entry = std::find_if(options.tags.begin(), options.tags.end(), 
+  const auto& error_entry = std::find_if(options.tags.begin(), options.tags.end(),
     [](const std::pair<std::string, opentracing::v3::Value>& entry){
       return entry.first == opentracing::ext::error;
     });
-
   // The Shim layer MUST perform the same error handling as described in the Set Tag operation
   if (error_entry != options.tags.end()) {
     span_shim->handleError(error_entry->second);
@@ -169,7 +168,7 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(opentracing:
 opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& sc,
                                                std::ostream& writer) const
 {
-  // Errors MAY be raised if the specified Format is not recognized, 
+  // Errors MAY be raised if the specified Format is not recognized,
   // depending on the specific OpenTracing Language API.
   return opentracing::make_unexpected(opentracing::invalid_carrier_error);
 }
@@ -177,10 +176,10 @@ opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& s
 opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& sc,
                                                const opentracing::TextMapWriter& writer) const
 {
-  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator, 
+  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator,
   // if any, or else use the global TextMapPropagator.
-  const auto& propagator = propagators_.textMap
-    ? propagators_.textMap
+  const auto& propagator = propagators_.text_map
+    ? propagators_.text_map
     : opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
 
   return injectImpl(sc, writer, propagator);
@@ -189,10 +188,10 @@ opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& s
 opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& sc,
                                                const opentracing::HTTPHeadersWriter& writer) const
 {
-  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator, 
+  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator,
   // if any, or else use the global TextMapPropagator.
-  const auto& propagator = propagators_.httpHeaders
-    ? propagators_.httpHeaders
+  const auto& propagator = propagators_.http_headers
+    ? propagators_.http_headers
     : opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
 
   return injectImpl(sc, writer, propagator);
@@ -200,39 +199,39 @@ opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext& s
 
 opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::Extract(std::istream& reader) const
 {
-  // Errors MAY be raised if either the Format is not recognized or no value 
+  // Errors MAY be raised if either the Format is not recognized or no value
   // could be extracted, depending on the specific OpenTracing Language API.
   return opentracing::make_unexpected(opentracing::invalid_carrier_error);
 }
 
 opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::Extract(const opentracing::TextMapReader& reader) const
 {
-  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator, 
+  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator,
   // if any, or else use the global TextMapPropagator.
-  const auto& propagator = propagators_.textMap
-    ? propagators_.textMap
+  const auto& propagator = propagators_.text_map
+    ? propagators_.text_map
     : opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  
+
   return extractImpl(reader, propagator);
 }
 
 opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::Extract(const opentracing::HTTPHeadersReader& reader) const
 {
-  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator, 
+  // TextMap and HttpHeaders formats MUST use their explicitly specified TextMapPropagator,
   // if any, or else use the global TextMapPropagator.
-  const auto& propagator = propagators_.httpHeaders
-    ? propagators_.httpHeaders
+  const auto& propagator = propagators_.http_headers
+    ? propagators_.http_headers
     : opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  
+
   return extractImpl(reader, propagator);
 }
 
 template <typename T>
-opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContext& sc, 
-                                                   const T& writer, 
+opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContext& sc,
+                                                   const T& writer,
                                                    const PropagatorPtr& propagator) const
 {
-  // Inject the underlying OpenTelemetry Span and Baggage using either the explicitly registered 
+  // Inject the underlying OpenTelemetry Span and Baggage using either the explicitly registered
   // or the global OpenTelemetry Propagators, as configured at construction time.
   if (auto context_shim = dynamic_cast<const SpanContextShim*>(&sc))
   {
@@ -248,10 +247,10 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
 }
 
 template <typename T>
-opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::extractImpl(const T& reader, 
+opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::extractImpl(const T& reader,
                                                                                          const PropagatorPtr& propagator) const
 {
-  // Extract the underlying OpenTelemetry Span and Baggage using either the explicitly registered 
+  // Extract the underlying OpenTelemetry Span and Baggage using either the explicitly registered
   // or the global OpenTelemetry Propagators, as configured at construction time.
   shimutils::CarrierReaderShim<T> carrier{reader};
   auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
@@ -259,8 +258,8 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
   auto span_context = opentelemetry::trace::GetSpan(context)->GetContext();
   auto baggage = opentelemetry::baggage::GetBaggage(context);
 
-  // If the extracted SpanContext is invalid AND the extracted Baggage is empty, 
-  // this operation MUST return a null value, and otherwise it MUST return a 
+  // If the extracted SpanContext is invalid AND the extracted Baggage is empty,
+  // this operation MUST return a null value, and otherwise it MUST return a
   // SpanContext Shim instance with the extracted values.
   SpanContextShim* context_shim = (!span_context.IsValid() && shimutils::isBaggageEmpty(baggage))
     ? nullptr

@@ -19,14 +19,13 @@ using TracerProviderPtr = nostd::shared_ptr<opentelemetry::trace::TracerProvider
 using PropagatorPtr = nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>;
 
 struct OpenTracingPropagators {
-    PropagatorPtr textMap;
-    PropagatorPtr httpHeaders;
+    PropagatorPtr text_map;
+    PropagatorPtr http_headers;
 };
 
 class TracerShim : public opentracing::Tracer
 {
 public:
-
   /**
    * Creates a {@code opentracing::Tracer} shim out of 
    * {@code Provider::GetTracerProvider()} and 
@@ -66,7 +65,7 @@ public:
   {
     return std::shared_ptr<opentracing::Tracer>(new (std::nothrow) TracerShim(tracer, propagators));
   }
-
+  // Overrides
   std::unique_ptr<opentracing::Span> StartSpanWithOptions(opentracing::string_view operation_name, 
                                                           const opentracing::StartSpanOptions& options) const noexcept override;
   opentracing::expected<void> Inject(const opentracing::SpanContext& sc,
@@ -81,19 +80,16 @@ public:
   inline void Close() noexcept override { is_closed_ = true; };
 
 private:
-
   explicit TracerShim(const TracerPtr& tracer, const OpenTracingPropagators& propagators)
     : tracer_(tracer), propagators_(propagators) {}
-
   template <typename T>
   opentracing::expected<void> injectImpl(const opentracing::SpanContext& sc, 
                                          const T& writer, 
                                          const PropagatorPtr& propagator) const;
-
   template <typename T>
   opentracing::expected<std::unique_ptr<opentracing::SpanContext>> extractImpl(const T& reader, 
                                                                                const PropagatorPtr& propagator) const;
-  
+
   TracerPtr tracer_;
   OpenTracingPropagators propagators_;
   bool is_closed_ = false;

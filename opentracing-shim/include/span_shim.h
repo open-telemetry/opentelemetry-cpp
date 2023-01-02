@@ -24,12 +24,10 @@ using EventEntry = std::pair<opentracing::string_view, opentracing::Value>;
 class SpanShim : public opentracing::Span
 {
 public:
-
-  explicit SpanShim(const TracerShim& tracer, const SpanPtr& span, const BaggagePtr& baggage) : 
-    tracer_(tracer), span_(span), context_(span->GetContext(), baggage) {}
-
+  explicit SpanShim(const TracerShim& tracer, const SpanPtr& span, const BaggagePtr& baggage)
+    : tracer_(tracer), span_(span), context_(span->GetContext(), baggage) {}
   void handleError(const opentracing::Value& value) noexcept;
-
+  // Overrides
   void FinishWithOptions(const opentracing::FinishSpanOptions& finish_span_options) noexcept override;
   void SetOperationName(opentracing::string_view name) noexcept override;
   void SetTag(opentracing::string_view key, const opentracing::Value& value) noexcept override;
@@ -42,14 +40,12 @@ public:
   inline const opentracing::Tracer& tracer() const noexcept override { return tracer_; };
 
 private:
-
   void logImpl(opentracing::SystemTime timestamp, nostd::span<const EventEntry> fields) noexcept;
 
   const TracerShim& tracer_;
   SpanPtr span_;
   SpanContextShim context_;
   mutable opentelemetry::common::SpinLockMutex context_lock_;
-
 };
 
 } // namespace opentracingshim
