@@ -45,7 +45,7 @@ private:
 
   void logImpl(opentracing::SystemTime timestamp, nostd::span<const EventEntry> fields) noexcept;
 
-  TracerShim tracer_;
+  const TracerShim& tracer_;
   SpanPtr span_;
   SpanContextShim context_;
   mutable opentelemetry::common::SpinLockMutex context_lock_;

@@ -34,7 +34,7 @@ public:
    *
    * @returns a {@code opentracing::Tracer}.
    */
-  static inline TracerShim createTracerShim() 
+  static inline std::shared_ptr<opentracing::Tracer> createTracerShim() noexcept
   {
     return createTracerShim(opentelemetry::trace::Provider::GetTracerProvider());
   }
@@ -48,8 +48,8 @@ public:
    * @param propagators the {@code OpenTracingPropagators} instance used to create this shim.
    * @returns a {@code opentracing::Tracer}.
    */
-  static inline TracerShim createTracerShim(const TracerProviderPtr& provider, 
-                                            const OpenTracingPropagators& propagators = {}) 
+  static inline std::shared_ptr<opentracing::Tracer> createTracerShim(const TracerProviderPtr& provider, 
+                                                                      const OpenTracingPropagators& propagators = {}) noexcept
   {
     return createTracerShim(provider->GetTracer("opentracing-shim"), propagators);
   }
@@ -61,10 +61,10 @@ public:
    *
    * @returns a {@code opentracing::Tracer}.
    */
-  static inline TracerShim createTracerShim(const TracerPtr& tracer, 
-                                            const OpenTracingPropagators& propagators = {}) 
+  static inline std::shared_ptr<opentracing::Tracer> createTracerShim(const TracerPtr& tracer, 
+                                                                      const OpenTracingPropagators& propagators = {}) noexcept
   {
-    return TracerShim(tracer, propagators);
+    return std::shared_ptr<opentracing::Tracer>(new (std::nothrow) TracerShim(tracer, propagators));
   }
 
   std::unique_ptr<opentracing::Span> StartSpanWithOptions(opentracing::string_view operation_name, 

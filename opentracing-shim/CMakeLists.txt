@@ -1,4 +1,4 @@
-#set(this_target opentelemetry_opentracing_shim)
+set(this_target opentelemetry_opentracing_shim)
 
 #message("CMAKE_CURRENT_LIST_DIR " ${CMAKE_CURRENT_LIST_DIR})
 #message("CMAKE_CURRENT_SOURCE_DIR " ${CMAKE_CURRENT_SOURCE_DIR})
@@ -32,6 +32,12 @@
 #  DESTINATION include/opentelemetry/
 #  FILES_MATCHING
 #  PATTERN "*.h")
+
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/include
+  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/build/include
+  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/3rd_party/include)
 
 add_subdirectory(src)
 

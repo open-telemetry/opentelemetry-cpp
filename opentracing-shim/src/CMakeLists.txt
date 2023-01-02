@@ -1,28 +1,22 @@
-set(THIS_TARGET opentelemetry_opentracing_shim)
-set(TARGET_NAME opentracing_shim)
-
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}/../include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/build/include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/3rd_party/include)
+set(this_target opentelemetry_opentracing_shim)
+set(target_name opentracing_shim)
 
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/*.cc)
 file(GLOB_RECURSE HEADER_FILES ${CMAKE_CURRENT_LIST_DIR}/../include/*.h)
 
-add_library(${THIS_TARGET} SHARED ${SOURCE_FILES} ${HEADER_FILES})
+add_library(${this_target} SHARED ${SOURCE_FILES} ${HEADER_FILES})
 
-set_target_properties(${THIS_TARGET} PROPERTIES EXPORT_NAME ${TARGET_NAME})
+set_target_properties(${this_target} PROPERTIES EXPORT_NAME ${target_name})
 
 target_include_directories(
-  ${THIS_TARGET}
+  ${this_target}
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(${THIS_TARGET} PUBLIC opentelemetry_api)
+target_link_libraries(${this_target} PUBLIC opentelemetry_api opentracing)
 
 install(
-  TARGETS ${THIS_TARGET}
+  TARGETS ${this_target}
   EXPORT "${PROJECT_NAME}-target"
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
