@@ -27,8 +27,8 @@ public:
   /**
    * Create a BatchLogRecordProcessor.
    */
-  std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter,
-                                             const BatchLogRecordProcessorOptions &options);
+  static std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter,
+                                                    const BatchLogRecordProcessorOptions &options);
 };
 
 }  // namespace logs

@@ -134,7 +134,7 @@ private:
 OPENTELEMETRY_END_NAMESPACE
 
 /**
- * GlobalLogHandler and TracerProvider/MeterProvider/LoggerProvider are lazy sigletons.
+ * GlobalLogHandler and TracerProvider/MeterProvider/LoggerProvider are lazy singletons.
  * To ensure that GlobalLogHandler is the first one to be initialized (and so last to be
  * destroyed), it is first used inside the constructors of TraceProvider, MeterProvider
  * and LoggerProvider for debug logging. */
