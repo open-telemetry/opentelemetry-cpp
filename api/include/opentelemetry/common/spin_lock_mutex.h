@@ -18,6 +18,8 @@
 #elif defined(__i386__) || defined(__x86_64__)
 #  if defined(__clang__)
 #    include <emmintrin.h>
+#  elif defined(__INTEL_COMPILER)
+#    include <immintrin.h>
 #  endif
 #endif
 
@@ -65,7 +67,7 @@ public:
 #if defined(_MSC_VER)
     YieldProcessor();
 #elif defined(__i386__) || defined(__x86_64__)
-#  if defined(__clang__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
     _mm_pause();
 #  else
     __builtin_ia32_pause();
