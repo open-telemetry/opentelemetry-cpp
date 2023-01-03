@@ -26,15 +26,13 @@ using LinksList = std::vector<std::pair<opentelemetry::trace::SpanContext, RefsL
 static opentelemetry::trace::StartSpanOptions makeOptionsShim(const opentracing::StartSpanOptions& options) noexcept
 {
   using opentracing::SpanReferenceType;
-
-  opentelemetry::trace::StartSpanOptions options_shim;
   // If an explicit start timestamp is specified, a conversion MUST
   // be done to match the OpenTracing and OpenTelemetry units.
+  opentelemetry::trace::StartSpanOptions options_shim;
   options_shim.start_system_time = opentelemetry::common::SystemTimestamp{options.start_system_timestamp};
   options_shim.start_steady_time = opentelemetry::common::SteadyTimestamp{options.start_steady_timestamp};
 
   const auto& refs = options.references;
-
   // If a list of Span references is specified...
   if (!refs.empty())
   {

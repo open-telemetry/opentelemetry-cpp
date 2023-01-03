@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "tracer_shim.h"
+#include "span_context_shim.h"
 
+#include <opentelemetry/baggage/baggage_context.h>
 #include <opentracing/noop.h>
 
 #include <gtest/gtest.h>
@@ -10,7 +12,45 @@
 namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace context   = opentelemetry::context;
+namespace baggage   = opentelemetry::baggage;
 namespace shim      = opentelemetry::opentracingshim;
+
+struct MockPropagator : public context::propagation::TextMapPropagator
+{
+  // Returns the context that is stored in the carrier with the TextMapCarrier as extractor.
+  context::Context Extract(const context::propagation::TextMapCarrier &carrier,
+                           context::Context &context) noexcept override
+  {
+    std::vector<std::pair<std::string, std::string>> kvs; 
+    carrier.Keys([&carrier,&kvs](nostd::string_view k){ 
+      kvs.emplace_back(k, carrier.Get(k));
+      return true;
+    });
+    is_extracted = true;
+    return baggage::SetBaggage(context, nostd::shared_ptr<baggage::Baggage>(new baggage::Baggage(kvs)));
+  }
+
+  // Sets the context for carrier with self defined rules.
+  void Inject(context::propagation::TextMapCarrier &carrier,
+              const context::Context &context) noexcept override
+  {
+    auto baggage = baggage::GetBaggage(context);
+    baggage->GetAllEntries([&carrier](nostd::string_view k, nostd::string_view v){
+      carrier.Set(k, v);
+      return true;
+    });
+    is_injected = true;
+  }
+
+  // Gets the fields set in the carrier by the `inject` method
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return true;
+  }
+
+  bool is_extracted = false;
+  bool is_injected = false;
+};
 
 struct TextMapCarrier : opentracing::TextMapReader, opentracing::TextMapWriter {
   TextMapCarrier(std::unordered_map<std::string, std::string>& text_map_)
@@ -75,11 +115,20 @@ class TracerShimTest : public testing::Test
 {
 public:
   std::shared_ptr<opentracing::Tracer> tracer_shim;
+  MockPropagator* text_map_format;
+  MockPropagator* http_headers_format;
 
 protected:
   virtual void SetUp()
   {
-    tracer_shim = shim::TracerShim::createTracerShim();
+    using context::propagation::TextMapPropagator;
+
+    text_map_format = new MockPropagator();
+    http_headers_format = new MockPropagator();
+
+    tracer_shim = shim::TracerShim::createTracerShim(trace_api::Provider::GetTracerProvider(),
+      { .text_map = nostd::shared_ptr<TextMapPropagator>(text_map_format),
+        .http_headers = nostd::shared_ptr<TextMapPropagator>(http_headers_format) });
   }
 
   virtual void TearDown()
@@ -119,6 +168,30 @@ TEST_F(TracerShimTest, InjectNullContext)
   ASSERT_TRUE(text_map.empty());
 }
 
+TEST_F(TracerShimTest, InjectTextMap)
+{
+  ASSERT_FALSE(text_map_format->is_injected);
+  ASSERT_FALSE(http_headers_format->is_injected);
+
+  std::unordered_map<std::string, std::string> text_map;
+  auto span_shim = tracer_shim->StartSpan("a");
+  tracer_shim->Inject(span_shim->context(), TextMapCarrier{text_map});
+  ASSERT_TRUE(text_map_format->is_injected);
+  ASSERT_FALSE(http_headers_format->is_injected);
+}
+
+TEST_F(TracerShimTest, InjectHttpsHeaders)
+{
+  ASSERT_FALSE(text_map_format->is_injected);
+  ASSERT_FALSE(http_headers_format->is_injected);
+
+  std::unordered_map<std::string, std::string> text_map;
+  auto span_shim = tracer_shim->StartSpan("a");
+  tracer_shim->Inject(span_shim->context(), HTTPHeadersCarrier{text_map});
+  ASSERT_FALSE(text_map_format->is_injected);
+  ASSERT_TRUE(http_headers_format->is_injected);
+}
+
 TEST_F(TracerShimTest, ExtractInvalidCarrier)
 {
   auto result = tracer_shim->Extract(std::cin);
@@ -130,4 +203,51 @@ TEST_F(TracerShimTest, ExtractNullContext)
   std::unordered_map<std::string, std::string> text_map;
   auto result = tracer_shim->Extract(TextMapCarrier{text_map});
   ASSERT_EQ(result.value(), nullptr);
+}
+
+TEST_F(TracerShimTest, ExtractTextMap)
+{
+  ASSERT_FALSE(text_map_format->is_extracted);
+  ASSERT_FALSE(http_headers_format->is_extracted);
+
+  std::unordered_map<std::string, std::string> text_map;
+  auto result = tracer_shim->Extract(TextMapCarrier{text_map});
+  ASSERT_EQ(result.value(), nullptr);
+  ASSERT_TRUE(text_map_format->is_extracted);
+  ASSERT_FALSE(http_headers_format->is_extracted);
+}
+
+TEST_F(TracerShimTest, ExtractHttpsHeaders)
+{
+  ASSERT_FALSE(text_map_format->is_extracted);
+  ASSERT_FALSE(http_headers_format->is_extracted);
+
+  std::unordered_map<std::string, std::string> text_map;
+  auto result = tracer_shim->Extract(HTTPHeadersCarrier{text_map});
+  ASSERT_EQ(result.value(), nullptr);
+  ASSERT_FALSE(text_map_format->is_extracted);
+  ASSERT_TRUE(http_headers_format->is_extracted);
+}
+
+TEST_F(TracerShimTest, ExtractOnlyBaggage)
+{
+  std::unordered_map<std::string, std::string> text_map;
+  auto span_shim = tracer_shim->StartSpan("a");
+  span_shim->SetBaggageItem("foo", "bar");
+
+  ASSERT_EQ(span_shim->BaggageItem("foo"), "bar");
+
+  TextMapCarrier carrier{text_map};
+  tracer_shim->Inject(span_shim->context(), carrier);
+
+  auto span_context = tracer_shim->Extract(carrier);
+  ASSERT_TRUE(span_context.value() != nullptr);
+
+  // auto span_context_shim = dynamic_cast<shim::SpanContextShim*>(span_context.value().get());
+  // ASSERT_TRUE(span_context_shim != nullptr);
+  // ASSERT_TRUE(span_context_shim->context().IsValid());
+
+  // std::string value;
+  // ASSERT_TRUE(span_context_shim->BaggageItem("foo", value));
+  // ASSERT_EQ(value, "bar");
 }

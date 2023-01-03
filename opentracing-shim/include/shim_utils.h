@@ -53,7 +53,6 @@ template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapWrit
 class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-
   CarrierWriterShim(const T& writer) : writer_(writer) {}
   
   // returns the value associated with the passed key.
@@ -69,16 +68,13 @@ public:
   }
 
 private:
-
   const T& writer_;
-
 };
 
 template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapReader, T>::value, bool> = true>
 class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-
   CarrierReaderShim(const T& reader) : reader_(reader) {}
   
   // returns the value associated with the passed key.
@@ -112,10 +108,19 @@ public:
     // Not required for Opentracing reader
   }
 
+  // list of all the keys in the carrier.
+  virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    reader_.ForeachKey([&callback]
+        (opentracing::string_view k, opentracing::string_view v) -> opentracing::expected<void> {
+          callback(k.data());
+          return opentracing::make_expected();
+        });
+    return true;
+  }
+
 private:
-
   const T& reader_;
-
 };
 
 static inline bool isBaggageEmpty(const BaggagePtr& baggage)
