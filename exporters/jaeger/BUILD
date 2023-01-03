@@ -14,7 +14,7 @@ constraint_value(
 config_setting(
     name = "windows",
     constraint_values = [
-        "@bazel_tools//platforms:windows",
+        "@platforms//os:windows",
     ],
     tags = ["jaeger"],
     visibility = ["//visibility:private"],
@@ -59,38 +59,38 @@ THRIFT_CACHE_ENTRIES_WIN = {
 cmake(
     name = "thrift",
     cache_entries = select({
-        "@bazel_tools//platforms:osx": THRIFT_CACHE_ENTRIES,
-        "@bazel_tools//platforms:linux": THRIFT_CACHE_ENTRIES,
-        "@bazel_tools//platforms:windows": THRIFT_CACHE_ENTRIES_WIN,
+        "@platforms//os:osx": THRIFT_CACHE_ENTRIES,
+        "@platforms//os:linux": THRIFT_CACHE_ENTRIES,
+        "@platforms//os:windows": THRIFT_CACHE_ENTRIES_WIN,
     }),
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
         "-fexceptions",
     ],
     generate_args = select({
-        "@bazel_tools//platforms:osx": [],
-        "@bazel_tools//platforms:linux": [],
-        "@bazel_tools//platforms:windows": [
+        "@platforms//os:osx": [],
+        "@platforms//os:linux": [],
+        "@platforms//os:windows": [
             "-G \"NMake Makefiles\"",
         ],
     }),
     install = True,
     lib_source = "@com_github_thrift//:all_srcs",
     out_lib_dir = select({
-        "@bazel_tools//platforms:osx": "lib",
-        "@bazel_tools//platforms:linux": "lib",
-        "@bazel_tools//platforms:windows": "bin",
+        "@platforms//os:osx": "lib",
+        "@platforms//os:linux": "lib",
+        "@platforms//os:windows": "bin",
     }),
     out_static_libs = select({
-        "@bazel_tools//platforms:osx": [
+        "@platforms//os:osx": [
             "libthrift.a",
             "libthriftz.a",
         ],
-        "@bazel_tools//platforms:linux": [
+        "@platforms//os:linux": [
             "libthrift.a",
             "libthriftz.a",
         ],
-        "@bazel_tools//platforms:windows": [
+        "@platforms//os:windows": [
             "thriftmd.lib",
         ],
     }),
@@ -133,9 +133,9 @@ cc_library(
     strip_include_prefix = "thrift-gen",
     tags = ["jaeger"],
     deps = select({
-        "@bazel_tools//platforms:osx": THRIFT_GEN_DEPS,
-        "@bazel_tools//platforms:linux": THRIFT_GEN_DEPS,
-        "@bazel_tools//platforms:windows": THRIFT_GEN_DEPS_WIN,
+        "@platforms//os:osx": THRIFT_GEN_DEPS,
+        "@platforms//os:linux": THRIFT_GEN_DEPS,
+        "@platforms//os:windows": THRIFT_GEN_DEPS_WIN,
     }),
 )
 
