@@ -58,6 +58,7 @@ if %ERRORLEVEL% == 1 (
   popd
 ) else (
   echo Using existing vcpkg installation...
+  set "VCPKG_ROOT=%~dp0\vcpkg"
 )
 
 REM Install dependencies

@@ -213,9 +213,14 @@ function(install_windows_deps)
   set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
-  set(CMAKE_TOOLCHAIN_FILE
+  # set(CMAKE_TOOLCHAIN_FILE
+  #     ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  #     PARENT_SCOPE)
+  include(
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE)
+      PARENT_SCOPE
+  )
+  
 endfunction()
 
 if(WITH_JAEGER)
