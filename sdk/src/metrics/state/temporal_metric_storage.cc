@@ -126,7 +126,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
         PointDataAttributes point_data_attr;
         point_data_attr.point_data = aggregation.ToPoint();
         point_data_attr.attributes = attributes;
-        metric_data.point_data_attr_.push_back(point_data_attr);
+        metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
         return true;
       });
   return callback(metric_data);
