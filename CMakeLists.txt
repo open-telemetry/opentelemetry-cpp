@@ -446,6 +446,8 @@ if(OTELCPP_MAINTAINER_MODE)
 
     # Enforced warnings
     add_compile_options(/we4265)
+    add_compile_options(/we5204)
+
   elseif()
     message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()
