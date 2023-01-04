@@ -26,7 +26,7 @@ namespace metrics_api     = opentelemetry::metrics;
 namespace
 {
 
-void initMetrics(const std::string &name)
+void InitMetrics(const std::string &name)
 {
   std::unique_ptr<metric_sdk::PushMetricExporter> exporter{
       new exportermetrics::OStreamMetricExporter};
@@ -83,6 +83,12 @@ void initMetrics(const std::string &name)
              std::move(histogram_view));
   metrics_api::Provider::SetMeterProvider(provider);
 }
+
+void CleanupMetrics()
+{
+  std::shared_ptr<metrics_api::MeterProvider> none;
+  metrics_api::Provider::SetMeterProvider(none);
+}
 }  // namespace
 
 int main(int argc, char **argv)
@@ -94,7 +100,7 @@ int main(int argc, char **argv)
   }
 
   std::string name{"ostream_metric_example"};
-  initMetrics(name);
+  InitMetrics(name);
 
   if (example_type == "counter")
   {
@@ -118,4 +124,6 @@ int main(int argc, char **argv)
     observable_counter_example.join();
     histogram_example.join();
   }
+
+  CleanupMetrics();
 }

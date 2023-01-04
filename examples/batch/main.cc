@@ -19,7 +19,7 @@ namespace nostd          = opentelemetry::nostd;
 namespace
 {
 
-void initTracer()
+void InitTracer()
 {
   auto exporter = trace_exporter::OStreamSpanExporterFactory::Create();
 
@@ -46,6 +46,12 @@ void initTracer()
   trace_api::Provider::SetTracerProvider(provider);
 }
 
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace_api::Provider::SetTracerProvider(none);
+}
+
 nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
   auto provider = trace_api::Provider::GetTracerProvider();
@@ -65,7 +71,7 @@ void StartAndEndSpans()
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  initTracer();
+  InitTracer();
 
   std::cout << "Creating first batch of " << kNumSpans << " spans and waiting 3 seconds ...\n";
   StartAndEndSpans();
@@ -83,7 +89,9 @@ int main()
   StartAndEndSpans();
   printf("Shutting down and draining queue.... \n");
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  // We immediately let the program terminate which invokes the processor destructor
+
+  // We invoke the processor destructor
   // which in turn invokes the processor Shutdown(), which finally drains the queue of ALL
   // its spans.
+  CleanupTracer();
 }
