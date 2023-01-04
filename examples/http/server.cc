@@ -70,7 +70,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-  initTracer();
+  InitTracer();
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
@@ -91,5 +91,6 @@ int main(int argc, char *argv[])
   }
   http_server.Stop();
   root_span->End();
+  CleanupTracer();
   return 0;
 }
