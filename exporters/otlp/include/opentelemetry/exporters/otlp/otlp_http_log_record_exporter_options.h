@@ -75,7 +75,7 @@ struct OtlpHttpLogRecordExporterOptions
   /** RESERVED. */
   std::string ssl_max_tls{};
   /** RESERVED. */
-  std::string ssl_cipher{};
+  std::string ssl_cipher_list{};
 #  endif
 };
 

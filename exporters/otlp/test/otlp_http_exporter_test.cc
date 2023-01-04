@@ -64,6 +64,9 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
+      "",                                 /* ssl_min_tls */
+      "",                                 /* ssl_max_tls */
+      "",                                 /* ssl_cipher_list */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)

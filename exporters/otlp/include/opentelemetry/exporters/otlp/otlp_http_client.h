@@ -60,6 +60,10 @@ struct OtlpHttpClientOptions
   std::string ssl_client_cert_path;
   std::string ssl_client_cert_string;
 
+  std::string ssl_min_tls;
+  std::string ssl_max_tls;
+  std::string ssl_cipher_list;
+
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
 
@@ -96,6 +100,9 @@ struct OtlpHttpClientOptions
                                nostd::string_view input_ssl_client_key_string,
                                nostd::string_view input_ssl_client_cert_path,
                                nostd::string_view input_ssl_client_cert_string,
+                               nostd::string_view input_ssl_min_tls,
+                               nostd::string_view input_ssl_max_tls,
+                               nostd::string_view input_ssl_cipher_list,
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
                                bool input_use_json_name,
@@ -113,6 +120,9 @@ struct OtlpHttpClientOptions
         ssl_client_key_string(input_ssl_client_key_string),
         ssl_client_cert_path(input_ssl_client_cert_path),
         ssl_client_cert_string(input_ssl_client_cert_string),
+        ssl_min_tls(input_ssl_min_tls),
+        ssl_max_tls(input_ssl_max_tls),
+        ssl_cipher_list(input_ssl_cipher_list),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),

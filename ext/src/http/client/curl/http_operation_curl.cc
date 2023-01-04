@@ -400,6 +400,70 @@ void HttpOperation::Cleanup()
   }
 }
 
+static long parse_min_ssl_version(std::string version)
+{
+#if LIBCURL_VERSION_NUM >= 0x072200
+  if (version == "TLSv1.0")
+  {
+    // CURL 7.34.0 (0x07 0x22 0x00)
+    return CURL_SSLVERSION_TLSv1_0;
+  }
+
+  if (version == "TLSv1.1")
+  {
+    // CURL 7.34.0
+    return CURL_SSLVERSION_TLSv1_1;
+  }
+
+  if (version == "TLSv1.2")
+  {
+    // CURL 7.34.0
+    return CURL_SSLVERSION_TLSv1_2;
+  }
+#endif
+
+#if LIBCURL_VERSION_NUM >= 0x073400
+  if (version == "TLSv1.3")
+  {
+    // CURL 7.52.0 (0x07 0x34 0x00)
+    return CURL_SSLVERSION_TLSv1_3;
+  }
+#endif
+
+  return 0;
+}
+
+static long parse_max_ssl_version(std::string version)
+{
+#if LIBCURL_VERSION_NUM >= 0x073600
+  if (version == "TLSv1.0")
+  {
+    // CURL 7.54.0 (0x07 0x36 0x00)
+    return CURL_SSLVERSION_MAX_TLSv1_0;
+  }
+
+  if (version == "TLSv1.1")
+  {
+    // CURL 7.54.0
+    return CURL_SSLVERSION_MAX_TLSv1_1;
+  }
+
+  if (version == "TLSv1.2")
+  {
+    // CURL 7.54.0
+    return CURL_SSLVERSION_MAX_TLSv1_2;
+  }
+
+  if (version == "TLSv1.3")
+  {
+    // CURL 7.54.0
+    return CURL_SSLVERSION_MAX_TLSv1_3;
+  }
+#endif
+
+  return 0;
+}
+
 CURLcode HttpOperation::Setup()
 {
   if (!curl_resource_.easy_handle)
@@ -490,16 +554,57 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
+    /* 4 - TLS */
+
+    long min_ssl_version = 0;
+
+    if (!ssl_options_.ssl_min_tls.empty())
+    {
+      min_ssl_version = parse_min_ssl_version(ssl_options_.ssl_min_tls);
+
+      if (min_ssl_version == 0)
+      {
+        return CURLE_UNKNOWN_OPTION;
+      }
+    }
+
+    long max_ssl_version = 0;
+
+    if (!ssl_options_.ssl_max_tls.empty())
+    {
+      max_ssl_version = parse_max_ssl_version(ssl_options_.ssl_max_tls);
+
+      if (max_ssl_version == 0)
+      {
+        return CURLE_UNKNOWN_OPTION;
+      }
+    }
+
+    long version_range = min_ssl_version | max_ssl_version;
+    if (version_range != 0)
+    {
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSLVERSION, version_range);
+    }
+
+    /* 5 - CIPHER_LIST */
+
+    if (!ssl_options_.ssl_cipher_list.empty())
+    {
+      // TODO: Unclear when to use CURLOPT_SSL_CIPHER_LIST versus CURLOPT_TLS13_CIPHERS
+      const char *cipher_list = ssl_options_.ssl_cipher_list.c_str();
+      curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_CIPHER_LIST, cipher_list);
+    }
+
     if (ssl_options_.ssl_insecure_skip_verify)
     {
-      /* 4 - DO NOT ENFORCE VERIFICATION, This is not secure. */
+      /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_NONE);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0L);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0L);
     }
     else
     {
-      /* 4 - ENFORCE VERIFICATION */
+      /* 6 - ENFORCE VERIFICATION */
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 1L);
       curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 2L);
