@@ -8,8 +8,10 @@
 #include <chrono>
 #if defined(_MSC_VER)
 #  pragma warning(suppress : 5204)
-#endif
+# include <future>
+#else
 #include <future>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

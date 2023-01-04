@@ -8,8 +8,10 @@
 
 #if defined(_MSC_VER)
 #  pragma warning(suppress : 5204)
-#endif
+# include<future>
+#else
 #include <future>
+#endif
 
 #include <map>
 #include <regex>
