@@ -6,7 +6,12 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #include <chrono>
-#include <future>
+#if defined(_MSC_VER)
+#  pragma warning(suppress : 5204)
+#  include <future>
+#else
+#  include <future>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

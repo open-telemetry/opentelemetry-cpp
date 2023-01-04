@@ -73,7 +73,7 @@ void sendRequest(const std::string &url)
 
 int main(int argc, char *argv[])
 {
-  initTracer();
+  InitTracer();
   constexpr char default_host[]   = "localhost";
   constexpr char default_path[]   = "/helloworld";
   constexpr uint16_t default_port = 8800;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = (uint16_t)(atoi(argv[1]));
   }
   else
   {
@@ -92,4 +92,5 @@ int main(int argc, char *argv[])
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +
                     std::string(default_path);
   sendRequest(url);
+  CleanupTracer();
 }

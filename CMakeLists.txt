@@ -445,6 +445,11 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4267)
 
     # Enforced warnings
+    add_compile_options(/we4265) # 'class': class has virtual functions, but
+                                 # destructor is not virtual
+    add_compile_options(/we5204) # A class with virtual functions has
+                                 # non-virtual trivial destructor.
+
   elseif()
     message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()

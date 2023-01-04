@@ -98,7 +98,7 @@ void RunClient(uint16_t port)
 
 int main(int argc, char **argv)
 {
-  initTracer();
+  InitTracer();
   // set global propagator
   context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       opentelemetry::nostd::shared_ptr<context::propagation::TextMapPropagator>(
@@ -114,5 +114,6 @@ int main(int argc, char **argv)
     port = default_port;
   }
   RunClient(port);
+  CleanupTracer();
   return 0;
 }
