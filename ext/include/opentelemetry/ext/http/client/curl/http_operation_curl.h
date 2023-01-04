@@ -6,7 +6,11 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
 
+//#pragma warning(push)
+#pragma warning(suppress : 5204)
 #include <future>
+//#pragma warning(pop)
+
 #include <map>
 #include <regex>
 #include <sstream>

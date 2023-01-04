@@ -1,13 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma warning(disable : 5204)
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #include <chrono>
+//#pragma warning(push)
+#pragma warning(suppress : 5204)
 #include <future>
+//#pragma warning(pop)
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
