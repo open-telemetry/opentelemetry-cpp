@@ -69,7 +69,7 @@ public:
   ServerContext *context_;
 };
 
-void initTracer()
+void InitTracer()
 {
   auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor =
@@ -88,6 +88,12 @@ void initTracer()
   opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       opentelemetry::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
           new opentelemetry::trace::propagation::HttpTraceContext()));
+}
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  opentelemetry::trace::Provider::SetTracerProvider(none);
 }
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)

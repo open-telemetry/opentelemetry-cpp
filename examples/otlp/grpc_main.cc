@@ -30,6 +30,12 @@ void InitTracer()
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace::Provider::SetTracerProvider(none);
+}
 }  // namespace
 
 int main(int argc, char *argv[])
@@ -47,4 +53,6 @@ int main(int argc, char *argv[])
   InitTracer();
 
   foo_library();
+
+  CleanupTracer();
 }
