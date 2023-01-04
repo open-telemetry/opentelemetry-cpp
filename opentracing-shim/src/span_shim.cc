@@ -10,7 +10,7 @@
 
 #include "opentelemetry/trace/semantic_conventions.h"
 #include "opentelemetry/trace/span_metadata.h"
-#include <opentracing/ext/tags.h>
+#include "opentracing/ext/tags.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim

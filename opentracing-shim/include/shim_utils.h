@@ -5,12 +5,20 @@
 
 #pragma once
 
-#include <opentelemetry/baggage/baggage.h>
-#include <opentelemetry/common/attribute_value.h>
-#include <opentelemetry/context/propagation/text_map_propagator.h>
-#include <opentelemetry/nostd/type_traits.h>
-#include <opentracing/propagation.h>
-#include <opentracing/value.h>
+#include "span_context_shim.h"
+
+#include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentracing/propagation.h"
+#include "opentracing/tracer.h"
+#include "opentracing/value.h"
+
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim::utils
@@ -56,82 +64,6 @@ static inline std::string stringFromValue(const opentracing::Value& value)
   return opentracing::Value::visit(value, StringMapper);
 }
 
-template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapWriter, T>::value, bool> = true>
-class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCarrier
-{
-public:
-  CarrierWriterShim(const T& writer) : writer_(writer) {}
-
-  // returns the value associated with the passed key.
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
-  {
-    return "";
-  }
-
-  // stores the key-value pair.
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
-  {
-    writer_.Set(key.data(), value.data());
-  }
-
-private:
-  const T& writer_;
-};
-
-template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapReader, T>::value, bool> = true>
-class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCarrier
-{
-public:
-  CarrierReaderShim(const T& reader) : reader_(reader) {}
-
-  // returns the value associated with the passed key.
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
-  {
-    nostd::string_view value;
-
-    // First try carrier.LookupKey since that can potentially be the fastest approach.
-    if (auto result = reader_.LookupKey(key.data()))
-    {
-      value = result.value().data();
-    }
-    else // Fall back to iterating through all of the keys.
-    {
-      reader_.ForeachKey([key, &value]
-        (opentracing::string_view k, opentracing::string_view v) -> opentracing::expected<void> {
-          if (k == key.data())
-          {
-            value = v.data();
-            // Found key, so bail out of the loop with a success error code.
-            return opentracing::make_unexpected(std::error_code{});
-          }
-          return opentracing::make_expected();
-        });
-    }
-
-    return value;
-  }
-
-  // stores the key-value pair.
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
-  {
-    // Not required for Opentracing reader
-  }
-
-  // list of all the keys in the carrier.
-  virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
-  {
-    return reader_.ForeachKey([&callback]
-      (opentracing::string_view key, opentracing::string_view) -> opentracing::expected<void> {
-        return callback(key.data())
-          ? opentracing::make_expected()
-          : opentracing::make_unexpected(std::error_code{});
-      }).has_value();
-  }
-
-private:
-  const T& reader_;
-};
-
 static inline bool isBaggageEmpty(const nostd::shared_ptr<opentelemetry::baggage::Baggage>& baggage)
 {
   if (baggage)
@@ -142,6 +74,116 @@ static inline bool isBaggageEmpty(const nostd::shared_ptr<opentelemetry::baggage
   }
 
   return true;
+}
+
+static opentelemetry::trace::StartSpanOptions makeOptionsShim(const opentracing::StartSpanOptions& options) noexcept
+{
+  using opentracing::SpanReferenceType;
+  // If an explicit start timestamp is specified, a conversion MUST
+  // be done to match the OpenTracing and OpenTelemetry units.
+  opentelemetry::trace::StartSpanOptions options_shim;
+  options_shim.start_system_time = opentelemetry::common::SystemTimestamp{options.start_system_timestamp};
+  options_shim.start_steady_time = opentelemetry::common::SteadyTimestamp{options.start_steady_timestamp};
+
+  const auto& refs = options.references;
+  // If a list of Span references is specified...
+  if (!refs.empty())
+  {
+    auto first_child_of = std::find_if(refs.cbegin(), refs.cend(),
+      [](const std::pair<SpanReferenceType, const opentracing::SpanContext*>& entry){
+        return entry.first == SpanReferenceType::ChildOfRef;
+      });
+    // The first SpanContext with Child Of type in the entire list is used as parent,
+    // else the first SpanContext is used as parent
+    auto context = (first_child_of != refs.cend()) ? first_child_of->second : refs.cbegin()->second;
+
+    if (auto context_shim = dynamic_cast<const SpanContextShim*>(context))
+    {
+      options_shim.parent = context_shim->context();
+    }
+  }
+
+  return options_shim;
+}
+
+using RefsList = std::vector<std::pair<nostd::string_view, common::AttributeValue>>;
+using LinksList = std::vector<std::pair<opentelemetry::trace::SpanContext, RefsList>>;
+
+static LinksList makeReferenceLinks(const opentracing::StartSpanOptions& options) noexcept
+{
+  using opentracing::SpanReferenceType;
+  using namespace opentelemetry::trace::SemanticConventions;
+
+  LinksList links;
+  links.reserve(options.references.size());
+  // All values in the list MUST be added as Links with the reference type value
+  // as a Link attribute, i.e. opentracing.ref_type set to follows_from or child_of
+  for (const auto& entry : options.references)
+  {
+    auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second);
+    nostd::string_view span_kind;
+
+    if (entry.first == SpanReferenceType::ChildOfRef)
+    {
+      span_kind = OpentracingRefTypeValues::kChildOf;
+    }
+    else if (entry.first == SpanReferenceType::FollowsFromRef)
+    {
+      span_kind = OpentracingRefTypeValues::kFollowsFrom;
+    }
+
+    if (context_shim && !span_kind.empty())
+    {
+      links.emplace_back(std::piecewise_construct,
+                         std::forward_as_tuple(context_shim->context()),
+                         std::forward_as_tuple(std::forward<RefsList>({{ kOpentracingRefType, span_kind }})));
+    }
+  }
+
+  return links;
+}
+
+static nostd::shared_ptr<opentelemetry::baggage::Baggage> makeBaggage(const opentracing::StartSpanOptions& options) noexcept
+{
+  using namespace opentelemetry::baggage;
+
+  std::unordered_map<std::string, std::string> baggage_items;
+  // If a list of Span references is specified...
+  for (const auto& entry : options.references)
+  {
+    if (auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second))
+    {
+      // The union of their Baggage values MUST be used as the initial Baggage of the newly created Span.
+      context_shim->ForeachBaggageItem([&baggage_items](const std::string& key, const std::string& value){
+        // It is unspecified which Baggage value is used in the case of repeated keys.
+        if (baggage_items.find(key) == baggage_items.end())
+        {
+          baggage_items.emplace(key, value); // Here, only insert if key not already present
+        }
+        return true;
+      });
+    }
+  }
+  // If no such list of references is specified, the current Baggage
+  // MUST be used as the initial value of the newly created Span.
+  return baggage_items.empty()
+    ? GetBaggage(opentelemetry::context::RuntimeContext::GetCurrent())
+    : nostd::shared_ptr<Baggage>(new Baggage(baggage_items));
+}
+
+static std::vector<std::pair<std::string, common::AttributeValue>> makeTags(const opentracing::StartSpanOptions& options) noexcept
+{
+  std::vector<std::pair<std::string, common::AttributeValue>> tags;
+  tags.reserve(options.tags.size());
+
+  // If an initial set of tags is specified, the values MUST
+  // be set at the creation time of the OpenTelemetry Span.
+  for (const auto& entry : options.tags)
+  {
+    tags.emplace_back(entry.first, utils::attributeFromValue(entry.second));
+  }
+
+  return tags;
 }
 
 } // namespace opentracingshim::utils

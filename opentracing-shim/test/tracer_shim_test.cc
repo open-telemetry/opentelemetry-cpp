@@ -9,7 +9,7 @@
 #include "shim_utils.h"
 #include "shim_mocks.h"
 
-#include <opentracing/noop.h>
+#include "opentracing/noop.h"
 
 #include <gtest/gtest.h>
 
@@ -80,7 +80,7 @@ TEST_F(TracerShimTest, InjectNullContext)
   auto noop_tracer = opentracing::MakeNoopTracer();
   auto span = noop_tracer->StartSpan("a");
   auto result = tracer_shim->Inject(span->context(), TextMapCarrier{text_map});
-  ASSERT_TRUE(result.has_value());
+  ASSERT_TRUE(opentracing::are_errors_equal(result.error(), opentracing::invalid_span_context_error));
   ASSERT_TRUE(text_map.empty());
 }
 

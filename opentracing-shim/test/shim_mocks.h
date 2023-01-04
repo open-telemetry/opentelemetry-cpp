@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include <opentelemetry/baggage/baggage_context.h>
-#include <opentelemetry/trace/span.h>
-#include <opentelemetry/trace/span_context.h>
-#include <opentelemetry/trace/span_metadata.h>
-#include <opentelemetry/trace/tracer.h>
-#include <opentracing/propagation.h>
+#include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentracing/propagation.h"
 
 #include <unordered_map>
 #include <tuple>

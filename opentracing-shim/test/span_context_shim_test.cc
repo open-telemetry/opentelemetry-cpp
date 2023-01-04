@@ -46,6 +46,10 @@ TEST_F(SpanContextShimTest, BaggageItem)
 TEST_F(SpanContextShimTest, NewWithKeyValue)
 {
   auto new_span_context_shim = span_context_shim->newWithKeyValue("test", "this");
+  ASSERT_NE(span_context_shim.get(), &new_span_context_shim);
+  ASSERT_EQ(span_context_shim->context(), new_span_context_shim.context());
+  ASSERT_EQ(span_context_shim->context().IsValid(), new_span_context_shim.context().IsValid());
+  ASSERT_EQ(span_context_shim->context().IsRemote(), new_span_context_shim.context().IsRemote());
 
   std::string value;
   ASSERT_TRUE(new_span_context_shim.BaggageItem("foo", value));
@@ -81,7 +85,9 @@ TEST_F(SpanContextShimTest, Clone)
   auto new_span_context_shim = dynamic_cast<shim::SpanContextShim*>(new_span_context.get());
   ASSERT_TRUE(new_span_context_shim != nullptr);
   ASSERT_NE(span_context_shim.get(), new_span_context_shim);
+  ASSERT_EQ(span_context_shim->context(), new_span_context_shim->context());
   ASSERT_EQ(span_context_shim->context().IsValid(), new_span_context_shim->context().IsValid());
+  ASSERT_EQ(span_context_shim->context().IsRemote(), new_span_context_shim->context().IsRemote());
 
   std::string value;
   std::string new_value;
