@@ -6,10 +6,10 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
 
-//#pragma warning(push)
+#if defined(_MSC_VER)
 #pragma warning(suppress : 5204)
+#endif
 #include <future>
-//#pragma warning(pop)
 
 #include <map>
 #include <regex>
