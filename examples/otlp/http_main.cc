@@ -42,7 +42,6 @@ void CleanupTracer()
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace::Provider::SetTracerProvider(none);
 }
-
 }  // namespace
 
 /*
