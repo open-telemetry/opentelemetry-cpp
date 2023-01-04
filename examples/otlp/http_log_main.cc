@@ -45,6 +45,12 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace::Provider::SetTracerProvider(none);
+}
+
 opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
 void InitLogger()
 {
@@ -56,6 +62,12 @@ void InitLogger()
       logs_sdk::LoggerProviderFactory::Create(std::move(processor));
 
   opentelemetry::logs::Provider::SetLoggerProvider(provider);
+}
+
+void CleanupLogger()
+{
+  std::shared_ptr<logs::LoggerProvider> none;
+  opentelemetry::logs::Provider::SetLoggerProvider(none);
 }
 }  // namespace
 
@@ -99,6 +111,8 @@ int main(int argc, char *argv[])
   InitLogger();
   InitTracer();
   foo_library();
+  CleanupTracer();
+  CleanupLogger();
 }
 #else
 int main()

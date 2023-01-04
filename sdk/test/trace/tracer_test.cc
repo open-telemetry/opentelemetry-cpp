@@ -271,11 +271,11 @@ TEST(Tracer, StartSpanWithAttributes)
   ASSERT_EQ(9, cur_span_data->GetAttributes().size());
   ASSERT_EQ(314159, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(cur_span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ(314159, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ((uint32_t)314159, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr3")));
   ASSERT_EQ(-20, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr4")));
-  ASSERT_EQ(20, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr5")));
+  ASSERT_EQ((uint32_t)20, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr5")));
   ASSERT_EQ(-20, nostd::get<int64_t>(cur_span_data->GetAttributes().at("attr6")));
-  ASSERT_EQ(20, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr7")));
+  ASSERT_EQ((uint64_t)20, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr7")));
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("attr8")));
   ASSERT_EQ("string", nostd::get<std::string>(cur_span_data->GetAttributes().at("attr9")));
 
