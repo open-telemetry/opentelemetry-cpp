@@ -40,7 +40,7 @@ public:
   inline const opentracing::Tracer& tracer() const noexcept override { return tracer_; };
 
 private:
-  void logImpl(opentracing::SystemTime timestamp, nostd::span<const EventEntry> fields) noexcept;
+  void logImpl(nostd::span<const EventEntry> fields, const opentracing::SystemTime* const timestamp) noexcept;
 
   const TracerShim& tracer_;
   SpanPtr span_;

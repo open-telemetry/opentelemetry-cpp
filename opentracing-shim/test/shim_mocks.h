@@ -6,13 +6,72 @@
 #pragma once
 
 #include <opentelemetry/baggage/baggage_context.h>
+#include <opentelemetry/trace/span.h>
+#include <opentelemetry/trace/span_context.h>
+#include <opentelemetry/trace/span_metadata.h>
+#include <opentelemetry/trace/tracer.h>
 #include <opentracing/propagation.h>
 
 #include <unordered_map>
+#include <tuple>
 
-namespace baggage = opentelemetry::baggage;
-namespace context = opentelemetry::context;
-namespace nostd   = opentelemetry::nostd;
+namespace trace_api = opentelemetry::trace;
+namespace baggage   = opentelemetry::baggage;
+namespace common    = opentelemetry::common;
+namespace context   = opentelemetry::context;
+namespace nostd     = opentelemetry::nostd;
+
+struct MockSpan final : public trace_api::Span
+{
+  void SetAttribute(nostd::string_view key,
+                    const common::AttributeValue& value) noexcept override
+  {
+    attribute_ = {key.data(), value};
+  }
+
+  void AddEvent(nostd::string_view name,
+                common::SystemTimestamp timestamp,
+                const common::KeyValueIterable& attributes) noexcept override
+  {
+    std::unordered_map<std::string, common::AttributeValue> attribute_map;
+    attribute_map.reserve(attributes.size());
+    attributes.ForEachKeyValue([&attribute_map](nostd::string_view key, const common::AttributeValue& value){
+      attribute_map.emplace(key.data(), value);
+      return true;
+    });
+    event_ = {name.data(), timestamp, attribute_map};
+  }
+
+  void AddEvent(nostd::string_view name,
+                const common::KeyValueIterable& attributes) noexcept override
+  {
+    AddEvent(name, {}, attributes);
+  }
+
+  void AddEvent(nostd::string_view name,
+                common::SystemTimestamp timestamp) noexcept override {}
+
+  void AddEvent(nostd::string_view name) noexcept override {}
+
+  void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override 
+  {
+    status_ = {code, description.data()};
+  }
+
+  void UpdateName(nostd::string_view name) noexcept override { name_ = name.data(); }
+
+  void End(const trace_api::EndSpanOptions& options) noexcept override { options_ = options; }
+
+  bool IsRecording() const noexcept override { return false; }
+
+  trace_api::SpanContext GetContext() const noexcept override { return trace_api::SpanContext(false, false); }
+
+  std::pair<std::string, common::AttributeValue> attribute_;
+  std::tuple<std::string, common::SystemTimestamp, std::unordered_map<std::string, common::AttributeValue>> event_;
+  std::pair<trace_api::StatusCode, std::string> status_;
+  std::string name_;
+  trace_api::EndSpanOptions options_;
+};
 
 struct MockPropagator : public context::propagation::TextMapPropagator
 {

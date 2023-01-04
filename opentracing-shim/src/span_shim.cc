@@ -67,14 +67,18 @@ void SpanShim::SetBaggageItem(opentracing::string_view restricted_key, opentraci
 {
   // Creates a new SpanContext Shim with a new OpenTelemetry Baggage containing the specified
   // Baggage key/value pair, and sets it as the current instance for this Span Shim.
+  if (restricted_key.empty() || value.empty()) return;
+
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
-  context_ = context_.newWithKeyValue(restricted_key.data(), value.data());;
+  context_ = context_.newWithKeyValue(restricted_key.data(), value.data());
 }
 
 std::string SpanShim::BaggageItem(opentracing::string_view restricted_key) const noexcept
 {
   // Returns the value for the specified key in the OpenTelemetry Baggage
   // of the current SpanContext Shim, or null if none exists.
+  if (restricted_key.empty()) return "";
+
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
   std::string value;
   return context_.BaggageItem(restricted_key.data(), value) ? value : "";
@@ -84,24 +88,24 @@ void SpanShim::Log(std::initializer_list<EventEntry> fields) noexcept
 {
   // If an explicit timestamp is specified, a conversion MUST
   // be done to match the OpenTracing and OpenTelemetry units.
-  logImpl(opentracing::SystemTime::min(), fields);
+  logImpl(fields, nullptr);
 }
 
 void SpanShim::Log(opentracing::SystemTime timestamp, std::initializer_list<EventEntry> fields) noexcept
 {
   // If an explicit timestamp is specified, a conversion MUST
   // be done to match the OpenTracing and OpenTelemetry units.
-  logImpl(timestamp, fields);
+  logImpl(fields, &timestamp);
 }
 
 void SpanShim::Log(opentracing::SystemTime timestamp, const std::vector<EventEntry>& fields) noexcept
 {
   // If an explicit timestamp is specified, a conversion MUST
   // be done to match the OpenTracing and OpenTelemetry units.
-  logImpl(timestamp, fields);
+  logImpl(fields, &timestamp);
 }
 
-void SpanShim::logImpl(opentracing::SystemTime timestamp, nostd::span<const EventEntry> fields) noexcept
+void SpanShim::logImpl(nostd::span<const EventEntry> fields, const opentracing::SystemTime* const timestamp) noexcept
 {
   // The Add Event’s name parameter MUST be the value with the event key
   // in the pair set, or else fallback to use the log literal string.
@@ -143,9 +147,9 @@ void SpanShim::logImpl(opentracing::SystemTime timestamp, nostd::span<const Even
     attributes.emplace_back(key, value);
   }
   // Calls Add Events on the underlying OpenTelemetry Span with the specified key/value pair set.
-  if (timestamp != opentracing::SystemTime::min())
+  if (timestamp)
   {
-    span_->AddEvent(name, timestamp, attributes);
+    span_->AddEvent(name, *timestamp, attributes);
   }
   else
   {
