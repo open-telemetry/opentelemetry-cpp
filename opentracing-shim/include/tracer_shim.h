@@ -11,7 +11,7 @@
 #include "opentracing/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace opentracingshim 
+namespace opentracingshim
 {
 
 using TracerPtr = nostd::shared_ptr<opentelemetry::trace::Tracer>;
@@ -19,54 +19,29 @@ using TracerProviderPtr = nostd::shared_ptr<opentelemetry::trace::TracerProvider
 using PropagatorPtr = nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>;
 
 struct OpenTracingPropagators {
-    PropagatorPtr text_map;
-    PropagatorPtr http_headers;
+  PropagatorPtr text_map;
+  PropagatorPtr http_headers;
 };
 
 class TracerShim : public opentracing::Tracer
 {
 public:
-  /**
-   * Creates a {@code opentracing::Tracer} shim out of 
-   * {@code Provider::GetTracerProvider()} and 
-   * {@code GlobalTextMapPropagator::GetGlobalPropagator()}.
-   *
-   * @returns a {@code opentracing::Tracer}.
-   */
-  static inline std::shared_ptr<opentracing::Tracer> createTracerShim() noexcept
+  // This operation MUST accept the following parameters:
+  // - An OpenTelemetry TracerProvider. This operation MUST use this TracerProvider to obtain a
+  //   Tracer with the name opentracing-shim along with the current shim library version.
+  // - OpenTelemetry Propagators to be used to perform injection and extraction for the the
+  //   OpenTracing TextMap and HTTPHeaders formats. If not specified, no Propagator values will
+  //   be stored in the Shim, and the global OpenTelemetry TextMap propagator will be used for
+  //   both OpenTracing TextMap and HTTPHeaders formats.
+  static inline std::shared_ptr<opentracing::Tracer> createTracerShim(
+    const TracerProviderPtr& provider = opentelemetry::trace::Provider::GetTracerProvider(),
+    const OpenTracingPropagators& propagators = {}) noexcept
   {
-    return createTracerShim(opentelemetry::trace::Provider::GetTracerProvider());
-  }
-
-  /**
-   * Creates a {@code opentracing::Tracer} shim using the provided 
-   * {@code TracerProvider} and
-   * {@code TextMapPropagator} instance.
-   *
-   * @param provider the {@code TracerProvider} instance used to create this shim.
-   * @param propagators the {@code OpenTracingPropagators} instance used to create this shim.
-   * @returns a {@code opentracing::Tracer}.
-   */
-  static inline std::shared_ptr<opentracing::Tracer> createTracerShim(const TracerProviderPtr& provider, 
-                                                                      const OpenTracingPropagators& propagators = {}) noexcept
-  {
-    return createTracerShim(provider->GetTracer("opentracing-shim"), propagators);
-  }
-
-  /**
-   * Creates a {@code opentracing::Tracer} shim using provided
-   * {@code Tracer} instance and
-   * {@code GlobalTextMapPropagator::GetGlobalPropagator()}.
-   *
-   * @returns a {@code opentracing::Tracer}.
-   */
-  static inline std::shared_ptr<opentracing::Tracer> createTracerShim(const TracerPtr& tracer, 
-                                                                      const OpenTracingPropagators& propagators = {}) noexcept
-  {
-    return std::shared_ptr<opentracing::Tracer>(new (std::nothrow) TracerShim(tracer, propagators));
+    return std::shared_ptr<opentracing::Tracer>(
+      new (std::nothrow) TracerShim(provider->GetTracer("opentracing-shim"), propagators));
   }
   // Overrides
-  std::unique_ptr<opentracing::Span> StartSpanWithOptions(opentracing::string_view operation_name, 
+  std::unique_ptr<opentracing::Span> StartSpanWithOptions(opentracing::string_view operation_name,
                                                           const opentracing::StartSpanOptions& options) const noexcept override;
   opentracing::expected<void> Inject(const opentracing::SpanContext& sc,
                                      std::ostream& writer) const override;
@@ -83,11 +58,11 @@ private:
   explicit TracerShim(const TracerPtr& tracer, const OpenTracingPropagators& propagators)
     : tracer_(tracer), propagators_(propagators) {}
   template <typename T>
-  opentracing::expected<void> injectImpl(const opentracing::SpanContext& sc, 
-                                         const T& writer, 
+  opentracing::expected<void> injectImpl(const opentracing::SpanContext& sc,
+                                         const T& writer,
                                          const PropagatorPtr& propagator) const;
   template <typename T>
-  opentracing::expected<std::unique_ptr<opentracing::SpanContext>> extractImpl(const T& reader, 
+  opentracing::expected<std::unique_ptr<opentracing::SpanContext>> extractImpl(const T& reader,
                                                                                const PropagatorPtr& propagator) const;
 
   TracerPtr tracer_;

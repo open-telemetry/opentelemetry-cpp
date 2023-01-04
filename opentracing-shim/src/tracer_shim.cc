@@ -60,7 +60,6 @@ static LinksList makeReferenceLinks(const opentracing::StartSpanOptions& options
 
   LinksList links;
   links.reserve(options.references.size());
-
   // All values in the list MUST be added as Links with the reference type value
   // as a Link attribute, i.e. opentracing.ref_type set to follows_from or child_of
   for (const auto& entry : options.references)
@@ -94,7 +93,6 @@ static BaggagePtr makeBaggage(const opentracing::StartSpanOptions& options) noex
   using namespace opentelemetry::baggage;
 
   std::unordered_map<std::string, std::string> baggage_items;
-
   // If a list of Span references is specified...
   for (const auto& entry : options.references)
   {
@@ -111,7 +109,6 @@ static BaggagePtr makeBaggage(const opentracing::StartSpanOptions& options) noex
       });
     }
   }
-
   // If no such lisf of references is specified, the current Baggage
   // MUST be used as the initial value of the newly created Span.
   return baggage_items.empty()
@@ -128,7 +125,7 @@ static std::vector<std::pair<std::string, common::AttributeValue>> makeTags(cons
   // be set at the creation time of the OpenTelemetry Span.
   for (const auto& entry : options.tags)
   {
-    tags.emplace_back(entry.first, shimutils::attributeFromValue(entry.second));
+    tags.emplace_back(entry.first, utils::attributeFromValue(entry.second));
   }
 
   return tags;
@@ -145,7 +142,6 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(opentracing:
   const auto& links = detail::makeReferenceLinks(options);
   const auto& baggage = detail::makeBaggage(options);
   const auto& attributes = detail::makeTags(options);
-
   auto span = tracer_->StartSpan(operation_name.data(), attributes, links, opts);
   auto span_shim = new SpanShim(*this, span, baggage);
 
@@ -237,7 +233,7 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
     // It MUST inject any non-empty Baggage even amidst no valid SpanContext.
     const auto& context = opentelemetry::baggage::SetBaggage(current_context, context_shim->baggage());
 
-    shimutils::CarrierWriterShim<T> carrier{writer};
+    utils::CarrierWriterShim<T> carrier{writer};
     propagator->Inject(carrier, context);
   }
 
@@ -250,7 +246,7 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
 {
   // Extract the underlying OpenTelemetry Span and Baggage using either the explicitly registered
   // or the global OpenTelemetry Propagators, as configured at construction time.
-  shimutils::CarrierReaderShim<T> carrier{reader};
+  utils::CarrierReaderShim<T> carrier{reader};
   auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
   auto context = propagator->Extract(carrier, current_context);
   auto span_context = opentelemetry::trace::GetSpan(context)->GetContext();
@@ -259,7 +255,7 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
   // If the extracted SpanContext is invalid AND the extracted Baggage is empty,
   // this operation MUST return a null value, and otherwise it MUST return a
   // SpanContext Shim instance with the extracted values.
-  SpanContextShim* context_shim = (!span_context.IsValid() && shimutils::isBaggageEmpty(baggage))
+  SpanContextShim* context_shim = (!span_context.IsValid() && utils::isBaggageEmpty(baggage))
     ? nullptr
     : new SpanContextShim(span_context, baggage);
 

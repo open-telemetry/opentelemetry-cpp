@@ -5,14 +5,21 @@
 
 #pragma once
 
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace opentracingshim::shimutils
-{
-    
-using opentelemetry::common::AttributeValue;
+#include <opentelemetry/baggage/baggage.h>
+#include <opentelemetry/common/attribute_value.h>
+#include <opentelemetry/context/propagation/text_map_propagator.h>
+#include <opentelemetry/nostd/type_traits.h>
+#include <opentracing/propagation.h>
+#include <opentracing/value.h>
 
-static inline AttributeValue attributeFromValue(const opentracing::Value& value)
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace opentracingshim::utils
 {
+
+static inline opentelemetry::common::AttributeValue attributeFromValue(const opentracing::Value& value)
+{
+  using opentelemetry::common::AttributeValue;
+
   static struct
   {
     AttributeValue operator()(bool v) { return v; }
@@ -21,12 +28,12 @@ static inline AttributeValue attributeFromValue(const opentracing::Value& value)
     AttributeValue operator()(uint64_t v) { return v; }
     AttributeValue operator()(std::string v) { return v.c_str(); }
     AttributeValue operator()(opentracing::string_view v) { return nostd::string_view{v.data()}; }
-    AttributeValue operator()(std::nullptr_t) { return std::string{}; }
+    AttributeValue operator()(std::nullptr_t) { return nostd::string_view{}; }
     AttributeValue operator()(const char* v) { return v; }
-    AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Values>) { return std::string{}; }
-    AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Dictionary>) { return std::string{}; }
+    AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Values>) { return nostd::string_view{}; }
+    AttributeValue operator()(opentracing::util::recursive_wrapper<opentracing::Dictionary>) { return nostd::string_view{}; }
   } AttributeMapper;
-  
+
   return opentracing::Value::visit(value, AttributeMapper);
 }
 
@@ -54,7 +61,7 @@ class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCar
 {
 public:
   CarrierWriterShim(const T& writer) : writer_(writer) {}
-  
+
   // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
@@ -76,22 +83,24 @@ class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCar
 {
 public:
   CarrierReaderShim(const T& reader) : reader_(reader) {}
-  
+
   // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    // First try carrier.LookupKey since that can potentially be the fastest approach.
-    auto result = reader_.LookupKey(key.data());
+    nostd::string_view value;
 
-    if (!result.has_value() || 
-        opentracing::are_errors_equal(result.error(), opentracing::lookup_key_not_supported_error)) 
+    // First try carrier.LookupKey since that can potentially be the fastest approach.
+    if (auto result = reader_.LookupKey(key.data()))
     {
-      // Fall back to iterating through all of the keys.
-      reader_.ForeachKey([key, &result]
+      value = result.value().data();
+    }
+    else // Fall back to iterating through all of the keys.
+    {
+      reader_.ForeachKey([key, &value]
         (opentracing::string_view k, opentracing::string_view v) -> opentracing::expected<void> {
-          if (key == k) 
+          if (k == key.data())
           {
-            result = opentracing::make_expected(v);
+            value = v.data();
             // Found key, so bail out of the loop with a success error code.
             return opentracing::make_unexpected(std::error_code{});
           }
@@ -99,7 +108,7 @@ public:
         });
     }
 
-    return nostd::string_view{ result.has_value() ? result.value().data() : "" };
+    return value;
   }
 
   // stores the key-value pair.
@@ -111,29 +120,29 @@ public:
   // list of all the keys in the carrier.
   virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    reader_.ForeachKey([&callback]
-        (opentracing::string_view k, opentracing::string_view v) -> opentracing::expected<void> {
-          callback(k.data());
-          return opentracing::make_expected();
-        });
-    return true;
+    return reader_.ForeachKey([&callback]
+      (opentracing::string_view key, opentracing::string_view) -> opentracing::expected<void> {
+        return callback(key.data())
+          ? opentracing::make_expected()
+          : opentracing::make_unexpected(std::error_code{});
+      }).has_value();
   }
 
 private:
   const T& reader_;
 };
 
-static inline bool isBaggageEmpty(const BaggagePtr& baggage)
+static inline bool isBaggageEmpty(const nostd::shared_ptr<opentelemetry::baggage::Baggage>& baggage)
 {
   if (baggage)
   {
     return baggage->GetAllEntries([](nostd::string_view, nostd::string_view){
       return false;
-    });    
+    });
   }
 
   return true;
 }
 
-} // namespace opentracingshim::shimutils
+} // namespace opentracingshim::utils
 OPENTELEMETRY_END_NAMESPACE

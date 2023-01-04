@@ -24,7 +24,7 @@ void SpanShim::handleError(const opentracing::Value& value) noexcept
   // - false maps to Ok
   // - no value being set maps to Unset.
   auto code = StatusCode::kUnset;
-  const auto& str_value = shimutils::stringFromValue(value);
+  const auto& str_value = utils::stringFromValue(value);
 
   if (str_value == "true")
   {
@@ -59,7 +59,7 @@ void SpanShim::SetTag(opentracing::string_view key, const opentracing::Value& va
   }
   else
   {
-    span_->SetAttribute(key.data(), shimutils::attributeFromValue(value));
+    span_->SetAttribute(key.data(), utils::attributeFromValue(value));
   }
 }
 
@@ -106,7 +106,7 @@ void SpanShim::logImpl(opentracing::SystemTime timestamp, nostd::span<const Even
   // The Add Event’s name parameter MUST be the value with the event key
   // in the pair set, or else fallback to use the log literal string.
   const auto event = std::find_if(fields.begin(), fields.end(), [](EventEntry item){ return item.first == "event"; });
-  auto name = (event != fields.end()) ? shimutils::stringFromValue(event->second) : std::string{"log"};
+  auto name = (event != fields.end()) ? utils::stringFromValue(event->second) : std::string{"log"};
   // If pair set contains an event=error entry, the values MUST be mapped to an Event
   // with the conventions outlined in the Exception semantic conventions document:
   bool is_error = (name == opentracing::ext::error);
@@ -119,7 +119,7 @@ void SpanShim::logImpl(opentracing::SystemTime timestamp, nostd::span<const Even
   for (const auto& entry : fields)
   {
     auto key = entry.first;
-    const auto& value = shimutils::attributeFromValue(entry.second);
+    const auto& value = utils::attributeFromValue(entry.second);
     // ... including mapping of the following key/value pairs:
     // - error.kind maps to exception.type.
     // - message maps to exception.message.

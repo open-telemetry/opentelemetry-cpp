@@ -15,7 +15,7 @@
 #include "opentracing/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace opentracingshim 
+namespace opentracingshim
 {
 
 using SpanPtr = nostd::shared_ptr<opentelemetry::trace::Span>;
