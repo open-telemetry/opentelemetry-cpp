@@ -15,11 +15,17 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
 * [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and
   cmake when using C++20 [#1852](https://github.com/open-telemetry/opentelemetry-cpp/pull/1852)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.16.0
   [#1854](https://github.com/open-telemetry/opentelemetry-cpp/pull/1854)
+* [SDK] BatchSpanProcessor now logs a warning when dropping a span because the
+  queue is full
+  [1871](https://github.com/open-telemetry/opentelemetry-cpp/pull/1871)
+* [BUILD] Migrate from @bazel_tools//platforms to [Bazel Platforms](https://github.com/bazelbuild/platforms)
+  to enable Bazel 6.0.0 compatibility [#1873](https://github.com/open-telemetry/opentelemetry-cpp/pull/1873)
 
 ## [1.8.1] 2022-12-04
 

@@ -226,7 +226,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "1.2.0", schema_url);
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -244,9 +244,16 @@ public:
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
           auto resource_logs     = *check_json["resource_logs"].begin();
           auto scope_logs        = *resource_logs["scope_logs"].begin();
+          auto schema_url        = scope_logs["schema_url"].get<std::string>();
+          auto scope             = scope_logs["scope"];
+          auto scope_name        = scope["name"];
+          auto scope_version     = scope["version"];
           auto log               = *scope_logs["log_records"].begin();
           auto received_trace_id = log["trace_id"].get<std::string>();
           auto received_span_id  = log["span_id"].get<std::string>();
+          EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
+          EXPECT_EQ(scope_name, "opentelelemtry_library");
+          EXPECT_EQ(scope_version, "1.2.0");
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
           EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
@@ -325,7 +332,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "1.2.0", schema_url);
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
@@ -339,7 +346,11 @@ public:
           opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_log = request_body.resource_logs(0).scope_logs(0).log_records(0);
+          auto scope_log = request_body.resource_logs(0).scope_logs(0);
+          EXPECT_EQ(scope_log.schema_url(), "https://opentelemetry.io/schemas/1.2.0");
+          EXPECT_EQ(scope_log.scope().name(), "opentelelemtry_library");
+          EXPECT_EQ(scope_log.scope().version(), "1.2.0");
+          auto received_log = scope_log.log_records(0);
           EXPECT_EQ(received_log.trace_id(), report_trace_id);
           EXPECT_EQ(received_log.span_id(), report_span_id);
           EXPECT_EQ("Log message", received_log.body().string_value());
