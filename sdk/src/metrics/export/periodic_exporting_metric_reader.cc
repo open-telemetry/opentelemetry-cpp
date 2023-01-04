@@ -8,9 +8,9 @@
 #include <chrono>
 #if defined(_MSC_VER)
 #  pragma warning(suppress : 5204)
-# include <future>
+#  include <future>
 #else
-#include <future>
+#  include <future>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
