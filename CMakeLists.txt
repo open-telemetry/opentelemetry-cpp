@@ -216,10 +216,8 @@ function(install_windows_deps)
   # set(CMAKE_TOOLCHAIN_FILE
   #     ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
   #     PARENT_SCOPE)
-  include(
-      ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE
-  )
+  message("Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process! 
+           Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice.")
   
 endfunction()
 
