@@ -21,6 +21,7 @@ public:
   //      Span::GetContext()
   virtual opentelemetry::sdk::trace::SamplingResult ShouldSample(
       const opentelemetry::trace::Span &span) noexcept = 0;
+  virtual ~TailSampler()                               = default;
 };
 
 class AlwaysOnTailSampler : public TailSampler
