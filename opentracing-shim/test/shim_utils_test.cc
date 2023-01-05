@@ -183,7 +183,7 @@ TEST_F(ShimUtilsTest, MakeOptionsShim_FirstInList)
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), span_context_shim->context());
 }
 
-TEST_F(ShimUtilsTest, MakeReferenceLinks)
+TEST_F(ShimUtilsTest, MakeIterableLinks)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -193,24 +193,38 @@ TEST_F(ShimUtilsTest, MakeReferenceLinks)
   auto span_context2 = static_cast<opentracing::SpanContext*>(span_context_shim2.get());
 
   opentracing::StartSpanOptions options;
-  auto links = shim::utils::makeReferenceLinks(options);
-  ASSERT_TRUE(links.empty());
+  auto empty = shim::utils::makeIterableLinks(options);
+  ASSERT_EQ(empty.size(), 0);
 
   options.references = {
     { opentracing::SpanReferenceType::FollowsFromRef, nullptr },
     { opentracing::SpanReferenceType::FollowsFromRef, span_context1 },
     { opentracing::SpanReferenceType::ChildOfRef, span_context2 }
   };
+  auto full = shim::utils::makeIterableLinks(options);
+  ASSERT_EQ(full.size(), 3);
 
-  links = shim::utils::makeReferenceLinks(options);
+  std::vector<std::tuple<trace_api::SpanContext, nostd::string_view, common::AttributeValue>> links;
+  full.ForEachKeyValue([&links](trace_api::SpanContext ctx, const common::KeyValueIterable& it){
+    it.ForEachKeyValue([&links, &ctx](nostd::string_view key, common::AttributeValue value){
+      links.emplace_back(ctx, key, value);
+      return false;
+    });
+    return true;
+  });
   ASSERT_EQ(links.size(), 2);
-  ASSERT_EQ(links[0].first, span_context_shim1->context());
-  ASSERT_FALSE(links[0].second.empty());
-  ASSERT_EQ(links[0].second[0].first, "opentracing.ref_type");
-  ASSERT_EQ(nostd::get<nostd::string_view>(links[0].second[0].second), "follows_from");
-  ASSERT_EQ(links[1].first, span_context_shim2->context());
-  ASSERT_EQ(links[1].second[0].first, "opentracing.ref_type");
-  ASSERT_EQ(nostd::get<nostd::string_view>(links[1].second[0].second), "child_of");
+
+  trace_api::SpanContext ctx = trace_api::SpanContext::GetInvalid();
+  nostd::string_view key;
+  common::AttributeValue value;
+  std::tie(ctx, key, value) = links[0];
+  ASSERT_EQ(ctx, span_context_shim1->context());
+  ASSERT_EQ(key, "opentracing.ref_type");
+  ASSERT_EQ(nostd::get<nostd::string_view>(value), "follows_from");
+  std::tie(ctx, key, value) = links[1];
+  ASSERT_EQ(ctx, span_context_shim2->context());
+  ASSERT_EQ(key, "opentracing.ref_type");
+  ASSERT_EQ(nostd::get<nostd::string_view>(value), "child_of");
 }
 
 TEST_F(ShimUtilsTest, MakeBaggage_EmptyRefs)
@@ -258,15 +272,21 @@ TEST_F(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
   ASSERT_EQ(value, "world");
 }
 
-TEST_F(ShimUtilsTest, MakeTags)
+TEST_F(ShimUtilsTest, MakeIterableTags)
 {
   opentracing::StartSpanOptions options;
-  auto attributes = shim::utils::makeTags(options);
-  ASSERT_TRUE(attributes.empty());
+  auto empty = shim::utils::makeIterableTags(options);
+  ASSERT_EQ(empty.size(), 0);
 
   options.tags = {{ "foo", 42.0 }, { "bar", true }, { "baz", "test" }};
-  attributes = shim::utils::makeTags(options);
-  ASSERT_EQ(attributes.size(), 3);
+  auto full = shim::utils::makeIterableTags(options);
+  ASSERT_EQ(full.size(), 3);
+
+  std::vector<std::pair<nostd::string_view, common::AttributeValue>> attributes;
+  full.ForEachKeyValue([&attributes](nostd::string_view key, common::AttributeValue value){
+    attributes.push_back({key, value});
+    return true;
+  });
   ASSERT_EQ(attributes[0].first, "foo");
   ASSERT_EQ(nostd::get<double>(attributes[0].second), 42.0);
   ASSERT_EQ(attributes[1].first, "bar");

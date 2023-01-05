@@ -53,6 +53,23 @@ TEST_F(TracerShimTest, SpanReferenceToCreatingTracer)
   ASSERT_EQ(&span_shim->tracer(), tracer_shim.get());
 }
 
+TEST_F(TracerShimTest, SpanParentChildRelationship)
+{
+  auto span_shim1 = tracer_shim->StartSpan("a");
+  auto span_shim2 = tracer_shim->StartSpan("b", { opentracing::ChildOf(&span_shim1->context()) });
+  ASSERT_NE(span_shim1, nullptr);
+  ASSERT_NE(span_shim2, nullptr);
+  ASSERT_NE(span_shim1, span_shim2);
+  ASSERT_EQ(span_shim1->context().ToSpanID(), span_shim2->context().ToSpanID());
+  ASSERT_EQ(span_shim1->context().ToTraceID(), span_shim2->context().ToTraceID());
+  
+  auto span_context_shim1 = dynamic_cast<const shim::SpanContextShim*>(&span_shim1->context());
+  auto span_context_shim2 = dynamic_cast<const shim::SpanContextShim*>(&span_shim2->context());
+  ASSERT_TRUE(span_context_shim1 != nullptr);
+  ASSERT_TRUE(span_context_shim2 != nullptr);
+  ASSERT_EQ(span_context_shim1->context(), span_context_shim2->context());
+}
+
 TEST_F(TracerShimTest, TracerGloballyRegistered)
 {
   ASSERT_FALSE(opentracing::Tracer::IsGlobalTracerRegistered());

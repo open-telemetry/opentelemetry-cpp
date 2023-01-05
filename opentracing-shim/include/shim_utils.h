@@ -10,9 +10,11 @@
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentracing/propagation.h"
 #include "opentracing/tracer.h"
@@ -106,41 +108,80 @@ static opentelemetry::trace::StartSpanOptions makeOptionsShim(const opentracing:
   return options_shim;
 }
 
-using RefsList = std::vector<std::pair<nostd::string_view, common::AttributeValue>>;
-using LinksList = std::vector<std::pair<opentelemetry::trace::SpanContext, RefsList>>;
-
-static LinksList makeReferenceLinks(const opentracing::StartSpanOptions& options) noexcept
+class LinksIterable final : public opentelemetry::trace::SpanContextKeyValueIterable
 {
-  using opentracing::SpanReferenceType;
-  using namespace opentelemetry::trace::SemanticConventions;
-
-  LinksList links;
-  links.reserve(options.references.size());
-  // All values in the list MUST be added as Links with the reference type value
-  // as a Link attribute, i.e. opentracing.ref_type set to follows_from or child_of
-  for (const auto& entry : options.references)
+public:
+  using RefsList = std::vector<std::pair<opentracing::SpanReferenceType, const opentracing::SpanContext*>>;
+  explicit LinksIterable(const RefsList& refs) noexcept : refs_(refs) {}
+  
+  bool ForEachKeyValue(nostd::function_ref<bool(opentelemetry::trace::SpanContext, 
+                                                const opentelemetry::common::KeyValueIterable&)>
+                                                callback) const noexcept override
   {
-    auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second);
-    nostd::string_view span_kind;
+    using opentracing::SpanReferenceType;
+    using namespace opentelemetry::trace::SemanticConventions;
+    using LinksList = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
+    
+    for (const auto& entry : refs_)
+    {
+      auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second);
+      nostd::string_view span_kind;
 
-    if (entry.first == SpanReferenceType::ChildOfRef)
-    {
-      span_kind = OpentracingRefTypeValues::kChildOf;
-    }
-    else if (entry.first == SpanReferenceType::FollowsFromRef)
-    {
-      span_kind = OpentracingRefTypeValues::kFollowsFrom;
+      if (entry.first == SpanReferenceType::ChildOfRef)
+      {
+        span_kind = OpentracingRefTypeValues::kChildOf;
+      }
+      else if (entry.first == SpanReferenceType::FollowsFromRef)
+      {
+        span_kind = OpentracingRefTypeValues::kFollowsFrom;
+      }
+
+      if (context_shim && !span_kind.empty())
+      {
+        if (!callback(context_shim->context(), 
+                      opentelemetry::common::KeyValueIterableView<LinksList>(
+                        {{ kOpentracingRefType, span_kind }})))
+          return false;
+      }
     }
 
-    if (context_shim && !span_kind.empty())
-    {
-      links.emplace_back(std::piecewise_construct,
-                         std::forward_as_tuple(context_shim->context()),
-                         std::forward_as_tuple(std::forward<RefsList>({{ kOpentracingRefType, span_kind }})));
-    }
+    return true;
   }
 
-  return links;
+  size_t size() const noexcept { return refs_.size(); }
+
+private:
+  const RefsList& refs_;
+};
+
+static const LinksIterable makeIterableLinks(const opentracing::StartSpanOptions& options) noexcept
+{
+  return LinksIterable(options.references);
+}
+
+class TagsIterable final : public opentelemetry::common::KeyValueIterable
+{
+public:
+  explicit TagsIterable(const std::vector<std::pair<std::string, opentracing::Value>>& tags) noexcept : tags_(tags) {}
+
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const noexcept override
+  {
+    for (const auto& entry : tags_)
+    {
+      if (!callback(entry.first, utils::attributeFromValue(entry.second))) return false;
+    }
+    return true;
+  }
+
+  size_t size() const noexcept override { return tags_.size(); }
+
+private:
+  const std::vector<std::pair<std::string, opentracing::Value>>& tags_;
+};
+
+static const TagsIterable makeIterableTags(const opentracing::StartSpanOptions& options) noexcept
+{
+  return TagsIterable(options.tags);
 }
 
 static nostd::shared_ptr<opentelemetry::baggage::Baggage> makeBaggage(const opentracing::StartSpanOptions& options) noexcept
@@ -169,21 +210,6 @@ static nostd::shared_ptr<opentelemetry::baggage::Baggage> makeBaggage(const open
   return baggage_items.empty()
     ? GetBaggage(opentelemetry::context::RuntimeContext::GetCurrent())
     : nostd::shared_ptr<Baggage>(new Baggage(baggage_items));
-}
-
-static std::vector<std::pair<std::string, common::AttributeValue>> makeTags(const opentracing::StartSpanOptions& options) noexcept
-{
-  std::vector<std::pair<std::string, common::AttributeValue>> tags;
-  tags.reserve(options.tags.size());
-
-  // If an initial set of tags is specified, the values MUST
-  // be set at the creation time of the OpenTelemetry Span.
-  for (const auto& entry : options.tags)
-  {
-    tags.emplace_back(entry.first, utils::attributeFromValue(entry.second));
-  }
-
-  return tags;
 }
 
 } // namespace opentracingshim::utils

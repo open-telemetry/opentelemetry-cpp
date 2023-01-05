@@ -22,9 +22,9 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(opentracing:
   if (is_closed_) return nullptr;
 
   const auto& opts = utils::makeOptionsShim(options);
-  const auto& links = utils::makeReferenceLinks(options);
+  const auto& links = utils::makeIterableLinks(options);
+  const auto& attributes = utils::makeIterableTags(options);
   const auto& baggage = utils::makeBaggage(options);
-  const auto& attributes = utils::makeTags(options);
   auto span = tracer_->StartSpan(operation_name.data(), attributes, links, opts);
   auto span_shim = new SpanShim(*this, span, baggage);
 
