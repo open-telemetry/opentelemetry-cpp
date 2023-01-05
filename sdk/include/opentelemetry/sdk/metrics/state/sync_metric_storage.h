@@ -33,17 +33,17 @@ public:
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor},
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(exemplar_reservoir),
 #endif
-        temporal_metric_storage_(instrument_descriptor, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
 
   {
-    create_default_aggregation_ = [&, aggregation_config]() -> std::unique_ptr<Aggregation> {
-      return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_,
+    create_default_aggregation_ = [&, aggregation_type,
+                                   aggregation_config]() -> std::unique_ptr<Aggregation> {
+      return DefaultAggregation::CreateAggregation(aggregation_type, instrument_descriptor_,
                                                    aggregation_config);
     };
   }
@@ -120,7 +120,6 @@ public:
 
 private:
   InstrumentDescriptor instrument_descriptor_;
-  AggregationType aggregation_type_;
 
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;

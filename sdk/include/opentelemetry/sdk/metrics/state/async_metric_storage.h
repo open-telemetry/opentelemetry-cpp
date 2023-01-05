@@ -36,7 +36,7 @@ public:
         state_{state},
         cumulative_hash_map_(new AttributesHashMap()),
         delta_hash_map_(new AttributesHashMap()),
-        temporal_metric_storage_(instrument_descriptor, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {}
 
   template <class T>

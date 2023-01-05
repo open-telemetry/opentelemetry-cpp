@@ -26,6 +26,7 @@ class TemporalMetricStorage
 {
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
+                        AggregationType aggregation_type,
                         const AggregationConfig *aggregation_config);
 
   bool buildMetrics(CollectorHandle *collector,
@@ -37,6 +38,7 @@ public:
 
 private:
   InstrumentDescriptor instrument_descriptor_;
+  AggregationType aggregation_type_;
 
   // unreported metrics stash for all the collectors
   std::unordered_map<CollectorHandle *, std::list<std::shared_ptr<AttributesHashMap>>>

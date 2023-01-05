@@ -29,6 +29,7 @@ public:
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
       const AggregationConfig *aggregation_config)
   {
+    std::cout << " CREATE AGGREGATION FROM INSTRUMENT DESRIPTOR\n";
     switch (instrument_descriptor.type_)
     {
       case InstrumentType::kCounter:
@@ -69,6 +70,7 @@ public:
       InstrumentDescriptor instrument_descriptor,
       const AggregationConfig *aggregation_config = nullptr)
   {
+    std::cout << "\n\nAgg type:" << GetAggregationType(aggregation_type) << "\n\n";
     switch (aggregation_type)
     {
       case AggregationType::kDrop:
@@ -97,7 +99,8 @@ public:
       case AggregationType::kSum: {
         bool is_monotonic = true;
         if (instrument_descriptor.type_ == InstrumentType::kUpDownCounter ||
-            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter)
+            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter ||
+            instrument_descriptor.type_ == InstrumentType::kHistogram)
         {
           is_monotonic = false;
         }
@@ -112,6 +115,7 @@ public:
         break;
       }
       default:
+        std::cout << "it's default-1\n";
         return DefaultAggregation::CreateAggregation(instrument_descriptor, aggregation_config);
     }
   }
@@ -159,6 +163,7 @@ public:
               new DoubleSumAggregation(nostd::get<SumPointData>(point_data)));
         }
       default:
+        std::cout << "it's default-2\n";
         return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
     }
   }
