@@ -33,5 +33,15 @@ std::unique_ptr<opentracing::SpanContext> SpanContextShim::Clone() const noexcep
   return std::unique_ptr<SpanContextShim>(new (std::nothrow) SpanContextShim(context_, baggage_));
 }
 
+std::string SpanContextShim::ToTraceID() const noexcept
+{
+  return toHexString(context_.trace_id());
+}
+
+std::string SpanContextShim::ToSpanID() const noexcept
+{
+  return toHexString(context_.span_id());
+}
+
 } // namespace opentracingshim
 OPENTELEMETRY_END_NAMESPACE

@@ -28,8 +28,18 @@ public:
   using VisitBaggageItem = std::function<bool(const std::string& key, const std::string& value)>;
   void ForeachBaggageItem(VisitBaggageItem f) const override;
   std::unique_ptr<opentracing::SpanContext> Clone() const noexcept override;
+  std::string ToTraceID() const noexcept override;
+  std::string ToSpanID() const noexcept override;
 
 private:
+  template <typename T>
+  static std::string toHexString(const T &id_item)
+  {
+    char buf[T::kSize * 2];
+    id_item.ToLowerBase16(buf);
+    return std::string(buf, sizeof(buf));
+  }
+
   opentelemetry::trace::SpanContext context_;
   BaggagePtr baggage_;
 };
