@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "span_context_shim.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"

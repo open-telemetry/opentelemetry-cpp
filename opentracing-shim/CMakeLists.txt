@@ -1,46 +1,73 @@
 set(this_target opentelemetry_opentracing_shim)
 
-#message("CMAKE_CURRENT_LIST_DIR " ${CMAKE_CURRENT_LIST_DIR})
-#message("CMAKE_CURRENT_SOURCE_DIR " ${CMAKE_CURRENT_SOURCE_DIR})
-#message("CMAKE_SOURCE_DIR " ${CMAKE_SOURCE_DIR})
-#message("PROJECT_SOURCE_DIR " ${PROJECT_SOURCE_DIR})
+add_library(${this_target}
+  src/span_shim.cc
+  src/span_context_shim.cc
+  src/tracer_shim.cc)
 
-#add_library(${this_target} INTERFACE)
-#target_include_directories(
-#  ${this_target}
-#  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-#         "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/include>"
-#         "$<INSTALL_INTERFACE:include>")
-#
-#set_target_properties(${this_target} PROPERTIES EXPORT_NAME "opentracing-shim")
-#target_link_libraries(${this_target} INTERFACE ${this_target} opentracing-cpp)
-#
-#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#foreach(dir ${dirs})
-#  message(STATUS "dir='${dir}'")
-#endforeach()
-#
-#install(
-#  TARGETS ${this_target}
-#  EXPORT "${PROJECT_NAME}-target"
-#  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-#
-#install(
-#  DIRECTORY include/opentelemetry/opentracing-shim
-#  DESTINATION include/opentelemetry/
-#  FILES_MATCHING
-#  PATTERN "*.h")
+set_target_properties(${this_target} PROPERTIES EXPORT_NAME opentracing_shim)
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/build/include
-  ${CMAKE_SOURCE_DIR}/third_party/opentracing-cpp/3rd_party/include)
+if(OPENTRACING_DIR)
+  include_directories(
+    "${CMAKE_BINARY_DIR}/${OPENTRACING_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/3rd_party/include")
+endif()
 
-add_subdirectory(src)
+target_include_directories(
+  ${this_target}
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+target_link_libraries(
+  ${this_target}
+  PUBLIC opentelemetry_api)
+
+install(
+  TARGETS ${this_target}
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(
+  DIRECTORY include/opentelemetry/opentracingshim
+  DESTINATION include/opentelemetry
+  FILES_MATCHING
+  PATTERN "*.h")
 
 if(BUILD_TESTING)
-  add_subdirectory(test)
+  foreach(
+    testname
+    propagation_test
+    shim_utils_test
+    span_shim_test
+    span_context_shim_test
+    tracer_shim_test)
+
+    add_executable(${testname} "test/${testname}.cc")
+
+    if(OPENTRACING_DIR)
+      target_link_libraries(
+        ${testname}
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_api
+        opentelemetry_opentracing_shim
+        opentracing)
+    else()
+      target_link_libraries(
+        ${testname}
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_api
+        opentelemetry_opentracing_shim
+        OpenTracing::opentracing)
+    endif()
+
+    gtest_add_tests(
+      TARGET ${testname}
+      TEST_PREFIX opentracing_shim.
+      TEST_LIST ${testname})
+  endforeach()
 endif() # BUILD_TESTING

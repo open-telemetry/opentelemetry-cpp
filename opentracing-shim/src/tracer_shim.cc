@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "tracer_shim.h"
-#include "span_shim.h"
-#include "shim_utils.h"
-#include "propagation.h"
+#include "opentelemetry/opentracingshim/tracer_shim.h"
+#include "opentelemetry/opentracingshim/span_shim.h"
+#include "opentelemetry/opentracingshim/shim_utils.h"
+#include "opentelemetry/opentracingshim/propagation.h"
 
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/trace/context.h"

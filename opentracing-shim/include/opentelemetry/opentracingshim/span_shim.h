@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "tracer_shim.h"
-#include "span_context_shim.h"
+#include "opentelemetry/opentracingshim/tracer_shim.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"

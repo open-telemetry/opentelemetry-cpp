@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "shim_utils.h"
 #include "shim_mocks.h"
+
+#include "opentelemetry/opentracingshim/shim_utils.h"
 
 #include "opentracing/tracer.h"
 

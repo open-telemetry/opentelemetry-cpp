@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "tracer_shim.h"
-#include "span_shim.h"
-#include "span_context_shim.h"
-#include "shim_utils.h"
 #include "shim_mocks.h"
+
+#include "opentelemetry/opentracingshim/tracer_shim.h"
+#include "opentelemetry/opentracingshim/span_shim.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/opentracingshim/shim_utils.h"
 
 #include "opentracing/noop.h"
 

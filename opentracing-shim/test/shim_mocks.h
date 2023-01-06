@@ -6,6 +6,7 @@
 #pragma once
 
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"

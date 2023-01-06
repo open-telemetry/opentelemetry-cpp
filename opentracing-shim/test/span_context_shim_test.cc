@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "span_context_shim.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/trace/span_context.h"

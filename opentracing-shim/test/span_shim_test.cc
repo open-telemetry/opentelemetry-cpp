@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "span_shim.h"
-#include "tracer_shim.h"
 #include "shim_mocks.h"
+
+#include "opentelemetry/opentracingshim/span_shim.h"
+#include "opentelemetry/opentracingshim/tracer_shim.h"
 
 #include <gtest/gtest.h>
 
