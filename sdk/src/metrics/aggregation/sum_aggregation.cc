@@ -21,15 +21,9 @@ LongSumAggregation::LongSumAggregation(bool is_monotonic)
   point_data_.is_monotonic_ = is_monotonic;
 }
 
-LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)}
-{
-  std::cout << "\n  create long sum\n";
-}
+LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
 
-LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data}
-{
-  std::cout << "\n  create long sum\n";
-}
+LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data} {}
 
 void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* attributes */) noexcept
 {
@@ -81,15 +75,9 @@ DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
   point_data_.is_monotonic_ = is_monotonic;
 }
 
-DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data))
-{
-  std::cout << "\n  create double sum\n";
-}
+DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data)) {}
 
-DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_data_(data)
-{
-  std::cout << "\n  create double sum\n";
-}
+DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_data_(data) {}
 
 void DoubleSumAggregation::Aggregate(double value,
                                      const PointAttributes & /* attributes */) noexcept
