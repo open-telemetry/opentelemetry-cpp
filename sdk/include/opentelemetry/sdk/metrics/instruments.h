@@ -45,6 +45,19 @@ enum class AggregationType
   kDefault
 };
 
+static const char *GetAggregationType(AggregationType e)
+{
+  const std::map<AggregationType, const char *> agg_strings{
+      {AggregationType::kDrop, "AggregationType::kDrop"},
+      {AggregationType::kHistogram, "AggregationType::kHistogram"},
+      {AggregationType::kLastValue, "AggregationType::kLastValue"},
+      {AggregationType::kSum, "AggregationType::kSum"},
+      {AggregationType::kDefault, "AggregationType::kDefaults"},
+  };
+  auto it = agg_strings.find(e);
+  return it == agg_strings.end() ? "Out of range" : it->second;
+}
+
 enum class AggregationTemporality
 {
   kUnspecified,
