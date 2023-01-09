@@ -4,7 +4,7 @@ foreach(
   meter_test
   view_registry_test
   aggregation_test
-  sum_test
+  sum_aggregation_test
   attributes_processor_test
   attributes_hashmap_test
   sync_metric_storage_counter_test
