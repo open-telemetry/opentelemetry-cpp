@@ -3,26 +3,32 @@
 [![Apache License][license-image]][license-image]
 
 The OpenTracing shim is a bridge layer from OpenTelemetry to the OpenTracing API.
-It takes OpenTelemetry Tracer and exposes it as an implementation of an OpenTracing Tracer.
+It takes an OpenTelemetry Tracer and exposes it as an implementation compatible with
+that of an OpenTracing Tracer.
 
 ## Usage
 
 Use the TracerShim wherever you initialize your OpenTracing tracers.
 There are 2 ways to expose an OpenTracing Tracer:
+
 1. From the global OpenTelemetry configuration:
+
     ```cpp
     auto tracer_shim = TracerShim::createTracerShim();
     ```
+
 1. From a provided OpenTelemetry Tracer instance:
+
     ```cpp
     auto tracer_shim = TracerShim::createTracerShim(tracer);
     ```
 
-Optionally, you can specify propagators to be used for the OpenTracing `TextMap` and `HttpHeaders` formats:
+Optionally, one can also specify the propagators to be used for the OpenTracing `TextMap`
+and `HttpHeaders` formats:
 
 ```cpp
 OpenTracingPropagators propagators{
-  .text_map = nostd::shared_ptr<TextMapPropagator>(new trace::propagation::JaegerPropagator()),
+  .text_map = nostd::shared_ptr<TextMapPropagator>(new CustomTextMap()),
   .http_headers = nostd::shared_ptr<TextMapPropagator>(new trace::propagation::HttpTraceContext())
 };
 
