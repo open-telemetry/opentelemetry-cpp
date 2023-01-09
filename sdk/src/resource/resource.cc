@@ -17,7 +17,7 @@ Resource::Resource(const ResourceAttributes &attributes, const std::string &sche
     : attributes_(attributes), schema_url_(schema_url)
 {}
 
-Resource Resource::Merge(const Resource &other) noexcept
+Resource Resource::Merge(const Resource &other) const noexcept
 {
   ResourceAttributes merged_resource_attributes(other.attributes_);
   merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
