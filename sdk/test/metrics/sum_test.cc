@@ -61,6 +61,7 @@ private:
 
 TEST(HistogramToSum, Double)
 {
+#if HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -106,10 +107,12 @@ TEST(HistogramToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+#endif
 }
 
 TEST(CounterToSum, Double)
 {
+#if HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -155,10 +158,12 @@ TEST(CounterToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+#endif
 }
 
 TEST(UpDownCounterToSum, Double)
 {
+#if HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -199,4 +204,5 @@ TEST(UpDownCounterToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(15.0, opentelemetry::nostd::get<double>(actual.value_));
+#endif
 }
