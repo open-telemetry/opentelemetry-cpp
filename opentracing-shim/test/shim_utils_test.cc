@@ -17,19 +17,7 @@ namespace common    = opentelemetry::common;
 namespace nostd     = opentelemetry::nostd;
 namespace shim      = opentelemetry::opentracingshim;
 
-class ShimUtilsTest : public testing::Test
-{
-protected:
-  virtual void SetUp()
-  {
-  }
-
-  virtual void TearDown()
-  {
-  }
-};
-
-TEST_F(ShimUtilsTest, IsBaggageEmpty)
+TEST(ShimUtilsTest, IsBaggageEmpty)
 {
   auto none = nostd::shared_ptr<baggage::Baggage>(nullptr);
   ASSERT_TRUE(shim::utils::isBaggageEmpty(none));
@@ -42,7 +30,7 @@ TEST_F(ShimUtilsTest, IsBaggageEmpty)
   ASSERT_FALSE(shim::utils::isBaggageEmpty(non_empty));
 }
 
-TEST_F(ShimUtilsTest, StringFromValue)
+TEST(ShimUtilsTest, StringFromValue)
 {
   ASSERT_EQ(shim::utils::stringFromValue(true), "true");
   ASSERT_EQ(shim::utils::stringFromValue(false), "false");
@@ -61,7 +49,7 @@ TEST_F(ShimUtilsTest, StringFromValue)
   ASSERT_EQ(shim::utils::stringFromValue(dict.get()), "");
 }
 
-TEST_F(ShimUtilsTest, AttributeFromValue)
+TEST(ShimUtilsTest, AttributeFromValue)
 {
   auto value = shim::utils::attributeFromValue(true);
   ASSERT_EQ(value.index(), common::AttributeType::kTypeBool);
@@ -110,7 +98,7 @@ TEST_F(ShimUtilsTest, AttributeFromValue)
   ASSERT_EQ(nostd::get<nostd::string_view>(value), nostd::string_view{});
 }
 
-TEST_F(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
+TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -126,7 +114,7 @@ TEST_F(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), trace_api::SpanContext::GetInvalid());
 }
 
-TEST_F(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
+TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -143,7 +131,7 @@ TEST_F(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), trace_api::SpanContext::GetInvalid());
 }
 
-TEST_F(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
+TEST(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -164,7 +152,7 @@ TEST_F(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), span_context_shim->context());
 }
 
-TEST_F(ShimUtilsTest, MakeOptionsShim_FirstInList)
+TEST(ShimUtilsTest, MakeOptionsShim_FirstInList)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -184,7 +172,7 @@ TEST_F(ShimUtilsTest, MakeOptionsShim_FirstInList)
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), span_context_shim->context());
 }
 
-TEST_F(ShimUtilsTest, MakeIterableLinks)
+TEST(ShimUtilsTest, MakeIterableLinks)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
@@ -228,7 +216,7 @@ TEST_F(ShimUtilsTest, MakeIterableLinks)
   ASSERT_EQ(nostd::get<nostd::string_view>(value), "child_of");
 }
 
-TEST_F(ShimUtilsTest, MakeBaggage_EmptyRefs)
+TEST(ShimUtilsTest, MakeBaggage_EmptyRefs)
 {
   auto baggage = baggage::Baggage::GetDefault()->Set("foo", "bar");
   std::string value;
@@ -246,7 +234,7 @@ TEST_F(ShimUtilsTest, MakeBaggage_EmptyRefs)
   ASSERT_EQ(value, "bar");
 }
 
-TEST_F(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
+TEST(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), 
@@ -273,7 +261,7 @@ TEST_F(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
   ASSERT_EQ(value, "world");
 }
 
-TEST_F(ShimUtilsTest, MakeIterableTags)
+TEST(ShimUtilsTest, MakeIterableTags)
 {
   opentracing::StartSpanOptions options;
   auto empty = shim::utils::makeIterableTags(options);

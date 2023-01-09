@@ -47,6 +47,14 @@ protected:
   }
 };
 
+TEST_F(TracerShimTest, TracerProviderName)
+{
+  auto mock_provider_ptr = new MockTracerProvider();
+  nostd::shared_ptr<trace_api::TracerProvider> provider(mock_provider_ptr);
+  ASSERT_NE(shim::TracerShim::createTracerShim(provider), nullptr);
+  ASSERT_EQ(mock_provider_ptr->library_name_, "opentracing-shim");
+}
+
 TEST_F(TracerShimTest, SpanReferenceToCreatingTracer)
 {
   auto span_shim = tracer_shim->StartSpan("a");

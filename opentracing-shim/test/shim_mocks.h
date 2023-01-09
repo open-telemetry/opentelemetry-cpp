@@ -11,6 +11,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 #include "opentracing/propagation.h"
 
 #include <unordered_map>
@@ -21,6 +22,19 @@ namespace baggage   = opentelemetry::baggage;
 namespace common    = opentelemetry::common;
 namespace context   = opentelemetry::context;
 namespace nostd     = opentelemetry::nostd;
+
+struct MockTracerProvider : public trace_api::TracerProvider
+{
+  nostd::shared_ptr<trace_api::Tracer> GetTracer(nostd::string_view library_name,
+                                                 nostd::string_view,
+                                                 nostd::string_view) noexcept override
+  {
+    library_name_ = std::string{library_name};
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>();
+  }
+
+  std::string library_name_;
+};
 
 struct MockSpan final : public trace_api::Span
 {

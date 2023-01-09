@@ -14,19 +14,7 @@ namespace common  = opentelemetry::common;
 namespace nostd   = opentelemetry::nostd;
 namespace shim    = opentelemetry::opentracingshim;
 
-class PropagationTest : public testing::Test
-{
-protected:
-  virtual void SetUp()
-  {
-  }
-
-  virtual void TearDown()
-  {
-  }
-};
-
-TEST_F(PropagationTest, TextMapReader_Get_LookupKey_Unsupported)
+TEST(PropagationTest, TextMapReader_Get_LookupKey_Unsupported)
 {
   std::unordered_map<std::string, std::string> text_map;
   TextMapCarrier testee{text_map};
@@ -48,7 +36,7 @@ TEST_F(PropagationTest, TextMapReader_Get_LookupKey_Unsupported)
   ASSERT_EQ(testee.foreach_key_call_count, 2);
 }
 
-TEST_F(PropagationTest, TextMapReader_Get_LookupKey_Supported)
+TEST(PropagationTest, TextMapReader_Get_LookupKey_Supported)
 {
   std::unordered_map<std::string, std::string> text_map;
   TextMapCarrier testee{text_map};
@@ -71,7 +59,7 @@ TEST_F(PropagationTest, TextMapReader_Get_LookupKey_Supported)
   ASSERT_EQ(testee.foreach_key_call_count, 1);
 }
 
-TEST_F(PropagationTest, TextMapReader_Keys)
+TEST(PropagationTest, TextMapReader_Keys)
 {
   std::unordered_map<std::string, std::string> text_map;
   TextMapCarrier testee{text_map};
@@ -98,7 +86,7 @@ TEST_F(PropagationTest, TextMapReader_Keys)
   ASSERT_EQ(testee.foreach_key_call_count, 2);
 }
 
-TEST_F(PropagationTest, TextMapWriter_Set)
+TEST(PropagationTest, TextMapWriter_Set)
 {
   std::unordered_map<std::string, std::string> text_map;
   TextMapCarrier testee{text_map};

@@ -107,6 +107,37 @@ TEST_F(SpanShimTest, SetBaggageItem)
   ASSERT_EQ(span_shim->BaggageItem("no value"), "");
 }
 
+TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
+{
+  auto span = nostd::shared_ptr<trace_api::Span>(new MockSpan());
+  auto tracer = shim::TracerShim::createTracerShim();
+  auto tracer_shim = dynamic_cast<shim::TracerShim*>(tracer.get());
+  auto baggage = baggage::Baggage::GetDefault();
+  shim::SpanShim span_shim(*tracer_shim, span, baggage);
+
+  std::vector<std::thread> threads;
+  std::vector<std::string> keys;
+  std::vector<std::string> values;
+  int thread_count = 100;
+
+  for (int index = 0; index < thread_count; ++index) 
+  {
+    keys.emplace_back("key-" + std::to_string(index));
+    values.emplace_back("value-" + std::to_string(index));
+    threads.emplace_back(std::bind(&shim::SpanShim::SetBaggageItem, &span_shim, keys[index], values[index]));
+  }
+
+  for (auto& thread : threads)
+  {
+    thread.join();
+  }
+
+  for (int index = 0; index < thread_count; ++index) 
+  {
+    ASSERT_EQ(span_shim.BaggageItem(keys[index]), values[index]);
+  }
+}
+
 TEST_F(SpanShimTest, Log_NoEvent)
 {
   std::string name;

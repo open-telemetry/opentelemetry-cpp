@@ -24,13 +24,13 @@ void SpanShim::handleError(const opentracing::Value& value) noexcept
   // - false maps to Ok
   // - no value being set maps to Unset.
   auto code = StatusCode::kUnset;
-  const auto& str_value = utils::stringFromValue(value);
+  const auto& error_tag = utils::stringFromValue(value);
 
-  if (str_value == "true")
+  if (error_tag == "true")
   {
     code = StatusCode::kError;
   }
-  else if (str_value == "false")
+  else if (error_tag == "false")
   {
     code = StatusCode::kOk;
   }
@@ -68,7 +68,7 @@ void SpanShim::SetBaggageItem(opentracing::string_view restricted_key, opentraci
   // Creates a new SpanContext Shim with a new OpenTelemetry Baggage containing the specified
   // Baggage key/value pair, and sets it as the current instance for this Span Shim.
   if (restricted_key.empty() || value.empty()) return;
-
+  // This operation MUST be safe to be called concurrently.
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
   context_ = context_.newWithKeyValue(restricted_key.data(), value.data());
 }
@@ -78,7 +78,7 @@ std::string SpanShim::BaggageItem(opentracing::string_view restricted_key) const
   // Returns the value for the specified key in the OpenTelemetry Baggage
   // of the current SpanContext Shim, or null if none exists.
   if (restricted_key.empty()) return "";
-
+  // This operation MUST be safe to be called concurrently.
   const std::lock_guard<decltype(context_lock_)> guard(context_lock_);
   std::string value;
   return context_.BaggageItem(restricted_key.data(), value) ? value : "";
