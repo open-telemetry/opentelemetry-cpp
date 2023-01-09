@@ -4,6 +4,7 @@ cc_library(
     name = "es_log_record_exporter",
     srcs = [
         "src/es_log_record_exporter.cc",
+        "src/es_log_recordable.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/elasticsearch/es_log_record_exporter.h",

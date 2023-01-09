@@ -41,6 +41,22 @@ void print_value(const std::vector<T> &vec, std::ostream &sout)
   sout << ']';
 }
 
+template <typename T>
+void print_value(const nostd::span<T> &vec, std::ostream &sout)
+{
+  sout << '[';
+  size_t i  = 1;
+  size_t sz = vec.size();
+  for (auto v : vec)
+  {
+    sout << v;
+    if (i != sz)
+      sout << ',';
+    i++;
+  };
+  sout << ']';
+}
+
 // Prior to C++14, generic lambda is not available so fallback to functor.
 #if __cplusplus < 201402L
 
@@ -59,6 +75,23 @@ private:
   std::ostream &sout_;
 };
 
+class AttributeValueVisitor
+{
+public:
+  AttributeValueVisitor(std::ostream &sout) : sout_(sout) {}
+
+  template <typename T>
+  void operator()(T &&arg)
+  {
+    print_value(arg, sout_);
+  }
+
+  void operator()(const nostd::string_view &&arg) { sout_.write(arg.data(), arg.size()); }
+
+private:
+  std::ostream &sout_;
+};
+
 #endif
 
 inline void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &value,
@@ -66,6 +99,20 @@ inline void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &v
 {
 #if __cplusplus < 201402L
   opentelemetry::nostd::visit(OwnedAttributeValueVisitor(sout), value);
+#else
+  opentelemetry::nostd::visit(
+      [&sout](auto &&arg) {
+        /* explicit this is needed by some gcc versions (observed with v5.4.0)*/
+        print_value(arg, sout);
+      },
+      value);
+#endif
+}
+
+inline void print_value(const opentelemetry::common::AttributeValue &value, std::ostream &sout)
+{
+#if __cplusplus < 201402L
+  opentelemetry::nostd::visit(AttributeValueVisitor(sout), value);
 #else
   opentelemetry::nostd::visit(
       [&sout](auto &&arg) {

@@ -3,11 +3,12 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
-#  include <mutex>
 #  include "opentelemetry/exporters/ostream/common_utils.h"
+#  include "opentelemetry/sdk/logs/read_write_log_record.h"
 #  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>
+#  include <mutex>
 #  include <type_traits>
 
 namespace nostd     = opentelemetry::nostd;
@@ -27,7 +28,7 @@ OStreamLogRecordExporter::OStreamLogRecordExporter(std::ostream &sout) noexcept 
 
 std::unique_ptr<sdklogs::Recordable> OStreamLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
+  return std::unique_ptr<sdklogs::Recordable>(new sdklogs::ReadWriteLogRecord());
 }
 
 sdk::common::ExportResult OStreamLogRecordExporter::Export(
@@ -42,9 +43,8 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
 
   for (auto &record : records)
   {
-    // Convert recordable to a LogRecord so that the getters of the LogRecord can be used
-    auto log_record =
-        std::unique_ptr<sdklogs::LogRecord>(static_cast<sdklogs::LogRecord *>(record.release()));
+    auto log_record = std::unique_ptr<sdklogs::ReadWriteLogRecord>(
+        static_cast<sdklogs::ReadWriteLogRecord *>(record.release()));
 
     if (log_record == nullptr)
     {
@@ -68,9 +68,13 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
     // Print out each field of the log record, noting that severity is separated
     // into severity_num and severity_text
     sout_ << "{\n"
-          << "  timestamp     : " << log_record->GetTimestamp().time_since_epoch().count() << "\n"
-          << "  severity_num  : " << static_cast<std::uint32_t>(log_record->GetSeverity()) << "\n"
-          << "  severity_text : ";
+          << "  timestamp          : " << log_record->GetTimestamp().time_since_epoch().count()
+          << "\n"
+          << "  observed_timestamp : "
+          << log_record->GetObservedTimestamp().time_since_epoch().count() << "\n"
+          << "  severity_num       : " << static_cast<std::uint32_t>(log_record->GetSeverity())
+          << "\n"
+          << "  severity_text      : ";
 
     std::uint32_t severity_index = static_cast<std::uint32_t>(log_record->GetSeverity());
     if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
@@ -82,20 +86,22 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
       sout_ << opentelemetry::logs::SeverityNumToText[severity_index] << "\n";
     }
 
-    sout_ << "  body          : " << log_record->GetBody() << "\n"
-          << "  resource      : ";
+    sout_ << "  body               : ";
+    opentelemetry::exporter::ostream_common::print_value(log_record->GetBody(), sout_);
+    sout_ << "\n";
 
+    sout_ << "  resource           : ";
     printAttributes(log_record->GetResource().GetAttributes());
 
     sout_ << "\n"
-          << "  attributes    : ";
+          << "  attributes         : ";
 
     printAttributes(log_record->GetAttributes());
 
     sout_ << "\n"
-          << "  trace_id      : " << std::string(trace_id, trace_id_len) << "\n"
-          << "  span_id       : " << std::string(span_id, span_id__len) << "\n"
-          << "  trace_flags   : " << std::string(trace_flags, trace_flags_len) << "\n"
+          << "  trace_id           : " << std::string(trace_id, trace_id_len) << "\n"
+          << "  span_id            : " << std::string(span_id, span_id__len) << "\n"
+          << "  trace_flags        : " << std::string(trace_flags, trace_flags_len) << "\n"
           << "}\n";
   }
 
@@ -117,6 +123,17 @@ bool OStreamLogRecordExporter::isShutdown() const noexcept
 
 void OStreamLogRecordExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
+    const std::string prefix)
+{
+  for (const auto &kv : map)
+  {
+    sout_ << prefix << kv.first << ": ";
+    opentelemetry::exporter::ostream_common::print_value(kv.second, sout_);
+  }
+}
+
+void OStreamLogRecordExporter::printAttributes(
+    const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &map,
     const std::string prefix)
 {
   for (const auto &kv : map)

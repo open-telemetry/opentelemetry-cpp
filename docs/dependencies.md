@@ -29,6 +29,10 @@ Both these dependencies are listed here:
     - For C++11/14/17 compilers, fallback to gsl::span if [GSL C++
       library](https://github.com/microsoft/GSL) is installed. License: `MIT
       License`
+    - libc++ 14.0.0 do not support construct std::span from a range or container
+      .We don't use the std::span in this situation.Users can also define
+      `OPENTELEMETRY_OPTION_USE_STD_SPAN=0` to indicate nostd:span will always
+      not be a alias for std::span.
   - Uses Abseil C++ Library for `absl::variant` as default `nostd::variant` if
     `WITH_ABSEIL` cmake option or
     `--@io_opentelemetry_cpp//api:with_abseil=true` (aka

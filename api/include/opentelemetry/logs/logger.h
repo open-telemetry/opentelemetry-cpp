@@ -13,11 +13,14 @@
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/trace/span_context.h"
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_flags.h"
 #  include "opentelemetry/trace/trace_id.h"
@@ -38,8 +41,40 @@ public:
   virtual const nostd::string_view GetName() noexcept = 0;
 
   /**
-   * Each of the following overloaded Log(...) methods
-   * creates a log message with the specific parameters passed.
+   * Create a Log Record object
+   *
+   * @return nostd::unique_ptr<LogRecord>
+   */
+  virtual nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept = 0;
+
+  /**
+   * Emit a Log Record object
+   *
+   * @param log_record
+   */
+  virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
+
+  /**
+   * Emit a Log Record object with custom span context
+   *
+   * @param log_record
+   */
+  virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record,
+                             const trace::SpanContext &trace_context)
+  {
+    if (!log_record)
+    {
+      return;
+    }
+
+    log_record->SetSpanId(trace_context.span_id());
+    log_record->SetTraceId(trace_context.trace_id());
+    log_record->SetTraceFlags(trace_context.trace_flags());
+
+    EmitLogRecord(std::move(log_record));
+  }
+
+  /**
    *
    * @param severity the severity level of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
@@ -51,37 +86,7 @@ public:
    * @param timestamp the timestamp the log record was created.
    * @throws No exceptions under any circumstances.
    */
-
-  /**
-   * The base Log(...) method that all other Log(...) overloaded methods will eventually call,
-   * in order to create a log record.
-   */
   virtual void Log(Severity severity,
-                   nostd::string_view body,
-                   const common::KeyValueIterable &attributes,
-                   trace::TraceId trace_id,
-                   trace::SpanId span_id,
-                   trace::TraceFlags trace_flags,
-                   common::SystemTimestamp timestamp) noexcept = 0;
-
-  /**
-   * Each of the following overloaded Log(...) methods
-   * creates a log message with the specific parameters passed.
-   *
-   * @param severity the severity level of the log event.
-   * @param name the name of the log event.
-   * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
-   * with the log event.
-   * @param trace_id the trace id associated with the log event.
-   * @param span_id the span id associate with the log event.
-   * @param trace_flags the trace flags associated with the log event.
-   * @param timestamp the timestamp the log record was created.
-   * @throws No exceptions under any circumstances.
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  virtual void Log(Severity severity,
-                   OPENTELEMETRY_MAYBE_UNUSED nostd::string_view name,
                    nostd::string_view body,
                    const common::KeyValueIterable &attributes,
                    trace::TraceId trace_id,
@@ -89,7 +94,67 @@ public:
                    trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
-    Log(severity, body, attributes, trace_id, span_id, trace_flags, timestamp);
+    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+    if (!log_record)
+    {
+      return;
+    }
+
+    log_record->SetSeverity(severity);
+    log_record->SetBody(body);
+    log_record->SetTimestamp(timestamp);
+
+    if (trace_id.IsValid())
+    {
+      log_record->SetTraceId(trace_id);
+      log_record->SetTraceFlags(trace_flags);
+    }
+
+    if (span_id.IsValid())
+    {
+      log_record->SetSpanId(span_id);
+    }
+
+    attributes.ForEachKeyValue(
+        [&log_record](nostd::string_view key, common::AttributeValue value) noexcept {
+          log_record->SetAttribute(key, value);
+          return true;
+        });
+
+    EmitLogRecord(std::move(log_record));
+  }
+
+  /**
+   *
+   * @param severity the severity level of the log event.
+   * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
+   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
+   * with the log event.
+   * @param timestamp the timestamp the log record was created.
+   * @throws No exceptions under any circumstances.
+   */
+  virtual void Log(Severity severity,
+                   nostd::string_view body,
+                   const common::KeyValueIterable &attributes,
+                   common::SystemTimestamp timestamp) noexcept
+  {
+    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+    if (!log_record)
+    {
+      return;
+    }
+
+    log_record->SetSeverity(severity);
+    log_record->SetBody(body);
+    log_record->SetTimestamp(timestamp);
+
+    attributes.ForEachKeyValue(
+        [&log_record](nostd::string_view key, common::AttributeValue value) noexcept {
+          log_record->SetAttribute(key, value);
+          return true;
+        });
+
+    EmitLogRecord(std::move(log_record));
   }
 
   /*** Overloaded methods for KeyValueIterables ***/
@@ -113,18 +178,12 @@ public:
 
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
   void Log(Severity severity,
-           nostd::string_view name,
            nostd::string_view body,
            const T &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
            common::SystemTimestamp timestamp) noexcept
   {
-    Log(severity, name, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id,
-        trace_flags, timestamp);
+    Log(severity, body, common::KeyValueIterableView<T>(attributes), timestamp);
   }
 
   void Log(Severity severity,
@@ -141,22 +200,6 @@ public:
                      trace_id, span_id, trace_flags, timestamp);
   }
 
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
-  {
-    return this->Log(severity, name, body,
-                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()},
-                     trace_id, span_id, trace_flags, timestamp);
-  }
-
   /** Wrapper methods that the user could call for convenience when logging **/
 
   /**
@@ -166,13 +209,9 @@ public:
    */
   void Log(Severity severity, nostd::string_view message) noexcept
   {
-    this->Log(severity, message, {}, {}, {}, {}, std::chrono::system_clock::now());
-  }
-
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Log(Severity severity, nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(severity, name, message, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message,
+              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{},
+              std::chrono::system_clock::now());
   }
 
   /**
@@ -184,7 +223,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity, const T &attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", attributes, std::chrono::system_clock::now());
   }
 
   /**
@@ -197,7 +236,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity, nostd::string_view message, const T &attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, std::chrono::system_clock::now());
   }
 
   /**
@@ -209,7 +248,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", attributes, std::chrono::system_clock::now());
   }
 
   /**
@@ -223,7 +262,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, std::chrono::system_clock::now());
   }
 
   /**
@@ -234,7 +273,7 @@ public:
    */
   void Log(Severity severity, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", attributes, std::chrono::system_clock::now());
   }
 
   /**
@@ -248,7 +287,7 @@ public:
            nostd::string_view message,
            const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, message, attributes, std::chrono::system_clock::now());
   }
 
   /** Trace severity overloads **/
@@ -258,17 +297,6 @@ public:
    * @param message The message to log
    */
   void Trace(nostd::string_view message) noexcept { this->Log(Severity::kTrace, message); }
-
-  /**
-   * Writes a log with a severity of trace.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Trace(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kTrace, name, message);
-  }
 
   /**
    * Writes a log with a severity of trace.
@@ -325,17 +353,6 @@ public:
 
   /**
    * Writes a log with a severity of debug.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Debug(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kDebug, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of debug.
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
@@ -386,17 +403,6 @@ public:
    * @param message The message to log
    */
   void Info(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
-
-  /**
-   * Writes a log with a severity of info.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Info(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kInfo, name, message);
-  }
 
   /**
    * Writes a log with a severity of info.
@@ -453,17 +459,6 @@ public:
 
   /**
    * Writes a log with a severity of warn.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Warn(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kWarn, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of warn.
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
@@ -517,17 +512,6 @@ public:
 
   /**
    * Writes a log with a severity of error.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Error(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kError, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of error.
    * @param attributes The attributes of the log as a key/value object
    */
   template <class T,
@@ -578,17 +562,6 @@ public:
    * @param message The message to log
    */
   void Fatal(nostd::string_view message) noexcept { this->Log(Severity::kFatal, message); }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Fatal(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kFatal, name, message);
-  }
 
   /**
    * Writes a log with a severity of fatal.

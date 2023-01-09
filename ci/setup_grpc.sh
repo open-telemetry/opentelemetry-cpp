@@ -6,7 +6,7 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
-new_grpc_version='v1.48.1'
+new_grpc_version='v1.49.2'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 install_grpc_version=${new_grpc_version}

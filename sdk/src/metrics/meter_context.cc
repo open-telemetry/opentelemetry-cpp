@@ -45,12 +45,12 @@ bool MeterContext::ForEachMeter(
 nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
   // no lock required, as this is called by MeterProvider in thread-safe manner.
-  return nostd::span<std::shared_ptr<Meter>>{meters_};
+  return nostd::span<std::shared_ptr<Meter>>{meters_.data(), meters_.size()};
 }
 
 nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept
 {
-  return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_);
+  return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_.data(), collectors_.size());
 }
 
 opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept

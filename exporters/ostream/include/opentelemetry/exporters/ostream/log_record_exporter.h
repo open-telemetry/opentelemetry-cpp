@@ -7,7 +7,7 @@
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/log_record.h"
+
 #  include "opentelemetry/version.h"
 
 #  include <iostream>
@@ -54,6 +54,9 @@ private:
   bool isShutdown() const noexcept;
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
+      const std::string prefix = "\n\t");
+  void printAttributes(
+      const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &map,
       const std::string prefix = "\n\t");
 };
 }  // namespace logs

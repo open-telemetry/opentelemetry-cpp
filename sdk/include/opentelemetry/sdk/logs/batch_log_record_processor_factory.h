@@ -5,6 +5,8 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <memory>
+
 #  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
@@ -25,8 +27,8 @@ public:
   /**
    * Create a BatchLogRecordProcessor.
    */
-  std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter,
-                                             const BatchLogRecordProcessorOptions &options);
+  static std::unique_ptr<LogRecordProcessor> Create(std::unique_ptr<LogRecordExporter> &&exporter,
+                                                    const BatchLogRecordProcessorOptions &options);
 };
 
 }  // namespace logs
