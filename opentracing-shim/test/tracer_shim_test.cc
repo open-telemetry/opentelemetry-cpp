@@ -71,7 +71,7 @@ TEST_F(TracerShimTest, SpanParentChildRelationship)
   ASSERT_NE(span_shim1, span_shim2);
   ASSERT_EQ(span_shim1->context().ToSpanID(), span_shim2->context().ToSpanID());
   ASSERT_EQ(span_shim1->context().ToTraceID(), span_shim2->context().ToTraceID());
-  
+
   auto span_context_shim1 = dynamic_cast<const shim::SpanContextShim*>(&span_shim1->context());
   auto span_context_shim2 = dynamic_cast<const shim::SpanContextShim*>(&span_shim2->context());
   ASSERT_TRUE(span_context_shim1 != nullptr);

@@ -103,7 +103,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
   auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-  
+
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
@@ -119,7 +119,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
   auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-  
+
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
@@ -136,7 +136,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
   auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-  
+
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
@@ -157,7 +157,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_FirstInList)
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
     trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
   auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-  
+
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
@@ -237,11 +237,11 @@ TEST(ShimUtilsTest, MakeBaggage_EmptyRefs)
 TEST(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), 
+    trace_api::SpanContext::GetInvalid(),
     baggage::Baggage::GetDefault()->Set("test", "foo")->Set("test1", "hello")));
   auto span_context1 = static_cast<opentracing::SpanContext*>(span_context_shim1.get());
   auto span_context_shim2 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), 
+    trace_api::SpanContext::GetInvalid(),
     baggage::Baggage::GetDefault()->Set("test", "bar")->Set("test2", "world")));
   auto span_context2 = static_cast<opentracing::SpanContext*>(span_context_shim2.get());
 

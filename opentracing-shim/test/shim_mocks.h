@@ -68,7 +68,7 @@ struct MockSpan final : public trace_api::Span
 
   void AddEvent(nostd::string_view name) noexcept override {}
 
-  void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override 
+  void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override
   {
     status_ = {code, description.data()};
   }

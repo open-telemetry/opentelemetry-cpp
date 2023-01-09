@@ -113,15 +113,15 @@ class LinksIterable final : public opentelemetry::trace::SpanContextKeyValueIter
 public:
   using RefsList = std::vector<std::pair<opentracing::SpanReferenceType, const opentracing::SpanContext*>>;
   explicit LinksIterable(const RefsList& refs) noexcept : refs_(refs) {}
-  
-  bool ForEachKeyValue(nostd::function_ref<bool(opentelemetry::trace::SpanContext, 
+
+  bool ForEachKeyValue(nostd::function_ref<bool(opentelemetry::trace::SpanContext,
                                                 const opentelemetry::common::KeyValueIterable&)>
                                                 callback) const noexcept override
   {
     using opentracing::SpanReferenceType;
     using namespace opentelemetry::trace::SemanticConventions;
     using LinksList = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
-    
+
     for (const auto& entry : refs_)
     {
       auto context_shim = dynamic_cast<const SpanContextShim*>(entry.second);
@@ -138,7 +138,7 @@ public:
 
       if (context_shim && !span_kind.empty())
       {
-        if (!callback(context_shim->context(), 
+        if (!callback(context_shim->context(),
                       opentelemetry::common::KeyValueIterableView<LinksList>(
                         {{ kOpentracingRefType, span_kind }})))
           return false;

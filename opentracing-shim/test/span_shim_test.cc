@@ -120,7 +120,7 @@ TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
   std::vector<std::string> values;
   int thread_count = 100;
 
-  for (int index = 0; index < thread_count; ++index) 
+  for (int index = 0; index < thread_count; ++index)
   {
     keys.emplace_back("key-" + std::to_string(index));
     values.emplace_back("value-" + std::to_string(index));
@@ -132,7 +132,7 @@ TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
     thread.join();
   }
 
-  for (int index = 0; index < thread_count; ++index) 
+  for (int index = 0; index < thread_count; ++index)
   {
     ASSERT_EQ(span_shim.BaggageItem(keys[index]), values[index]);
   }

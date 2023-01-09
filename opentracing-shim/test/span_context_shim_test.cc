@@ -76,7 +76,7 @@ TEST_F(SpanContextShimTest, ForeachBaggageItem)
   ASSERT_EQ(concatenated.size(), 3);
   ASSERT_EQ(concatenated[0], "foo:bar");
   ASSERT_EQ(concatenated[1], "bar:baz");
-  ASSERT_EQ(concatenated[2], "baz:foo"); 
+  ASSERT_EQ(concatenated[2], "baz:foo");
 }
 
 TEST_F(SpanContextShimTest, Clone)

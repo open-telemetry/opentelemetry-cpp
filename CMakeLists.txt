@@ -170,7 +170,7 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
-option(WITH_OPENTRACING "Whether to include the Opentracing shim" ON)
+option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 
 set(OTELCPP_PROTO_PATH
     ""
