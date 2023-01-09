@@ -40,7 +40,7 @@ public:
    * @returns the newly merged Resource.
    */
 
-  Resource Merge(const Resource &other) noexcept;
+  Resource Merge(const Resource &other) const noexcept;
 
   /**
    * Returns a newly created Resource with the specified attributes.
