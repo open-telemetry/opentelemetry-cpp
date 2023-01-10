@@ -94,10 +94,9 @@ enum class SessionState
   Cancelled            // (manually) cancelled
 };
 
-using Byte           = uint8_t;
-using StatusCode     = uint16_t;
-using Body           = std::vector<Byte>;
-using SSLCertificate = std::vector<Byte>;
+using Byte       = uint8_t;
+using StatusCode = uint16_t;
+using Body       = std::vector<Byte>;
 
 struct cmp_ic
 {
@@ -272,8 +271,6 @@ public:
   virtual void OnResponse(Response &) noexcept = 0;
 
   virtual void OnEvent(SessionState, nostd::string_view) noexcept = 0;
-
-  virtual void OnConnecting(const SSLCertificate &) noexcept {}
 
   virtual ~EventHandler() = default;
 };

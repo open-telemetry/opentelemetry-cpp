@@ -285,6 +285,9 @@ private:
   // The configuration options associated with this HTTP client.
   const OtlpHttpClientOptions options_;
 
+  /** SSL options. */
+  ext::http::client::HttpSslOptions ssl_options_;
+
   // Object that stores the HTTP sessions that have been created
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
 
