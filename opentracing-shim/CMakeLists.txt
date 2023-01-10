@@ -5,18 +5,20 @@ add_library(${this_target} src/span_shim.cc src/span_context_shim.cc
 
 set_target_properties(${this_target} PROPERTIES EXPORT_NAME opentracing_shim)
 
+target_include_directories(
+  ${this_target} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+                        "$<INSTALL_INTERFACE:include>")
+
 if(OPENTRACING_DIR)
   include_directories(
     "${CMAKE_BINARY_DIR}/${OPENTRACING_DIR}/include"
     "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/include"
     "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/3rd_party/include")
+  target_link_libraries(${this_target} opentelemetry_api opentracing)
+else()
+  target_link_libraries(${this_target} opentelemetry_api
+                        OpenTracing::opentracing)
 endif()
-
-target_include_directories(
-  ${this_target} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-                        "$<INSTALL_INTERFACE:include>")
-
-target_link_libraries(${this_target} PUBLIC opentelemetry_api)
 
 install(
   TARGETS ${this_target}
