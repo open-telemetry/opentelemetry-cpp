@@ -99,7 +99,6 @@ TEST(PropagationTest, TextMapWriter_Set)
   tester.Set("foo", "bar");
   tester.Set("bar", "baz");
   tester.Set("baz", "foo");
-  ASSERT_FALSE(text_map.empty());
   ASSERT_EQ(text_map.size(), 3);
   ASSERT_EQ(text_map["foo"], "bar");
   ASSERT_EQ(text_map["bar"], "baz");

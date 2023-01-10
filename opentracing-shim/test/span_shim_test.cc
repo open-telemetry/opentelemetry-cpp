@@ -47,6 +47,10 @@ TEST_F(SpanShimTest, HandleError)
   ASSERT_EQ(mock_span->status_.first, trace_api::StatusCode::kOk);
   span_shim->handleError(nullptr);
   ASSERT_EQ(mock_span->status_.first, trace_api::StatusCode::kUnset);
+  span_shim->handleError("unknown");
+  ASSERT_EQ(mock_span->status_.first, trace_api::StatusCode::kUnset);
+  span_shim->handleError(42);
+  ASSERT_EQ(mock_span->status_.first, trace_api::StatusCode::kUnset);
 }
 
 TEST_F(SpanShimTest, FinishWithOptions)
@@ -79,6 +83,8 @@ TEST_F(SpanShimTest, SetTag_Error)
   span_shim->SetTag("error", true);
   ASSERT_NE(mock_span->attribute_.first, "error");
   span_shim->SetTag("error", "false");
+  ASSERT_NE(mock_span->attribute_.first, "error");
+  span_shim->SetTag("error", 42);
   ASSERT_NE(mock_span->attribute_.first, "error");
   span_shim->SetTag("error", nullptr);
   ASSERT_NE(mock_span->attribute_.first, "error");
@@ -174,7 +180,7 @@ TEST_F(SpanShimTest, Log_Event)
 
   auto logtime = opentracing::SystemTime::time_point::clock::now();
   std::initializer_list<std::pair<opentracing::string_view, opentracing::Value>> fields{
-      {"event", "test!"},
+      {"event", "normal"},
       {"foo", opentracing::string_view{"bar"}},
       {"error.kind", 42},
       {"message", "hello"},
@@ -182,10 +188,10 @@ TEST_F(SpanShimTest, Log_Event)
   span_shim->Log(logtime, fields);
   std::tie(name, timestamp, attributes) = mock_span->event_;
 
-  ASSERT_EQ(name, "test!");
+  ASSERT_EQ(name, "normal");
   ASSERT_EQ(timestamp, common::SystemTimestamp{logtime});
   ASSERT_EQ(attributes.size(), 5);
-  ASSERT_STREQ(nostd::get<const char *>(attributes["event"]), "test!");
+  ASSERT_STREQ(nostd::get<const char *>(attributes["event"]), "normal");
   ASSERT_EQ(nostd::get<nostd::string_view>(attributes["foo"]), nostd::string_view{"bar"});
   ASSERT_EQ(nostd::get<int64_t>(attributes["error.kind"]), 42);
   ASSERT_STREQ(nostd::get<const char *>(attributes["message"]), "hello");
