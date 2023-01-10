@@ -152,7 +152,8 @@ endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
-option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" OFF)
+option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
+       OFF)
 
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
@@ -351,8 +352,7 @@ endif()
 # Do we need HTTP CLIENT CURL ?
 #
 
-if(WITH_OTLP_HTTP
-  OR WITH_HTTP_EXAMPLES)
+if(WITH_OTLP_HTTP OR WITH_EXAMPLES_HTTP)
   set(WITH_HTTP_CLIENT_CURL ON)
 else()
   set(WITH_HTTP_CLIENT_CURL OFF)
