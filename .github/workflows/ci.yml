@@ -489,7 +489,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh format
 
-
   windows:
     name: CMake -> exporter proto
     runs-on: windows-2019
