@@ -34,6 +34,7 @@
 
 # nlohmann_json package is required for most SDK build configurations
 find_package(nlohmann_json QUIET)
+set(nlohmann_json_clone FALSE)
 if(nlohmann_json_FOUND)
   message(STATUS "nlohmann::json dependency satisfied by: package")
 elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
@@ -56,6 +57,7 @@ else()
       set(nlohmann-json "develop")
   endif()
   message(STATUS "nlohmann::json dependency satisfied by: github download")
+  set(nlohmann_json_clone TRUE)
   include(ExternalProject)
   ExternalProject_Add(nlohmann_json_download
       PREFIX third_party
