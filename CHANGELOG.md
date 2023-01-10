@@ -26,6 +26,8 @@ Increment the:
   [1871](https://github.com/open-telemetry/opentelemetry-cpp/pull/1871)
 * [BUILD] Migrate from @bazel_tools//platforms to [Bazel Platforms](https://github.com/bazelbuild/platforms)
   to enable Bazel 6.0.0 compatibility [#1873](https://github.com/open-telemetry/opentelemetry-cpp/pull/1873)
+* [BUILD] Cleanup CMake makefiles for nlohmann_json
+  [#1912](https://github.com/open-telemetry/opentelemetry-cpp/pull/1912)
 
 ## [1.8.1] 2022-12-04
 
