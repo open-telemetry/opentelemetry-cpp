@@ -20,8 +20,6 @@
 #include "opentracing/tracer.h"
 #include "opentracing/value.h"
 
-#include <iostream>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim::utils
 {
@@ -36,7 +34,7 @@ static inline opentelemetry::common::AttributeValue attributeFromValue(const ope
     AttributeValue operator()(double v) { return v; }
     AttributeValue operator()(int64_t v) { return v; }
     AttributeValue operator()(uint64_t v) { return v; }
-    AttributeValue operator()(const std::string& v) { return v.c_str(); }
+    AttributeValue operator()(const std::string& v) { return nostd::string_view{}; }
     AttributeValue operator()(opentracing::string_view v) { return nostd::string_view{v.data()}; }
     AttributeValue operator()(std::nullptr_t) { return nostd::string_view{}; }
     AttributeValue operator()(const char* v) { return v; }
@@ -154,7 +152,7 @@ private:
   const RefsList& refs_;
 };
 
-static const LinksIterable makeIterableLinks(const opentracing::StartSpanOptions& options) noexcept
+static LinksIterable makeIterableLinks(const opentracing::StartSpanOptions& options) noexcept
 {
   return LinksIterable(options.references);
 }
@@ -179,7 +177,7 @@ private:
   const std::vector<std::pair<std::string, opentracing::Value>>& tags_;
 };
 
-static const TagsIterable makeIterableTags(const opentracing::StartSpanOptions& options) noexcept
+static TagsIterable makeIterableTags(const opentracing::StartSpanOptions& options) noexcept
 {
   return TagsIterable(options.tags);
 }

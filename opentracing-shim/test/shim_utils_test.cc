@@ -72,8 +72,8 @@ TEST(ShimUtilsTest, AttributeFromValue)
   ASSERT_EQ(nostd::get<uint64_t>(value), 55ul);
 
   value = shim::utils::attributeFromValue(std::string{"a string"});
-  ASSERT_EQ(value.index(), common::AttributeType::kTypeCString);
-  ASSERT_STREQ(nostd::get<const char *>(value), "a string");
+  ASSERT_EQ(value.index(), common::AttributeType::kTypeString);
+  ASSERT_EQ(nostd::get<nostd::string_view>(value), nostd::string_view{});
 
   value = shim::utils::attributeFromValue(opentracing::string_view{"a string view"});
   ASSERT_EQ(value.index(), common::AttributeType::kTypeString);
@@ -85,7 +85,7 @@ TEST(ShimUtilsTest, AttributeFromValue)
 
   value = shim::utils::attributeFromValue("a char ptr");
   ASSERT_EQ(value.index(), common::AttributeType::kTypeCString);
-  ASSERT_STREQ(nostd::get<const char *>(value), "a char ptr");
+  ASSERT_EQ(nostd::get<const char *>(value), "a char ptr");
 
   opentracing::util::recursive_wrapper<opentracing::Values> values{};
   value = shim::utils::attributeFromValue(values.get());
@@ -100,10 +100,6 @@ TEST(ShimUtilsTest, AttributeFromValue)
 
 TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
 {
-  auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
@@ -116,10 +112,6 @@ TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
 
 TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
 {
-  auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
-
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
