@@ -24,4 +24,7 @@ add_subdirectory(batch)
 add_subdirectory(metrics_simple)
 add_subdirectory(multithreaded)
 add_subdirectory(multi_processor)
-add_subdirectory(http)
+
+if(WITH_EXAMPLES_HTTP)
+  add_subdirectory(http)
+endif()

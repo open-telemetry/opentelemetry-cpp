@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.1)
 
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
@@ -148,6 +151,9 @@ if(WITH_STL)
 endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+
+option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -194,6 +200,7 @@ option(
   "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
+option(WITH_EXAMPLES_HTTP "Whether to build http client/server examples" ON)
 
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
@@ -314,21 +321,46 @@ if(WITH_OTLP)
     endif()
   endif()
   include(CMakeDependentOption)
-  if(WITH_OTLP_HTTP OR (NOT DEFINED WITH_OTLP_HTTP AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_HTTP}))
-    find_package(CURL)
-  endif()
 
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
     "gRPC_FOUND" OFF)
-  cmake_dependent_option(
-    WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
-    "CURL_FOUND" OFF)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
 endif()
+
+#
+# Do we need CURL ?
+#
+
+if(WITH_ZIPKIN
+   OR WITH_OTLP_HTTP
+   OR WITH_EXAMPLES_HTTP
+   OR BUILD_W3CTRACECONTEXT_TEST)
+  set(USE_CURL ON)
+else()
+  set(USE_CURL OFF)
+endif()
+
+if((NOT WITH_API_ONLY) AND USE_CURL)
+  find_package(CURL REQUIRED)
+endif()
+
+#
+# Do we need HTTP CLIENT CURL ?
+#
+
+if(WITH_OTLP_HTTP
+  OR WITH_HTTP_EXAMPLES)
+  set(WITH_HTTP_CLIENT_CURL ON)
+else()
+  set(WITH_HTTP_CLIENT_CURL OFF)
+endif()
+
+#
+# Do we need NLOHMANN_JSON ?
+#
 
 if(WITH_ELASTICSEARCH
    OR WITH_ZIPKIN
