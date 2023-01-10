@@ -25,7 +25,7 @@ TEST(ShimUtilsTest, IsBaggageEmpty)
   auto empty = nostd::shared_ptr<baggage::Baggage>(new baggage::Baggage({}));
   ASSERT_TRUE(shim::utils::isBaggageEmpty(empty));
 
-  std::map<std::string, std::string> list{{ "foo", "bar" }};
+  std::map<std::string, std::string> list{{"foo", "bar"}};
   auto non_empty = nostd::shared_ptr<baggage::Baggage>(new baggage::Baggage(list));
   ASSERT_FALSE(shim::utils::isBaggageEmpty(non_empty));
 }
@@ -38,7 +38,8 @@ TEST(ShimUtilsTest, StringFromValue)
   ASSERT_EQ(shim::utils::stringFromValue(42l), "42");
   ASSERT_EQ(shim::utils::stringFromValue(55ul), "55");
   ASSERT_EQ(shim::utils::stringFromValue(std::string{"a string"}), "a string");
-  ASSERT_EQ(shim::utils::stringFromValue(opentracing::string_view{"a string view"}), "a string view");
+  ASSERT_EQ(shim::utils::stringFromValue(opentracing::string_view{"a string view"}),
+            "a string view");
   ASSERT_EQ(shim::utils::stringFromValue(nullptr), "");
   ASSERT_EQ(shim::utils::stringFromValue("a char ptr"), "a char ptr");
 
@@ -105,9 +106,12 @@ TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
 
   auto options_shim = shim::utils::makeOptionsShim(options);
-  ASSERT_EQ(options_shim.start_system_time, common::SystemTimestamp{options.start_system_timestamp});
-  ASSERT_EQ(options_shim.start_steady_time, common::SteadyTimestamp{options.start_steady_timestamp});
-  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), trace_api::SpanContext::GetInvalid());
+  ASSERT_EQ(options_shim.start_system_time,
+            common::SystemTimestamp{options.start_system_timestamp});
+  ASSERT_EQ(options_shim.start_steady_time,
+            common::SteadyTimestamp{options.start_steady_timestamp});
+  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent),
+            trace_api::SpanContext::GetInvalid());
 }
 
 TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
@@ -115,79 +119,80 @@ TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
-  options.references = {{ opentracing::SpanReferenceType::FollowsFromRef, nullptr }};
+  options.references             = {{opentracing::SpanReferenceType::FollowsFromRef, nullptr}};
 
   auto options_shim = shim::utils::makeOptionsShim(options);
-  ASSERT_EQ(options_shim.start_system_time, common::SystemTimestamp{options.start_system_timestamp});
-  ASSERT_EQ(options_shim.start_steady_time, common::SteadyTimestamp{options.start_steady_timestamp});
-  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), trace_api::SpanContext::GetInvalid());
+  ASSERT_EQ(options_shim.start_system_time,
+            common::SystemTimestamp{options.start_system_timestamp});
+  ASSERT_EQ(options_shim.start_steady_time,
+            common::SteadyTimestamp{options.start_steady_timestamp});
+  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent),
+            trace_api::SpanContext::GetInvalid());
 }
 
 TEST(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
+      trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
+  auto span_context      = static_cast<opentracing::SpanContext *>(span_context_shim.get());
 
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
-  options.references = {
-    { opentracing::SpanReferenceType::FollowsFromRef, nullptr },
-    { opentracing::SpanReferenceType::ChildOfRef, span_context },
-    { opentracing::SpanReferenceType::ChildOfRef, nullptr }
-  };
+  options.references             = {{opentracing::SpanReferenceType::FollowsFromRef, nullptr},
+                        {opentracing::SpanReferenceType::ChildOfRef, span_context},
+                        {opentracing::SpanReferenceType::ChildOfRef, nullptr}};
 
   auto options_shim = shim::utils::makeOptionsShim(options);
-  ASSERT_EQ(options_shim.start_system_time, common::SystemTimestamp{options.start_system_timestamp});
-  ASSERT_EQ(options_shim.start_steady_time, common::SteadyTimestamp{options.start_steady_timestamp});
+  ASSERT_EQ(options_shim.start_system_time,
+            common::SystemTimestamp{options.start_system_timestamp});
+  ASSERT_EQ(options_shim.start_steady_time,
+            common::SteadyTimestamp{options.start_steady_timestamp});
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), span_context_shim->context());
 }
 
 TEST(ShimUtilsTest, MakeOptionsShim_FirstInList)
 {
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context = static_cast<opentracing::SpanContext*>(span_context_shim.get());
+      trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
+  auto span_context      = static_cast<opentracing::SpanContext *>(span_context_shim.get());
 
   opentracing::StartSpanOptions options;
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
-  options.references = {
-    { opentracing::SpanReferenceType::FollowsFromRef, span_context },
-    { opentracing::SpanReferenceType::FollowsFromRef, nullptr }
-  };
+  options.references             = {{opentracing::SpanReferenceType::FollowsFromRef, span_context},
+                        {opentracing::SpanReferenceType::FollowsFromRef, nullptr}};
 
   auto options_shim = shim::utils::makeOptionsShim(options);
-  ASSERT_EQ(options_shim.start_system_time, common::SystemTimestamp{options.start_system_timestamp});
-  ASSERT_EQ(options_shim.start_steady_time, common::SteadyTimestamp{options.start_steady_timestamp});
+  ASSERT_EQ(options_shim.start_system_time,
+            common::SystemTimestamp{options.start_system_timestamp});
+  ASSERT_EQ(options_shim.start_steady_time,
+            common::SteadyTimestamp{options.start_steady_timestamp});
   ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent), span_context_shim->context());
 }
 
 TEST(ShimUtilsTest, MakeIterableLinks)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context1 = static_cast<opentracing::SpanContext*>(span_context_shim1.get());
+      trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
+  auto span_context1      = static_cast<opentracing::SpanContext *>(span_context_shim1.get());
   auto span_context_shim2 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
-  auto span_context2 = static_cast<opentracing::SpanContext*>(span_context_shim2.get());
+      trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
+  auto span_context2      = static_cast<opentracing::SpanContext *>(span_context_shim2.get());
 
   opentracing::StartSpanOptions options;
   auto empty = shim::utils::makeIterableLinks(options);
   ASSERT_EQ(empty.size(), 0);
 
-  options.references = {
-    { opentracing::SpanReferenceType::FollowsFromRef, nullptr },
-    { opentracing::SpanReferenceType::FollowsFromRef, span_context1 },
-    { opentracing::SpanReferenceType::ChildOfRef, span_context2 }
-  };
-  auto full = shim::utils::makeIterableLinks(options);
+  options.references = {{opentracing::SpanReferenceType::FollowsFromRef, nullptr},
+                        {opentracing::SpanReferenceType::FollowsFromRef, span_context1},
+                        {opentracing::SpanReferenceType::ChildOfRef, span_context2}};
+  auto full          = shim::utils::makeIterableLinks(options);
   ASSERT_EQ(full.size(), 3);
 
   std::vector<std::tuple<trace_api::SpanContext, nostd::string_view, common::AttributeValue>> links;
-  full.ForEachKeyValue([&links](trace_api::SpanContext ctx, const common::KeyValueIterable& it){
-    it.ForEachKeyValue([&links, &ctx](nostd::string_view key, common::AttributeValue value){
+  full.ForEachKeyValue([&links](trace_api::SpanContext ctx, const common::KeyValueIterable &it) {
+    it.ForEachKeyValue([&links, &ctx](nostd::string_view key, common::AttributeValue value) {
       links.emplace_back(ctx, key, value);
       return false;
     });
@@ -215,9 +220,9 @@ TEST(ShimUtilsTest, MakeBaggage_EmptyRefs)
   ASSERT_TRUE(baggage->GetValue("foo", value));
   ASSERT_EQ(value, "bar");
 
-  auto context = context::RuntimeContext::GetCurrent();
+  auto context     = context::RuntimeContext::GetCurrent();
   auto new_context = baggage::SetBaggage(context, baggage);
-  auto token = context::RuntimeContext::Attach(new_context);
+  auto token       = context::RuntimeContext::Attach(new_context);
   ASSERT_EQ(context::RuntimeContext::GetCurrent(), new_context);
 
   opentracing::StartSpanOptions options;
@@ -229,19 +234,17 @@ TEST(ShimUtilsTest, MakeBaggage_EmptyRefs)
 TEST(ShimUtilsTest, MakeBaggage_NonEmptyRefs)
 {
   auto span_context_shim1 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(),
-    baggage::Baggage::GetDefault()->Set("test", "foo")->Set("test1", "hello")));
-  auto span_context1 = static_cast<opentracing::SpanContext*>(span_context_shim1.get());
+      trace_api::SpanContext::GetInvalid(),
+      baggage::Baggage::GetDefault()->Set("test", "foo")->Set("test1", "hello")));
+  auto span_context1      = static_cast<opentracing::SpanContext *>(span_context_shim1.get());
   auto span_context_shim2 = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
-    trace_api::SpanContext::GetInvalid(),
-    baggage::Baggage::GetDefault()->Set("test", "bar")->Set("test2", "world")));
-  auto span_context2 = static_cast<opentracing::SpanContext*>(span_context_shim2.get());
+      trace_api::SpanContext::GetInvalid(),
+      baggage::Baggage::GetDefault()->Set("test", "bar")->Set("test2", "world")));
+  auto span_context2      = static_cast<opentracing::SpanContext *>(span_context_shim2.get());
 
   opentracing::StartSpanOptions options;
-  options.references = {
-    { opentracing::SpanReferenceType::FollowsFromRef, span_context1 },
-    { opentracing::SpanReferenceType::ChildOfRef, span_context2 }
-  };
+  options.references = {{opentracing::SpanReferenceType::FollowsFromRef, span_context1},
+                        {opentracing::SpanReferenceType::ChildOfRef, span_context2}};
 
   auto baggage = shim::utils::makeBaggage(options);
   std::string value;
@@ -259,12 +262,12 @@ TEST(ShimUtilsTest, MakeIterableTags)
   auto empty = shim::utils::makeIterableTags(options);
   ASSERT_EQ(empty.size(), 0);
 
-  options.tags = {{ "foo", 42.0 }, { "bar", true }, { "baz", "test" }};
-  auto full = shim::utils::makeIterableTags(options);
+  options.tags = {{"foo", 42.0}, {"bar", true}, {"baz", "test"}};
+  auto full    = shim::utils::makeIterableTags(options);
   ASSERT_EQ(full.size(), 3);
 
   std::vector<std::pair<nostd::string_view, common::AttributeValue>> attributes;
-  full.ForEachKeyValue([&attributes](nostd::string_view key, common::AttributeValue value){
+  full.ForEachKeyValue([&attributes](nostd::string_view key, common::AttributeValue value) {
     attributes.push_back({key, value});
     return true;
   });
@@ -273,5 +276,5 @@ TEST(ShimUtilsTest, MakeIterableTags)
   ASSERT_EQ(attributes[1].first, "bar");
   ASSERT_TRUE(nostd::get<bool>(attributes[1].second));
   ASSERT_EQ(attributes[2].first, "baz");
-  ASSERT_STREQ(nostd::get<const char *>(attributes[2].second), "test" );
+  ASSERT_STREQ(nostd::get<const char *>(attributes[2].second), "test");
 }

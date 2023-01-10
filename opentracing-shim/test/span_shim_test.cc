@@ -19,24 +19,20 @@ class SpanShimTest : public testing::Test
 {
 public:
   nostd::unique_ptr<shim::SpanShim> span_shim;
-  MockSpan* mock_span;
+  MockSpan *mock_span;
 
 protected:
   virtual void SetUp()
   {
-    mock_span = new MockSpan();
-    auto span = nostd::shared_ptr<trace_api::Span>(mock_span);
-    auto tracer = shim::TracerShim::createTracerShim();
-    auto tracer_shim = dynamic_cast<shim::TracerShim*>(tracer.get());
-    auto baggage = baggage::Baggage::GetDefault()->Set("baggage", "item");
-    span_shim = nostd::unique_ptr<shim::SpanShim>(
-      new shim::SpanShim(*tracer_shim, span, baggage));
+    mock_span        = new MockSpan();
+    auto span        = nostd::shared_ptr<trace_api::Span>(mock_span);
+    auto tracer      = shim::TracerShim::createTracerShim();
+    auto tracer_shim = dynamic_cast<shim::TracerShim *>(tracer.get());
+    auto baggage     = baggage::Baggage::GetDefault()->Set("baggage", "item");
+    span_shim = nostd::unique_ptr<shim::SpanShim>(new shim::SpanShim(*tracer_shim, span, baggage));
   }
 
-  virtual void TearDown()
-  {
-    span_shim.reset();
-  }
+  virtual void TearDown() { span_shim.reset(); }
 };
 
 TEST_F(SpanShimTest, HandleError)
@@ -109,10 +105,10 @@ TEST_F(SpanShimTest, SetBaggageItem)
 
 TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
 {
-  auto span = nostd::shared_ptr<trace_api::Span>(new MockSpan());
-  auto tracer = shim::TracerShim::createTracerShim();
-  auto tracer_shim = dynamic_cast<shim::TracerShim*>(tracer.get());
-  auto baggage = baggage::Baggage::GetDefault();
+  auto span        = nostd::shared_ptr<trace_api::Span>(new MockSpan());
+  auto tracer      = shim::TracerShim::createTracerShim();
+  auto tracer_shim = dynamic_cast<shim::TracerShim *>(tracer.get());
+  auto baggage     = baggage::Baggage::GetDefault();
   shim::SpanShim span_shim(*tracer_shim, span, baggage);
 
   std::vector<std::thread> threads;
@@ -124,10 +120,11 @@ TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
   {
     keys.emplace_back("key-" + std::to_string(index));
     values.emplace_back("value-" + std::to_string(index));
-    threads.emplace_back(std::bind(&shim::SpanShim::SetBaggageItem, &span_shim, keys[index], values[index]));
+    threads.emplace_back(
+        std::bind(&shim::SpanShim::SetBaggageItem, &span_shim, keys[index], values[index]));
   }
 
-  for (auto& thread : threads)
+  for (auto &thread : threads)
   {
     thread.join();
   }
@@ -177,8 +174,11 @@ TEST_F(SpanShimTest, Log_Event)
 
   auto logtime = opentracing::SystemTime::time_point::clock::now();
   std::initializer_list<std::pair<opentracing::string_view, opentracing::Value>> fields{
-    {"event", "test!"}, {"foo", opentracing::string_view{"bar"}},
-    {"error.kind", 42}, {"message","hello"}, {"stack","overflow"}};
+      {"event", "test!"},
+      {"foo", opentracing::string_view{"bar"}},
+      {"error.kind", 42},
+      {"message", "hello"},
+      {"stack", "overflow"}};
   span_shim->Log(logtime, fields);
   std::tie(name, timestamp, attributes) = mock_span->event_;
 
@@ -200,8 +200,11 @@ TEST_F(SpanShimTest, Log_Error)
 
   auto logtime = opentracing::SystemTime::time_point::clock::now();
   std::vector<std::pair<opentracing::string_view, opentracing::Value>> fields{
-    {"event", "error"}, {"foo", opentracing::string_view{"bar"}},
-    {"error.kind", 42}, {"message","hello"}, {"stack","overflow"}};
+      {"event", "error"},
+      {"foo", opentracing::string_view{"bar"}},
+      {"error.kind", 42},
+      {"message", "hello"},
+      {"stack", "overflow"}};
   span_shim->Log(logtime, fields);
   std::tie(name, timestamp, attributes) = mock_span->event_;
 

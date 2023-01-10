@@ -9,23 +9,22 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
 {
 
-SpanContextShim SpanContextShim::newWithKeyValue(nostd::string_view key, nostd::string_view value) const noexcept
+SpanContextShim SpanContextShim::newWithKeyValue(nostd::string_view key,
+                                                 nostd::string_view value) const noexcept
 {
   return SpanContextShim{context_, baggage_->Set(key, value)};
 }
 
-bool SpanContextShim::BaggageItem(nostd::string_view key, std::string& value) const noexcept
+bool SpanContextShim::BaggageItem(nostd::string_view key, std::string &value) const noexcept
 {
   return baggage_->GetValue(key, value);
 }
 
 void SpanContextShim::ForeachBaggageItem(VisitBaggageItem f) const
 {
-  baggage_->GetAllEntries([&f](nostd::string_view key, nostd::string_view value)
-    {
-      return f(key.data(), value.data());
-    }
-  );
+  baggage_->GetAllEntries([&f](nostd::string_view key, nostd::string_view value) {
+    return f(key.data(), value.data());
+  });
 }
 
 std::unique_ptr<opentracing::SpanContext> SpanContextShim::Clone() const noexcept
@@ -43,5 +42,5 @@ std::string SpanContextShim::ToSpanID() const noexcept
   return toHexString(context_.span_id());
 }
 
-} // namespace opentracingshim
+}  // namespace opentracingshim
 OPENTELEMETRY_END_NAMESPACE

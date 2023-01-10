@@ -16,16 +16,17 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
 {
 
-template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapWriter, T>::value, bool> = true>
+template <typename T,
+          nostd::enable_if_t<std::is_base_of<opentracing::TextMapWriter, T>::value, bool> = true>
 class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  CarrierWriterShim(const T& writer) : writer_(writer) {}
+  CarrierWriterShim(const T &writer) : writer_(writer) {}
 
   // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    return "";
+    return "";  // Not required for Opentracing writer
   }
 
   // stores the key-value pair.
@@ -35,14 +36,15 @@ public:
   }
 
 private:
-  const T& writer_;
+  const T &writer_;
 };
 
-template<typename T, nostd::enable_if_t<std::is_base_of<opentracing::TextMapReader, T>::value, bool> = true>
+template <typename T,
+          nostd::enable_if_t<std::is_base_of<opentracing::TextMapReader, T>::value, bool> = true>
 class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  CarrierReaderShim(const T& reader) : reader_(reader) {}
+  CarrierReaderShim(const T &reader) : reader_(reader) {}
 
   // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
@@ -54,18 +56,18 @@ public:
     {
       value = result.value().data();
     }
-    else // Fall back to iterating through all of the keys.
+    else  // Fall back to iterating through all of the keys.
     {
-      reader_.ForeachKey([key, &value]
-        (opentracing::string_view k, opentracing::string_view v) -> opentracing::expected<void> {
-          if (k == key.data())
-          {
-            value = v.data();
-            // Found key, so bail out of the loop with a success error code.
-            return opentracing::make_unexpected(std::error_code{});
-          }
-          return opentracing::make_expected();
-        });
+      reader_.ForeachKey([key, &value](opentracing::string_view k,
+                                       opentracing::string_view v) -> opentracing::expected<void> {
+        if (k == key.data())
+        {
+          value = v.data();
+          // Found key, so bail out of the loop with a success error code.
+          return opentracing::make_unexpected(std::error_code{});
+        }
+        return opentracing::make_expected();
+      });
     }
 
     return value;
@@ -80,17 +82,18 @@ public:
   // list of all the keys in the carrier.
   virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    return reader_.ForeachKey([&callback]
-      (opentracing::string_view key, opentracing::string_view) -> opentracing::expected<void> {
-        return callback(key.data())
-          ? opentracing::make_expected()
-          : opentracing::make_unexpected(std::error_code{});
-      }).has_value();
+    return reader_
+        .ForeachKey([&callback](opentracing::string_view key,
+                                opentracing::string_view) -> opentracing::expected<void> {
+          return callback(key.data()) ? opentracing::make_expected()
+                                      : opentracing::make_unexpected(std::error_code{});
+        })
+        .has_value();
   }
 
 private:
-  const T& reader_;
+  const T &reader_;
 };
 
-} // namespace opentracingshim
+}  // namespace opentracingshim
 OPENTELEMETRY_END_NAMESPACE

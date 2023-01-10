@@ -24,15 +24,12 @@ protected:
   virtual void SetUp()
   {
     auto span_context = trace_api::SpanContext::GetInvalid();
-    auto baggage = baggage::Baggage::GetDefault()->Set("foo", "bar");
-    span_context_shim = nostd::unique_ptr<shim::SpanContextShim>(
-      new shim::SpanContextShim(span_context, baggage));
+    auto baggage      = baggage::Baggage::GetDefault()->Set("foo", "bar");
+    span_context_shim =
+        nostd::unique_ptr<shim::SpanContextShim>(new shim::SpanContextShim(span_context, baggage));
   }
 
-  virtual void TearDown()
-  {
-    span_context_shim.reset();
-  }
+  virtual void TearDown() { span_context_shim.reset(); }
 };
 
 TEST_F(SpanContextShimTest, BaggageItem)
@@ -60,18 +57,17 @@ TEST_F(SpanContextShimTest, NewWithKeyValue)
 
 TEST_F(SpanContextShimTest, ForeachBaggageItem)
 {
-  std::initializer_list<std::pair<std::string,std::string>> list{
-    { "foo", "bar" }, { "bar", "baz" }, { "baz", "foo" }
-  };
+  std::initializer_list<std::pair<std::string, std::string>> list{
+      {"foo", "bar"}, {"bar", "baz"}, {"baz", "foo"}};
   nostd::shared_ptr<baggage::Baggage> baggage(new baggage::Baggage(list));
   shim::SpanContextShim new_span_context_shim(span_context_shim->context(), baggage);
 
   std::vector<std::string> concatenated;
-  new_span_context_shim.ForeachBaggageItem([&concatenated]
-    (const std::string& key, const std::string& value){
-      concatenated.emplace_back(key + ":" + value);
-      return true;
-  });
+  new_span_context_shim.ForeachBaggageItem(
+      [&concatenated](const std::string &key, const std::string &value) {
+        concatenated.emplace_back(key + ":" + value);
+        return true;
+      });
 
   ASSERT_EQ(concatenated.size(), 3);
   ASSERT_EQ(concatenated[0], "foo:bar");
@@ -81,8 +77,8 @@ TEST_F(SpanContextShimTest, ForeachBaggageItem)
 
 TEST_F(SpanContextShimTest, Clone)
 {
-  auto new_span_context = span_context_shim->Clone();
-  auto new_span_context_shim = dynamic_cast<shim::SpanContextShim*>(new_span_context.get());
+  auto new_span_context      = span_context_shim->Clone();
+  auto new_span_context_shim = dynamic_cast<shim::SpanContextShim *>(new_span_context.get());
   ASSERT_TRUE(new_span_context_shim != nullptr);
   ASSERT_NE(span_context_shim.get(), new_span_context_shim);
   ASSERT_EQ(span_context_shim->context(), new_span_context_shim->context());

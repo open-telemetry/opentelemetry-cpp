@@ -5,10 +5,10 @@
 
 #include "shim_mocks.h"
 
-#include "opentelemetry/opentracingshim/tracer_shim.h"
-#include "opentelemetry/opentracingshim/span_shim.h"
-#include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/shim_utils.h"
+#include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/opentracingshim/span_shim.h"
+#include "opentelemetry/opentracingshim/tracer_shim.h"
 
 #include "opentracing/noop.h"
 
@@ -24,30 +24,27 @@ class TracerShimTest : public testing::Test
 {
 public:
   std::shared_ptr<opentracing::Tracer> tracer_shim;
-  MockPropagator* text_map_format;
-  MockPropagator* http_headers_format;
+  MockPropagator *text_map_format;
+  MockPropagator *http_headers_format;
 
 protected:
   virtual void SetUp()
   {
     using context::propagation::TextMapPropagator;
 
-    text_map_format = new MockPropagator();
+    text_map_format     = new MockPropagator();
     http_headers_format = new MockPropagator();
 
-    tracer_shim = shim::TracerShim::createTracerShim(trace_api::Provider::GetTracerProvider(), {
-      .text_map = nostd::shared_ptr<TextMapPropagator>(text_map_format),
-      .http_headers = nostd::shared_ptr<TextMapPropagator>(http_headers_format)
-    });
+    tracer_shim = shim::TracerShim::createTracerShim(
+        trace_api::Provider::GetTracerProvider(),
+        {.text_map     = nostd::shared_ptr<TextMapPropagator>(text_map_format),
+         .http_headers = nostd::shared_ptr<TextMapPropagator>(http_headers_format)});
   }
 
-  virtual void TearDown()
-  {
-    tracer_shim.reset();
-  }
+  virtual void TearDown() { tracer_shim.reset(); }
 };
 
-TEST_F(TracerShimTest, TracerProviderName)
+TEST_F(TracerShimTest, TracerName)
 {
   auto mock_provider_ptr = new MockTracerProvider();
   nostd::shared_ptr<trace_api::TracerProvider> provider(mock_provider_ptr);
@@ -65,15 +62,15 @@ TEST_F(TracerShimTest, SpanReferenceToCreatingTracer)
 TEST_F(TracerShimTest, SpanParentChildRelationship)
 {
   auto span_shim1 = tracer_shim->StartSpan("a");
-  auto span_shim2 = tracer_shim->StartSpan("b", { opentracing::ChildOf(&span_shim1->context()) });
+  auto span_shim2 = tracer_shim->StartSpan("b", {opentracing::ChildOf(&span_shim1->context())});
   ASSERT_NE(span_shim1, nullptr);
   ASSERT_NE(span_shim2, nullptr);
   ASSERT_NE(span_shim1, span_shim2);
   ASSERT_EQ(span_shim1->context().ToSpanID(), span_shim2->context().ToSpanID());
   ASSERT_EQ(span_shim1->context().ToTraceID(), span_shim2->context().ToTraceID());
 
-  auto span_context_shim1 = dynamic_cast<const shim::SpanContextShim*>(&span_shim1->context());
-  auto span_context_shim2 = dynamic_cast<const shim::SpanContextShim*>(&span_shim2->context());
+  auto span_context_shim1 = dynamic_cast<const shim::SpanContextShim *>(&span_shim1->context());
+  auto span_context_shim2 = dynamic_cast<const shim::SpanContextShim *>(&span_shim2->context());
   ASSERT_TRUE(span_context_shim1 != nullptr);
   ASSERT_TRUE(span_context_shim2 != nullptr);
   ASSERT_EQ(span_context_shim1->context(), span_context_shim2->context());
@@ -96,7 +93,7 @@ TEST_F(TracerShimTest, Close)
 TEST_F(TracerShimTest, InjectInvalidCarrier)
 {
   auto span_shim = tracer_shim->StartSpan("a");
-  auto result = tracer_shim->Inject(span_shim->context(), std::cout);
+  auto result    = tracer_shim->Inject(span_shim->context(), std::cout);
   ASSERT_TRUE(opentracing::are_errors_equal(result.error(), opentracing::invalid_carrier_error));
 }
 
@@ -104,9 +101,10 @@ TEST_F(TracerShimTest, InjectNullContext)
 {
   std::unordered_map<std::string, std::string> text_map;
   auto noop_tracer = opentracing::MakeNoopTracer();
-  auto span = noop_tracer->StartSpan("a");
-  auto result = tracer_shim->Inject(span->context(), TextMapCarrier{text_map});
-  ASSERT_TRUE(opentracing::are_errors_equal(result.error(), opentracing::invalid_span_context_error));
+  auto span        = noop_tracer->StartSpan("a");
+  auto result      = tracer_shim->Inject(span->context(), TextMapCarrier{text_map});
+  ASSERT_TRUE(
+      opentracing::are_errors_equal(result.error(), opentracing::invalid_span_context_error));
   ASSERT_TRUE(text_map.empty());
 }
 
@@ -182,7 +180,7 @@ TEST_F(TracerShimTest, ExtractOnlyBaggage)
   auto span_context = tracer_shim->Extract(TextMapCarrier{text_map});
   ASSERT_TRUE(span_context.value() != nullptr);
 
-  auto span_context_shim = dynamic_cast<shim::SpanContextShim*>(span_context.value().get());
+  auto span_context_shim = dynamic_cast<shim::SpanContextShim *>(span_context.value().get());
   ASSERT_TRUE(span_context_shim != nullptr);
   ASSERT_FALSE(span_context_shim->context().IsValid());
   ASSERT_FALSE(shim::utils::isBaggageEmpty(span_context_shim->baggage()));

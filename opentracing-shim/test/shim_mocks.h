@@ -14,8 +14,8 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentracing/propagation.h"
 
-#include <unordered_map>
 #include <tuple>
+#include <unordered_map>
 
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;
@@ -23,14 +23,14 @@ namespace common    = opentelemetry::common;
 namespace context   = opentelemetry::context;
 namespace nostd     = opentelemetry::nostd;
 
-struct MockTracerProvider : public trace_api::TracerProvider
+struct MockTracerProvider final : public trace_api::TracerProvider
 {
   nostd::shared_ptr<trace_api::Tracer> GetTracer(nostd::string_view library_name,
                                                  nostd::string_view,
                                                  nostd::string_view) noexcept override
   {
     library_name_ = std::string{library_name};
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>();
+    return nostd::shared_ptr<trace_api::Tracer>();
   }
 
   std::string library_name_;
@@ -38,33 +38,32 @@ struct MockTracerProvider : public trace_api::TracerProvider
 
 struct MockSpan final : public trace_api::Span
 {
-  void SetAttribute(nostd::string_view key,
-                    const common::AttributeValue& value) noexcept override
+  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
     attribute_ = {key.data(), value};
   }
 
   void AddEvent(nostd::string_view name,
                 common::SystemTimestamp timestamp,
-                const common::KeyValueIterable& attributes) noexcept override
+                const common::KeyValueIterable &attributes) noexcept override
   {
     std::unordered_map<std::string, common::AttributeValue> attribute_map;
     attribute_map.reserve(attributes.size());
-    attributes.ForEachKeyValue([&attribute_map](nostd::string_view key, const common::AttributeValue& value){
-      attribute_map.emplace(key.data(), value);
-      return true;
-    });
+    attributes.ForEachKeyValue(
+        [&attribute_map](nostd::string_view key, const common::AttributeValue &value) {
+          attribute_map.emplace(key.data(), value);
+          return true;
+        });
     event_ = {name.data(), timestamp, attribute_map};
   }
 
   void AddEvent(nostd::string_view name,
-                const common::KeyValueIterable& attributes) noexcept override
+                const common::KeyValueIterable &attributes) noexcept override
   {
     AddEvent(name, {}, attributes);
   }
 
-  void AddEvent(nostd::string_view name,
-                common::SystemTimestamp timestamp) noexcept override {}
+  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override {}
 
   void AddEvent(nostd::string_view name) noexcept override {}
 
@@ -75,14 +74,20 @@ struct MockSpan final : public trace_api::Span
 
   void UpdateName(nostd::string_view name) noexcept override { name_ = name.data(); }
 
-  void End(const trace_api::EndSpanOptions& options) noexcept override { options_ = options; }
+  void End(const trace_api::EndSpanOptions &options) noexcept override { options_ = options; }
 
   bool IsRecording() const noexcept override { return false; }
 
-  trace_api::SpanContext GetContext() const noexcept override { return trace_api::SpanContext(false, false); }
+  trace_api::SpanContext GetContext() const noexcept override
+  {
+    return trace_api::SpanContext(false, false);
+  }
 
   std::pair<std::string, common::AttributeValue> attribute_;
-  std::tuple<std::string, common::SystemTimestamp, std::unordered_map<std::string, common::AttributeValue>> event_;
+  std::tuple<std::string,
+             common::SystemTimestamp,
+             std::unordered_map<std::string, common::AttributeValue>>
+      event_;
   std::pair<trace_api::StatusCode, std::string> status_;
   std::string name_;
   trace_api::EndSpanOptions options_;
@@ -95,12 +100,13 @@ struct MockPropagator : public context::propagation::TextMapPropagator
                            context::Context &context) noexcept override
   {
     std::vector<std::pair<std::string, std::string>> kvs;
-    carrier.Keys([&carrier,&kvs](nostd::string_view k){
+    carrier.Keys([&carrier, &kvs](nostd::string_view k) {
       kvs.emplace_back(k, carrier.Get(k));
       return true;
     });
     is_extracted = true;
-    return baggage::SetBaggage(context, nostd::shared_ptr<baggage::Baggage>(new baggage::Baggage(kvs)));
+    return baggage::SetBaggage(context,
+                               nostd::shared_ptr<baggage::Baggage>(new baggage::Baggage(kvs)));
   }
 
   // Sets the context for carrier with self defined rules.
@@ -108,7 +114,7 @@ struct MockPropagator : public context::propagation::TextMapPropagator
               const context::Context &context) noexcept override
   {
     auto baggage = baggage::GetBaggage(context);
-    baggage->GetAllEntries([&carrier](nostd::string_view k, nostd::string_view v){
+    baggage->GetAllEntries([&carrier](nostd::string_view k, nostd::string_view v) {
       carrier.Set(k, v);
       return true;
     });
@@ -122,64 +128,81 @@ struct MockPropagator : public context::propagation::TextMapPropagator
   }
 
   bool is_extracted = false;
-  bool is_injected = false;
+  bool is_injected  = false;
 };
 
-struct TextMapCarrier : opentracing::TextMapReader, opentracing::TextMapWriter {
-  TextMapCarrier(std::unordered_map<std::string, std::string>& text_map_)
-      : text_map(text_map_) {}
+struct TextMapCarrier : opentracing::TextMapReader, opentracing::TextMapWriter
+{
+  TextMapCarrier(std::unordered_map<std::string, std::string> &text_map_) : text_map(text_map_) {}
 
-  opentracing::expected<void> Set(opentracing::string_view key, opentracing::string_view value) const override {
+  opentracing::expected<void> Set(opentracing::string_view key,
+                                  opentracing::string_view value) const override
+  {
     text_map[key] = value;
     return {};
   }
 
-  opentracing::expected<opentracing::string_view> LookupKey(opentracing::string_view key) const override {
-    if (!supports_lookup) {
+  opentracing::expected<opentracing::string_view> LookupKey(
+      opentracing::string_view key) const override
+  {
+    if (!supports_lookup)
+    {
       return opentracing::make_unexpected(opentracing::lookup_key_not_supported_error);
     }
     auto iter = text_map.find(key);
-    if (iter != text_map.end()) {
+    if (iter != text_map.end())
+    {
       return opentracing::string_view{iter->second};
-    } else {
+    }
+    else
+    {
       return opentracing::make_unexpected(opentracing::key_not_found_error);
     }
   }
 
   opentracing::expected<void> ForeachKey(
-      std::function<opentracing::expected<void>(opentracing::string_view key, opentracing::string_view value)> f)
-      const override {
+      std::function<opentracing::expected<void>(opentracing::string_view key,
+                                                opentracing::string_view value)> f) const override
+  {
     ++foreach_key_call_count;
-    for (const auto& key_value : text_map) {
+    for (const auto &key_value : text_map)
+    {
       auto result = f(key_value.first, key_value.second);
-      if (!result) return result;
+      if (!result)
+        return result;
     }
     return {};
   }
 
-  bool supports_lookup = false;
+  bool supports_lookup               = false;
   mutable int foreach_key_call_count = 0;
-  std::unordered_map<std::string, std::string>& text_map;
+  std::unordered_map<std::string, std::string> &text_map;
 };
 
-struct HTTPHeadersCarrier : opentracing::HTTPHeadersReader, opentracing::HTTPHeadersWriter {
-  HTTPHeadersCarrier(std::unordered_map<std::string, std::string>& text_map_)
-      : text_map(text_map_) {}
+struct HTTPHeadersCarrier : opentracing::HTTPHeadersReader, opentracing::HTTPHeadersWriter
+{
+  HTTPHeadersCarrier(std::unordered_map<std::string, std::string> &text_map_) : text_map(text_map_)
+  {}
 
-  opentracing::expected<void> Set(opentracing::string_view key, opentracing::string_view value) const override {
+  opentracing::expected<void> Set(opentracing::string_view key,
+                                  opentracing::string_view value) const override
+  {
     text_map[key] = value;
     return {};
   }
 
   opentracing::expected<void> ForeachKey(
-      std::function<opentracing::expected<void>(opentracing::string_view key, opentracing::string_view value)> f)
-      const override {
-    for (const auto& key_value : text_map) {
+      std::function<opentracing::expected<void>(opentracing::string_view key,
+                                                opentracing::string_view value)> f) const override
+  {
+    for (const auto &key_value : text_map)
+    {
       auto result = f(key_value.first, key_value.second);
-      if (!result) return result;
+      if (!result)
+        return result;
     }
     return {};
   }
 
-  std::unordered_map<std::string, std::string>& text_map;
+  std::unordered_map<std::string, std::string> &text_map;
 };

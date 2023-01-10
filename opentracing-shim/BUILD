@@ -41,8 +41,8 @@ cc_test(
 cc_test(
     name = "shim_utils_test",
     srcs = [
-        "test/shim_utils_test.cc",
         "test/shim_mocks.h",
+        "test/shim_utils_test.cc",
     ],
     tags = [
         "opentracing_shim",
@@ -57,8 +57,8 @@ cc_test(
 cc_test(
     name = "span_shim_test",
     srcs = [
-        "test/span_shim_test.cc",
         "test/shim_mocks.h",
+        "test/span_shim_test.cc",
     ],
     tags = [
         "opentracing_shim",
@@ -88,8 +88,8 @@ cc_test(
 cc_test(
     name = "tracer_shim_test",
     srcs = [
-        "test/tracer_shim_test.cc",
         "test/shim_mocks.h",
+        "test/tracer_shim_test.cc",
     ],
     tags = [
         "opentracing_shim",

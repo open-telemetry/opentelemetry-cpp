@@ -1,9 +1,7 @@
 set(this_target opentelemetry_opentracing_shim)
 
-add_library(${this_target}
-  src/span_shim.cc
-  src/span_context_shim.cc
-  src/tracer_shim.cc)
+add_library(${this_target} src/span_shim.cc src/span_context_shim.cc
+                           src/tracer_shim.cc)
 
 set_target_properties(${this_target} PROPERTIES EXPORT_NAME opentracing_shim)
 
@@ -15,13 +13,10 @@ if(OPENTRACING_DIR)
 endif()
 
 target_include_directories(
-  ${this_target}
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-         "$<INSTALL_INTERFACE:include>")
+  ${this_target} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+                        "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(
-  ${this_target}
-  PUBLIC opentelemetry_api)
+target_link_libraries(${this_target} PUBLIC opentelemetry_api)
 
 install(
   TARGETS ${this_target}
@@ -37,31 +32,19 @@ install(
   PATTERN "*.h")
 
 if(BUILD_TESTING)
-  foreach(
-    testname
-    propagation_test
-    shim_utils_test
-    span_shim_test
-    span_context_shim_test
-    tracer_shim_test)
+  foreach(testname propagation_test shim_utils_test span_shim_test
+                   span_context_shim_test tracer_shim_test)
 
     add_executable(${testname} "test/${testname}.cc")
 
     if(OPENTRACING_DIR)
       target_link_libraries(
-        ${testname}
-        ${GTEST_BOTH_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-        opentelemetry_api
-        opentelemetry_opentracing_shim
-        opentracing)
+        ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_api opentelemetry_opentracing_shim opentracing)
     else()
       target_link_libraries(
-        ${testname}
-        ${GTEST_BOTH_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT}
-        opentelemetry_api
-        opentelemetry_opentracing_shim
+        ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_api opentelemetry_opentracing_shim
         OpenTracing::opentracing)
     endif()
 

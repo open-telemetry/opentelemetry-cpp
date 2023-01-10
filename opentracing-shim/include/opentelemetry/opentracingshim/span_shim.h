@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "opentelemetry/opentracingshim/tracer_shim.h"
 #include "opentelemetry/opentracingshim/span_context_shim.h"
+#include "opentelemetry/opentracingshim/tracer_shim.h"
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"
@@ -18,35 +18,41 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
 {
 
-using SpanPtr = nostd::shared_ptr<opentelemetry::trace::Span>;
+using SpanPtr    = nostd::shared_ptr<opentelemetry::trace::Span>;
 using EventEntry = std::pair<opentracing::string_view, opentracing::Value>;
 
 class SpanShim : public opentracing::Span
 {
 public:
-  explicit SpanShim(const TracerShim& tracer, const SpanPtr& span, const BaggagePtr& baggage)
-    : tracer_(tracer), span_(span), context_(span->GetContext(), baggage) {}
-  void handleError(const opentracing::Value& value) noexcept;
+  explicit SpanShim(const TracerShim &tracer, const SpanPtr &span, const BaggagePtr &baggage)
+      : tracer_(tracer), span_(span), context_(span->GetContext(), baggage)
+  {}
+  void handleError(const opentracing::Value &value) noexcept;
   // Overrides
-  void FinishWithOptions(const opentracing::FinishSpanOptions& finish_span_options) noexcept override;
+  void FinishWithOptions(
+      const opentracing::FinishSpanOptions &finish_span_options) noexcept override;
   void SetOperationName(opentracing::string_view name) noexcept override;
-  void SetTag(opentracing::string_view key, const opentracing::Value& value) noexcept override;
-  void SetBaggageItem(opentracing::string_view restricted_key, opentracing::string_view value) noexcept override;
+  void SetTag(opentracing::string_view key, const opentracing::Value &value) noexcept override;
+  void SetBaggageItem(opentracing::string_view restricted_key,
+                      opentracing::string_view value) noexcept override;
   std::string BaggageItem(opentracing::string_view restricted_key) const noexcept override;
   void Log(std::initializer_list<EventEntry> fields) noexcept override;
-  void Log(opentracing::SystemTime timestamp, std::initializer_list<EventEntry> fields) noexcept override;
-  void Log(opentracing::SystemTime timestamp, const std::vector<EventEntry>& fields) noexcept override;
-  inline const opentracing::SpanContext& context() const noexcept override { return context_; };
-  inline const opentracing::Tracer& tracer() const noexcept override { return tracer_; };
+  void Log(opentracing::SystemTime timestamp,
+           std::initializer_list<EventEntry> fields) noexcept override;
+  void Log(opentracing::SystemTime timestamp,
+           const std::vector<EventEntry> &fields) noexcept override;
+  inline const opentracing::SpanContext &context() const noexcept override { return context_; };
+  inline const opentracing::Tracer &tracer() const noexcept override { return tracer_; };
 
 private:
-  void logImpl(nostd::span<const EventEntry> fields, const opentracing::SystemTime* const timestamp) noexcept;
+  void logImpl(nostd::span<const EventEntry> fields,
+               const opentracing::SystemTime *const timestamp) noexcept;
 
-  const TracerShim& tracer_;
+  const TracerShim &tracer_;
   SpanPtr span_;
   SpanContextShim context_;
   mutable opentelemetry::common::SpinLockMutex context_lock_;
 };
 
-} // namespace opentracingshim
+}  // namespace opentracingshim
 OPENTELEMETRY_END_NAMESPACE
