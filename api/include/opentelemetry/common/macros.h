@@ -5,8 +5,6 @@
 
 #include <cstdint>
 
-#include "opentelemetry/version.h"
-
 #if !defined(OPENTELEMETRY_LIKELY_IF) && defined(__cplusplus)
 // GCC 9 has likely attribute but do not support declare it at the beginning of statement
 #  if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
