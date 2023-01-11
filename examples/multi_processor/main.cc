@@ -18,7 +18,6 @@
 using opentelemetry::exporter::memory::InMemorySpanData;
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
-namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
