@@ -111,8 +111,8 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
 template <class T>
 size_t BucketBinarySearch(T value, const std::vector<double> &boundaries)
 {
-    auto low = std::lower_bound(boundaries.begin(), boundaries.end(), value);
-    return low - boundaries.begin();
+  auto low = std::lower_bound(boundaries.begin(), boundaries.end(), value);
+  return low - boundaries.begin();
 }
 
 }  // namespace metrics
