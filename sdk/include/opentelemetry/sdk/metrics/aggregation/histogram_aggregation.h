@@ -109,23 +109,10 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
 }
 
 template <class T>
-size_t BucketBinarySearch(T value, std::vector<double> &boundaries)
+size_t BucketBinarySearch(T value, const std::vector<double> &boundaries)
 {
-  size_t lower_bound = 0;
-  size_t upper_bound = boundaries.size();
-  while (lower_bound != upper_bound)
-  {
-    size_t mid = (lower_bound + upper_bound) / 2;
-    if (value > boundaries[mid])
-    {
-      lower_bound = mid + 1;
-    }
-    else
-    {
-      upper_bound = mid;
-    }
-  }
-  return lower_bound;
+    auto low = std::lower_bound(boundaries.begin(), boundaries.end(), value);
+    return low - boundaries.begin();
 }
 
 }  // namespace metrics
