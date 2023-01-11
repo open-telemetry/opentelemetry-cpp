@@ -11,7 +11,7 @@ namespace sdk
 {
 namespace metrics
 {
-class InstrumentSelector
+class OPENTELEMETRY_API InstrumentSelector
 {
 public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,

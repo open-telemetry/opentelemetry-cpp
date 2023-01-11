@@ -18,7 +18,7 @@ namespace logs
 /**
  * Stores the singleton global LoggerProvider.
  */
-class Provider
+class OPENTELEMETRY_API Provider
 {
 public:
   /**

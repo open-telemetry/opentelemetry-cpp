@@ -22,7 +22,7 @@ namespace trace
 /**
  * The OStreamSpanExporter exports span data through an ostream
  */
-class OStreamSpanExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_API OStreamSpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**

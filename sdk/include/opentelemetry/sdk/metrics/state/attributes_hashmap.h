@@ -21,7 +21,7 @@ namespace metrics
 {
 using opentelemetry::sdk::common::OrderedAttributeMap;
 
-class AttributeHashGenerator
+class OPENTELEMETRY_API AttributeHashGenerator
 {
 public:
   size_t operator()(const MetricAttributes &attributes) const
@@ -30,7 +30,7 @@ public:
   }
 };
 
-class AttributesHashMap
+class OPENTELEMETRY_API AttributesHashMap
 {
 public:
   Aggregation *Get(const MetricAttributes &attributes) const
@@ -42,6 +42,12 @@ public:
     }
     return nullptr;
   }
+
+  // https://stackoverflow.com/a/51033485/743263
+  AttributesHashMap() = default;
+  AttributesHashMap(const AttributesHashMap &) = delete;
+  AttributesHashMap &operator=(const AttributesHashMap &) = delete;  
+
 
   /**
    * @return check if key is present in hash

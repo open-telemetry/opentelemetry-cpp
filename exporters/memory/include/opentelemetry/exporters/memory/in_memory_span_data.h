@@ -14,7 +14,7 @@ namespace exporter
 {
 namespace memory
 {
-class InMemorySpanData final : public exporter::memory::InMemoryData<sdk::trace::SpanData>
+class OPENTELEMETRY_API InMemorySpanData final : public exporter::memory::InMemoryData<sdk::trace::SpanData>
 {
 public:
   /**

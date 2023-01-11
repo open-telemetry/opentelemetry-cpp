@@ -14,7 +14,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-class SynchronousInstrument
+class OPENTELEMETRY_API SynchronousInstrument
 {
 public:
   SynchronousInstrument()          = default;
@@ -22,7 +22,7 @@ public:
 };
 
 template <class T>
-class Counter : public SynchronousInstrument
+class OPENTELEMETRY_API Counter : public SynchronousInstrument
 {
 
 public:
@@ -90,7 +90,7 @@ public:
 /** A histogram instrument that records values. */
 
 template <class T>
-class Histogram : public SynchronousInstrument
+class OPENTELEMETRY_API Histogram : public SynchronousInstrument
 {
 public:
   /**
@@ -132,7 +132,7 @@ public:
 /** An up-down-counter instrument that adds or reduce values. */
 
 template <class T>
-class UpDownCounter : public SynchronousInstrument
+class OPENTELEMETRY_API UpDownCounter : public SynchronousInstrument
 {
 public:
   /**

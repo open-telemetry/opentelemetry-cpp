@@ -19,7 +19,7 @@ namespace metrics
  * instrument use.
  */
 template <class T>
-class ObserverResultT
+class OPENTELEMETRY_API ObserverResultT
 {
 
 public:

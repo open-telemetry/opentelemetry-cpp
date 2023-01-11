@@ -28,7 +28,7 @@ using std::chrono::microseconds;
  * creation other than by calling the static function Initialize(). This follows the
  * meyers singleton pattern and only a single instance of the class is allowed.
  */
-class ZPages
+class OPENTELEMETRY_API ZPages
 {
 public:
   /**

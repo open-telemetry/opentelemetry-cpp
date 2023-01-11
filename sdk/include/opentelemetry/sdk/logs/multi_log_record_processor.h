@@ -25,7 +25,7 @@ namespace logs
  * Built-in log processors are responsible for batching and conversion of
  * logs to exportable representation and passing batches to exporters.
  */
-class MultiLogRecordProcessor : public LogRecordProcessor
+class OPENTELEMETRY_API MultiLogRecordProcessor : public LogRecordProcessor
 {
 public:
   MultiLogRecordProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);

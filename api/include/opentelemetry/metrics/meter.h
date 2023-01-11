@@ -22,7 +22,7 @@ namespace metrics
  * measurements from all instruments.
  *
  */
-class Meter
+class OPENTELEMETRY_API Meter
 {
 public:
   virtual ~Meter() = default;

@@ -23,7 +23,7 @@ namespace
 {
 
 template <typename T>
-class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
+class OPENTELEMETRY_API HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
   HttpTextMapCarrier<T>(T &headers) : headers_(headers) {}

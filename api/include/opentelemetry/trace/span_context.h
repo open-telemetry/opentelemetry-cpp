@@ -16,7 +16,7 @@ namespace trace
  * process boundaries. It contains TraceId and SpanId, TraceFlags, TraceState
  * and whether it was propagated from a remote parent.
  */
-class SpanContext final
+class OPENTELEMETRY_API SpanContext final
 {
 public:
   /* A temporary constructor for an invalid SpanContext.

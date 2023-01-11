@@ -32,7 +32,7 @@ namespace logs
 /**
  * Handles log record creation.
  **/
-class Logger
+class OPENTELEMETRY_API Logger
 {
 public:
   virtual ~Logger() = default;

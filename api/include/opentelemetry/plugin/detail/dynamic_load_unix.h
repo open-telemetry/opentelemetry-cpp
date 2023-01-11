@@ -16,7 +16,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
-class DynamicLibraryHandleUnix final : public DynamicLibraryHandle
+class OPENTELEMETRY_API DynamicLibraryHandleUnix final : public DynamicLibraryHandle
 {
 public:
   explicit DynamicLibraryHandleUnix(void *handle) noexcept : handle_{handle} {}

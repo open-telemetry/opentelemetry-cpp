@@ -18,7 +18,7 @@ namespace otlp
 /**
  * The OTLP gRPC client contains utility functions of gRPC.
  */
-class OtlpGrpcClient
+class OPENTELEMETRY_API OtlpGrpcClient
 {
 public:
   /**

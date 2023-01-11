@@ -21,7 +21,7 @@ namespace common
  * and a single consumer.
  */
 template <class T>
-class CircularBuffer
+class OPENTELEMETRY_API CircularBuffer
 {
 public:
   explicit CircularBuffer(size_t max_size)

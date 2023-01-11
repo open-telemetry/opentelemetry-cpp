@@ -19,9 +19,9 @@ namespace metrics
 {
 
 // forward declaration
-class SyncWritableMetricStorage;
+class OPENTELEMETRY_API SyncWritableMetricStorage;
 
-class Synchronous
+class OPENTELEMETRY_API Synchronous
 {
 public:
   Synchronous(InstrumentDescriptor instrument_descriptor,
@@ -35,7 +35,7 @@ protected:
 };
 
 template <typename T>
-class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
+class OPENTELEMETRY_API LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
@@ -91,7 +91,7 @@ public:
   }
 };
 
-class DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
+class OPENTELEMETRY_API DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
 {
 
 public:
@@ -108,7 +108,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
+class OPENTELEMETRY_API LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
   LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -124,7 +124,7 @@ public:
   void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
+class OPENTELEMETRY_API DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
   DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -141,7 +141,7 @@ public:
 };
 
 template <typename T>
-class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
+class OPENTELEMETRY_API LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,
@@ -184,7 +184,7 @@ public:
   }
 };
 
-class DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
+class OPENTELEMETRY_API DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
   DoubleHistogram(InstrumentDescriptor instrument_descriptor,

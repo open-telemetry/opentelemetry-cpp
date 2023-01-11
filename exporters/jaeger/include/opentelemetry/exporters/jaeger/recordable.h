@@ -54,7 +54,7 @@ inline uint64_t otel_bswap_64(uint64_t host_int)
 
 using namespace jaegertracing;
 
-class JaegerRecordable final : public sdk::trace::Recordable
+class OPENTELEMETRY_API JaegerRecordable final : public sdk::trace::Recordable
 {
 public:
   JaegerRecordable();

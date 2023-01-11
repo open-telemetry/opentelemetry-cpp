@@ -22,11 +22,13 @@ struct LastReportedMetrics
   opentelemetry::common::SystemTimestamp collection_ts;
 };
 
-class TemporalMetricStorage
+class OPENTELEMETRY_API TemporalMetricStorage
 {
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                         const AggregationConfig *aggregation_config);
+
+  TemporalMetricStorage() = default;
 
   bool buildMetrics(CollectorHandle *collector,
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,

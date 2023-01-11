@@ -22,7 +22,7 @@ using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
  * Exemplars also hold information about the environment when the measurement was recorded, for
  * example the span and trace ID of the active span when the exemplar was recorded.
  */
-class ExemplarData
+class OPENTELEMETRY_API ExemplarData
 {
 public:
   static ExemplarData Create(std::shared_ptr<trace::SpanContext> context,

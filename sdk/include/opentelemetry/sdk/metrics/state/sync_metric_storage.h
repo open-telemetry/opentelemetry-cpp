@@ -23,7 +23,7 @@ namespace sdk
 {
 namespace metrics
 {
-class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
+class OPENTELEMETRY_API SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
 public:

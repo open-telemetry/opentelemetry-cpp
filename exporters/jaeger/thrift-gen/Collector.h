@@ -19,13 +19,13 @@ namespace jaegertracing { namespace thrift {
   #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
-class CollectorIf {
+class OPENTELEMETRY_API CollectorIf {
  public:
   virtual ~CollectorIf() {}
   virtual void submitBatches(std::vector<BatchSubmitResponse> & _return, const std::vector<Batch> & batches) = 0;
 };
 
-class CollectorIfFactory {
+class OPENTELEMETRY_API CollectorIfFactory {
  public:
   typedef CollectorIf Handler;
 
@@ -35,7 +35,7 @@ class CollectorIfFactory {
   virtual void releaseHandler(CollectorIf* /* handler */) = 0;
 };
 
-class CollectorIfSingletonFactory : virtual public CollectorIfFactory {
+class OPENTELEMETRY_API CollectorIfSingletonFactory : virtual public CollectorIfFactory {
  public:
   CollectorIfSingletonFactory(const ::std::shared_ptr<CollectorIf>& iface) : iface_(iface) {}
   virtual ~CollectorIfSingletonFactory() {}
@@ -49,7 +49,7 @@ class CollectorIfSingletonFactory : virtual public CollectorIfFactory {
   ::std::shared_ptr<CollectorIf> iface_;
 };
 
-class CollectorNull : virtual public CollectorIf {
+class OPENTELEMETRY_API CollectorNull : virtual public CollectorIf {
  public:
   virtual ~CollectorNull() {}
   void submitBatches(std::vector<BatchSubmitResponse> & /* _return */, const std::vector<Batch> & /* batches */) {
@@ -62,7 +62,7 @@ typedef struct _Collector_submitBatches_args__isset {
   bool batches :1;
 } _Collector_submitBatches_args__isset;
 
-class Collector_submitBatches_args {
+class OPENTELEMETRY_API Collector_submitBatches_args {
  public:
 
   Collector_submitBatches_args(const Collector_submitBatches_args&);
@@ -95,7 +95,7 @@ class Collector_submitBatches_args {
 };
 
 
-class Collector_submitBatches_pargs {
+class OPENTELEMETRY_API Collector_submitBatches_pargs {
  public:
 
 
@@ -111,7 +111,7 @@ typedef struct _Collector_submitBatches_result__isset {
   bool success :1;
 } _Collector_submitBatches_result__isset;
 
-class Collector_submitBatches_result {
+class OPENTELEMETRY_API Collector_submitBatches_result {
  public:
 
   Collector_submitBatches_result(const Collector_submitBatches_result&);
@@ -148,7 +148,7 @@ typedef struct _Collector_submitBatches_presult__isset {
   bool success :1;
 } _Collector_submitBatches_presult__isset;
 
-class Collector_submitBatches_presult {
+class OPENTELEMETRY_API Collector_submitBatches_presult {
  public:
 
 
@@ -161,7 +161,7 @@ class Collector_submitBatches_presult {
 
 };
 
-class CollectorClient : virtual public CollectorIf {
+class OPENTELEMETRY_API CollectorClient : virtual public CollectorIf {
  public:
   CollectorClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
     setProtocol(prot);
@@ -196,7 +196,7 @@ class CollectorClient : virtual public CollectorIf {
   ::apache::thrift::protocol::TProtocol* oprot_;
 };
 
-class CollectorProcessor : public ::apache::thrift::TDispatchProcessor {
+class OPENTELEMETRY_API CollectorProcessor : public ::apache::thrift::TDispatchProcessor {
  protected:
   ::std::shared_ptr<CollectorIf> iface_;
   virtual bool dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext);
@@ -214,7 +214,7 @@ class CollectorProcessor : public ::apache::thrift::TDispatchProcessor {
   virtual ~CollectorProcessor() {}
 };
 
-class CollectorProcessorFactory : public ::apache::thrift::TProcessorFactory {
+class OPENTELEMETRY_API CollectorProcessorFactory : public ::apache::thrift::TProcessorFactory {
  public:
   CollectorProcessorFactory(const ::std::shared_ptr< CollectorIfFactory >& handlerFactory) :
       handlerFactory_(handlerFactory) {}
@@ -225,7 +225,7 @@ class CollectorProcessorFactory : public ::apache::thrift::TProcessorFactory {
   ::std::shared_ptr< CollectorIfFactory > handlerFactory_;
 };
 
-class CollectorMultiface : virtual public CollectorIf {
+class OPENTELEMETRY_API CollectorMultiface : virtual public CollectorIf {
  public:
   CollectorMultiface(std::vector<std::shared_ptr<CollectorIf> >& ifaces) : ifaces_(ifaces) {
   }
@@ -252,7 +252,7 @@ class CollectorMultiface : virtual public CollectorIf {
 // The 'concurrent' client is a thread safe client that correctly handles
 // out of order responses.  It is slower than the regular client, so should
 // only be used when you need to share a connection among multiple threads
-class CollectorConcurrentClient : virtual public CollectorIf {
+class OPENTELEMETRY_API CollectorConcurrentClient : virtual public CollectorIf {
  public:
   CollectorConcurrentClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot, std::shared_ptr<::apache::thrift::async::TConcurrentClientSyncInfo> sync) : sync_(sync)
 {

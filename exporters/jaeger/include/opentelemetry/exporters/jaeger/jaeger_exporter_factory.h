@@ -15,7 +15,7 @@ namespace jaeger
 /**
  * Factory class for JaegerExporter.
  */
-class JaegerExporterFactory
+class OPENTELEMETRY_API JaegerExporterFactory
 {
 public:
   /**

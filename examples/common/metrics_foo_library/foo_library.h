@@ -5,7 +5,7 @@
 
 #include <string>
 
-class foo_library
+class OPENTELEMETRY_API foo_library
 {
 public:
   static void counter_example(const std::string &name);

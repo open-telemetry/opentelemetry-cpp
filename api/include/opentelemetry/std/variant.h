@@ -34,7 +34,7 @@ using monostate = std::monostate;
 #  if __EXCEPTIONS
 
 // nostd::bad_variant_access
-class bad_variant_access : public std::exception
+class OPENTELEMETRY_API bad_variant_access : public std::exception
 {
 public:
   virtual const char *what() const noexcept override { return "bad_variant_access"; }

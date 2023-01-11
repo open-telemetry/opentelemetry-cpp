@@ -17,7 +17,7 @@ namespace trace
  * SpanExporter defines the interface that protocol-specific span exporters must
  * implement.
  */
-class SpanExporter
+class OPENTELEMETRY_API SpanExporter
 {
 public:
   virtual ~SpanExporter() = default;

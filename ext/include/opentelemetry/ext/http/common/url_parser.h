@@ -20,7 +20,7 @@ namespace common
 // host:port ( path defaults to "/")
 // host:port?
 
-class UrlParser
+class OPENTELEMETRY_API UrlParser
 {
 public:
   std::string url_;

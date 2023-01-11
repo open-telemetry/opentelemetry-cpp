@@ -21,7 +21,7 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class LogRecord
+class OPENTELEMETRY_API LogRecord
 {
 public:
   virtual ~LogRecord() = default;

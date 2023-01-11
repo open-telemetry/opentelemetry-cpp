@@ -14,7 +14,7 @@ namespace logs
 /**
  * Creates new Logger instances.
  */
-class LoggerProvider
+class OPENTELEMETRY_API LoggerProvider
 {
 public:
   virtual ~LoggerProvider() = default;

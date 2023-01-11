@@ -16,7 +16,7 @@ namespace sdk
 {
 namespace metrics
 {
-class ReservoirCellSelector
+class OPENTELEMETRY_API ReservoirCellSelector
 {
 
 public:

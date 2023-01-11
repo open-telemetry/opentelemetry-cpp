@@ -22,7 +22,7 @@ namespace sdk
 namespace metrics
 {
 
-class DefaultAggregation
+class OPENTELEMETRY_API DefaultAggregation
 {
 public:
   static std::unique_ptr<Aggregation> CreateAggregation(

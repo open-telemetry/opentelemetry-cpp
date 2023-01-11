@@ -21,7 +21,7 @@ namespace metrics
 /**
  * The Prometheus Collector maintains the intermediate collection in Prometheus Exporter
  */
-class PrometheusCollector : public prometheus_client::Collectable
+class OPENTELEMETRY_API PrometheusCollector : public prometheus_client::Collectable
 {
 public:
   /**

@@ -15,7 +15,7 @@ namespace propagation
 {
 
 // TextMapCarrier is the storage medium used by TextMapPropagator.
-class TextMapCarrier
+class OPENTELEMETRY_API TextMapCarrier
 {
 public:
   // returns the value associated with the passed key.
@@ -39,7 +39,7 @@ public:
 // headers, and a getter and setter function for the extraction and
 // injection of values, respectively.
 
-class TextMapPropagator
+class OPENTELEMETRY_API TextMapPropagator
 {
 public:
   // Returns the context that is stored in the carrier with the TextMapCarrier as extractor.

@@ -14,7 +14,7 @@ using namespace ::apache::thrift::server;
 
 using namespace  ::jaegertracing::agent::thrift;
 
-class AgentHandler : virtual public AgentIf {
+class OPENTELEMETRY_API AgentHandler : virtual public AgentIf {
  public:
   AgentHandler() {
     // Your initialization goes here

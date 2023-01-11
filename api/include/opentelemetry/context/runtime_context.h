@@ -13,7 +13,7 @@ namespace context
 // RuntimeContext object and is associated with a context object, and
 // can be provided to the RuntimeContext Detach method to remove the
 // associated context from the RuntimeContext.
-class Token
+class OPENTELEMETRY_API Token
 {
 public:
   bool operator==(const Context &other) const noexcept { return context_ == other; }
@@ -37,7 +37,7 @@ private:
  * this class and passing an initialized RuntimeContextStorage object to
  * RuntimeContext::SetRuntimeContextStorage.
  */
-class RuntimeContextStorage
+class OPENTELEMETRY_API RuntimeContextStorage
 {
 public:
   /**
@@ -78,7 +78,7 @@ static RuntimeContextStorage *GetDefaultStorage() noexcept;
 // Provides a wrapper for propagating the context object globally.
 //
 // By default, a thread-local runtime context storage is used.
-class RuntimeContext
+class OPENTELEMETRY_API RuntimeContext
 {
 public:
   // Return the current context.
@@ -183,7 +183,7 @@ inline Token::~Token() noexcept
 // RuntimeContextStorage and provides a wrapper for propagating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
-class ThreadLocalContextStorage : public RuntimeContextStorage
+class OPENTELEMETRY_API ThreadLocalContextStorage : public RuntimeContextStorage
 {
 public:
   ThreadLocalContextStorage() noexcept = default;

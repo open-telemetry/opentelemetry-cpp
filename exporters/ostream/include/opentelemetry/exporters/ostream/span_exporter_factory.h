@@ -13,7 +13,7 @@ namespace sdk
 {
 namespace trace
 {
-class SpanExporter;
+class OPENTELEMETRY_API SpanExporter;
 }  // namespace trace
 }  // namespace sdk
 
@@ -25,7 +25,7 @@ namespace trace
 /**
  * Factory class for OStreamSpanExporter.
  */
-class OStreamSpanExporterFactory
+class OPENTELEMETRY_API OStreamSpanExporterFactory
 {
 public:
   /**

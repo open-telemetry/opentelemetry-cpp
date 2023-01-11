@@ -21,7 +21,7 @@ namespace logs
 /**
  * Factory class for LoggerContext.
  */
-class LoggerContextFactory
+class OPENTELEMETRY_API LoggerContextFactory
 {
 public:
   /**

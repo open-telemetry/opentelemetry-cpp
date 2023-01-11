@@ -28,7 +28,7 @@ Note: This assumes export maps are used to properly control symbol resolution.
    virtual function signatures. Example
 
 ```cpp
-class Tracer {
+class OPENTELEMETRY_API Tracer {
 public:
   ...
 
@@ -47,7 +47,7 @@ public:
 The ABI restrictions don't apply to concrete classes.
 
 ```cpp
-class TracerImpl final : public Tracer {
+class OPENTELEMETRY_API TracerImpl final : public Tracer {
 public:
   // ...
 private:

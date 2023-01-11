@@ -16,7 +16,7 @@ namespace sdk
 {
 namespace metrics
 {
-class FilteredExemplarReservoir final : public ExemplarReservoir
+class OPENTELEMETRY_API FilteredExemplarReservoir final : public ExemplarReservoir
 {
 
 public:

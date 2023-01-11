@@ -31,7 +31,7 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class ReadableLogRecord : public Recordable
+class OPENTELEMETRY_API ReadableLogRecord : public Recordable
 {
 public:
   /**

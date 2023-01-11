@@ -17,7 +17,7 @@ namespace sdk
 namespace instrumentationscope
 {
 
-class InstrumentationScope
+class OPENTELEMETRY_API InstrumentationScope
 {
 public:
   InstrumentationScope(const InstrumentationScope &) = default;

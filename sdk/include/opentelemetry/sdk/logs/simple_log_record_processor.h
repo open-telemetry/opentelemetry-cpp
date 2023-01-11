@@ -25,7 +25,7 @@ namespace logs
  * All calls to the configured LogRecordExporter are synchronized using a
  * spin-lock on an atomic_flag.
  */
-class SimpleLogRecordProcessor : public LogRecordProcessor
+class OPENTELEMETRY_API SimpleLogRecordProcessor : public LogRecordProcessor
 {
 
 public:

@@ -32,7 +32,7 @@ namespace common
  * https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max
  *
  */
-class FastRandomNumberGenerator
+class OPENTELEMETRY_API FastRandomNumberGenerator
 {
 public:
   using result_type = uint64_t;

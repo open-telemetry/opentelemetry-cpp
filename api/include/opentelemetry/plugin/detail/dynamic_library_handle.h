@@ -11,7 +11,7 @@ namespace plugin
 /**
  * Manage the ownership of a dynamically loaded library.
  */
-class DynamicLibraryHandle
+class OPENTELEMETRY_API DynamicLibraryHandle
 {
 public:
   virtual ~DynamicLibraryHandle() = default;

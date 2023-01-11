@@ -47,7 +47,7 @@ struct HttpResponse
 
 using CallbackFunction = std::function<int(HttpRequest const &request, HttpResponse &response)>;
 
-class HttpRequestCallback
+class OPENTELEMETRY_API HttpRequestCallback
 {
 protected:
   CallbackFunction callback = nullptr;
@@ -87,7 +87,7 @@ public:
 // Out of scope:
 //   - Performance
 //   - Full support of RFC 7230-7237
-class HttpServer : private SocketTools::Reactor::SocketCallback
+class OPENTELEMETRY_API HttpServer : private SocketTools::Reactor::SocketCallback
 {
 protected:
   struct Connection

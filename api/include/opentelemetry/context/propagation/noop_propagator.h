@@ -15,7 +15,7 @@ namespace propagation
 /**
  * No-op implementation TextMapPropagator
  */
-class NoOpPropagator : public TextMapPropagator
+class OPENTELEMETRY_API NoOpPropagator : public TextMapPropagator
 {
 public:
   /** Noop extract function does nothing and returns the input context */

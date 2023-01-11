@@ -16,7 +16,7 @@ namespace trace
 /**
  * Factory class for AlwaysOffSampler.
  */
-class AlwaysOffSamplerFactory
+class OPENTELEMETRY_API AlwaysOffSamplerFactory
 {
 public:
   /**

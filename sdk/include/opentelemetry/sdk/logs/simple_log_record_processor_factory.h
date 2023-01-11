@@ -19,7 +19,7 @@ namespace logs
 /**
  * Factory class for SimpleLogRecordProcessor.
  */
-class SimpleLogRecordProcessorFactory
+class OPENTELEMETRY_API SimpleLogRecordProcessorFactory
 {
 public:
   /**

@@ -57,7 +57,7 @@ struct SamplingResult
  * The Sampler interface allows users to create custom samplers which will return a
  * SamplingResult based on information that is typically available just before the Span was created.
  */
-class Sampler
+class OPENTELEMETRY_API Sampler
 {
 public:
   virtual ~Sampler() = default;

@@ -16,7 +16,7 @@ namespace sdk
 namespace metrics
 {
 
-class LongHistogramAggregation : public Aggregation
+class OPENTELEMETRY_API LongHistogramAggregation : public Aggregation
 {
 public:
   LongHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
@@ -46,7 +46,7 @@ private:
   bool record_min_max_ = true;
 };
 
-class DoubleHistogramAggregation : public Aggregation
+class OPENTELEMETRY_API DoubleHistogramAggregation : public Aggregation
 {
 public:
   DoubleHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);

@@ -41,8 +41,8 @@ const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
 const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
-class HttpClient;
-class Session;
+class OPENTELEMETRY_API HttpClient;
+class OPENTELEMETRY_API Session;
 
 struct HttpCurlEasyResource
 {
@@ -73,7 +73,7 @@ struct HttpCurlEasyResource
   HttpCurlEasyResource &operator=(const HttpCurlEasyResource &other) = delete;
 };
 
-class HttpOperation
+class OPENTELEMETRY_API HttpOperation
 {
 private:
   /**

@@ -21,10 +21,10 @@ namespace metrics
 {
 
 // forward declaration
-class MetricCollector;
-class MetricReader;
+class OPENTELEMETRY_API MetricCollector;
+class OPENTELEMETRY_API MetricReader;
 
-class MeterProvider final : public opentelemetry::metrics::MeterProvider
+class OPENTELEMETRY_API MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**

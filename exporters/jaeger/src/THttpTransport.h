@@ -14,7 +14,7 @@ namespace exporter
 namespace jaeger
 {
 
-class THttpTransport : public apache::thrift::transport::TVirtualTransport<THttpTransport>
+class OPENTELEMETRY_API THttpTransport : public apache::thrift::transport::TVirtualTransport<THttpTransport>
 {
 public:
   THttpTransport(std::string endpoint, ext::http::client::Headers extra_headers);

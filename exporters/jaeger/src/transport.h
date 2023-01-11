@@ -19,7 +19,7 @@ namespace jaeger
 
 using namespace jaegertracing;
 
-class Transport
+class OPENTELEMETRY_API Transport
 {
 public:
   Transport()          = default;

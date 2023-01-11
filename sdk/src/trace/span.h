@@ -13,7 +13,7 @@ namespace sdk
 {
 namespace trace
 {
-class Span final : public opentelemetry::trace::Span
+class OPENTELEMETRY_API Span final : public opentelemetry::trace::Span
 {
 public:
   Span(std::shared_ptr<Tracer> &&tracer,

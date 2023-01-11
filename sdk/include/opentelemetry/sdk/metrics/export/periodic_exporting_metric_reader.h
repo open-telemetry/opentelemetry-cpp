@@ -17,7 +17,7 @@ namespace sdk
 namespace metrics
 {
 
-class PushMetricExporter;
+class OPENTELEMETRY_API PushMetricExporter;
 /**
  * Struct to hold PeriodicExortingMetricReader options.
  */
@@ -35,7 +35,7 @@ struct PeriodicExportingMetricReaderOptions
   std::chrono::milliseconds export_timeout_millis = std::chrono::milliseconds(kExportTimeOutMillis);
 };
 
-class PeriodicExportingMetricReader : public MetricReader
+class OPENTELEMETRY_API PeriodicExportingMetricReader : public MetricReader
 {
 
 public:

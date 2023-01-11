@@ -14,7 +14,7 @@ namespace trace
 /**
  * Supports internal iteration over a collection of SpanContext/key-value pairs.
  */
-class SpanContextKeyValueIterable
+class OPENTELEMETRY_API SpanContextKeyValueIterable
 {
 public:
   virtual ~SpanContextKeyValueIterable() = default;
@@ -37,7 +37,7 @@ public:
 /**
  * @brief Null Span context that does not carry any information.
  */
-class NullSpanContext : public SpanContextKeyValueIterable
+class OPENTELEMETRY_API NullSpanContext : public SpanContextKeyValueIterable
 {
 public:
   bool ForEachKeyValue(

@@ -12,7 +12,7 @@ namespace plugin
 /**
  * Manage the ownership of a dynamically loaded tracer.
  */
-class TracerHandle
+class OPENTELEMETRY_API TracerHandle
 {
 public:
   virtual ~TracerHandle() = default;

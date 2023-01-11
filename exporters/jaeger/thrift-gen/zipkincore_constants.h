@@ -11,7 +11,7 @@
 
 namespace twitter { namespace zipkin { namespace thrift {
 
-class zipkincoreConstants {
+class OPENTELEMETRY_API zipkincoreConstants {
  public:
   zipkincoreConstants();
 

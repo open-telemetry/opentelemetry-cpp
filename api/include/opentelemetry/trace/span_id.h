@@ -24,7 +24,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
-class SpanId final
+class OPENTELEMETRY_API SpanId final
 {
 public:
   // The size in bytes of the SpanId.

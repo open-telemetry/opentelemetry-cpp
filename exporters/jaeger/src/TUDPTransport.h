@@ -22,7 +22,7 @@ namespace exporter
 namespace jaeger
 {
 
-class TUDPTransport : public apache::thrift::transport::TVirtualTransport<TUDPTransport>
+class OPENTELEMETRY_API TUDPTransport : public apache::thrift::transport::TVirtualTransport<TUDPTransport>
 {
 public:
   TUDPTransport(const std::string &host, int port);

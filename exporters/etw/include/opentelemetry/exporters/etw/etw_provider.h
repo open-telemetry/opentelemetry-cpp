@@ -58,7 +58,7 @@ using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-class ETWProvider
+class OPENTELEMETRY_API ETWProvider
 {
 
 public:

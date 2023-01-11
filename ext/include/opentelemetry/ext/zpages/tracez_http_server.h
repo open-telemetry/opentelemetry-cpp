@@ -28,7 +28,7 @@ namespace ext
 namespace zpages
 {
 
-class TracezHttpServer : public opentelemetry::ext::zpages::zPagesHttpServer
+class OPENTELEMETRY_API TracezHttpServer : public opentelemetry::ext::zpages::zPagesHttpServer
 {
 public:
   /**

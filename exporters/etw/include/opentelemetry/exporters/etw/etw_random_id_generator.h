@@ -15,7 +15,7 @@ namespace sdk
 namespace trace
 {
 
-class ETWRandomIdGenerator : public IdGenerator
+class OPENTELEMETRY_API ETWRandomIdGenerator : public IdGenerator
 {
 
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override

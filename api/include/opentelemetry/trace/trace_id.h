@@ -16,7 +16,7 @@ namespace trace
 // TraceId represents an opaque 128-bit trace identifier. The trace identifier
 // remains constant across the trace. A valid trace identifier is a 16-byte array with at
 // least one non-zero byte.
-class TraceId final
+class OPENTELEMETRY_API TraceId final
 {
 public:
   // The size in bytes of the TraceId.

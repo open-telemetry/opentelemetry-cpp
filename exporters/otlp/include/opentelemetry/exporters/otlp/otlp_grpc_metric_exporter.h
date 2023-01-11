@@ -25,7 +25,7 @@ namespace otlp
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OtlpGrpcMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter
+class OPENTELEMETRY_API OtlpGrpcMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**

@@ -30,7 +30,7 @@ namespace logs
  * This class is thread-compatible.
  */
 
-class Recordable : public opentelemetry::logs::LogRecord
+class OPENTELEMETRY_API Recordable : public opentelemetry::logs::LogRecord
 {
 public:
   /**

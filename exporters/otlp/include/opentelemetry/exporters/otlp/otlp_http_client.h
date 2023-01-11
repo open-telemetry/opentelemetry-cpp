@@ -27,7 +27,7 @@ namespace google
 {
 namespace protobuf
 {
-class Message;
+class OPENTELEMETRY_API Message;
 }
 }  // namespace google
 
@@ -104,7 +104,7 @@ struct OtlpHttpClientOptions
 /**
  * The OTLP HTTP client exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpHttpClient
+class OPENTELEMETRY_API OtlpHttpClient
 {
 public:
   /**

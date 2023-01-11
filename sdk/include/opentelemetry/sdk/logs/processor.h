@@ -19,7 +19,7 @@ namespace logs
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
  */
-class LogRecordProcessor
+class OPENTELEMETRY_API LogRecordProcessor
 {
 public:
   virtual ~LogRecordProcessor() = default;

@@ -14,12 +14,16 @@ namespace context
 namespace propagation
 {
 
-class CompositePropagator : public TextMapPropagator
+class OPENTELEMETRY_API CompositePropagator : public TextMapPropagator
 {
 public:
   CompositePropagator(std::vector<std::unique_ptr<TextMapPropagator>> propagators)
       : propagators_(std::move(propagators))
   {}
+
+  // https://stackoverflow.com/a/51033485/743263
+  CompositePropagator(const CompositePropagator &) = delete;
+  CompositePropagator &operator=(const CompositePropagator &) = delete;  
 
   /**
    * Run each of the configured propagators with the given context and carrier.

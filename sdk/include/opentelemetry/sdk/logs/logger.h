@@ -19,9 +19,9 @@ namespace sdk
 {
 namespace logs
 {
-class LoggerProvider;
+class OPENTELEMETRY_API LoggerProvider;
 
-class Logger final : public opentelemetry::logs::Logger
+class OPENTELEMETRY_API Logger final : public opentelemetry::logs::Logger
 {
 public:
   /**

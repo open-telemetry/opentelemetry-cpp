@@ -17,7 +17,7 @@ namespace sdk
 {
 namespace metrics
 {
-class InstrumentMetaDataValidator
+class OPENTELEMETRY_API InstrumentMetaDataValidator
 {
 public:
   InstrumentMetaDataValidator();

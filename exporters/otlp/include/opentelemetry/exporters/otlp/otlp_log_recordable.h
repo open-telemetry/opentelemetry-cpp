@@ -28,7 +28,7 @@ namespace otlp
 /**
  * An OTLP Recordable implemenation for Logs.
  */
-class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
+class OPENTELEMETRY_API OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
   ~OtlpLogRecordable() override = default;

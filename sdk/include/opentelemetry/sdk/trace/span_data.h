@@ -27,7 +27,7 @@ namespace trace
 /**
  * Class for storing events in SpanData.
  */
-class SpanDataEvent
+class OPENTELEMETRY_API SpanDataEvent
 {
 public:
   SpanDataEvent(std::string name,
@@ -66,7 +66,7 @@ private:
 /**
  * Class for storing links in SpanData.
  */
-class SpanDataLink
+class OPENTELEMETRY_API SpanDataLink
 {
 public:
   SpanDataLink(opentelemetry::trace::SpanContext span_context,
@@ -97,7 +97,7 @@ private:
 /**
  * SpanData is a representation of all data collected by a span.
  */
-class SpanData final : public Recordable
+class OPENTELEMETRY_API SpanData final : public Recordable
 {
 public:
   SpanData() : resource_{nullptr}, instrumentation_scope_{nullptr} {}

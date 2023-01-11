@@ -20,7 +20,7 @@ namespace logs
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class LogRecordExporter
+class OPENTELEMETRY_API LogRecordExporter
 {
 public:
   virtual ~LogRecordExporter() = default;

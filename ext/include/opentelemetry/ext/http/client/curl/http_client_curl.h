@@ -30,7 +30,7 @@ namespace curl
 
 const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
 
-class HttpCurlGlobalInitializer
+class OPENTELEMETRY_API HttpCurlGlobalInitializer
 {
 private:
   HttpCurlGlobalInitializer(const HttpCurlGlobalInitializer &) = delete;
@@ -47,7 +47,7 @@ public:
   static nostd::shared_ptr<HttpCurlGlobalInitializer> GetInstance();
 };
 
-class Request : public opentelemetry::ext::http::client::Request
+class OPENTELEMETRY_API Request : public opentelemetry::ext::http::client::Request
 {
 public:
   Request() : method_(opentelemetry::ext::http::client::Method::Get), uri_("/") {}
@@ -91,7 +91,7 @@ public:
   std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
 
-class Response : public opentelemetry::ext::http::client::Response
+class OPENTELEMETRY_API Response : public opentelemetry::ext::http::client::Response
 {
 public:
   Response() : status_code_(Http_Ok) {}
@@ -137,9 +137,9 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class HttpClient;
+class OPENTELEMETRY_API HttpClient;
 
-class Session : public opentelemetry::ext::http::client::Session,
+class OPENTELEMETRY_API Session : public opentelemetry::ext::http::client::Session,
                 public std::enable_shared_from_this<Session>
 {
 public:
@@ -151,6 +151,10 @@ public:
   {
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
+
+  // https://stackoverflow.com/a/51033485/743263
+  Session(const Session &) = delete;
+  Session &operator=(const Session &) = delete;  
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -207,10 +211,14 @@ private:
   std::atomic<bool> is_session_active_;
 };
 
-class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
+class OPENTELEMETRY_API HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
   HttpClientSync() : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()) {}
+
+  // https://stackoverflow.com/a/51033485/743263
+  HttpClientSync(const HttpClientSync &) = delete;
+  HttpClientSync &operator=(const HttpClientSync &) = delete;  
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
@@ -269,7 +277,7 @@ private:
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
-class HttpClient : public opentelemetry::ext::http::client::HttpClient
+class OPENTELEMETRY_API HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.

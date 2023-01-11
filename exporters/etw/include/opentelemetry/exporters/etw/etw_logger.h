@@ -42,9 +42,9 @@ namespace exporter
 namespace etw
 {
 
-class LoggerProvider;
+class OPENTELEMETRY_API LoggerProvider;
 
-class LogRecord : public opentelemetry::logs::LogRecord
+class OPENTELEMETRY_API LogRecord : public opentelemetry::logs::LogRecord
 {
 public:
   ~LogRecord() override = default;
@@ -129,7 +129,7 @@ private:
 /**
  * @brief Logger  class that allows to send logs to ETW Provider.
  */
-class Logger : public opentelemetry::logs::Logger
+class OPENTELEMETRY_API Logger : public opentelemetry::logs::Logger
 {
 
   /**
@@ -288,7 +288,7 @@ public:
 /**
  * @brief ETW LoggerProvider
  */
-class LoggerProvider : public opentelemetry::logs::LoggerProvider
+class OPENTELEMETRY_API LoggerProvider : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

@@ -11,7 +11,7 @@ namespace sdk
 {
 namespace metrics
 {
-class Aggregation
+class OPENTELEMETRY_API Aggregation
 {
 public:
   virtual void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept = 0;

@@ -70,7 +70,7 @@ enum PropertyType
  * @brief PropertyValue class that holds PropertyVariant and
  * provides converter for non-owning common::AttributeValue
  */
-class PropertyValue : public PropertyVariant
+class OPENTELEMETRY_API PropertyValue : public PropertyVariant
 {
 
   /**
@@ -353,7 +353,7 @@ using PropertyValueMap = std::map<std::string, PropertyValue>;
 /**
  * @brief Map of PropertyValue with common::KeyValueIterable interface.
  */
-class Properties : public common::KeyValueIterable, public PropertyValueMap
+class OPENTELEMETRY_API Properties : public common::KeyValueIterable, public PropertyValueMap
 {
 
   /**

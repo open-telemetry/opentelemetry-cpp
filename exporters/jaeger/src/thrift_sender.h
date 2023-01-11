@@ -28,7 +28,7 @@ namespace jaeger
 
 using namespace jaegertracing;
 
-class ThriftSender : public Sender
+class OPENTELEMETRY_API ThriftSender : public Sender
 {
 public:
   static constexpr uint32_t kEmitBatchOverhead = 30;

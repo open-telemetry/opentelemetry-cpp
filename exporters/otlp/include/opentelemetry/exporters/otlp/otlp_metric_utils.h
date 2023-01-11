@@ -21,7 +21,7 @@ namespace otlp
 /**
  * The OtlpMetricUtils contains utility functions for OTLP metrics
  */
-class OtlpMetricUtils
+class OPENTELEMETRY_API OtlpMetricUtils
 {
 public:
   static opentelemetry::sdk::metrics::AggregationType GetAggregationType(

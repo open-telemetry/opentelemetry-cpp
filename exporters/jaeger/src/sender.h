@@ -14,7 +14,7 @@ namespace jaeger
 
 using namespace jaegertracing;
 
-class Sender
+class OPENTELEMETRY_API Sender
 {
 public:
   Sender()          = default;

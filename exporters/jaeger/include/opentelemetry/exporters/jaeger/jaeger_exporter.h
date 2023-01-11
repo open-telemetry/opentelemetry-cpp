@@ -14,9 +14,9 @@ namespace exporter
 namespace jaeger
 {
 
-class ThriftSender;
+class OPENTELEMETRY_API ThriftSender;
 
-class JaegerExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_API JaegerExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**

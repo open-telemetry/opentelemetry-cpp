@@ -34,7 +34,7 @@ using TBufferedTransport = apache::thrift::transport::TBufferedTransport;
 using TProtocol          = apache::thrift::protocol::TProtocol;
 using TTransport         = apache::thrift::transport::TTransport;
 
-class UDPTransport : public Transport
+class OPENTELEMETRY_API UDPTransport : public Transport
 {
 public:
   static constexpr auto kUDPPacketMaxLength = 65000;

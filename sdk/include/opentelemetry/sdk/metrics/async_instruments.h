@@ -15,9 +15,9 @@ namespace sdk
 namespace metrics
 {
 
-class AsyncWritableMetricStorage;
+class OPENTELEMETRY_API AsyncWritableMetricStorage;
 
-class ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
+class OPENTELEMETRY_API ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,

@@ -16,7 +16,7 @@ namespace context
 // of DataList nodes and each context holds a shared_ptr to a place within
 // the list that determines which keys and values it has access to. All that
 // come before and none that come after.
-class Context
+class OPENTELEMETRY_API Context
 {
 
 public:

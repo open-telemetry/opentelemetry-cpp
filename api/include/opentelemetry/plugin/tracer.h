@@ -14,7 +14,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
-class Span final : public trace::Span
+class OPENTELEMETRY_API Span final : public trace::Span
 {
 public:
   Span(std::shared_ptr<trace::Tracer> &&tracer, nostd::shared_ptr<trace::Span> span) noexcept
@@ -65,7 +65,7 @@ private:
   nostd::shared_ptr<trace::Span> span_;
 };
 
-class Tracer final : public trace::Tracer, public std::enable_shared_from_this<Tracer>
+class OPENTELEMETRY_API Tracer final : public trace::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
   Tracer(std::shared_ptr<DynamicLibraryHandle> library_handle,

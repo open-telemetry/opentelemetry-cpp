@@ -110,7 +110,7 @@ struct cmp_ic
 };
 using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
-class Request
+class OPENTELEMETRY_API Request
 {
 public:
   virtual void SetMethod(Method method) noexcept = 0;
@@ -128,7 +128,7 @@ public:
   virtual ~Request() = default;
 };
 
-class Response
+class OPENTELEMETRY_API Response
 {
 public:
   virtual const Body &GetBody() const noexcept = 0;
@@ -147,7 +147,7 @@ public:
   virtual ~Response() = default;
 };
 
-class NoopResponse : public Response
+class OPENTELEMETRY_API NoopResponse : public Response
 {
 public:
   const Body &GetBody() const noexcept override
@@ -171,13 +171,16 @@ public:
   StatusCode GetStatusCode() const noexcept override { return 0; }
 };
 
-class Result
+class OPENTELEMETRY_API Result
 {
 
 public:
   Result(std::unique_ptr<Response> res, SessionState session_state)
       : response_(std::move(res)), session_state_(session_state)
   {}
+  // https://stackoverflow.com/a/51033485/743263
+  Result(const Result &) = delete;
+  Result &operator=(const Result &) = delete;  
   operator bool() const { return session_state_ == SessionState::Response; }
   Response &GetResponse()
   {
@@ -195,7 +198,7 @@ private:
   SessionState session_state_;
 };
 
-class EventHandler
+class OPENTELEMETRY_API EventHandler
 {
 public:
   virtual void OnResponse(Response &) noexcept = 0;
@@ -207,7 +210,7 @@ public:
   virtual ~EventHandler() = default;
 };
 
-class Session
+class OPENTELEMETRY_API Session
 {
 public:
   virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
@@ -223,7 +226,7 @@ public:
   virtual ~Session() = default;
 };
 
-class HttpClient
+class OPENTELEMETRY_API HttpClient
 {
 public:
   virtual std::shared_ptr<Session> CreateSession(nostd::string_view url) noexcept = 0;
@@ -237,7 +240,7 @@ public:
   virtual ~HttpClient() = default;
 };
 
-class HttpClientSync
+class OPENTELEMETRY_API HttpClientSync
 {
 public:
   virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;

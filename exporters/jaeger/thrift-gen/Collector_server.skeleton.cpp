@@ -14,7 +14,7 @@ using namespace ::apache::thrift::server;
 
 using namespace  ::jaegertracing::thrift;
 
-class CollectorHandler : virtual public CollectorIf {
+class OPENTELEMETRY_API CollectorHandler : virtual public CollectorIf {
  public:
   CollectorHandler() {
     // Your initialization goes here

@@ -49,7 +49,7 @@ namespace exporter
 namespace etw
 {
 
-class Span;
+class OPENTELEMETRY_API Span;
 
 /**
  * @brief Template that allows to instantiate new Span object for header-only forward-declared
@@ -84,7 +84,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> to_span_ptr(SpanType *ptr)
   return nostd::shared_ptr<opentelemetry::trace::Span>{ptr};
 }
 
-class TracerProvider;
+class OPENTELEMETRY_API TracerProvider;
 
 /**
  * @brief Utility template for obtaining Span Name
@@ -123,7 +123,7 @@ common::SystemTimestamp GetEndTime(T &t)
   return t.GetEndTime();
 }
 
-class Properties;
+class OPENTELEMETRY_API Properties;
 
 /**
  * @brief Utility template to store Attributes on Span
@@ -159,7 +159,7 @@ void UpdateStatus(T &t, Properties &props)
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
 
-class Tracer : public opentelemetry::trace::Tracer,
+class OPENTELEMETRY_API Tracer : public opentelemetry::trace::Tracer,
                public std::enable_shared_from_this<trace::Tracer>
 {
 
@@ -684,7 +684,7 @@ public:
 /**
  * @brief etw::Span allows to send event data to ETW listener.
  */
-class Span : public opentelemetry::trace::Span
+class OPENTELEMETRY_API Span : public opentelemetry::trace::Span
 {
 protected:
   friend class Tracer;
@@ -951,7 +951,7 @@ public:
 /**
  * @brief ETW TracerProvider
  */
-class TracerProvider : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_API TracerProvider : public opentelemetry::trace::TracerProvider
 {
 public:
   /**

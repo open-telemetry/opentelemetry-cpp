@@ -20,7 +20,7 @@ using ValueType = nostd::variant<int64_t, double>;
 
 // TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
 
-class SumPointData
+class OPENTELEMETRY_API SumPointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
@@ -33,7 +33,7 @@ public:
   bool is_monotonic_ = true;
 };
 
-class LastValuePointData
+class OPENTELEMETRY_API LastValuePointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
@@ -47,7 +47,7 @@ public:
   opentelemetry::common::SystemTimestamp sample_ts_ = {};
 };
 
-class HistogramPointData
+class OPENTELEMETRY_API HistogramPointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
@@ -65,7 +65,7 @@ public:
   bool record_min_max_          = true;
 };
 
-class DropPointData
+class OPENTELEMETRY_API DropPointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu

@@ -52,7 +52,7 @@ inline std::string LevelToString(LogLevel level)
   return {};
 }
 
-class LogHandler
+class OPENTELEMETRY_API LogHandler
 {
 public:
   virtual ~LogHandler();
@@ -64,7 +64,7 @@ public:
                       const sdk::common::AttributeMap &attributes) noexcept = 0;
 };
 
-class DefaultLogHandler : public LogHandler
+class OPENTELEMETRY_API DefaultLogHandler : public LogHandler
 {
 public:
   void Handle(LogLevel level,
@@ -74,7 +74,7 @@ public:
               const sdk::common::AttributeMap &attributes) noexcept override;
 };
 
-class NoopLogHandler : public LogHandler
+class OPENTELEMETRY_API NoopLogHandler : public LogHandler
 {
 public:
   void Handle(LogLevel level,
@@ -87,7 +87,7 @@ public:
 /**
  * Stores the singleton global LogHandler.
  */
-class GlobalLogHandler
+class OPENTELEMETRY_API GlobalLogHandler
 {
 public:
   /**

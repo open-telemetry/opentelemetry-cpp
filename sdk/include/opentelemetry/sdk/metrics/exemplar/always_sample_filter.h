@@ -11,7 +11,7 @@ namespace sdk
 namespace metrics
 {
 
-class AlwaysSampleFilter final : public ExemplarFilter
+class OPENTELEMETRY_API AlwaysSampleFilter final : public ExemplarFilter
 {
 public:
   bool ShouldSampleMeasurement(

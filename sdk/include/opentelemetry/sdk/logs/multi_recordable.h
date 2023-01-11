@@ -20,7 +20,7 @@ namespace sdk
 {
 namespace logs
 {
-class MultiRecordable final : public Recordable
+class OPENTELEMETRY_API MultiRecordable final : public Recordable
 {
 public:
   void AddRecordable(const LogRecordProcessor &processor,

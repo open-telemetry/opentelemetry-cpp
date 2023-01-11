@@ -4,4 +4,5 @@ cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
+    defines = ["ENABLE_TEST"]
 )

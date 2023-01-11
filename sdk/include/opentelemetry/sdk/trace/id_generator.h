@@ -13,7 +13,7 @@ namespace trace
 {
 
 /** IdGenerator provides an interface for generating Trace Id and Span Id */
-class IdGenerator
+class OPENTELEMETRY_API IdGenerator
 {
 
 public:

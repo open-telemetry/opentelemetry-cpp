@@ -22,12 +22,12 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
-class Tracer;
+class OPENTELEMETRY_API Tracer;
 
 /**
  * A Span represents a single operation within a Trace.
  */
-class Span
+class OPENTELEMETRY_API Span
 {
 public:
   // Note that Spans should be created using the Tracer class. Please refer to

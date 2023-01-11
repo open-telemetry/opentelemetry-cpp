@@ -26,7 +26,7 @@ namespace otlp
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpGrpcExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_API OtlpGrpcExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**

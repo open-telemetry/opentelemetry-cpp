@@ -18,7 +18,7 @@ namespace metrics
  *
  * <p>This represents a reservoir for a specific "point" of metric data.
  */
-class ExemplarReservoir
+class OPENTELEMETRY_API ExemplarReservoir
 {
 public:
   virtual ~ExemplarReservoir() = default;

@@ -16,7 +16,7 @@ namespace trace
  * the tracer context by wrapping it inside the Span object.
  */
 
-class DefaultSpan : public Span
+class OPENTELEMETRY_API DefaultSpan : public Span
 {
 public:
   // Returns an invalid span.

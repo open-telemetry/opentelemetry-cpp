@@ -7,7 +7,7 @@
 
 #include "opentelemetry/trace/tracer.h"
 
-class Tracer final : public opentelemetry::trace::Tracer,
+class OPENTELEMETRY_API Tracer final : public opentelemetry::trace::Tracer,
                      public std::enable_shared_from_this<Tracer>
 {
 public:
