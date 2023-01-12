@@ -31,8 +31,8 @@ jobs:
         with:
           push: true
           file: docker/grpc/Dockerfile
-          build-args: GRPC_GIT_TAG=${{matrix:grpc-version}}
-          tags: ghcr.io/open-telemetry/opentelemetry-cpp/opentelemetry-cpp-grpc:${{matrix:grpc-version}}
+          build-args: GRPC_GIT_TAG=${{ matrix:grpc-version }}
+          tags: ghcr.io/open-telemetry/opentelemetry-cpp/opentelemetry-cpp-grpc:${{ matrix:grpc-version }}
 
 
 
