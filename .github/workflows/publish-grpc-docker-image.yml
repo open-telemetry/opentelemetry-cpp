@@ -1,7 +1,7 @@
 name: publish-otel-cpp-grpc-docker-image
 on:
   workflow_dispatch
-  pull_request: -- Add this here
+  pull_request
 jobs:
   push_to_registry:
     name: gRPC docker image creation
