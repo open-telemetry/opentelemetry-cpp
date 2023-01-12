@@ -8,7 +8,7 @@ $SRC_DIR = (Get-Item -Path ".\").FullName
 $BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 # Shim has a dependency on Opentracing package which lacks support for Windows
-$BAZEL_EXCLUDE = "-//opentracing-shim:opentracing_shim"
+$BAZEL_EXCLUDE = "-//opentracing-shim/..."
 
 if (!(test-path build)) {
   mkdir build
