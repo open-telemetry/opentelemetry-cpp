@@ -18,7 +18,6 @@
 #endif
 
 namespace metric_sdk    = opentelemetry::sdk::metrics;
-namespace nostd         = opentelemetry::nostd;
 namespace common        = opentelemetry::common;
 namespace metrics_api   = opentelemetry::metrics;
 namespace otlp_exporter = opentelemetry::exporter::otlp;
