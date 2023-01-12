@@ -348,7 +348,7 @@ endif()
 
 if((NOT WITH_API_ONLY) AND USE_CURL)
   find_package(CURL REQUIRED)
-  message(STATUS "Found CURL ${CURL_VERSION}"
+  message(STATUS "Found CURL ${CURL_VERSION}")
 endif()
 
 #
