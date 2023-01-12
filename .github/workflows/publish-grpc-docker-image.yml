@@ -1,6 +1,7 @@
-name: publish-otel-php-base-docker-image
+name: publish-otel-cpp-grpc-docker-image
 on:
   workflow_dispatch
+  pull_request: -- Add this here
 jobs:
   push_to_registry:
     name: gRPC docker image creation
