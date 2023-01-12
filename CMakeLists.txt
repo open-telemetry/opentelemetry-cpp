@@ -201,7 +201,9 @@ option(
   "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
-option(WITH_EXAMPLES_HTTP "Whether to build http client/server examples" ON)
+
+# This requires CURL, OFF by default.
+option(WITH_EXAMPLES_HTTP "Whether to build http client/server examples" OFF)
 
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
@@ -346,6 +348,7 @@ endif()
 
 if((NOT WITH_API_ONLY) AND USE_CURL)
   find_package(CURL REQUIRED)
+  message(STATUS "Found CURL ${CURL_VERSION}"
 endif()
 
 #
