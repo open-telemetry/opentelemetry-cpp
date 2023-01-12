@@ -21,7 +21,7 @@ public:
   nostd::unique_ptr<shim::SpanContextShim> span_context_shim;
 
 protected:
-  virtual void SetUp()
+  virtual void SetUp() override
   {
     auto span_context = trace_api::SpanContext::GetInvalid();
     auto baggage      = baggage::Baggage::GetDefault()->Set("foo", "bar");
@@ -29,7 +29,7 @@ protected:
         nostd::unique_ptr<shim::SpanContextShim>(new shim::SpanContextShim(span_context, baggage));
   }
 
-  virtual void TearDown() { span_context_shim.reset(); }
+  virtual void TearDown() override { span_context_shim.reset(); }
 };
 
 TEST_F(SpanContextShimTest, BaggageItem)

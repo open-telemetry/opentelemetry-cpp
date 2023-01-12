@@ -63,9 +63,9 @@ struct MockSpan final : public trace_api::Span
     AddEvent(name, {}, attributes);
   }
 
-  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override {}
+  void AddEvent(nostd::string_view, common::SystemTimestamp) noexcept override {}
 
-  void AddEvent(nostd::string_view name) noexcept override {}
+  void AddEvent(nostd::string_view) noexcept override {}
 
   void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override
   {
@@ -122,7 +122,7 @@ struct MockPropagator : public context::propagation::TextMapPropagator
   }
 
   // Gets the fields set in the carrier by the `inject` method
-  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  bool Fields(nostd::function_ref<bool(nostd::string_view)>) const noexcept override
   {
     return true;
   }

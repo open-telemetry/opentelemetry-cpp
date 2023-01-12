@@ -1,7 +1,7 @@
 set(this_target opentelemetry_opentracing_shim)
 
-add_library(${this_target} src/span_shim.cc src/span_context_shim.cc
-                           src/tracer_shim.cc)
+add_library(${this_target} src/shim_utils.cc src/span_shim.cc
+                           src/span_context_shim.cc src/tracer_shim.cc)
 
 set_target_properties(${this_target} PROPERTIES EXPORT_NAME opentracing_shim)
 

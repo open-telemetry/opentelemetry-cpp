@@ -28,7 +28,7 @@ public:
   MockPropagator *http_headers_format;
 
 protected:
-  virtual void SetUp()
+  virtual void SetUp() override
   {
     using context::propagation::TextMapPropagator;
 
@@ -41,7 +41,7 @@ protected:
          .http_headers = nostd::shared_ptr<TextMapPropagator>(http_headers_format)});
   }
 
-  virtual void TearDown() { tracer_shim.reset(); }
+  virtual void TearDown() override { tracer_shim.reset(); }
 };
 
 TEST_F(TracerShimTest, TracerName)

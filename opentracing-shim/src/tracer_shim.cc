@@ -8,6 +8,7 @@
 #include "opentelemetry/opentracingshim/shim_utils.h"
 #include "opentelemetry/opentracingshim/span_shim.h"
 
+#include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/trace/context.h"
 #include "opentracing/ext/tags.h"
@@ -46,8 +47,8 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(
   return std::unique_ptr<opentracing::Span>(span_shim);
 }
 
-opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext &sc,
-                                               std::ostream &writer) const
+opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext &,
+                                               std::ostream &) const
 {
   // Errors MAY be raised if the specified Format is not recognized,
   // depending on the specific OpenTracing Language API.
@@ -81,7 +82,7 @@ opentracing::expected<void> TracerShim::Inject(const opentracing::SpanContext &s
 }
 
 opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::Extract(
-    std::istream &reader) const
+    std::istream &) const
 {
   // Errors MAY be raised if either the Format is not recognized or no value
   // could be extracted, depending on the specific OpenTracing Language API.

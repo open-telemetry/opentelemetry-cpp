@@ -22,7 +22,7 @@ public:
   MockSpan *mock_span;
 
 protected:
-  virtual void SetUp()
+  virtual void SetUp() override
   {
     mock_span        = new MockSpan();
     auto span        = nostd::shared_ptr<trace_api::Span>(mock_span);
@@ -32,7 +32,7 @@ protected:
     span_shim = nostd::unique_ptr<shim::SpanShim>(new shim::SpanShim(*tracer_shim, span, baggage));
   }
 
-  virtual void TearDown() { span_shim.reset(); }
+  virtual void TearDown() override { span_shim.reset(); }
 };
 
 TEST_F(SpanShimTest, HandleError)

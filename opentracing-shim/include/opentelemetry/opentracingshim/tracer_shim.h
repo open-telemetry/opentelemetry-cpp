@@ -57,7 +57,7 @@ public:
       const opentracing::TextMapReader &reader) const override;
   opentracing::expected<std::unique_ptr<opentracing::SpanContext>> Extract(
       const opentracing::HTTPHeadersReader &reader) const override;
-  inline void Close() noexcept override { is_closed_ = true; };
+  inline void Close() noexcept override { is_closed_ = true; }
 
 private:
   explicit TracerShim(const TracerPtr &tracer, const OpenTracingPropagators &propagators)

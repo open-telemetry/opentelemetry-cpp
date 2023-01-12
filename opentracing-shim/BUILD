@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "opentracing_shim",
     srcs = [
+        "src/shim_utils.cc",
         "src/span_context_shim.cc",
         "src/span_shim.cc",
         "src/tracer_shim.cc",

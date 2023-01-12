@@ -23,7 +23,7 @@ class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCar
 public:
   CarrierWriterShim(const T &writer) : writer_(writer) {}
 
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
+  virtual nostd::string_view Get(nostd::string_view) const noexcept override
   {
     return "";  // Not required for Opentracing writer
   }
@@ -70,7 +70,7 @@ public:
     return value;
   }
 
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  virtual void Set(nostd::string_view, nostd::string_view) noexcept override
   {
     // Not required for Opentracing reader
   }

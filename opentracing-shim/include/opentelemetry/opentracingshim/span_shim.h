@@ -42,8 +42,8 @@ public:
            std::initializer_list<EventEntry> fields) noexcept override;
   void Log(opentracing::SystemTime timestamp,
            const std::vector<EventEntry> &fields) noexcept override;
-  inline const opentracing::SpanContext &context() const noexcept override { return context_; };
-  inline const opentracing::Tracer &tracer() const noexcept override { return tracer_; };
+  inline const opentracing::SpanContext &context() const noexcept override { return context_; }
+  inline const opentracing::Tracer &tracer() const noexcept override { return tracer_; }
 
 private:
   void logImpl(nostd::span<const EventEntry> fields,
