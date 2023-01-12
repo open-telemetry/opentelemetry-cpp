@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.1)
 cmake_policy(SET CMP0057 NEW)
 
 # See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
-# version of zlib which is dependeded by cURL.
+# version of zlib which CURL depends on.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
@@ -341,8 +341,8 @@ if(WITH_OTLP_HTTP
    OR WITH_ELASTICSEARCH
    OR WITH_JAEGER
    OR WITH_ZIPKIN
-  OR BUILD_W3CTRACECONTEXT_TEST
-  OR WITH_EXAMPLES_HTTP)
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_EXAMPLES_HTTP)
   set(WITH_HTTP_CLIENT_CURL ON)
 else()
   set(WITH_HTTP_CLIENT_CURL OFF)
