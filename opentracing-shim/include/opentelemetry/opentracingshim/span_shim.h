@@ -27,8 +27,9 @@ public:
   explicit SpanShim(const TracerShim &tracer, const SpanPtr &span, const BaggagePtr &baggage)
       : tracer_(tracer), span_(span), context_(span->GetContext(), baggage)
   {}
+
   void handleError(const opentracing::Value &value) noexcept;
-  // Overrides
+
   void FinishWithOptions(
       const opentracing::FinishSpanOptions &finish_span_options) noexcept override;
   void SetOperationName(opentracing::string_view name) noexcept override;

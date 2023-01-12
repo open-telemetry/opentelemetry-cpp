@@ -34,14 +34,14 @@ public:
     // This operation MUST accept the following parameters:
     // - An OpenTelemetry TracerProvider. This operation MUST use this TracerProvider to obtain a
     //   Tracer with the name opentracing-shim along with the current shim library version.
-    // - OpenTelemetry Propagators to be used to perform injection and extraction for the the
+    // - OpenTelemetry Propagators to be used to perform injection and extraction for the
     //   OpenTracing TextMap and HTTPHeaders formats. If not specified, no Propagator values will
     //   be stored in the Shim, and the global OpenTelemetry TextMap propagator will be used for
     //   both OpenTracing TextMap and HTTPHeaders formats.
     return std::shared_ptr<opentracing::Tracer>(
         new (std::nothrow) TracerShim(provider->GetTracer("opentracing-shim"), propagators));
   }
-  // Overrides
+
   std::unique_ptr<opentracing::Span> StartSpanWithOptions(
       opentracing::string_view operation_name,
       const opentracing::StartSpanOptions &options) const noexcept override;

@@ -23,13 +23,11 @@ class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCar
 public:
   CarrierWriterShim(const T &writer) : writer_(writer) {}
 
-  // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     return "";  // Not required for Opentracing writer
   }
 
-  // stores the key-value pair.
   virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     writer_.Set(key.data(), value.data());
@@ -46,7 +44,6 @@ class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCar
 public:
   CarrierReaderShim(const T &reader) : reader_(reader) {}
 
-  // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     nostd::string_view value;
@@ -73,13 +70,11 @@ public:
     return value;
   }
 
-  // stores the key-value pair.
   virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     // Not required for Opentracing reader
   }
 
-  // list of all the keys in the carrier.
   virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
     return reader_
