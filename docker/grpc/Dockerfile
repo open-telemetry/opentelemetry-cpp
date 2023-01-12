@@ -4,6 +4,8 @@ FROM ${BASE_IMAGE} AS grpc
 ARG CORES=${nproc}
 ARG GRPC_GIT_TAG=v1.45.2
 
+RUN apt-get update && apt-get install build-essential cmake libcurl4-openssl-dev libssl-dev git -y
+
 RUN mkdir mkdir -p /opt/third_party/grpc
 
 WORKDIR /opt/third_party/grpc
