@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /work
-ARG CORES=${nproc}
+ARG CORES=2
 ARG GRPC_GIT_TAG=v1.45.2
 
 #install grpc and abseil
