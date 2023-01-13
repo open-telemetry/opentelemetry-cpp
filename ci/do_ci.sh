@@ -103,7 +103,6 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
   make -k
   make test
@@ -133,6 +132,16 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
+elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
   make
   make test
