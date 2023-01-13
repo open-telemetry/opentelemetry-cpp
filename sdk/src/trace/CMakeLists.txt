@@ -1,5 +1,6 @@
 add_library(
   opentelemetry_trace
+  OBJECT
   tracer_context.cc
   tracer_context_factory.cc
   tracer_provider.cc

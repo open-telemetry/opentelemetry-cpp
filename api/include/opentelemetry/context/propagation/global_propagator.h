@@ -22,7 +22,7 @@ namespace propagation
 
 /* Stores the singleton TextMapPropagator */
 
-class GlobalTextMapPropagator
+class OPENTELEMETRY_API GlobalTextMapPropagator
 {
 public:
   static nostd::shared_ptr<TextMapPropagator> GetGlobalPropagator() noexcept

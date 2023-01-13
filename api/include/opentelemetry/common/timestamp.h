@@ -17,7 +17,7 @@ namespace common
  *
  * This is used for marking the beginning and end of an operation.
  */
-class SystemTimestamp
+class OPENTELEMETRY_API SystemTimestamp
 {
 public:
   /**

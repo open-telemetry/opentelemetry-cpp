@@ -47,7 +47,7 @@ struct is_key_value_iterable
  * 'non-standard' type to one of the standard types.
  */
 template <class T>
-class KeyValueIterableView final : public KeyValueIterable
+class OPENTELEMETRY_API KeyValueIterableView final : public KeyValueIterable
 {
 
 public:

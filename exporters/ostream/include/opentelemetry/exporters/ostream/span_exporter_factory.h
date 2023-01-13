@@ -25,7 +25,7 @@ namespace trace
 /**
  * Factory class for OStreamSpanExporter.
  */
-class OStreamSpanExporterFactory
+class OPENTELEMETRY_API OStreamSpanExporterFactory
 {
 public:
   /**

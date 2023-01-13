@@ -513,6 +513,10 @@ endif()
 
 include(CMakePackageConfigHelpers)
 
+if(MSVC AND DEFINED OPENTELEMETRY_BUILD_DLL)
+    add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
+endif()
+
 include_directories(api/include)
 
 add_subdirectory(api)
