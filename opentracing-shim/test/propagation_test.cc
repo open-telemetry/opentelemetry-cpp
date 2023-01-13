@@ -30,9 +30,9 @@ TEST(PropagationTest, TextMapReader_Get_LookupKey_Unsupported)
   ASSERT_EQ(testee.foreach_key_call_count, 1);
 
   text_map["foo"]   = "bar";
-  auto lookup_found = testee.LookupKey("foo");
+  auto lookup_still_unsupported = testee.LookupKey("foo");
   ASSERT_FALSE(text_map.empty());
-  ASSERT_TRUE(opentracing::are_errors_equal(lookup_unsupported.error(),
+  ASSERT_TRUE(opentracing::are_errors_equal(lookup_still_unsupported.error(),
                                             opentracing::lookup_key_not_supported_error));
   ASSERT_EQ(tester.Get("foo"), nostd::string_view{"bar"});
   ASSERT_EQ(testee.foreach_key_call_count, 2);
