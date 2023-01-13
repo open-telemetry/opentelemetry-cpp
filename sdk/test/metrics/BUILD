@@ -48,6 +48,22 @@ cc_test(
 )
 
 cc_test(
+    name = "histogram_test",
+    srcs = [
+        "histogram_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "view_registry_test",
     srcs = [
         "view_registry_test.cc",
@@ -263,5 +279,21 @@ otel_cc_benchmark(
     ],
     deps = [
         "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "histogram_aggregation_benchmark",
+    srcs = [
+        "histogram_aggregation_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
     ],
 )
