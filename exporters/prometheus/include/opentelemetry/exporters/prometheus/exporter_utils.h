@@ -67,7 +67,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
-                      const std::list<double> &boundaries,
+                      const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       std::chrono::nanoseconds time,
@@ -104,7 +104,7 @@ private:
    */
   template <typename T>
   static void SetValue(std::vector<T> values,
-                       const std::list<double> &boundaries,
+                       const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
 };
