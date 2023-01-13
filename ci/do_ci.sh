@@ -95,6 +95,8 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
