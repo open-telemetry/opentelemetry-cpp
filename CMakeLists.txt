@@ -482,10 +482,13 @@ if(WITH_OPENTRACING)
     set(OPENTRACING_DIR "third_party/opentracing-cpp")
     message("Trying to use local ${OPENTRACING_DIR} from submodule")
     if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
+      set(SAVED_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+      set(CMAKE_CXX_FLAGS OFF)
       set(SAVED_BUILD_TESTING ${BUILD_TESTING})
       set(BUILD_TESTING OFF)
       add_subdirectory(${OPENTRACING_DIR})
       set(BUILD_TESTING ${SAVED_BUILD_TESTING})
+      set(CMAKE_CXX_FLAGS ${SAVED_CMAKE_CXX_FLAGS})
     else()
       message(
         FATAL_ERROR
