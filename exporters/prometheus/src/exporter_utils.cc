@@ -221,7 +221,7 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const std::list<double> &boundaries,
+                                      const std::vector<double> &boundaries,
                                       const std::vector<uint64_t> &counts,
                                       const metric_sdk::PointAttributes &labels,
                                       std::chrono::nanoseconds time,
@@ -340,7 +340,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
  */
 template <typename T>
 void PrometheusExporterUtils::SetValue(std::vector<T> values,
-                                       const std::list<double> &boundaries,
+                                       const std::vector<double> &boundaries,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)
 {
