@@ -7,8 +7,6 @@ $SRC_DIR = (Get-Item -Path ".\").FullName
 
 $BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
-# Shim has a dependency on Opentracing package which lacks support for Windows
-$BAZEL_EXCLUDE = "-//opentracing-shim/..."
 
 if (!(test-path build)) {
   mkdir build
@@ -24,7 +22,7 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR -- //... $BAZEL_EXCLUDE
+    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR -- //... -//opentracing-shim/...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
