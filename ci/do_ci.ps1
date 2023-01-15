@@ -22,7 +22,7 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR -- //... -//opentracing-shim/...
+    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
