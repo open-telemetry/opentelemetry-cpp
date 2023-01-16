@@ -246,6 +246,11 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
+  template <class T>
+  CURLcode SetCurlOption(CURLoption option, T value);
+
+  const char *GetCurlErrorMessage(CURLcode code);
+
   std::atomic<bool> is_aborted_;   // Set to 'true' when async callback is aborted
   std::atomic<bool> is_finished_;  // Set to 'true' when async callback is finished.
   std::atomic<bool> is_cleaned_;   // Set to 'true' when async callback is cleaned.
@@ -253,6 +258,7 @@ private:
   const bool reuse_connection_;    // Reuse connection
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
+  char curl_error_message_[CURL_ERROR_SIZE];
   HttpCurlEasyResource curl_resource_;
   CURLcode last_curl_result_;  // Curl result OR HTTP status code if successful
 

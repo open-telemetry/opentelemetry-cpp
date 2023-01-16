@@ -152,10 +152,10 @@ struct HttpSslOptions
     Minimum SSL version to use.
     Valid values are:
     - empty (no minimum version required)
-    - "TLSv1.0"
-    - "TLSv1.1"
-    - "TLSv1.2"
-    - "TLSv1.3"
+    - "1.0" (TLSv1.0)
+    - "1.1" (TLSv1.1)
+    - "1.2" (TLSv1.2)
+    - "1.3" (TLSv1.3)
   */
   std::string ssl_min_tls{};
 
@@ -163,17 +163,17 @@ struct HttpSslOptions
     Maximum SSL version to use.
     Valid values are:
     - empty (no maximum version required)
-    - "TLSv1.0"
-    - "TLSv1.1"
-    - "TLSv1.2"
-    - "TLSv1.3"
+    - "1.0" (TLSv1.0)
+    - "1.1" (TLSv1.1)
+    - "1.2" (TLSv1.2)
+    - "1.3" (TLSv1.3)
   */
   std::string ssl_max_tls{};
 
   /**
     TLS Cipher list.
     The list is delimited by colons (":").
-    Cipher names depends on the underlying SSL implementation.
+    Cipher names depends on the underlying CURL implementation.
   */
   std::string ssl_cipher_list{};
 };
