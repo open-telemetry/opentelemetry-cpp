@@ -203,7 +203,10 @@ option(
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 # This requires CURL, OFF by default.
-option(WITH_EXAMPLES_HTTP "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL" OFF)
+option(
+  WITH_EXAMPLES_HTTP
+  "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
+   OFF)
 
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
