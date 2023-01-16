@@ -360,13 +360,7 @@ endif()
 # Do we need CURL ?
 #
 
-if(WITH_HTTP_CLIENT_CURL)
-  set(USE_CURL ON)
-else()
-  set(USE_CURL OFF)
-endif()
-
-if((NOT WITH_API_ONLY) AND USE_CURL)
+if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
   find_package(CURL REQUIRED)
   message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
 endif()
