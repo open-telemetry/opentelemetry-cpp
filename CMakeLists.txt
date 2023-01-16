@@ -341,32 +341,9 @@ if(WITH_ELASTICSEARCH
 else()
   set(USE_NLOHMANN_JSON OFF)
 endif()
+
 if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
-  # nlohmann_json package is required for most SDK build configurations
-  find_package(nlohmann_json QUIET)
-  set(nlohmann_json_clone FALSE)
-  if(nlohmann_json_FOUND)
-    message("Using external nlohmann::json")
-  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
-         AND EXISTS
-             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
-    message("Trying to use local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    # This option allows to link nlohmann_json::nlohmann_json target
-    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-    # This option allows to add header to include directories
-    include_directories(
-      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
-  else()
-    set(nlohmann_json_clone TRUE)
-    include(cmake/nlohmann-json.cmake)
-    message("\nnlohmann_json package was not found. Cloning from github")
-  endif()
+  include(cmake/nlohmann-json.cmake)
 endif()
 
 if(OTELCPP_MAINTAINER_MODE)
@@ -446,6 +423,11 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4267)
 
     # Enforced warnings
+    add_compile_options(/we4265) # 'class': class has virtual functions, but
+                                 # destructor is not virtual
+    add_compile_options(/we5204) # A class with virtual functions has
+                                 # non-virtual trivial destructor.
+
   elseif()
     message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()

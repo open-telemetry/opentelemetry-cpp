@@ -6,7 +6,12 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #include <chrono>
-#include <future>
+#if defined(_MSC_VER)
+#  pragma warning(suppress : 5204)
+#  include <future>
+#else
+#  include <future>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -46,40 +51,52 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
   std::unique_lock<std::mutex> lk(cv_m_);
   do
   {
-    if (IsShutdown())
+    auto start  = std::chrono::steady_clock::now();
+    auto status = CollectAndExportOnce();
+    if (!status)
     {
-      break;
+      OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
     }
-    std::atomic<bool> cancel_export_for_timeout{false};
-    auto start          = std::chrono::steady_clock::now();
-    auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
-      Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-        if (cancel_export_for_timeout)
-        {
-          OTEL_INTERNAL_LOG_ERROR(
-              "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-              << export_timeout_millis_.count() << " ms, and timed out");
-          return false;
-        }
-        this->exporter_->Export(metric_data);
-        return true;
-      });
-    });
-    std::future_status status;
-    do
-    {
-      status = future_receive.wait_for(std::chrono::milliseconds(export_timeout_millis_));
-      if (status == std::future_status::timeout)
-      {
-        cancel_export_for_timeout = true;
-        break;
-      }
-    } while (status != std::future_status::ready);
     auto end            = std::chrono::steady_clock::now();
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
     cv_.wait_for(lk, remaining_wait_interval_ms);
-  } while (true);
+  } while (IsShutdown() != true);
+  // One last Collect and Export before shutdown
+  auto status = CollectAndExportOnce();
+  if (!status)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
+  }
+}
+
+bool PeriodicExportingMetricReader::CollectAndExportOnce()
+{
+  std::atomic<bool> cancel_export_for_timeout{false};
+  auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
+    Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
+      if (cancel_export_for_timeout)
+      {
+        OTEL_INTERNAL_LOG_ERROR(
+            "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+            << export_timeout_millis_.count() << " ms, and timed out");
+        return false;
+      }
+      this->exporter_->Export(metric_data);
+      return true;
+    });
+  });
+  std::future_status status;
+  do
+  {
+    status = future_receive.wait_for(std::chrono::milliseconds(export_timeout_millis_));
+    if (status == std::future_status::timeout)
+    {
+      cancel_export_for_timeout = true;
+      break;
+    }
+  } while (status != std::future_status::ready);
+  return true;
 }
 
 bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeout) noexcept

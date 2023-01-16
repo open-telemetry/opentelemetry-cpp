@@ -13,7 +13,6 @@
 #endif
 
 namespace trace     = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace jaeger    = opentelemetry::exporter::jaeger;
 
