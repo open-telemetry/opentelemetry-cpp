@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #if !defined(OPENTELEMETRY_LIKELY_IF) && defined(__cplusplus)
 // GCC 9 has likely attribute but do not support declare it at the beginning of statement
 #  if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
@@ -90,10 +88,9 @@
 
 // Regex support
 #if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
-#  define HAVE_WORKING_REGEX 0
+#  define OPENTELEMETRY_HAVE_WORKING_REGEX 0
 #else
-#  include <regex>
-#  define HAVE_WORKING_REGEX 1
+#  define OPENTELEMETRY_HAVE_WORKING_REGEX 1
 #endif
 
 /* clang-format off */
