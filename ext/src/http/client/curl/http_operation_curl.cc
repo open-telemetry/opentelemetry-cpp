@@ -401,32 +401,42 @@ void HttpOperation::Cleanup()
   }
 }
 
+#if LIBCURL_VERSION_NUM >= 0x072200
+// CURL 7.34.0 (0x07 0x22 0x00)
+// CURL_SSLVERSION_TLSv1_0
+// CURL_SSLVERSION_TLSv1_1
+// CURL_SSLVERSION_TLSv1_2
+#  define HAVE_TLS_10_to_12
+#endif
+
+#if LIBCURL_VERSION_NUM >= 0x073400
+// CURL 7.52.0 (0x07 0x34 0x00)
+// CURL_SSLVERSION_TLSv1_3;
+#  define HAVE_TLS_13
+#endif
+
 static long parse_min_ssl_version(std::string version)
 {
-#if LIBCURL_VERSION_NUM >= 0x072200
+#ifdef HAVE_TLS_10_to_12
   if (version == "1.0")
   {
-    // CURL 7.34.0 (0x07 0x22 0x00)
     return CURL_SSLVERSION_TLSv1_0;
   }
 
   if (version == "1.1")
   {
-    // CURL 7.34.0
     return CURL_SSLVERSION_TLSv1_1;
   }
 
   if (version == "1.2")
   {
-    // CURL 7.34.0
     return CURL_SSLVERSION_TLSv1_2;
   }
 #endif
 
-#if LIBCURL_VERSION_NUM >= 0x073400
+#ifdef HAVE_TLS_13
   if (version == "1.3")
   {
-    // CURL 7.52.0 (0x07 0x34 0x00)
     return CURL_SSLVERSION_TLSv1_3;
   }
 #endif
@@ -436,28 +446,26 @@ static long parse_min_ssl_version(std::string version)
 
 static long parse_max_ssl_version(std::string version)
 {
-#if LIBCURL_VERSION_NUM >= 0x073600
+#ifdef HAVE_TLS_10_to_12
   if (version == "1.0")
   {
-    // CURL 7.54.0 (0x07 0x36 0x00)
     return CURL_SSLVERSION_MAX_TLSv1_0;
   }
 
   if (version == "1.1")
   {
-    // CURL 7.54.0
     return CURL_SSLVERSION_MAX_TLSv1_1;
   }
 
   if (version == "1.2")
   {
-    // CURL 7.54.0
     return CURL_SSLVERSION_MAX_TLSv1_2;
   }
+#endif
 
+#ifdef HAVE_TLS_13
   if (version == "1.3")
   {
-    // CURL 7.54.0
     return CURL_SSLVERSION_MAX_TLSv1_3;
   }
 #endif
@@ -702,13 +710,80 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_cipher_list.empty())
     {
-      // TODO: Unclear when to use CURLOPT_SSL_CIPHER_LIST versus CURLOPT_TLS13_CIPHERS
+      /*
+        CIPHER_LIST can contain:
+        - (a) only TLS 1.0, 1.1 or 1.2 ciphers
+        - (b) only TLS 1.3 ciphers
+        - (c) both
+        and the CURL api exposes
+        - (d) CURLOPT_SSL_CIPHER_LIST for 1.0, 1.1, 1.2 ciphers
+        - (e) CURLOPT_TLS13_CIPHERS for 1.3 ciphers
+
+        We need to sort out what to call:
+        - (d) only, with (a)
+        - (e) only, with (b)
+        - or (d) and (e), with ciphers in (c),
+          letting CURL discard un applicable ciphers.
+      */
       const char *cipher_list = ssl_options_.ssl_cipher_list.c_str();
 
-      rc = SetCurlOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
-      if (rc != CURLE_OK)
+      bool can_use_tls_12 = false;
+      bool can_use_tls_13 = false;
+
+#ifdef HAVE_TLS_10_to_12
+      if ((min_ssl_version == 0) || (min_ssl_version == CURL_SSLVERSION_TLSv1_0) ||
+          (min_ssl_version == CURL_SSLVERSION_TLSv1_1) ||
+          (min_ssl_version == CURL_SSLVERSION_TLSv1_2))
       {
-        return rc;
+        can_use_tls_12 = true;
+      }
+#endif
+
+#ifdef HAVE_TLS_13
+      if ((max_ssl_version == 0) || (max_ssl_version == CURL_SSLVERSION_TLSv1_3))
+      {
+        can_use_tls_13 = true;
+      }
+#endif
+
+      if (can_use_tls_12)
+      {
+        /*
+          This will cover cases (a) and (c).
+
+          If someone uses only TLS 1.3 ciphers,
+          and do not set min TLS version to 1.3,
+          this will fail with an error,
+          because CURL won't find 1.0, 1.1, 1.2 suitable ciphers.
+        */
+        rc = SetCurlOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
+        if (rc != CURLE_OK)
+        {
+          return rc;
+        }
+      }
+
+      if (can_use_tls_13)
+      {
+        /*
+          This will cover cases (b) and (c).
+
+          If someone uses only TLS 1.2 or lower ciphers,
+          and do not set max TLS version to 1.2 or lower,
+          this will fail with an error,
+          because CURL won't find 1.3 suitable ciphers.
+        */
+        rc = SetCurlOption(CURLOPT_TLS13_CIPHERS, cipher_list);
+        if (rc != CURLE_OK)
+        {
+          return rc;
+        }
+      }
+
+      if (!can_use_tls_12 && !can_use_tls_13)
+      {
+        OTEL_INTERNAL_LOG_ERROR("No suitable TLS version for CIPHER LIST");
+        return CURLE_UNKNOWN_OPTION;
       }
     }
 
