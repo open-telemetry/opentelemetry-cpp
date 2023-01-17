@@ -364,6 +364,7 @@ endif()
 #
 
 if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+  # No specific version required.
   find_package(CURL REQUIRED)
   message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
 endif()
