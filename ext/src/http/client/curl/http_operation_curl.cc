@@ -710,6 +710,16 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_cipher_list.empty())
     {
+      const char *cipher_list = ssl_options_.ssl_cipher_list.c_str();
+
+      rc = SetCurlOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+/* This needs more investigations. */
+#if 0
       /*
         CIPHER_LIST can contain:
         - (a) only TLS 1.0, 1.1 or 1.2 ciphers
@@ -725,26 +735,25 @@ CURLcode HttpOperation::Setup()
         - or (d) and (e), with ciphers in (c),
           letting CURL discard un applicable ciphers.
       */
-      const char *cipher_list = ssl_options_.ssl_cipher_list.c_str();
 
       bool can_use_tls_12 = false;
       bool can_use_tls_13 = false;
 
-#ifdef HAVE_TLS_10_to_12
+#  ifdef HAVE_TLS_10_to_12
       if ((min_ssl_version == 0) || (min_ssl_version == CURL_SSLVERSION_TLSv1_0) ||
           (min_ssl_version == CURL_SSLVERSION_TLSv1_1) ||
           (min_ssl_version == CURL_SSLVERSION_TLSv1_2))
       {
         can_use_tls_12 = true;
       }
-#endif
+#  endif
 
-#ifdef HAVE_TLS_13
+#  ifdef HAVE_TLS_13
       if ((max_ssl_version == 0) || (max_ssl_version == CURL_SSLVERSION_TLSv1_3))
       {
         can_use_tls_13 = true;
       }
-#endif
+#  endif
 
       if (can_use_tls_12)
       {
@@ -785,6 +794,7 @@ CURLcode HttpOperation::Setup()
         OTEL_INTERNAL_LOG_ERROR("No suitable TLS version for CIPHER LIST");
         return CURLE_UNKNOWN_OPTION;
       }
+#endif
     }
 
     if (ssl_options_.ssl_insecure_skip_verify)
