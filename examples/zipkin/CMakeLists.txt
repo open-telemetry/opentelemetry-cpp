@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include_directories(${CMAKE_SOURCE_DIR}/exporters/zipkin/include)
 
 add_executable(example_zipkin main.cc)
