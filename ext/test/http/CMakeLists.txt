@@ -8,13 +8,11 @@ if(CURL_FOUND)
 
   if(TARGET CURL::libcurl)
     target_link_libraries(${FILENAME} opentelemetry_http_client_curl
-                          opentelemetry_common
-                          CURL::libcurl)
+                          opentelemetry_common CURL::libcurl)
   else()
     include_directories(${CURL_INCLUDE_DIRS})
     target_link_libraries(${FILENAME} ${CURL_LIBRARIES}
-                          opentelemetry_http_client_curl
-                          opentelemetry_common)
+                          opentelemetry_http_client_curl opentelemetry_common)
   endif()
   gtest_add_tests(
     TARGET ${FILENAME}

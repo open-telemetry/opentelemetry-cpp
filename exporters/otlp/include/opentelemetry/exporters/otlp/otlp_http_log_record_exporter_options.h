@@ -69,13 +69,15 @@ struct OtlpHttpLogRecordExporterOptions
 
   std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
+#  endif
 
-  /** RESERVED. */
-  std::string ssl_min_tls{};
-  /** RESERVED. */
-  std::string ssl_max_tls{};
-  /** RESERVED. */
-  std::string ssl_cipher_list{};
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS
+  /** Minimum TLS version. */
+  std::string ssl_min_tls = GetOtlpDefaultLogsSslTlsMinVersion();
+  /** Maximum TLS version. */
+  std::string ssl_max_tls = GetOtlpDefaultLogsSslTlsMaxVersion();
+  /** TLS cipher list. */
+  std::string ssl_cipher_list = GetOtlpDefaultLogsSslTlsCipherList();
 #  endif
 };
 

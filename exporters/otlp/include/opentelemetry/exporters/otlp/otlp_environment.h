@@ -99,6 +99,20 @@ std::string GetOtlpDefaultTracesSslClientCertificateString();
 std::string GetOtlpDefaultMetricsSslClientCertificateString();
 std::string GetOtlpDefaultLogsSslClientCertificateString();
 
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+std::string GetOtlpDefaultTracesSslTlsMinVersion();
+std::string GetOtlpDefaultMetricsSslTlsMinVersion();
+std::string GetOtlpDefaultLogsSslTlsMinVersion();
+
+std::string GetOtlpDefaultTracesSslTlsMaxVersion();
+std::string GetOtlpDefaultMetricsSslTlsMaxVersion();
+std::string GetOtlpDefaultLogsSslTlsMaxVersion();
+
+std::string GetOtlpDefaultTracesSslTlsCipherList();
+std::string GetOtlpDefaultMetricsSslTlsCipherList();
+std::string GetOtlpDefaultLogsSslTlsCipherList();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS */
+
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout();

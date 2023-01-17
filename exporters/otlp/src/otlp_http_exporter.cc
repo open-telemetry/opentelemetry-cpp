@@ -34,9 +34,6 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.ssl_client_key_string,
                                                             options.ssl_client_cert_path,
                                                             options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher_list,
 #else
                                                             false /* ssl_insecure_skip_verify */,
                                                             "" /* ssl_ca_cert_path */,
@@ -45,6 +42,12 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             "" /* ssl_client_key_string */,
                                                             "" /* ssl_client_cert_path */,
                                                             "" /* ssl_client_cert_string */,
+#endif
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+                                                            options.ssl_min_tls,
+                                                            options.ssl_max_tls,
+                                                            options.ssl_cipher_list,
+#else
                                                             "" /* ssl_min_tls */,
                                                             "" /* ssl_max_tls */,
                                                             "" /* ssl_cipher_list */,

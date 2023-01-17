@@ -73,13 +73,15 @@ struct OtlpHttpMetricExporterOptions
 
   std::string ssl_client_cert_path   = GetOtlpDefaultMetricsSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultMetricsSslClientCertificateString();
+#endif
 
-  /** RESERVED. */
-  std::string ssl_min_tls{};
-  /** RESERVED. */
-  std::string ssl_max_tls{};
-  /** RESERVED. */
-  std::string ssl_cipher_list{};
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+  /** Minimum TLS version. */
+  std::string ssl_min_tls = GetOtlpDefaultMetricsSslTlsMinVersion();
+  /** Maximum TLS version. */
+  std::string ssl_max_tls = GetOtlpDefaultMetricsSslTlsMaxVersion();
+  /** TLS cipher list. */
+  std::string ssl_cipher_list = GetOtlpDefaultMetricsSslTlsCipherList();
 #endif
 };
 
