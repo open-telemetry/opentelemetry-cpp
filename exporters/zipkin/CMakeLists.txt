@@ -13,7 +13,6 @@
 # limitations under the License.
 
 include_directories(include)
-find_package(CURL REQUIRED)
 add_definitions(-DWITH_CURL)
 add_library(
   opentelemetry_exporter_zipkin_trace
