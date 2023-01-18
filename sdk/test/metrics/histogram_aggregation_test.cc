@@ -59,7 +59,7 @@ private:
   std::unique_ptr<PushMetricExporter> exporter_;
 };
 
-TEST(HistogramToSum, Double)
+TEST(HistogramInstrumentToHistogramAggregation, Double)
 {
 #if HAVE_WORKING_REGEX
   MeterProvider mp;
@@ -68,12 +68,6 @@ TEST(HistogramToSum, Double)
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
-
-  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
-  std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kHistogram, "histogram1")};
-  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
-  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 
   auto h = m->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
 
@@ -89,7 +83,7 @@ TEST(HistogramToSum, Double)
   h->Record(50, {});
   h->Record(1e6, {});
 
-  std::vector<SumPointData> actuals;
+  std::vector<HistogramPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
     {
@@ -97,7 +91,7 @@ TEST(HistogramToSum, Double)
       {
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+          actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
         }
       }
     }
@@ -106,11 +100,12 @@ TEST(HistogramToSum, Double)
 
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.sum_));
+  ASSERT_EQ(11, actual.count_);
 #endif
 }
 
-TEST(CounterToSum, Double)
+TEST(CounterToHistogram, Double)
 {
 #if HAVE_WORKING_REGEX
   MeterProvider mp;
@@ -120,7 +115,7 @@ TEST(CounterToSum, Double)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
 
-  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kHistogram)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "counter1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
@@ -140,7 +135,7 @@ TEST(CounterToSum, Double)
   h->Add(50, {});
   h->Add(1e6, {});
 
-  std::vector<SumPointData> actuals;
+  std::vector<HistogramPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
     {
@@ -148,7 +143,7 @@ TEST(CounterToSum, Double)
       {
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+          actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
         }
       }
     }
@@ -157,52 +152,7 @@ TEST(CounterToSum, Double)
 
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
-#endif
-}
-
-TEST(UpDownCounterToSum, Double)
-{
-#if HAVE_WORKING_REGEX
-  MeterProvider mp;
-  auto m = mp.GetMeter("meter1", "version1", "schema1");
-
-  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
-  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
-  mp.AddMetricReader(reader);
-
-  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum)};
-  std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kUpDownCounter, "counter1")};
-  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
-  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
-
-  auto h = m->CreateDoubleUpDownCounter("counter1", "counter1_description", "counter1_unit");
-
-  h->Add(5, {});
-  h->Add(10, {});
-  h->Add(-15, {});
-  h->Add(20, {});
-  h->Add(25, {});
-  h->Add(-30, {});
-
-  std::vector<SumPointData> actuals;
-  reader->Collect([&](ResourceMetrics &rm) {
-    for (const ScopeMetrics &smd : rm.scope_metric_data_)
-    {
-      for (const MetricData &md : smd.metric_data_)
-      {
-        for (const PointDataAttributes &dp : md.point_data_attr_)
-        {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
-        }
-      }
-    }
-    return true;
-  });
-
-  ASSERT_EQ(1, actuals.size());
-  const auto &actual = actuals.at(0);
-  ASSERT_EQ(15.0, opentelemetry::nostd::get<double>(actual.value_));
+  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.sum_));
+  ASSERT_EQ(11, actual.count_);
 #endif
 }
