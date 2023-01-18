@@ -32,8 +32,6 @@ public:
                      void *state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
-        //      attributes_processor_{attributes_processor},
-        //      state_{state},
         cumulative_hash_map_(new AttributesHashMap()),
         delta_hash_map_(new AttributesHashMap()),
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
@@ -116,8 +114,6 @@ public:
 private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
-  // const AttributesProcessor *attributes_processor_;
-  // void *state_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
