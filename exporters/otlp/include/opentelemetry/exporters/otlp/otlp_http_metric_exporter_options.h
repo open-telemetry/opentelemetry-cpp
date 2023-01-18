@@ -80,8 +80,10 @@ struct OtlpHttpMetricExporterOptions
   std::string ssl_min_tls = GetOtlpDefaultMetricsSslTlsMinVersion();
   /** Maximum TLS version. */
   std::string ssl_max_tls = GetOtlpDefaultMetricsSslTlsMaxVersion();
-  /** TLS cipher list. */
-  std::string ssl_cipher_list = GetOtlpDefaultMetricsSslTlsCipherList();
+  /** TLS cipher. */
+  std::string ssl_cipher = GetOtlpDefaultMetricsSslTlsCipher();
+  /** TLS cipher suite. */
+  std::string ssl_cipher_suite = GetOtlpDefaultMetricsSslTlsCipherSuite();
 #endif
 };
 

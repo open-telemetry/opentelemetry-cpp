@@ -108,9 +108,15 @@ std::string GetOtlpDefaultTracesSslTlsMaxVersion();
 std::string GetOtlpDefaultMetricsSslTlsMaxVersion();
 std::string GetOtlpDefaultLogsSslTlsMaxVersion();
 
-std::string GetOtlpDefaultTracesSslTlsCipherList();
-std::string GetOtlpDefaultMetricsSslTlsCipherList();
-std::string GetOtlpDefaultLogsSslTlsCipherList();
+// For TLS 1.0, 1.1, 1.2
+std::string GetOtlpDefaultTracesSslTlsCipher();
+std::string GetOtlpDefaultMetricsSslTlsCipher();
+std::string GetOtlpDefaultLogsSslTlsCipher();
+
+// For TLS 1.3
+std::string GetOtlpDefaultTracesSslTlsCipherSuite();
+std::string GetOtlpDefaultMetricsSslTlsCipherSuite();
+std::string GetOtlpDefaultLogsSslTlsCipherSuite();
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS */
 
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();

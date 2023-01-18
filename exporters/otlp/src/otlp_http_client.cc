@@ -968,7 +968,8 @@ OtlpHttpClient::createSession(
     ssl_options_.ssl_client_cert_string   = options_.ssl_client_cert_string;
     ssl_options_.ssl_min_tls              = options_.ssl_min_tls;
     ssl_options_.ssl_max_tls              = options_.ssl_max_tls;
-    ssl_options_.ssl_cipher_list          = options_.ssl_cipher_list;
+    ssl_options_.ssl_cipher               = options_.ssl_cipher;
+    ssl_options_.ssl_cipher_suite         = options_.ssl_cipher_suite;
   }
   else
   {

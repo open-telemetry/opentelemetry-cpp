@@ -75,8 +75,10 @@ struct OtlpHttpExporterOptions
   std::string ssl_min_tls = GetOtlpDefaultTracesSslTlsMinVersion();
   /** Maximum TLS version. */
   std::string ssl_max_tls = GetOtlpDefaultTracesSslTlsMaxVersion();
-  /** TLS cipher list. */
-  std::string ssl_cipher_list = GetOtlpDefaultTracesSslTlsCipherList();
+  /** TLS cipher. */
+  std::string ssl_cipher = GetOtlpDefaultTracesSslTlsCipher();
+  /** TLS cipher suite. */
+  std::string ssl_cipher_suite = GetOtlpDefaultTracesSslTlsCipherSuite();
 #endif
 };
 

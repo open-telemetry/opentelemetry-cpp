@@ -49,11 +49,13 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
 #ifdef ENABLE_OTLP_HTTP_SSL_TLS
                                                             options.ssl_min_tls,
                                                             options.ssl_max_tls,
-                                                            options.ssl_cipher_list,
+                                                            options.ssl_cipher,
+                                                            options.ssl_cipher_suite,
 #else
                                                             "" /* ssl_min_tls */,
                                                             "" /* ssl_max_tls */,
-                                                            "" /* ssl_cipher_list */,
+                                                            "" /* ssl_cipher */,
+                                                            "" /* ssl_cipher_suite */,
 #endif
                                                             options.content_type,
                                                             options.json_bytes_mapping,

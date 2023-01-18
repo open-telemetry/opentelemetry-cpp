@@ -706,95 +706,37 @@ CURLcode HttpOperation::Setup()
       }
     }
 
-    /* 5 - CIPHER_LIST */
+    /* 5 - CIPHER */
 
-    if (!ssl_options_.ssl_cipher_list.empty())
+    if (!ssl_options_.ssl_cipher.empty())
     {
-      const char *cipher_list = ssl_options_.ssl_cipher_list.c_str();
+      /* TLS 1.0, 1.1, 1.2 */
+      const char *cipher_list = ssl_options_.ssl_cipher.c_str();
 
       rc = SetCurlOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
       if (rc != CURLE_OK)
       {
         return rc;
       }
+    }
 
-/* This needs more investigations. */
-#if 0
-      /*
-        CIPHER_LIST can contain:
-        - (a) only TLS 1.0, 1.1 or 1.2 ciphers
-        - (b) only TLS 1.3 ciphers
-        - (c) both
-        and the CURL api exposes
-        - (d) CURLOPT_SSL_CIPHER_LIST for 1.0, 1.1, 1.2 ciphers
-        - (e) CURLOPT_TLS13_CIPHERS for 1.3 ciphers
+    if (!ssl_options_.ssl_cipher_suite.empty())
+    {
+#if LIBCURL_VERSION_NUM >= 0x073D00
+      /* TLS 1.3 */
+      const char *cipher_list = ssl_options_.ssl_cipher_suite.c_str();
 
-        We need to sort out what to call:
-        - (d) only, with (a)
-        - (e) only, with (b)
-        - or (d) and (e), with ciphers in (c),
-          letting CURL discard un applicable ciphers.
-      */
-
-      bool can_use_tls_12 = false;
-      bool can_use_tls_13 = false;
-
-#  ifdef HAVE_TLS_10_to_12
-      if ((min_ssl_version == 0) || (min_ssl_version == CURL_SSLVERSION_TLSv1_0) ||
-          (min_ssl_version == CURL_SSLVERSION_TLSv1_1) ||
-          (min_ssl_version == CURL_SSLVERSION_TLSv1_2))
-      {
-        can_use_tls_12 = true;
-      }
-#  endif
-
-#  ifdef HAVE_TLS_13
-      if ((max_ssl_version == 0) || (max_ssl_version == CURL_SSLVERSION_TLSv1_3))
-      {
-        can_use_tls_13 = true;
-      }
-#  endif
-
-      if (can_use_tls_12)
-      {
-        /*
-          This will cover cases (a) and (c).
-
-          If someone uses only TLS 1.3 ciphers,
-          and do not set min TLS version to 1.3,
-          this will fail with an error,
-          because CURL won't find 1.0, 1.1, 1.2 suitable ciphers.
-        */
-        rc = SetCurlOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
-        if (rc != CURLE_OK)
-        {
-          return rc;
-        }
-      }
-
-      if (can_use_tls_13)
-      {
-        /*
-          This will cover cases (b) and (c).
-
-          If someone uses only TLS 1.2 or lower ciphers,
-          and do not set max TLS version to 1.2 or lower,
-          this will fail with an error,
-          because CURL won't find 1.3 suitable ciphers.
-        */
-        rc = SetCurlOption(CURLOPT_TLS13_CIPHERS, cipher_list);
-        if (rc != CURLE_OK)
-        {
-          return rc;
-        }
-      }
-
-      if (!can_use_tls_12 && !can_use_tls_13)
-      {
-        OTEL_INTERNAL_LOG_ERROR("No suitable TLS version for CIPHER LIST");
-        return CURLE_UNKNOWN_OPTION;
-      }
+      rc = SetCurlOption(CURLOPT_TLS13_CIPHERS, cipher_list);
+#else
+      // CURL 7.61.0 (0x07 0x3D 0x00) required for CURLOPT_TLS13_CIPHERS.
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.61.0 required for CIPHER SUITE");
+      return CURLE_UNKNOWN_OPTION;
 #endif
+
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
     }
 
     if (ssl_options_.ssl_insecure_skip_verify)
