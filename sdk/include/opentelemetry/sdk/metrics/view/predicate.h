@@ -8,6 +8,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#  include <regex>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -26,7 +30,7 @@ public:
   PatternPredicate(opentelemetry::nostd::string_view pattern) : reg_key_{pattern.data()} {}
   bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
     return std::regex_match(str.data(), reg_key_);
 #else
     // TBD - Support regex match for GCC4.8
@@ -37,7 +41,7 @@ public:
   }
 
 private:
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   std::regex reg_key_;
 #else
   std::string reg_key_;

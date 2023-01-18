@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/detail/preprocessor.h"
 
 #define OPENTELEMETRY_ABI_VERSION_NO 1

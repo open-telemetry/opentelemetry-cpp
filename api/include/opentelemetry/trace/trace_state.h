@@ -7,19 +7,15 @@
 #include <cstring>
 #include <string>
 
-#include <regex>
-#if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
-#  define HAVE_WORKING_REGEX 0
-#else
-#  define HAVE_WORKING_REGEX 1
-#endif
-
 #include "opentelemetry/common/kv_properties.h"
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+
+#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#  include <regex>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -212,7 +208,7 @@ public:
    */
   static bool IsValidKey(nostd::string_view key)
   {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
     return IsValidKeyRegEx(key);
 #else
     return IsValidKeyNonRegEx(key);
@@ -225,7 +221,7 @@ public:
    */
   static bool IsValidValue(nostd::string_view value)
   {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
     return IsValidValueRegEx(value);
 #else
     return IsValidValueNonRegEx(value);
