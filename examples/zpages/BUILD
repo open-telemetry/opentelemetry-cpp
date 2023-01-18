@@ -26,11 +26,11 @@ cc_binary(
         "//conditions:default": ["-pthread"],
     }),
     tags = ["examples"],
-    deps = dll_deps(
-        [
+    deps = dll_deps([
             "//ext:headers",
             "//ext/src/zpages",
             "//sdk/src/trace",
-        ],
-    )
+    ]) + [
+        "@github_nlohmann_json//:json"
+    ]
 )

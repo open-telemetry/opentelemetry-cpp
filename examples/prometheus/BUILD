@@ -4,7 +4,7 @@ cc_binary(
         "main.cc",
     ],
     linkopts = ["-pthread"],
-    tags = ["ostream"],
+    tags = ["prometheus"],
     deps = [
         "//api",
         "//examples/common/metrics_foo_library:common_metrics_foo_library",

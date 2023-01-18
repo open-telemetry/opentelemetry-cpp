@@ -65,33 +65,33 @@
 #include <opentelemetry/trace/propagation/http_trace_context.h>
 #include <opentelemetry/trace/propagation/jaeger.h>
 
-// This hack forces static inline functions, marked with OPENTELEMETRY_API_SINGLETON to be linked in.
-// It goes by either directly adding them to this list, or adding something that calls them (if they are private).
-extern "C" OPENTELEMETRY_API void** return_something()
-{
-static void* otel_sdk_force_link[] = {
-    &opentelemetry::baggage::Baggage::GetDefault,
-    &opentelemetry::baggage::Baggage::FromHeader,
-    &opentelemetry::context::GetDefaultStorage,
-    &opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator,
-    &opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator,
-    &opentelemetry::context::RuntimeContext::Attach,
-    &opentelemetry::context::RuntimeContext::Detach,
-    &opentelemetry::context::RuntimeContext::GetConstRuntimeContextStorage,
-    &opentelemetry::context::RuntimeContext::GetConstRuntimeContextStorage,
-    &opentelemetry::context::RuntimeContext::GetCurrent,
-    &opentelemetry::context::RuntimeContext::GetValue,
-    &opentelemetry::context::RuntimeContext::SetRuntimeContextStorage,
-    &opentelemetry::context::RuntimeContext::SetValue,
-    &opentelemetry::metrics::Provider::GetMeterProvider,
-    &opentelemetry::metrics::Provider::SetMeterProvider,
-    &opentelemetry::trace::Provider::GetTracerProvider,
-    &opentelemetry::trace::Provider::SetTracerProvider,
-    &opentelemetry::trace::TraceState::GetDefault,
-    &opentelemetry::trace::TraceState::FromHeader,
-    &opentelemetry::trace::TraceState::IsValidKey,
-    &opentelemetry::trace::TraceState::IsValidValue,
-    nullptr
-};
-return otel_sdk_force_link;
-}
+// // This hack forces static inline functions, marked with OPENTELEMETRY_API_SINGLETON to be linked in.
+// // It goes by either directly adding them to this list, or adding something that calls them (if they are private).
+// extern "C" OPENTELEMETRY_API void** return_something()
+// {
+// static void* otel_sdk_force_link[] = {
+//     &opentelemetry::baggage::Baggage::GetDefault,
+//     &opentelemetry::baggage::Baggage::FromHeader,
+//     &opentelemetry::context::GetDefaultStorage,
+//     &opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator,
+//     &opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator,
+//     &opentelemetry::context::RuntimeContext::Attach,
+//     &opentelemetry::context::RuntimeContext::Detach,
+//     &opentelemetry::context::RuntimeContext::GetConstRuntimeContextStorage,
+//     &opentelemetry::context::RuntimeContext::GetConstRuntimeContextStorage,
+//     &opentelemetry::context::RuntimeContext::GetCurrent,
+//     &opentelemetry::context::RuntimeContext::GetValue,
+//     &opentelemetry::context::RuntimeContext::SetRuntimeContextStorage,
+//     &opentelemetry::context::RuntimeContext::SetValue,
+//     &opentelemetry::metrics::Provider::GetMeterProvider,
+//     &opentelemetry::metrics::Provider::SetMeterProvider,
+//     &opentelemetry::trace::Provider::GetTracerProvider,
+//     &opentelemetry::trace::Provider::SetTracerProvider,
+//     &opentelemetry::trace::TraceState::GetDefault,
+//     &opentelemetry::trace::TraceState::FromHeader,
+//     &opentelemetry::trace::TraceState::IsValidKey,
+//     &opentelemetry::trace::TraceState::IsValidValue,
+//     nullptr
+// };
+// return otel_sdk_force_link;
+// }

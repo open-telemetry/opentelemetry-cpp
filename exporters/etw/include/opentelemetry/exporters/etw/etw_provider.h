@@ -231,11 +231,12 @@ public:
           it->second.providerHandle = INVALID_HANDLE;
           if (result == STATUS_OK)
           {
-            m.erase(it);
+            it = m.erase(it);
           }
         }
         return result;
       }
+      it++;
     }
     return STATUS_ERROR;
   }

@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -27,8 +29,9 @@ cc_test(
         "etw",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":etw_exporter",
+    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
     ],
@@ -44,8 +47,9 @@ cc_test(
         "etw",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":etw_exporter",
+    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
     ],
@@ -61,9 +65,19 @@ cc_test(
         "etw",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":etw_exporter",
+    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

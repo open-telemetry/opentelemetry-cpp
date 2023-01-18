@@ -52,7 +52,7 @@ TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
 
 TEST(ETWProvider, CheckCloseSuccess)
 {
-  std::string providerName = "OpenTelemetry-ETW-Provider";
+  std::string providerName = "OpenTelemetry-ETW-Provider-2";
 
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str(), ETWProvider::EventFormat::ETW_MANIFEST);

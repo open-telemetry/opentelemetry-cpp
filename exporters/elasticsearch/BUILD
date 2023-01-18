@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -36,9 +38,20 @@ cc_test(
         "es",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":es_log_record_exporter",
+    ]) + [
+        "@github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
         "@curl",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

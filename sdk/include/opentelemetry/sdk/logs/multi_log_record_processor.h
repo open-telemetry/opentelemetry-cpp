@@ -31,6 +31,9 @@ public:
   MultiLogRecordProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
   ~MultiLogRecordProcessor() override;
 
+  MultiLogRecordProcessor(const MultiLogRecordProcessor&) = delete;
+  MultiLogRecordProcessor& operator=(const MultiLogRecordProcessor&) = delete;
+
   void AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor);
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;

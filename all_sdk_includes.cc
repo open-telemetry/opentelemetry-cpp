@@ -154,3 +154,27 @@
 #include <opentelemetry/ext/zpages/static/tracez_index.h>
 #include <opentelemetry/ext/zpages/static/tracez_script.h>
 #include <opentelemetry/ext/zpages/static/tracez_style.h>
+
+// #include <opentelemetry/exporters/etw/etw_config.h>
+// #include <opentelemetry/exporters/etw/etw_fields.h>
+// #include <opentelemetry/exporters/etw/etw_logger.h>
+// #include <opentelemetry/exporters/etw/etw_logger_exporter.h>
+// #include <opentelemetry/exporters/etw/etw_properties.h>
+// #include <opentelemetry/exporters/etw/etw_provider.h>
+// #include <opentelemetry/exporters/etw/etw_random_id_generator.h>
+// #include <opentelemetry/exporters/etw/etw_tail_sampler.h>
+// #include <opentelemetry/exporters/etw/etw_traceloggingdynamic.h>
+// #include <opentelemetry/exporters/etw/etw_tracer.h>
+// #include <opentelemetry/exporters/etw/etw_tracer_exporter.h>
+// #include <opentelemetry/exporters/etw/TraceLoggingDynamic.h>
+// #include <opentelemetry/exporters/etw/utils.h>
+// #include <opentelemetry/exporters/etw/uuid.h>
+
+#include <opentelemetry/exporters/elasticsearch/es_log_recordable.h>
+#include <opentelemetry/exporters/elasticsearch/es_log_record_exporter.h>
+
+#include <opentelemetry/exporters/etw/etw_provider.h>
+#include <opentelemetry/exporters/etw/etw_logger.h>
+#include <opentelemetry/exporters/etw/etw_random_id_generator.h>
+#include <opentelemetry/exporters/etw/etw_tracer.h>
+

@@ -50,6 +50,7 @@ cc_test(
     deps = dll_deps([
         ":zipkin_recordable",
     ]) + [
+        "@github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
     ],
 )

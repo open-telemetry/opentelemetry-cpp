@@ -23,6 +23,10 @@ namespace logs
 class OPENTELEMETRY_API MultiRecordable final : public Recordable
 {
 public:
+  MultiRecordable() = default;
+  MultiRecordable(const MultiRecordable&) = delete;
+  MultiRecordable& operator=(const MultiRecordable&) = delete;
+
   void AddRecordable(const LogRecordProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept;
 
