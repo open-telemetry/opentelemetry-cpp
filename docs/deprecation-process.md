@@ -15,33 +15,33 @@ Removal issues should be tagged with the "Removal" label.
 Discoverability of ongoing deprecations and removals is the key here,
 to avoid surprises.
 
-### The DEPRECATED.md document
+### The DEPRECATED document
 
-At any given time, file `DEPRECATED.md` lists all the ongoing deprecations,
+At any given time, file `DEPRECATED` lists all the ongoing deprecations,
 no matter how long ago these were announced.
 
-A user using release N should find, when reading `DEPRECATED.md`,
+A user using release N should find, when reading `DEPRECATED`,
 if a given api was deprecated in release N-5 or N-10, without having to go back to
 release notes from past versions.
 
-When a removal is finally implemented, the DEPRECATED.md file is expunged,
+When a removal is finally implemented, the `DEPRECATED` file is expunged,
 so it contains only the currently active deprecations.
 
 Main sections in that document are organized as follows:
 
-- [Platforms]
-- [Compilers]
-- [Third party dependencies]
-- [Build tools]
-  - This is for `CMake`, `Bazel`, `Doxygen`, ...
-  - Changes of tooling go here.
-- [Build scripts]
-  - This is for `CMakeLists.txt`, `BUILD`, `Doxyfile`, ...
-  - Changes of build options go here.
-- [Opentelemetry-cpp API]
-- [Opentelemetry-cpp SDK]
-- [Opentelemetry-cpp Exporter]
-- [Documentation]
+* [Platforms]
+* [Compilers]
+* [Third party dependencies]
+* [Build tools]
+  * This is for `CMake`, `Bazel`, `Doxygen`, ...
+  * Changes of tooling go here.
+* [Build scripts]
+  * This is for `CMakeLists.txt`, `BUILD`, `Doxyfile`, ...
+  * Changes of build options go here.
+* [Opentelemetry-cpp API]
+* [Opentelemetry-cpp SDK]
+* [Opentelemetry-cpp Exporter]
+* [Documentation]
 
 Please keep main sections as is, with a content of "N/A", instead of
 removing sections with no current deprecations.
@@ -62,10 +62,10 @@ Use [DEPRECATION] in the title, and tag with label "Deprecation".
 For highly visible features,
 consider other ways to improve awareness, such as:
 
-- pin the deprecation issue in the GitHub UI,
-- discussions in the slack channels
-- discussions with other teams in open-telemetry
-- blog posts
+* pin the deprecation issue in the GitHub UI,
+* discussions in the slack channels
+* discussions with other teams in open-telemetry
+* blog posts
 
 ### Prepare deprecation
 
@@ -73,35 +73,37 @@ Implement the deprecation issue with a PR.
 
 Deprecation consist of two parts, communication and tooling.
 
-For the communication, the PR should add an entry in file `DEPRECATED.md`,
+For the communication, the PR should add an entry in file `DEPRECATED`,
 detailing the following sections:
 
-- Announcement
-  - set `Version:` to TO-BE-RELEASED-VERSION
-  - set `Date:` to TO-BE-RELEASED-DATE
-  - set `PR:` to the deprecation PR
-  - If applicable, add references to any other relevant document
+* Announcement
+  * set `Version:` to TO-BE-RELEASED-VERSION
+  * set `Date:` to TO-BE-RELEASED-DATE
+  * set `PR:` to the deprecation PR
+  * If applicable, add references to any other relevant document
     (slack discussion, blog, meeting minutes)
-- Motivation
-  - add justifications for the need to deprecate.
-  - this step is critical to get support from users that will be affected,
+* Motivation
+  * add justifications for the need to deprecate.
+  * this step is critical to get support from users that will be affected,
     instead of getting push back.
-- Scope:
-  - details which part are affected.
-  - when applicable, give the exact name of CMake options,
+* Scope:
+  * details which part are affected.
+  * when applicable, give the exact name of CMake options,
     C++ header files, classes, functions, etc,
     so that users can easily search in their code base
     for references to the deprecated items,
     and assess the exposure to deprecated code.
-- Mitigation:
-  - indicate technical mitigations if known.
-  - name replacement apis, libraries, compiling options, etc,
+* Mitigation:
+  * indicate any tooling available to identify the
+    deprecated code still in use,
+  * indicate technical mitigations if known,
+  * name replacement apis, libraries, compiling options, etc,
     and describe how to adjust the user code in general,
     to remove any dependencies on deprecated code.
-- Planned removal:
-  - Indicate an estimated date and/or version, if known,
-    by which the deprecated code will be removed
-  - this allows users to plan accordingly, to minimize disruption.
+* Planned removal:
+  * Indicate an estimated date and/or version, if known,
+    by which the deprecated code will be removed,
+  * this allows users to plan accordingly, to minimize disruption.
 
 For the tooling, the PR should implement any code change necessary
 to help users transition to a clean code base,
@@ -112,10 +114,10 @@ in a reliable way.
 
 The goal is to, at the same time:
 
-- not break existing functionality in any way, in "normal" mode,
-- find all references to deprecated code, in "verify" mode.
+* not break existing functionality in any way, in "normal" mode,
+* find all references to deprecated code, in "verify" mode.
 
-See [technical guildelines](xxx) for examples.
+See [technical guildelines](./deprecation-process.md#Technical-guildelines) for examples.
 
 Once both parts are addressed,
 get the PR reviewed and merged to the main branch.
@@ -131,28 +133,34 @@ In the removal issue, refer to the corresponding deprecation issue.
 When making a new opentelemetry-cpp release,
 in addition to the regular release tasks:
 
-- Replace every occurrences of `TO-BE-RELEASED-VERSION` in file
-  `DEPRECATED.md` with the new release version,
-- Replace every occurrences of `TO-BE-RELEASED-DATE` in file
-  `DEPRECATED.md` with the new release date,
-- In the `CHANGELOG.md` and the release notes, add references
+* Replace every occurrences of `TO-BE-RELEASED-VERSION` in file
+  `DEPRECATED` with the new release version,
+* Replace every occurrences of `TO-BE-RELEASED-DATE` in file
+  `DEPRECATED` with the new release date,
+* In the `CHANGELOG` and the release notes, add references
   to the new deprecated items for this release,
-  pointing to the `DEPRECATED.md` document.
+  pointing to the `DEPRECATED` document.
 
 ### Wait
 
 Do not implement the removal right away.
 
-If a removal is implemented and merged to main just after a new release,
-it exposes itself to a full revert, should a new release be necessary to fix
+First, if a removal is implemented and merged to main just after a new release,
+it exposes itself to a full revert, should another release be necessary to fix
 any regressions just caused recently.
 
-Depending on the change, a removal can be implemented:
+Second, some people will only notice the deprecation when discovering it
+in the release, no matter how many previous announcements were done.
+Allow some time for people to raise issues or concerns,
+especially if there are special usage patterns that were not anticipated.
 
-- in the next minor release,
-- after a few minor releases,
-- in the next major release,
-- after a few major releases
+Once things are stable, proceed with the removal.
+Depending on the change, it can be implemented:
+
+* in the next minor release,
+* after a few minor releases,
+* in the next major release,
+* after a few major releases
 
 following the deprecation.
 
@@ -173,9 +181,9 @@ Remove all the deprecated code.
 Remove all the tooling (compiling options) related to the deprecated code,
 if any.
 
-Remove all the relevant entries in `DEPRECATED.md`
+Remove all the relevant entries in `DEPRECATED`.
 
-Add a `CHANGELOG.md` entry for the removal.
+Add a `CHANGELOG` entry for the removal.
 
 Get the removal PR reviewed and merged to the main branch.
 
@@ -184,7 +192,7 @@ Get the removal PR reviewed and merged to the main branch.
 When making a new opentelemetry-cpp release,
 in addition to the regular release tasks:
 
-- In the `CHANGELOG.md` and the release notes, add references
+* In the `CHANGELOG` and the release notes, add references
   to the new removed items for this release.
 
 ## Technical guidelines
@@ -205,7 +213,7 @@ In a verification build, code is compiled with `WITH_NO_DEPRECATION=ON`.
 
 Implement the following logic in CMake:
 
-```
+```cmake
   option(WITH_FOO "DEPRECATED - With the foo feature" OFF)
 
   if(WITH_FOO)
@@ -224,7 +232,7 @@ If the verification build succeeds, the user code is guaranteed to be clean,
 and will not be impacted by the removal to come.
 
 When implementing such logic, document it in the mitigation section,
-in file `DEPRECATED.md`.
+in file `DEPRECATED`.
 
 ### C++ deprecation
 
@@ -232,7 +240,7 @@ Assume a C++ item needs to be deprecated.
 
 For example:
 
-```
+```cpp
   struct some_options
   {
     int x;
@@ -246,7 +254,7 @@ using y.
 
 Implement the following change:
 
-```
+```cpp
   struct some_options
   {
     int x;
@@ -268,12 +276,12 @@ production, because the memory layout just changed, breaking the ABI.
 
 This verification build is used to enforce:
 
-- the API (Application _Programming_ Interface), is unchanged,
+* the API (Application _Programming_ Interface), is unchanged,
   aka the source code will build before and after the removal.
 
 By the time the removal is implemented:
 
-```
+```cpp
   struct some_options
   {
     int x;
@@ -283,8 +291,8 @@ By the time the removal is implemented:
 
 the new release will have:
 
-- an API still compatible
-- an ABI (Application _Binary_ Interface) change
+* an API still compatible
+* an ABI (Application _Binary_ Interface) change
 
 When documenting the deprecation, document this logic in the mitigation
 section, so that users know how to find and remove old references to

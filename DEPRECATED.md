@@ -8,7 +8,21 @@ Deprecated items will be removed in the future.
 
 ### Maintainer guidelines
 
-### User guidelines
+See the [deprecation-process](./docs/deprecation-process.md)
+
+## [TEMPLATE]
+
+### New Deprecation Template Title
+
+#### Announcement
+
+#### Motivation
+
+#### Scope
+
+#### Mitigation
+
+#### Planned removal
 
 ## [Platforms]
 
@@ -22,7 +36,7 @@ N/A
 
 ### Jaeger
 
-See [Jaeger exporter](./Jaeger exporter)
+See [Jaeger exporter](./DEPRECATED.md#Jaeger-exporter)
 
 ## [Build tools]
 
@@ -74,13 +88,13 @@ months ago already.
 
 The following are deprecated and planned for removal:
 
-- all the code located under `exporters/jaeger/`, including:
-  - the jaeger exporter C++ class (`JaegerExporter`)
-  - the related factory (`JaegerExporterFactory`)
-  - the related options (`JaegerExporterOptions`)
-- the jaeger exporter library(`opentelemetry_exporter_jaeger_trace`)
-- the jaeger build options in CMake (`WITH_JAEGER`)
-- the dependency on thrift
+* all the code located under `exporters/jaeger/`, including:
+  * the jaeger exporter C++ class (`JaegerExporter`)
+  * the related factory (`JaegerExporterFactory`)
+  * the related options (`JaegerExporterOptions`)
+* the jaeger exporter library(`opentelemetry_exporter_jaeger_trace`)
+* the jaeger build options in CMake (`WITH_JAEGER`)
+* the dependency on thrift
 
 #### Mitigation
 
@@ -90,7 +104,6 @@ An application instrumented with opentelemetry needs to change how the SDK
 and exporter are configured to replace the Jaeger exporter with the OTLP
 exporter (both OTLP HTTP and OTLP GRPC are supported).
 
-
 #### Planned removal
 
 * Date: After April 1st, 2023
@@ -98,4 +111,3 @@ exporter (both OTLP HTTP and OTLP GRPC are supported).
 ## [Documentation]
 
 N/A
-
