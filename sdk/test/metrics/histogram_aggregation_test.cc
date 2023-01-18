@@ -61,7 +61,7 @@ private:
 
 TEST(HistogramInstrumentToHistogramAggregation, Double)
 {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -107,7 +107,7 @@ TEST(HistogramInstrumentToHistogramAggregation, Double)
 
 TEST(CounterToHistogram, Double)
 {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
