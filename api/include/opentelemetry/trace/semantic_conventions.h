@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.16.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.17.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -516,6 +516,12 @@ static constexpr const char *kCodeFilepath = "code.filepath";
 static constexpr const char *kCodeLineno = "code.lineno";
 
 /**
+ * The column number in {@code code.filepath} best representing the operation. It SHOULD point
+ * within the code unit named in {@code code.function}.
+ */
+static constexpr const char *kCodeColumn = "code.column";
+
+/**
  * HTTP request method.
  */
 static constexpr const char *kHttpMethod = "http.method";
@@ -752,88 +758,148 @@ static constexpr const char *kGraphqlOperationType = "graphql.operation.type";
 static constexpr const char *kGraphqlDocument = "graphql.document";
 
 /**
- * A string identifying the messaging system.
- */
-static constexpr const char *kMessagingSystem = "messaging.system";
-
-/**
- * The message destination name. This might be equal to the span name but is required nevertheless.
- */
-static constexpr const char *kMessagingDestination = "messaging.destination";
-
-/**
- * The kind of message destination
- */
-static constexpr const char *kMessagingDestinationKind = "messaging.destination_kind";
-
-/**
- * A boolean that is true if the message destination is temporary.
- */
-static constexpr const char *kMessagingTempDestination = "messaging.temp_destination";
-
-/**
- * The name of the transport protocol.
- */
-static constexpr const char *kMessagingProtocol = "messaging.protocol";
-
-/**
- * The version of the transport protocol.
- */
-static constexpr const char *kMessagingProtocolVersion = "messaging.protocol_version";
-
-/**
- * Connection string.
- */
-static constexpr const char *kMessagingUrl = "messaging.url";
-
-/**
  * A value used by the messaging system as an identifier for the message, represented as a string.
  */
-static constexpr const char *kMessagingMessageId = "messaging.message_id";
+static constexpr const char *kMessagingMessageId = "messaging.message.id";
 
 /**
  * The <a href="#conversations">conversation ID</a> identifying the conversation to which the
  * message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
  */
-static constexpr const char *kMessagingConversationId = "messaging.conversation_id";
+static constexpr const char *kMessagingMessageConversationId = "messaging.message.conversation_id";
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown
  * whether the compressed or uncompressed payload size is reported.
  */
 static constexpr const char *kMessagingMessagePayloadSizeBytes =
-    "messaging.message_payload_size_bytes";
+    "messaging.message.payload_size_bytes";
 
 /**
  * The compressed size of the message payload in bytes.
  */
 static constexpr const char *kMessagingMessagePayloadCompressedSizeBytes =
-    "messaging.message_payload_compressed_size_bytes";
+    "messaging.message.payload_compressed_size_bytes";
 
 /**
- * A string identifying the kind of message consumption as defined in the <a
- * href="#operation-names">Operation names</a> section above. If the operation is &quot;send&quot;,
- * this attribute MUST NOT be set, since the operation can be inferred from the span kind in that
- * case.
+ * The message destination name
+ *
+ * <p>Notes:
+  <ul> <li>Destination name SHOULD uniquely identify a specific queue, topic or other entity within
+the broker. If the broker does not have such notion, the destination name SHOULD uniquely identify
+the broker.</li> </ul>
+ */
+static constexpr const char *kMessagingDestinationName = "messaging.destination.name";
+
+/**
+ * The kind of message destination
+ */
+static constexpr const char *kMessagingDestinationKind = "messaging.destination.kind";
+
+/**
+ * Low cardinality representation of the messaging destination name
+ *
+ * <p>Notes:
+  <ul> <li>Destination names could be constructed from templates. An example would be a destination
+ name involving a user name or product id. Although the destination name in this case is of high
+ cardinality, the underlying template is of low cardinality and can be effectively used for grouping
+ and aggregation.</li> </ul>
+ */
+static constexpr const char *kMessagingDestinationTemplate = "messaging.destination.template";
+
+/**
+ * A boolean that is true if the message destination is temporary and might not exist anymore after
+ * messages are processed.
+ */
+static constexpr const char *kMessagingDestinationTemporary = "messaging.destination.temporary";
+
+/**
+ * A boolean that is true if the message destination is anonymous (could be unnamed or have
+ * auto-generated name).
+ */
+static constexpr const char *kMessagingDestinationAnonymous = "messaging.destination.anonymous";
+
+/**
+ * The message source name
+ *
+ * <p>Notes:
+  <ul> <li>Source name SHOULD uniquely identify a specific queue, topic, or other entity within the
+broker. If the broker does not have such notion, the source name SHOULD uniquely identify the
+broker.</li> </ul>
+ */
+static constexpr const char *kMessagingSourceName = "messaging.source.name";
+
+/**
+ * The kind of message source
+ */
+static constexpr const char *kMessagingSourceKind = "messaging.source.kind";
+
+/**
+ * Low cardinality representation of the messaging source name
+ *
+ * <p>Notes:
+  <ul> <li>Source names could be constructed from templates. An example would be a source name
+ involving a user name or product id. Although the source name in this case is of high cardinality,
+ the underlying template is of low cardinality and can be effectively used for grouping and
+ aggregation.</li> </ul>
+ */
+static constexpr const char *kMessagingSourceTemplate = "messaging.source.template";
+
+/**
+ * A boolean that is true if the message source is temporary and might not exist anymore after
+ * messages are processed.
+ */
+static constexpr const char *kMessagingSourceTemporary = "messaging.source.temporary";
+
+/**
+ * A boolean that is true if the message source is anonymous (could be unnamed or have
+ * auto-generated name).
+ */
+static constexpr const char *kMessagingSourceAnonymous = "messaging.source.anonymous";
+
+/**
+ * A string identifying the messaging system.
+ */
+static constexpr const char *kMessagingSystem = "messaging.system";
+
+/**
+ * A string identifying the kind of messaging operation as defined in the <a
+ href="#operation-names">Operation names</a> section above.
+ *
+ * <p>Notes:
+  <ul> <li>If a custom value is used, it MUST be of low cardinality.</li> </ul>
  */
 static constexpr const char *kMessagingOperation = "messaging.operation";
 
 /**
+ * The number of messages sent, received, or processed in the scope of the batching operation.
+ *
+ * <p>Notes:
+  <ul> <li>Instrumentations SHOULD NOT set {@code messaging.batch.message_count} on spans that
+ operate with a single message. When a messaging client library supports both batch and
+ single-message API for the same operation, instrumentations SHOULD use {@code
+ messaging.batch.message_count} for batching APIs and SHOULD NOT use it for single-message
+ APIs.</li> </ul>
+ */
+static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.message_count";
+
+/**
  * The identifier for the consumer receiving a message. For Kafka, set it to {@code
- * {messaging.kafka.consumer_group} - {messaging.kafka.client_id}}, if both are present, or only
- * {@code messaging.kafka.consumer_group}. For brokers, such as RabbitMQ and Artemis, set it to the
+ * {messaging.kafka.consumer.group} - {messaging.kafka.client_id}}, if both are present, or only
+ * {@code messaging.kafka.consumer.group}. For brokers, such as RabbitMQ and Artemis, set it to the
  * {@code client_id} of the client consuming the message.
  */
-static constexpr const char *kMessagingConsumerId = "messaging.consumer_id";
+static constexpr const char *kMessagingConsumerId = "messaging.consumer.id";
 
 /**
  * RabbitMQ message routing key.
  */
-static constexpr const char *kMessagingRabbitmqRoutingKey = "messaging.rabbitmq.routing_key";
+static constexpr const char *kMessagingRabbitmqDestinationRoutingKey =
+    "messaging.rabbitmq.destination.routing_key";
 
 /**
  * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the
- same partition. They differ from {@code messaging.message_id} in that they're not unique. If the
+ same partition. They differ from {@code messaging.message.id} in that they're not unique. If the
  key is {@code null}, the attribute MUST NOT be set.
  *
  * <p>Notes:
@@ -841,13 +907,13 @@ static constexpr const char *kMessagingRabbitmqRoutingKey = "messaging.rabbitmq.
  attribute. If the key has no unambiguous, canonical string form, don't include its value.</li>
  </ul>
  */
-static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message_key";
+static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message.key";
 
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not
  * producers.
  */
-static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer_group";
+static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer.group";
 
 /**
  * Client Id for the Consumer or Producer that is handling the message.
@@ -857,7 +923,13 @@ static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_i
 /**
  * Partition the message is sent to.
  */
-static constexpr const char *kMessagingKafkaPartition = "messaging.kafka.partition";
+static constexpr const char *kMessagingKafkaDestinationPartition =
+    "messaging.kafka.destination.partition";
+
+/**
+ * Partition the message is received from.
+ */
+static constexpr const char *kMessagingKafkaSourcePartition = "messaging.kafka.source.partition";
 
 /**
  * The offset of a record in the corresponding Kafka partition.
@@ -867,7 +939,7 @@ static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.mes
 /**
  * A boolean that is true if the message is a tombstone.
  */
-static constexpr const char *kMessagingKafkaTombstone = "messaging.kafka.tombstone";
+static constexpr const char *kMessagingKafkaMessageTombstone = "messaging.kafka.message.tombstone";
 
 /**
  * Namespace of RocketMQ resources, resources in different namespaces are individual.
@@ -888,35 +960,35 @@ static constexpr const char *kMessagingRocketmqClientId = "messaging.rocketmq.cl
 /**
  * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
  */
-static constexpr const char *kMessagingRocketmqDeliveryTimestamp =
-    "messaging.rocketmq.delivery_timestamp";
+static constexpr const char *kMessagingRocketmqMessageDeliveryTimestamp =
+    "messaging.rocketmq.message.delivery_timestamp";
 
 /**
  * The delay time level for delay message, which determines the message delay time.
  */
-static constexpr const char *kMessagingRocketmqDelayTimeLevel =
-    "messaging.rocketmq.delay_time_level";
+static constexpr const char *kMessagingRocketmqMessageDelayTimeLevel =
+    "messaging.rocketmq.message.delay_time_level";
 
 /**
  * It is essential for FIFO message. Messages that belong to the same message group are always
  * processed one by one within the same consumer group.
  */
-static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message_group";
+static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message.group";
 
 /**
  * Type of message.
  */
-static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message_type";
+static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message.type";
 
 /**
  * The secondary classifier of message besides topic.
  */
-static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message_tag";
+static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message.tag";
 
 /**
  * Key(s) of message, another way to mark message besides message id.
  */
-static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message_keys";
+static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message.keys";
 
 /**
  * Model of message consumption. This only applies to consumer spans.
@@ -1099,6 +1171,8 @@ static constexpr const char *kMemcached = "memcached";
 static constexpr const char *kCockroachdb = "cockroachdb";
 /** OpenSearch. */
 static constexpr const char *kOpensearch = "opensearch";
+/** ClickHouse. */
+static constexpr const char *kClickhouse = "clickhouse";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
@@ -1292,8 +1366,18 @@ static constexpr const char *kQueue = "queue";
 static constexpr const char *kTopic = "topic";
 }  // namespace MessagingDestinationKindValues
 
+namespace MessagingSourceKindValues
+{
+/** A message received from a queue. */
+static constexpr const char *kQueue = "queue";
+/** A message received from a topic. */
+static constexpr const char *kTopic = "topic";
+}  // namespace MessagingSourceKindValues
+
 namespace MessagingOperationValues
 {
+/** publish. */
+static constexpr const char *kPublish = "publish";
 /** receive. */
 static constexpr const char *kReceive = "receive";
 /** process. */

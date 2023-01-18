@@ -76,17 +76,17 @@ TEST(Aggregation, LongHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<int64_t>(histogram_data.sum_));
   EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
-  aggr.Aggregate((int64_t)12, {});   // lies in fourth bucket
-  aggr.Aggregate((int64_t)100, {});  // lies in eight bucket
+  aggr.Aggregate((int64_t)12, {});   // lies in third bucket
+  aggr.Aggregate((int64_t)100, {});  // lies in sixth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(nostd::get<int64_t>(histogram_data.min_), 12);
   EXPECT_EQ(nostd::get<int64_t>(histogram_data.max_), 100);
   EXPECT_EQ(nostd::get<int64_t>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
-  EXPECT_EQ(histogram_data.counts_[7], 1);
-  aggr.Aggregate((int64_t)13, {});   // lies in fourth bucket
-  aggr.Aggregate((int64_t)252, {});  // lies in ninth bucket
+  EXPECT_EQ(histogram_data.counts_[6], 1);
+  aggr.Aggregate((int64_t)13, {});   // lies in third bucket
+  aggr.Aggregate((int64_t)252, {});  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
@@ -132,9 +132,9 @@ TEST(Aggregation, LongHistogramAggregationBoundaries)
 {
   std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig> aggregation_config{
       new opentelemetry::sdk::metrics::HistogramAggregationConfig};
-  std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
-                                       750.0, 1000.0, 2500.0, 5000.0, 10000.0};
-  aggregation_config->boundaries_   = user_boundaries;
+  std::vector<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
+                                         750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  aggregation_config->boundaries_     = user_boundaries;
   LongHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
@@ -146,9 +146,9 @@ TEST(Aggregation, DoubleHistogramAggregationBoundaries)
 {
   std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig> aggregation_config{
       new opentelemetry::sdk::metrics::HistogramAggregationConfig};
-  std::list<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
-                                       750.0, 1000.0, 2500.0, 5000.0, 10000.0};
-  aggregation_config->boundaries_   = user_boundaries;
+  std::vector<double> user_boundaries = {0.0,   50.0,   100.0,  250.0,  500.0,
+                                         750.0, 1000.0, 2500.0, 5000.0, 10000.0};
+  aggregation_config->boundaries_     = user_boundaries;
   DoubleHistogramAggregation aggr{aggregation_config.get()};
   auto data = aggr.ToPoint();
   ASSERT_TRUE(nostd::holds_alternative<HistogramPointData>(data));
@@ -165,17 +165,17 @@ TEST(Aggregation, DoubleHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<double>(histogram_data.sum_));
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
-  aggr.Aggregate(12.0, {});   // lies in fourth bucket
-  aggr.Aggregate(100.0, {});  // lies in eight bucket
+  aggr.Aggregate(12.0, {});   // lies in third bucket
+  aggr.Aggregate(100.0, {});  // lies in sixth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
-  EXPECT_EQ(histogram_data.counts_[7], 1);
+  EXPECT_EQ(histogram_data.counts_[6], 1);
   EXPECT_EQ(nostd::get<double>(histogram_data.min_), 12);
   EXPECT_EQ(nostd::get<double>(histogram_data.max_), 100);
-  aggr.Aggregate(13.0, {});   // lies in fourth bucket
-  aggr.Aggregate(252.0, {});  // lies in ninth bucket
+  aggr.Aggregate(13.0, {});   // lies in third bucket
+  aggr.Aggregate(252.0, {});  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.ToPoint());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
