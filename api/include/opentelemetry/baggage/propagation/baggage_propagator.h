@@ -14,7 +14,7 @@ namespace baggage
 namespace propagation
 {
 
-class OPENTELEMETRY_API BaggagePropagator : public opentelemetry::context::propagation::TextMapPropagator
+class BaggagePropagator : public opentelemetry::context::propagation::TextMapPropagator
 {
 public:
   void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,

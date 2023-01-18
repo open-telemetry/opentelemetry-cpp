@@ -1,3 +1,4 @@
+load("//:dll_deps.bzl", "dll_deps")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -46,8 +47,9 @@ cc_test(
         "test",
         "zipkin",
     ],
-    deps = [
+    deps = dll_deps([
         ":zipkin_recordable",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -59,9 +61,19 @@ cc_test(
         "test",
         "zipkin",
     ],
-    deps = [
+    deps = dll_deps([
         ":zipkin_exporter",
         ":zipkin_recordable",
+    ]) + [
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

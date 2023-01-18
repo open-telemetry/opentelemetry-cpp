@@ -14,7 +14,7 @@ namespace context
 namespace propagation
 {
 
-class OPENTELEMETRY_API CompositePropagator : public TextMapPropagator
+class CompositePropagator : public TextMapPropagator
 {
 public:
   CompositePropagator(std::vector<std::unique_ptr<TextMapPropagator>> propagators)

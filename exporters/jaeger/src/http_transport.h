@@ -16,7 +16,7 @@ namespace jaeger
 
 using TProtocol = apache::thrift::protocol::TProtocol;
 
-class OPENTELEMETRY_API HttpTransport : public Transport
+class HttpTransport : public Transport
 {
 public:
   HttpTransport(std::string endpoint, ext::http::client::Headers headers);

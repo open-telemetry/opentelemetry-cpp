@@ -1,12 +1,15 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_test(
     name = "threadsafe_span_data_tests",
     srcs = [
         "threadsafe_span_data_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -17,9 +20,10 @@ cc_test(
         "tracez_data_aggregator_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -30,9 +34,10 @@ cc_test(
         "tracez_processor_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )

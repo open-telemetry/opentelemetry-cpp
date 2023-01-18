@@ -17,7 +17,7 @@ namespace propagation
 
 static const nostd::string_view kJaegerTraceHeader = "uber-trace-id";
 
-class OPENTELEMETRY_API JaegerPropagator : public context::propagation::TextMapPropagator
+class JaegerPropagator : public context::propagation::TextMapPropagator
 {
 public:
   void Inject(context::propagation::TextMapCarrier &carrier,

@@ -16,7 +16,7 @@ namespace trace
 // TraceFlags represents options for a Trace. These options are propagated to all child Spans
 // and determine features such as whether a Span should be traced. TraceFlags
 // are implemented as a bitmask.
-class OPENTELEMETRY_API TraceFlags final
+class TraceFlags final
 {
 public:
   static constexpr uint8_t kIsSampled = 1;

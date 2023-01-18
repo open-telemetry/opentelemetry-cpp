@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
-load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_library(
     name = "otlp_recordable",
@@ -290,8 +292,10 @@ cc_test(
         "otlp",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_recordable",
+    ]) + [
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -306,9 +310,11 @@ cc_test(
         "otlp",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_recordable",
+    ]) + [
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -321,9 +327,10 @@ cc_test(
         "otlp_grpc",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -336,9 +343,10 @@ cc_test(
         "otlp_grpc",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -351,9 +359,10 @@ cc_test(
         "otlp_http",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
+    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
@@ -367,9 +376,10 @@ cc_test(
         "otlp_http",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
+    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
@@ -383,9 +393,10 @@ cc_test(
         "otlp_http_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
+    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
@@ -399,9 +410,10 @@ cc_test(
         "otlp_http_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
+    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
@@ -415,10 +427,11 @@ cc_test(
         "otlp_grpc_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -431,10 +444,11 @@ cc_test(
         "otlp_grpc_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -495,8 +509,20 @@ otel_cc_benchmark(
         "otlp_grpc",
         "test",
     ],
-    deps = [
-        ":otlp_grpc_exporter",
+    deps = dll_deps([
+        ":otlp_grpc_exporter"
+    ]) + [
         "//examples/common/foo_library:common_foo_library",
+        "@com_github_grpc_grpc//:grpc++",
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

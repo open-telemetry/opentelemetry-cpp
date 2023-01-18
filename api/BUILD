@@ -22,10 +22,17 @@ bool_flag(
 )
 
 cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+)
+
+cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
+        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=1", "HAVE_CPP_STDLIB=1", "OPENTELEMETRY_API=__declspec(dllexport)"],
         "//conditions:default": [],
     }),
     strip_include_prefix = "include",
@@ -43,3 +50,4 @@ config_setting(
     name = "with_external_abseil",
     flag_values = {":with_abseil": "true"},
 )
+

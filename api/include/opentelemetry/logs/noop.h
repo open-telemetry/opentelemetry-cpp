@@ -36,7 +36,7 @@ namespace logs
  * No-op implementation of Logger. This class should not be used directly. It should only be
  * instantiated using a LoggerProvider's GetLogger() call.
  */
-class OPENTELEMETRY_API NoopLogger final : public Logger
+class NoopLogger final : public Logger
 {
 public:
   const nostd::string_view GetName() noexcept override { return "noop logger"; }
@@ -51,7 +51,7 @@ public:
 /**
  * No-op implementation of a LoggerProvider.
  */
-class OPENTELEMETRY_API NoopLoggerProvider final : public opentelemetry::logs::LoggerProvider
+class NoopLoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
 public:
   NoopLoggerProvider()

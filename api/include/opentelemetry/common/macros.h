@@ -173,10 +173,19 @@ point.
 
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
 
-#else
+#elif defined(OPENTELEMETRY_DLL) && OPENTELEMETRY_DLL
 
 /* Add support for other compilers here. */
 
+#  ifndef OPENTELEMETRY_API
+#  define OPENTELEMETRY_API __declspec(dllimport)
+#  endif
+
+#  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_API
+
+#else
+
+#  define OPENTELEMETRY_API
 #  define OPENTELEMETRY_API_SINGLETON
 
 #endif

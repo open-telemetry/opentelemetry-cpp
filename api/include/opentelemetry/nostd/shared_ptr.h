@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
+#include "opentelemetry/version.h"
+
 #ifdef HAVE_CPP_STDLIB
 #  include "opentelemetry/std/shared_ptr.h"
 #else

@@ -1,3 +1,5 @@
+load( "//:dll_deps.bzl", "dll_deps" )
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -9,9 +11,11 @@ cc_library(
         "foo_library.h",
     ],
     defines = ["BAZEL_BUILD"],
-    deps = [
-        "//api",
-        "//sdk:headers",
-        "//sdk/src/metrics",
-    ],
+    deps = dll_deps(
+        [   
+            "//api",
+            "//sdk:headers",
+            "//sdk/src/metrics",
+        ]
+    ),
 )

@@ -1,3 +1,5 @@
+load ("//:dll_deps.bzl", "dll_deps")
+
 cc_binary(
     name = "example_http_client",
     srcs = [
@@ -16,13 +18,13 @@ cc_binary(
         "//conditions:default": [],
     }),
     tags = ["ostream"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -33,10 +35,10 @@ cc_binary(
         "tracer_common.h",
     ],
     tags = ["ostream"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
         "//sdk/src/trace",
-    ],
+    ]),
 )

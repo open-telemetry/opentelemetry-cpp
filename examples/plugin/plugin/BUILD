@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_binary(
     name = "example_plugin.so",
     srcs = [
@@ -6,7 +8,7 @@ cc_binary(
         "tracer.h",
     ],
     linkshared = 1,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )

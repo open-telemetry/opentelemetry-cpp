@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/noop.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -213,6 +214,7 @@ void BM_otlp_grpc_with_collector(benchmark::State &state)
   {
     foo_library();
   }
+  trace::Provider::SetTracerProvider({});
 }
 BENCHMARK(BM_otlp_grpc_with_collector);
 }  // namespace

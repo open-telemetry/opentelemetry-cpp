@@ -17,7 +17,7 @@ namespace metrics
 /**
  * Stores the singleton global MeterProvider.
  */
-class OPENTELEMETRY_API Provider
+class Provider
 {
 public:
   /**

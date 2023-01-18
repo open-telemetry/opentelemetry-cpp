@@ -1,7 +1,9 @@
-package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load ("//:dll_deps.bzl", "dll_deps")
+
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "messages_proto",
@@ -25,9 +27,9 @@ cc_library(
     srcs = ["tracer_common.h"],
     defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
-    deps = [
+    deps = dll_deps([
         "//exporters/ostream:ostream_span_exporter",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -37,11 +39,12 @@ cc_binary(
     ],
     defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
-    deps = [
-        "messages_cc_grpc",
-        ":tracer_common",
+    deps = dll_deps([
         "//api",
         "//sdk/src/trace",
+    ]) + [
+        "messages_cc_grpc",
+        ":tracer_common",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -53,11 +56,12 @@ cc_binary(
     ],
     defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
-    deps = [
-        "messages_cc_grpc",
-        ":tracer_common",
+    deps = dll_deps([
         "//api",
         "//sdk/src/trace",
+    ]) + [
+        "messages_cc_grpc",
+        ":tracer_common",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )

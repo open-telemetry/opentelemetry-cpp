@@ -41,7 +41,7 @@ static const int kSpanIdHexStrLength  = 16;
 // providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
 
-class OPENTELEMETRY_API B3PropagatorExtractor : public opentelemetry::context::propagation::TextMapPropagator
+class B3PropagatorExtractor : public opentelemetry::context::propagation::TextMapPropagator
 {
 public:
   // Returns the context that is stored in the HTTP header carrier.
@@ -124,7 +124,7 @@ private:
 
 // The B3Propagator class provides interface that enables extracting and injecting context into
 // single header of HTTP Request.
-class OPENTELEMETRY_API B3Propagator : public B3PropagatorExtractor
+class B3Propagator : public B3PropagatorExtractor
 {
 public:
   // Sets the context for a HTTP header carrier with self defined rules.
@@ -157,7 +157,7 @@ public:
   }
 };
 
-class OPENTELEMETRY_API B3PropagatorMultiHeader : public B3PropagatorExtractor
+class B3PropagatorMultiHeader : public B3PropagatorExtractor
 {
 public:
   void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,

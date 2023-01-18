@@ -17,7 +17,7 @@ namespace common
  *
  * This is used for marking the beginning and end of an operation.
  */
-class OPENTELEMETRY_API SystemTimestamp
+class SystemTimestamp
 {
 public:
   /**
@@ -96,7 +96,7 @@ private:
  *
  * This is used for calculating the duration of an operation.
  */
-class OPENTELEMETRY_API SteadyTimestamp
+class SteadyTimestamp
 {
 public:
   /**
@@ -170,7 +170,7 @@ private:
   int64_t nanos_since_epoch_;
 };
 
-class OPENTELEMETRY_API DurationUtil
+class DurationUtil
 {
 public:
   template <class Rep, class Period>

@@ -41,7 +41,7 @@ inline void GetLastErrorMessage(std::string &error_message) noexcept
 }
 }  // namespace detail
 
-class OPENTELEMETRY_API DynamicLibraryHandleWindows final : public DynamicLibraryHandle
+class DynamicLibraryHandleWindows final : public DynamicLibraryHandle
 {
 public:
   explicit DynamicLibraryHandleWindows(HINSTANCE handle) : handle_{handle} {}

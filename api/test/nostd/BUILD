@@ -43,6 +43,34 @@ cc_test(
     ],
 )
 
+cc_binary(
+    name = "variant_test_dll_deps",
+    local_defines = ["OPENTELEMETRY_API=__declspec(dllexport)"],
+    linkshared = True,
+    tags = [
+        "dll",
+    ],
+    deps = [
+        "//api",
+    ]
+)
+
+cc_test(
+    name = "variant_test_dll",
+    srcs = [
+        "variant_test.cc",
+    ],
+    tags = [
+        "dll",
+        "api",
+        "test",
+    ],
+    deps = [
+        "variant_test_dll_deps",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_test(
     name = "unique_ptr_test",
     srcs = [

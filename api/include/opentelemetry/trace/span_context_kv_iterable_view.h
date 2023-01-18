@@ -49,7 +49,7 @@ struct is_span_context_kv_iterable
 }  // namespace detail
 
 template <class T>
-class OPENTELEMETRY_API SpanContextKeyValueIterableView final : public SpanContextKeyValueIterable
+class SpanContextKeyValueIterableView final : public SpanContextKeyValueIterable
 {
   static_assert(detail::is_span_context_kv_iterable<T>::value,
                 "Must be a context/key-value iterable");

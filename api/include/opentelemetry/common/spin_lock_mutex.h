@@ -52,7 +52,7 @@ constexpr int SPINLOCK_SLEEP_MS        = 1;
  * This class implements the `BasicLockable` specification:
  * https://en.cppreference.com/w/cpp/named_req/BasicLockable
  */
-class OPENTELEMETRY_API SpinLockMutex
+class SpinLockMutex
 {
 public:
   SpinLockMutex() noexcept {}

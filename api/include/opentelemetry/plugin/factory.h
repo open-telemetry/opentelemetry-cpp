@@ -15,7 +15,7 @@ namespace plugin
 /**
  * Factory creates OpenTelemetry objects from configuration strings.
  */
-class OPENTELEMETRY_API Factory final
+class Factory final
 {
 public:
   class FactoryImpl

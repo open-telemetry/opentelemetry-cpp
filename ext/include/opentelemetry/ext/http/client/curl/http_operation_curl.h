@@ -42,7 +42,7 @@ const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
 class OPENTELEMETRY_API HttpClient;
-class OPENTELEMETRY_API Session;
+class Session;
 
 struct HttpCurlEasyResource
 {

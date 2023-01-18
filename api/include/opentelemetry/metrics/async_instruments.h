@@ -11,7 +11,7 @@ namespace metrics
 
 using ObservableCallbackPtr = void (*)(ObserverResult, void *);
 
-class OPENTELEMETRY_API ObservableInstrument
+class ObservableInstrument
 {
 public:
   ObservableInstrument()          = default;

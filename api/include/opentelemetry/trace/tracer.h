@@ -25,7 +25,7 @@ namespace trace
  * This class provides methods for manipulating the context, creating spans, and controlling spans'
  * lifecycles.
  */
-class OPENTELEMETRY_API Tracer
+class Tracer
 {
 public:
   virtual ~Tracer() = default;

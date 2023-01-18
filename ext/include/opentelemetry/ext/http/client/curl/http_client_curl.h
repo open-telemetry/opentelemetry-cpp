@@ -47,7 +47,7 @@ public:
   static nostd::shared_ptr<HttpCurlGlobalInitializer> GetInstance();
 };
 
-class OPENTELEMETRY_API Request : public opentelemetry::ext::http::client::Request
+class Request : public opentelemetry::ext::http::client::Request
 {
 public:
   Request() : method_(opentelemetry::ext::http::client::Method::Get), uri_("/") {}
@@ -91,7 +91,7 @@ public:
   std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
 
-class OPENTELEMETRY_API Response : public opentelemetry::ext::http::client::Response
+class Response : public opentelemetry::ext::http::client::Response
 {
 public:
   Response() : status_code_(Http_Ok) {}
@@ -139,7 +139,7 @@ public:
 
 class OPENTELEMETRY_API HttpClient;
 
-class OPENTELEMETRY_API Session : public opentelemetry::ext::http::client::Session,
+class Session : public opentelemetry::ext::http::client::Session,
                 public std::enable_shared_from_this<Session>
 {
 public:
@@ -211,7 +211,7 @@ private:
   std::atomic<bool> is_session_active_;
 };
 
-class OPENTELEMETRY_API HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
+class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
   HttpClientSync() : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()) {}

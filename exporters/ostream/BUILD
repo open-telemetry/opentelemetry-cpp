@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -23,8 +25,9 @@ cc_test(
         "ostream",
         "test",
     ],
-    deps = [
-        ":ostream_log_record_exporter",
+    deps = dll_deps([
+        ":ostream_log_record_exporter"
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -55,8 +58,9 @@ cc_test(
         "ostream",
         "test",
     ],
-    deps = [
-        ":ostream_metric_exporter",
+    deps = dll_deps([
+        ":ostream_metric_exporter"
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -97,9 +101,19 @@ cc_test(
         "ostream",
         "test",
     ],
-    deps = [
-        ":ostream_capture",
+    deps = dll_deps([
         ":ostream_span_exporter",
+    ]) + [
+        ":ostream_capture",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

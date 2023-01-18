@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 // Try to use either `std::span` or `gsl::span`
 #ifdef HAVE_CPP_STDLIB
 #  include <array>

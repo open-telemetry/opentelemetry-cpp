@@ -15,7 +15,7 @@ namespace metrics
 {
 
 template <class T>
-class OPENTELEMETRY_API NoopCounter : public Counter<T>
+class NoopCounter : public Counter<T>
 {
 public:
   NoopCounter(nostd::string_view /* name */,
@@ -33,7 +33,7 @@ public:
 };
 
 template <class T>
-class OPENTELEMETRY_API NoopHistogram : public Histogram<T>
+class NoopHistogram : public Histogram<T>
 {
 public:
   NoopHistogram(nostd::string_view /* name */,
@@ -50,7 +50,7 @@ public:
 };
 
 template <class T>
-class OPENTELEMETRY_API NoopUpDownCounter : public UpDownCounter<T>
+class NoopUpDownCounter : public UpDownCounter<T>
 {
 public:
   NoopUpDownCounter(nostd::string_view /* name */,
@@ -68,7 +68,7 @@ public:
   {}
 };
 
-class OPENTELEMETRY_API NoopObservableInstrument : public ObservableInstrument
+class NoopObservableInstrument : public ObservableInstrument
 {
 public:
   NoopObservableInstrument(nostd::string_view /* name */,
@@ -83,7 +83,7 @@ public:
 /**
  * No-op implementation of Meter.
  */
-class OPENTELEMETRY_API NoopMeter final : public Meter
+class NoopMeter final : public Meter
 {
 public:
   nostd::unique_ptr<Counter<uint64_t>> CreateUInt64Counter(
@@ -195,7 +195,7 @@ public:
 /**
  * No-op implementation of a MeterProvider.
  */
-class OPENTELEMETRY_API NoopMeterProvider final : public MeterProvider
+class NoopMeterProvider final : public MeterProvider
 {
 public:
   NoopMeterProvider() : meter_{nostd::shared_ptr<Meter>(new NoopMeter)} {}

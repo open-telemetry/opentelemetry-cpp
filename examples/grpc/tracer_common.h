@@ -23,7 +23,7 @@ using grpc::ServerContext;
 
 namespace
 {
-class OPENTELEMETRY_API GrpcClientCarrier : public opentelemetry::context::propagation::TextMapCarrier
+class GrpcClientCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
   GrpcClientCarrier(ClientContext *context) : context_(context) {}
@@ -44,7 +44,7 @@ public:
   ClientContext *context_;
 };
 
-class OPENTELEMETRY_API GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCarrier
+class GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
   GrpcServerCarrier(ServerContext *context) : context_(context) {}

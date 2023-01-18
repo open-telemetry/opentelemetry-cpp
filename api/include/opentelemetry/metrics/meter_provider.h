@@ -13,7 +13,7 @@ namespace metrics
 /**
  * Creates new Meter instances.
  */
-class OPENTELEMETRY_API MeterProvider
+class MeterProvider
 {
 public:
   virtual ~MeterProvider() = default;

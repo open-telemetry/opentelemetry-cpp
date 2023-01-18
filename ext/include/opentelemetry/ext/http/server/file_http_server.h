@@ -14,7 +14,7 @@
 namespace HTTP_SERVER_NS
 {
 
-class OPENTELEMETRY_API FileHttpServer : public HTTP_SERVER_NS::HttpServer
+class FileHttpServer : public HTTP_SERVER_NS::HttpServer
 {
 protected:
   /**

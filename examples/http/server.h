@@ -9,7 +9,7 @@
 namespace
 {
 
-class OPENTELEMETRY_API HttpServer : public HTTP_SERVER_NS::HttpRequestCallback
+class HttpServer : public HTTP_SERVER_NS::HttpRequestCallback
 {
 
 protected:

@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -22,8 +24,9 @@ cc_test(
         "memory",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":in_memory_span_data",
+    ]) + [
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -55,8 +58,18 @@ cc_test(
         "memory",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":in_memory_span_exporter",
+    ]) + [
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk:headers",
     ],
 )

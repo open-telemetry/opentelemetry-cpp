@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load( "//:dll_deps.bzl", "dll_deps" )
+
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -24,9 +26,11 @@ cc_binary(
         "//conditions:default": ["-pthread"],
     }),
     tags = ["examples"],
-    deps = [
-        "//ext:headers",
-        "//ext/src/zpages",
-        "//sdk/src/trace",
-    ],
+    deps = dll_deps(
+        [
+            "//ext:headers",
+            "//ext/src/zpages",
+            "//sdk/src/trace",
+        ],
+    )
 )

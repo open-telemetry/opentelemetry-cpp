@@ -28,7 +28,7 @@ struct KeyValueStringTokenizerOptions
 };
 
 // Tokenizer for key-value headers
-class OPENTELEMETRY_API KeyValueStringTokenizer
+class KeyValueStringTokenizer
 {
 public:
   KeyValueStringTokenizer(
@@ -134,7 +134,7 @@ private:
 };
 
 // Class to store fixed size array of key-value pairs of string type
-class OPENTELEMETRY_API KeyValueProperties
+class KeyValueProperties
 {
   // Class to store key-value pairs of string types
 public:

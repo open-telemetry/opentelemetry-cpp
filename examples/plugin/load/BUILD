@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_binary(
     name = "load_plugin",
     srcs = [
@@ -6,7 +8,7 @@ cc_binary(
     linkopts = [
         "-ldl",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )

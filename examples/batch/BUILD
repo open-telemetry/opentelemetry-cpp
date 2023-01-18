@@ -1,3 +1,5 @@
+load( "//:dll_deps.bzl", "dll_deps" )
+
 cc_binary(
     name = "example_simple",
     srcs = [
@@ -5,9 +7,11 @@ cc_binary(
     ],
     linkopts = ["-lpthread"],
     tags = ["ostream"],
-    deps = [
-        "//api",
-        "//exporters/ostream:ostream_span_exporter",
-        "//sdk/src/trace",
-    ],
+    deps = dll_deps(
+        [   
+            "//api",
+            "//exporters/ostream:ostream_span_exporter",
+            "//sdk/src/trace",
+        ]
+    ),
 )

@@ -1,3 +1,5 @@
+load( "//:dll_deps.bzl", "dll_deps" )
+
 cc_binary(
     name = "example_simple",
     srcs = [
@@ -7,9 +9,10 @@ cc_binary(
         "examples",
         "ostream",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
-        "//examples/common/foo_library:common_foo_library",
         "//exporters/ostream:ostream_span_exporter",
+    ]) + [
+        "//examples/common/foo_library:common_foo_library",
     ],
 )

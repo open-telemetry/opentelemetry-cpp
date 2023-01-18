@@ -1,15 +1,22 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
+common --experimental_cc_implementation_deps
+build --incompatible_use_platforms_repo_for_constraints=false
+
+build --disk_cache=f:/b/d
+common --repository_cache=f:/b/r
+startup --output_user_root=f:/b/u
+
 # Needed by gRPC to build on some platforms.
 build --strip=never --cxxopt="-std:c++17" --host_cxxopt="-std:c++17"
 build --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
 build --action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
-build --action_env=_CL_="/Z7 /guard:cf /Brepro /DOPENTELEMETRY_API=__declspec(dllexport) /DHAVE_CPP_STDLIB=1"
+build --action_env=_CL_="/Z7 /guard:cf /Brepro"
 build --action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
 build --host_action_env=BAZEL_VC_FULL_VERSION=14.29.30133
 build --host_action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
-build --host_action_env=_CL_="/Z7 /guard:cf /Brepro /DOPENTELEMETRY_API=__declspec(dllexport) /DHAVE_CPP_STDLIB=1"
+build --host_action_env=_CL_="/Z7 /guard:cf /Brepro"
 build --host_action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
 
 # --config=asan : Address Sanitizer.

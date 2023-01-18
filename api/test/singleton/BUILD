@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//:dll_deps.bzl", "dll_deps")
+
 DEFAULT_WIN_COPTS = [
 ]
 
@@ -26,9 +28,9 @@ cc_library(
         "component_a.h",
     ],
     linkstatic = True,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_library(
@@ -40,9 +42,9 @@ cc_library(
         "component_b.h",
     ],
     linkstatic = True,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_library(
@@ -58,9 +60,9 @@ cc_library(
         "//conditions:default": DEFAULT_NOWIN_COPTS,
     }),
     linkstatic = False,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_library(
@@ -76,9 +78,9 @@ cc_library(
         "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
     linkstatic = False,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_library(
@@ -94,9 +96,9 @@ cc_library(
         "//conditions:default": DEFAULT_NOWIN_COPTS,
     }),
     linkstatic = False,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_library(
@@ -112,9 +114,9 @@ cc_library(
         "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
     linkstatic = False,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_test(
@@ -127,14 +129,15 @@ cc_test(
         "api",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
+        "//api",
+    ]) + [
         "component_a",
         "component_b",
         "component_c",
         "component_d",
         "component_e",
         "component_f",
-        "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )

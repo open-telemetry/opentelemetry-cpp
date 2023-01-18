@@ -13,7 +13,7 @@ namespace common
 /**
  * Supports internal iteration over a collection of key-value pairs.
  */
-class OPENTELEMETRY_API KeyValueIterable
+class KeyValueIterable
 {
 public:
   virtual ~KeyValueIterable() = default;

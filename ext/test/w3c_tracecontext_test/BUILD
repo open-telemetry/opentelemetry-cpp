@@ -1,3 +1,5 @@
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_binary(
     name = "w3c_tracecontext_test",
     srcs = [
@@ -11,12 +13,13 @@ cc_binary(
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps = dll_deps([
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
+    ]) + [
         "@curl",
         "@github_nlohmann_json//:json",
     ],

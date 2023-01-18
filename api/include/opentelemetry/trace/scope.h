@@ -17,7 +17,7 @@ namespace trace
  * active span. On destruction, the given span is ended and the previously
  * active span will be the currently active span again.
  */
-class OPENTELEMETRY_API Scope final
+class Scope final
 {
 public:
   /**

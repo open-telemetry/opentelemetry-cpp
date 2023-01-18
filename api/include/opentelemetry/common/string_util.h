@@ -9,7 +9,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
-class OPENTELEMETRY_API StringUtil
+class StringUtil
 {
 public:
   static nostd::string_view Trim(nostd::string_view str, size_t left, size_t right) noexcept

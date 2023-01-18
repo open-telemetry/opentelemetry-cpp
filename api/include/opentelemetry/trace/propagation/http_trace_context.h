@@ -30,7 +30,7 @@ static const size_t kTraceParentSize         = 55;
 //    HttpTraceContext().Inject(carrier, context);
 //    HttpTraceContext().Extract(carrier, context);
 
-class OPENTELEMETRY_API HttpTraceContext : public opentelemetry::context::propagation::TextMapPropagator
+class HttpTraceContext : public opentelemetry::context::propagation::TextMapPropagator
 {
 public:
   void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
