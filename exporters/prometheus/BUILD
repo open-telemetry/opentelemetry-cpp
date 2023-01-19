@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//:dll_deps.bzl", "dll_deps")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -93,10 +95,13 @@ cc_test(
         "prometheus",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":prometheus_exporter",
+    ]) + [
         ":prometheus_test_helper",
         "@com_google_googletest//:gtest_main",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//pull",
     ],
 )
 
@@ -109,10 +114,13 @@ cc_test(
         "prometheus",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":prometheus_collector",
+    ]) + [
         ":prometheus_test_helper",
         "@com_google_googletest//:gtest_main",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//pull",
     ],
 )
 
@@ -125,10 +133,13 @@ cc_test(
         "prometheus",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":prometheus_exporter_utils",
+    ]) + [
         ":prometheus_test_helper",
         "@com_google_googletest//:gtest_main",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//pull",
     ],
 )
 

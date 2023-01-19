@@ -1,8 +1,8 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
-build --build_tag_filters=-jaeger,-prometheus
-test --test_tag_filters=-jaeger,-prometheus
+build --build_tag_filters=-jaeger
+test --test_tag_filters=-jaeger
 
 build --experimental_convenience_symlinks=clean
 

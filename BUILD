@@ -30,6 +30,7 @@ cc_binary(
         "//exporters/otlp:otlp_grpc_metric_exporter",
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//exporters/otlp:otlp_grpc_log_record_exporter",
+        "//exporters/prometheus:prometheus_exporter",
         "//exporters/zipkin:zipkin_exporter",
         "//ext/src/http/client/curl:http_client_curl",
         "//ext/src/zpages",
@@ -100,8 +101,9 @@ cc_library(
         "//exporters/etw:headers",
         "//exporters/memory:headers",
         "//exporters/ostream:headers",
-        "//exporters/zipkin:headers",
         "//exporters/otlp:headers",
+        "//exporters/prometheus:headers",
+        "//exporters/zipkin:headers",
     ],
     visibility = ["//visibility:public"],
 )
