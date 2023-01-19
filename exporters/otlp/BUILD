@@ -529,3 +529,9 @@ cc_library(
         "//sdk:headers",
     ],
 )
+
+# This is used for otel_sdk.zip packaging
+filegroup(
+    name="header_files",
+    srcs=glob(["include/**/*.h"]),
+)

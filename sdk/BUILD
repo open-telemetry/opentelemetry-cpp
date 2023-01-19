@@ -5,3 +5,9 @@ cc_library(
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
 )
+
+# This is used for otel_sdk.zip packaging
+filegroup(
+    name="header_files",
+    srcs=glob(["include/**/*.h"]),
+)

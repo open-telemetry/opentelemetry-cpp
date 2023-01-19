@@ -27,6 +27,12 @@ cc_library(
     strip_include_prefix = "include",
 )
 
+# This is used for otel_sdk.zip packaging
+filegroup(
+    name="header_files",
+    srcs=glob(["include/**/*.h"]),
+)
+
 cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
