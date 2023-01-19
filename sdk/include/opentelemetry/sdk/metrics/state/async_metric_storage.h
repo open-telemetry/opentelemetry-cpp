@@ -27,9 +27,9 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     const AttributesProcessor *attributes_processor,
+                     const AttributesProcessor * /*attributes_processor*/,
                      const AggregationConfig *aggregation_config,
-                     void *state = nullptr)
+                     void * /*state = nullptr*/)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         cumulative_hash_map_(new AttributesHashMap()),
