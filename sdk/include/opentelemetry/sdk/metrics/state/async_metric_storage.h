@@ -27,18 +27,13 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     const AttributesProcessor *attributes_processor,
-                     const AggregationConfig *aggregation_config,
-                     void *state = nullptr)
+                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         cumulative_hash_map_(new AttributesHashMap()),
         delta_hash_map_(new AttributesHashMap()),
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
-  {
-    (void *)state;                 // unused
-    (void *)attributes_processor;  // unused
-  }
+  {}
 
   template <class T>
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
