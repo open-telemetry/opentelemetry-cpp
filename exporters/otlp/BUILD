@@ -433,7 +433,6 @@ cc_test(
         "//sdk/src/logs",
     ]) + [
         "@com_google_googletest//:gtest_main",
-#        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
         "@com_github_grpc_grpc//:grpc++",
     ],
@@ -513,7 +512,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = dll_deps([
-        ":otlp_grpc_exporter"
+        ":otlp_grpc_exporter",
     ]) + [
         "//examples/common/foo_library:common_foo_library",
         "@com_github_grpc_grpc//:grpc++",

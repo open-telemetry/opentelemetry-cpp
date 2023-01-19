@@ -21,7 +21,7 @@ namespace common
  */
 #if (__GNUC__ == 4 && (__GNUC_MINOR__ >= 8))
 template <class T>
-class OPENTELEMETRY_API AtomicSharedPtr
+class AtomicSharedPtr
 {
 public:
   explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept : ptr_{std::move(ptr)} {}
@@ -44,7 +44,7 @@ private:
 };
 #else
 template <class T>
-class OPENTELEMETRY_API AtomicSharedPtr
+class AtomicSharedPtr
 {
 public:
   explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept : ptr_{std::move(ptr)} {}

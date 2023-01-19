@@ -20,7 +20,7 @@ namespace common
  * A non-owning view into a range of elements in a circular buffer.
  */
 template <class T>
-class OPENTELEMETRY_API CircularBufferRange
+class CircularBufferRange
 {
 public:
   CircularBufferRange() noexcept = default;

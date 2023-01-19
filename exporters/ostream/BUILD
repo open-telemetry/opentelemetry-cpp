@@ -59,7 +59,7 @@ cc_test(
         "test",
     ],
     deps = dll_deps([
-        ":ostream_metric_exporter"
+        ":ostream_metric_exporter",
     ]) + [
         "@com_google_googletest//:gtest_main",
     ],

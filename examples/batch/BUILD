@@ -7,11 +7,9 @@ cc_binary(
     ],
     linkopts = ["-lpthread"],
     tags = ["ostream"],
-    deps = dll_deps(
-        [   
-            "//api",
-            "//exporters/ostream:ostream_span_exporter",
-            "//sdk/src/trace",
-        ]
-    ),
+    deps = dll_deps([   
+        "//api",
+        "//exporters/ostream:ostream_span_exporter",
+        "//sdk/src/trace",
+    ]),
 )

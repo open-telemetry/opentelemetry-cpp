@@ -1,6 +1,6 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
-cc_binary(
+cc_test(
     name = "context_test",
     srcs = [
         "context_test.cc",
@@ -15,7 +15,7 @@ cc_binary(
     ],
 )
 
-cc_binary(
+cc_test(
     name = "runtime_context_test",
     srcs = [
         "runtime_context_test.cc",

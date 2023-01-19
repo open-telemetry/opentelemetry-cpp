@@ -18,7 +18,7 @@ namespace common
  * operations.
  */
 template <class T>
-class OPENTELEMETRY_API AtomicUniquePtr
+class AtomicUniquePtr
 {
 public:
   AtomicUniquePtr() noexcept {}

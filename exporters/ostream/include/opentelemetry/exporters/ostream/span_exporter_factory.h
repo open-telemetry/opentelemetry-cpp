@@ -7,9 +7,16 @@
 #include <memory>
 
 #include "opentelemetry/sdk/version/version.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class SpanExporter;
+}  // namespace trace
+}  // namespace sdk
+
 namespace exporter
 {
 namespace trace

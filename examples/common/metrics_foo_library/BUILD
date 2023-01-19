@@ -11,11 +11,9 @@ cc_library(
         "foo_library.h",
     ],
     defines = ["BAZEL_BUILD"],
-    deps = dll_deps(
-        [   
-            "//api",
-            "//sdk:headers",
-            "//sdk/src/metrics",
-        ]
-    ),
+    deps = dll_deps([   
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/metrics",
+    ]),
 )
