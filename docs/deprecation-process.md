@@ -38,9 +38,9 @@ Main sections in that document are organized as follows:
 * [Build scripts]
   * This is for `CMakeLists.txt`, `BUILD`, `Doxyfile`, ...
   * Changes of build options go here.
-* [Opentelemetry-cpp API]
-* [Opentelemetry-cpp SDK]
-* [Opentelemetry-cpp Exporter]
+* [opentelemetry-cpp API]
+* [opentelemetry-cpp SDK]
+* [opentelemetry-cpp Exporter]
 * [Documentation]
 
 Please keep main sections as is, with a content of "N/A", instead of
@@ -117,7 +117,7 @@ The goal is to, at the same time:
 * not break existing functionality in any way, in "normal" mode,
 * find all references to deprecated code, in "verify" mode.
 
-See [technical guildelines](./deprecation-process.md#Technical-guildelines) for examples.
+See [technical guidelines](./deprecation-process.md#Technical-guidelines) for examples.
 
 Once both parts are addressed,
 get the PR reviewed and merged to the main branch.

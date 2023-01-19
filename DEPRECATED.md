@@ -12,17 +12,17 @@ See the [deprecation-process](./docs/deprecation-process.md)
 
 ## [TEMPLATE]
 
-### New Deprecation Template Title
+### New Deprecation Title (Template)
 
-#### Announcement
+#### Announcement (Template)
 
-#### Motivation
+#### Motivation (Template)
 
-#### Scope
+#### Scope (Template)
 
-#### Mitigation
+#### Mitigation (Template)
 
-#### Planned removal
+#### Planned removal (Template)
 
 ## [Platforms]
 
@@ -46,26 +46,26 @@ N/A
 
 N/A
 
-## [OpenTelemetry-cpp API]
+## [opentelemetry-cpp API]
 
 N/A
 
-## [OpenTelemetry-cpp SDK]
+## [opentelemetry-cpp SDK]
 
 N/A
 
-## [OpenTelemetry-cpp Exporter]
+## [opentelemetry-cpp Exporter]
 
 ### Jaeger exporter
 
-#### Announcement
+#### Announcement (Jaeger)
 
 * Version: TO-BE-RELEASED-VERSION
 * Date: TO-BE-RELEASED-DATE
 * PR: [DEPRECATION] Deprecate the Jaeger exporter
   [#9999](https://github.com/open-telemetry/opentelemetry-cpp/pull/9999)
 
-#### Motivation
+#### Motivation (Jaeger)
 
 The jaeger client libraries are deprecated, as announced
 [here](https://www.jaegertracing.io/docs/1.41/client-libraries/).
@@ -84,7 +84,7 @@ longer accept new changes.
 At time of writing, Jan 2023, the client libraries have been archived 6
 months ago already.
 
-#### Scope
+#### Scope (Jaeger)
 
 The following are deprecated and planned for removal:
 
@@ -96,7 +96,7 @@ The following are deprecated and planned for removal:
 * the jaeger build options in CMake (`WITH_JAEGER`)
 * the dependency on thrift
 
-#### Mitigation
+#### Mitigation (Jaeger)
 
 Jaeger supports natively the OTLP protocol, starting with jaeger 1.35.
 
@@ -104,7 +104,7 @@ An application instrumented with opentelemetry needs to change how the SDK
 and exporter are configured to replace the Jaeger exporter with the OTLP
 exporter (both OTLP HTTP and OTLP GRPC are supported).
 
-#### Planned removal
+#### Planned removal (Jaeger)
 
 * Date: After April 1st, 2023
 
