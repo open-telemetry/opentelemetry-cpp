@@ -18,7 +18,7 @@ namespace otlp
 /**
  * Factory class for OtlpHttpLogRecordExporter.
  */
-class OtlpHttpLogRecordExporterFactory
+class OPENTELEMETRY_API OtlpHttpLogRecordExporterFactory
 {
 public:
   /**

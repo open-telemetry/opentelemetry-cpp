@@ -6,6 +6,8 @@
 // Include API header files here for exporting
 #include <opentelemetry/trace/provider.h>
 
+#include <opentelemetry/logs/logger_provider.h>
+
 extern "C"
 BOOL
 WINAPI
