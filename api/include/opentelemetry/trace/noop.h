@@ -76,7 +76,8 @@ private:
 /**
  * No-op implementation of Tracer.
  */
-class OPENTELEMETRY_API NoopTracer final : public Tracer, public std::enable_shared_from_this<NoopTracer>
+class OPENTELEMETRY_API NoopTracer final : public Tracer,
+                                           public std::enable_shared_from_this<NoopTracer>
 {
 public:
   // Tracer

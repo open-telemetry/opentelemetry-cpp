@@ -177,23 +177,22 @@ point.
 #endif
 
 //
-// The if/elif order matters here. If both OPENTELEMETRY_BUILD_IMPORT_DLL and 
+// The if/elif order matters here. If both OPENTELEMETRY_BUILD_IMPORT_DLL and
 // OPENTELEMETRY_BUILD_EXPORT_DLL are defined, the former takes precedence.
 //
 #if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
 
-#define OPENTELEMETRY_API __declspec(dllimport)
-#define OPENTELEMETRY_API_SINGLETON __declspec(noinline)
+#  define OPENTELEMETRY_API __declspec(dllimport)
 
 #elif defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
 
-#define OPENTELEMETRY_API __declspec(dllexport)
+#  define OPENTELEMETRY_API __declspec(dllexport)
 
 #else
 
 //
 // build OpenTelemetry as static library or not on Windows.
 //
-#define OPENTELEMETRY_API
+#  define OPENTELEMETRY_API
 
 #endif
