@@ -27,7 +27,7 @@ namespace trace
 /**
  * No-op implementation of Span. This class should not be used directly.
  */
-class OPENTELEMETRY_API NoopSpan final : public Span
+class OPENTELEMETRY_EXPORT NoopSpan final : public Span
 {
 public:
   explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept
@@ -76,7 +76,7 @@ private:
 /**
  * No-op implementation of Tracer.
  */
-class OPENTELEMETRY_API NoopTracer final : public Tracer,
+class OPENTELEMETRY_EXPORT NoopTracer final : public Tracer,
                                            public std::enable_shared_from_this<NoopTracer>
 {
 public:
@@ -102,7 +102,7 @@ public:
 /**
  * No-op implementation of a TracerProvider.
  */
-class OPENTELEMETRY_API NoopTracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT NoopTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   NoopTracerProvider() noexcept

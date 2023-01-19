@@ -182,11 +182,11 @@ point.
 //
 #if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
 
-#  define OPENTELEMETRY_API __declspec(dllimport)
+#  define OPENTELEMETRY_EXPORT __declspec(dllimport)
 
 #elif defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
 
-#  define OPENTELEMETRY_API __declspec(dllexport)
+#  define OPENTELEMETRY_EXPORT __declspec(dllexport)
 
 #else
 

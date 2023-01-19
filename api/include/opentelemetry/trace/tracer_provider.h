@@ -13,7 +13,7 @@ namespace trace
 /**
  * Creates new Tracer instances.
  */
-class OPENTELEMETRY_API TracerProvider
+class OPENTELEMETRY_EXPORT TracerProvider
 {
 public:
   virtual ~TracerProvider() = default;

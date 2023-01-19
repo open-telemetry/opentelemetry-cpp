@@ -37,7 +37,7 @@ private:
  * this class and passing an initialized RuntimeContextStorage object to
  * RuntimeContext::SetRuntimeContextStorage.
  */
-class OPENTELEMETRY_API RuntimeContextStorage
+class OPENTELEMETRY_EXPORT RuntimeContextStorage
 {
 public:
   /**
@@ -78,7 +78,7 @@ static RuntimeContextStorage *GetDefaultStorage() noexcept;
 // Provides a wrapper for propagating the context object globally.
 //
 // By default, a thread-local runtime context storage is used.
-class OPENTELEMETRY_API RuntimeContext
+class OPENTELEMETRY_EXPORT RuntimeContext
 {
 public:
   // Return the current context.

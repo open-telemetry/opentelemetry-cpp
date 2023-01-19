@@ -29,7 +29,7 @@ namespace trace
  * For more information, see the W3C Trace Context specification:
  * https://www.w3.org/TR/trace-context
  */
-class OPENTELEMETRY_API TraceState
+class OPENTELEMETRY_EXPORT TraceState
 {
 public:
   static constexpr int kKeyMaxSize         = 256;

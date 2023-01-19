@@ -17,7 +17,7 @@ namespace trace
 /**
  * Stores the singleton global TracerProvider.
  */
-class OPENTELEMETRY_API Provider
+class OPENTELEMETRY_EXPORT Provider
 {
 public:
   /**
