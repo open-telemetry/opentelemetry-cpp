@@ -117,7 +117,7 @@ The goal is to, at the same time:
 * not break existing functionality in any way, in "normal" mode,
 * find all references to deprecated code, in "verify" mode.
 
-See [technical guidelines](./deprecation-process.md#Technical-guidelines) for examples.
+See [Technical guidelines](#technical-guidelines) for examples.
 
 Once both parts are addressed,
 get the PR reviewed and merged to the main branch.
@@ -307,4 +307,3 @@ constructs as well (classes, structs, functions, methods, etc).
 
 When the compiler also provide deprecation annotations, use them as well to
 raise build warnings.
-

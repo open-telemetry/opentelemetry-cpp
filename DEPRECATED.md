@@ -36,7 +36,7 @@ N/A
 
 ### Jaeger
 
-See [Jaeger exporter](./DEPRECATED.md#Jaeger-exporter)
+See [Jaeger exporter](#jaeger-exporter)
 
 ## [Build tools]
 
