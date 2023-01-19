@@ -30,6 +30,8 @@ Increment the:
   [#1912](https://github.com/open-telemetry/opentelemetry-cpp/pull/1912)
 * [BUILD] Cleanup CMake makefiles for CURL usage
   [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
+  [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
 
 Important changes:
 
