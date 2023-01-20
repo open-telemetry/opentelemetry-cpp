@@ -291,7 +291,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "", "opentelelemtry_library", "", schema_url);
+      "Logger", "opentelelemtry_library", "", schema_url);
 
   // Back up cout's streambuf
   std::streambuf *original = std::cout.rdbuf();

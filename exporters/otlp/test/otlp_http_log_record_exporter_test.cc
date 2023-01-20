@@ -129,7 +129,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url);
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -228,7 +228,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "1.2.0", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url);
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -336,7 +336,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "1.2.0", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url);
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
@@ -437,7 +437,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url);
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));

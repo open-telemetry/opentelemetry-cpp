@@ -136,7 +136,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::trace::SpanId span_id{span_id_bin};
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+  auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url);
   std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
   attributes["service.name"]     = "unit_test_service";
   attributes["tenant.id"]        = "test_user";

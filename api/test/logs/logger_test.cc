@@ -28,7 +28,7 @@ TEST(Logger, GetLoggerDefault)
 {
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
   EXPECT_EQ(name, "noop logger");
@@ -39,14 +39,10 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
 {
   auto lp = Provider::GetLoggerProvider();
 
-  // GetLogger(name, list(args))
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  lp->GetLogger("NoopLoggerWithArgs", args, "opentelelemtry_library", "", schema_url);
+  lp->GetLogger("NoopLoggerWithArgs", "opentelelemtry_library", "", schema_url);
 
-  // GetLogger(name, string options)
-  lp->GetLogger("NoopLoggerWithOptions", "options", "opentelelemtry_library", "", schema_url);
+  lp->GetLogger("NoopLoggerWithOptions", "opentelelemtry_library", "", schema_url);
 }
 
 // Test the EmitLogRecord() overloads
@@ -54,7 +50,7 @@ TEST(Logger, LogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
 
   // Create a map to test the logs with
   std::map<std::string, std::string> m = {{"key1", "value1"}};
@@ -120,7 +116,7 @@ TEST(Logger, EventLogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
 
   auto elp          = Provider::GetEventLoggerProvider();
   auto event_logger = elp->CreateEventLogger(logger, "otel-cpp.test");
@@ -163,18 +159,6 @@ class TestLogger : public Logger
 class TestProvider : public LoggerProvider
 {
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::string_view /* options */,
-                                      nostd::string_view /* library_name */,
-                                      nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */,
-                                      bool /* include_trace_context */,
-                                      const common::KeyValueIterable & /* attributes */) override
-  {
-    return shared_ptr<Logger>(new TestLogger());
-  }
-
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::span<nostd::string_view> /* args */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
                                       nostd::string_view /* schema_url */,
@@ -195,7 +179,7 @@ TEST(Logger, PushLoggerImplementation)
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
 #endif

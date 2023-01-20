@@ -34,16 +34,6 @@ public:
 
   virtual nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view options,
-      nostd::string_view library_name,
-      nostd::string_view library_version         = "",
-      nostd::string_view schema_url              = "",
-      bool include_trace_context                 = true,
-      const common::KeyValueIterable &attributes = common::NoopKeyValueIterable()) = 0;
-
-  virtual nostd::shared_ptr<Logger> GetLogger(
-      nostd::string_view logger_name,
-      nostd::span<nostd::string_view> args,
       nostd::string_view library_name,
       nostd::string_view library_version         = "",
       nostd::string_view schema_url              = "",
@@ -52,30 +42,13 @@ public:
 
   nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view options,
       nostd::string_view library_name,
       nostd::string_view library_version,
       nostd::string_view schema_url,
       bool include_trace_context,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes)
   {
-    return GetLogger(logger_name, options, library_name, library_version, schema_url,
-                     include_trace_context,
-                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()});
-  }
-
-  nostd::shared_ptr<Logger> GetLogger(
-      nostd::string_view logger_name,
-      nostd::span<nostd::string_view> args,
-      nostd::string_view library_name,
-      nostd::string_view library_version,
-      nostd::string_view schema_url,
-      bool include_trace_context,
-      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes)
-  {
-    return GetLogger(logger_name, args, library_name, library_version, schema_url,
-                     include_trace_context,
+    return GetLogger(logger_name, library_name, library_version, schema_url, include_trace_context,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                          attributes.begin(), attributes.end()});
   }
@@ -83,29 +56,14 @@ public:
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::string_view options,
                                       nostd::string_view library_name,
                                       nostd::string_view library_version,
                                       nostd::string_view schema_url,
                                       bool include_trace_context,
                                       const T &attributes)
   {
-    return GetLogger(logger_name, options, library_name, library_version, schema_url,
-                     include_trace_context, common::KeyValueIterableView<T>(attributes));
-  }
-
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::span<nostd::string_view> args,
-                                      nostd::string_view library_name,
-                                      nostd::string_view library_version,
-                                      nostd::string_view schema_url,
-                                      bool include_trace_context,
-                                      const T &attributes)
-  {
-    return GetLogger(logger_name, args, library_name, library_version, schema_url,
-                     include_trace_context, common::KeyValueIterableView<T>(attributes));
+    return GetLogger(logger_name, library_name, library_version, schema_url, include_trace_context,
+                     common::KeyValueIterableView<T>(attributes));
   }
 };
 }  // namespace logs

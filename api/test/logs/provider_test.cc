@@ -21,19 +21,6 @@ class TestProvider : public LoggerProvider
 {
   nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view /* logger_name */,
-      nostd::string_view /* options */,
-      nostd::string_view /* library_name */,
-      nostd::string_view /* library_version */,
-      nostd::string_view /* schema_url */,
-      bool /* include_trace_context */,
-      const opentelemetry::common::KeyValueIterable & /* attributes */) override
-  {
-    return shared_ptr<Logger>(nullptr);
-  }
-
-  nostd::shared_ptr<Logger> GetLogger(
-      nostd::string_view /* logger_name */,
-      nostd::span<nostd::string_view> /* args */,
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */,
@@ -72,14 +59,12 @@ TEST(Provider, GetLogger)
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
   // tests GetLogger(name, version, schema)
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-  auto logger = tf->GetLogger("logger1", "", "opentelelemtry_library", "", schema_url);
+  auto logger = tf->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
   EXPECT_EQ(nullptr, logger);
 
   // tests GetLogger(name, arguments)
 
-  std::array<nostd::string_view, 1> sv{"string"};
-  nostd::span<nostd::string_view> args{sv};
-  auto logger2 = tf->GetLogger("logger2", args, "opentelelemtry_library", "", schema_url);
+  auto logger2 = tf->GetLogger("logger2", "opentelelemtry_library", "", schema_url);
   EXPECT_EQ(nullptr, logger2);
 }
 
