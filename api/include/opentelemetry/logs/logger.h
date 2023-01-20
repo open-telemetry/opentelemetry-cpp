@@ -124,7 +124,7 @@ public:
    * @param log_record
    */
   template <class... ArgumentType>
-  void EmitLogRecord(Severity severity, ArgumentType &&... args)
+  void EmitLogRecord(ArgumentType &&... args)
   {
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
     if (!log_record)
@@ -132,7 +132,6 @@ public:
       return;
     }
 
-    log_record->SetSeverity(severity);
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 

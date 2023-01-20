@@ -36,13 +36,6 @@ public:
   virtual nostd::shared_ptr<Logger> GetDelegateLogger() noexcept = 0;
 
   /**
-   * Create a Log Record object
-   *
-   * @return nostd::unique_ptr<LogRecord>
-   */
-  virtual nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept = 0;
-
-  /**
    * Emit a event Log Record object
    *
    * @param event_name Event name
@@ -55,18 +48,21 @@ public:
    * Emit a event Log Record object with arguments
    *
    * @param event_name Event name
-   * @param log_record Log record
+   * @param args log fields
    */
   template <class... ArgumentType>
-  void EmitEvent(Severity severity, nostd::string_view event_name, ArgumentType &&... args)
+  void EmitEvent(nostd::string_view event_name, ArgumentType &&... args)
   {
-    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+    nostd::shared_ptr<Logger> delegate_logger = GetDelegateLogger();
+    if (!delegate_logger)
+    {
+      return;
+    }
+    nostd::unique_ptr<LogRecord> log_record = delegate_logger->CreateLogRecord();
     if (!log_record)
     {
       return;
     }
-
-    log_record->SetSeverity(severity);
 
     IgnoreTraitResult(
         detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(

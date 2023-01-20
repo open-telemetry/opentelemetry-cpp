@@ -36,8 +36,6 @@ public:
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetDelegateLogger() noexcept override;
 
-  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override;
-
   using opentelemetry::logs::EventLogger::EmitEvent;
 
   void EmitEvent(nostd::string_view event_name,

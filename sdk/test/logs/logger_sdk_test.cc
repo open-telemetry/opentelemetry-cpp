@@ -249,7 +249,7 @@ TEST(LoggerSDK, EventLog)
       new MockProcessor(shared_recordable)));
 
   // Check that the recordable created by the EmitEvent() statement is set properly
-  event_logger->EmitEvent(logs_api::Severity::kWarn, "otel-cpp.event_name", "Event Log Message");
+  event_logger->EmitEvent("otel-cpp.event_name", logs_api::Severity::kWarn, "Event Log Message");
 
   ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
   ASSERT_EQ(shared_recordable->GetBody(), "Event Log Message");

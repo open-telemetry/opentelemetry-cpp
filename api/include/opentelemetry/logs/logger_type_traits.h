@@ -14,6 +14,7 @@
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/log_record.h"
+#  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
@@ -32,6 +33,18 @@ namespace detail
 {
 template <class ValueType>
 struct LogRecordSetterTrait;
+
+template <>
+struct LogRecordSetterTrait<Severity>
+{
+  template <class ArgumentType>
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  {
+    log_record->SetSeverity(std::forward<ArgumentType>(arg));
+
+    return log_record;
+  }
+};
 
 template <>
 struct LogRecordSetterTrait<trace::SpanContext>

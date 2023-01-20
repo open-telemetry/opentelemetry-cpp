@@ -127,21 +127,21 @@ TEST(Logger, EventLogMethodOverloads)
 
   std::map<std::string, std::string> m = {{"key1", "value1"}};
 
-  event_logger->EmitEvent(Severity::kTrace, "event name", "Test log message");
-  event_logger->EmitEvent(Severity::kInfo, "event name", "Test log message");
-  event_logger->EmitEvent(Severity::kDebug, "event name", m);
-  event_logger->EmitEvent(Severity::kWarn, "event name", "Logging a map", m);
-  event_logger->EmitEvent(Severity::kError, "event name",
+  event_logger->EmitEvent("event name", Severity::kTrace, "Test log message");
+  event_logger->EmitEvent("event name", Severity::kInfo, "Test log message");
+  event_logger->EmitEvent("event name", Severity::kDebug, m);
+  event_logger->EmitEvent("event name", Severity::kWarn, "Logging a map", m);
+  event_logger->EmitEvent("event name", Severity::kError,
                           Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
-  event_logger->EmitEvent(Severity::kFatal, "event name", "Logging an initializer list",
+  event_logger->EmitEvent("event name", Severity::kFatal, "Logging an initializer list",
                           Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
-  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(m));
-  event_logger->EmitEvent(Severity::kDebug, "event name",
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(m));
+  event_logger->EmitEvent("event name", Severity::kDebug,
                           common::KeyValueIterableView<std::map<std::string, std::string>>(m));
   std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
-  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(array));
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(array));
   std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
-  event_logger->EmitEvent(Severity::kDebug, "event name", Logger::MakeAttributes(vec));
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(vec));
 }
 
 // Define a basic Logger class

@@ -95,11 +95,6 @@ public:
 
   nostd::shared_ptr<Logger> GetDelegateLogger() noexcept override { return logger_; }
 
-  nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept override
-  {
-    return logger_->CreateLogRecord();
-  }
-
   void EmitEvent(nostd::string_view, nostd::unique_ptr<LogRecord> &&) noexcept override {}
 
 private:

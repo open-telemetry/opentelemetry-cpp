@@ -33,17 +33,6 @@ nostd::shared_ptr<opentelemetry::logs::Logger> EventLogger::GetDelegateLogger() 
   return delegate_logger_;
 }
 
-nostd::unique_ptr<opentelemetry::logs::LogRecord> EventLogger::CreateLogRecord() noexcept
-{
-  // If this logger does not have a processor, no need to create a log recordable
-  if (!delegate_logger_)
-  {
-    return nullptr;
-  }
-
-  return delegate_logger_->CreateLogRecord();
-}
-
 void EventLogger::EmitEvent(nostd::string_view event_name,
                             nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
