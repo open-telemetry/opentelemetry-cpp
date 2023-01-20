@@ -1,7 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(opentelemetry_cpp SHARED dllmain.cc opentelemetry_cpp.def)
+set(OPENTELEMETRY_EXPORT_DEF
+    "${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def")
+
+add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
 target_link_libraries(
   opentelemetry_cpp
@@ -12,6 +15,15 @@ target_link_libraries(
           opentelemetry_exporter_otlp_http_log
           opentelemetry_logs
           opentelemetry_exporter_otlp_grpc_log)
+
+add_custom_command(
+  OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
+  COMMAND
+    ${CMAKE_CXX_COMPILER}
+    "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
+    ${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry_cpp.src >
+    ${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def
+  COMMAND_EXPAND_LISTS VERBATIM)
 
 install(
   TARGETS opentelemetry_cpp
