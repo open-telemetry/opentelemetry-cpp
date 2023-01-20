@@ -29,6 +29,36 @@ Increment the:
   to enable Bazel 6.0.0 compatibility [#1873](https://github.com/open-telemetry/opentelemetry-cpp/pull/1873)
 * [BUILD] Cleanup CMake makefiles for nlohmann_json
   [#1912](https://github.com/open-telemetry/opentelemetry-cpp/pull/1912)
+* [BUILD] Cleanup CMake makefiles for CURL usage
+  [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
+  [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
+
+Important changes:
+
+* [BUILD] Cleanup CMake makefiles for CURL usage
+  [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
+  * CMake option `WITH_OTLP_HTTP`
+    * Before this change, the CMake option `WITH_OTLP_HTTP` was unpredictable,
+      sometime set to ON and sometime set to OFF by default,
+      depending on whether a CURL package was found or not.
+      The option `WITH_OTLP_HTTP` was sometime not displayed in the ccmake
+      UI, making it impossible to even discover there is an option of that name.
+    * With this change, CMake option `WITH_OTLP_HTTP` is always OFF by
+      default. WITH_OTLP_HTTP MUST be set to ON explicitly to build the
+      OTLP HTTP exporter. The option is always visible in the ccmake UI.
+  * CMake option `BUILD_W3CTRACECONTEXT_TEST`
+    * Before this change, the W3C trace context tests were built, or
+      not, in an unpredictable way, depending on the presence, or not, of a
+      CURL package. In particular, the build could ignore the W3C trace
+      context tests even when BUILD_W3CTRACECONTEXT_TEST=ON.
+    * With this change, option BUILD_W3CTRACECONTEXT_TEST is honored.
+  * HTTP client/server examples
+    * Before this change, the HTTP client/server examples were built, or
+      not, in an unpredictable way, depending on the presence, or not, of a
+      CURL package.
+    * With this change, a new option `WITH_EXAMPLES_HTTP` is used to
+      build the HTTP client/server examples.
 
 ## [1.8.1] 2022-12-04
 
