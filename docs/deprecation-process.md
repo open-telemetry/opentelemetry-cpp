@@ -4,7 +4,7 @@
 
 TODO
 
-## Artefacts
+## Artifacts
 
 ### Issues
 
@@ -197,7 +197,7 @@ in addition to the regular release tasks:
 
 ## Technical guidelines
 
-### CMake options
+### CMake options deprecation
 
 Assume the option `WITH_FOO` needs to be deprecated.
 
