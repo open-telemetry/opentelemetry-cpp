@@ -140,7 +140,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
   make
