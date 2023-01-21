@@ -12,3 +12,4 @@ EXPORTS
     ?Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@7@@Z
     ?Create@OtlpHttpLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpLogRecordExporterOptions@2345@@Z
 #endif  // end of ENABLE_LOGS_PREVIEW
+// clang-format on
