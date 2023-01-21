@@ -95,6 +95,8 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
@@ -190,6 +192,7 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -203,6 +206,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
@@ -215,6 +219,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include_directories(
   ${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto
   ${CMAKE_SOURCE_DIR}/exporters/otlp/include)

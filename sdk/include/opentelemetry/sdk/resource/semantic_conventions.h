@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.16.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.17.0";
 
 /**
  * Array of brand name and version separated by a space
