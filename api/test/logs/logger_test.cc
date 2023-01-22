@@ -55,14 +55,7 @@ TEST(Logger, LogMethodOverloads)
   // Create a map to test the logs with
   std::map<std::string, std::string> m = {{"key1", "value1"}};
 
-  // Log overloads
-  logger->Log(Severity::kTrace, "Test log message");
-  logger->Log(Severity::kInfo, "Test log message");
-  logger->Log(Severity::kDebug, m);
-  logger->Log(Severity::kWarn, "Logging a map", m);
-  logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
-  logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
-
+  // EmitLogRecord overloads
   logger->EmitLogRecord(Severity::kTrace, "Test log message");
   logger->EmitLogRecord(Severity::kInfo, "Test log message");
   logger->EmitLogRecord(Severity::kDebug, m);
@@ -82,34 +75,34 @@ TEST(Logger, LogMethodOverloads)
   // Severity methods
   logger->Trace("Test log message");
   logger->Trace("Test log message", m);
-  logger->Trace("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Trace("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Trace(m);
-  logger->Trace({{"key1", "value 1"}, {"key2", 2}});
+  logger->Trace(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug("Test log message");
   logger->Debug("Test log message", m);
-  logger->Debug("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug(m);
-  logger->Debug({{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info("Test log message");
   logger->Info("Test log message", m);
-  logger->Info("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Info("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info(m);
-  logger->Info({{"key1", "value 1"}, {"key2", 2}});
+  logger->Info(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn("Test log message");
   logger->Warn("Test log message", m);
-  logger->Warn("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn(m);
-  logger->Warn({{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error("Test log message");
   logger->Error("Test log message", m);
-  logger->Error("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Error("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error(m);
-  logger->Error({{"key1", "value 1"}, {"key2", 2}});
+  logger->Error(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal("Test log message");
   logger->Fatal("Test log message", m);
-  logger->Fatal("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal(m);
-  logger->Fatal({{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
 }
 
 TEST(Logger, EventLogMethodOverloads)

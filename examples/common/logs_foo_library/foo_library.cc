@@ -32,8 +32,8 @@ void foo_library()
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("foo_library"));
   auto ctx         = span->GetContext();
   auto logger      = get_logger();
-  logger->Log(opentelemetry::logs::Severity::kDebug, "body", {}, ctx.trace_id(), ctx.span_id(),
-              ctx.trace_flags(),
-              opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug, "body", ctx.trace_id(),
+                        ctx.span_id(), ctx.trace_flags(),
+                        opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 }
 #endif

@@ -38,7 +38,7 @@ template <>
 struct LogRecordSetterTrait<Severity>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetSeverity(std::forward<ArgumentType>(arg));
 
@@ -50,7 +50,7 @@ template <>
 struct LogRecordSetterTrait<trace::SpanContext>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetSpanId(arg.span_id());
     log_record->SetTraceId(arg.trace_id());
@@ -64,7 +64,7 @@ template <>
 struct LogRecordSetterTrait<trace::SpanId>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetSpanId(std::forward<ArgumentType>(arg));
 
@@ -76,7 +76,7 @@ template <>
 struct LogRecordSetterTrait<trace::TraceId>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetTraceId(std::forward<ArgumentType>(arg));
 
@@ -88,7 +88,7 @@ template <>
 struct LogRecordSetterTrait<trace::TraceFlags>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetTraceFlags(std::forward<ArgumentType>(arg));
 
@@ -100,7 +100,7 @@ template <>
 struct LogRecordSetterTrait<common::SystemTimestamp>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetTimestamp(std::forward<ArgumentType>(arg));
 
@@ -112,7 +112,7 @@ template <>
 struct LogRecordSetterTrait<std::chrono::system_clock::time_point>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetTimestamp(common::SystemTimestamp(std::forward<ArgumentType>(arg)));
 
@@ -124,7 +124,7 @@ template <>
 struct LogRecordSetterTrait<common::KeyValueIterable>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     arg.ForEachKeyValue(
         [&log_record](nostd::string_view key, common::AttributeValue value) noexcept {
@@ -143,7 +143,7 @@ struct LogRecordSetterTrait
             nostd::enable_if_t<std::is_convertible<ArgumentType, nostd::string_view>::value ||
                                    std::is_convertible<ArgumentType, common::AttributeValue>::value,
                                void> * = nullptr>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     log_record->SetBody(std::forward<ArgumentType>(arg));
 
@@ -153,7 +153,7 @@ struct LogRecordSetterTrait
   template <class ArgumentType,
             nostd::enable_if_t<std::is_base_of<common::KeyValueIterable, ArgumentType>::value, bool>
                 * = nullptr>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     return LogRecordSetterTrait<common::KeyValueIterable>::template Set(
         log_record, std::forward<ArgumentType>(arg));
@@ -162,7 +162,7 @@ struct LogRecordSetterTrait
   template <class ArgumentType,
             nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value, int> * =
                 nullptr>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg)
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
     for (auto &argv : arg)
     {

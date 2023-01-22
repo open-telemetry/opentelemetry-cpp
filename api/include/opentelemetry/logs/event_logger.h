@@ -48,7 +48,19 @@ public:
    * Emit a event Log Record object with arguments
    *
    * @param event_name Event name
-   * @param args log fields
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  Severity                                -> severity, severity_text
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
   void EmitEvent(nostd::string_view event_name, ArgumentType &&... args)
