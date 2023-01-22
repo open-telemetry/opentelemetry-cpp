@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_subdirectory(common)
 include_directories(common)
 if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
@@ -24,4 +27,7 @@ add_subdirectory(batch)
 add_subdirectory(metrics_simple)
 add_subdirectory(multithreaded)
 add_subdirectory(multi_processor)
-add_subdirectory(http)
+
+if(WITH_EXAMPLES_HTTP)
+  add_subdirectory(http)
+endif()

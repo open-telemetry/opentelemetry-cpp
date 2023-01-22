@@ -30,7 +30,7 @@ PeriodicExportingMetricReader::PeriodicExportingMetricReader(
   {
     OTEL_INTERNAL_LOG_WARN(
         "[Periodic Exporting Metric Reader] Invalid configuration: "
-        "export_interval_millis_ should be less than export_timeout_millis_, using default values");
+        "export_timeout_millis_ should be less than export_interval_millis_, using default values");
     export_interval_millis_ = kExportIntervalMillis;
     export_timeout_millis_  = kExportTimeOutMillis;
   }
