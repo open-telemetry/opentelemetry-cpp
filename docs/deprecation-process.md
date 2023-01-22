@@ -204,12 +204,14 @@ Assume the option `WITH_FOO` needs to be deprecated.
 Code using `WITH_FOO=OFF` or `WITH_FOO=ON` must build as before,
 yet users should be notified if they use `WITH_FOO` in their build.
 
-Assume a build option `WITH_NO_DEPRECATION` already exists.
+CMake defines a `WITH_NO_DEPRECATED_CODE` option, set to OFF by default.
 
 In a normal build, used in production, code is compiled with
-`WITH_NO_DEPRECATION=OFF`.
+`WITH_NO_DEPRECATED_CODE=OFF`.
 
-In a verification build, code is compiled with `WITH_NO_DEPRECATION=ON`.
+In a verification build, code is compiled with `WITH_NO_DEPRECATED_CODE=ON`.
+This verification also defines `OPENTELEMETRY_NO_DEPRECATED_CODE`, for code
+level checks.
 
 Implement the following logic in CMake:
 
@@ -217,7 +219,7 @@ Implement the following logic in CMake:
   option(WITH_FOO "DEPRECATED - With the foo feature" OFF)
 
   if(WITH_FOO)
-    if(WITH_NO_DEPRECATION)
+    if(WITH_NO_DEPRECATED_CODE)
       message(FATAL_ERROR "WITH_FOO is deprecated")
     else()
       message(WARNING "WITH_FOO is deprecated")
@@ -236,6 +238,37 @@ in file `DEPRECATED`.
 
 ### C++ deprecation
 
+#### C++ header deprecation
+
+When a header is deprecated, it will be removed,
+so users should no longer include the header.
+
+Add the following code in the header file
+
+```cpp
+#ifdef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  error "header <opentelemetry/foo.h> is deprecated."
+#endif
+```
+
+#### macro deprecation
+
+For macros, there are no `[[deprecated]]` annotations.
+
+Replace the macro with something that is sure to fail at build time,
+so it gets noticed when used.
+
+```cpp
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+  #define OTEL_MACRO_FOO(X, Y) ... (normal implementation) ...
+#else
+  #define OTEL_MACRO_FOO(X, Y) { this macro foo is deprecated }
+#endif
+
+```
+
+#### C++ code deprecation
+
 Assume a C++ item needs to be deprecated.
 
 For example:
@@ -252,24 +285,49 @@ For example:
 Code using y must build as before, and yet users should be notified if still
 using y.
 
-Implement the following change:
+First, there is a way in C++ to flag deprecated code:
 
 ```cpp
   struct some_options
   {
     int x;
-#ifdef HAVE_DEPRECATED_CODE
-    int y; // deprecated, to be removed
-#endif /* HAVE_DEPRECATED_CODE */
+    OPENTELEMETRY_DEPRECATED int y; // deprecated, to be removed
+    int z;
+  };
+```
+
+This will cause deprecation warnings.
+Some users will notice, but others will not,
+because warnings are most of the time ignored.
+
+A better solution is to provide a way to forcefully
+remove the deprecated code:
+
+```cpp
+  struct some_options
+  {
+    int x;
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+    OPENTELEMETRY_DEPRECATED int y; // deprecated, to be removed
+#endif
     int z;
   };
 ```
 
 A regular build, to use in production, will build with
-`HAVE_DEPRECATED_CODE` defined.
+the regular, unchanged, configuration,
+in which OPENTELEMETRY_NO_DEPRECATED_CODE is not defined.
 
 A verification build, to _not_ use in production,
-will build with `HAVE_DEPRECATED_CODE` undefined.
+will build with `OPENTELEMETRY_NO_DEPRECATED_CODE` defined,
+removing the deprecated member entirely.
+
+A verification build that succeeds is a proof that
+the application does not use the deprecated member,
+and needs no change.
+
+A verification build that fails will list all the application code that needs
+to be fixed before the deprecated code is finally removed.
 
 Even if the verification build succeeds, it really should not be used in
 production, because the memory layout just changed, breaking the ABI.
@@ -291,19 +349,22 @@ By the time the removal is implemented:
 
 the new release will have:
 
-* an API still compatible
+* an reduced API
 * an ABI (Application _Binary_ Interface) change
+
+The reduced API will be:
+- a subset of the original API,
+- compatible with applications which no longer use the removed code
+- incompatible with applications which still uses the removed code
 
 When documenting the deprecation, document this logic in the mitigation
 section, so that users know how to find and remove old references to
 deprecated code.
 
 When documenting the removal, clarify in the release notes that the
-release is API compatible but not ABI compatible,
+release is API compatible (when application cleanup was done) but not ABI compatible,
 and therefore a full build must be done again.
 
 This example used a member in a struct, but the same applies to other
 constructs as well (classes, structs, functions, methods, etc).
 
-When the compiler also provide deprecation annotations, use them as well to
-raise build warnings.
