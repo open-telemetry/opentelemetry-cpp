@@ -39,8 +39,8 @@ void assert_basic(prometheus_client::MetricFamily &metric,
                   std::vector<T> vals)
 {
   ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
-  ASSERT_EQ(metric.help, description);     // description not changed
-  ASSERT_EQ(metric.type, type);            // type translated
+  ASSERT_EQ(metric.help, description);               // description not changed
+  ASSERT_EQ(metric.type, type);                      // type translated
 
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
