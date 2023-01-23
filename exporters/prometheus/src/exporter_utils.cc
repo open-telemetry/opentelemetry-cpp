@@ -46,9 +46,10 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       for (const auto &metric_data : instrumentation_info.metric_data_)
       {
         auto origin_name = metric_data.instrument_descriptor.name_;
+        auto unit        = metric_data.instrument_descriptor.unit_;
         auto sanitized   = SanitizeNames(origin_name);
         prometheus_client::MetricFamily metric_family;
-        metric_family.name = sanitized;
+        metric_family.name = sanitized + "_" + unit;
         metric_family.help = metric_data.instrument_descriptor.description_;
         auto time          = metric_data.start_ts.time_since_epoch();
         for (const auto &point_data_attr : metric_data.point_data_attr_)
@@ -138,10 +139,40 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
  */
 std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 {
-  // replace all '.' and '-' with '_'
-  std::replace(name.begin(), name.end(), '.', '_');
-  std::replace(name.begin(), name.end(), '-', '_');
+  constexpr const auto replacement     = '_';
+  constexpr const auto replacement_dup = '=';
 
+  auto valid = [](int i, char c) {
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
+        (c >= '0' && c <= '9' && i > 0))
+    {
+      return true;
+    }
+    return false;
+  };
+
+  bool has_dup = false;
+  for (int i = 0; i < (int)name.size(); ++i)
+  {
+    if (valid(i, name[i]))
+    {
+      continue;
+    }
+    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
+    {
+      has_dup = true;
+      name[i] = replacement_dup;
+    }
+    else
+    {
+      name[i] = replacement;
+    }
+  }
+  if (has_dup)
+  {
+    auto end = std::remove(name.begin(), name.end(), replacement_dup);
+    return std::string{name.begin(), end};
+  }
   return name;
 }
 

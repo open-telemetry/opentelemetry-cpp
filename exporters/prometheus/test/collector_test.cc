@@ -251,7 +251,7 @@ TEST(PrometheusCollector, CollectParsesDataToMetricFamily)
   auto metric_family = collected[0];
 
   // Collect function really collects a vector of MetricFamily
-  ASSERT_EQ(metric_family.name, "library_name");
+  ASSERT_EQ(metric_family.name, "library_name_unit");
   ASSERT_EQ(metric_family.help, "description");
   ASSERT_EQ(metric_family.type, prometheus_client::MetricType::Counter);
   ASSERT_EQ(metric_family.metric.size(), 2);
