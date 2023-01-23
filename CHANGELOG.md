@@ -33,6 +33,16 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
   [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
 
+Deprecations:
+
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [DEPRECATION] Deprecate the Jaeger exporter
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+* A new file, [DEPRECATED](./DEPRECATED.md) list all the code currently
+  deprecated.
+* A new [deprecation process](./docs/deprecation-process.md) details the plan to
+  deprecate and later remove code.
+
 Important changes:
 
 * [BUILD] Cleanup CMake makefiles for CURL usage

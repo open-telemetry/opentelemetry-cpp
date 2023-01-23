@@ -353,6 +353,7 @@ the new release will have:
 * an ABI (Application _Binary_ Interface) change
 
 The reduced API will be:
+
 * a subset of the original API,
 * compatible with applications which no longer use the removed code
 * incompatible with applications which still uses the removed code
@@ -368,4 +369,3 @@ and therefore a full build must be done again.
 
 This example used a member in a struct, but the same applies to other
 constructs as well (classes, structs, functions, methods, etc).
-
