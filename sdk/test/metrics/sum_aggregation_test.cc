@@ -1,15 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/macros.h"
-#include "opentelemetry/sdk/metrics/data/point_data.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_context.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/common/macros.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/meter_context.h"
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/metrics/metric_reader.h"
+#  include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+
+#  include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -61,7 +63,6 @@ private:
 
 TEST(HistogramToSum, Double)
 {
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -107,12 +108,10 @@ TEST(HistogramToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
-#endif
 }
 
 TEST(CounterToSum, Double)
 {
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -158,12 +157,10 @@ TEST(CounterToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
-#endif
 }
 
 TEST(UpDownCounterToSum, Double)
 {
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
 
@@ -204,5 +201,5 @@ TEST(UpDownCounterToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(15.0, opentelemetry::nostd::get<double>(actual.value_));
-#endif
 }
+#endif
