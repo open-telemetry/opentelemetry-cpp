@@ -285,7 +285,7 @@ configuration
 
    ```console
    $ cd opentelemetry-cpp
-   $ mkdir build && cd build && cmake -DBUILD_PACKAGE ..
+   $ mkdir build && cd build && cmake -DBUILD_PACKAGE=ON ..
 
    -- Package name: opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb
    -- Configuring done

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(
   opentelemetry_otlp_recordable
   src/otlp_log_recordable.cc src/otlp_recordable.cc
@@ -94,7 +97,6 @@ if(WITH_OTLP_GRPC)
 endif()
 
 if(WITH_OTLP_HTTP)
-  find_package(CURL REQUIRED)
   add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_http_client
                         PROPERTIES EXPORT_NAME otlp_http_client)
