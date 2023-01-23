@@ -17,8 +17,11 @@ namespace metrics
 {
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
+                                             AggregationType aggregation_type,
                                              const AggregationConfig *aggregation_config)
-    : instrument_descriptor_(instrument_descriptor), aggregation_config_(aggregation_config)
+    : instrument_descriptor_(instrument_descriptor),
+      aggregation_type_(aggregation_type),
+      aggregation_config_(aggregation_config)
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -64,9 +67,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           }
           else
           {
-            merged_metrics->Set(attributes, DefaultAggregation::CreateAggregation(
-                                                instrument_descriptor_, aggregation_config_)
-                                                ->Merge(aggregation));
+            merged_metrics->Set(attributes,
+                                DefaultAggregation::CreateAggregation(
+                                    aggregation_type_, instrument_descriptor_, aggregation_config_)
+                                    ->Merge(aggregation));
           }
           return true;
         });
@@ -88,21 +92,21 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     if (aggregation_temporarily == AggregationTemporality::kCumulative)
     {
       // merge current delta to previous cumulative
-      last_aggr_hashmap->GetAllEnteries([&merged_metrics, this](const MetricAttributes &attributes,
-                                                                Aggregation &aggregation) {
-        auto agg = merged_metrics->Get(attributes);
-        if (agg)
-        {
-          merged_metrics->Set(attributes, agg->Merge(aggregation));
-        }
-        else
-        {
-          auto def_agg =
-              DefaultAggregation::CreateAggregation(instrument_descriptor_, aggregation_config_);
-          merged_metrics->Set(attributes, def_agg->Merge(aggregation));
-        }
-        return true;
-      });
+      last_aggr_hashmap->GetAllEnteries(
+          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
+            auto agg = merged_metrics->Get(attributes);
+            if (agg)
+            {
+              merged_metrics->Set(attributes, agg->Merge(aggregation));
+            }
+            else
+            {
+              auto def_agg = DefaultAggregation::CreateAggregation(
+                  aggregation_type_, instrument_descriptor_, aggregation_config_);
+              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
+            }
+            return true;
+          });
     }
     last_reported_metrics_[collector] =
         LastReportedMetrics{std::move(merged_metrics), collection_ts};

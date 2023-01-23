@@ -97,7 +97,8 @@ public:
       case AggregationType::kSum: {
         bool is_monotonic = true;
         if (instrument_descriptor.type_ == InstrumentType::kUpDownCounter ||
-            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter)
+            instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter ||
+            instrument_descriptor.type_ == InstrumentType::kHistogram)
         {
           is_monotonic = false;
         }
