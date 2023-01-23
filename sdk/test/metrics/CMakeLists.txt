@@ -4,6 +4,8 @@ foreach(
   meter_test
   view_registry_test
   aggregation_test
+  sum_aggregation_test
+  histogram_aggregation_test
   attributes_processor_test
   attributes_hashmap_test
   histogram_test
