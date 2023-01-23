@@ -334,7 +334,7 @@ production, because the memory layout just changed, breaking the ABI.
 
 This verification build is used to enforce:
 
-* the API (Application _Programming_ Interface), is unchanged,
+* the API (Application _Programming_ Interface) subset is compatible,
   aka the source code will build before and after the removal.
 
 By the time the removal is implemented:
@@ -353,16 +353,17 @@ the new release will have:
 * an ABI (Application _Binary_ Interface) change
 
 The reduced API will be:
-- a subset of the original API,
-- compatible with applications which no longer use the removed code
-- incompatible with applications which still uses the removed code
+* a subset of the original API,
+* compatible with applications which no longer use the removed code
+* incompatible with applications which still uses the removed code
 
 When documenting the deprecation, document this logic in the mitigation
 section, so that users know how to find and remove old references to
 deprecated code.
 
 When documenting the removal, clarify in the release notes that the
-release is API compatible (when application cleanup was done) but not ABI compatible,
+release is API compatible (when application cleanup was done),
+but not ABI compatible (when sizeof() or virtual tables of classes changed),
 and therefore a full build must be done again.
 
 This example used a member in a struct, but the same applies to other

@@ -88,6 +88,8 @@ months ago already.
 
 The following are deprecated and planned for removal:
 
+* the API header `opentelemetry/trace/propagation/jaeger.h`, including:
+  * the C++ class `JaegerPropagator`
 * all the code located under `exporters/jaeger/`, including:
   * the jaeger exporter C++ class (`JaegerExporter`)
   * the related factory (`JaegerExporterFactory`)

@@ -37,7 +37,8 @@ if(BUILD_TESTING)
 endif()
 
 if(WITH_NO_DEPRECATED_CODE)
-  target_compile_definitions(opentelemetry_api INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
 endif()
 
 if(WITH_ABSEIL)
