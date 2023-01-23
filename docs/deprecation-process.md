@@ -349,7 +349,7 @@ By the time the removal is implemented:
 
 the new release will have:
 
-* an reduced API
+* a reduced API
 * an ABI (Application _Binary_ Interface) change
 
 The reduced API will be:
