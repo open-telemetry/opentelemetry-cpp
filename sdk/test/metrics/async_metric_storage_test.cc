@@ -65,10 +65,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  std::unique_ptr<AttributesProcessor> default_attributes_processor{
-      new DefaultAttributesProcessor{}};
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(), nullptr);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kSum,
+                                                          nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -157,10 +155,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  std::unique_ptr<AttributesProcessor> default_attributes_processor{
-      new DefaultAttributesProcessor{}};
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kLastValue,
+                                                          nullptr);
   int64_t freq_cpu0                                                                   = 3;
   int64_t freq_cpu1                                                                   = 5;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {

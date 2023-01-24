@@ -252,6 +252,36 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "histogram_aggregation_test",
+    srcs = [
+        "histogram_aggregation_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "sum_aggregation_test",
+    srcs = [
+        "sum_aggregation_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
