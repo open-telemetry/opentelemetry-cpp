@@ -246,8 +246,24 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
-  template <class T>
-  CURLcode SetCurlOption(CURLoption option, T value);
+  CURLcode SetCurlPtrOption(CURLoption option, void *value);
+
+  CURLcode SetCurlStrOption(CURLoption option, const char *value)
+  {
+    return SetCurlPtrOption(option, (void *)value);
+  }
+
+  CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *value)
+  {
+    return SetCurlPtrOption(option, (void *)value);
+  }
+
+  CURLcode SetCurlListOption(CURLoption option, struct curl_slist *value)
+  {
+    return SetCurlPtrOption(option, (void *)value);
+  }
+
+  CURLcode SetCurlLongOption(CURLoption option, long value);
 
   const char *GetCurlErrorMessage(CURLcode code);
 
