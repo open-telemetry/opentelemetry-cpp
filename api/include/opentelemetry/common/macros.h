@@ -193,6 +193,6 @@ point.
 //
 // build OpenTelemetry as static library or not on Windows.
 //
-#  define OPENTELEMETRY_API
+#  define OPENTELEMETRY_EXPORT
 
 #endif

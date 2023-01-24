@@ -19,7 +19,7 @@ namespace trace
 /**
  * Factory class for BatchSpanProcessor.
  */
-class BatchSpanProcessorFactory
+class OPENTELEMETRY_EXPORT BatchSpanProcessorFactory
 {
 public:
   /**
