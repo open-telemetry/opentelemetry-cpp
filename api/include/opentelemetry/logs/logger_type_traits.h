@@ -6,6 +6,7 @@
 
 #  include <chrono>
 #  include <map>
+#  include <type_traits>
 #  include <vector>
 
 #  include "opentelemetry/common/attribute_value.h"
@@ -172,6 +173,20 @@ struct LogRecordSetterTrait
     return log_record;
   }
 };
+
+template <class ValueType, class... ArgumentType>
+struct LogRecordHasType;
+
+template <class ValueType>
+struct LogRecordHasType<ValueType> : public std::false_type
+{};
+
+template <class ValueType, class TargetType, class... ArgumentType>
+struct LogRecordHasType<ValueType, TargetType, ArgumentType...>
+    : public std::conditional<std::is_same<ValueType, TargetType>::value,
+                              std::true_type,
+                              LogRecordHasType<ValueType, ArgumentType...>>::type
+{};
 
 }  // namespace detail
 

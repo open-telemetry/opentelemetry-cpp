@@ -174,7 +174,6 @@ public:
   /**
    * Writes a log with a severity of trace.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -190,13 +189,15 @@ public:
   template <class... ArgumentType>
   void Trace(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kTrace, std::forward<ArgumentType>(args)...);
   }
 
   /**
    * Writes a log with a severity of debug.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -212,13 +213,15 @@ public:
   template <class... ArgumentType>
   void Debug(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kDebug, std::forward<ArgumentType>(args)...);
   }
 
   /**
    * Writes a log with a severity of info.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -234,13 +237,15 @@ public:
   template <class... ArgumentType>
   void Info(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kInfo, std::forward<ArgumentType>(args)...);
   }
 
   /**
    * Writes a log with a severity of warn.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -256,13 +261,15 @@ public:
   template <class... ArgumentType>
   void Warn(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kWarn, std::forward<ArgumentType>(args)...);
   }
 
   /**
    * Writes a log with a severity of error.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -278,13 +285,15 @@ public:
   template <class... ArgumentType>
   void Error(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kError, std::forward<ArgumentType>(args)...);
   }
 
   /**
    * Writes a log with a severity of fatal.
    * @tparam args Arguments which can be used to set data of log record by type.
-   *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
    *  SpanContext                             -> span_id,tace_id and trace_flags
@@ -300,6 +309,9 @@ public:
   template <class... ArgumentType>
   void Fatal(ArgumentType &&... args) noexcept
   {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
     this->EmitLogRecord(Severity::kFatal, std::forward<ArgumentType>(args)...);
   }
 
