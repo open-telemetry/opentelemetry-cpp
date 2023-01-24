@@ -401,23 +401,37 @@ void HttpOperation::Cleanup()
   }
 }
 
-#if LIBCURL_VERSION_NUM >= 0x072200
-// CURL 7.34.0 (0x07 0x22 0x00)
-// CURL_SSLVERSION_TLSv1_0
-// CURL_SSLVERSION_TLSv1_1
-// CURL_SSLVERSION_TLSv1_2
-#  define HAVE_TLS_10_to_12
-#endif
+/*
+  Support for TLS min version, TLS max version.
 
-#if LIBCURL_VERSION_NUM >= 0x073400
-// CURL 7.52.0 (0x07 0x34 0x00)
-// CURL_SSLVERSION_TLSv1_3;
-#  define HAVE_TLS_13
+  To represent versions, the following symbols are needed:
+
+  Added in CURL 7.34.0:
+  - CURL_SSLVERSION_TLSv1_0
+  - CURL_SSLVERSION_TLSv1_1
+  - CURL_SSLVERSION_TLSv1_2
+
+  Added in CURL 7.52.0:
+  - CURL_SSLVERSION_TLSv1_3
+
+  Added in CURL 7.54.0:
+  - CURL_SSLVERSION_MAX_TLSv1_0
+  - CURL_SSLVERSION_MAX_TLSv1_1
+  - CURL_SSLVERSION_MAX_TLSv1_2
+  - CURL_SSLVERSION_MAX_TLSv1_3
+
+  For 7.34.0 <= CURL < 7.54.0,
+  we don't want to get into partial support.
+
+  CURL 7.54.0 (0x07 0x36 0x00) is required.
+*/
+#if LIBCURL_VERSION_NUM >= 0x073600
+#  define HAVE_TLS_VERSION
 #endif
 
 static long parse_min_ssl_version(std::string version)
 {
-#ifdef HAVE_TLS_10_to_12
+#ifdef HAVE_TLS_VERSION
   if (version == "1.0")
   {
     return CURL_SSLVERSION_TLSv1_0;
@@ -432,9 +446,7 @@ static long parse_min_ssl_version(std::string version)
   {
     return CURL_SSLVERSION_TLSv1_2;
   }
-#endif
 
-#ifdef HAVE_TLS_13
   if (version == "1.3")
   {
     return CURL_SSLVERSION_TLSv1_3;
@@ -446,7 +458,7 @@ static long parse_min_ssl_version(std::string version)
 
 static long parse_max_ssl_version(std::string version)
 {
-#ifdef HAVE_TLS_10_to_12
+#ifdef HAVE_TLS_VERSION
   if (version == "1.0")
   {
     return CURL_SSLVERSION_MAX_TLSv1_0;
@@ -461,9 +473,7 @@ static long parse_max_ssl_version(std::string version)
   {
     return CURL_SSLVERSION_MAX_TLSv1_2;
   }
-#endif
 
-#ifdef HAVE_TLS_13
   if (version == "1.3")
   {
     return CURL_SSLVERSION_MAX_TLSv1_3;
@@ -497,7 +507,7 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
 
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
-    Various SetCurl<T>Option() helpers ensure it is called with a pointer,
+    Various SetCurlXxxOption() helpers ensure it is called with a pointer,
     which can be:
     - a string (const char*)
     - a blob (struct curl_blob*)
@@ -697,30 +707,40 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_min_tls.empty())
     {
+#ifdef HAVE_TLS_VERSION
       min_ssl_version = parse_min_ssl_version(ssl_options_.ssl_min_tls);
 
       if (min_ssl_version == 0)
       {
         OTEL_INTERNAL_LOG_ERROR("Unknown min TLS version <" << ssl_options_.ssl_min_tls
-                                                            << "> ignored");
+                                                            << ">");
 
         return CURLE_UNKNOWN_OPTION;
       }
+#else
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MIN TLS");
+      return CURLE_UNKNOWN_OPTION;
+#endif
     }
 
     long max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
     {
+#ifdef HAVE_TLS_VERSION
       max_ssl_version = parse_max_ssl_version(ssl_options_.ssl_max_tls);
 
       if (max_ssl_version == 0)
       {
         OTEL_INTERNAL_LOG_ERROR("Unknown max TLS version <" << ssl_options_.ssl_max_tls
-                                                            << "> ignored");
+                                                            << ">");
 
         return CURLE_UNKNOWN_OPTION;
       }
+#else
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MAX TLS");
+      return CURLE_UNKNOWN_OPTION;
+#endif
     }
 
     long version_range = min_ssl_version | max_ssl_version;
@@ -1077,6 +1097,8 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   last_curl_result_ = code;
   if (code != CURLE_OK)
   {
+    const char *message = GetCurlErrorMessage(code);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed, message);
     return code;
   }
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, session);
