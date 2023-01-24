@@ -248,19 +248,20 @@ public:
 private:
   CURLcode SetCurlPtrOption(CURLoption option, void *value);
 
-  CURLcode SetCurlStrOption(CURLoption option, const char *value)
+  CURLcode SetCurlStrOption(CURLoption option, const char *str)
   {
-    return SetCurlPtrOption(option, (void *)value);
+    void *ptr = const_cast<char *>(str);
+    return SetCurlPtrOption(option, ptr);
   }
 
-  CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *value)
+  CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *blob)
   {
-    return SetCurlPtrOption(option, (void *)value);
+    return SetCurlPtrOption(option, blob);
   }
 
-  CURLcode SetCurlListOption(CURLoption option, struct curl_slist *value)
+  CURLcode SetCurlListOption(CURLoption option, struct curl_slist *list)
   {
-    return SetCurlPtrOption(option, (void *)value);
+    return SetCurlPtrOption(option, list);
   }
 
   CURLcode SetCurlLongOption(CURLoption option, long value);
