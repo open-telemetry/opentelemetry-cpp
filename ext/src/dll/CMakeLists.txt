@@ -8,10 +8,8 @@ add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
 target_link_libraries(
   opentelemetry_cpp
-  PRIVATE opentelemetry_trace
-          opentelemetry_exporter_ostream_span
-          opentelemetry_exporter_otlp_grpc
-          opentelemetry_exporter_otlp_http)
+  PRIVATE opentelemetry_trace opentelemetry_exporter_ostream_span
+          opentelemetry_exporter_otlp_grpc opentelemetry_exporter_otlp_http)
 
 if(WITH_LOGS_PREVIEW)
   target_link_libraries(
