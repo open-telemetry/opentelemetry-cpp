@@ -534,11 +534,12 @@ if(NOT WITH_API_ONLY)
   endif()
 endif()
 
-
 # Add custom vendor directory via environment variable
 if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
-  # Add custom contrib path to build tree and consolidate binary artifacts in current project binary output directory.
-  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH} ${PROJECT_BINARY_DIR}/contrib)
+  # Add custom contrib path to build tree and consolidate binary artifacts in
+  # current project binary output directory.
+  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH}
+                   ${PROJECT_BINARY_DIR}/contrib)
 endif()
 # OR Add opentelemetry-cpp-contrib from GitHub
 if(WITH_CONTRIB)
