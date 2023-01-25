@@ -712,9 +712,7 @@ CURLcode HttpOperation::Setup()
 
       if (min_ssl_version == 0)
       {
-        OTEL_INTERNAL_LOG_ERROR("Unknown min TLS version <" << ssl_options_.ssl_min_tls
-                                                            << ">");
-
+        OTEL_INTERNAL_LOG_ERROR("Unknown min TLS version <" << ssl_options_.ssl_min_tls << ">");
         return CURLE_UNKNOWN_OPTION;
       }
 #else
@@ -732,9 +730,7 @@ CURLcode HttpOperation::Setup()
 
       if (max_ssl_version == 0)
       {
-        OTEL_INTERNAL_LOG_ERROR("Unknown max TLS version <" << ssl_options_.ssl_max_tls
-                                                            << ">");
-
+        OTEL_INTERNAL_LOG_ERROR("Unknown max TLS version <" << ssl_options_.ssl_max_tls << ">");
         return CURLE_UNKNOWN_OPTION;
       }
 #else

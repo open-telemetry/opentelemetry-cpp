@@ -887,8 +887,7 @@ std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
 }
 
 static void DumpOtlpHeaders(OtlpHeaders &output,
-                            const char *env_var_name,
-                            std::unordered_set<std::string> &remove_cache)
+                            const char *env_var_name)
 {
   std::string raw_value;
   bool exists;
@@ -905,12 +904,13 @@ static void DumpOtlpHeaders(OtlpHeaders &output,
   opentelemetry::nostd::string_view header_value;
   bool header_valid = true;
 
+  std::unordered_set<std::string> remove_cache;
+
   while (tokenizer.next(header_valid, header_key, header_value))
   {
     if (header_valid)
     {
       std::string key(header_key);
-      std::string value(header_value);
       if (remove_cache.end() == remove_cache.find(key))
       {
         remove_cache.insert(key);
@@ -921,6 +921,7 @@ static void DumpOtlpHeaders(OtlpHeaders &output,
         }
       }
 
+      std::string value(header_value);
       output.emplace(std::make_pair(std::move(key), std::move(value)));
     }
   }
@@ -929,11 +930,8 @@ static void DumpOtlpHeaders(OtlpHeaders &output,
 static OtlpHeaders GetHeaders(const char *signal_name, const char *generic_name)
 {
   OtlpHeaders result;
-  std::unordered_set<std::string> trace_remove_cache;
-  DumpOtlpHeaders(result, generic_name, trace_remove_cache);
-
-  trace_remove_cache.clear();
-  DumpOtlpHeaders(result, signal_name, trace_remove_cache);
+  DumpOtlpHeaders(result, generic_name);
+  DumpOtlpHeaders(result, signal_name);
 
   return result;
 }
