@@ -2,7 +2,58 @@
 
 ## Motivation
 
-TODO
+Deprecation of code is a difficult topic,
+which can become a point of friction.
+
+On one hand, maintainers have to maintain the code base
+for many platforms, many compilers, while making bug fixes
+and adding new features over time.
+
+To do so, sometime code cleanup, minor refactoring, or removal of
+previous engineering debt is required to maintain a healthy code base,
+to allow for further improvements.
+
+In short, maintainers may want to, or may have to,
+remove some apis during the lifetime of a project.
+
+On the other hand, users who have a working application built using
+opentelemetry-cpp, for a given platform, a given compiler, and a given
+configuration, prefer to have stability and as few changes as possible.
+
+Doing code changes in the application imply a new build / test / deploy
+cycle, which induce costs, and risks.
+
+In short, users typically do now want changes, if the code works for them.
+
+The following extreme behaviors are what needs to be avoided for a project
+to stay healthy:
+
+* constant changes in the code base, done without notice,
+  introducing incompatibilities, causing adoption of each new release to
+  be costly with code rewrite. While this allows maintainers to make
+  more releases, it ultimately slows down adoption from users.
+
+* impossibility to make any changes in the code base, or having to support
+  many different flavors of the same api for compatibility reasons,
+  which introduces cost, technical risks, and code bloat, ultimately slowing
+  innovation down.
+
+The whole idea of a deprecation and removal process is to provide some
+mitigation, that will satisfy both maintainers and users, while allowing
+both to move forward with their own areas or responsibilities.
+
+This process attempts to provide:
+
+* visibility on the delivery pipeline itself, so that deprecations are
+  visible and documented in advance,
+* sufficient time between the deprecation and the removal of an API,
+  so that users can adapt the application at a time of their choice,
+  planned, instead of having to do it in emergency,
+* tooling to verify if a given code base is exposed to deprecated code or
+  not, to help assess how much effort is required to stay up to date,
+* migration and mitigations, to document not only that some api is going
+  away, but to also provide instructions to adjust the code with an
+  alternate solution.
 
 ## Artifacts
 
