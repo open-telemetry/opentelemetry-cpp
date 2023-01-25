@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/logs/logger.h"
@@ -44,4 +45,29 @@ public:
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif
+
+#  if defined(OPENTELEMETRY_EXPORT)
+
+namespace std
+{
+
+//
+// Partial specialization of default_delete used by unique_ptr.
+// This makes the delete of the type in unique_ptr happening in the DLL where it
+// is allocated.
+//
+template <>
+class OPENTELEMETRY_EXPORT default_delete<OPENTELEMETRY_NAMESPACE::logs::LoggerProvider>
+{
+public:
+  void operator()(OPENTELEMETRY_NAMESPACE::logs::LoggerProvider *logger_provider)
+  {
+    delete logger_provider;
+  }
+};
+
+}  // namespace std
+
+#  endif  // defined(OPENTELEMETRY_EXPORT)
+
+#endif  // ENABLE_LOGS_PREVIEW

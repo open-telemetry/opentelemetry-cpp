@@ -6,7 +6,9 @@
 // Include API header files here for exporting
 #include <opentelemetry/trace/provider.h>
 
-#include <opentelemetry/logs/logger_provider.h>
+#if defined(ENABLE_LOGS_PREVIEW)
+#  include <opentelemetry/logs/logger_provider.h>
+#endif  // ENABLE_LOGS_PREVIEW
 
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {

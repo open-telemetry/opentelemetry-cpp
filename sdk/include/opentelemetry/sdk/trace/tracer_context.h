@@ -98,3 +98,27 @@ private:
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#if defined(OPENTELEMETRY_EXPORT)
+
+namespace std
+{
+
+//
+// Partial specialization of default_delete used by unique_ptr.
+// This makes the delete of the type in unique_ptr happening in the DLL where it
+// is allocated.
+//
+template <>
+struct OPENTELEMETRY_EXPORT default_delete<OPENTELEMETRY_NAMESPACE::sdk::trace::TracerContext>
+{
+public:
+  void operator()(OPENTELEMETRY_NAMESPACE::sdk::trace::TracerContext *tracer_context)
+  {
+    delete tracer_context;
+  }
+};
+
+}  // namespace std
+
+#endif

@@ -11,10 +11,15 @@ target_link_libraries(
   PRIVATE opentelemetry_trace
           opentelemetry_exporter_ostream_span
           opentelemetry_exporter_otlp_grpc
-          opentelemetry_exporter_otlp_http
-          opentelemetry_exporter_otlp_http_log
-          opentelemetry_logs
-          opentelemetry_exporter_otlp_grpc_log)
+          opentelemetry_exporter_otlp_http)
+
+if(WITH_LOGS_PREVIEW)
+  target_link_libraries(
+    opentelemetry_cpp
+    PRIVATE opentelemetry_logs
+            opentelemetry_exporter_otlp_http_log
+            opentelemetry_exporter_otlp_grpc_log)
+endif()
 
 add_custom_command(
   OUTPUT ${OPENTELEMETRY_EXPORT_DEF}

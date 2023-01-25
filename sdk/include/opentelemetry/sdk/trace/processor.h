@@ -18,7 +18,7 @@ namespace trace
  * Built-in span processors are responsible for batching and conversion of
  * spans to exportable representation and passing batches to exporters.
  */
-class SpanProcessor
+class OPENTELEMETRY_EXPORT SpanProcessor
 {
 public:
   virtual ~SpanProcessor() = default;
@@ -68,3 +68,27 @@ public:
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#if defined(OPENTELEMETRY_EXPORT)
+
+namespace std
+{
+
+//
+// Partial specialization of default_delete used by unique_ptr.
+// This makes the delete of the type in unique_ptr happening in the DLL where it
+// is allocated.
+//
+template <>
+struct OPENTELEMETRY_EXPORT default_delete<OPENTELEMETRY_NAMESPACE::sdk::trace::SpanProcessor>
+{
+public:
+  void operator()(OPENTELEMETRY_NAMESPACE::sdk::trace::SpanProcessor *span_processor)
+  {
+    delete span_processor;
+  }
+};
+
+}  // namespace std
+
+#endif  // OPENTELEMETRY_EXPORT

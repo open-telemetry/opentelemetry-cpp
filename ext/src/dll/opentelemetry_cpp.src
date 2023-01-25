@@ -2,13 +2,16 @@
 LIBRARY opentelemetry_cpp
 EXPORTS
     ?Create@OStreamSpanExporterFactory@trace@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@XZ
-    ?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpExporterOptions@2345@@Z
-    ?Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
+    ??R?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@QEAAXPEAVSpanExporter@trace@sdk@v1@opentelemetry@@@Z
     ?Create@SimpleSpanProcessorFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
     ?Create@TracerProviderFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VTracerProvider@trace@v1@opentelemetry@@U?$default_delete@VTracerProvider@trace@v1@opentelemetry@@@std@@@std@@V?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
+    ??R?$default_delete@VTracerProvider@trace@v1@opentelemetry@@@std@@QEAAXPEAVTracerProvider@trace@v1@opentelemetry@@@Z
+    ??R?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@QEAAXPEAVSpanProcessor@trace@sdk@v1@opentelemetry@@@Z
+    ?Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
+    ?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpExporterOptions@2345@@Z
 #if defined(ENABLE_LOGS_PREVIEW)
     ?Create@OtlpGrpcLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
-    ?Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLoggerProvider@logs@v1@opentelemetry@@U?$default_delete@VLoggerProvider@logs@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@7@@Z
+    ?Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLoggerProvider@logs@v1@opentelemetry@@V?$default_delete@VLoggerProvider@logs@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@7@@Z
     ?Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@7@@Z
     ?Create@OtlpHttpLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpLogRecordExporterOptions@2345@@Z
 #endif  // end of ENABLE_LOGS_PREVIEW
