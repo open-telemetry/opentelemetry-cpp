@@ -16,8 +16,7 @@ target_link_libraries(
 if(WITH_LOGS_PREVIEW)
   target_link_libraries(
     opentelemetry_cpp
-    PRIVATE opentelemetry_logs
-            opentelemetry_exporter_otlp_http_log
+    PRIVATE opentelemetry_logs opentelemetry_exporter_otlp_http_log
             opentelemetry_exporter_otlp_grpc_log)
 endif()
 
