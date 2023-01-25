@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# Enable building external components and/or cotrib repo through otel-cpp build
+# Enable building external components and/or contrib repo through otel-cpp build
 # The config options are
 #  - OPENTELEMETRY_CONTRIB_PATH - Setting local path of the external
 # component as env variable
