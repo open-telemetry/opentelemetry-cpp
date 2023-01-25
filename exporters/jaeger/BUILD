@@ -1,6 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
+
 
 constraint_setting(
     name = "incompatible_setting",
@@ -96,7 +98,13 @@ cmake(
     }),
     tags = ["jaeger"],
     visibility = ["//visibility:private"],
-    deps = [],
+    deps = select({
+        "@platforms//os:osx": [],
+        "@platforms//os:linux": [
+            "@boost//:locale",
+        ],
+        "@platforms//os:windows": [],
+    }),
 )
 
 THRIFT_GEN_DEPS = [

@@ -179,6 +179,14 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    # boost (optional)
+    maybe(
+        http_archive,
+        name = "com_github_nelhage_rules_boost",
+        url = "https://github.com/nelhage/rules_boost/archive/69d2b1331a7e659be76c646273ff140c75d71bab.tar.gz",
+        strip_prefix = "rules_boost-69d2b1331a7e659be76c646273ff140c75d71bab",
+    )
+
     # boost headers from vcpkg
     maybe(
         native.new_local_repository,
