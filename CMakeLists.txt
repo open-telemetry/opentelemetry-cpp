@@ -534,27 +534,7 @@ if(NOT WITH_API_ONLY)
   endif()
 endif()
 
-# Add custom vendor directory via environment variable
-if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
-  # Add custom contrib path to build tree and consolidate binary artifacts in
-  # current project binary output directory.
-  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH}
-                   ${PROJECT_BINARY_DIR}/contrib)
-endif()
-# OR Add opentelemetry-cpp-contrib from GitHub
-if(WITH_CONTRIB)
-  # This option requires CMake 3.11+: add standard remote contrib to build tree.
-  include(FetchContent)
-  FetchContent_Declare(
-    contrib
-    GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
-    GIT_TAG "main")
-  FetchContent_GetProperties(contrib)
-  if(NOT contrib_POPULATED)
-    FetchContent_Populate(contrib)
-    add_subdirectory(${contrib_SOURCE_DIR})
-  endif()
-endif()
+include(cmake/opentelemetry-build-contrib.cmake)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
