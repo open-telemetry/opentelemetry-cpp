@@ -56,4 +56,3 @@ config_setting(
     name = "with_external_abseil",
     flag_values = {":with_abseil": "true"},
 )
-

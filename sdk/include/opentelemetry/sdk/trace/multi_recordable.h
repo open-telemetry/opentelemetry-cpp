@@ -27,10 +27,10 @@ std::size_t MakeKey(const SpanProcessor &processor)
 class OPENTELEMETRY_API MultiRecordable : public Recordable
 {
 public:
-  // https://stackoverflow.com/a/51033485/743263
   MultiRecordable() = default;
+  MultiRecordable(MultiRecordable &&) = default;
   MultiRecordable(const MultiRecordable &) = delete;
-  MultiRecordable &operator=(const MultiRecordable &) = delete;  
+  MultiRecordable& operator=(const MultiRecordable &) = delete;  
 
   void AddRecordable(const SpanProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept
