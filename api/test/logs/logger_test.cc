@@ -123,7 +123,7 @@ class TestProvider : public LoggerProvider
                                       nostd::string_view /* library_version */,
                                       nostd::string_view /* schema_url */) override
   {
-    return shared_ptr<Logger>(new TestLogger());
+    return nostd::shared_ptr<Logger>(new TestLogger());
   }
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
@@ -132,7 +132,7 @@ class TestProvider : public LoggerProvider
                                       nostd::string_view /* library_version */,
                                       nostd::string_view /* schema_url */) override
   {
-    return shared_ptr<Logger>(new TestLogger());
+    return nostd::shared_ptr<Logger>(new TestLogger());
   }
 };
 

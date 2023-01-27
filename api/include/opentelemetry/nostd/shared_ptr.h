@@ -77,7 +77,7 @@ public:
 
   explicit shared_ptr(pointer ptr)
   {
-    std::shared_ptr<T> ptr_(ptr);
+    std::shared_ptr<T> ptr_(ptr, std::default_delete<T>());
     new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
   }
 

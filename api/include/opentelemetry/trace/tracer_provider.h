@@ -36,9 +36,9 @@ namespace std
 {
 
 //
-// Partial specialization of default_delete used by unique_ptr.
-// This makes the delete of the type in unique_ptr happening in the DLL where it
-// is allocated.
+// Partial specialization of default_delete used by unique_ptr or shared_ptr.
+// This makes the delete of the type in unique_ptr/shared_ptr happening in the
+// DLL in which it is allocated.
 //
 template <>
 struct OPENTELEMETRY_EXPORT default_delete<OPENTELEMETRY_NAMESPACE::trace::TracerProvider>
