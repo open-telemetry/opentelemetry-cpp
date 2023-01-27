@@ -67,10 +67,10 @@ N/A
 
 #### Motivation (Jaeger)
 
-The jaeger client libraries are deprecated, as announced
+The Jaeger client libraries are deprecated, as announced
 [here](https://www.jaegertracing.io/docs/1.41/client-libraries/).
 
-The initial jaeger announcement in release 1.35 reads as:
+The initial Jaeger announcement in release 1.35 reads as:
 
 "
 We plan to continue accepting pull requests and making new releases of
