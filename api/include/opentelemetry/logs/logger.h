@@ -611,7 +611,7 @@ public:
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
 
-#if defined(OPENTELEMETRY_EXPORT)
+#  if defined(OPENTELEMETRY_EXPORT)
 
 namespace std
 {
@@ -633,7 +633,7 @@ public:
 
 }  // namespace std
 
-#endif  // OPENTELEMETRY_EXPORT
+#  endif  // OPENTELEMETRY_EXPORT
 
 #endif  // end of ENABLE_LOGS_PREVIEW
 
