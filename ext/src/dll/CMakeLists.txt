@@ -7,9 +7,8 @@ set(OPENTELEMETRY_EXPORT_DEF
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
 target_link_libraries(
-  opentelemetry_cpp
-  PRIVATE opentelemetry_trace
-          opentelemetry_exporter_ostream_span)
+  opentelemetry_cpp PRIVATE opentelemetry_trace
+                            opentelemetry_exporter_ostream_span)
 
 if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
@@ -23,13 +22,15 @@ endif()
 
 if(WITH_LOGS_PREVIEW)
   if(WITH_OTLP_GRPC)
-    target_link_libraries(opentelemetry_cpp
-                          PRIVATE opentelemetry_logs opentelemetry_exporter_otlp_grpc_log)
+    target_link_libraries(
+      opentelemetry_cpp PRIVATE opentelemetry_logs
+                                opentelemetry_exporter_otlp_grpc_log)
   endif()
 
   if(WITH_OTLP_HTTP)
-    target_link_libraries(opentelemetry_cpp
-                          PRIVATE opentelemetry_logs opentelemetry_exporter_otlp_http_log)
+    target_link_libraries(
+      opentelemetry_cpp PRIVATE opentelemetry_logs
+                                opentelemetry_exporter_otlp_http_log)
   endif()
 endif()
 

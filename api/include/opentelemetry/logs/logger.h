@@ -636,4 +636,3 @@ public:
 #  endif  // OPENTELEMETRY_EXPORT
 
 #endif  // end of ENABLE_LOGS_PREVIEW
-
