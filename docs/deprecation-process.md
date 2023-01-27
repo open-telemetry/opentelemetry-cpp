@@ -66,9 +66,13 @@ This process attempts to provide:
 
 ### Issues
 
-Deprecation issues should be tagged with the "Deprecated" label.
+Deprecation issues should be tagged with the "Deprecated" label,
+for example like
+[issue #1892](https://github.com/open-telemetry/opentelemetry-cpp/issues/1892).
 
-Removal issues should be tagged with the "Removal" label.
+Removal issues should be tagged with the "Removal" label,
+for example like
+[issue #1938](https://github.com/open-telemetry/opentelemetry-cpp/issues/1938).
 
 Discoverability of ongoing deprecations and removals is the key here,
 to avoid surprises.
