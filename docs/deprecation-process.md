@@ -42,6 +42,13 @@ The whole idea of a deprecation and removal process is to provide some
 mitigation, that will satisfy both maintainers and users, while allowing
 both to move forward with their own areas or responsibilities.
 
+Also, note that some areas of the code are considered stable, while others
+are maturing (feature preview), or experimental and in active development.
+
+The deprecation and removal process is primarily for stable parts of the
+code. Code in feature preview and experimental is expected to change in a
+faster pace, possibly with short of no notice in case of experimental code.
+
 This process attempts to provide:
 
 * visibility on the delivery pipeline itself, so that deprecations are
