@@ -136,7 +136,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::trace::SpanId span_id{span_id_bin};
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+  auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url);
   std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
   attributes["service.name"]     = "unit_test_service";
   attributes["tenant.id"]        = "test_user";
@@ -153,9 +153,10 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   attributes["vec_uint64_value"] = attribute_storage_uint64_value;
   attributes["vec_double_value"] = attribute_storage_double_value;
   attributes["vec_string_value"] = attribute_storage_string_value;
-  logger->Log(opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
-              opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-              std::chrono::system_clock::now());
+  logger->EmitLogRecord(
+      opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+      std::chrono::system_clock::now());
 }
 
 }  // namespace otlp

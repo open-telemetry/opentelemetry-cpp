@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Add `include_trace_context` and `EventLogger` [#1884](https://github.com/open-telemetry/opentelemetry-cpp/pull/1884)
 * [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
 * [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and

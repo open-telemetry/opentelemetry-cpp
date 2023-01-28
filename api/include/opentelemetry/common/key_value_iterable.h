@@ -32,5 +32,32 @@ public:
    */
   virtual size_t size() const noexcept = 0;
 };
+
+/**
+ * Supports internal iteration over a collection of key-value pairs.
+ */
+class NoopKeyValueIterable : public KeyValueIterable
+{
+public:
+  ~NoopKeyValueIterable() override = default;
+
+  /**
+   * Iterate over key-value pairs
+   * @param callback a callback to invoke for each key-value. If the callback returns false,
+   * the iteration is aborted.
+   * @return true if every key-value pair was iterated over
+   */
+  bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>) const noexcept override
+  {
+    return true;
+  }
+
+  /**
+   * @return the number of key-value pairs
+   */
+  size_t size() const noexcept override { return 0; }
+};
+
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE
