@@ -291,7 +291,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "", "opentelelemtry_library", "", schema_url);
+      "Logger", "opentelelemtry_library", "", schema_url);
 
   // Back up cout's streambuf
   std::streambuf *original = std::cout.rdbuf();
@@ -302,7 +302,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
 
   // Write a log to ostream exporter
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(logs_api::Severity::kDebug, "Hello", {}, {}, {}, {}, now);
+  logger->EmitLogRecord(logs_api::Severity::kDebug, "Hello", now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);
