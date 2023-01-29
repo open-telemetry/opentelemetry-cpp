@@ -44,7 +44,7 @@ jobs:
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_grpc.sh
+        sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode)
       env:
         CC: /usr/bin/gcc-12
@@ -68,7 +68,7 @@ jobs:
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_grpc.sh
+        sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode)
       env:
         CC: /usr/bin/clang-14

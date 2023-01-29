@@ -8,4 +8,3 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(func_otlp_http ${CMAKE_THREAD_LIBS_INIT}
                         opentelemetry_trace opentelemetry_exporter_otlp_http)
 endif()
-
