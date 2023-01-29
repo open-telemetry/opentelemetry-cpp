@@ -208,6 +208,8 @@ option(
   "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
   OFF)
 
+option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
+
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
@@ -546,6 +548,9 @@ if(NOT WITH_API_ONLY)
   endif()
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
+  endif()
+  if(WITH_FUNC_TESTS)
+    add_subdirectory(functional)
   endif()
 endif()
 
