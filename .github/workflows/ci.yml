@@ -78,6 +78,15 @@ jobs:
       run: |
         sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
 
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
