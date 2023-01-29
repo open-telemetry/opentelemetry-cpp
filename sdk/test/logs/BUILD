@@ -25,6 +25,7 @@ cc_test(
     ],
     deps = [
         "//sdk/src/logs",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
