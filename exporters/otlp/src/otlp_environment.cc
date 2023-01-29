@@ -886,8 +886,7 @@ std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
   return value;
 }
 
-static void DumpOtlpHeaders(OtlpHeaders &output,
-                            const char *env_var_name)
+static void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
 {
   std::string raw_value;
   bool exists;

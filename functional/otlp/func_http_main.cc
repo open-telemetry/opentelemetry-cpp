@@ -147,6 +147,9 @@ struct test_case
   test_func_t m_func;
 };
 
+int test_basic();
+
+#ifdef ENABLE_OTLP_HTTP_SSL
 int test_cert_not_found();
 int test_cert_invalid();
 int test_cert_unreadable();
@@ -159,6 +162,9 @@ int test_client_key_not_found();
 int test_client_key_invalid();
 int test_client_key_unreadable();
 int test_client_key_ok();
+#endif /* ENABLE_OTLP_HTTP_SSL */
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
 int test_min_tls_unknown();
 int test_min_tls_10();
 int test_min_tls_11();
@@ -185,8 +191,11 @@ int test_range_tls_12_13();
 int test_range_tls_13_10();
 int test_range_tls_13_11();
 int test_range_tls_13_12();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS */
 
-static const test_case all_tests[] = {{"cert-not-found", test_cert_not_found},
+static const test_case all_tests[] = {{"basic", test_basic},
+#ifdef ENABLE_OTLP_HTTP_SSL
+                                      {"cert-not-found", test_cert_not_found},
                                       {"cert-invalid", test_cert_invalid},
                                       {"cert-unreadable", test_cert_unreadable},
                                       {"cert-ok", test_cert_ok},
@@ -198,6 +207,9 @@ static const test_case all_tests[] = {{"cert-not-found", test_cert_not_found},
                                       {"client-key-invalid", test_client_key_invalid},
                                       {"client-key-unreadable", test_client_key_unreadable},
                                       {"client-key-ok", test_client_key_ok},
+#endif /* ENABLE_OTLP_HTTP_SSL */
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
                                       {"min-tls-unknown", test_min_tls_unknown},
                                       {"min-tls-10", test_min_tls_10},
                                       {"min-tls-11", test_min_tls_11},
@@ -224,6 +236,7 @@ static const test_case all_tests[] = {{"cert-not-found", test_cert_not_found},
                                       {"range-tls-13-10", test_range_tls_13_10},
                                       {"range-tls-13-11", test_range_tls_13_11},
                                       {"range-tls-13-12", test_range_tls_13_12},
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS */
                                       {"", nullptr}};
 
 void list_test_cases()
@@ -289,6 +302,18 @@ void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
 {
   opts.url = opt_endpoint;
 }
+
+int test_basic()
+{
+  otlp::OtlpHttpExporterOptions opts;
+
+  set_common_opts(opts);
+
+  instrumented_payload(opts);
+  return 0;
+}
+
+#ifdef ENABLE_OTLP_HTTP_SSL
 
 int test_cert_not_found()
 {
@@ -435,6 +460,9 @@ int test_client_key_ok()
   instrumented_payload(opts);
   return 0;
 }
+#endif /* ENABLE_OTLP_HTTP_SSL */
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS
 
 int test_min_tls_unknown()
 {
@@ -815,3 +843,5 @@ int test_range_tls_13_12()
   instrumented_payload(opts);
   return 0;
 }
+
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS */

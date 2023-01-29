@@ -4,4 +4,3 @@
 if(WITH_OTLP_HTTP)
   add_subdirectory(otlp)
 endif()
-
