@@ -41,7 +41,7 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
         GOOGLETEST_VERSION: 1.12.1
-        PROTOBUF_VERSION: 3.21.12
+        PROTOBUF_VERSION: 3.20.3
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -66,7 +66,7 @@ jobs:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
         GOOGLETEST_VERSION: 1.12.1
-        PROTOBUF_VERSION: 3.21.12
+        PROTOBUF_VERSION: 3.20.3
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
