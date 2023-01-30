@@ -1,5 +1,11 @@
 # Jaeger Exporter for OpenTelemetry C++
 
+## DEPRECATED
+
+The Jaeger Exporter is deprecated, and will be removed in a future release.
+
+See [DEPRECATED](../../DEPRECATED.md) for details.
+
 ## Prerequisite
 
 * [Get Jaeger](https://www.jaegertracing.io/docs/getting-started/) and run

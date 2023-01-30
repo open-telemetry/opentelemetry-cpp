@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Add `include_trace_context` and `EventLogger` [#1884](https://github.com/open-telemetry/opentelemetry-cpp/pull/1884)
 * [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
 * [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and
@@ -32,6 +33,21 @@ Increment the:
   [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
   [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [DEPRECATION] Deprecate the Jaeger exporter,
+  implemented by [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+
+Deprecations:
+
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * A new file, [DEPRECATED](./DEPRECATED.md) list all the code currently
+    deprecated.
+  * A new [deprecation process](./docs/deprecation-process.md) details the plan to
+    deprecate and later remove code.
+* [DEPRECATION] Deprecate the Jaeger exporter
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
 
 Important changes:
 
