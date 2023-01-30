@@ -17,13 +17,135 @@ namespace nostd     = opentelemetry::nostd;
 
 namespace internal_log = opentelemetry::sdk::common::internal_log;
 
-bool opt_help  = false;
-bool opt_list  = false;
-bool opt_debug = false;
+const int TEST_PASSED = 0;
+const int TEST_FAILED = 1;
+
+/*
+  Command line parameters.
+*/
+
+enum test_mode
+{
+  MODE_NONE,
+  MODE_HTTP,
+  MODE_HTTPS
+};
+
+bool opt_help   = false;
+bool opt_list   = false;
+bool opt_debug  = false;
+bool opt_secure = false;
 // HTTPS by default
 std::string opt_endpoint = "https://localhost:4318/v1/traces";
 std::string opt_cert_dir;
 std::string opt_test_name;
+test_mode opt_mode = MODE_NONE;
+
+/*
+  Log parsing
+*/
+
+struct TestResult
+{
+  bool found_connection_failed    = false;
+  bool found_connection_refused   = false;
+  bool found_request_send_failure = false;
+  bool found_export_error         = false;
+  bool found_export_success       = false;
+
+  void reset()
+  {
+    found_connection_failed    = false;
+    found_connection_refused   = false;
+    found_request_send_failure = false;
+    found_export_error         = false;
+    found_export_success       = false;
+  }
+};
+
+struct TestResult g_test_result;
+
+void parse_error_msg(TestResult *result, std::string msg)
+{
+  static std::string connection_failed("Session state: connection failed.");
+
+  if (msg.find(connection_failed) != std::string::npos)
+  {
+    result->found_connection_failed = true;
+  }
+
+  static std::string connection_refused("Connection refused");
+
+  if (msg.find(connection_refused) != std::string::npos)
+  {
+    result->found_connection_refused = true;
+  }
+
+  static std::string request_send_failed("Session state: request send failed.");
+
+  if (msg.find(request_send_failed) != std::string::npos)
+  {
+    result->found_request_send_failure = true;
+  }
+
+  static std::string export_failed("ERROR: Export 1 trace span(s) error: 1");
+
+  if (msg.find(export_failed) != std::string::npos)
+  {
+    result->found_export_error = true;
+  }
+}
+
+void parse_warning_msg(TestResult *result, std::string msg) {}
+
+void parse_info_msg(TestResult *result, std::string msg) {}
+
+void parse_debug_msg(TestResult *result, std::string msg)
+{
+
+  static std::string export_success("Export 1 trace span(s) success");
+
+  if (msg.find(export_success) != std::string::npos)
+  {
+    result->found_export_success = true;
+  }
+}
+
+class TestLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
+{
+public:
+  void Handle(opentelemetry::sdk::common::internal_log::LogLevel level,
+              const char * /* file */,
+              int /* line */,
+              const char *msg,
+              const opentelemetry::sdk::common::AttributeMap & /* attributes */) noexcept override
+  {
+    if (msg == nullptr)
+    {
+      msg = "<no msg>";
+    }
+
+    switch (level)
+    {
+      case opentelemetry::sdk::common::internal_log::LogLevel::Error:
+        std::cout << " - [E] " << msg << std::endl;
+        parse_error_msg(&g_test_result, msg);
+        break;
+      case opentelemetry::sdk::common::internal_log::LogLevel::Warning:
+        std::cout << " - [W] " << msg << std::endl;
+        parse_warning_msg(&g_test_result, msg);
+        break;
+      case opentelemetry::sdk::common::internal_log::LogLevel::Info:
+        std::cout << " - [I] " << msg << std::endl;
+        parse_info_msg(&g_test_result, msg);
+        break;
+      case opentelemetry::sdk::common::internal_log::LogLevel::Debug:
+        std::cout << " - [D] " << msg << std::endl;
+        parse_debug_msg(&g_test_result, msg);
+        break;
+    }
+  }
+};
 
 void init(const otlp::OtlpHttpExporterOptions &opts)
 {
@@ -58,6 +180,7 @@ void cleanup()
 
 void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)
 {
+  g_test_result.reset();
   init(opts);
   payload();
   cleanup();
@@ -71,7 +194,11 @@ void usage(FILE *out)
       "  --help            Print this help\n"
       "  --list            List test names\n"
       "  --endpoint url    OTLP HTTP endpoint (https://localhost:4318/v1/traces by default)\n"
-      "  --cert-dir dir    Directory that contains test ssl certificates\n";
+      "  --cert-dir dir    Directory that contains test ssl certificates\n"
+      "  --mode mode       Test server mode (used to verify expected results)\n"
+      "                      - none: no endpoint\n"
+      "                      - http: http endpoint\n"
+      "                      - https: https endpoint\n";
   fprintf(out, "%s", msg);
 }
 
@@ -121,6 +248,35 @@ int parse_args(int argc, char *argv[])
         opt_endpoint = *remaining_argv;
         remaining_argc--;
         remaining_argv++;
+        continue;
+      }
+
+      if (strcmp(*remaining_argv, "--mode") == 0)
+      {
+        remaining_argc--;
+        remaining_argv++;
+        std::string mode = *remaining_argv;
+        remaining_argc--;
+        remaining_argv++;
+
+        if (mode == "none")
+        {
+          opt_mode = MODE_NONE;
+        }
+        else if (mode == "http")
+        {
+          opt_mode = MODE_HTTP;
+        }
+        else if (mode == "https")
+        {
+          opt_mode = MODE_HTTPS;
+        }
+        else
+        {
+          // Unknown mode
+          return 2;
+        }
+
         continue;
       }
     }
@@ -294,6 +450,20 @@ int main(int argc, char *argv[])
     return 0;
   }
 
+  if (opt_endpoint.find("https:") != std::string::npos)
+  {
+    opt_secure = true;
+  }
+  else
+  {
+    opt_secure = false;
+  }
+
+  opentelemetry::nostd::shared_ptr<internal_log::LogHandler> log_handler(new TestLogHandler);
+
+  internal_log::GlobalLogHandler::SetLogHandler(log_handler);
+  internal_log::GlobalLogHandler::SetLogLevel(internal_log::LogLevel::Debug);
+
   rc = run_test_case(opt_test_name);
   return rc;
 }
@@ -303,6 +473,50 @@ void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
   opts.url = opt_endpoint;
 }
 
+int expect_connection_failed()
+{
+  if (g_test_result.found_export_error && g_test_result.found_connection_failed)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
+int expect_success()
+{
+  if (g_test_result.found_export_success)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
+int expect_request_send_failed()
+{
+  if (g_test_result.found_export_error && g_test_result.found_request_send_failure)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
+int expect_export_failed()
+{
+  /*
+    Can not test exact root cause:
+    - connect failed ?
+    - send request failed ?
+    - exact error message ?
+    so only verifying export failed.
+  */
+
+  if (g_test_result.found_export_error)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
 int test_basic()
 {
   otlp::OtlpHttpExporterOptions opts;
@@ -310,7 +524,30 @@ int test_basic()
   set_common_opts(opts);
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  // This could depends on the host config
+  // SSL certificate problem: unable to get local issuer certificate
+  return expect_connection_failed();
 }
 
 #ifdef ENABLE_OTLP_HTTP_SSL
@@ -323,7 +560,23 @@ int test_cert_not_found()
   opts.ssl_ca_cert_path = opt_cert_dir + "/no-such-file.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_cert_invalid()
@@ -334,7 +587,23 @@ int test_cert_invalid()
   opts.ssl_ca_cert_path = opt_cert_dir + "/garbage.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_cert_unreadable()
@@ -342,12 +611,26 @@ int test_cert_unreadable()
   otlp::OtlpHttpExporterOptions opts;
 
   set_common_opts(opts);
-  // FIXME: file unreadable.pem exists locally with chmod 0,
-  // but then it can not be added in git.
   opts.ssl_ca_cert_path = opt_cert_dir + "/unreadable.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_cert_ok()
@@ -358,7 +641,28 @@ int test_cert_ok()
   opts.ssl_ca_cert_path = opt_cert_dir + "/ca.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_client_cert_not_found()
@@ -370,7 +674,23 @@ int test_client_cert_not_found()
   opts.ssl_client_cert_path = opt_cert_dir + "/no-such-file.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_cert_invalid()
@@ -382,7 +702,23 @@ int test_client_cert_invalid()
   opts.ssl_client_cert_path = opt_cert_dir + "/garbage.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_cert_unreadable()
@@ -394,7 +730,23 @@ int test_client_cert_unreadable()
   opts.ssl_client_cert_path = opt_cert_dir + "/unreadable.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_cert_no_key()
@@ -406,7 +758,23 @@ int test_client_cert_no_key()
   opts.ssl_client_cert_path = opt_cert_dir + "/client_cert.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_key_not_found()
@@ -419,7 +787,23 @@ int test_client_key_not_found()
   opts.ssl_client_key_path  = opt_cert_dir + "/no-such-file.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_key_invalid()
@@ -432,7 +816,23 @@ int test_client_key_invalid()
   opts.ssl_client_key_path  = opt_cert_dir + "/garbage.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_key_unreadable()
@@ -445,7 +845,23 @@ int test_client_key_unreadable()
   opts.ssl_client_key_path  = opt_cert_dir + "/unreadable.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_client_key_ok()
@@ -458,7 +874,28 @@ int test_client_key_ok()
   opts.ssl_client_key_path  = opt_cert_dir + "/client_cert-key.pem";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 #endif /* ENABLE_OTLP_HTTP_SSL */
 
@@ -475,7 +912,23 @@ int test_min_tls_unknown()
   opts.ssl_min_tls          = "99.99";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_min_tls_10()
@@ -489,7 +942,28 @@ int test_min_tls_10()
   opts.ssl_min_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_min_tls_11()
@@ -503,7 +977,28 @@ int test_min_tls_11()
   opts.ssl_min_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_min_tls_12()
@@ -517,7 +1012,28 @@ int test_min_tls_12()
   opts.ssl_min_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_min_tls_13()
@@ -531,7 +1047,28 @@ int test_min_tls_13()
   opts.ssl_min_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_max_tls_unknown()
@@ -545,7 +1082,23 @@ int test_max_tls_unknown()
   opts.ssl_max_tls          = "99.99";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  return expect_connection_failed();
 }
 
 int test_max_tls_10()
@@ -559,7 +1112,29 @@ int test_max_tls_10()
   opts.ssl_max_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_export_failed();
+  }
+
+  // No support for TLS 1.0
+  return expect_connection_failed();
 }
 
 int test_max_tls_11()
@@ -573,7 +1148,29 @@ int test_max_tls_11()
   opts.ssl_max_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_export_failed();
+  }
+
+  // No support for TLS 1.1
+  return expect_connection_failed();
 }
 
 int test_max_tls_12()
@@ -587,7 +1184,28 @@ int test_max_tls_12()
   opts.ssl_max_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_max_tls_13()
@@ -601,7 +1219,28 @@ int test_max_tls_13()
   opts.ssl_max_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_10()
@@ -616,7 +1255,29 @@ int test_range_tls_10()
   opts.ssl_max_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  // No support for TLS 1.0
+  return expect_connection_failed();
 }
 
 int test_range_tls_11()
@@ -631,7 +1292,29 @@ int test_range_tls_11()
   opts.ssl_max_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  // No support for TLS 1.0
+  return expect_connection_failed();
 }
 
 int test_range_tls_12()
@@ -646,7 +1329,28 @@ int test_range_tls_12()
   opts.ssl_max_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_13()
@@ -661,7 +1365,28 @@ int test_range_tls_13()
   opts.ssl_max_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_10_11()
@@ -676,7 +1401,29 @@ int test_range_tls_10_11()
   opts.ssl_max_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  // No support for TLS 1.0, TLS 1.1
+  return expect_connection_failed();
 }
 
 int test_range_tls_10_12()
@@ -691,7 +1438,28 @@ int test_range_tls_10_12()
   opts.ssl_max_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_10_13()
@@ -706,7 +1474,28 @@ int test_range_tls_10_13()
   opts.ssl_max_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_11_10()
@@ -721,7 +1510,24 @@ int test_range_tls_11_10()
   opts.ssl_max_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 int test_range_tls_11_12()
@@ -736,7 +1542,28 @@ int test_range_tls_11_12()
   opts.ssl_max_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_11_13()
@@ -751,7 +1578,28 @@ int test_range_tls_11_13()
   opts.ssl_max_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_12_10()
@@ -766,7 +1614,24 @@ int test_range_tls_12_10()
   opts.ssl_max_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 int test_range_tls_12_11()
@@ -781,7 +1646,24 @@ int test_range_tls_12_11()
   opts.ssl_max_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 int test_range_tls_12_13()
@@ -796,7 +1678,28 @@ int test_range_tls_12_13()
   opts.ssl_max_tls          = "1.3";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
+  }
+
+  return expect_success();
 }
 
 int test_range_tls_13_10()
@@ -811,7 +1714,24 @@ int test_range_tls_13_10()
   opts.ssl_max_tls          = "1.0";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 int test_range_tls_13_11()
@@ -826,7 +1746,24 @@ int test_range_tls_13_11()
   opts.ssl_max_tls          = "1.1";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 int test_range_tls_13_12()
@@ -841,7 +1778,24 @@ int test_range_tls_13_12()
   opts.ssl_max_tls          = "1.2";
 
   instrumented_payload(opts);
-  return 0;
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
 }
 
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS */

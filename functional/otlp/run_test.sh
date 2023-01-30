@@ -13,15 +13,32 @@ export TEST_BIN_DIR=${BUILD_DIR}/functional/otlp/
 
 ${TEST_BIN_DIR}/func_otlp_http --list > test_list.txt
 
-for T in `cat test_list.txt`
-do
-  echo "====================================================================="
-  echo "Running test $T"
-  ${TEST_BIN_DIR}/func_otlp_http --cert-dir ${CERT_DIR} ${T}
-  RC=$?
-  if [ ${RC} -eq 0 ]; then
-    echo "TEST ${T}: PASSED"
-  else
-    echo "TEST ${T}: FAILED"
-  fi
-done
+#
+# MODE 'NONE'
+#
+
+export SERVER_MODE="none"
+./run_test_mode.sh
+
+#
+# MODE 'HTTP'
+#
+
+echo "FIXME: start otelcol --config otel-config-http.yaml"
+
+export SERVER_MODE="http"
+# ./run_test_mode.sh
+
+echo "FIXME: stop otelcol"
+
+#
+# MODE 'SSL'
+#
+
+echo "FIXME: start otelcol --config otel-config-https.yaml"
+
+export SERVER_MODE="http"
+# ./run_test_mode.sh
+
+echo "FIXME: stop otelcol"
+
