@@ -33,6 +33,8 @@ Increment the:
   [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
   [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
+* [BUILD] OTLP HTTP Exporter has build warnings in maintainer mode
+  [#1943](https://github.com/open-telemetry/opentelemetry-cpp/pull/1943)
 
 Important changes:
 

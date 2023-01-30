@@ -34,8 +34,7 @@ set -e
 export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
 
 cd /
-wget
-https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz
+wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz
 tar zxf protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz --no-same-owner
 cd protobuf-${CPP_PROTOBUF_VERSION}
 ./configure
