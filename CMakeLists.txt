@@ -110,6 +110,8 @@ else()
   )
 endif()
 
+option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
+
 option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
@@ -165,7 +167,7 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
 
-option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
+option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
@@ -240,6 +242,12 @@ function(install_windows_deps)
 endfunction()
 
 if(WITH_JAEGER)
+  if(WITH_NO_DEPRECATED_CODE)
+    message(FATAL_ERROR "Jaeger is DEPRECATED.")
+  else()
+    message(WARNING "Jaeger is DEPRECATED.")
+  endif()
+
   find_package(Thrift QUIET)
   if(Thrift_FOUND)
     find_package(Boost REQUIRED)
