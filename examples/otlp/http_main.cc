@@ -17,7 +17,6 @@
 #endif
 
 namespace trace     = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace otlp      = opentelemetry::exporter::otlp;
 
@@ -35,6 +34,12 @@ void InitTracer()
       trace_sdk::TracerProviderFactory::Create(std::move(processor));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
+}
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace::Provider::SetTracerProvider(none);
 }
 }  // namespace
 
@@ -77,4 +82,6 @@ int main(int argc, char *argv[])
   InitTracer();
 
   foo_library();
+
+  CleanupTracer();
 }

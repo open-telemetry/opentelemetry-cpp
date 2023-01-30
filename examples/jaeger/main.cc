@@ -13,7 +13,6 @@
 #endif
 
 namespace trace     = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace jaeger    = opentelemetry::exporter::jaeger;
 
@@ -30,6 +29,12 @@ void InitTracer()
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace::Provider::SetTracerProvider(none);
+}
 }  // namespace
 
 int main(int argc, char *argv[])
@@ -42,4 +47,6 @@ int main(int argc, char *argv[])
   InitTracer();
 
   foo_library();
+
+  CleanupTracer();
 }

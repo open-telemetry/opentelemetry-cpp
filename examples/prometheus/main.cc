@@ -18,7 +18,6 @@
 #endif
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
-namespace nostd            = opentelemetry::nostd;
 namespace common           = opentelemetry::common;
 namespace metrics_exporter = opentelemetry::exporter::metrics;
 namespace metrics_api      = opentelemetry::metrics;
@@ -26,7 +25,7 @@ namespace metrics_api      = opentelemetry::metrics;
 namespace
 {
 
-void initMetrics(const std::string &name, const std::string &addr)
+void InitMetrics(const std::string &name, const std::string &addr)
 {
   metrics_exporter::PrometheusExporterOptions opts;
   if (!addr.empty())
@@ -73,6 +72,12 @@ void initMetrics(const std::string &name, const std::string &addr)
              std::move(histogram_view));
   metrics_api::Provider::SetMeterProvider(provider);
 }
+
+void CleanupMetrics()
+{
+  std::shared_ptr<metrics_api::MeterProvider> none;
+  metrics_api::Provider::SetMeterProvider(none);
+}
 }  // namespace
 
 int main(int argc, char **argv)
@@ -94,7 +99,7 @@ int main(int argc, char **argv)
   }
 
   std::string name{"prometheus_metric_example"};
-  initMetrics(name, addr);
+  InitMetrics(name, addr);
 
   if (example_type == "counter")
   {
@@ -111,4 +116,6 @@ int main(int argc, char **argv)
     counter_example.join();
     histogram_example.join();
   }
+
+  CleanupMetrics();
 }

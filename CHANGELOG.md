@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Add `include_trace_context` and `EventLogger` [#1884](https://github.com/open-telemetry/opentelemetry-cpp/pull/1884)
 * [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
 * [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and
@@ -26,6 +27,53 @@ Increment the:
   [1871](https://github.com/open-telemetry/opentelemetry-cpp/pull/1871)
 * [BUILD] Migrate from @bazel_tools//platforms to [Bazel Platforms](https://github.com/bazelbuild/platforms)
   to enable Bazel 6.0.0 compatibility [#1873](https://github.com/open-telemetry/opentelemetry-cpp/pull/1873)
+* [BUILD] Cleanup CMake makefiles for nlohmann_json
+  [#1912](https://github.com/open-telemetry/opentelemetry-cpp/pull/1912)
+* [BUILD] Cleanup CMake makefiles for CURL usage
+  [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
+  [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [DEPRECATION] Deprecate the Jaeger exporter,
+  implemented by [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+
+Deprecations:
+
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * A new file, [DEPRECATED](./DEPRECATED.md) list all the code currently
+    deprecated.
+  * A new [deprecation process](./docs/deprecation-process.md) details the plan to
+    deprecate and later remove code.
+* [DEPRECATION] Deprecate the Jaeger exporter
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+
+Important changes:
+
+* [BUILD] Cleanup CMake makefiles for CURL usage
+  [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
+  * CMake option `WITH_OTLP_HTTP`
+    * Before this change, the CMake option `WITH_OTLP_HTTP` was unpredictable,
+      sometime set to ON and sometime set to OFF by default,
+      depending on whether a CURL package was found or not.
+      The option `WITH_OTLP_HTTP` was sometime not displayed in the ccmake
+      UI, making it impossible to even discover there is an option of that name.
+    * With this change, CMake option `WITH_OTLP_HTTP` is always OFF by
+      default. WITH_OTLP_HTTP MUST be set to ON explicitly to build the
+      OTLP HTTP exporter. The option is always visible in the ccmake UI.
+  * CMake option `BUILD_W3CTRACECONTEXT_TEST`
+    * Before this change, the W3C trace context tests were built, or
+      not, in an unpredictable way, depending on the presence, or not, of a
+      CURL package. In particular, the build could ignore the W3C trace
+      context tests even when BUILD_W3CTRACECONTEXT_TEST=ON.
+    * With this change, option BUILD_W3CTRACECONTEXT_TEST is honored.
+  * HTTP client/server examples
+    * Before this change, the HTTP client/server examples were built, or
+      not, in an unpredictable way, depending on the presence, or not, of a
+      CURL package.
+    * With this change, a new option `WITH_EXAMPLES_HTTP` is used to
+      build the HTTP client/server examples.
 
 ## [1.8.1] 2022-12-04
 

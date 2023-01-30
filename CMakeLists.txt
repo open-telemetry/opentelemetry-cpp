@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cmake_minimum_required(VERSION 3.1)
 
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
@@ -5,7 +8,7 @@ cmake_minimum_required(VERSION 3.1)
 cmake_policy(SET CMP0057 NEW)
 
 # See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
-# version of zlib which is dependeded by cURL.
+# version of zlib which CURL depends on.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
@@ -107,6 +110,8 @@ else()
   )
 endif()
 
+option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
+
 option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
@@ -148,6 +153,10 @@ if(WITH_STL)
 endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+
+option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
+       OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -158,7 +167,7 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
 
-option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
+option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
@@ -195,11 +204,25 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
+# This requires CURL, OFF by default.
+option(
+  WITH_EXAMPLES_HTTP
+  "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
+  OFF)
+
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether enable async export" OFF)
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whethere to enable exemplar within metrics" OFF)
+
+#
+# Verify options dependencies
+#
+
+if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
+  message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
+endif()
 
 find_package(Threads)
 
@@ -222,6 +245,12 @@ function(install_windows_deps)
 endfunction()
 
 if(WITH_JAEGER)
+  if(WITH_NO_DEPRECATED_CODE)
+    message(FATAL_ERROR "Jaeger is DEPRECATED.")
+  else()
+    message(WARNING "Jaeger is DEPRECATED.")
+  endif()
+
   find_package(Thrift QUIET)
   if(Thrift_FOUND)
     find_package(Boost REQUIRED)
@@ -317,21 +346,43 @@ if(WITH_OTLP)
     endif()
   endif()
   include(CMakeDependentOption)
-  if(WITH_OTLP_HTTP OR (NOT DEFINED WITH_OTLP_HTTP AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_HTTP}))
-    find_package(CURL)
-  endif()
 
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
     "gRPC_FOUND" OFF)
-  cmake_dependent_option(
-    WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
-    "CURL_FOUND" OFF)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
 endif()
+
+#
+# Do we need HTTP CLIENT CURL ?
+#
+
+if(WITH_OTLP_HTTP
+   OR WITH_ELASTICSEARCH
+   OR WITH_JAEGER
+   OR WITH_ZIPKIN
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_EXAMPLES_HTTP)
+  set(WITH_HTTP_CLIENT_CURL ON)
+else()
+  set(WITH_HTTP_CLIENT_CURL OFF)
+endif()
+
+#
+# Do we need CURL ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+  # No specific version required.
+  find_package(CURL REQUIRED)
+  message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
+endif()
+
+#
+# Do we need NLOHMANN_JSON ?
+#
 
 if(WITH_ELASTICSEARCH
    OR WITH_ZIPKIN
@@ -343,32 +394,9 @@ if(WITH_ELASTICSEARCH
 else()
   set(USE_NLOHMANN_JSON OFF)
 endif()
+
 if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
-  # nlohmann_json package is required for most SDK build configurations
-  find_package(nlohmann_json QUIET)
-  set(nlohmann_json_clone FALSE)
-  if(nlohmann_json_FOUND)
-    message("Using external nlohmann::json")
-  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
-         AND EXISTS
-             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
-    message("Trying to use local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    # This option allows to link nlohmann_json::nlohmann_json target
-    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-    # This option allows to add header to include directories
-    include_directories(
-      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
-  else()
-    set(nlohmann_json_clone TRUE)
-    include(cmake/nlohmann-json.cmake)
-    message("\nnlohmann_json package was not found. Cloning from github")
-  endif()
+  include(cmake/nlohmann-json.cmake)
 endif()
 
 if(OTELCPP_MAINTAINER_MODE)
@@ -448,6 +476,11 @@ if(OTELCPP_MAINTAINER_MODE)
     add_compile_options(/wd4267)
 
     # Enforced warnings
+    add_compile_options(/we4265) # 'class': class has virtual functions, but
+                                 # destructor is not virtual
+    add_compile_options(/we5204) # A class with virtual functions has
+                                 # non-virtual trivial destructor.
+
   elseif()
     message(FATAL_ERROR "Building with unknown compiler in maintainer mode.")
   endif()

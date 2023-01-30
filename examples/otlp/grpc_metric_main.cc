@@ -18,7 +18,6 @@
 #endif
 
 namespace metric_sdk    = opentelemetry::sdk::metrics;
-namespace nostd         = opentelemetry::nostd;
 namespace common        = opentelemetry::common;
 namespace metrics_api   = opentelemetry::metrics;
 namespace otlp_exporter = opentelemetry::exporter::otlp;
@@ -28,7 +27,7 @@ namespace
 
 otlp_exporter::OtlpGrpcMetricExporterOptions options;
 
-void initMetrics()
+void InitMetrics()
 {
   auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(options);
 
@@ -46,6 +45,12 @@ void initMetrics()
   p->AddMetricReader(std::move(reader));
 
   metrics_api::Provider::SetMeterProvider(provider);
+}
+
+void CleanupMetrics()
+{
+  std::shared_ptr<metrics_api::MeterProvider> none;
+  metrics_api::Provider::SetMeterProvider(none);
 }
 }  // namespace
 
@@ -66,7 +71,7 @@ int main(int argc, char *argv[])
     }
   }
   // Removing this line will leave the default noop MetricProvider in place.
-  initMetrics();
+  InitMetrics();
   std::string name{"otlp_grpc_metric_example"};
 
   if (example_type == "counter")
@@ -91,4 +96,6 @@ int main(int argc, char *argv[])
     observable_counter_example.join();
     histogram_example.join();
   }
+
+  CleanupMetrics();
 }

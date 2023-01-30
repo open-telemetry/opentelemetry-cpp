@@ -84,7 +84,7 @@ public:
 
   /**
    * Creates a Asynchronouse (Observable) Gauge with the passed characteristics and returns a
-   * shared_ptr to that Observable Counter
+   * shared_ptr to that Observable Gauge
    *
    * @param name the name of the new Observable Gauge.
    * @param description a brief description of what the Observable Gauge is used for.

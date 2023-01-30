@@ -5,6 +5,7 @@
 
 #  include <gtest/gtest.h>
 #  include <array>
+#  include <vector>
 
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/logger.h"
@@ -27,7 +28,7 @@ TEST(Logger, GetLoggerDefault)
 {
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
   EXPECT_EQ(name, "noop logger");
@@ -38,65 +39,98 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
 {
   auto lp = Provider::GetLoggerProvider();
 
-  // GetLogger(name, list(args))
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  lp->GetLogger("NoopLoggerWithArgs", args, "opentelelemtry_library", "", schema_url);
+  lp->GetLogger("NoopLoggerWithArgs", "opentelelemtry_library", "", schema_url);
 
-  // GetLogger(name, string options)
-  lp->GetLogger("NoopLoggerWithOptions", "options", "opentelelemtry_library", "", schema_url);
+  lp->GetLogger("NoopLoggerWithOptions", "opentelelemtry_library", "", schema_url);
 }
 
-// Test the Log() overloads
+// Test the EmitLogRecord() overloads
 TEST(Logger, LogMethodOverloads)
 {
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
 
   // Create a map to test the logs with
   std::map<std::string, std::string> m = {{"key1", "value1"}};
 
-  // Log overloads
-  logger->Log(Severity::kTrace, "Test log message");
-  logger->Log(Severity::kInfo, "Test log message");
-  logger->Log(Severity::kDebug, m);
-  logger->Log(Severity::kWarn, "Logging a map", m);
-  logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
-  logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
+  // EmitLogRecord overloads
+  logger->EmitLogRecord(Severity::kTrace, "Test log message");
+  logger->EmitLogRecord(Severity::kInfo, "Test log message");
+  logger->EmitLogRecord(Severity::kDebug, m);
+  logger->EmitLogRecord(Severity::kWarn, "Logging a map", m);
+  logger->EmitLogRecord(Severity::kError,
+                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->EmitLogRecord(Severity::kFatal, "Logging an initializer list",
+                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(m));
+  logger->EmitLogRecord(Severity::kDebug,
+                        common::KeyValueIterableView<std::map<std::string, std::string>>(m));
+  std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(array));
+  std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
+  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(vec));
 
   // Severity methods
   logger->Trace("Test log message");
   logger->Trace("Test log message", m);
-  logger->Trace("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Trace("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Trace(m);
-  logger->Trace({{"key1", "value 1"}, {"key2", 2}});
+  logger->Trace(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug("Test log message");
   logger->Debug("Test log message", m);
-  logger->Debug("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug(m);
-  logger->Debug({{"key1", "value 1"}, {"key2", 2}});
+  logger->Debug(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info("Test log message");
   logger->Info("Test log message", m);
-  logger->Info("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Info("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info(m);
-  logger->Info({{"key1", "value 1"}, {"key2", 2}});
+  logger->Info(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn("Test log message");
   logger->Warn("Test log message", m);
-  logger->Warn("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn(m);
-  logger->Warn({{"key1", "value 1"}, {"key2", 2}});
+  logger->Warn(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error("Test log message");
   logger->Error("Test log message", m);
-  logger->Error("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Error("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error(m);
-  logger->Error({{"key1", "value 1"}, {"key2", 2}});
+  logger->Error(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal("Test log message");
   logger->Fatal("Test log message", m);
-  logger->Fatal("Test log message", {{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal(m);
-  logger->Fatal({{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+}
+
+TEST(Logger, EventLogMethodOverloads)
+{
+  auto lp = Provider::GetLoggerProvider();
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
+
+  auto elp          = Provider::GetEventLoggerProvider();
+  auto event_logger = elp->CreateEventLogger(logger, "otel-cpp.test");
+
+  std::map<std::string, std::string> m = {{"key1", "value1"}};
+
+  event_logger->EmitEvent("event name", Severity::kTrace, "Test log message");
+  event_logger->EmitEvent("event name", Severity::kInfo, "Test log message");
+  event_logger->EmitEvent("event name", Severity::kDebug, m);
+  event_logger->EmitEvent("event name", Severity::kWarn, "Logging a map", m);
+  event_logger->EmitEvent("event name", Severity::kError,
+                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent("event name", Severity::kFatal, "Logging an initializer list",
+                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(m));
+  event_logger->EmitEvent("event name", Severity::kDebug,
+                          common::KeyValueIterableView<std::map<std::string, std::string>>(m));
+  std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(array));
+  std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
+  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(vec));
 }
 
 // Define a basic Logger class
@@ -118,19 +152,11 @@ class TestLogger : public Logger
 class TestProvider : public LoggerProvider
 {
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::string_view /* options */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
-  {
-    return shared_ptr<Logger>(new TestLogger());
-  }
-
-  nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
-                                      nostd::span<nostd::string_view> /* args */,
-                                      nostd::string_view /* library_name */,
-                                      nostd::string_view /* library_version */,
-                                      nostd::string_view /* schema_url */) override
+                                      nostd::string_view /* schema_url */,
+                                      bool /* include_trace_context */,
+                                      const common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
@@ -146,7 +172,7 @@ TEST(Logger, PushLoggerImplementation)
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = lp->GetLogger("TestLogger", "", "opentelelemtry_library", "", schema_url);
+  auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
 #endif
