@@ -60,10 +60,10 @@ N/A
 
 #### Announcement (Jaeger)
 
-* Version: TO-BE-RELEASED-VERSION
-* Date: TO-BE-RELEASED-DATE
+* Version: 1.8.2
+* Date: 2023-01-31
 * PR: [DEPRECATION] Deprecate the Jaeger exporter
-  [#9999](https://github.com/open-telemetry/opentelemetry-cpp/pull/9999)
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
 
 #### Motivation (Jaeger)
 
