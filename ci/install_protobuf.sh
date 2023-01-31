@@ -38,5 +38,5 @@ wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/p
 tar zxf protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz --no-same-owner
 cd protobuf-${CPP_PROTOBUF_VERSION}
 ./configure
-make && make install
+make -j $(nproc) && make install
 ldconfig
