@@ -3,6 +3,10 @@
 
 #pragma once
 
+#ifdef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  error "header <opentelemetry/exporters/jaeger/jaeger_exporter_factory.h> is deprecated."
+#endif
+
 #include <opentelemetry/exporters/jaeger/jaeger_exporter_options.h>
 #include <opentelemetry/sdk/trace/exporter.h>
 
@@ -15,7 +19,7 @@ namespace jaeger
 /**
  * Factory class for JaegerExporter.
  */
-class OPENTELEMETRY_API JaegerExporterFactory
+class OPENTELEMETRY_DEPRECATED JaegerExporterFactory
 {
 public:
   /**
