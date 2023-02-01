@@ -159,6 +159,7 @@ cc_test(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
@@ -175,6 +176,7 @@ cc_test(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
@@ -191,6 +193,7 @@ cc_test(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
@@ -315,7 +318,6 @@ otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
         "attributes_processor_benchmark.cc",
-        "metrics_common_test_utils",
     ],
     tags = [
         "benchmark",
@@ -323,6 +325,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
     ],
 )
@@ -331,7 +334,6 @@ otel_cc_benchmark(
     name = "attributes_hashmap_benchmark",
     srcs = [
         "attributes_hashmap_benchmark.cc",
-        "metrics_common_test_utils",
     ],
     tags = [
         "benchmark",
@@ -339,6 +341,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
     ],
 )
@@ -347,7 +350,6 @@ otel_cc_benchmark(
     name = "histogram_aggregation_benchmark",
     srcs = [
         "histogram_aggregation_benchmark.cc",
-        "metrics_common_test_utils",
     ],
     tags = [
         "benchmark",
@@ -355,6 +357,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
     ],
@@ -363,7 +366,6 @@ otel_cc_benchmark(
 otel_cc_benchmark(
     name = "sum_aggregation_benchmark",
     srcs = [
-        "metrics_common_test_utils",
         "sum_aggregation_benchmark.cc",
     ],
     tags = [
@@ -372,6 +374,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
     ],
