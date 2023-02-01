@@ -96,9 +96,9 @@ void parse_error_msg(TestResult *result, std::string msg)
   }
 }
 
-void parse_warning_msg(TestResult *result, std::string msg) {}
+void parse_warning_msg(TestResult * /* result */, std::string /* msg */) {}
 
-void parse_info_msg(TestResult *result, std::string msg) {}
+void parse_info_msg(TestResult * /* result */, std::string /* msg */) {}
 
 void parse_debug_msg(TestResult *result, std::string msg)
 {
