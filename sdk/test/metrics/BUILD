@@ -1,12 +1,11 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
-cc_test(
+cc_library(
     name = "metrics_common_test_utils",
     srcs = [
         "common.cc",
     ],
-    hdrs = ["sdk/test/metrics/common.h"],
-    strip_include_prefix = ["sdk/test/metrics/"],
+    hdrs = ["common.h"],
     tags = [
         "metrics",
         "test",
@@ -27,7 +26,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -43,7 +41,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -60,7 +57,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -77,7 +73,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -94,7 +89,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -111,7 +105,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -128,7 +121,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -145,7 +137,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -162,7 +153,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -179,7 +169,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -196,7 +185,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -212,7 +200,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -229,7 +216,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -246,7 +232,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -263,7 +248,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -279,7 +263,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -295,7 +278,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -311,7 +293,6 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -328,7 +309,6 @@ otel_cc_benchmark(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
     ],
 )
 
@@ -344,7 +324,6 @@ otel_cc_benchmark(
     ],
     deps = [
         "metrics_common_test_utils",
-        "//sdk/src/metrics",
     ],
 )
 

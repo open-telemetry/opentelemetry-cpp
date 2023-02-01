@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "sdk/test/metrics/common.h"
+#include "common.h"
 
 #include <memory>
 #include "opentelemetry/common/key_value_iterable_view.h"

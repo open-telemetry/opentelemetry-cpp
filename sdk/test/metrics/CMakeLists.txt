@@ -27,7 +27,7 @@ foreach(
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils opentelemetry_resources opentelemetry_metrics)
+    metrics_common_test_utils opentelemetry_resources)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.
@@ -47,23 +47,14 @@ if(WITH_BENCHMARK)
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)
   target_link_libraries(
-    histogram_aggregation_benchmark
-    benchmark::benchmark
-    ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils
-    opentelemetry_common
-    opentelemetry_metrics
+    histogram_aggregation_benchmark benchmark::benchmark
+    ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_common
     opentelemetry_resources)
 
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
-    sum_aggregation_benchmark
-    benchmark::benchmark
-    ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils
-    opentelemetry_common
-    opentelemetry_metrics
-    opentelemetry_resources)
+    sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
 add_subdirectory(exemplar)
