@@ -106,10 +106,10 @@ void BM_HistogramAggregation(benchmark::State &state)
       if (i % 1000 == 0 || i == TOTAL_MEASUREMENTS - 1)
       {
         collectMetrics();
-        if (i == 100)
-        {
-          std::this_thread::sleep_for(std::chrono::nanoseconds(4));
-        }
+      }
+      if (i == 100)
+      {
+        std::this_thread::sleep_for(std::chrono::nanoseconds(4));
       }
     }
   }
