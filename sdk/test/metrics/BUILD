@@ -5,6 +5,8 @@ cc_test(
     srcs = [
         "common.cc",
     ],
+    hdrs = ["sdk/test/metrics/common.h"],
+    strip_include_prefix = ["sdk/test/metrics/"],
     tags = [
         "metrics",
         "test",
