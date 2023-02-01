@@ -3,6 +3,10 @@
 
 #pragma once
 
+#ifdef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  error "header <opentelemetry/exporters/jaeger/jaeger_exporter.h> is deprecated."
+#endif
+
 #include <opentelemetry/common/spin_lock_mutex.h>
 #include <opentelemetry/exporters/jaeger/jaeger_exporter_options.h>
 #include <opentelemetry/ext/http/client/http_client.h>
@@ -16,7 +20,7 @@ namespace jaeger
 
 class ThriftSender;
 
-class JaegerExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_DEPRECATED JaegerExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
