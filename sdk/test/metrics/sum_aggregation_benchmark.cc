@@ -40,7 +40,7 @@ void BM_SumAggregation(benchmark::State &state)
   }
   std::vector<SumPointData> actuals;
   std::vector<std::thread> collectionThreads;
-  std::function<void()> collectMetrics = [&reader, &actuals, &TOTAL_MEASUREMENTS]() {
+  std::function<void()> collectMetrics = [&reader, &actuals]() {
     reader->Collect([&](ResourceMetrics &rm) {
       for (const ScopeMetrics &smd : rm.scope_metric_data_)
       {
