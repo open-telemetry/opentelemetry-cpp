@@ -58,10 +58,11 @@ LoggerProvider::~LoggerProvider()
 
 nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view logger_name,
-    nostd::string_view /* options */,
     nostd::string_view library_name,
     nostd::string_view library_version,
-    nostd::string_view schema_url) noexcept
+    nostd::string_view schema_url,
+    bool include_trace_context,
+    const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
   std::lock_guard<std::mutex> lock_guard{lock_};
@@ -102,20 +103,11 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     lib = instrumentationscope::InstrumentationScope::Create(library_name, library_version,
                                                              schema_url);
   }
+  // TODO: attributes should be added into InstrumentationScope once it implement attributes.
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
-      new Logger(logger_name, context_, std::move(lib))));
+      new Logger(logger_name, context_, std::move(lib), include_trace_context)));
   return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
-}
-
-nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
-    nostd::string_view logger_name,
-    nostd::span<nostd::string_view> /* args */,
-    nostd::string_view library_name,
-    nostd::string_view library_version,
-    nostd::string_view schema_url) noexcept
-{
-  return GetLogger(logger_name, "", library_name, library_version, schema_url);
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
