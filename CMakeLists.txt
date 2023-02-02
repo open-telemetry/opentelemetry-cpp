@@ -526,10 +526,7 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
     message(WARNING "Build DLL is supposed to work with MSVC!")
   endif()
   if(WITH_STL)
-    message(
-      STATUS_FATAL
-      "Build DLL with C++ STL is not recommended because ABI compatibility could be broken!"
-    )
+    message(STATUS_FATAL "Build DLL with C++ STL is not supported!")
   endif()
   add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
 endif()
