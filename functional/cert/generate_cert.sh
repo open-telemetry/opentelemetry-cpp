@@ -30,5 +30,9 @@ cfssl gencert -ca ca_b.pem -ca-key ca_b-key.pem server_csr_b.json | cfssljson -b
 echo "UNREADABLE" > unreadable.pem
 chmod 0 unreadable.pem
 
+# Needed to copy this key inside docker (different owner)
+chmod +r server_cert-key.pem
+
+# Debug
 ls -l
 

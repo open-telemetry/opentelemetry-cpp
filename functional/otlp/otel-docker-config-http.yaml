@@ -1,6 +1,5 @@
 #
-# To use directly:
-# otelcol --config ...
+# To use from a docker container
 #
 
 receivers:

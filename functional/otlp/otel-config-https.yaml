@@ -1,4 +1,6 @@
 #
+# To use directly:
+# otelcol --config ...
 #
 
 receivers:
