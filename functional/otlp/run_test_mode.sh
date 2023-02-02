@@ -45,9 +45,9 @@ do
   ${TEST_BIN_DIR}/func_otlp_http --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
-    echo "TEST ${TEST_FULL_NAME}: PASSED"
+    echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log
   else
-    echo "TEST ${TEST_FULL_NAME}: FAILED"
+    echo "TEST ${TEST_FULL_NAME}: FAILED" | tee -a report.log
   fi
 done
 
@@ -66,9 +66,9 @@ do
   ${TEST_BIN_DIR}/func_otlp_http --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
-    echo "TEST ${TEST_FULL_NAME}: PASSED"
+    echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log
   else
-    echo "TEST ${TEST_FULL_NAME}: FAILED"
+    echo "TEST ${TEST_FULL_NAME}: FAILED" | tee -a report.log
   fi
 done
 

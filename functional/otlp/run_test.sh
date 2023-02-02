@@ -19,6 +19,8 @@ ${TEST_BIN_DIR}/func_otlp_http --list > test_list.txt
 
 docker build -t otelcpp-func-test .
 
+echo "REPORT:" > report.log
+
 #
 # MODE 'NONE'
 #
@@ -89,4 +91,12 @@ echo ""
 
 docker stop otelcpp-test-https
 docker rm otelcpp-test-https
+
+echo ""
+echo "###############################################################"
+echo "TEST REPORT"
+echo "###############################################################"
+echo ""
+
+cat report.log
 
