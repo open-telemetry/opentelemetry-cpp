@@ -3,6 +3,12 @@
 
 #pragma once
 
+#include <opentelemetry/common/macros.h>
+
+#ifdef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  error "header <opentelemetry/exporters/jaeger/jaeger_exporter_options.h> is deprecated."
+#endif
+
 #include <opentelemetry/ext/http/client/http_client.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -21,7 +27,7 @@ enum class TransportFormat
 /**
  * Struct to hold Jaeger exporter options.
  */
-struct JaegerExporterOptions
+struct OPENTELEMETRY_DEPRECATED JaegerExporterOptions
 {
   TransportFormat transport_format = TransportFormat::kThriftUdpCompact;
   std::string endpoint             = "localhost";

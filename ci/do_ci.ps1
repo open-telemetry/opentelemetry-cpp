@@ -52,6 +52,8 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
+      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DWITH_JAEGER=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

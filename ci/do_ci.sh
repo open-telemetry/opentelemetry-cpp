@@ -94,17 +94,20 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
+        -DWITH_JAEGER=OFF \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
   make -k
   make test
