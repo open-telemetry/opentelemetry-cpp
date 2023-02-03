@@ -7,16 +7,29 @@
 #include <thread>
 
 #include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/version.h"
 #include "prometheus_test_helper.h"
 
 using opentelemetry::exporter::metrics::PrometheusCollector;
 namespace metric_api = opentelemetry::metrics;
 namespace metric_sdk = opentelemetry::sdk::metrics;
+namespace metric_exporter= opentelemetry::exporter::metrics;
 
-#if 0
-OPENTELEMETRY_BEGIN_NAMESPACE
+class MockMetricReader : public metric_sdk::MetricReader
+{
+  public:
+  
+  private:
 
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+
+  void OnInitialized() noexcept override {}
+
+
+}
 // ==================== Test for addMetricsData() function ======================
 
 /**
@@ -27,6 +40,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
  */
 TEST(PrometheusCollector, AddMetricDataWithCounterRecordsSuccessfully)
 {
+  Prome
   PrometheusCollector collector;
 
   // construct a collection of records with CounterAggregators and double
@@ -351,4 +365,3 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
 }
 
 OPENTELEMETRY_END_NAMESPACE
-#endif
