@@ -59,14 +59,6 @@ public:
   sdk::metrics::AggregationTemporality GetAggregationTemporality(
       sdk::metrics::InstrumentType instrument_type) const noexcept override;
 
-  /**
-   * @return: returns a shared_ptr to
-   * the PrometheusCollector instance
-   */
-  std::shared_ptr<PrometheusCollector> &GetCollector();
-
-  ~PrometheusExporter();
-
 private:
   // The configuration options associated with this exporter.
   const PrometheusExporterOptions options_;
@@ -83,22 +75,11 @@ private:
    */
   std::unique_ptr<::prometheus::Exposer> exposer_;
 
-  /**
-   * friend class for testing
-   */
-  friend class PrometheusExporterTest;
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override;
 
-  /**
-   * PrometheusExporter constructor with no parameters
-   * Used for testing only
-   */
-  PrometheusExporter();
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override;
 
-  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
-
-  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
-
-  void OnInitialized() noexcept override {}
+  void OnInitialized() noexcept override;
 };
 }  // namespace metrics
 }  // namespace exporter

@@ -22,15 +22,6 @@ PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
   exposer_->RegisterCollectable(collector_);
 }
 
-/**
- * PrometheusExporter constructor with no parameters
- * Used for testing only
- */
-PrometheusExporter::PrometheusExporter()
-{
-  collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector(this));
-}
-
 sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporality(
     sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
@@ -38,7 +29,17 @@ sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporali
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
-PrometheusExporter::~PrometheusExporter() {}
+bool PrometheusExporter::OnForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return true;
+}
+
+bool PrometheusExporter::OnShutDown(std::chrono::microseconds timeout) noexcept
+{
+  return true;
+}
+
+void PrometheusExporter::OnInitialized() noexcept {}
 
 }  // namespace metrics
 }  // namespace exporter
