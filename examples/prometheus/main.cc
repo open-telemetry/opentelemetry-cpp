@@ -43,7 +43,7 @@ void InitMetrics(const std::string &name, const std::string &addr)
   // Initialize and set the global MeterProvider
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metrics_sdk::MeterProvider());
   auto p        = std::static_pointer_cast<metrics_sdk::MeterProvider>(provider);
-  p->AddMetricReader(std::move(prometheus_exporter));
+  p->AddMetricReader(prometheus_exporter);
 
   // counter view
   std::string counter_name = name + "_counter";
