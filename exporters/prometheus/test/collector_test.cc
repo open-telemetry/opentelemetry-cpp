@@ -77,4 +77,6 @@ TEST(PrometheusCollector, BasicTests)
   // Collection size should be the same as the size
   // of the records collection produced by MetricProducer.
   ASSERT_EQ(data.size(), 1);
+  delete reader;
+  delete producer;
 }
