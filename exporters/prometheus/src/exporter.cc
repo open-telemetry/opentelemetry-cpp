@@ -14,8 +14,7 @@ namespace metrics
  * @param address: an address for an exposer that exposes
  *  an HTTP endpoint for the exporter to connect to
  */
-PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
-    : options_(options)
+PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options) : options_(options)
 {
   std::cout << " exporter url" << options.url;
   exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
@@ -41,10 +40,10 @@ sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporali
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
-PrometheusExporter::~PrometheusExporter(){
+PrometheusExporter::~PrometheusExporter()
+{
   std::cout << "\nExporter exiting...";
 }
-
 
 }  // namespace metrics
 }  // namespace exporter

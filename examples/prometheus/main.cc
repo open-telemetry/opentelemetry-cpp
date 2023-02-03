@@ -37,7 +37,8 @@ void InitMetrics(const std::string &name, const std::string &addr)
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
-  std::shared_ptr<metrics_sdk::MetricReader> prometheus_exporter(new metrics_exporter::PrometheusExporter(opts));
+  std::shared_ptr<metrics_sdk::MetricReader> prometheus_exporter(
+      new metrics_exporter::PrometheusExporter(opts));
 
   // Initialize and set the global MeterProvider
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metrics_sdk::MeterProvider());

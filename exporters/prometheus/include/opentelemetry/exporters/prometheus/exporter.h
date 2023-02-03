@@ -65,7 +65,6 @@ public:
    */
   std::shared_ptr<PrometheusCollector> &GetCollector();
 
-  
   ~PrometheusExporter();
 
 private:
@@ -95,12 +94,11 @@ private:
    */
   PrometheusExporter();
 
-  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true;}
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
 
-  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true;}
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
 
   void OnInitialized() noexcept override {}
-
 };
 }  // namespace metrics
 }  // namespace exporter

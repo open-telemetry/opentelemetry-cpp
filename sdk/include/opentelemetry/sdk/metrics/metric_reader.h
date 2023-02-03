@@ -61,7 +61,6 @@ public:
 
   virtual ~MetricReader() = default;
 
-
 private:
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept = 0;
 
@@ -70,7 +69,6 @@ private:
   virtual void OnInitialized() noexcept {}
 
 protected:
-
 private:
   MetricProducer *metric_producer_;
   mutable opentelemetry::common::SpinLockMutex lock_;

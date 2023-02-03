@@ -82,8 +82,7 @@ void assert_histogram(prometheus_client::MetricFamily &metric,
 TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollection)
 {
   metric_sdk::ResourceMetrics metrics_data = {};
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(
-      metrics_data);
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 0);
 }
 

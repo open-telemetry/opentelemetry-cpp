@@ -41,14 +41,12 @@ public:
   std::vector<prometheus_client::MetricFamily> Collect() const override;
 
 private:
-
   sdk::metrics::MetricReader *reader_;
 
   /*
    * Lock when operating the metricsToCollect collection
    */
   mutable std::mutex collection_lock_;
-
 };
 }  // namespace metrics
 }  // namespace exporter

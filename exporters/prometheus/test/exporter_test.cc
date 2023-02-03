@@ -18,7 +18,7 @@
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::exporter::metrics::PrometheusExporter;
 using opentelemetry::exporter::metrics::PrometheusExporterOptions;
-//using opentelemetry::sdk::common::ExportResult;
+// using opentelemetry::sdk::common::ExportResult;
 
 /**
  * When a PrometheusExporter is initialized,

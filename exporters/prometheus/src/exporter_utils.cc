@@ -51,7 +51,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         if (kind == sdk::metrics::AggregationType::kSum)
         {
           is_monotonic =
-            nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
+              nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
         }
         const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
         metric_family.type                       = type;
@@ -70,8 +70,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           {
             sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
-          SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
-                  counts, point_data_attr.attributes, time, &metric_family);
+          SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
+                  point_data_attr.attributes, time, &metric_family);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -83,8 +83,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
             SetData(values, point_data_attr.attributes, type, time, &metric_family);
           }
-          else if (nostd::holds_alternative<sdk::metrics::SumPointData>(
-                    point_data_attr.point_data))
+          else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
@@ -94,7 +93,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           else
           {
             OTEL_INTERNAL_LOG_WARN(
-              "[Prometheus Exporter] TranslateToPrometheus - "
+                "[Prometheus Exporter] TranslateToPrometheus - "
                 "invalid LastValuePointData type");
           }
         }
