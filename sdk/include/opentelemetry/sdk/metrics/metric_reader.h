@@ -45,7 +45,7 @@ public:
       InstrumentType instrument_type) const noexcept = 0;
 
   /**
-   * Shutdown the meter reader.
+   * Shutdown the metric reader.
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
@@ -54,7 +54,13 @@ public:
    */
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
+  /**
+   * Return the status of Metric reader.
+   */
+  bool IsShutdown() const noexcept;
+
   virtual ~MetricReader() = default;
+
 
 private:
   virtual bool OnForceFlush(std::chrono::microseconds timeout) noexcept = 0;
@@ -64,7 +70,6 @@ private:
   virtual void OnInitialized() noexcept {}
 
 protected:
-  bool IsShutdown() const noexcept;
 
 private:
   MetricProducer *metric_producer_;
