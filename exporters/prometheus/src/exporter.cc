@@ -16,12 +16,10 @@ namespace metrics
  */
 PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options) : options_(options)
 {
-  std::cout << " exporter url" << options.url;
   exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
   collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector(this));
 
   exposer_->RegisterCollectable(collector_);
-  std::cout << "collector registered\n";
 }
 
 /**
@@ -40,10 +38,7 @@ sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporali
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
-PrometheusExporter::~PrometheusExporter()
-{
-  std::cout << "\nExporter exiting...";
-}
+PrometheusExporter::~PrometheusExporter() {}
 
 }  // namespace metrics
 }  // namespace exporter
