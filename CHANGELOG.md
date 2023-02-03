@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
+
 ## [1.8.2] 2023-01-31
 
 * Remove redundant macro check in nostd::shared_ptr [#1939](https://github.com/open-telemetry/opentelemetry-cpp/pull/1939)
