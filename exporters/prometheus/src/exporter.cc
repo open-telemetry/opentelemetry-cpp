@@ -29,12 +29,12 @@ sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporali
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
-bool PrometheusExporter::OnForceFlush(std::chrono::microseconds timeout) noexcept
+bool PrometheusExporter::OnForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }
 
-bool PrometheusExporter::OnShutDown(std::chrono::microseconds timeout) noexcept
+bool PrometheusExporter::OnShutDown(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }
