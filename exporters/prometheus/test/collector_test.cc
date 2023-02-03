@@ -44,16 +44,16 @@ class MockMetricReader : public opentelemetry::sdk::metrics::MetricReader
 {
 public:
   opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
-      opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept
+      opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept override
   {
     // Prometheus exporter only support Cumulative
     return opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;
   }
 
 private:
-  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override { return true; }
+  bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
-  bool OnShutDown(std::chrono::microseconds timeout) noexcept override { return true; }
+  bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
   void OnInitialized() noexcept override {}
 };

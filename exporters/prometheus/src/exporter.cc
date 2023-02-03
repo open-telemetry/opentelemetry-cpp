@@ -36,6 +36,7 @@ bool PrometheusExporter::OnForceFlush(std::chrono::microseconds /* timeout */) n
 
 bool PrometheusExporter::OnShutDown(std::chrono::microseconds /* timeout */) noexcept
 {
+  exposer_->RemoveCollectable(collector_);
   return true;
 }
 
