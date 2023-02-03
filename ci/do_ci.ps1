@@ -69,7 +69,7 @@ switch ($action) {
       exit $exit
     }
   }
-  "cmake.dll.test" {
+  "cmake.dll.test.sanitize" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
