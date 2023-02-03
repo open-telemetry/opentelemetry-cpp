@@ -64,6 +64,8 @@ Increment the:
 * [MAINTAINER DOC] Define and document a deprecation process,
   [DEPRECATION] Deprecate the Jaeger exporter,
   implemented by [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+* [BUILD] OTLP HTTP Exporter has build warnings in maintainer mode
+  [#1943](https://github.com/open-telemetry/opentelemetry-cpp/pull/1943)
 
 Deprecations:
 
