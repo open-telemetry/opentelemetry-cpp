@@ -42,7 +42,7 @@ do
   echo "====================================================================="
   echo "Running test ${T} on ${TEST_RUN} ${TEST_ENDPOINT} with server ${SERVER_MODE}"
   TEST_FULL_NAME="${T}-${TEST_RUN}-${SERVER_MODE}"
-  ${TEST_BIN_DIR}/func_otlp_http --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
+  ${TEST_BIN_DIR}/func_otlp_http --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
     echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log
@@ -63,7 +63,7 @@ do
   echo "====================================================================="
   echo "Running test ${T} on ${TEST_RUN} ${TEST_ENDPOINT} with server ${SERVER_MODE}"
   TEST_FULL_NAME="${T}-${TEST_RUN}-${SERVER_MODE}"
-  ${TEST_BIN_DIR}/func_otlp_http --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
+  ${TEST_BIN_DIR}/func_otlp_http --debug --mode ${SERVER_MODE} --cert-dir ${CERT_DIR} --endpoint ${TEST_ENDPOINT} ${T}
   RC=$?
   if [ ${RC} -eq 0 ]; then
     echo "TEST ${TEST_FULL_NAME}: PASSED" | tee -a report.log

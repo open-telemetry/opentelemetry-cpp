@@ -170,6 +170,8 @@ void payload()
   auto span = tracer->StartSpan(k_span_name);
   span->SetAttribute(k_attr_test_name, opt_test_name);
   span->End();
+
+  tracer->ForceFlushWithMicroseconds(1000000);
 }
 
 void cleanup()
@@ -471,6 +473,16 @@ int main(int argc, char *argv[])
 void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
 {
   opts.url = opt_endpoint;
+
+  if (opt_debug)
+  {
+    opts.console_debug = true;
+  }
+
+#ifdef ENABLE_ASYNC_EXPORT
+  // Work around, ASYNC export not working.
+  opts.max_concurrent_requests = 0;
+#endif
 }
 
 int expect_connection_failed()
@@ -545,8 +557,6 @@ int test_basic()
     return expect_connection_failed();
   }
 
-  // This could depends on the host config
-  // SSL certificate problem: unable to get local issuer certificate
   return expect_connection_failed();
 }
 
