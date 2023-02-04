@@ -323,28 +323,4 @@ private:
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
 
-#  if defined(OPENTELEMETRY_EXPORT)
-
-namespace std
-{
-
-//
-// Partial specialization of default_delete used by unique_ptr or shared_ptr.
-// This makes the delete of the type in unique_ptr/shared_ptr happening in the
-// DLL in which it is allocated.
-//
-template <>
-struct OPENTELEMETRY_EXPORT default_delete<OPENTELEMETRY_NAMESPACE::logs::Logger>
-{
-public:
-  void operator()(OPENTELEMETRY_NAMESPACE::logs::Logger *logger_provider)
-  {
-    delete logger_provider;
-  }
-};
-
-}  // namespace std
-
-#  endif  // OPENTELEMETRY_EXPORT
-
 #endif  // end of ENABLE_LOGS_PREVIEW

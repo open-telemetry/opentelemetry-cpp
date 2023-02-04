@@ -526,18 +526,9 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
     message(WARNING "Build DLL is supposed to work with MSVC!")
   endif()
   if(WITH_STL)
-    message(STATUS_FATAL "Build DLL with C++ STL is not supported!")
+    message(WARNING "Build DLL with C++ STL could cause binary incompatibility!")
   endif()
   add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
-  if(DEFINED OPENTELEMETRY_BUILD_DLL_ENABLE_EXTRA_CHECKS)
-    # See below doc link, disable vector annotation is needed to enable address
-    # sanitizer in VS2022
-    # https://learn.microsoft.com/en-us/cpp/sanitizers/error-container-overflow
-    if(MSVC_VERSION GREATER 1932)
-      add_definitions(-D_DISABLE_VECTOR_ANNOTATION)
-    endif()
-    add_compile_options(/fsanitize=address)
-  endif()
 endif()
 
 include_directories(api/include)

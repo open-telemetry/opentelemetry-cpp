@@ -176,6 +176,65 @@ point.
 
 #endif
 
+/* clang-format off */
+
+/**
+
+  For MSVC, a class can be marked as export, and its inline member functions will be exported.
+
+  class __declspec(export) Foo
+  {
+    T& get_singleton()
+    {
+      static T singleton;
+      return singleton;
+    }
+  };
+
+  Ref: https://learn.microsoft.com/en-us/cpp/cpp/defining-inline-cpp-functions-with-dllexport-and-dllimport
+
+  (a) is needed when the code is build with
+  @code -fvisibility="hidden" @endcode
+  to ensure that all instances of (b) are visible to the linker.
+
+  What is duplicated in the binary is @em code, in (b).
+
+  The linker will make sure only one instance
+  of all the (b) methods is used.
+
+  (c) is a singleton implemented inside a method.
+
+  This is very desirable, because:
+
+  - the C++ compiler guarantees that construction
+    of the variable (c) is thread safe.
+
+  - constructors for (c) singletons are executed in code path order,
+    or not at all if the singleton is never used.
+
+  @section OTHER_SINGLETON
+
+  For other platforms, header only singletons are not supported at this
+point.
+
+  @section CODING_PATTERN
+
+  The coding pattern to use in the source code is as follows
+
+  @verbatim
+  class Foo
+  {
+    OPENTELEMETRY_API_SINGLETON
+    T& get_singleton()
+    {
+      static T singleton;
+      return singleton;
+    }
+  };
+  @endverbatim
+*/
+
+/* clang-format on */
 //
 // The if/elif order matters here. If both OPENTELEMETRY_BUILD_IMPORT_DLL and
 // OPENTELEMETRY_BUILD_EXPORT_DLL are defined, the former takes precedence.
@@ -185,7 +244,7 @@ point.
 //
 #if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
 
-#  define OPENTELEMETRY_EXPORT __declspec(dllimport)
+#  define OPENTELEMETRY_EXPORT __declspec(dllexport)
 
 #elif defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
 
