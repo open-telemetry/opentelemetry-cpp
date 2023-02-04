@@ -68,6 +68,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
     examples\simple\Debug\example_simple.exe
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
