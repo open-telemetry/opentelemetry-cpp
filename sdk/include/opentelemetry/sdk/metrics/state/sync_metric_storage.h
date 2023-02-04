@@ -30,7 +30,8 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
-                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
+                        OPENTELEMETRY_MAYBE_UNUSED,
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         attributes_hashmap_(new AttributesHashMap()),
@@ -48,7 +49,9 @@ public:
     };
   }
 
-  void RecordLong(int64_t value, const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(int64_t value,
+                  const opentelemetry::context::Context &context
+                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -63,7 +66,8 @@ public:
 
   void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
-                  const opentelemetry::context::Context &context) noexcept override
+                  const opentelemetry::context::Context &context
+                      OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -78,7 +82,9 @@ public:
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
-  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double value,
+                    const opentelemetry::context::Context &context
+                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -93,7 +99,8 @@ public:
 
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
-                    const opentelemetry::context::Context &context) noexcept override
+                    const opentelemetry::context::Context &context
+                        OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
