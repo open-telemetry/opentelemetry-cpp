@@ -68,6 +68,11 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    examples\simple\Debug\example_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
   }
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
