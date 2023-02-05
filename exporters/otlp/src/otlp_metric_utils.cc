@@ -266,7 +266,7 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
 }
 
 sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelector(
-    sdk::metrics::InstrumentType instrument_type) noexcept
+    sdk::metrics::InstrumentType /* instrument_type */) noexcept
 {
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
