@@ -86,65 +86,39 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollect
   ASSERT_EQ(translated.size(), 0);
 }
 
-#if 0
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
 
   metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
-  //std::vector<std::unique_ptr<metric_sdk::ResourceMetrics>> collection;
-
-  //collection.emplace_back(new metric_sdk::ResourceMetrics{CreateSumPointData()});
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), collection.size());
+  ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
   assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 1,
                vals);
-
-  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateSumPointData()});
-
-  translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
-  ASSERT_EQ(translated.size(), collection.size());
-
-  auto metric2 = translated[1];
-  assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Counter, 1,
-               vals);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 {
-  std::vector<std::unique_ptr<metric_sdk::ResourceMetrics>> collection;
+  metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
 
-  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateLastValuePointData()});
-
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
-  ASSERT_EQ(translated.size(), collection.size());
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
   assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
                vals);
-
-  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateLastValuePointData()});
-
-  translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
-  ASSERT_EQ(translated.size(), collection.size());
-
-  auto metric2 = translated[1];
-  assert_basic(metric2, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
-               vals);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 {
-  std::vector<std::unique_ptr<metric_sdk::ResourceMetrics>> collection;
+  metric_sdk::ResourceMetrics metrics_data = CreateHistogramPointData();
 
-  collection.emplace_back(new metric_sdk::ResourceMetrics{CreateHistogramPointData()});
-
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
-  ASSERT_EQ(translated.size(), collection.size());
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  ASSERT_EQ(translated.size(), 1);
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
@@ -152,5 +126,5 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
                vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
-#endif
+
 OPENTELEMETRY_END_NAMESPACE
