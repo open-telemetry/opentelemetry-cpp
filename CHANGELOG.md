@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
+* Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
 
 ## [1.8.2] 2023-01-31
 
