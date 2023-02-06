@@ -99,6 +99,7 @@ cc_test(
         ":prometheus_exporter",
     ]) + [
         ":prometheus_test_helper",
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",
@@ -118,6 +119,7 @@ cc_test(
         ":prometheus_collector",
     ]) + [
         ":prometheus_test_helper",
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",

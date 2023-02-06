@@ -45,7 +45,7 @@ public:
       InstrumentType instrument_type) const noexcept = 0;
 
   /**
-   * Shutdown the meter reader.
+   * Shutdown the metric reader.
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
@@ -53,6 +53,11 @@ public:
    * Force flush the metric read by the reader.
    */
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
+
+  /**
+   * Return the status of Metric reader.
+   */
+  bool IsShutdown() const noexcept;
 
   virtual ~MetricReader() = default;
 
@@ -64,8 +69,6 @@ private:
   virtual void OnInitialized() noexcept {}
 
 protected:
-  bool IsShutdown() const noexcept;
-
 private:
   MetricProducer *metric_producer_;
   mutable opentelemetry::common::SpinLockMutex lock_;
