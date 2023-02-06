@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include(GoogleTest)
 
 add_executable(dynamic_load_test dynamic_load_test.cc)
