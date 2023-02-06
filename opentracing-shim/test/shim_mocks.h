@@ -112,7 +112,7 @@ struct MockTracerProvider final : public trace_api::TracerProvider
   }
 
   std::string library_name_;
-  MockTracer *tracer_ = new MockTracer();
+  MockTracer *tracer_;
 };
 
 struct MockPropagator : public context::propagation::TextMapPropagator

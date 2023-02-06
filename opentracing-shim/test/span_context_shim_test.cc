@@ -38,9 +38,9 @@ TEST_F(SpanContextShimTest, ExtractFrom)
 {
   ASSERT_TRUE(shim::SpanContextShim::extractFrom(nullptr) == nullptr);
 
-  auto span_context =
-      &opentracing::MakeNoopTracer()->StartSpanWithOptions("operation", {})->context();
-  ASSERT_TRUE(shim::SpanContextShim::extractFrom(span_context) == nullptr);
+  auto tracer = opentracing::MakeNoopTracer();
+  auto span   = tracer->StartSpanWithOptions("operation", {});
+  ASSERT_TRUE(shim::SpanContextShim::extractFrom(&span->context()) == nullptr);
 
   auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
       trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
