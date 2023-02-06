@@ -29,7 +29,7 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(
   const auto &attributes = utils::makeIterableTags(options);
   const auto &baggage    = utils::makeBaggage(options);
   auto span              = tracer_->StartSpan(operation_name.data(), attributes, links, opts);
-  auto span_shim         = new SpanShim(*this, span, baggage);
+  auto span_shim         = new (std::nothrow) SpanShim(*this, span, baggage);
 
   // If an initial set of tags is specified and the OpenTracing error tag
   // is included after the OpenTelemetry Span was created.
@@ -39,7 +39,7 @@ std::unique_ptr<opentracing::Span> TracerShim::StartSpanWithOptions(
                      return entry.first == opentracing::ext::error;
                    });
   // The Shim layer MUST perform the same error handling as described in the Set Tag operation
-  if (error_entry != options.tags.cend())
+  if (span_shim && error_entry != options.tags.cend())
   {
     span_shim->handleError(error_entry->second);
   }
@@ -115,9 +115,8 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::Ext
   return extractImpl(reader, propagator);
 }
 
-template <typename T>
 opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContext &sc,
-                                                   const T &writer,
+                                                   const opentracing::TextMapWriter &writer,
                                                    const PropagatorPtr &propagator) const
 {
   // Inject the underlying OpenTelemetry Span and Baggage using either the explicitly registered
@@ -129,7 +128,7 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
     const auto &context =
         opentelemetry::baggage::SetBaggage(current_context, context_shim->baggage());
 
-    CarrierWriterShim<T> carrier{writer};
+    CarrierWriterShim carrier{writer};
     propagator->Inject(carrier, context);
     return opentracing::make_expected();
   }
@@ -137,14 +136,13 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
   return opentracing::make_unexpected(opentracing::invalid_span_context_error);
 }
 
-template <typename T>
 opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::extractImpl(
-    const T &reader,
+    const opentracing::TextMapReader &reader,
     const PropagatorPtr &propagator) const
 {
   // Extract the underlying OpenTelemetry Span and Baggage using either the explicitly registered
   // or the global OpenTelemetry Propagators, as configured at construction time.
-  CarrierReaderShim<T> carrier{reader};
+  CarrierReaderShim carrier{reader};
   auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
   auto context         = propagator->Extract(carrier, current_context);
   auto span_context    = opentelemetry::trace::GetSpan(context)->GetContext();
@@ -155,7 +153,7 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
   // SpanContext Shim instance with the extracted values.
   SpanContextShim *context_shim = (!span_context.IsValid() && utils::isBaggageEmpty(baggage))
                                       ? nullptr
-                                      : new SpanContextShim(span_context, baggage);
+                                      : new (std::nothrow) SpanContextShim(span_context, baggage);
 
   return opentracing::make_expected(std::unique_ptr<opentracing::SpanContext>(context_shim));
 }

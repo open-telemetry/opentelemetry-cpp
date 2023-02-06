@@ -16,16 +16,14 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace opentracingshim
 {
 
-template <typename T,
-          nostd::enable_if_t<std::is_base_of<opentracing::TextMapWriter, T>::value, bool> = true>
 class CarrierWriterShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  CarrierWriterShim(const T &writer) : writer_(writer) {}
+  CarrierWriterShim(const opentracing::TextMapWriter &writer) : writer_(writer) {}
 
   virtual nostd::string_view Get(nostd::string_view) const noexcept override
   {
-    return "";  // Not required for Opentracing writer
+    return {};  // Not required for Opentracing writer
   }
 
   virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
@@ -34,15 +32,13 @@ public:
   }
 
 private:
-  const T &writer_;
+  const opentracing::TextMapWriter &writer_;
 };
 
-template <typename T,
-          nostd::enable_if_t<std::is_base_of<opentracing::TextMapReader, T>::value, bool> = true>
 class CarrierReaderShim : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  CarrierReaderShim(const T &reader) : reader_(reader) {}
+  CarrierReaderShim(const opentracing::TextMapReader &reader) : reader_(reader) {}
 
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
@@ -87,7 +83,7 @@ public:
   }
 
 private:
-  const T &reader_;
+  const opentracing::TextMapReader &reader_;
 };
 
 }  // namespace opentracingshim

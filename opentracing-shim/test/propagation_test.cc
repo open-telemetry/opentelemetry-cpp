@@ -21,7 +21,7 @@ TEST(PropagationTest, TextMapReader_Get_LookupKey_Unsupported)
   ASSERT_FALSE(testee.supports_lookup);
   ASSERT_EQ(testee.foreach_key_call_count, 0);
 
-  shim::CarrierReaderShim<TextMapCarrier> tester{testee};
+  shim::CarrierReaderShim tester{testee};
   auto lookup_unsupported = testee.LookupKey("foo");
   ASSERT_TRUE(text_map.empty());
   ASSERT_TRUE(opentracing::are_errors_equal(lookup_unsupported.error(),
@@ -46,7 +46,7 @@ TEST(PropagationTest, TextMapReader_Get_LookupKey_Supported)
   ASSERT_TRUE(testee.supports_lookup);
   ASSERT_EQ(testee.foreach_key_call_count, 0);
 
-  shim::CarrierReaderShim<TextMapCarrier> tester{testee};
+  shim::CarrierReaderShim tester{testee};
   auto lookup_not_found = testee.LookupKey("foo");
   ASSERT_TRUE(text_map.empty());
   ASSERT_TRUE(
@@ -68,7 +68,7 @@ TEST(PropagationTest, TextMapReader_Keys)
   TextMapCarrier testee{text_map};
   ASSERT_EQ(testee.foreach_key_call_count, 0);
 
-  shim::CarrierReaderShim<TextMapCarrier> tester{testee};
+  shim::CarrierReaderShim tester{testee};
   std::vector<nostd::string_view> kvs;
   auto callback = [&text_map, &kvs](nostd::string_view k) {
     kvs.emplace_back(k);
@@ -93,7 +93,7 @@ TEST(PropagationTest, TextMapWriter_Set)
 {
   std::unordered_map<std::string, std::string> text_map;
   TextMapCarrier testee{text_map};
-  shim::CarrierWriterShim<TextMapCarrier> tester{testee};
+  shim::CarrierWriterShim tester{testee};
   ASSERT_TRUE(text_map.empty());
 
   tester.Set("foo", "bar");

@@ -63,13 +63,12 @@ private:
   explicit TracerShim(const TracerPtr &tracer, const OpenTracingPropagators &propagators)
       : tracer_(tracer), propagators_(propagators)
   {}
-  template <typename T>
+
   opentracing::expected<void> injectImpl(const opentracing::SpanContext &sc,
-                                         const T &writer,
+                                         const opentracing::TextMapWriter &writer,
                                          const PropagatorPtr &propagator) const;
-  template <typename T>
   opentracing::expected<std::unique_ptr<opentracing::SpanContext>> extractImpl(
-      const T &reader,
+      const opentracing::TextMapReader &reader,
       const PropagatorPtr &propagator) const;
 
   TracerPtr tracer_;

@@ -20,17 +20,15 @@ void SpanShim::handleError(const opentracing::Value &value) noexcept
 {
   using opentelemetry::trace::StatusCode;
   // The error tag MUST be mapped to StatusCode:
-  // - true maps to Error.
-  // - false maps to Ok
-  // - no value being set maps to Unset.
-  auto code             = StatusCode::kUnset;
   const auto &error_tag = utils::stringFromValue(value);
+  // - no value being set maps to Unset.
+  auto code = StatusCode::kUnset;
 
-  if (error_tag == "true")
+  if (error_tag == "true")  // - true maps to Error.
   {
     code = StatusCode::kError;
   }
-  else if (error_tag == "false")
+  else if (error_tag == "false")  // - false maps to Ok.
   {
     code = StatusCode::kOk;
   }
@@ -125,27 +123,24 @@ void SpanShim::logImpl(nostd::span<const EventEntry> fields,
   if (is_error)
     name = "exception";
   // Along the specified key/value pair set as additional event attributes...
-  std::vector<std::pair<std::string, common::AttributeValue>> attributes;
+  std::vector<std::pair<nostd::string_view, common::AttributeValue>> attributes;
   attributes.reserve(fields.size());
 
   for (const auto &entry : fields)
   {
-    auto key = entry.first;
+    nostd::string_view key = entry.first.data();
     // ... including mapping of the following key/value pairs:
-    // - error.kind maps to exception.type.
-    // - message maps to exception.message.
-    // - stack maps to exception.stacktrace.
     if (is_error)
     {
-      if (key == "error.kind")
+      if (key == "error.kind")  // - error.kind maps to exception.type.
       {
         key = opentelemetry::trace::SemanticConventions::kExceptionType;
       }
-      else if (key == "message")
+      else if (key == "message")  // - message maps to exception.message.
       {
         key = opentelemetry::trace::SemanticConventions::kExceptionMessage;
       }
-      else if (key == "stack")
+      else if (key == "stack")  // - stack maps to exception.stacktrace.
       {
         key = opentelemetry::trace::SemanticConventions::kExceptionStacktrace;
       }
@@ -153,6 +148,7 @@ void SpanShim::logImpl(nostd::span<const EventEntry> fields,
 
     attributes.emplace_back(key, utils::attributeFromValue(entry.second));
   }
+
   // Calls Add Events on the underlying OpenTelemetry Span with the specified key/value pair set.
   if (timestamp)
   {

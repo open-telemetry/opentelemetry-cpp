@@ -23,13 +23,6 @@ public:
       : context_(context), baggage_(baggage)
   {}
 
-  SpanContextShim &operator=(const SpanContextShim &other)
-  {
-    context_ = other.context_;
-    baggage_ = other.baggage_;
-    return *this;
-  }
-
   inline const opentelemetry::trace::SpanContext &context() const { return context_; }
   inline const BaggagePtr baggage() const { return baggage_; }
   SpanContextShim newWithKeyValue(nostd::string_view key, nostd::string_view value) const noexcept;
@@ -64,8 +57,8 @@ private:
   BaggagePtr baggage_;
 
 #ifndef OPENTELEMETRY_RTTI_ENABLED
-  static constexpr uint64_t kUniqueTag         = 0x07e1ba99a9e5;
-  const uint64_t provides_context_and_baggage_ = kUniqueTag;
+  static constexpr uint64_t kUniqueTag   = 0x07e1ca578e57a71c;
+  uint64_t provides_context_and_baggage_ = kUniqueTag;
 #endif
 };
 
