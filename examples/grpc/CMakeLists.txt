@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Proto file
 get_filename_component(proto_file "./protos/messages.proto" ABSOLUTE)
 get_filename_component(proto_file_path "${proto_file}" PATH)
