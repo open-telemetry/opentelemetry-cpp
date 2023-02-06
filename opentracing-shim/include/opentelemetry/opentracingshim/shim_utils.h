@@ -98,7 +98,6 @@ public:
 
     for (const auto &entry : refs_)
     {
-      auto context_shim = dynamic_cast<const SpanContextShim *>(entry.second);
       nostd::string_view span_kind;
 
       if (entry.first == SpanReferenceType::ChildOfRef)
@@ -109,6 +108,8 @@ public:
       {
         span_kind = OpentracingRefTypeValues::kFollowsFrom;
       }
+
+      auto context_shim = SpanContextShim::extractFrom(entry.second);
 
       if (context_shim && !span_kind.empty() &&
           !callback(context_shim->context(), opentelemetry::common::KeyValueIterableView<LinksList>(

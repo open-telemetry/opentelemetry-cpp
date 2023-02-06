@@ -69,8 +69,8 @@ TEST_F(TracerShimTest, SpanParentChildRelationship)
   ASSERT_EQ(span_shim1->context().ToSpanID(), span_shim2->context().ToSpanID());
   ASSERT_EQ(span_shim1->context().ToTraceID(), span_shim2->context().ToTraceID());
 
-  auto span_context_shim1 = dynamic_cast<const shim::SpanContextShim *>(&span_shim1->context());
-  auto span_context_shim2 = dynamic_cast<const shim::SpanContextShim *>(&span_shim2->context());
+  auto span_context_shim1 = static_cast<const shim::SpanContextShim *>(&span_shim1->context());
+  auto span_context_shim2 = static_cast<const shim::SpanContextShim *>(&span_shim2->context());
   ASSERT_TRUE(span_context_shim1 != nullptr);
   ASSERT_TRUE(span_context_shim2 != nullptr);
   ASSERT_EQ(span_context_shim1->context(), span_context_shim2->context());
@@ -180,7 +180,7 @@ TEST_F(TracerShimTest, ExtractOnlyBaggage)
   auto span_context = tracer_shim->Extract(TextMapCarrier{text_map});
   ASSERT_TRUE(span_context.value() != nullptr);
 
-  auto span_context_shim = dynamic_cast<shim::SpanContextShim *>(span_context.value().get());
+  auto span_context_shim = static_cast<shim::SpanContextShim *>(span_context.value().get());
   ASSERT_TRUE(span_context_shim != nullptr);
   ASSERT_FALSE(span_context_shim->context().IsValid());
   ASSERT_FALSE(shim::utils::isBaggageEmpty(span_context_shim->baggage()));

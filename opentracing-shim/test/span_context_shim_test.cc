@@ -8,6 +8,8 @@
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/trace/span_context.h"
 
+#include "opentracing/noop.h"
+
 #include <gtest/gtest.h>
 
 namespace trace_api = opentelemetry::trace;
@@ -31,6 +33,19 @@ protected:
 
   virtual void TearDown() override { span_context_shim.reset(); }
 };
+
+TEST_F(SpanContextShimTest, ExtractFrom)
+{
+  ASSERT_TRUE(shim::SpanContextShim::extractFrom(nullptr) == nullptr);
+
+  auto span_context =
+      &opentracing::MakeNoopTracer()->StartSpanWithOptions("operation", {})->context();
+  ASSERT_TRUE(shim::SpanContextShim::extractFrom(span_context) == nullptr);
+
+  auto span_context_shim = nostd::shared_ptr<shim::SpanContextShim>(new shim::SpanContextShim(
+      trace_api::SpanContext::GetInvalid(), baggage::Baggage::GetDefault()));
+  ASSERT_TRUE(shim::SpanContextShim::extractFrom(span_context_shim.get()) != nullptr);
+}
 
 TEST_F(SpanContextShimTest, BaggageItem)
 {
@@ -78,7 +93,7 @@ TEST_F(SpanContextShimTest, ForeachBaggageItem)
 TEST_F(SpanContextShimTest, Clone)
 {
   auto new_span_context      = span_context_shim->Clone();
-  auto new_span_context_shim = dynamic_cast<shim::SpanContextShim *>(new_span_context.get());
+  auto new_span_context_shim = static_cast<shim::SpanContextShim *>(new_span_context.get());
   ASSERT_TRUE(new_span_context_shim != nullptr);
   ASSERT_NE(span_context_shim.get(), new_span_context_shim);
   ASSERT_EQ(span_context_shim->context(), new_span_context_shim->context());

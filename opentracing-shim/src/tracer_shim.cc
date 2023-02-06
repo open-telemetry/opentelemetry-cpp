@@ -122,7 +122,7 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
 {
   // Inject the underlying OpenTelemetry Span and Baggage using either the explicitly registered
   // or the global OpenTelemetry Propagators, as configured at construction time.
-  if (auto context_shim = dynamic_cast<const SpanContextShim *>(&sc))
+  if (auto context_shim = SpanContextShim::extractFrom(&sc))
   {
     auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
     // It MUST inject any non-empty Baggage even amidst no valid SpanContext.

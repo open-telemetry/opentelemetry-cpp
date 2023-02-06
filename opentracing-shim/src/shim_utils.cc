@@ -38,7 +38,7 @@ opentelemetry::trace::StartSpanOptions makeOptionsShim(
     // else the first SpanContext is used as parent
     auto context = (first_child_of != refs.cend()) ? first_child_of->second : refs.cbegin()->second;
 
-    if (auto context_shim = dynamic_cast<const SpanContextShim *>(context))
+    if (auto context_shim = SpanContextShim::extractFrom(context))
     {
       options_shim.parent = context_shim->context();
     }
@@ -66,20 +66,17 @@ nostd::shared_ptr<opentelemetry::baggage::Baggage> makeBaggage(
   // If a list of Span references is specified...
   for (const auto &entry : options.references)
   {
-    if (auto context_shim = dynamic_cast<const SpanContextShim *>(entry.second))
-    {
-      // The union of their Baggage values MUST be used as the initial Baggage of the newly created
-      // Span.
-      context_shim->ForeachBaggageItem(
-          [&baggage_items](const std::string &key, const std::string &value) {
-            // It is unspecified which Baggage value is used in the case of repeated keys.
-            if (baggage_items.find(key) == baggage_items.end())
-            {
-              baggage_items.emplace(key, value);  // Here, only insert if key not already present
-            }
-            return true;
-          });
-    }
+    // The union of their Baggage values MUST be used
+    // as the initial Baggage of the newly created Span.
+    entry.second->ForeachBaggageItem(
+        [&baggage_items](const std::string &key, const std::string &value) {
+          // It is unspecified which Baggage value is used in the case of repeated keys.
+          if (baggage_items.find(key) == baggage_items.end())
+          {
+            baggage_items.emplace(key, value);  // Here, only insert if key not already present
+          }
+          return true;
+        });
   }
   // If no such list of references is specified, the current Baggage
   // MUST be used as the initial value of the newly created Span.

@@ -27,7 +27,7 @@ protected:
     mock_span        = new MockSpan();
     auto span        = nostd::shared_ptr<trace_api::Span>(mock_span);
     auto tracer      = shim::TracerShim::createTracerShim();
-    auto tracer_shim = dynamic_cast<shim::TracerShim *>(tracer.get());
+    auto tracer_shim = static_cast<shim::TracerShim *>(tracer.get());
     auto baggage     = baggage::Baggage::GetDefault()->Set("baggage", "item");
     span_shim = nostd::unique_ptr<shim::SpanShim>(new shim::SpanShim(*tracer_shim, span, baggage));
   }
@@ -113,7 +113,7 @@ TEST_F(SpanShimTest, SetBaggageItem_MultiThreaded)
 {
   auto span        = nostd::shared_ptr<trace_api::Span>(new MockSpan());
   auto tracer      = shim::TracerShim::createTracerShim();
-  auto tracer_shim = dynamic_cast<shim::TracerShim *>(tracer.get());
+  auto tracer_shim = static_cast<shim::TracerShim *>(tracer.get());
   auto baggage     = baggage::Baggage::GetDefault();
   shim::SpanShim span_shim(*tracer_shim, span, baggage);
 
