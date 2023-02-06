@@ -23,19 +23,6 @@ namespace common    = opentelemetry::common;
 namespace context   = opentelemetry::context;
 namespace nostd     = opentelemetry::nostd;
 
-struct MockTracerProvider final : public trace_api::TracerProvider
-{
-  nostd::shared_ptr<trace_api::Tracer> GetTracer(nostd::string_view library_name,
-                                                 nostd::string_view,
-                                                 nostd::string_view) noexcept override
-  {
-    library_name_ = std::string{library_name};
-    return nostd::shared_ptr<trace_api::Tracer>();
-  }
-
-  std::string library_name_;
-};
-
 struct MockSpan final : public trace_api::Span
 {
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
@@ -91,6 +78,41 @@ struct MockSpan final : public trace_api::Span
   std::pair<trace_api::StatusCode, std::string> status_;
   std::string name_;
   trace_api::EndSpanOptions options_;
+};
+
+struct MockTracer final : public trace_api::Tracer
+{
+  nostd::shared_ptr<trace_api::Span> StartSpan(
+      nostd::string_view name,
+      const common::KeyValueIterable &,
+      const trace_api::SpanContextKeyValueIterable &,
+      const trace_api::StartSpanOptions &) noexcept override
+  {
+    span_        = new MockSpan();
+    span_->name_ = std::string{name};
+    return nostd::shared_ptr<trace_api::Span>(span_);
+  }
+
+  void ForceFlushWithMicroseconds(uint64_t) noexcept override {}
+
+  void CloseWithMicroseconds(uint64_t) noexcept override {}
+
+  MockSpan *span_;
+};
+
+struct MockTracerProvider final : public trace_api::TracerProvider
+{
+  nostd::shared_ptr<trace_api::Tracer> GetTracer(nostd::string_view library_name,
+                                                 nostd::string_view,
+                                                 nostd::string_view) noexcept override
+  {
+    library_name_ = std::string{library_name};
+    tracer_       = new MockTracer();
+    return nostd::shared_ptr<trace_api::Tracer>(tracer_);
+  }
+
+  std::string library_name_;
+  MockTracer *tracer_ = new MockTracer();
 };
 
 struct MockPropagator : public context::propagation::TextMapPropagator

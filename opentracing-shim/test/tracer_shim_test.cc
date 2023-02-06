@@ -90,6 +90,36 @@ TEST_F(TracerShimTest, Close)
   ASSERT_TRUE(span_shim == nullptr);
 }
 
+TEST_F(TracerShimTest, SpanHandleErrorTagAtCreation)
+{
+  auto mock_provider_ptr = new MockTracerProvider();
+  nostd::shared_ptr<trace_api::TracerProvider> provider(mock_provider_ptr);
+  auto tracer_shim = shim::TracerShim::createTracerShim(provider);
+  auto span_shim   = tracer_shim->StartSpanWithOptions("test", {});
+  ASSERT_TRUE(span_shim != nullptr);
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->name_, "test");
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->status_.first, trace_api::StatusCode::kUnset);
+
+  opentracing::StartSpanOptions options;
+  options.tags    = {{"event", "normal"}};
+  auto span_shim1 = tracer_shim->StartSpanWithOptions("test1", options);
+  ASSERT_TRUE(span_shim1 != nullptr);
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->name_, "test1");
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->status_.first, trace_api::StatusCode::kUnset);
+
+  options.tags    = {{"error", true}};
+  auto span_shim2 = tracer_shim->StartSpanWithOptions("test2", options);
+  ASSERT_TRUE(span_shim2 != nullptr);
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->name_, "test2");
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->status_.first, trace_api::StatusCode::kError);
+
+  options.tags    = {{"error", "false"}};
+  auto span_shim3 = tracer_shim->StartSpanWithOptions("test3", options);
+  ASSERT_TRUE(span_shim3 != nullptr);
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->name_, "test3");
+  ASSERT_EQ(mock_provider_ptr->tracer_->span_->status_.first, trace_api::StatusCode::kOk);
+}
+
 TEST_F(TracerShimTest, InjectInvalidCarrier)
 {
   auto span_shim = tracer_shim->StartSpan("a");
