@@ -94,6 +94,8 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -296,7 +298,9 @@ elif [[ "$1" == "bazel.asan" ]]; then
   //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC //...
+# TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
+# https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
   bazel $BAZEL_STARTUP_OPTIONS run --config=tsan $BAZEL_TEST_OPTIONS_ASYNC \
   //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0

@@ -96,6 +96,7 @@ cc_test(
     deps = [
         ":prometheus_exporter",
         ":prometheus_test_helper",
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -112,6 +113,7 @@ cc_test(
     deps = [
         ":prometheus_collector",
         ":prometheus_test_helper",
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )
