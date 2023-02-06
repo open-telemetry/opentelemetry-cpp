@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 macro(check_append_cxx_compiler_flag OUTPUT_VAR)
   foreach(CHECK_FLAG ${ARGN})
     check_cxx_compiler_flag(${CHECK_FLAG}

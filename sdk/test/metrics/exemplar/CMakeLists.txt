@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 foreach(
   testname
   no_exemplar_reservoir_test never_sample_filter_test always_sample_filter_test

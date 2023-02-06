@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Function returns 4-part 'classic' version string from SemVer 2.0 string
 function GenVer4Part([String] $Version)
 {
