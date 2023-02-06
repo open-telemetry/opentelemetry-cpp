@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(opentelemetry_version version.cc)
 
 set_target_properties(opentelemetry_version PROPERTIES EXPORT_NAME version)
