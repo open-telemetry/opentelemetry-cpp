@@ -29,11 +29,17 @@
 *.json
 *.nuspec
 
-# Ignore the following files
+# Packaging
+*/CONTROL
+
+# LICENSE files
+*/LICENSE
+
+# Ignore the following misc files
 
 ./.bazelignore
 ./.bazelversion
-./LICENSE
-./exporters/etw/include/opentelemetry/exporters/etw/LICENSE
 ./docker/.gitignore
-
+.markdownlintignore
+./ci/toc.yml
+./ci/valgrind-suppressions
