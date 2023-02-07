@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include)
 
 add_executable(batch_span_processor_example main.cc)

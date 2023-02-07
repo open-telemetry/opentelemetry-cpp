@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include_directories(${CMAKE_SOURCE_DIR}/exporters/prometheus/include)
 add_executable(prometheus_example main.cc)
 target_link_libraries(
