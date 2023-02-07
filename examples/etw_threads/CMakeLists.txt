@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 project(etw_threadpool)
 
 add_executable(etw_threadpool main.cc)

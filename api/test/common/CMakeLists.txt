@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include(GoogleTest)
 
 foreach(testname kv_properties_test string_util_test)

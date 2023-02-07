@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 $llvmVersion = "10.0.0"
 Write-Host "Installing LLVM $llvmVersion ..." -ForegroundColor Cyan
 Write-Host "Downloading..."

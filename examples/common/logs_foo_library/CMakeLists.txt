@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   add_definitions(-DOPENTELEMETRY_BUILD_IMPORT_DLL)
 endif()
