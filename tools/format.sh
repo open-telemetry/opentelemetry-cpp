@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 if [[ ! -e tools/format.sh ]]; then
   echo "This tool must be run from the topmost directory." >&2
   exit 1

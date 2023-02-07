@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # This module defines Thrift_LIBRARIES, libraries to link Thrift_INCLUDE_DIR,
 # Thrift_FOUND, If false, do not try to use it.
 

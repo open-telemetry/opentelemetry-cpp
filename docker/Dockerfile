@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 ARG BASE_IMAGE=ubuntu:latest
 ARG GRPC_IMAGE=grpc-${BASE_IMAGE}
 ARG THRIFT_IMAGE=thrift-${BASE_IMAGE}
