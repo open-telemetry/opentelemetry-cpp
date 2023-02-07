@@ -1,3 +1,6 @@
+# Copyright 2023, The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 FROM centos:7
 
 ARG TOOLSET_VER=11

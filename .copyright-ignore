@@ -1,18 +1,22 @@
 # Copyright 2023, The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-## Ignore the following directories
+# Ignore the following directories
 
 ./.git/*
 ./.github/*
 ./third_party/*
 ./tools/vcpkg/*
+./tools/ports/*
 
 # Third party code
+
 ./api/include/opentelemetry/nostd/internal/absl/*
 ./exporters/jaeger/thrift-gen/*
+./exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h
 
 # Doc
+
 ./docs/*
 
 ## Ignore the following files patterns
@@ -23,9 +27,13 @@
 *.log
 *.patch
 *.json
+*.nuspec
 
-## Ignore the following files
+# Ignore the following files
 
+./.bazelignore
+./.bazelversion
 ./LICENSE
 ./exporters/etw/include/opentelemetry/exporters/etw/LICENSE
+./docker/.gitignore
 
