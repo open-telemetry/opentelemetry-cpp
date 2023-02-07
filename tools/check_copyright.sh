@@ -22,9 +22,6 @@ grep -v "^[[:space:]]*$" > /tmp/all_ignored
 
 #
 # Find all files from the repository
-# - ignore ./.git
-# - ignore git submodules in ./third_party
-# - ignore git submodules in ./tools/vcpkg
 # to create file /tmp/all_checked
 #
 

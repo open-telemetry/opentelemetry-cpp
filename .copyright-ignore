@@ -4,28 +4,25 @@
 ## Ignore the following directories
 
 ./.git/*
-
+./.github/*
 ./third_party/*
-
 ./tools/vcpkg/*
 
+# Third party code
 ./api/include/opentelemetry/nostd/internal/absl/*
-
 ./exporters/jaeger/thrift-gen/*
+
+# Doc
+./docs/*
 
 ## Ignore the following files patterns
 
-# Markdown (unsure how to add comments in markdown)
-
 *.md
-
-# Images
-
+*.rst
 *.png
-
-# Log files
-
 *.log
+*.patch
+*.json
 
 ## Ignore the following files
 
