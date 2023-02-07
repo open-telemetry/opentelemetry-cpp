@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
 
