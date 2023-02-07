@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include(GoogleTest)
 
 add_executable(timestamp_test timestamp_test.cc)
