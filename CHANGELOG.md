@@ -17,6 +17,8 @@ Increment the:
 
 * Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
 * Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* [BUILD] Build OpenTelemetry SDK and exporters into DLL
+  [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
 
 ## [1.8.2] 2023-01-31
 
@@ -64,8 +66,6 @@ Increment the:
   [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
   [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
-* [BUILD] Build OpenTelemetry SDK and exporters into DLL
-  [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
 * [MAINTAINER DOC] Define and document a deprecation process,
   [DEPRECATION] Deprecate the Jaeger exporter,
   implemented by [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
