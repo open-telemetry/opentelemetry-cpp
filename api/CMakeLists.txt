@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(opentelemetry_api INTERFACE)
 target_include_directories(
   opentelemetry_api
