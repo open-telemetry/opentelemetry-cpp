@@ -50,10 +50,8 @@
 #
 
 # =============================================================================
-# Copyright 2020 opentelemetry.
-#
-# Distributed under the Apache License (the "License"); see accompanying file
-# LICENSE for details.
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 # =============================================================================
 
 set(OPENTELEMETRY_ABI_VERSION_NO
