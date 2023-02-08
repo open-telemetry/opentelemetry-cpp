@@ -5,7 +5,13 @@
 
 ./.git/*
 ./.github/*
-./third_party/*
+./third_party/benchmark/*
+./third_party/boost/*
+./third_party/googletest/*
+./third_party/ms-gsl/*
+./third_party/nlohmann-json/*
+./third_party/opentelemetry-proto/*
+./third_party/prometheus-cpp/*
 ./tools/vcpkg/*
 ./tools/ports/*
 
