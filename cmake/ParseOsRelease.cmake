@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Parse /etc/os-release to determine Linux distro
 
 if(EXISTS /etc/os-release)
