@@ -264,10 +264,8 @@ cc_library(
 
 ## Building shared libs for Windows
 
-Windows DLL build is not supported. There are some constraints on how C++ DLLs
-work on Windows, specifically we can't safely allocate memory in one DLL and
-free it in another. For now, OpenTelemetry C++ targets need to be statically
-linked into the Windows applications.
+Windows DLL build is supported under **preview**. Please check the
+[doc](./docs/build-as-dll.md) for more details.
 
 ## Generatring binary packages
 

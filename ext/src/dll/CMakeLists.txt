@@ -42,7 +42,7 @@ add_custom_command(
     ${CMAKE_CXX_COMPILER}
     "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
     ${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry_cpp.src >
-    ${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def
+    ${OPENTELEMETRY_EXPORT_DEF}
   COMMAND_EXPAND_LISTS VERBATIM)
 
 install(
