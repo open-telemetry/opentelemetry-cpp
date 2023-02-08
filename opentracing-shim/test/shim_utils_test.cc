@@ -72,9 +72,10 @@ TEST(ShimUtilsTest, AttributeFromValue)
   ASSERT_EQ(value.index(), common::AttributeType::kTypeUInt64);
   ASSERT_EQ(nostd::get<uint64_t>(value), 55ul);
 
-  value = shim::utils::attributeFromValue(std::string{"a string"});
+  opentracing::Value str{std::string{"a string"}};
+  value = shim::utils::attributeFromValue(str);
   ASSERT_EQ(value.index(), common::AttributeType::kTypeString);
-  ASSERT_EQ(nostd::get<nostd::string_view>(value), nostd::string_view{});
+  ASSERT_EQ(nostd::get<nostd::string_view>(value), nostd::string_view{"a string"});
 
   value = shim::utils::attributeFromValue(opentracing::string_view{"a string view"});
   ASSERT_EQ(value.index(), common::AttributeType::kTypeString);

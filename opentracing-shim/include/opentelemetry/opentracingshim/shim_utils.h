@@ -28,7 +28,7 @@ static inline opentelemetry::common::AttributeValue attributeFromValue(
     AttributeValue operator()(double v) { return v; }
     AttributeValue operator()(int64_t v) { return v; }
     AttributeValue operator()(uint64_t v) { return v; }
-    AttributeValue operator()(const std::string &) { return nostd::string_view{}; }
+    AttributeValue operator()(const std::string &v) { return nostd::string_view{v}; }
     AttributeValue operator()(opentracing::string_view v) { return nostd::string_view{v.data()}; }
     AttributeValue operator()(std::nullptr_t) { return nostd::string_view{}; }
     AttributeValue operator()(const char *v) { return v; }
