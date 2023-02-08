@@ -566,7 +566,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
 {
   const std::string url = "http://localhost:9999/v1/traces";
   setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", url.c_str(), 1);
-  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT", "1eternity", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
@@ -574,7 +574,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
-      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{20})
+      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10})
           .count());
   EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
   {
@@ -597,7 +597,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   }
 
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
-  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
 }

@@ -82,7 +82,7 @@ bool GetBoolEnvironmentVariable(const char *env_var_name, bool &value)
   return true;
 }
 
-static std::chrono::system_clock::duration GetTimeoutFromString(const char *input)
+static bool GetTimeoutFromString(const char *input, std::chrono::system_clock::duration &value)
 {
   std::chrono::system_clock::duration::rep result = 0;
 
@@ -99,36 +99,58 @@ static std::chrono::system_clock::duration GetTimeoutFromString(const char *inpu
 
   if (unit == "ns")
   {
-    return std::chrono::duration_cast<std::chrono::system_clock::duration>(
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
         std::chrono::nanoseconds{result});
+    return true;
   }
 
   if (unit == "us")
   {
-    return std::chrono::duration_cast<std::chrono::system_clock::duration>(
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
         std::chrono::microseconds{result});
+    return true;
   }
 
   if (unit == "ms")
   {
-    return std::chrono::duration_cast<std::chrono::system_clock::duration>(
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
         std::chrono::milliseconds{result});
+    return true;
+  }
+
+  if (unit == "s")
+  {
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        std::chrono::seconds{result});
+    return true;
   }
 
   if (unit == "m")
   {
-    return std::chrono::duration_cast<std::chrono::system_clock::duration>(
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
         std::chrono::minutes{result});
+    return true;
   }
 
   if (unit == "h")
   {
-    return std::chrono::duration_cast<std::chrono::system_clock::duration>(
-        std::chrono::hours{result});
+    value =
+        std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::hours{result});
+    return true;
   }
 
-  return std::chrono::duration_cast<std::chrono::system_clock::duration>(
-      std::chrono::seconds{result});
+  if (unit == "")
+  {
+    // TODO: The spec says milliseconds, but opentelemetry-cpp implemented
+    // seconds by default. Fixing this is a breaking change.
+
+    value = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+        std::chrono::seconds{result});
+    return true;
+  }
+
+  // Failed to parse the input string.
+  return false;
 }
 
 bool GetDurationEnvironmentVariable(const char *env_var_name,
@@ -143,8 +165,14 @@ bool GetDurationEnvironmentVariable(const char *env_var_name,
     return false;
   }
 
-  value = GetTimeoutFromString(raw_value.c_str());
-  return true;
+  exists = GetTimeoutFromString(raw_value.c_str(), value);
+
+  if (!exists)
+  {
+    OTEL_INTERNAL_LOG_WARN("Environment variable <" << env_var_name << "> has an invalid value <"
+                                                    << raw_value << ">, ignoring");
+  }
+  return exists;
 }
 
 bool GetStringEnvironmentVariable(const char *env_var_name, std::string &value)
