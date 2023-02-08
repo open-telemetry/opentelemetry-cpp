@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2023, The OpenTelemetry Authors
+# Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
 if [[ ! -e tools/check_copyright.sh ]]; then
@@ -51,8 +51,6 @@ done < /tmp/all_ignored
 #
 # Valid copyright strings are:
 # - Copyright The OpenTelemetry Authors
-# - Copyright YEAR, The OpenTelemetry Authors
-# - Copyright YEAR, YEAR, The OpenTelemetry Authors
 #
 # Valid license strings are:
 # - SPDX-License-Identifier: Apache-2.0
@@ -64,7 +62,7 @@ touch /tmp/all_missing
 for FILE in `cat /tmp/all_checked`
 do
   echo "Checking ${FILE}"
-  export COPYRIGHT=`head -10 ${FILE} | egrep -c "Copyright (20[0-9][0-9], ){0,2}The OpenTelemetry Authors"`
+  export COPYRIGHT=`head -10 ${FILE} | grep -c "Copyright The OpenTelemetry Authors"`
   export LICENSE=`head -10 ${FILE} | grep -c "SPDX-License-Identifier: Apache-2.0"`
   if [ "$COPYRIGHT" == "0" ]; then
     echo "Missing copyright in ${FILE}" >> /tmp/all_missing

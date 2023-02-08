@@ -1,4 +1,4 @@
-// Copyright 2020, 2023, The OpenTelemetry Authors
+// Copyright The OpenTelemetry Authors
 // Copyright 2017, OpenCensus Authors
 // SPDX-License-Identifier: Apache-2.0
 
