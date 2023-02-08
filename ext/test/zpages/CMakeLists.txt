@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 foreach(testname tracez_processor_test tracez_data_aggregator_test
                  threadsafe_span_data_test)
   add_executable(${testname} "${testname}.cc")

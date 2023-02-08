@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Builds CURL from a distribution.
 
 load("@io_opentelemetry_cpp//bazel:curl.bzl", "CURL_COPTS")

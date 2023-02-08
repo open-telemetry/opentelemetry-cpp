@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Make sure to include GRPC headers first because otherwise Abseil may create
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.

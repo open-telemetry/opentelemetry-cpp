@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 foreach(testname provider_test logger_test)
   add_executable(logs_api_${testname} "${testname}.cc")
   target_link_libraries(logs_api_${testname} ${GTEST_BOTH_LIBRARIES}

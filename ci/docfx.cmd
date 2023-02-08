@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 SETLOCAL ENABLEEXTENSIONS
 
 type ci\docfx.json > docfx.json
