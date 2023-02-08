@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 set "PATH=%SystemRoot%;%SystemRoot%\System32;%SystemRoot%\System32\WindowsPowerShell\v1.0\;%ProgramFiles%\Git\bin"
 cd %~dp0
 call powershell -File .\install_llvm-win64.ps1

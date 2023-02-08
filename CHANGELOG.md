@@ -19,6 +19,7 @@ Increment the:
 * Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
 * [BUILD] Build OpenTelemetry SDK and exporters into DLL
   [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
+* [CI] Enforce copyright check in CI [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
 
 ## [1.8.2] 2023-01-31
 
