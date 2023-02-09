@@ -29,10 +29,10 @@ bool GetRawEnvironmentVariable(const char *env_var_name, std::string &value)
   // avoid calling std::getenv which is deprecated in MSVC.
   size_t required_size = 0;
   getenv_s(&required_size, nullptr, 0, env_var_name);
-  std::unique_ptr<char> endpoint_buffer;
+  std::unique_ptr<char[]> endpoint_buffer;
   if (required_size > 0)
   {
-    endpoint_buffer = std::unique_ptr<char>{new char[required_size]};
+    endpoint_buffer = std::unique_ptr<char[]>{new char[required_size]};
     getenv_s(&required_size, endpoint_buffer.get(), required_size, env_var_name);
     endpoint_from_env = endpoint_buffer.get();
   }
@@ -93,6 +93,12 @@ static bool GetTimeoutFromString(const char *input, std::chrono::system_clock::d
   for (; *input && (*input >= '0' && *input <= '9'); ++input)
   {
     result = result * 10 + (*input - '0');
+  }
+
+  if (result == 0)
+  {
+    // Rejecting duration 0 as invalid.
+    return false;
   }
 
   opentelemetry::nostd::string_view unit{input};
