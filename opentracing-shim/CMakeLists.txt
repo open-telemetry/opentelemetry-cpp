@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 set(this_target opentelemetry_opentracing_shim)
 
 add_library(${this_target} src/shim_utils.cc src/span_shim.cc
