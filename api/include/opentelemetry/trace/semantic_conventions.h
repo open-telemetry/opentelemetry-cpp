@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.17.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.18.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -595,12 +595,12 @@ static constexpr const char *kHttpTarget = "http.target";
 
 /**
  * The matched route (path template in the format used by the respective server framework). See note
- below
+below
  *
  * <p>Notes:
-  <ul> <li>'http.route' MUST NOT be populated when this is not supported by the HTTP server
- framework as the route attribute should have low-cardinality and the URI path can NOT substitute
- it.</li> </ul>
+  <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
+route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
+the <a href="#http-server-definitions">application root</a> if there is one.</li> </ul>
  */
 static constexpr const char *kHttpRoute = "http.route";
 
@@ -1079,6 +1079,8 @@ namespace DbSystemValues
 static constexpr const char *kOtherSql = "other_sql";
 /** Microsoft SQL Server. */
 static constexpr const char *kMssql = "mssql";
+/** Microsoft SQL Server Compact. */
+static constexpr const char *kMssqlcompact = "mssqlcompact";
 /** MySQL. */
 static constexpr const char *kMysql = "mysql";
 /** Oracle Database. */
@@ -1173,6 +1175,8 @@ static constexpr const char *kCockroachdb = "cockroachdb";
 static constexpr const char *kOpensearch = "opensearch";
 /** ClickHouse. */
 static constexpr const char *kClickhouse = "clickhouse";
+/** Cloud Spanner. */
+static constexpr const char *kSpanner = "spanner";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
