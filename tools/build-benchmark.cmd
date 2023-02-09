@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 @echo off
 set BUILDTOOLS_VERSION=vs2019
 set CMAKE_GEN="Visual Studio 16 2019"

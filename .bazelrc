@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
