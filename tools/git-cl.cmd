@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 @echo off
 setlocal enabledelayedexpansion
 if "%1" == "format" (

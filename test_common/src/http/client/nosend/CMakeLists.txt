@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 if(${BUILD_TESTING})
   add_library(opentelemetry_http_client_nosend http_client_factory_nosend.cc
                                                http_client_nosend.cc)

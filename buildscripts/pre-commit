@@ -48,6 +48,9 @@ git add "$(pwd)/api/include/opentelemetry/version.h"
 
 # Update sdk version.cc
 cat > "$(pwd)/sdk/src/version/version.cc" <<END
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
 
