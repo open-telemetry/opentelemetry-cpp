@@ -17,6 +17,8 @@ Increment the:
 
 * Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
 * Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* [BUILD] Build OpenTelemetry SDK and exporters into DLL
+  [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
 * [CI] Enforce copyright check in CI [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.18.0
   [#1974](https://github.com/open-telemetry/opentelemetry-cpp/pull/1974)
