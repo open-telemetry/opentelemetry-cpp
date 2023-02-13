@@ -17,7 +17,7 @@ namespace trace
 /**
  * Factory class for TracerContext.
  */
-class TracerContextFactory
+class OPENTELEMETRY_EXPORT TracerContextFactory
 {
 public:
   /**

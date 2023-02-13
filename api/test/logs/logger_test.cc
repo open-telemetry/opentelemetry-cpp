@@ -158,7 +158,7 @@ class TestProvider : public LoggerProvider
                                       bool /* include_trace_context */,
                                       const common::KeyValueIterable & /* attributes */) override
   {
-    return shared_ptr<Logger>(new TestLogger());
+    return nostd::shared_ptr<Logger>(new TestLogger());
   }
 };
 
