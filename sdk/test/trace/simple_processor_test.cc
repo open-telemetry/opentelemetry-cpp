@@ -17,9 +17,9 @@ using opentelemetry::trace::SpanContext;
 
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
-  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
-  SimpleSpanProcessor processor(std::move(exporter));
+  SimpleSpanProcessor processor(std::unique_ptr<SpanExporter>{exporter});
 
   auto recordable = processor.MakeRecordable();
 
@@ -63,9 +63,9 @@ private:
 
 TEST(SimpleSpanProcessor, ShutdownCalledOnce)
 {
-  int shutdowns = 0;
-  std::unique_ptr<RecordShutdownExporter> exporter(new RecordShutdownExporter(&shutdowns));
-  SimpleSpanProcessor processor(std::move(exporter));
+  int shutdowns                    = 0;
+  RecordShutdownExporter *exporter = new RecordShutdownExporter(&shutdowns);
+  SimpleSpanProcessor processor(std::unique_ptr<SpanExporter>{exporter});
   EXPECT_EQ(0, shutdowns);
   processor.Shutdown();
   EXPECT_EQ(1, shutdowns);

@@ -19,6 +19,7 @@
 *.so
 *.dylib
 *.dll
+*.pdb
 
 # Fortran module files
 *.mod
