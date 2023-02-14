@@ -31,7 +31,7 @@ std::string GetOtlpDefaultGrpcTracesEndpoint();
 std::string GetOtlpDefaultGrpcMetricsEndpoint();
 std::string GetOtlpDefaultGrpcLogsEndpoint();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultGrpcEndpoint()
 {
   return GetOtlpDefaultGrpcTracesEndpoint();
@@ -41,13 +41,13 @@ std::string GetOtlpDefaultHttpTracesEndpoint();
 std::string GetOtlpDefaultHttpMetricsEndpoint();
 std::string GetOtlpDefaultHttpLogsEndpoint();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultHttpEndpoint()
 {
   return GetOtlpDefaultHttpTracesEndpoint();
 }
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultMetricsEndpoint()
 {
   return GetOtlpDefaultHttpMetricsEndpoint();
@@ -57,7 +57,7 @@ bool GetOtlpDefaultTracesIsInsecure();
 bool GetOtlpDefaultMetricsIsInsecure();
 bool GetOtlpDefaultLogsIsInsecure();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline bool GetOtlpDefaultIsSslEnable()
 {
   return (!GetOtlpDefaultTracesIsInsecure());
@@ -67,7 +67,7 @@ std::string GetOtlpDefaultTracesSslCertificatePath();
 std::string GetOtlpDefaultMetricsSslCertificatePath();
 std::string GetOtlpDefaultLogsSslCertificatePath();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultSslCertificatePath()
 {
   return GetOtlpDefaultTracesSslCertificatePath();
@@ -77,7 +77,7 @@ std::string GetOtlpDefaultTracesSslCertificateString();
 std::string GetOtlpDefaultMetricsSslCertificateString();
 std::string GetOtlpDefaultLogsSslCertificateString();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultSslCertificateString()
 {
   return GetOtlpDefaultTracesSslCertificateString();
@@ -123,7 +123,7 @@ std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline std::chrono::system_clock::duration GetOtlpDefaultTimeout()
 {
   return GetOtlpDefaultTracesTimeout();
@@ -144,7 +144,7 @@ OtlpHeaders GetOtlpDefaultTracesHeaders();
 OtlpHeaders GetOtlpDefaultMetricsHeaders();
 OtlpHeaders GetOtlpDefaultLogsHeaders();
 
-// Compatibility with OTELCPP 1.7.0
+// Compatibility with OTELCPP 1.8.2
 inline OtlpHeaders GetOtlpDefaultHeaders()
 {
   return GetOtlpDefaultTracesHeaders();

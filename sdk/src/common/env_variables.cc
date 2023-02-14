@@ -58,7 +58,7 @@ bool GetBoolEnvironmentVariable(const char *env_var_name, bool &value)
 {
   std::string raw_value;
   bool exists = GetRawEnvironmentVariable(env_var_name, raw_value);
-  if (!exists)
+  if (!exists || raw_value.empty())
   {
     value = false;
     return false;
@@ -164,7 +164,7 @@ bool GetDurationEnvironmentVariable(const char *env_var_name,
 {
   std::string raw_value;
   bool exists = GetRawEnvironmentVariable(env_var_name, raw_value);
-  if (!exists)
+  if (!exists || raw_value.empty())
   {
     value =
         std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{0});
@@ -183,7 +183,12 @@ bool GetDurationEnvironmentVariable(const char *env_var_name,
 
 bool GetStringEnvironmentVariable(const char *env_var_name, std::string &value)
 {
-  return GetRawEnvironmentVariable(env_var_name, value);
+  bool exists = GetRawEnvironmentVariable(env_var_name, value);
+  if (!exists || value.empty())
+  {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace common
