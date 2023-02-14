@@ -1,8 +1,14 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(
   opentelemetry_logs
   logger_provider.cc
   logger_provider_factory.cc
   logger.cc
+  event_logger_provider.cc
+  event_logger_provider_factory.cc
+  event_logger.cc
   simple_log_record_processor.cc
   simple_log_record_processor_factory.cc
   batch_log_record_processor.cc

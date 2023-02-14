@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 endlocal
 set "PATH=%~dp0;%PATH%"
 set "TOOLS_PATH=%~dp0"

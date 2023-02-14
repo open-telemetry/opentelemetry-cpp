@@ -264,10 +264,8 @@ cc_library(
 
 ## Building shared libs for Windows
 
-Windows DLL build is not supported. There are some constraints on how C++ DLLs
-work on Windows, specifically we can't safely allocate memory in one DLL and
-free it in another. For now, OpenTelemetry C++ targets need to be statically
-linked into the Windows applications.
+Windows DLL build is supported under **preview**. Please check the
+[doc](./docs/build-as-dll.md) for more details.
 
 ## Generatring binary packages
 
@@ -319,6 +317,10 @@ package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
 with `vcpkg install opentelemetry-cpp` and follow the then displayed
 descriptions. Please see the vcpkg project for any issues regarding the
 packaging.
+
+If you are using [alpine linux](https://www.alpinelinux.org/) you can install
+the [opentelemetry-cpp packages](https://pkgs.alpinelinux.org/packages?name=opentelemetry-cpp-*)
+with `apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/testing opentelemetry-cpp-dev`.
 
 Please note, these packages are not officially provided and maintained by
 OpenTelemetry C++ project, and are just listed here to consolidate all such

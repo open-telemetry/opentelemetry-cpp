@@ -15,6 +15,43 @@ Increment the:
 
 ## [Unreleased]
 
+* Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
+* Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* [BUILD] Build OpenTelemetry SDK and exporters into DLL
+  [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
+* [CI] Enforce copyright check in CI [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.18.0
+  [#1974](https://github.com/open-telemetry/opentelemetry-cpp/pull/1974)
+
+## [1.8.2] 2023-01-31
+
+* Remove redundant macro check in nostd::shared_ptr [#1939](https://github.com/open-telemetry/opentelemetry-cpp/pull/1939)
+* Fix typo in packages.cmake causing incorrect nuget package versions [#1936](https://github.com/open-telemetry/opentelemetry-cpp/pull/1936)
+* [METRICS] Custom Aggregation support [#1899](https://github.com/open-telemetry/opentelemetry-cpp/pull/1899)
+* Small fix in INSTALL.md for enabling building package. [#1930](https://github.com/open-telemetry/opentelemetry-cpp/pull/1930)
+* [METRICS] Fix warning for misconfiguration of PeriodicExportingMetricReader [#1929](https://github.com/open-telemetry/opentelemetry-cpp/pull/1929)
+* Make macros.h available for all source files via version.h [#1918](https://github.com/open-telemetry/opentelemetry-cpp/pull/1918)
+* [METRICS] Histogram Aggregation: Fix bucket detection logic,
+ performance improvements, and benchmark tests [#1869](https://github.com/open-telemetry/opentelemetry-cpp/pull/1869)
+* Remove unused namespace alias for nostd [#1914](https://github.com/open-telemetry/opentelemetry-cpp/pull/1914)
+* [METRICS] Update meter.h [#1907](https://github.com/open-telemetry/opentelemetry-cpp/pull/1907)
+* sdk::resource::Resource::Merge should be const [#1905](https://github.com/open-telemetry/opentelemetry-cpp/pull/1905)
+* [METRICS] Collect and Export metric data before
+ PeriodicMetricReader shutdown. [#1860](https://github.com/open-telemetry/opentelemetry-cpp/pull/1860)
+* [ETW EXPORTER] Add Virtual destructor for TailSampler, Update Maintainer
+ mode warnings for MSVC [#1897](https://github.com/open-telemetry/opentelemetry-cpp/pull/1897)
+* Fix #1867 Orderly shutdown in examples [#1868](https://github.com/open-telemetry/opentelemetry-cpp/pull/1868)
+* [METRICS] minor metrics handling optimizations [#1890](https://github.com/open-telemetry/opentelemetry-cpp/pull/1890)
+* fix SpinLockMutex for Intel Compiler [#1885](https://github.com/open-telemetry/opentelemetry-cpp/pull/1885)
+* [LOGS] Change BatchLogRecordProcessorFactory::Create to static method [#1876](https://github.com/open-telemetry/opentelemetry-cpp/pull/1876)
+* Enable generating deb, rpm, NuGet, tgz, zip package through cmake build [#1662](https://github.com/open-telemetry/opentelemetry-cpp/pull/1662)
+* Updated clone command in INSTALL.md [#1818](https://github.com/open-telemetry/opentelemetry-cpp/pull/1818)
+* Small cleanup to remove old metrics design docs [#1855](https://github.com/open-telemetry/opentelemetry-cpp/pull/1855)
+* [BUILD] Fix build error with older version of VS2017 compiler. [1857](https://github.com/open-telemetry/opentelemetry-cpp/pull/1857)
+* [EXPORTERS] Enable setting Span endtime for ETW exporter [#1846](https://github.com/open-telemetry/opentelemetry-cpp/pull/1846)
+* [REMOVAL] Remove deprecated experimental semantic conventions [#1743](https://github.com/open-telemetry/opentelemetry-cpp/pull/1743)
+* [EXPORTERS] Fix console debug logs for otlp exporters. [#1848](https://github.com/open-telemetry/opentelemetry-cpp/pull/1848)
+* [LOGS] Add `include_trace_context` and `EventLogger` [#1884](https://github.com/open-telemetry/opentelemetry-cpp/pull/1884)
 * [METRICS] Change BatchLogRecordProcessorFactory::Create to static method
 * [BUILD] Fix OTELCPP_MAINTAINER_MODE [#1844](https://github.com/open-telemetry/opentelemetry-cpp/pull/1844)
 * [BUILD] Fix compatibility when using clang and libc++, upgrade GTest and
@@ -32,6 +69,23 @@ Increment the:
   [#1916](https://github.com/open-telemetry/opentelemetry-cpp/pull/1916)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.17.0
   [#1927](https://github.com/open-telemetry/opentelemetry-cpp/pull/1927)
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [DEPRECATION] Deprecate the Jaeger exporter,
+  implemented by [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+* [BUILD] OTLP HTTP Exporter has build warnings in maintainer mode
+  [#1943](https://github.com/open-telemetry/opentelemetry-cpp/pull/1943)
+
+Deprecations:
+
+* [MAINTAINER DOC] Define and document a deprecation process,
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * A new file, [DEPRECATED](./DEPRECATED.md) list all the code currently
+    deprecated.
+  * A new [deprecation process](./docs/deprecation-process.md) details the plan to
+    deprecate and later remove code.
+* [DEPRECATION] Deprecate the Jaeger exporter
+  [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
+  * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
 
 Important changes:
 

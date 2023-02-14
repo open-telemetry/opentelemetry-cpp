@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Ref. https://github.com/github/gitignore/blob/master/C%2B%2B.gitignore
 # Prerequisites
 *.d
@@ -16,6 +19,7 @@
 *.so
 *.dylib
 *.dll
+*.pdb
 
 # Fortran module files
 *.mod
@@ -51,3 +55,6 @@
 
 tags
 .cache/clangd/*
+
+# Temporary dir used when generating semconv
+./buildscripts/semantic-convention/opentelemetry-specification

@@ -5,6 +5,7 @@
 
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
 #include "prometheus_test_helper.h"
 
@@ -14,36 +15,24 @@
  * an exposer as an argument, and instead takes no arguments; this
  * private constructor is only to be used here for testing
  */
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporter
-{
-namespace metrics
-{
-class PrometheusExporterTest  // : public ::testing::Test
-{
-public:
-  PrometheusExporter GetExporter() { return PrometheusExporter(); }
-};
-}  // namespace metrics
-}  // namespace exporter
-OPENTELEMETRY_END_NAMESPACE
 
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::exporter::metrics::PrometheusExporter;
-using opentelemetry::exporter::metrics::PrometheusExporterTest;
-using opentelemetry::sdk::common::ExportResult;
-
+using opentelemetry::exporter::metrics::PrometheusExporterOptions;
+using opentelemetry::sdk::metrics::AggregationTemporality;
+using opentelemetry::sdk::metrics::InstrumentType;
 /**
  * When a PrometheusExporter is initialized,
  * isShutdown should be false.
  */
 TEST(PrometheusExporter, InitializeConstructorIsNotShutdown)
 {
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
-
+  PrometheusExporterOptions options;
+  options.url = "localhost:8081";
+  PrometheusExporter exporter(options);
   // // Asserts that the exporter is not shutdown.
-  ASSERT_TRUE(!exporter.IsShutdown());
+  // ASSERT_TRUE(!exporter.IsShutdown());
+  exporter.Shutdown();
 }
 
 /**
@@ -51,8 +40,8 @@ TEST(PrometheusExporter, InitializeConstructorIsNotShutdown)
  */
 TEST(PrometheusExporter, ShutdownSetsIsShutdownToTrue)
 {
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
+  PrometheusExporterOptions options;
+  PrometheusExporter exporter(options);
 
   // exporter shuold not be shutdown by default
   ASSERT_TRUE(!exporter.IsShutdown());
@@ -68,93 +57,23 @@ TEST(PrometheusExporter, ShutdownSetsIsShutdownToTrue)
 }
 
 /**
- * The Export() function should return kSuccess = 0
- *  when data is exported successfully.
+ * The Aggregation temporality should be correctly set
  */
-TEST(PrometheusExporter, ExportSuccessfully)
+TEST(PrometheusExporter, CheckAggregationTemporality)
 {
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
+  PrometheusExporterOptions options;
+  PrometheusExporter exporter(options);
 
-  auto res = exporter.Export(CreateSumPointData());
-
-  // result should be kSuccess = 0
-  ExportResult code = ExportResult::kSuccess;
-  ASSERT_EQ(res, code);
-}
-
-/**
- * If the exporter is shutdown, it cannot process
- * any more export requests and returns kFailure = 1.
- */
-TEST(PrometheusExporter, ExporterIsShutdown)
-{
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
-
-  exporter.Shutdown();
-
-  // send export request after shutdown
-  auto res = exporter.Export(CreateSumPointData());
-
-  // result code should be kFailure = 1
-  ExportResult code = ExportResult::kFailure;
-  ASSERT_EQ(res, code);
-}
-
-/**
- * The Export() function should return
- * kFailureFull = 2 when the collection is full,
- * or when the collection is not full but does not have enough
- * space to hold the batch data.
- */
-TEST(PrometheusExporter, CollectionNotEnoughSpace)
-{
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
-
-  // prepare two collections of records to export,
-  // one close to max size and another one that, when added
-  // to the first, will exceed the size of the collection
-
-  int max_collection_size = exporter.GetCollector()->GetMaxCollectionSize();
-
-  // send export request to fill the
-  // collection in the collector
-  ExportResult code = ExportResult::kSuccess;
-  for (int count = 1; count <= max_collection_size; ++count)
-  {
-    auto res = exporter.Export(CreateSumPointData());
-    ASSERT_EQ(res, code);
-  }
-
-  // send export request that does not complete
-  // due to not enough space in the collection
-  auto res = exporter.Export(CreateSumPointData());
-
-  // the result code should be kFailureFull = 2
-  code = ExportResult::kFailureFull;
-  ASSERT_EQ(res, code);
-}
-
-/**
- *  The Export() function should return
- *  kFailureInvalidArgument = 3 when an empty collection
- *  of records is passed to the Export() function.
- */
-TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
-{
-  PrometheusExporterTest p;
-  PrometheusExporter exporter = p.GetExporter();
-
-  // Initializes an empty colelction of records
-  metric_sdk::ResourceMetrics data;
-
-  // send export request to fill the
-  // collection in the collector
-  auto res = exporter.Export(data);
-
-  // the result code should be kFailureInvalidArgument = 3
-  ExportResult code = ExportResult::kFailureInvalidArgument;
-  ASSERT_EQ(res, code);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kCounter),
+            AggregationTemporality::kCumulative);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kHistogram),
+            AggregationTemporality::kCumulative);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kObservableCounter),
+            AggregationTemporality::kCumulative);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kObservableGauge),
+            AggregationTemporality::kCumulative);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kObservableUpDownCounter),
+            AggregationTemporality::kCumulative);
+  ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kUpDownCounter),
+            AggregationTemporality::kCumulative);
 }

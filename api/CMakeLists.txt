@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(opentelemetry_api INTERFACE)
 target_include_directories(
   opentelemetry_api
@@ -34,6 +37,11 @@ install(
 
 if(BUILD_TESTING)
   add_subdirectory(test)
+endif()
+
+if(WITH_NO_DEPRECATED_CODE)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
 endif()
 
 if(WITH_ABSEIL)
@@ -73,7 +81,7 @@ if(WITH_LOGS_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_LOGS_PREVIEW)
 endif()
 
-if(WITH_NO_GENENV)
+if(WITH_NO_GETENV)
   target_compile_definitions(opentelemetry_api INTERFACE NO_GETENV)
 endif()
 

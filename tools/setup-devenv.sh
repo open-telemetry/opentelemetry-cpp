@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Try to autodetect the tools dir
 if [ "$BASH_SOURCE" != "" ]; then
 TOOLS_PATH=`dirname ${BASH_SOURCE[0]}`

@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #ifdef BAZEL_BUILD
 #  include "examples/grpc/protos/messages.grpc.pb.h"
 #else
