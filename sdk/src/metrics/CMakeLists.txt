@@ -5,6 +5,7 @@ add_library(
   opentelemetry_metrics
   async_instruments.cc
   meter_provider.cc
+  meter_provider_factory.cc
   meter.cc
   meter_context.cc
   metric_reader.cc

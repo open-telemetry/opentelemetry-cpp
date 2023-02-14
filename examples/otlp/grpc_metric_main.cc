@@ -38,10 +38,18 @@ void InitMetrics()
   metric_sdk::PeriodicExportingMetricReaderOptions options;
   options.export_interval_millis = std::chrono::milliseconds(1000);
   options.export_timeout_millis  = std::chrono::milliseconds(500);
+
   std::unique_ptr<metric_sdk::MetricReader> reader{
       new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
+
+  auto reader2 =
+      metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
+
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
-  auto p        = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
+
+  auto provider2 = metric_sdk::MeterProviderFactory::Create();
+
+  auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
   p->AddMetricReader(std::move(reader));
 
   metrics_api::Provider::SetMeterProvider(provider);

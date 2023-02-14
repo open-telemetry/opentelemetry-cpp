@@ -73,6 +73,7 @@ public:
     return true;
   }
 
+  ViewRegistry() = default;
   ~ViewRegistry() = default;
 
 private:
