@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 namespace metric_sdk = opentelemetry::sdk::metrics;
 
@@ -27,6 +28,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
 {
   if (reader_->IsShutdown())
   {
+    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] ERROR: Collect: "
+      "Exporter is shutdown, cann't invoke collect operation.");
     return {};
   }
   collection_lock_.lock();
