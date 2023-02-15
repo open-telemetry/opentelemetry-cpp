@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/common/key_value_iterable.h"
@@ -16,7 +17,7 @@ namespace logs
 /**
  * Creates new Logger instances.
  */
-class LoggerProvider
+class OPENTELEMETRY_EXPORT LoggerProvider
 {
 public:
   virtual ~LoggerProvider() = default;
@@ -68,4 +69,5 @@ public:
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif
+
+#endif  // ENABLE_LOGS_PREVIEW
