@@ -323,4 +323,4 @@ private:
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
 
-#endif
+#endif  // end of ENABLE_LOGS_PREVIEW

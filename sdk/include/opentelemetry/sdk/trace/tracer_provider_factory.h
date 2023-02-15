@@ -19,7 +19,7 @@ namespace trace
  * Factory class for TracerProvider.
  * See @ref TracerProvider.
  */
-class TracerProviderFactory
+class OPENTELEMETRY_EXPORT TracerProviderFactory
 {
 public:
   /* Serie of builders with a single processor. */
