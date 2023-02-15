@@ -27,7 +27,7 @@ graph LR
 
 subgraph SDK
   MeterProvider
-  MetricReader[PrometheusExporter<br/>(http://localhost:9464/)"]
+  MetricReader["PrometheusExporter<br/>(http://localhost:9464/)"]
 end
 
 subgraph API
