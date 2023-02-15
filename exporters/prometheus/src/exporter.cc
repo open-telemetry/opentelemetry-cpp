@@ -21,9 +21,9 @@ PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
   {
     exposer_ = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
   }
-  catch (const std::exception &ex)  // const CivetException &ex)
+  catch (const std::exception &ex)
   {
-    exposer_ = nullptr;
+    exposer_.reset(nullptr);
     OTEL_INTERNAL_LOG_ERROR("[Prometheus Exporter] "
                             << "Can't initialize prometheus exposer with endpoint: " << options_.url
                             << "\nError: " << ex.what());
