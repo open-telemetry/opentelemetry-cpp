@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/prometheus/exporter.h"
-#include "prometheus/CivetServer.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,16 +17,17 @@ namespace metrics
  */
 PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options) : options_(options)
 {
-  try {
-    exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
-  }
-  catch (const CivetException &ex)
+  try
   {
-    std::cout << "Exception caught\n";
+    exposer_ = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
+  }
+  catch (const std::exception &ex)  // const CivetException &ex)
+  {
     exposer_ = nullptr;
-    OTEL_INTERNAL_LOG_ERROR("[Prometheus Exporter] ERROR: Init: "
-                            << " Cannot Initialize start HTTP server exception :"<< ex.what() << std::endl);
-    Shutdown(); // set MetricReader in shutdown state.
+    OTEL_INTERNAL_LOG_ERROR("[Prometheus Exporter] "
+                            << "Can't initialize prometheus exposer with endpoint: " << options_.url
+                            << "\nError: " << ex.what());
+    Shutdown();  // set MetricReader in shutdown state.
     return;
   }
   collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector(this));

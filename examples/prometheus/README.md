@@ -11,29 +11,10 @@
 
 ## Export metrics from the application
 
-It is highly recommended to go over the [ostream-metrics](../metrics_simple/README.md)
-doc before following along this document.
-
 Run the application with:
 
 ```sh
 bazel run //examples/prometheus:prometheus_example
-```
-
-The main difference between the [ostream-metrics](../metrics_simple/README.md)
-example with this one is that the line below is replaced:
-
-```cpp
-std::unique_ptr<metric_sdk::PushMetricExporter> exporter{
-    new exportermetrics::OStreamMetricExporter};
-
-```
-
-with
-
-```cpp
-std::unique_ptr<metrics_sdk::PushMetricExporter> exporter{
-    new metrics_exporter::PrometheusExporter(opts)};
 ```
 
 OpenTelemetry `PrometheusExporter` will export
@@ -46,8 +27,7 @@ graph LR
 
 subgraph SDK
   MeterProvider
-  MetricReader[PeriodicExportingMetricReader]
-  PrometheusExporter["PrometheusExporter<br/>(http://localhost:9464/)"]
+  MetricReader[PrometheusExporter<br/>(http://localhost:9464/)"]
 end
 
 subgraph API
@@ -56,7 +36,7 @@ end
 
 Instrument --> | Measurements | MeterProvider
 
-MeterProvider --> | Metrics | MetricReader --> | Pull | PrometheusExporter
+MeterProvider --> | Metrics | MetricReader
 ```
 
 Also, for our learning purpose, we use a while-loop to keep recoring random
