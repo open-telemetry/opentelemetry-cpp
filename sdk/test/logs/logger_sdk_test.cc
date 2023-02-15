@@ -131,13 +131,14 @@ public:
 
   void CopyFrom(const MockLogRecordable &other)
   {
-    severity_     = other.severity_;
-    body_         = other.body_;
-    trace_id_     = other.trace_id_;
-    span_id_      = other.span_id_;
-    trace_flags_  = other.trace_flags_;
-    event_name_   = other.event_name_;
-    event_domain_ = other.event_domain_;
+    severity_           = other.severity_;
+    body_               = other.body_;
+    trace_id_           = other.trace_id_;
+    span_id_            = other.span_id_;
+    trace_flags_        = other.trace_flags_;
+    event_name_         = other.event_name_;
+    event_domain_       = other.event_domain_;
+    observed_timestamp_ = other.observed_timestamp_;
   }
 
 private:
