@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <chrono>
 #  include <string>
 
 #  include "opentelemetry/nostd/string_view.h"
@@ -43,7 +44,16 @@ class MockLogRecordable final : public opentelemetry::sdk::logs::Recordable
 public:
   void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
 
-  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+  void SetObservedTimestamp(
+      opentelemetry::common::SystemTimestamp observed_timestamp) noexcept override
+  {
+    observed_timestamp_ = observed_timestamp;
+  }
+
+  const opentelemetry::common::SystemTimestamp &GetObservedTimestamp() const noexcept
+  {
+    return observed_timestamp_;
+  }
 
   opentelemetry::logs::Severity GetSeverity() const noexcept { return severity_; }
 
@@ -121,13 +131,14 @@ public:
 
   void CopyFrom(const MockLogRecordable &other)
   {
-    severity_     = other.severity_;
-    body_         = other.body_;
-    trace_id_     = other.trace_id_;
-    span_id_      = other.span_id_;
-    trace_flags_  = other.trace_flags_;
-    event_name_   = other.event_name_;
-    event_domain_ = other.event_domain_;
+    severity_           = other.severity_;
+    body_               = other.body_;
+    trace_id_           = other.trace_id_;
+    span_id_            = other.span_id_;
+    trace_flags_        = other.trace_flags_;
+    event_name_         = other.event_name_;
+    event_domain_       = other.event_domain_;
+    observed_timestamp_ = other.observed_timestamp_;
   }
 
 private:
@@ -138,6 +149,8 @@ private:
   opentelemetry::trace::TraceFlags trace_flags_;
   std::string event_name_;
   std::string event_domain_;
+  opentelemetry::common::SystemTimestamp observed_timestamp_ =
+      std::chrono::system_clock::from_time_t(0);
 };
 
 class MockProcessor final : public LogRecordProcessor
@@ -196,6 +209,8 @@ TEST(LoggerSDK, LogToAProcessor)
   }
   opentelemetry::trace::Scope trace_scope{include_span};
 
+  auto now = std::chrono::system_clock::now();
+
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetVersion(), "");
@@ -226,6 +241,10 @@ TEST(LoggerSDK, LogToAProcessor)
   std::string span_id_text_in_span{span_id_in_span, sizeof(span_id_in_span)};
   ASSERT_EQ(trace_id_text_in_logger, trace_id_text_in_span);
   ASSERT_EQ(span_id_text_in_logger, span_id_text_in_span);
+
+  ASSERT_GE(
+      static_cast<std::chrono::system_clock::time_point>(shared_recordable->GetObservedTimestamp()),
+      now);
 }
 
 TEST(LoggerSDK, EventLog)
