@@ -144,16 +144,16 @@ TEST(EnvVarTest, DurationEnvVar)
   EXPECT_TRUE(exists);
   EXPECT_EQ(value, expected);
 
-  value = poison;
-  expected =
-      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::microseconds{20});
+  value    = poison;
+  expected = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::microseconds{20});
   exists = GetDurationEnvironmentVariable("DURATION_ENV_VAR_2", value);
   EXPECT_TRUE(exists);
   EXPECT_EQ(value, expected);
 
-  value = poison;
-  expected =
-      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::milliseconds{30});
+  value    = poison;
+  expected = std::chrono::duration_cast<std::chrono::system_clock::duration>(
+      std::chrono::milliseconds{30});
   exists = GetDurationEnvironmentVariable("DURATION_ENV_VAR_3", value);
   EXPECT_TRUE(exists);
   EXPECT_EQ(value, expected);
