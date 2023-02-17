@@ -23,6 +23,8 @@ Increment the:
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.18.0
   [#1974](https://github.com/open-telemetry/opentelemetry-cpp/pull/1974)
 * Fix Prometheus server crash on listening to already used port [#1986](https://github.com/open-telemetry/opentelemetry-cpp/pull/1986)
+* [EXPORTER] Boolean environment variables not parsed per the spec
+  [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
 
 ## [1.8.2] 2023-01-31
 

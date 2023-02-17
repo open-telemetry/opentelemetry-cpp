@@ -64,10 +64,10 @@ struct OtlpHttpClientOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  std::chrono::system_clock::duration timeout;
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+  OtlpHeaders http_headers;
 
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
@@ -76,7 +76,7 @@ struct OtlpHttpClientOptions
   std::size_t max_requests_per_connection = 8;
 
   // User agent
-  std::string user_agent = GetOtlpDefaultUserAgent();
+  std::string user_agent;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
                                HttpRequestContentType input_content_type,
