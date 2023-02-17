@@ -18,9 +18,11 @@ inline const std::string GetDefaultZipkinEndpoint()
   const char *otel_exporter_zipkin_endpoint_env = "OTEL_EXPORTER_ZIPKIN_ENDPOINT";
   const char *kZipkinEndpointDefault            = "http://localhost:9411/api/v2/spans";
 
-  auto endpoint =
-      opentelemetry::sdk::common::GetEnvironmentVariable(otel_exporter_zipkin_endpoint_env);
-  return endpoint.size() ? endpoint : kZipkinEndpointDefault;
+  std::string endpoint;
+
+  auto exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
+      otel_exporter_zipkin_endpoint_env, endpoint);
+  return exists ? endpoint : kZipkinEndpointDefault;
 }
 
 enum class TransportFormat
