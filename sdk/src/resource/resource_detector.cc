@@ -20,7 +20,7 @@ Resource OTELResourceDetector::Detect() noexcept
 
   exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_RESOURCE_ATTRIBUTES,
                                                                     attributes_str);
-  if (!exists || attributes_str.empty())
+  if (!exists)
   {
     return Resource();
   }
