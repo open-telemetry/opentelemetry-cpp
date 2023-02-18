@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [ETW Exporter]Support serialize span/log attributes into JSON
+  [#1991](https://github.com/open-telemetry/opentelemetry-cpp/pull/1991)
 * Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
 * Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
 * [BUILD] Build OpenTelemetry SDK and exporters into DLL
