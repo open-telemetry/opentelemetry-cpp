@@ -78,7 +78,7 @@ void CleanupMetrics()
 int main(int argc, char **argv)
 {
   std::string example_type;
-  std::string addr{"localhost:8080"};
+  std::string addr{"localhost:9464"};
   if (argc == 1)
   {
     std::puts("usage: $prometheus_example <example type> <url>");

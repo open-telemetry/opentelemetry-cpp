@@ -15,9 +15,12 @@ const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
-  auto attributes_str =
-      opentelemetry::sdk::common::GetEnvironmentVariable(OTEL_RESOURCE_ATTRIBUTES);
-  if (attributes_str.size() == 0)
+  std::string attributes_str;
+  bool exists;
+
+  exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_RESOURCE_ATTRIBUTES,
+                                                                    attributes_str);
+  if (!exists)
   {
     return Resource();
   }

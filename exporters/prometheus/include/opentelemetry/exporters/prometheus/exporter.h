@@ -33,8 +33,11 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
   constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
 
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kPrometheusEndpointEnv);
-  return endpoint.size() ? endpoint : kPrometheusEndpointDefault;
+  std::string endpoint;
+
+  auto exists =
+      opentelemetry::sdk::common::GetStringEnvironmentVariable(kPrometheusEndpointEnv, endpoint);
+  return exists ? endpoint : kPrometheusEndpointDefault;
 }
 
 /**

@@ -40,6 +40,8 @@ public:
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
 
+  virtual ~TracerContext() = default;
+
   /**
    * Attaches a span processor to list of configured processors to this tracer context.
    * Processor once attached can't be removed.

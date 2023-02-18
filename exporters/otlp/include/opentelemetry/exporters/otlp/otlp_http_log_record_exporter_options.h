@@ -28,7 +28,7 @@ struct OtlpHttpLogRecordExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpLogEndpoint();
+  std::string url = GetOtlpDefaultHttpLogsEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -45,10 +45,10 @@ struct OtlpHttpLogRecordExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogTimeout();
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogsTimeout();
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
+  OtlpHeaders http_headers = GetOtlpDefaultLogsHeaders();
 
 #  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
