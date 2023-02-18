@@ -871,7 +871,7 @@ public:
   {
     // don't override fields propagated from span data.
     if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
-        key == ETW_FILE_SPAN_PARENTID)
+        key == ETW_FIELD_SPAN_PARENTID)
     {
       return;
     }
