@@ -250,8 +250,36 @@ class Tracer : public opentelemetry::trace::Tracer,
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
-    Span &currentSpan   = const_cast<Span &>(span);
-    Properties evt      = GetSpanAttributes(currentSpan);
+    Span &currentSpan = const_cast<Span &>(span);
+    Properties evt    = GetSpanAttributes(currentSpan);
+
+#if defined(ENABLE_ENV_PROPERTIES)
+
+    Properties env_properties_env = {};
+    if (evt.size() > 0)
+    {
+      nlohmann::json env_properties_json = nlohmann::json::object();
+      for (auto &kv : evt)
+      {
+        nostd::string_view key = kv.first.data();
+        // don't override fields propagated from span data.
+        if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+            key == ETW_FIELD_SPAN_PARENTID)
+        {
+          env_properties_env[key.data()] = kv.second;
+        }
+        else
+        {
+          utils::PopulateAttribute(env_properties_json, key, kv.second);
+        }
+      }
+      env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+
+      evt = std::move(env_properties_env);
+    }
+
+#endif  // defined(ENABLE_ENV_PROPERTIES)
+
     evt[ETW_FIELD_NAME] = GetName(span);
 
     if (cfg.enableSpanId)

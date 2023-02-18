@@ -222,12 +222,43 @@ public:
   virtual void Log(opentelemetry::logs::Severity severity,
                    nostd::string_view name,
                    nostd::string_view body,
-                   Properties &evt,
+                   Properties &input_evt,
                    opentelemetry::trace::TraceId trace_id,
                    opentelemetry::trace::SpanId span_id,
                    opentelemetry::trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
+#  if defined(ENABLE_ENV_PROPERTIES)
+
+    Properties env_properties_env = {};
+    if (input_evt.size() > 0)
+    {
+      nlohmann::json env_properties_json = nlohmann::json::object();
+      for (auto &kv : input_evt)
+      {
+        nostd::string_view key = kv.first.data();
+        // don't override fields propagated from span data.
+        if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+            key == ETW_FIELD_SPAN_PARENTID)
+        {
+          env_properties_env[key.data()] = kv.second;
+        }
+        else
+        {
+          utils::PopulateAttribute(env_properties_json, key, kv.second);
+        }
+      }
+      env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+    }
+
+    Properties &evt = env_properties_env;
+
+#  else
+
+    Properties &evt = input_evt;
+
+#  endif  // defined(ENABLE_ENV_PROPERTIES)
+
     // Populate Etw.EventName attribute at envelope level
     evt[ETW_FIELD_NAME] = ETW_VALUE_LOG;
 
