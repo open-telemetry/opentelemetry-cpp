@@ -237,7 +237,8 @@ public:
       for (auto &kv : input_evt)
       {
         nostd::string_view key = kv.first.data();
-        // don't override fields propagated from span data.
+
+        // don't serialize fields propagated from span data.
         if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
             key == ETW_FIELD_SPAN_PARENTID)
         {
