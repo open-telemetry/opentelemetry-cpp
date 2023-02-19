@@ -49,7 +49,8 @@ void CleanupTracer()
 void InitLogger()
 {
   // Create ostream log exporter instance
-  auto exporter  = std::unique_ptr<logs_sdk::LogRecordExporter>(new logs_exporter::OStreamLogRecordExporter);
+  auto exporter =
+      std::unique_ptr<logs_sdk::LogRecordExporter>(new logs_exporter::OStreamLogRecordExporter);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   std::shared_ptr<logs_api::LoggerProvider> provider(
       logs_sdk::LoggerProviderFactory::Create(std::move(processor)));

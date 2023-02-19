@@ -15,9 +15,8 @@ if(WITH_LOGS_PREVIEW)
   if(DEFINED OPENTELEMETRY_BUILD_DLL)
     target_link_libraries(example_logs_simple opentelemetry_cpp)
   else()
-    target_link_libraries(example_logs_simple opentelemetry_trace
-                          opentelemetry_logs
-                          opentelemetry_exporter_ostream_span
-                          opentelemetry_exporter_ostream_logs)
+    target_link_libraries(
+      example_logs_simple opentelemetry_trace opentelemetry_logs
+      opentelemetry_exporter_ostream_span opentelemetry_exporter_ostream_logs)
   endif()
 endif()

@@ -13,7 +13,7 @@ cc_binary(
     deps = [
         "//api",
         "//examples/common/logs_foo_library:common_logs_foo_library",
-        "//exporters/ostream:ostream_span_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
+        "//exporters/ostream:ostream_span_exporter",
     ],
 )
