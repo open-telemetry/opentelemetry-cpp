@@ -22,6 +22,18 @@ cc_library(
 )
 
 cc_library(
+    name = "env_variables",
+    srcs = [
+        "env_variables.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:global_log_handler",
+    ],
+)
+
+cc_library(
     name = "global_log_handler",
     srcs = [
         "global_log_handler.cc",
