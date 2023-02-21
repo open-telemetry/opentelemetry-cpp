@@ -46,7 +46,7 @@ public:
     return result;
   }
 
-  bool isPresent(nostd::string_view key) const noexcept override { return true; }
+  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
 };
 
 /**

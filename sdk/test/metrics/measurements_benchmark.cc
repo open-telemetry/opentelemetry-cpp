@@ -62,7 +62,6 @@ void BM_MeasurementsTest(benchmark::State &state)
       return true;
     });
   };
-  constexpr int NUM_CORES           = 1;
   constexpr size_t MAX_MEASUREMENTS = 1000000;
   std::atomic<long long> measurements_processed{0l};
   while (state.KeepRunning())
