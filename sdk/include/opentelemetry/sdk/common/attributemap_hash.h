@@ -7,6 +7,23 @@
 #include <string>
 #include "opentelemetry/sdk/common/attribute_utils.h"
 
+#define OTEL_IS_BIT_SET(var, bit) ((var & (1 << bit)) != 0)  // true if bit is set, false otherwise
+#define OTEL_SETBIT(var, bit) (var |= (1 << bit))
+#define OTEL_RESETBIT(var, bit) (var &= (0 << bit))
+
+#if 0
+namespace std {
+  template <> struct hash<opentelemetry::nostd::string_view>
+  {
+    size_t operator()(const opentelemetry::nostd::string_view &s) const
+    {
+      return std::hash<std::string>()(s.data());
+      /* your code here, e.g. "return hash<int>()(x.value);" */
+    }
+  };
+}
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -14,7 +31,7 @@ namespace common
 {
 
 template <class T>
-inline void GetHashForAttributeValue(size_t &seed, const T arg)
+inline void GetHashForAttributeValue(size_t &seed, const T &arg)
 {
   std::hash<T> hasher;
   // reference -
@@ -55,6 +72,38 @@ inline size_t GetHashForAttributeMap(const OrderedAttributeMap &attribute_map)
     nostd::visit(GetHashForAttributeValueVisitor(seed), kv.second);
   }
   return seed;
+}
+
+// Calculate hash of keys and values of KeyValueIterable, filtered using  callback.
+inline size_t GetHashForAttributeMap(
+    const opentelemetry::common::KeyValueIterable &attributes,
+    nostd::function_ref<bool(nostd::string_view)> is_key_present_callback)
+{
+  AttributeConverter converter;
+  size_t seed  = 0UL;
+  size_t index = 0;
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        if (!is_key_present_callback(key))
+        {
+          return true;
+        }
+        std::hash<std::string> hasher;
+        // reference -
+        // https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
+        seed ^= hasher(key.data()) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        auto attr_val = nostd::visit(converter, value);
+        nostd::visit(GetHashForAttributeValueVisitor(seed), attr_val);
+        return true;
+      });
+  return seed;
+}
+
+template <class T>
+inline size_t GetHash(T value)
+{
+  std::hash<T> hasher;
+  return hasher(value);
 }
 
 }  // namespace common
