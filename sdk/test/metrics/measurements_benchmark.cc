@@ -47,12 +47,12 @@ void BM_MeasurementsTest(benchmark::State &state)
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
   constexpr size_t MAX_MEASUREMENTS    = 1000000;
   constexpr size_t POSSIBLE_ATTRIBUTES = 1000;
-  std::map<std::string, size_t> attributes[POSSIBLE_ATTRIBUTES];
+  std::map<std::string, uint64_t> attributes[POSSIBLE_ATTRIBUTES];
   size_t total_index = 0;
-  for (size_t i = 0; i < 10; i++)
+  for (uint64_t i = 0; i < 10; i++)
   {
-    for (size_t j = 0; j < 10; j++)
-      for (size_t k = 0; k < 10; k++)
+    for (uint64_t j = 0; j < 10; j++)
+      for (uint64_t k = 0; k < 10; k++)
         attributes[total_index++] = {{"dim1", i}, {"dim2", j}, {"dim3", k}};
   }
   while (state.KeepRunning())
