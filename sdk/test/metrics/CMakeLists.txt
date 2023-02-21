@@ -50,6 +50,11 @@ if(WITH_BENCHMARK)
     histogram_aggregation_benchmark benchmark::benchmark
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common opentelemetry_metrics
     opentelemetry_resources)
+
+  add_executable(measurements_benchmark measurements_benchmark.cc)
+  target_link_libraries(
+    measurements_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 endif()
 
 add_subdirectory(exemplar)
