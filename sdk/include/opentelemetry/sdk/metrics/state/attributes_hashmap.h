@@ -118,8 +118,8 @@ public:
     {
       return it->second.second.get();
     }
-
-    hash_map_[hash] = {{}, aggregation_callback()};
+    MetricAttributes attr{};
+    hash_map_[hash] = {attr, aggregation_callback()};
     return hash_map_[hash].second.get();
   }
 

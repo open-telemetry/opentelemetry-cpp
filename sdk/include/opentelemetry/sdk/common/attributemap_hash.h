@@ -62,8 +62,7 @@ inline size_t GetHashForAttributeMap(
     nostd::function_ref<bool(nostd::string_view)> is_key_present_callback)
 {
   AttributeConverter converter;
-  size_t seed  = 0UL;
-  size_t index = 0;
+  size_t seed = 0UL;
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
         if (!is_key_present_callback(key))
