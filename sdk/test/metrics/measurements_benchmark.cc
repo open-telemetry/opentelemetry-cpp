@@ -45,7 +45,6 @@ void BM_MeasurementsTest(benchmark::State &state)
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
-  std::vector<std::thread> collectionThreads;
   constexpr size_t MAX_MEASUREMENTS    = 1000000;
   constexpr size_t POSSIBLE_ATTRIBUTES = 1000;
   std::map<std::string, size_t> attributes[POSSIBLE_ATTRIBUTES];
@@ -61,7 +60,10 @@ void BM_MeasurementsTest(benchmark::State &state)
     for (size_t i = 0; i < MAX_MEASUREMENTS; i++)
     {
       size_t index = rand() % POSSIBLE_ATTRIBUTES;
-      h->Add(1.0, attributes[index], opentelemetry::context::Context{});
+      h->Add(1.0,
+             opentelemetry::common::KeyValueIterableView<std::map<std::string, size_t>>(
+                 attributes[index]),
+             opentelemetry::context::Context{});
     }
   }
   exporter->Collect([&](ResourceMetrics &rm) { return true; });
