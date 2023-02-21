@@ -112,8 +112,8 @@ public:
 
   Aggregation *GetOrSetDefault(std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
-    auto hash = opentelemetry::sdk::common::GetHash("");
-    auto it   = hash_map_.find(hash);
+    static size_t hash = opentelemetry::sdk::common::GetHash("");
+    auto it            = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
       return it->second.second.get();
@@ -202,8 +202,6 @@ public:
 private:
   std::unordered_map<size_t, std::pair<MetricAttributes, std::unique_ptr<Aggregation>>> hash_map_;
   const AttributesProcessor *attributes_processor_;
-
-  // std::unique_ptr<AttributeHashGenerator> attributes_hash_generator_;
 };
 }  // namespace metrics
 

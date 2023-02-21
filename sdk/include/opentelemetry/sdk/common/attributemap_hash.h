@@ -3,26 +3,8 @@
 
 #pragma once
 
-#include <iostream>
 #include <string>
 #include "opentelemetry/sdk/common/attribute_utils.h"
-
-#define OTEL_IS_BIT_SET(var, bit) ((var & (1 << bit)) != 0)  // true if bit is set, false otherwise
-#define OTEL_SETBIT(var, bit) (var |= (1 << bit))
-#define OTEL_RESETBIT(var, bit) (var &= (0 << bit))
-
-#if 0
-namespace std {
-  template <> struct hash<opentelemetry::nostd::string_view>
-  {
-    size_t operator()(const opentelemetry::nostd::string_view &s) const
-    {
-      return std::hash<std::string>()(s.data());
-      /* your code here, e.g. "return hash<int>()(x.value);" */
-    }
-  };
-}
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
