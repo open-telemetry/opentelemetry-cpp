@@ -45,39 +45,27 @@ void BM_MeasurementsTest(benchmark::State &state)
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
-  std::vector<SumPointData> actuals;
   std::vector<std::thread> collectionThreads;
-  std::function<void()> collectMetrics = [&exporter, &actuals]() {
-    exporter->Collect([&](ResourceMetrics &rm) {
-      for (const ScopeMetrics &smd : rm.scope_metric_data_)
-      {
-        for (const MetricData &md : smd.metric_data_)
-        {
-          for (const PointDataAttributes &dp : md.point_data_attr_)
-          {
-            actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
-          }
-        }
-      }
-      return true;
-    });
-  };
-  constexpr size_t MAX_MEASUREMENTS = 1000000;
-  std::atomic<long long> measurements_processed{0l};
+  constexpr size_t MAX_MEASUREMENTS    = 1000000;
+  constexpr size_t POSSIBLE_ATTRIBUTES = 1000;
+  std::map<std::string, size_t> attributes[POSSIBLE_ATTRIBUTES];
+  size_t total_index = 0;
+  for (size_t i = 0; i < 10; i++)
+  {
+    for (size_t j = 0; j < 10; j++)
+      for (size_t k = 0; k < 10; k++)
+        attributes[total_index++] = {{"dim1", i}, {"dim2", j}, {"dim3", k}};
+  }
   while (state.KeepRunning())
   {
-    measurements_processed = 0;
-    while (measurements_processed++ <= MAX_MEASUREMENTS)
+    for (size_t i = 0; i < MAX_MEASUREMENTS; i++)
     {
-      size_t val1 = rand() % 10;
-      size_t val2 = rand() % 10;
-      size_t val3 = rand() % 10;
-      h->Add(1.0, {{"dim1", val1}, {"dim2", val2}, {"dim3", val3}},
-             opentelemetry::context::Context{});
+      size_t index = rand() % POSSIBLE_ATTRIBUTES;
+      h->Add(1.0, attributes[index], opentelemetry::context::Context{});
     }
   }
+  exporter->Collect([&](ResourceMetrics &rm) { return true; });
 }
-
 BENCHMARK(BM_MeasurementsTest);
 
 }  // namespace
