@@ -231,7 +231,7 @@ public:
 #  if defined(ENABLE_ENV_PROPERTIES)
 
     Properties env_properties_env = {};
-    bool has_customer_attribute = false;
+    bool has_customer_attribute   = false;
     if (input_evt.size() > 0)
     {
       nlohmann::json env_properties_json = nlohmann::json::object();

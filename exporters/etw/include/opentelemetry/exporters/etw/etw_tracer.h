@@ -258,7 +258,7 @@ class Tracer : public opentelemetry::trace::Tracer,
     Properties env_properties_env = {};
     if (evt.size() > 0)
     {
-      bool has_customer_attribute = false;
+      bool has_customer_attribute        = false;
       nlohmann::json env_properties_json = nlohmann::json::object();
       for (auto &kv : evt)
       {
@@ -279,7 +279,7 @@ class Tracer : public opentelemetry::trace::Tracer,
       if (has_customer_attribute)
       {
         env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
-        evt = std::move(env_properties_env);
+        evt                                          = std::move(env_properties_env);
       }
     }
 
@@ -483,10 +483,9 @@ public:
     auto spanContext =
         std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
             traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), traceFlags, false,
-            sampling_result.trace_state
-                ? sampling_result.trace_state
-                : parentContext.IsValid() ? parentContext.trace_state()
-                                          : opentelemetry::trace::TraceState::GetDefault()));
+            sampling_result.trace_state ? sampling_result.trace_state
+            : parentContext.IsValid()   ? parentContext.trace_state()
+                                        : opentelemetry::trace::TraceState::GetDefault()));
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
