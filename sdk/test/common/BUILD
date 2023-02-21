@@ -163,3 +163,15 @@ otel_cc_benchmark(
         "//sdk:headers",
     ],
 )
+
+cc_test(
+    name = "env_var_test",
+    srcs = [
+        "env_var_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//sdk/src/common:env_variables",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

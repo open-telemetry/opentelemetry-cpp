@@ -870,7 +870,8 @@ public:
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
     // don't override fields propagated from span data.
-    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID)
+    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+        key == ETW_FIELD_SPAN_PARENTID)
     {
       return;
     }

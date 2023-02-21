@@ -10,7 +10,8 @@ foreach(
   circular_buffer_test
   attribute_utils_test
   attributemap_hash_test
-  global_log_handle_test)
+  global_log_handle_test
+  env_var_test)
 
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
