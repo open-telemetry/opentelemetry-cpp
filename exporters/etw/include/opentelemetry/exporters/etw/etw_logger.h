@@ -231,6 +231,7 @@ public:
 #  if defined(ENABLE_ENV_PROPERTIES)
 
     Properties env_properties_env = {};
+    bool has_customer_attribute = false;
     if (input_evt.size() > 0)
     {
       nlohmann::json env_properties_json = nlohmann::json::object();
@@ -247,12 +248,16 @@ public:
         else
         {
           utils::PopulateAttribute(env_properties_json, key, kv.second);
+          has_customer_attribute = true;
         }
       }
-      env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+      if (has_customer_attribute)
+      {
+        env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+      }
     }
 
-    Properties &evt = env_properties_env;
+    Properties &evt = has_customer_attribute ? env_properties_env : input_evt;
 
 #  else
 

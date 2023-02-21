@@ -258,6 +258,7 @@ class Tracer : public opentelemetry::trace::Tracer,
     Properties env_properties_env = {};
     if (evt.size() > 0)
     {
+      bool has_customer_attribute = false;
       nlohmann::json env_properties_json = nlohmann::json::object();
       for (auto &kv : evt)
       {
@@ -272,11 +273,14 @@ class Tracer : public opentelemetry::trace::Tracer,
         else
         {
           utils::PopulateAttribute(env_properties_json, key, kv.second);
+          has_customer_attribute = true;
         }
       }
-      env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
-
-      evt = std::move(env_properties_env);
+      if (has_customer_attribute)
+      {
+        env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+        evt = std::move(env_properties_env);
+      }
     }
 
 #endif  // defined(ENABLE_ENV_PROPERTIES)
