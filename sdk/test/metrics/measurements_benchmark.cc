@@ -66,7 +66,7 @@ void BM_MeasurementsTest(benchmark::State &state)
              opentelemetry::context::Context{});
     }
   }
-  exporter->Collect([&](ResourceMetrics &rm) { return true; });
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
 }
 BENCHMARK(BM_MeasurementsTest);
 
