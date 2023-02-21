@@ -19,7 +19,7 @@ TEST(AttributeMapHashTest, BasicTests)
   }
 
   {
-    // hashmap algo is order insensitive.
+    // hash algo returns same value irrespective of order of attributes.
     OrderedAttributeMap map1 = {{"k1", 10}, {"k2", true}, {"k3", 12.22}};
     OrderedAttributeMap map2 = {{"k3", 12.22}, {"k1", 10}, {"k2", true}};
     EXPECT_TRUE(GetHashForAttributeMap(map1) == GetHashForAttributeMap(map2));
@@ -32,7 +32,7 @@ TEST(AttributeMapHashTest, BasicTests)
   }
 
   {
-    // true is treated as `1`, and false as `0` with hashmap algo.
+    // true is treated as `1`, and false as `0` with hash algo.
     OrderedAttributeMap map1 = {{"k1", 1}, {"k2", true}, {"k3", 1}};
     OrderedAttributeMap map2 = {{"k2", 1}, {"k1", true}, {"k3", true}};
     EXPECT_TRUE(GetHashForAttributeMap(map1) == GetHashForAttributeMap(map2));

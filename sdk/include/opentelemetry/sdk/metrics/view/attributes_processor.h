@@ -5,10 +5,6 @@
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
 
-#define OTEL_IS_BIT_SET(var, bit) ((var & (1 << bit)) != 0)  // true if bit is set, false otherwise
-#define OTEL_SETBIT(var, bit) (var |= (1 << bit))
-#define OTEL_RESETBIT(var, bit) (var &= (0 << bit))
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

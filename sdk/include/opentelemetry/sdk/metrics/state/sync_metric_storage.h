@@ -75,7 +75,6 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
 #endif
-    // auto keys_to_ignore = attributes_processor_->process(attributes);
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_)->Aggregate(value);
   }
@@ -112,7 +111,6 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
 #endif
-    // auto keys_to_ignore = attributes_processor_->process(attributes);
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
     attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_)->Aggregate(value);
   }
@@ -125,7 +123,6 @@ public:
 
 private:
   InstrumentDescriptor instrument_descriptor_;
-
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   // unreported metrics stash for all the collectors
