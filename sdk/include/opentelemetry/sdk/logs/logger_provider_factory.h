@@ -24,7 +24,7 @@ namespace logs
 /**
  * Factory class for LoggerProvider.
  */
-class LoggerProviderFactory
+class OPENTELEMETRY_EXPORT LoggerProviderFactory
 {
 public:
   /**

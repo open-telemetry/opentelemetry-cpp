@@ -521,6 +521,17 @@ endif()
 
 include(CMakePackageConfigHelpers)
 
+if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(NOT MSVC)
+    message(WARNING "Build DLL is supposed to work with MSVC!")
+  endif()
+  if(WITH_STL)
+    message(
+      WARNING "Build DLL with C++ STL could cause binary incompatibility!")
+  endif()
+  add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
+endif()
+
 include_directories(api/include)
 
 add_subdirectory(api)

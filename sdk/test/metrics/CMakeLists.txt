@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(metrics_common_test_utils common.cc)
 target_link_libraries(metrics_common_test_utils opentelemetry_metrics)
 

@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 @echo off
 REM +-------------------------------------------------------------------+
 REM | Autodetect and set up the build environment.                      |

@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.17.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.18.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -754,7 +754,7 @@ static constexpr const char *kGcpCloudFunctions = "gcp_cloud_functions";
 /** Google Cloud App Engine (GAE). */
 static constexpr const char *kGcpAppEngine = "gcp_app_engine";
 /** Red Hat OpenShift on Google Cloud. */
-static constexpr const char *kGoogleCloudOpenshift = "google_cloud_openshift";
+static constexpr const char *kGcpOpenshift = "gcp_openshift";
 /** Red Hat OpenShift on IBM Cloud. */
 static constexpr const char *kIbmCloudOpenshift = "ibm_cloud_openshift";
 /** Tencent Cloud Cloud Virtual Machine (CVM). */
