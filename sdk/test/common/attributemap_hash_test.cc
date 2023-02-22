@@ -30,12 +30,4 @@ TEST(AttributeMapHashTest, BasicTests)
     OrderedAttributeMap map1 = {};
     EXPECT_TRUE(GetHashForAttributeMap(map1) == 0);
   }
-
-  {
-    // true is treated as `1`, and false as `0` with hash algo.
-    OrderedAttributeMap map1 = {{"k1", 1}, {"k2", true}, {"k3", 1}};
-    OrderedAttributeMap map2 = {{"k2", 1}, {"k1", true}, {"k3", true}};
-    EXPECT_TRUE(GetHashForAttributeMap(map1) == GetHashForAttributeMap(map2));
-    EXPECT_TRUE(GetHashForAttributeMap(map1) != 0);
-  }
 }

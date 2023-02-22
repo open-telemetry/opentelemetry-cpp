@@ -47,12 +47,12 @@ void BM_MeasurementsTest(benchmark::State &state)
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
   constexpr size_t MAX_MEASUREMENTS    = 10000;  // keeping low value to avoid the CI timeouts.
   constexpr size_t POSSIBLE_ATTRIBUTES = 1000;
-  std::map<std::string, size_t> attributes[POSSIBLE_ATTRIBUTES];
+  std::map<std::string, uint32_t> attributes[POSSIBLE_ATTRIBUTES];
   size_t total_index = 0;
-  for (size_t i = 0; i < 10; i++)
+  for (uint32_t i = 0; i < 10; i++)
   {
-    for (size_t j = 0; j < 10; j++)
-      for (size_t k = 0; k < 10; k++)
+    for (uint32_t j = 0; j < 10; j++)
+      for (uint32_t k = 0; k < 10; k++)
         attributes[total_index++] = {{"dim1", i}, {"dim2", j}, {"dim3", k}};
   }
   while (state.KeepRunning())
@@ -61,7 +61,7 @@ void BM_MeasurementsTest(benchmark::State &state)
     {
       size_t index = rand() % POSSIBLE_ATTRIBUTES;
       h->Add(1.0,
-             opentelemetry::common::KeyValueIterableView<std::map<std::string, size_t>>(
+             opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
                  attributes[index]),
              opentelemetry::context::Context{});
     }
