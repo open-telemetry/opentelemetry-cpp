@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(opentelemetry_exporter_elasticsearch_logs
             src/es_log_record_exporter.cc src/es_log_recordable.cc)
 

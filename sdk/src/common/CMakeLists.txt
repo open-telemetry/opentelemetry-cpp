@@ -1,4 +1,7 @@
-set(COMMON_SRCS random.cc core.cc global_log_handler.cc)
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+set(COMMON_SRCS random.cc core.cc global_log_handler.cc env_variables.cc)
 if(WIN32)
   list(APPEND COMMON_SRCS platform/fork_windows.cc)
 else()

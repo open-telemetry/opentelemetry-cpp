@@ -21,7 +21,7 @@ namespace logs
 /**
  * Factory class for BatchLogRecordProcessor.
  */
-class BatchLogRecordProcessorFactory
+class OPENTELEMETRY_EXPORT BatchLogRecordProcessorFactory
 {
 public:
   /**

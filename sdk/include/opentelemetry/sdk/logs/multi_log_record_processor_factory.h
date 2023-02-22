@@ -19,7 +19,7 @@ namespace logs
 /**
  * Factory class for MultiLogRecordProcessor.
  */
-class MultiLogRecordProcessorFactory
+class OPENTELEMETRY_EXPORT MultiLogRecordProcessorFactory
 {
 public:
   static std::unique_ptr<LogRecordProcessor> Create(

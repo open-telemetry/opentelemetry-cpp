@@ -1,3 +1,6 @@
+REM Copyright The OpenTelemetry Authors
+REM SPDX-License-Identifier: Apache-2.0
+
 REM Build with Visual Studio 2017
 set "BUILDTOOLS_VERSION=vs2017"
 set ARCH=x64
