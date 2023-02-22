@@ -1,7 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <memory>
+#include "common.h"
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
@@ -11,28 +12,12 @@
 
 #include <gtest/gtest.h>
 #include <map>
+#include <memory>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 using M         = std::map<std::string, std::string>;
 namespace nostd = opentelemetry::nostd;
-
-class MockCollectorHandle : public CollectorHandle
-{
-public:
-  MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
-
-  ~MockCollectorHandle() override = default;
-
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) noexcept override
-  {
-    return temporality;
-  }
-
-private:
-  AggregationTemporality temporality;
-};
 
 class WritableMetricStorageHistogramTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>

@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 #include <benchmark/benchmark.h>
+#include <memory>
 #include <random>
 
 using namespace opentelemetry;
@@ -19,7 +20,7 @@ using namespace opentelemetry::sdk::metrics;
 
 namespace
 {
-void BM_HistogramAggregation(benchmark::State &state)
+void BM_SumAggregation(benchmark::State &state)
 {
   MeterProvider mp;
   auto m = mp.GetMeter("meter1", "version1", "schema1");
@@ -27,7 +28,7 @@ void BM_HistogramAggregation(benchmark::State &state)
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
-  auto h = m->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
+  auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(0, 1000000);
   // Generate 100000 measurements
@@ -37,7 +38,7 @@ void BM_HistogramAggregation(benchmark::State &state)
   {
     measurements[i] = (double)distribution(generator);
   }
-  std::vector<HistogramPointData> actuals;
+  std::vector<SumPointData> actuals;
   std::vector<std::thread> collectionThreads;
   std::function<void()> collectMetrics = [&reader, &actuals]() {
     reader->Collect([&](ResourceMetrics &rm) {
@@ -47,7 +48,7 @@ void BM_HistogramAggregation(benchmark::State &state)
         {
           for (const PointDataAttributes &dp : md.point_data_attr_)
           {
-            actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+            actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
           }
         }
       }
@@ -59,20 +60,20 @@ void BM_HistogramAggregation(benchmark::State &state)
   {
     for (size_t i = 0; i < TOTAL_MEASUREMENTS; i++)
     {
-      h->Record(measurements[i], {});
+      h->Add(measurements[i], {});
       if (i % 1000 == 0 || i == TOTAL_MEASUREMENTS - 1)
       {
         collectMetrics();
       }
-      if (i == 100)
+      if (i == 500)
       {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(4));
+        std::this_thread::sleep_for(std::chrono::nanoseconds(2));
       }
     }
   }
 }
 
-BENCHMARK(BM_HistogramAggregation);
+BENCHMARK(BM_SumAggregation);
 
 }  // namespace
 BENCHMARK_MAIN();
