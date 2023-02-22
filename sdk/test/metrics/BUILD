@@ -331,18 +331,18 @@ otel_cc_benchmark(
     ],
 )
 
-#otel_cc_benchmark(
-#    name = "measurements_benchmark",
-#    srcs = [
-#        "measurements_benchmark.cc",
-#    ],
-#    tags = [
-#        "benchmark",
-#        "metrics",
-#        "test",
-#    ],
-#    deps = [
-#        "//sdk/src/metrics",
-#        "//sdk/src/resource",
-#    ],
-#)
+otel_cc_benchmark(
+    name = "measurements_benchmark",
+    srcs = [
+        "measurements_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)

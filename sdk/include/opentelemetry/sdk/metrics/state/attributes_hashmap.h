@@ -35,16 +35,23 @@ public:
 class AttributesHashMap
 {
 public:
-  AttributesHashMap(
-      const AttributesProcessor *attributes_processor = new DefaultAttributesProcessor())
+  AttributesHashMap(const AttributesProcessor *attributes_processor = nullptr)
       : attributes_processor_{attributes_processor}
   {}
 
   Aggregation *Get(const opentelemetry::common::KeyValueIterable &attributes) const
   {
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes,
-        [this](nostd::string_view key) { return attributes_processor_->isPresent(key); });
+        attributes, [this](nostd::string_view key) {
+          if (attributes_processor_)
+          {
+            return attributes_processor_->isPresent(key);
+          }
+          else
+          {
+            return true;
+          }
+        });
 
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
@@ -95,8 +102,16 @@ public:
   {
 
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes,
-        [this](nostd::string_view key) { return attributes_processor_->isPresent(key); });
+        attributes, [this](nostd::string_view key) {
+          if (attributes_processor_)
+          {
+            return attributes_processor_->isPresent(key);
+          }
+          else
+          {
+            return true;
+          }
+        });
 
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
@@ -147,8 +162,16 @@ public:
            std::unique_ptr<Aggregation> aggr)
   {
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes,
-        [this](nostd::string_view key) { return attributes_processor_->isPresent(key); });
+        attributes, [this](nostd::string_view key) {
+          if (attributes_processor_)
+          {
+            return attributes_processor_->isPresent(key);
+          }
+          else
+          {
+            return true;
+          }
+        });
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
