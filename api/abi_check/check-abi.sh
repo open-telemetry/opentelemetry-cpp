@@ -13,7 +13,7 @@ export INSTALL_PREFIX=/usr/local
 
 export PATH=${INSTALL_PREFIX}/bin:$PATH
 
-${CC} -g -Og -I ../include -c abi_check_trace.cc -o abi_check_trace.o
+${CXX} -g -Og -I ../include -c abi_check_trace.cc -o abi_check_trace.o
 
 abi-dumper -lver 1 abi_check_trace.o -o abi_check_trace-v1.dump
 abi-dumper -lver latest abi_check_trace.o -o abi_check_trace-vlatest.dump
