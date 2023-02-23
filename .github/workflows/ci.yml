@@ -518,9 +518,9 @@ jobs:
       run: ./api/check-abi.sh
     - name: upload check abi report
       uses: actions/upload-artifact@v3
-        with:
-          name: abi_check_result
-          path: api/abi_check/
+      with:
+        name: abi_check_result
+        path: api/abi_check/
 
   windows:
     name: CMake -> exporter proto
