@@ -510,7 +510,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-      run: ./tools/setup-abi-check.sh
+      run: sudo -E ./tools/setup-abi-check.sh
     - name: check abi
       env:
         CC: /usr/bin/gcc-12
