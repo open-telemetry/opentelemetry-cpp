@@ -289,6 +289,27 @@ jobs:
       run: ./ci/do_ci.sh format
 
 
+  abi_check:
+    name: ABI check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: setup abi check
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: sudo -E ./tools/setup-abi-check.sh
+    - name: check abi
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: (cd ./api/abi_check; ./check-abi.sh)
+    - name: upload check abi report
+      uses: actions/upload-artifact@v3
+      with:
+        name: abi_check_result
+        path: api/abi_check/
+
   windows:
     name: CMake -> exporter proto
     runs-on: windows-2019
