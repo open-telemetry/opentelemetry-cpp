@@ -58,3 +58,6 @@ tags
 
 # Temporary dir used when generating semconv
 ./buildscripts/semantic-convention/opentelemetry-specification
+
+# ABI reports
+api/abi_check/compat_reports/*

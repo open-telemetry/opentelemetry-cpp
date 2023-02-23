@@ -6,17 +6,30 @@
 set -e
 
 #
-# This script installs latest ABI tools on Linux machine
+# This script collects ABI and compare with previous releases
 #
 
 export INSTALL_PREFIX=/usr/local
 
 export PATH=${INSTALL_PREFIX}/bin:$PATH
 
-${CXX} -g -Og -I ../include -c abi_check_trace.cc -o abi_check_trace.o
+export CXX_ABI_FLAGS="-g -Og"
 
-abi-dumper -lver 1 abi_check_trace.o -o abi_check_trace-v1.dump
+${CXX} ${CXX_ABI_FLAGS} -I ../include -c abi_check_baggage.cc -o abi_check_baggage.o
+${CXX} ${CXX_ABI_FLAGS} -I ../include -c abi_check_trace.cc -o abi_check_trace.o
+
 abi-dumper -lver latest abi_check_trace.o -o abi_check_trace-vlatest.dump
+abi-dumper -lver latest abi_check_baggage.o -o abi_check_baggage-vlatest.dump
 
-abi-compliance-checker -l trace --old abi_check_trace-v1.dump --new abi_check_trace-vlatest.dump
+#
+# Do not fail CI,
+# Allow to download dumps and reports for investigation
+#
 
+set +e
+
+abi-compliance-checker -l trace --old abi_check_trace-v1.0.0.dump --new abi_check_trace-vlatest.dump
+
+abi-compliance-checker -l baggage --old abi_check_baggage-v1.0.0.dump --new abi_check_baggage-vlatest.dump
+
+echo "Done"
