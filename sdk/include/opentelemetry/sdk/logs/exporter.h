@@ -48,6 +48,12 @@ public:
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
   /**
+   * Force flush the log records pushed into this log exporter.
+   */
+  virtual bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+
+  /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
    * Shutdown should be called only once for each Exporter instance.
    * @param timeout minimum amount of microseconds to wait for shutdown before giving up and

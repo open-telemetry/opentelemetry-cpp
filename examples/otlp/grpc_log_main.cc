@@ -11,6 +11,11 @@
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
 
+// sdk::TracerProvider and sdk::LoggerProvider is just used to call ForceFlush and prevent to cancle
+// running exportings when destroy and shutdown exporters.It's optional to users.
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
+
 #  include <string>
 
 #  ifdef BAZEL_BUILD
@@ -42,6 +47,14 @@ void InitTracer()
 
 void CleanupTracer()
 {
+  // We call ForceFlush to prevent to cancel running exportings, It's optional.
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace::Provider::GetTracerProvider();
+  if (provider)
+  {
+    static_cast<trace_sdk::TracerProvider *>(provider.get())->ForceFlush();
+  }
+
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace::Provider::SetTracerProvider(none);
 }
@@ -59,6 +72,14 @@ void InitLogger()
 
 void CleanupLogger()
 {
+  // We call ForceFlush to prevent to cancel running exportings, It's optional.
+  opentelemetry::nostd::shared_ptr<logs::LoggerProvider> provider =
+      logs::Provider::GetLoggerProvider();
+  if (provider)
+  {
+    static_cast<logs_sdk::LoggerProvider *>(provider.get())->ForceFlush();
+  }
+
   nostd::shared_ptr<logs::LoggerProvider> none;
   opentelemetry::logs::Provider::SetLoggerProvider(none);
 }

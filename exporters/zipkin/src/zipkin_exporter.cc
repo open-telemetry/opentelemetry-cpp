@@ -110,6 +110,11 @@ void ZipkinExporter::InitializeLocalEndpoint()
   local_end_point_["port"] = url_parser_.port_;
 }
 
+bool ZipkinExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  return true;
+}
+
 bool ZipkinExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

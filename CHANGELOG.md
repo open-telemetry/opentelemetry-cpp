@@ -21,6 +21,8 @@ Increment the:
   [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
 * [BUILD] Restore detfault value of `OPENTELEMETRY_INSTALL` to `ON` when it's on
   top level.[#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
 
 Important changes:
 
@@ -95,6 +97,13 @@ Important changes:
   [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
 * [EXPORTER] Opentracing shim
   [#1909](https://github.com/open-telemetry/opentelemetry-cpp/pull/1909)
+
+Important changes:
+
+* `LogRecordExporter` and `SpanExporter` add a new pure virtual function
+  `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+  `SpanExporter`, they should also implement this function.There should be no
+  influence if users only use factory to create exporters.
 
 ## [1.8.2] 2023-01-31
 
