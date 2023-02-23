@@ -56,7 +56,7 @@ inline size_t GetHashForAttributeMap(const OrderedAttributeMap &attribute_map)
   return seed;
 }
 
-// Calculate hash of keys and values of KeyValueIterable, filtered using  callback.
+// Calculate hash of keys and values of KeyValueIterable, filtered using callback.
 inline size_t GetHashForAttributeMap(
     const opentelemetry::common::KeyValueIterable &attributes,
     nostd::function_ref<bool(nostd::string_view)> is_key_present_callback)
