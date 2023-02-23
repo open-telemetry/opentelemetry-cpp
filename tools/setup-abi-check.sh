@@ -21,7 +21,7 @@ echo "Installing libelf-dev ..."
 echo ""
 
 apt update
-apt install -y --no-install-recommends libelf-dev
+apt install -y --no-install-recommends libelf-dev elfutils
 
 echo "Cloning vtable-dumper ..."
 echo ""
