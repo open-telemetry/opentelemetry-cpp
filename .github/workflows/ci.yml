@@ -515,7 +515,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-      run: ./api/abi_check/check-abi.sh
+      run: (cd ./api/abi_check; ./check-abi.sh)
     - name: upload check abi report
       uses: actions/upload-artifact@v3
       with:

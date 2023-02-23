@@ -1,4 +1,13 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
+/*
+  Keep includes in the same order as:
+  - cd api/include
+  - find . -name "*.h"
+*/
+
+// clang-format off
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/detail/hex.h"
@@ -23,11 +32,12 @@
 #include "opentelemetry/trace/semantic_conventions.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
+// clang-format on
 
-void do_abi_check_trace() {
-  auto p = opentelemetry::trace::Provider::GetTracerProvider();
+void do_abi_check_trace()
+{
+  auto p      = opentelemetry::trace::Provider::GetTracerProvider();
   auto tracer = p->GetTracer("abi");
-  auto span = tracer->StartSpan("abi");
+  auto span   = tracer->StartSpan("abi");
   span->End();
 }
-
