@@ -501,6 +501,27 @@ jobs:
     - name: check copyright
       run: ./tools/check_copyright.sh
 
+  abi_check:
+    name: ABI check
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: setup abi check
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: ./tools/setup-abi-check.sh
+    - name: check abi
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: ./api/check-abi.sh
+    - name: upload check abi report
+      uses: actions/upload-artifact@v3
+        with:
+          name: abi_check_result
+          path: api/abi_check/
+
   windows:
     name: CMake -> exporter proto
     runs-on: windows-2019
