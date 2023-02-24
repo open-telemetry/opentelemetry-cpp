@@ -34,7 +34,8 @@ public:
                         OPENTELEMETRY_MAYBE_UNUSED,
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
-        attributes_hashmap_(new AttributesHashMap(attributes_processor)),
+        attributes_hashmap_(new AttributesHashMap()),
+        attributes_processor_(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(exemplar_reservoir),
 #endif
@@ -58,8 +59,9 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
 #endif
+    static size_t hash = opentelemetry::sdk::common::GetHash("");
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
   }
 
   void RecordLong(int64_t value,
@@ -75,8 +77,21 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
 #endif
+    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
+        attributes, [this](nostd::string_view key) {
+          if (attributes_processor_)
+          {
+            return attributes_processor_->isPresent(key);
+          }
+          else
+          {
+            return true;
+          }
+        });
+
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_, hash)
+        ->Aggregate(value);
   }
 
   void RecordDouble(double value,
@@ -90,8 +105,9 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
 #endif
+    static size_t hash = opentelemetry::sdk::common::GetHash("");
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(create_default_aggregation_, hash)->Aggregate(value);
   }
 
   void RecordDouble(double value,
@@ -111,8 +127,20 @@ public:
     exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                           std::chrono::system_clock::now());
 #endif
+    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
+        attributes, [this](nostd::string_view key) {
+          if (attributes_processor_)
+          {
+            return attributes_processor_->isPresent(key);
+          }
+          else
+          {
+            return true;
+          }
+        });
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
-    attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_)->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault(attributes, create_default_aggregation_, hash)
+        ->Aggregate(value);
   }
 
   bool Collect(CollectorHandle *collector,
@@ -136,6 +164,7 @@ private:
 #endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
+  const AttributesProcessor *attributes_processor_;
 };
 
 }  // namespace metrics

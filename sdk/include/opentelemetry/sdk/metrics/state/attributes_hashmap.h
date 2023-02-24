@@ -35,36 +35,9 @@ public:
 class AttributesHashMap
 {
 public:
-  AttributesHashMap(const AttributesProcessor *attributes_processor = nullptr)
-      : attributes_processor_{attributes_processor}
-  {}
-
-  Aggregation *Get(const opentelemetry::common::KeyValueIterable &attributes) const
+  Aggregation *Get(size_t hash) const
   {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
-
     auto it = hash_map_.find(hash);
-    if (it != hash_map_.end())
-    {
-      return it->second.second.get();
-    }
-    return nullptr;
-  }
-
-  Aggregation *Get(const MetricAttributes &attributes) const
-  {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    auto it   = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
       return it->second.second.get();
@@ -76,21 +49,7 @@ public:
    * @return check if key is present in hash
    *
    */
-  bool Has(const opentelemetry::common::KeyValueIterable &attributes) const
-  {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes,
-        [this](nostd::string_view key) { return attributes_processor_->isPresent(key); });
-
-    return (hash_map_.find(hash) == hash_map_.end()) ? false : true;
-  }
-
-  bool Has(const MetricAttributes &attributes) const
-  {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-
-    return (hash_map_.find(hash) == hash_map_.end()) ? false : true;
-  }
+  bool Has(size_t hash) const { return (hash_map_.find(hash) == hash_map_.end()) ? false : true; }
 
   /**
    * @return the pointer to value for given key if present.
@@ -98,21 +57,9 @@ public:
    * value and store in the hash
    */
   Aggregation *GetOrSetDefault(const opentelemetry::common::KeyValueIterable &attributes,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
+                               size_t hash)
   {
-
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
-
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
@@ -125,10 +72,10 @@ public:
     return hash_map_[hash].second.get();
   }
 
-  Aggregation *GetOrSetDefault(std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+  Aggregation *GetOrSetDefault(std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
+                               size_t hash)
   {
-    static size_t hash = opentelemetry::sdk::common::GetHash("");
-    auto it            = hash_map_.find(hash);
+    auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
       return it->second.second.get();
@@ -139,10 +86,9 @@ public:
   }
 
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
-                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
+                               std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
+                               size_t hash)
   {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
@@ -159,19 +105,9 @@ public:
    * Set the value for given key, overwriting the value if already present
    */
   void Set(const opentelemetry::common::KeyValueIterable &attributes,
-           std::unique_ptr<Aggregation> aggr)
+           std::unique_ptr<Aggregation> aggr,
+           size_t hash)
   {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
-        attributes, [this](nostd::string_view key) {
-          if (attributes_processor_)
-          {
-            return attributes_processor_->isPresent(key);
-          }
-          else
-          {
-            return true;
-          }
-        });
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
@@ -184,10 +120,9 @@ public:
     }
   }
 
-  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr)
+  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr, size_t hash)
   {
-    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    auto it   = hash_map_.find(hash);
+    auto it = hash_map_.find(hash);
     if (it != hash_map_.end())
     {
       it->second.second = std::move(aggr);
@@ -220,11 +155,8 @@ public:
    */
   size_t Size() { return hash_map_.size(); }
 
-  const AttributesProcessor *GetAttributesProcessor() { return attributes_processor_; }
-
 private:
   std::unordered_map<size_t, std::pair<MetricAttributes, std::unique_ptr<Aggregation>>> hash_map_;
-  const AttributesProcessor *attributes_processor_;
 };
 }  // namespace metrics
 
