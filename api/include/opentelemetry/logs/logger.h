@@ -36,60 +36,6 @@ namespace logs
 class Logger
 {
 public:
-  /**
-   * Utility function to help to make a attribute view from initializer_list
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                     attributes) noexcept
-  {
-    return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-        attributes.begin(), attributes.end()};
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a span
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(
-      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a KeyValueIterable
-   *
-   * @param attributes
-   * @return common::KeyValueIterable
-   */
-  inline static const common::KeyValueIterable &MakeAttributes(
-      const common::KeyValueIterable &attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a key-value iterable object
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  template <
-      class ArgumentType,
-      nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
-  inline static common::KeyValueIterableView<ArgumentType> MakeAttributes(
-      const ArgumentType &arg) noexcept
-  {
-    return common::KeyValueIterableView<ArgumentType>(arg);
-  }
-
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */

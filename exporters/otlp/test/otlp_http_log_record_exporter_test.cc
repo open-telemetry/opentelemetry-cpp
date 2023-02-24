@@ -167,7 +167,7 @@ public:
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
-        opentelemetry::logs::Logger::MakeAttributes(
+        opentelemetry::common::MakeAttributes(
             {{"service.name", "unit_test_service"},
              {"tenant.id", "test_user"},
              {"bool_value", true},
@@ -278,7 +278,7 @@ public:
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
-        opentelemetry::logs::Logger::MakeAttributes(
+        opentelemetry::common::MakeAttributes(
             {{"service.name", "unit_test_service"},
              {"tenant.id", "test_user"},
              {"bool_value", true},
@@ -378,7 +378,7 @@ public:
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
-        opentelemetry::logs::Logger::MakeAttributes(
+        opentelemetry::common::MakeAttributes(
             {{"service.name", "unit_test_service"},
              {"tenant.id", "test_user"},
              {"bool_value", true},
@@ -479,7 +479,7 @@ public:
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
-        opentelemetry::logs::Logger::MakeAttributes(
+        opentelemetry::common::MakeAttributes(
             {{"service.name", "unit_test_service"},
              {"tenant.id", "test_user"},
              {"bool_value", true},
