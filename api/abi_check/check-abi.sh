@@ -7,6 +7,11 @@ set -e
 
 #
 # This script collects ABI and compare with previous releases
+# The following environment variables are expected to be set:
+# - CXX : path to the compiler to use
+# - ABI_VERSION : Name of the version tested (v1.2.3, latest)
+# - ABI_CXX_NAME : name of the compiler (gcc12, clang13)
+# - ABI_OS_NAME : name of the platform
 #
 
 export INSTALL_PREFIX=/usr/local
@@ -15,21 +20,16 @@ export PATH=${INSTALL_PREFIX}/bin:$PATH
 
 export CXX_ABI_FLAGS="-g -Og"
 
-echo "Compiling abi_check_baggage.cc ..."
+for TEST in `cat ABI_CHECK_LIST`
+do
 
-${CXX} ${CXX_ABI_FLAGS} -I ../include -c abi_check_baggage.cc -o abi_check_baggage.o
+echo "Compiling ${TEST}.cc with ${ABI_CXX_NAME} ..."
+${CXX} ${CXX_ABI_FLAGS} -I ../include -c ${TEST}.cc -o ${TEST}.o
 
-echo "Compiling abi_check_trace.cc ..."
+echo "Dumping ${TEST}.o for compiler ${ABI_CXX_NAME}, os ${ABI_OS_NAME}, version ${ABI_VERSION} ..."
+abi-dumper -lver ${ABI_VERSION} ${TEST}.o -o ${TEST}-${ABI_CXX_NAME}-${ABI_OS_NAME}-${ABI_VERSION}.dump
 
-${CXX} ${CXX_ABI_FLAGS} -I ../include -c abi_check_trace.cc -o abi_check_trace.o
-
-echo "Dumping abi_check_baggage.o ..."
-
-abi-dumper -lver latest abi_check_baggage.o -o abi_check_baggage-vlatest.dump
-
-echo "Dumping abi_check_trace.o ..."
-
-abi-dumper -lver latest abi_check_trace.o -o abi_check_trace-vlatest.dump
+done
 
 #
 # Do not fail CI,
@@ -38,13 +38,22 @@ abi-dumper -lver latest abi_check_trace.o -o abi_check_trace-vlatest.dump
 
 set +e
 
-echo "Checking compliance for abi_check_baggage ..."
+# TODO, compare abi
 
-abi-compliance-checker -l baggage --old abi_check_baggage-v1.0.0.dump --new abi_check_baggage-vlatest.dump
+for TEST in `cat ABI_CHECK_LIST`
+do
 
-echo "Checking compliance for abi_check_trace ..."
+echo "Checking compliance for ${TEST} ..."
 
-abi-compliance-checker -l trace --old abi_check_trace-v1.0.0.dump --new abi_check_trace-vlatest.dump
+export NEW_DUMP=${TEST}-${ABI_CXX_NAME}-${ABI_OS_NAME}-${ABI_VERSION}.dump
+
+for OLD_DUMP in `ls -1 ${TEST}-${ABI_CXX_NAME}-${ABI_OS_NAME}-*.dump`
+do
+  abi-compliance-checker -l ${TEST} --old ${OLD_DUMP} --new ${NEW_DUMP}
+done
+
+done
+
 
 # Return OK to CI
 echo "Done"
