@@ -36,9 +36,7 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
 {}
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options)
-    : options_(options),
-      log_service_stub_(
-          OtlpGrpcClient::MakeServiceStub<proto::collector::logs::v1::LogsService>(options))
+    : options_(options), log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
 {}
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
@@ -74,7 +72,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
   auto context = OtlpGrpcClient::MakeClientContext(options_);
   proto::collector::logs::v1::ExportLogsServiceResponse response;
 
-  grpc::Status status = log_service_stub_->Export(context.get(), request, &response);
+  grpc::Status status =
+      OtlpGrpcClient::DelegateExport(log_service_stub_.get(), context.get(), request, &response);
 
   if (!status.ok())
   {
