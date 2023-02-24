@@ -103,7 +103,6 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     lib = instrumentationscope::InstrumentationScope::Create(library_name, library_version,
                                                              schema_url, attributes);
   }
-  // TODO: attributes should be added into InstrumentationScope once it implement attributes.
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib), include_trace_context)));

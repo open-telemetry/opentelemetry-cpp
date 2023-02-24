@@ -95,8 +95,8 @@ TEST(ETWLogger, LoggerCheckWithAttributes)
   auto logger = lp.GetLogger(providerName, schema_url);
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", 2}};
-  EXPECT_NO_THROW(
-      logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug, opentelemetry::common::MakeAttributes(attribs)));
+  EXPECT_NO_THROW(logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug,
+                                        opentelemetry::common::MakeAttributes(attribs)));
 }
 
 #  endif  // _WIN32
