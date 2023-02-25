@@ -61,7 +61,7 @@ void BM_MeasurementsTest(benchmark::State &state)
   {
     threads.clear();
     std::atomic<size_t> cur_processed{0};
-    for (int i = 0; i < NUM_CORES; i++)
+    for (size_t i = 0; i < NUM_CORES; i++)
     {
       threads.push_back(
           std::thread([&h, &cur_processed, &MAX_MEASUREMENTS, &POSSIBLE_ATTRIBUTES, &attributes]() {
