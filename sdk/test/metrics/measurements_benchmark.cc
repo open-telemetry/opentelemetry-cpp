@@ -45,9 +45,9 @@ void BM_MeasurementsTest(benchmark::State &state)
   std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
   mp.AddMetricReader(exporter);
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
-  constexpr size_t MAX_MEASUREMENTS    = 10000;  // keep low to prevent CI failure due to timeout
-  constexpr size_t POSSIBLE_ATTRIBUTES = 1000;
-  constexpr size_t NUM_CORES           = 1;
+  size_t MAX_MEASUREMENTS    = 10000;  // keep low to prevent CI failure due to timeout
+  size_t POSSIBLE_ATTRIBUTES = 1000;
+  size_t NUM_CORES           = 1;
   std::vector<std::thread> threads;
   std::map<std::string, uint32_t> attributes[POSSIBLE_ATTRIBUTES];
   size_t total_index = 0;
@@ -63,16 +63,17 @@ void BM_MeasurementsTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(std::thread([&h, &cur_processed, &POSSIBLE_ATTRIBUTES, &attributes]() {
-        while (cur_processed++ <= MAX_MEASUREMENTS)
-        {
-          size_t index = rand() % POSSIBLE_ATTRIBUTES;
-          h->Add(1.0,
-                 opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
-                     attributes[index]),
-                 opentelemetry::context::Context{});
-        }
-      }));
+      threads.push_back(
+          std::thread([&h, &cur_processed, &MAX_MEASUREMENTS, &POSSIBLE_ATTRIBUTES, &attributes]() {
+            while (cur_processed++ <= MAX_MEASUREMENTS)
+            {
+              size_t index = rand() % POSSIBLE_ATTRIBUTES;
+              h->Add(1.0,
+                     opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
+                         attributes[index]),
+                     opentelemetry::context::Context{});
+            }
+          }));
     }
     for (auto &thread : threads)
     {
