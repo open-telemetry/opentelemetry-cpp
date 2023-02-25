@@ -20,6 +20,8 @@ namespace sdk
 namespace instrumentationscope
 {
 
+using InstrumentationScopeAttributes = opentelemetry::sdk::common::AttributeMap;
+
 class InstrumentationScope
 {
 public:
@@ -35,13 +37,12 @@ public:
    */
   static nostd::unique_ptr<InstrumentationScope> Create(
       nostd::string_view name,
-      nostd::string_view version    = "",
-      nostd::string_view schema_url = "",
-      ::std::initializer_list<
-          ::std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> attributes = {})
+      nostd::string_view version                  = "",
+      nostd::string_view schema_url               = "",
+      InstrumentationScopeAttributes &&attributes = {})
   {
     return nostd::unique_ptr<InstrumentationScope>(
-        new InstrumentationScope{name, version, schema_url, common::AttributeMap(attributes)});
+        new InstrumentationScope{name, version, schema_url, std::move(attributes)});
   }
 
   /**
@@ -56,10 +57,10 @@ public:
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
-      const opentelemetry::common::KeyValueIterable &attributes)
+      const InstrumentationScopeAttributes &attributes)
   {
-    return nostd::unique_ptr<InstrumentationScope>(
-        new InstrumentationScope{name, version, schema_url, common::AttributeMap(attributes)});
+    return nostd::unique_ptr<InstrumentationScope>(new InstrumentationScope{
+        name, version, schema_url, InstrumentationScopeAttributes(attributes)});
   }
 
   /**
@@ -123,7 +124,7 @@ public:
   const std::string &GetName() const noexcept { return name_; }
   const std::string &GetVersion() const noexcept { return version_; }
   const std::string &GetSchemaURL() const noexcept { return schema_url_; }
-  const common::AttributeMap &GetAttributes() const noexcept { return attributes_; }
+  const InstrumentationScopeAttributes &GetAttributes() const noexcept { return attributes_; }
 
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
@@ -134,8 +135,8 @@ public:
 private:
   InstrumentationScope(nostd::string_view name,
                        nostd::string_view version,
-                       nostd::string_view schema_url     = "",
-                       common::AttributeMap &&attributes = {})
+                       nostd::string_view schema_url               = "",
+                       InstrumentationScopeAttributes &&attributes = {})
       : name_(name), version_(version), schema_url_(schema_url), attributes_(std::move(attributes))
   {
     std::string hash_data;
@@ -152,7 +153,7 @@ private:
   std::string schema_url_;
   std::size_t hash_code_;
 
-  common::AttributeMap attributes_;
+  InstrumentationScopeAttributes attributes_;
 };
 
 }  // namespace instrumentationscope
