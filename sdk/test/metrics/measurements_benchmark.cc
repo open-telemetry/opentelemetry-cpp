@@ -63,17 +63,16 @@ void BM_MeasurementsTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(
-          std::thread([&h, &cur_processed, &MAX_MEASUREMENTS, &POSSIBLE_ATTRIBUTES, &attributes]() {
-            while (cur_processed++ <= MAX_MEASUREMENTS)
-            {
-              size_t index = rand() % POSSIBLE_ATTRIBUTES;
-              h->Add(1.0,
-                     opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
-                         attributes[index]),
-                     opentelemetry::context::Context{});
-            }
-          }));
+      threads.push_back(std::thread([&h, &cur_processed, &POSSIBLE_ATTRIBUTES, &attributes]() {
+        while (cur_processed++ <= MAX_MEASUREMENTS)
+        {
+          size_t index = rand() % POSSIBLE_ATTRIBUTES;
+          h->Add(1.0,
+                 opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
+                     attributes[index]),
+                 opentelemetry::context::Context{});
+        }
+      }));
     }
     for (auto &thread : threads)
     {
