@@ -159,12 +159,12 @@ private:
   // last reported metrics stash for all the collectors.
   std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
+  const AttributesProcessor *attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
-  const AttributesProcessor *attributes_processor_;
 };
 
 }  // namespace metrics
