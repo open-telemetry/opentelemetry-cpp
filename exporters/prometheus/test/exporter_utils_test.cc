@@ -65,12 +65,12 @@ void assert_histogram(prometheus_client::MetricFamily &metric,
   int cumulative_count = 0;
   auto buckets         = metric.metric[0].histogram.bucket;
   auto boundary_it     = boundaries.cbegin();
-  for (size_t i = 0; i < buckets.size(); i++, ++boundary_it)
+  for (size_t i = 0; i < buckets.size(); i++)
   {
     auto bucket = buckets[i];
     if (i != buckets.size() - 1)
     {
-      ASSERT_DOUBLE_EQ(*boundary_it, bucket.upper_bound);
+      ASSERT_DOUBLE_EQ(*boundary_it++, bucket.upper_bound);
     }
     else
     {
