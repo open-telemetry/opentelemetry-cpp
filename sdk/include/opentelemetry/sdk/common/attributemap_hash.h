@@ -13,7 +13,7 @@ namespace common
 {
 
 template <class T>
-inline void GetHashForAttributeValue(size_t &seed, const T &arg)
+inline void GetHash(size_t &seed, const T &arg)
 {
   std::hash<T> hasher;
   // reference -
@@ -22,11 +22,11 @@ inline void GetHashForAttributeValue(size_t &seed, const T &arg)
 }
 
 template <class T>
-inline void GetHashForAttributeValue(size_t &seed, const std::vector<T> &arg)
+inline void GetHash(size_t &seed, const std::vector<T> &arg)
 {
   for (auto v : arg)
   {
-    GetHashForAttributeValue<T>(seed, v);
+    GetHash<T>(seed, v);
   }
 }
 
@@ -36,7 +36,7 @@ struct GetHashForAttributeValueVisitor
   template <class T>
   void operator()(T &v)
   {
-    GetHashForAttributeValue(seed_, v);
+    GetHash(seed_, v);
   }
   size_t &seed_;
 };
@@ -47,10 +47,7 @@ inline size_t GetHashForAttributeMap(const OrderedAttributeMap &attribute_map)
   size_t seed = 0UL;
   for (auto &kv : attribute_map)
   {
-    std::hash<std::string> hasher;
-    // reference -
-    // https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
-    seed ^= hasher(kv.first) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    GetHash(seed, kv.first);
     nostd::visit(GetHashForAttributeValueVisitor(seed), kv.second);
   }
   return seed;
@@ -69,10 +66,7 @@ inline size_t GetHashForAttributeMap(
         {
           return true;
         }
-        std::hash<std::string> hasher;
-        // reference -
-        // https://www.boost.org/doc/libs/1_37_0/doc/html/hash/reference.html#boost.hash_combine
-        seed ^= hasher(key.data()) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        GetHash(seed, key.data());
         auto attr_val = nostd::visit(converter, value);
         nostd::visit(GetHashForAttributeValueVisitor(seed), attr_val);
         return true;

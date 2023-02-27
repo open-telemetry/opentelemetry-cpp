@@ -49,7 +49,7 @@ public:
    * @return check if key is present in hash
    *
    */
-  bool Has(size_t hash) const { return (hash_map_.find(hash) == hash_map_.end()) ? false : true; }
+  bool Has(size_t hash) const { return hash_map_.find(hash) != hash_map_.end(); }
 
   /**
    * @return the pointer to value for given key if present.
