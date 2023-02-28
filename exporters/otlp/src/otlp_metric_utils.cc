@@ -96,7 +96,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     // sum
     if ((nostd::holds_alternative<int64_t>(histogram_data.sum_)))
     {
-      proto_histogram_point_data->set_sum(nostd::get<int64_t>(histogram_data.sum_));
+      // Use static_cast to avoid C4244 in MSVC
+      proto_histogram_point_data->set_sum(
+          static_cast<double>(nostd::get<int64_t>(histogram_data.sum_)));
     }
     else
     {
@@ -108,7 +110,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     {
       if (nostd::holds_alternative<int64_t>(histogram_data.min_))
       {
-        proto_histogram_point_data->set_min(nostd::get<int64_t>(histogram_data.min_));
+        // Use static_cast to avoid C4244 in MSVC
+        proto_histogram_point_data->set_min(
+            static_cast<double>(nostd::get<int64_t>(histogram_data.min_)));
       }
       else
       {
@@ -116,7 +120,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       }
       if (nostd::holds_alternative<int64_t>(histogram_data.max_))
       {
-        proto_histogram_point_data->set_max(nostd::get<int64_t>(histogram_data.max_));
+        // Use static_cast to avoid C4244 in MSVC
+        proto_histogram_point_data->set_max(
+            static_cast<double>(nostd::get<int64_t>(histogram_data.max_)));
       }
       else
       {

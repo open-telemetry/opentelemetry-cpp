@@ -4,27 +4,12 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <map>
-#  include <vector>
-
-#  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/trace/span_context.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
