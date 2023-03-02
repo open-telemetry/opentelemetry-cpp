@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Rename the global SDK version variables to avoid naming clash
+  [#2011](https://github.com/open-telemetry/opentelemetry-cpp/pull/2011)
 * [SDK]Add attributes for InstrumentationScope
   [#2004](https://github.com/open-telemetry/opentelemetry-cpp/pull/2004)
 * [ETW Exporter]Support serialize span/log attributes into JSON
