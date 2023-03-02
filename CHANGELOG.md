@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK]Add attributes for InstrumentationScope
+  [#2004](https://github.com/open-telemetry/opentelemetry-cpp/pull/2004)
 * [ETW Exporter]Support serialize span/log attributes into JSON
   [#1991](https://github.com/open-telemetry/opentelemetry-cpp/pull/1991)
 * ETW Exporter]Do not overwrite ParentId when setting attribute on Span
