@@ -5,14 +5,10 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <chrono>
-#  include <map>
 #  include <type_traits>
-#  include <vector>
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/severity.h"

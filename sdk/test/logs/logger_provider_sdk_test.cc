@@ -65,9 +65,6 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 
 TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 {
-  // Currently, arguments are not supported by the loggers.
-  // TODO: Once the logging spec defines what arguments are allowed, add more
-  // detail to this test
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
@@ -79,11 +76,29 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 
   auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url, true,
-                               {{"scope_key1", "scope_value"}, {"scope_key1", 2}});
+                               {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
+
+  auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
+  EXPECT_EQ(sdk_logger3->GetInstrumentationScope().GetAttributes().size(), 2);
+  {
+    auto attibute = sdk_logger3->GetInstrumentationScope().GetAttributes().find("scope_key1");
+    ASSERT_FALSE(attibute == sdk_logger3->GetInstrumentationScope().GetAttributes().end());
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::string>(attibute->second));
+    EXPECT_EQ(opentelemetry::nostd::get<std::string>(attibute->second), "scope_value");
+  }
 
   std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
   auto logger4 =
       lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, true, scope_attributes);
+  auto sdk_logger4 = static_cast<opentelemetry::sdk::logs::Logger *>(logger4.get());
+
+  EXPECT_EQ(sdk_logger4->GetInstrumentationScope().GetAttributes().size(), 1);
+  {
+    auto attibute = sdk_logger4->GetInstrumentationScope().GetAttributes().find("scope_key");
+    ASSERT_FALSE(attibute == sdk_logger4->GetInstrumentationScope().GetAttributes().end());
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::string>(attibute->second));
+    EXPECT_EQ(opentelemetry::nostd::get<std::string>(attibute->second), "scope_value");
+  }
 }
 
 TEST(LoggerProviderSDK, EventLoggerProviderFactory)
