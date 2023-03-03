@@ -61,16 +61,16 @@ namespace sdk
 {
 namespace version
 {
-const int OPENTELEMETRY_SDK_MAJOR_VERSION = ${major};
-const int OPENTELEMETRY_SDK_MINOR_VERSION = ${minor};
-const int OPENTELEMETRY_SDK_PATCH_VERSION = ${patch};
-const char* OPENTELEMETRY_SDK_PRE_RELEASE = "${pre_release}";
-const char* OPENTELEMETRY_SDK_BUILD_METADATA = "${build_metadata}";
-const int OPENTELEMETRY_SDK_COUNT_NEW_COMMITS = ${count_new_commits};
-const char* OPENTELEMETRY_SDK_BRANCH = "${branch}";
-const char* OPENTELEMETRY_SDK_COMMIT_HASH = "${latest_commit_hash}";
-const char* OPENTELEMETRY_SDK_SHORT_VERSION = "${short_version}";
-const char* OPENTELEMETRY_SDK_FULL_VERSION =
+const int major_version = ${major};
+const int minor_version = ${minor};
+const int patch_version = ${patch};
+const char* pre_release = "${pre_release}";
+const char* build_metadata = "${build_metadata}";
+const int count_new_commits = ${count_new_commits};
+const char* branch = "${branch}";
+const char* commit_hash = "${latest_commit_hash}";
+const char* short_version = "${short_version}";
+const char* full_version =
     "${full_version}";
 const char* OPENTELEMETRY_SDK_BUILD_DATE = "$(date -u)";
 }  // namespace version
