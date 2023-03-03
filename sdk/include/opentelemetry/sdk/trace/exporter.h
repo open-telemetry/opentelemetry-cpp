@@ -20,7 +20,8 @@ namespace trace
 class OPENTELEMETRY_EXPORT SpanExporter
 {
 public:
-  virtual ~SpanExporter() = default;
+  SpanExporter();
+  virtual ~SpanExporter();
 
   /**
    * Create a span recordable. This object will be used to record span data and

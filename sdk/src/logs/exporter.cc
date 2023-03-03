@@ -11,6 +11,10 @@ namespace sdk
 namespace logs
 {
 
+OPENTELEMETRY_EXPORT LogRecordExporter::LogRecordExporter() {}
+
+OPENTELEMETRY_EXPORT LogRecordExporter::~LogRecordExporter() {}
+
 OPENTELEMETRY_EXPORT bool LogRecordExporter::ForceFlush(
     std::chrono::microseconds /*timeout*/) noexcept
 {

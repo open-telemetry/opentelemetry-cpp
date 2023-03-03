@@ -23,7 +23,8 @@ namespace logs
 class OPENTELEMETRY_EXPORT LogRecordExporter
 {
 public:
-  virtual ~LogRecordExporter() = default;
+  LogRecordExporter();
+  virtual ~LogRecordExporter();
 
   /**
    * Create a log recordable. This object will be used to record log data and
