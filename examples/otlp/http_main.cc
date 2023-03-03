@@ -8,7 +8,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
-// sdk::TracerProvider is just used to call ForceFlush and prevent to cancle running exportings when
+// sdk::TracerProvider is just used to call ForceFlush and prevent to cancel running exportings when
 // destroy and shutdown exporters.It's optional to users.
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 

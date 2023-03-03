@@ -20,7 +20,7 @@ namespace logs
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class LogRecordExporter
+class OPENTELEMETRY_EXPORT LogRecordExporter
 {
 public:
   virtual ~LogRecordExporter() = default;
@@ -51,7 +51,7 @@ public:
    * Force flush the log records pushed into this log exporter.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

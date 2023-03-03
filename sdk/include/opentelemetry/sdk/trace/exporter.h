@@ -49,7 +49,7 @@ public:
    * @return return true when all data are exported, and false when timeout
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Shut down the exporter.

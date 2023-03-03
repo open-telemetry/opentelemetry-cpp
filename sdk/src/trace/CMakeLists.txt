@@ -9,6 +9,7 @@ add_library(
   tracer_provider_factory.cc
   tracer.cc
   span.cc
+  exporter.cc
   batch_span_processor.cc
   batch_span_processor_factory.cc
   simple_processor_factory.cc
