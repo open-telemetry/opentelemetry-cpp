@@ -423,9 +423,9 @@ void HttpOperation::Cleanup()
   For 7.34.0 <= CURL < 7.54.0,
   we don't want to get into partial support.
 
-  CURL 7.54.0 (0x07 0x36 0x00) is required.
+  CURL 7.54.0 is required.
 */
-#if LIBCURL_VERSION_NUM >= 0x073600
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 54, 0)
 #  define HAVE_TLS_VERSION
 #endif
 
@@ -586,7 +586,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x074D00
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 77, 0)
       const char *data = ssl_options_.ssl_ca_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
 
@@ -601,7 +601,7 @@ CURLcode HttpOperation::Setup()
         return rc;
       }
 #else
-      // CURL 7.77.0 (0x07 0x4D 0x00) required for CURLOPT_CAINFO_BLOB.
+      // CURL 7.77.0 required for CURLOPT_CAINFO_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.77.0 required for CA CERT STRING");
       return CURLE_UNKNOWN_OPTION;
 #endif
@@ -627,7 +627,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_key_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x074700
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
       const char *data = ssl_options_.ssl_client_key_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_key_string.length();
 
@@ -648,7 +648,7 @@ CURLcode HttpOperation::Setup()
         return rc;
       }
 #else
-      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_SSLKEY_BLOB.
+      // CURL 7.71.0 required for CURLOPT_SSLKEY_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT KEY STRING");
       return CURLE_UNKNOWN_OPTION;
 #endif
@@ -674,7 +674,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_cert_string.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x074700
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
       const char *data = ssl_options_.ssl_client_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_cert_string.length();
 
@@ -695,7 +695,7 @@ CURLcode HttpOperation::Setup()
         return rc;
       }
 #else
-      // CURL 7.71.0 (0x07 0x47 0x00) required for CURLOPT_SSLCERT_BLOB.
+      // CURL 7.71.0 required for CURLOPT_SSLCERT_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT CERT STRING");
       return CURLE_UNKNOWN_OPTION;
 #endif
@@ -765,13 +765,13 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_cipher_suite.empty())
     {
-#if LIBCURL_VERSION_NUM >= 0x073D00
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 61, 0)
       /* TLS 1.3 */
       const char *cipher_list = ssl_options_.ssl_cipher_suite.c_str();
 
       rc = SetCurlStrOption(CURLOPT_TLS13_CIPHERS, cipher_list);
 #else
-      // CURL 7.61.0 (0x07 0x3D 0x00) required for CURLOPT_TLS13_CIPHERS.
+      // CURL 7.61.0 required for CURLOPT_TLS13_CIPHERS.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.61.0 required for CIPHER SUITE");
       return CURLE_UNKNOWN_OPTION;
 #endif
