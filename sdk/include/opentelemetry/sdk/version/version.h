@@ -14,17 +14,17 @@ namespace sdk
 {
 namespace version
 {
-extern const int MAJOR_VERSION;
-extern const int MINOR_VERSION;
-extern const int PATCH_VERSION;
-extern const char *PRE_RELEASE;
-extern const char *BUILD_METADATA;
-extern const int COUNT_NEW_COMMITS;
-extern const char *BRANCH;
-extern const char *COMMIT_HASH;
-extern const char *FULL_VERSION;
-extern const char *FULL_VERSION_WITH_BRANCH_COMMITHASH;
-extern const char *BUILD_DATE;
+extern const int OPENTELEMETRY_SDK_MAJOR_VERSION;
+extern const int OPENTELEMETRY_SDK_MINOR_VERSION;
+extern const int OPENTELEMETRY_SDK_PATCH_VERSION;
+extern const char *OPENTELEMETRY_SDK_PRE_RELEASE;
+extern const char *OPENTELEMETRY_SDK_BUILD_METADATA;
+extern const int OPENTELEMETRY_SDK_COUNT_NEW_COMMITS;
+extern const char *OPENTELEMETRY_SDK_BRANCH;
+extern const char *OPENTELEMETRY_SDK_COMMIT_HASH;
+extern const char *OPENTELEMETRY_SDK_SHORT_VERSION;
+extern const char *OPENTELEMETRY_SDK_FULL_VERSION;
+extern const char *OPENTELEMETRY_SDK_BUILD_DATE;
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
