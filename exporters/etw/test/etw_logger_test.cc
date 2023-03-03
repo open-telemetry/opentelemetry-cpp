@@ -96,7 +96,7 @@ TEST(ETWLogger, LoggerCheckWithAttributes)
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", 2}};
   EXPECT_NO_THROW(logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug,
-                                        Logger::MakeAttributes(attribs)));
+                                        opentelemetry::common::MakeAttributes(attribs)));
 }
 
 #  endif  // _WIN32
