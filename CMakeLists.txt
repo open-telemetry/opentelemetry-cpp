@@ -224,7 +224,7 @@ option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
 
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
-       "Whethere to enable exemplar within metrics" OFF)
+       "Whether to enable exemplar within metrics" OFF)
 
 #
 # Verify options dependencies
