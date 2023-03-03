@@ -72,7 +72,7 @@ const char* commit_hash = "${latest_commit_hash}";
 const char* short_version = "${short_version}";
 const char* full_version =
     "${full_version}";
-const char* OPENTELEMETRY_SDK_BUILD_DATE = "$(date -u)";
+const char* build_date = "$(date -u)";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
