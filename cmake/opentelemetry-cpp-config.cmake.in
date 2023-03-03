@@ -49,6 +49,7 @@
 #   opentelemetry-cpp::jaeger_trace_exporter             - Imported target of opentelemetry-cpp::jaeger_trace_exporter
 #   opentelemetry-cpp::zpages                            - Imported target of opentelemetry-cpp::zpages
 #   opentelemetry-cpp::http_client_curl                  - Imported target of opentelemetry-cpp::http_client_curl
+#   opentelemetry-cpp::opentracing_shim                  - Imported target of opentelemetry-cpp::opentracing_shim
 #
 
 # =============================================================================
@@ -102,7 +103,8 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     etw_exporter
     jaeger_trace_exporter
     zpages
-    http_client_curl)
+    http_client_curl
+    opentracing_shim)
 foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)
   if(TARGET opentelemetry-cpp::${_TEST_TARGET})
     list(APPEND OPENTELEMETRY_CPP_LIBRARIES opentelemetry-cpp::${_TEST_TARGET})

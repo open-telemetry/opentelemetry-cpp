@@ -141,6 +141,16 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -282,13 +292,14 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
-  # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
+  # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
+  # that make this test always fail. Ignore these packages in the noexcept test here.
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
-  # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
+  # that make this test always fail. Ignore these packages in the nortti test here.
   bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
   bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
   exit 0
