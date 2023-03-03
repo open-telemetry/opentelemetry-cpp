@@ -179,6 +179,8 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
+option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
+
 set(OTELCPP_PROTO_PATH
     ""
     CACHE PATH "Path to opentelemetry-proto")
@@ -536,6 +538,29 @@ include_directories(api/include)
 
 add_subdirectory(api)
 
+if(WITH_OPENTRACING)
+  find_package(OpenTracing CONFIG QUIET)
+  if(NOT OpenTracing_FOUND)
+    set(OPENTRACING_DIR "third_party/opentracing-cpp")
+    message("Trying to use local ${OPENTRACING_DIR} from submodule")
+    if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
+      set(SAVED_BUILD_TESTING ${BUILD_TESTING})
+      set(BUILD_TESTING OFF)
+      add_subdirectory(${OPENTRACING_DIR})
+      set(BUILD_TESTING ${SAVED_BUILD_TESTING})
+    else()
+      message(
+        FATAL_ERROR
+          "\nopentracing-cpp package was not found. Please either provide it manually or clone with submodules. "
+          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+          "git submodule update --init --recursive")
+    endif()
+  else()
+    message("Using external opentracing-cpp")
+  endif()
+  add_subdirectory(opentracing-shim)
+endif()
+
 if(NOT WITH_API_ONLY)
   set(BUILD_TESTING ${BUILD_TESTING})
   include_directories(sdk/include)
@@ -545,6 +570,7 @@ if(NOT WITH_API_ONLY)
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
+
   if(BUILD_TESTING)
     add_subdirectory(test_common)
   endif()

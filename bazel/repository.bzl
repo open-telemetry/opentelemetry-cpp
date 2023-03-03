@@ -182,6 +182,17 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    # Opentracing
+    maybe(
+        http_archive,
+        name = "com_github_opentracing",
+        sha256 = "5b170042da4d1c4c231df6594da120875429d5231e9baa5179822ee8d1054ac3",
+        strip_prefix = "opentracing-cpp-1.6.0",
+        urls = [
+            "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
+        ],
+    )
+
     # boost headers from vcpkg
     maybe(
         native.new_local_repository,
