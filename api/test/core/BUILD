@@ -15,3 +15,18 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "version_test",
+    srcs = [
+        "version_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
