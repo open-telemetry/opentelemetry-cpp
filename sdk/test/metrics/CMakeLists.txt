@@ -54,6 +54,10 @@ if(WITH_BENCHMARK)
     ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_common
     opentelemetry_resources)
 
+  add_executable(measurements_benchmark measurements_benchmark.cc)
+  target_link_libraries(
+    measurements_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
     sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
