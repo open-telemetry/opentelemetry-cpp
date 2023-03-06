@@ -67,6 +67,7 @@ private:
 
   // For testing
   friend class OtlpGrpcExporterTestPeer;
+  friend class OtlpGrpcLogRecordExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;

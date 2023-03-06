@@ -409,6 +409,7 @@ cc_test(
         "test",
     ],
     deps = [
+        ":otlp_grpc_exporter",
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",

@@ -280,6 +280,22 @@ jobs:
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.do_not_install.test
 
+  cmake_otprotocol_shared_libs_with_static_grpc_test:
+    name: CMake test (build shared libraries with otlp-exporter and static gRPC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh -T
+        ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest

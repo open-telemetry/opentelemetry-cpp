@@ -217,6 +217,20 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DBUILD_SHARED_LIBS=ON \
+        "${SRC_DIR}"
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
