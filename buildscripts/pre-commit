@@ -40,6 +40,7 @@ fi
 
 branch="$(git rev-parse --abbrev-ref HEAD)"
 short_version="${major}.${minor}.${patch}"
+echo "${short_version}"
 full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
 
 # Update api version.h
