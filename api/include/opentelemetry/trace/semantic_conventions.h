@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.18.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.19.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -41,25 +41,11 @@ static constexpr const char *kExceptionMessage = "exception.message";
 static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 
 /**
- * The name identifies the event.
- */
-static constexpr const char *kEventName = "event.name";
-
-/**
- * The domain identifies the business context for the events.
- *
- * <p>Notes:
-  <ul> <li>Events across different domains may have same {@code event.name}, yet be
-unrelated events.</li> </ul>
- */
-static constexpr const char *kEventDomain = "event.domain";
-
-/**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
  Lambda-Runtime-Invoked-Function-Arn} header on the {@code /runtime/invocation/next} applicable).
  *
  * <p>Notes:
-  <ul> <li>This may be different from {@code faas.id} if an alias is involved.</li> </ul>
+  <ul> <li>This may be different from {@code cloud.resource_id} if an alias is involved.</li> </ul>
  */
 static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
 
@@ -255,7 +241,7 @@ static constexpr const char *kOtelStatusCode = "otel.status_code";
 static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
 /**
- * Type of the trigger which caused this function execution.
+ * Type of the trigger which caused this function invocation.
  *
  * <p>Notes:
   <ul> <li>For the server/consumer span on the incoming side,
@@ -268,9 +254,9 @@ lambda, which is often HTTP).</li> </ul>
 static constexpr const char *kFaasTrigger = "faas.trigger";
 
 /**
- * The execution ID of the current function execution.
+ * The invocation ID of the current function invocation.
  */
-static constexpr const char *kFaasExecution = "faas.execution";
+static constexpr const char *kFaasInvocationId = "faas.invocation_id";
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud
@@ -344,114 +330,6 @@ static constexpr const char *kFaasInvokedProvider = "faas.invoked_provider";
 static constexpr const char *kFaasInvokedRegion = "faas.invoked_region";
 
 /**
- * Transport protocol used. See note below.
- */
-static constexpr const char *kNetTransport = "net.transport";
-
-/**
- * Application layer protocol used. The value SHOULD be normalized to lowercase.
- */
-static constexpr const char *kNetAppProtocolName = "net.app.protocol.name";
-
-/**
- * Version of the application layer protocol used. See note below.
- *
- * <p>Notes:
-  <ul> <li>{@code net.app.protocol.version} refers to the version of the protocol used and might be
- different from the protocol client's version. If the HTTP client used has a version of {@code
- 0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
- </ul>
- */
-static constexpr const char *kNetAppProtocolVersion = "net.app.protocol.version";
-
-/**
- * Remote socket peer name.
- */
-static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
-
-/**
- * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, <a
- * href="https://man7.org/linux/man-pages/man7/address_families.7.html">etc</a>.
- */
-static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
-
-/**
- * Remote socket peer port.
- */
-static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
-
-/**
- * Protocol <a href="https://man7.org/linux/man-pages/man7/address_families.7.html">address
- * family</a> which is used for communication.
- */
-static constexpr const char *kNetSockFamily = "net.sock.family";
-
-/**
- * Logical remote hostname, see note below.
- *
- * <p>Notes:
-  <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
- lookup.</li> </ul>
- */
-static constexpr const char *kNetPeerName = "net.peer.name";
-
-/**
- * Logical remote port number
- */
-static constexpr const char *kNetPeerPort = "net.peer.port";
-
-/**
- * Logical local hostname or similar, see note below.
- */
-static constexpr const char *kNetHostName = "net.host.name";
-
-/**
- * Logical local port number, preferably the one that the peer used to connect
- */
-static constexpr const char *kNetHostPort = "net.host.port";
-
-/**
- * Local socket address. Useful in case of a multi-IP host.
- */
-static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
-
-/**
- * Local socket port number.
- */
-static constexpr const char *kNetSockHostPort = "net.sock.host.port";
-
-/**
- * The internet connection type currently being used by the host.
- */
-static constexpr const char *kNetHostConnectionType = "net.host.connection.type";
-
-/**
- * This describes more details regarding the connection.type. It may be the type of cell technology
- * connection, but it could be used for describing details about a wifi connection.
- */
-static constexpr const char *kNetHostConnectionSubtype = "net.host.connection.subtype";
-
-/**
- * The name of the mobile carrier.
- */
-static constexpr const char *kNetHostCarrierName = "net.host.carrier.name";
-
-/**
- * The mobile carrier country code.
- */
-static constexpr const char *kNetHostCarrierMcc = "net.host.carrier.mcc";
-
-/**
- * The mobile carrier network code.
- */
-static constexpr const char *kNetHostCarrierMnc = "net.host.carrier.mnc";
-
-/**
- * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
- */
-static constexpr const char *kNetHostCarrierIcc = "net.host.carrier.icc";
-
-/**
  * The <a href="../../resource/semantic_conventions/README.md#service">{@code service.name}</a> of
  * the remote service. SHOULD be equal to the actual {@code service.name} resource attribute of the
  * remote service if any.
@@ -522,47 +400,6 @@ static constexpr const char *kCodeLineno = "code.lineno";
 static constexpr const char *kCodeColumn = "code.column";
 
 /**
- * HTTP request method.
- */
-static constexpr const char *kHttpMethod = "http.method";
-
-/**
- * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
- */
-static constexpr const char *kHttpStatusCode = "http.status_code";
-
-/**
- * Kind of HTTP protocol used.
- *
- * <p>Notes:
-  <ul> <li>If {@code net.transport} is not specified, it can be assumed to be {@code IP.TCP} except
- if {@code http.flavor} is {@code QUIC}, in which case {@code IP.UDP} is assumed.</li> </ul>
- */
-static constexpr const char *kHttpFlavor = "http.flavor";
-
-/**
- * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
- * User-Agent</a> header sent by the client.
- */
-static constexpr const char *kHttpUserAgent = "http.user_agent";
-
-/**
- * The size of the request payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size.
- */
-static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
-
-/**
- * The size of the response payload body in bytes. This is the number of bytes transferred excluding
- * headers and is often, but not always, present as the <a
- * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
- * header. For requests using transport encoding, this should be the compressed size.
- */
-static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
-
-/**
  * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
  fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
  *
@@ -584,25 +421,9 @@ static constexpr const char *kHttpUrl = "http.url";
 static constexpr const char *kHttpResendCount = "http.resend_count";
 
 /**
- * The URI scheme identifying the used protocol.
- */
-static constexpr const char *kHttpScheme = "http.scheme";
-
-/**
  * The full request target as passed in a HTTP request line or equivalent.
  */
 static constexpr const char *kHttpTarget = "http.target";
-
-/**
- * The matched route (path template in the format used by the respective server framework). See note
-below
- *
- * <p>Notes:
-  <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
-route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
-the <a href="#http-server-definitions">application root</a> if there is one.</li> </ul>
- */
-static constexpr const char *kHttpRoute = "http.route";
 
 /**
  * The IP address of the original client behind all proxies, if known (e.g. from <a
@@ -758,106 +579,6 @@ static constexpr const char *kGraphqlOperationType = "graphql.operation.type";
 static constexpr const char *kGraphqlDocument = "graphql.document";
 
 /**
- * A value used by the messaging system as an identifier for the message, represented as a string.
- */
-static constexpr const char *kMessagingMessageId = "messaging.message.id";
-
-/**
- * The <a href="#conversations">conversation ID</a> identifying the conversation to which the
- * message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
- */
-static constexpr const char *kMessagingMessageConversationId = "messaging.message.conversation_id";
-
-/**
- * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown
- * whether the compressed or uncompressed payload size is reported.
- */
-static constexpr const char *kMessagingMessagePayloadSizeBytes =
-    "messaging.message.payload_size_bytes";
-
-/**
- * The compressed size of the message payload in bytes.
- */
-static constexpr const char *kMessagingMessagePayloadCompressedSizeBytes =
-    "messaging.message.payload_compressed_size_bytes";
-
-/**
- * The message destination name
- *
- * <p>Notes:
-  <ul> <li>Destination name SHOULD uniquely identify a specific queue, topic or other entity within
-the broker. If the broker does not have such notion, the destination name SHOULD uniquely identify
-the broker.</li> </ul>
- */
-static constexpr const char *kMessagingDestinationName = "messaging.destination.name";
-
-/**
- * The kind of message destination
- */
-static constexpr const char *kMessagingDestinationKind = "messaging.destination.kind";
-
-/**
- * Low cardinality representation of the messaging destination name
- *
- * <p>Notes:
-  <ul> <li>Destination names could be constructed from templates. An example would be a destination
- name involving a user name or product id. Although the destination name in this case is of high
- cardinality, the underlying template is of low cardinality and can be effectively used for grouping
- and aggregation.</li> </ul>
- */
-static constexpr const char *kMessagingDestinationTemplate = "messaging.destination.template";
-
-/**
- * A boolean that is true if the message destination is temporary and might not exist anymore after
- * messages are processed.
- */
-static constexpr const char *kMessagingDestinationTemporary = "messaging.destination.temporary";
-
-/**
- * A boolean that is true if the message destination is anonymous (could be unnamed or have
- * auto-generated name).
- */
-static constexpr const char *kMessagingDestinationAnonymous = "messaging.destination.anonymous";
-
-/**
- * The message source name
- *
- * <p>Notes:
-  <ul> <li>Source name SHOULD uniquely identify a specific queue, topic, or other entity within the
-broker. If the broker does not have such notion, the source name SHOULD uniquely identify the
-broker.</li> </ul>
- */
-static constexpr const char *kMessagingSourceName = "messaging.source.name";
-
-/**
- * The kind of message source
- */
-static constexpr const char *kMessagingSourceKind = "messaging.source.kind";
-
-/**
- * Low cardinality representation of the messaging source name
- *
- * <p>Notes:
-  <ul> <li>Source names could be constructed from templates. An example would be a source name
- involving a user name or product id. Although the source name in this case is of high cardinality,
- the underlying template is of low cardinality and can be effectively used for grouping and
- aggregation.</li> </ul>
- */
-static constexpr const char *kMessagingSourceTemplate = "messaging.source.template";
-
-/**
- * A boolean that is true if the message source is temporary and might not exist anymore after
- * messages are processed.
- */
-static constexpr const char *kMessagingSourceTemporary = "messaging.source.temporary";
-
-/**
- * A boolean that is true if the message source is anonymous (could be unnamed or have
- * auto-generated name).
- */
-static constexpr const char *kMessagingSourceAnonymous = "messaging.source.anonymous";
-
-/**
  * A string identifying the messaging system.
  */
 static constexpr const char *kMessagingSystem = "messaging.system";
@@ -890,111 +611,6 @@ static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.mess
  * {@code client_id} of the client consuming the message.
  */
 static constexpr const char *kMessagingConsumerId = "messaging.consumer.id";
-
-/**
- * RabbitMQ message routing key.
- */
-static constexpr const char *kMessagingRabbitmqDestinationRoutingKey =
-    "messaging.rabbitmq.destination.routing_key";
-
-/**
- * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the
- same partition. They differ from {@code messaging.message.id} in that they're not unique. If the
- key is {@code null}, the attribute MUST NOT be set.
- *
- * <p>Notes:
-  <ul> <li>If the key type is not string, it's string representation has to be supplied for the
- attribute. If the key has no unambiguous, canonical string form, don't include its value.</li>
- </ul>
- */
-static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message.key";
-
-/**
- * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not
- * producers.
- */
-static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer.group";
-
-/**
- * Client Id for the Consumer or Producer that is handling the message.
- */
-static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_id";
-
-/**
- * Partition the message is sent to.
- */
-static constexpr const char *kMessagingKafkaDestinationPartition =
-    "messaging.kafka.destination.partition";
-
-/**
- * Partition the message is received from.
- */
-static constexpr const char *kMessagingKafkaSourcePartition = "messaging.kafka.source.partition";
-
-/**
- * The offset of a record in the corresponding Kafka partition.
- */
-static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.message.offset";
-
-/**
- * A boolean that is true if the message is a tombstone.
- */
-static constexpr const char *kMessagingKafkaMessageTombstone = "messaging.kafka.message.tombstone";
-
-/**
- * Namespace of RocketMQ resources, resources in different namespaces are individual.
- */
-static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.namespace";
-
-/**
- * Name of the RocketMQ producer/consumer group that is handling the message. The client type is
- * identified by the SpanKind.
- */
-static constexpr const char *kMessagingRocketmqClientGroup = "messaging.rocketmq.client_group";
-
-/**
- * The unique identifier for each client.
- */
-static constexpr const char *kMessagingRocketmqClientId = "messaging.rocketmq.client_id";
-
-/**
- * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
- */
-static constexpr const char *kMessagingRocketmqMessageDeliveryTimestamp =
-    "messaging.rocketmq.message.delivery_timestamp";
-
-/**
- * The delay time level for delay message, which determines the message delay time.
- */
-static constexpr const char *kMessagingRocketmqMessageDelayTimeLevel =
-    "messaging.rocketmq.message.delay_time_level";
-
-/**
- * It is essential for FIFO message. Messages that belong to the same message group are always
- * processed one by one within the same consumer group.
- */
-static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message.group";
-
-/**
- * Type of message.
- */
-static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message.type";
-
-/**
- * The secondary classifier of message besides topic.
- */
-static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message.tag";
-
-/**
- * Key(s) of message, another way to mark message besides message id.
- */
-static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message.keys";
-
-/**
- * Model of message consumption. This only applies to consumer spans.
- */
-static constexpr const char *kMessagingRocketmqConsumptionModel =
-    "messaging.rocketmq.consumption_model";
 
 /**
  * A string identifying the remoting system. See below for a list of well-known identifiers.
@@ -1054,17 +670,13 @@ static constexpr const char *kRpcJsonrpcErrorCode = "rpc.jsonrpc.error_code";
  */
 static constexpr const char *kRpcJsonrpcErrorMessage = "rpc.jsonrpc.error_message";
 
-// Enum definitions
-namespace EventDomainValues
-{
-/** Events from browser apps. */
-static constexpr const char *kBrowser = "browser";
-/** Events from mobile apps. */
-static constexpr const char *kDevice = "device";
-/** Events from Kubernetes. */
-static constexpr const char *kK8s = "k8s";
-}  // namespace EventDomainValues
+/**
+ * The <a href="https://connect.build/docs/protocol/#error-codes">error codes</a> of the Connect
+ * request. Error codes are always string values.
+ */
+static constexpr const char *kRpcConnectRpcErrorCode = "rpc.connect_rpc.error_code";
 
+// Enum definitions
 namespace OpentracingRefTypeValues
 {
 /** The parent Span depends on the child Span in some capacity. */
@@ -1252,106 +864,6 @@ static constexpr const char *kGcp = "gcp";
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace FaasInvokedProviderValues
 
-namespace NetTransportValues
-{
-/** ip_tcp. */
-static constexpr const char *kIpTcp = "ip_tcp";
-/** ip_udp. */
-static constexpr const char *kIpUdp = "ip_udp";
-/** Named or anonymous pipe. See note below. */
-static constexpr const char *kPipe = "pipe";
-/** In-process communication. */
-static constexpr const char *kInproc = "inproc";
-/** Something else (non IP-based). */
-static constexpr const char *kOther = "other";
-}  // namespace NetTransportValues
-
-namespace NetSockFamilyValues
-{
-/** IPv4 address. */
-static constexpr const char *kInet = "inet";
-/** IPv6 address. */
-static constexpr const char *kInet6 = "inet6";
-/** Unix domain socket path. */
-static constexpr const char *kUnix = "unix";
-}  // namespace NetSockFamilyValues
-
-namespace NetHostConnectionTypeValues
-{
-/** wifi. */
-static constexpr const char *kWifi = "wifi";
-/** wired. */
-static constexpr const char *kWired = "wired";
-/** cell. */
-static constexpr const char *kCell = "cell";
-/** unavailable. */
-static constexpr const char *kUnavailable = "unavailable";
-/** unknown. */
-static constexpr const char *kUnknown = "unknown";
-}  // namespace NetHostConnectionTypeValues
-
-namespace NetHostConnectionSubtypeValues
-{
-/** GPRS. */
-static constexpr const char *kGprs = "gprs";
-/** EDGE. */
-static constexpr const char *kEdge = "edge";
-/** UMTS. */
-static constexpr const char *kUmts = "umts";
-/** CDMA. */
-static constexpr const char *kCdma = "cdma";
-/** EVDO Rel. 0. */
-static constexpr const char *kEvdo0 = "evdo_0";
-/** EVDO Rev. A. */
-static constexpr const char *kEvdoA = "evdo_a";
-/** CDMA2000 1XRTT. */
-static constexpr const char *kCdma20001xrtt = "cdma2000_1xrtt";
-/** HSDPA. */
-static constexpr const char *kHsdpa = "hsdpa";
-/** HSUPA. */
-static constexpr const char *kHsupa = "hsupa";
-/** HSPA. */
-static constexpr const char *kHspa = "hspa";
-/** IDEN. */
-static constexpr const char *kIden = "iden";
-/** EVDO Rev. B. */
-static constexpr const char *kEvdoB = "evdo_b";
-/** LTE. */
-static constexpr const char *kLte = "lte";
-/** EHRPD. */
-static constexpr const char *kEhrpd = "ehrpd";
-/** HSPAP. */
-static constexpr const char *kHspap = "hspap";
-/** GSM. */
-static constexpr const char *kGsm = "gsm";
-/** TD-SCDMA. */
-static constexpr const char *kTdScdma = "td_scdma";
-/** IWLAN. */
-static constexpr const char *kIwlan = "iwlan";
-/** 5G NR (New Radio). */
-static constexpr const char *kNr = "nr";
-/** 5G NRNSA (New Radio Non-Standalone). */
-static constexpr const char *kNrnsa = "nrnsa";
-/** LTE CA. */
-static constexpr const char *kLteCa = "lte_ca";
-}  // namespace NetHostConnectionSubtypeValues
-
-namespace HttpFlavorValues
-{
-/** HTTP/1.0. */
-static constexpr const char *kHttp10 = "1.0";
-/** HTTP/1.1. */
-static constexpr const char *kHttp11 = "1.1";
-/** HTTP/2. */
-static constexpr const char *kHttp20 = "2.0";
-/** HTTP/3. */
-static constexpr const char *kHttp30 = "3.0";
-/** SPDY protocol. */
-static constexpr const char *kSpdy = "SPDY";
-/** QUIC protocol. */
-static constexpr const char *kQuic = "QUIC";
-}  // namespace HttpFlavorValues
-
 namespace GraphqlOperationTypeValues
 {
 /** GraphQL query. */
@@ -1361,22 +873,6 @@ static constexpr const char *kMutation = "mutation";
 /** GraphQL subscription. */
 static constexpr const char *kSubscription = "subscription";
 }  // namespace GraphqlOperationTypeValues
-
-namespace MessagingDestinationKindValues
-{
-/** A message sent to a queue. */
-static constexpr const char *kQueue = "queue";
-/** A message sent to a topic. */
-static constexpr const char *kTopic = "topic";
-}  // namespace MessagingDestinationKindValues
-
-namespace MessagingSourceKindValues
-{
-/** A message received from a queue. */
-static constexpr const char *kQueue = "queue";
-/** A message received from a topic. */
-static constexpr const char *kTopic = "topic";
-}  // namespace MessagingSourceKindValues
 
 namespace MessagingOperationValues
 {
@@ -1388,26 +884,6 @@ static constexpr const char *kReceive = "receive";
 static constexpr const char *kProcess = "process";
 }  // namespace MessagingOperationValues
 
-namespace MessagingRocketmqMessageTypeValues
-{
-/** Normal message. */
-static constexpr const char *kNormal = "normal";
-/** FIFO message. */
-static constexpr const char *kFifo = "fifo";
-/** Delay message. */
-static constexpr const char *kDelay = "delay";
-/** Transaction message. */
-static constexpr const char *kTransaction = "transaction";
-}  // namespace MessagingRocketmqMessageTypeValues
-
-namespace MessagingRocketmqConsumptionModelValues
-{
-/** Clustering consumption model. */
-static constexpr const char *kClustering = "clustering";
-/** Broadcasting consumption model. */
-static constexpr const char *kBroadcasting = "broadcasting";
-}  // namespace MessagingRocketmqConsumptionModelValues
-
 namespace RpcSystemValues
 {
 /** gRPC. */
@@ -1418,6 +894,8 @@ static constexpr const char *kJavaRmi = "java_rmi";
 static constexpr const char *kDotnetWcf = "dotnet_wcf";
 /** Apache Dubbo. */
 static constexpr const char *kApacheDubbo = "apache_dubbo";
+/** Connect RPC. */
+static constexpr const char *kConnectRpc = "connect_rpc";
 }  // namespace RpcSystemValues
 
 namespace RpcGrpcStatusCodeValues
@@ -1457,6 +935,42 @@ static constexpr const int kDataLoss = 15;
 /** UNAUTHENTICATED. */
 static constexpr const int kUnauthenticated = 16;
 }  // namespace RpcGrpcStatusCodeValues
+
+namespace RpcConnectRpcErrorCodeValues
+{
+/** cancelled. */
+static constexpr const char *kCancelled = "cancelled";
+/** unknown. */
+static constexpr const char *kUnknown = "unknown";
+/** invalid_argument. */
+static constexpr const char *kInvalidArgument = "invalid_argument";
+/** deadline_exceeded. */
+static constexpr const char *kDeadlineExceeded = "deadline_exceeded";
+/** not_found. */
+static constexpr const char *kNotFound = "not_found";
+/** already_exists. */
+static constexpr const char *kAlreadyExists = "already_exists";
+/** permission_denied. */
+static constexpr const char *kPermissionDenied = "permission_denied";
+/** resource_exhausted. */
+static constexpr const char *kResourceExhausted = "resource_exhausted";
+/** failed_precondition. */
+static constexpr const char *kFailedPrecondition = "failed_precondition";
+/** aborted. */
+static constexpr const char *kAborted = "aborted";
+/** out_of_range. */
+static constexpr const char *kOutOfRange = "out_of_range";
+/** unimplemented. */
+static constexpr const char *kUnimplemented = "unimplemented";
+/** internal. */
+static constexpr const char *kInternal = "internal";
+/** unavailable. */
+static constexpr const char *kUnavailable = "unavailable";
+/** data_loss. */
+static constexpr const char *kDataLoss = "data_loss";
+/** unauthenticated. */
+static constexpr const char *kUnauthenticated = "unauthenticated";
+}  // namespace RpcConnectRpcErrorCodeValues
 
 }  // namespace SemanticConventions
 }  // namespace trace
