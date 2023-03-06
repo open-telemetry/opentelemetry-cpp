@@ -35,6 +35,8 @@ Increment the:
   [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
 * Provide version major/minor/patch macros
   [#2014](https://github.com/open-telemetry/opentelemetry-cpp/pull/2014)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
+  [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
 
 ## [1.8.2] 2023-01-31
 
