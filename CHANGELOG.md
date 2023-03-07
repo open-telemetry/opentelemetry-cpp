@@ -14,7 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [1.8.3] 2023-03-06
 
 * Provide version major/minor/patch macros
