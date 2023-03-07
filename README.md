@@ -43,11 +43,13 @@ of the current project.
 
 | Platform                                                            |   Build type  |
 |---------------------------------------------------------------------|---------------|
-| ubuntu-20.04 (Default GCC Compiler - 9.3.0)                         | CMake, Bazel  |
-| ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
-| ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)   | CMake, Bazel  |
-| macOS 10.15 (Xcode 12.2)                                            | Bazel         |
+| ubuntu-22.04 (GCC - 10, 12)                                         | CMake, Bazel  |
+| ubuntu-20.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
+| ubuntu-20.04 (GCC 9.4.0)                                            | CMake, Bazel  |
+| ubuntu-20.04 (Default GCC Compiler - 9.4.0 with -std=c++20 flags)   | CMake, Bazel  |
+| macOS 12.0 (Xcode 14.2)                                             | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
+| Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
 
 [1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
   (required by OTLP expoter) don't build with this compiler. See gRPC [official
