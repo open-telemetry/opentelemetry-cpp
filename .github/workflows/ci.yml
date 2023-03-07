@@ -147,11 +147,15 @@ jobs:
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8 (without otlp exporter)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
+    - name: Add Ubuntu Xenial package sources
+      run: |
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -170,12 +174,15 @@ jobs:
 
   cmake_gcc_48_otlp_exporter_test:
     name: CMake gcc 4.8 (with otlp exporter)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
-    - name: setup
+    - name: Add Ubuntu Xenial package sources
+      run: |
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'    - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
