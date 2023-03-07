@@ -182,7 +182,8 @@ jobs:
     - name: Add Ubuntu Xenial package sources
       run: |
           sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
-          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'    - name: setup
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
+    - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_gcc48.sh
