@@ -264,6 +264,22 @@ jobs:
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
+  cmake_do_not_install_test:
+    name: CMake do not install test (with otlp-exporter)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.do_not_install.test
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
