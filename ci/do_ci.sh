@@ -231,6 +231,21 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "cmake.do_not_install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        "${SRC_DIR}"
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
+  exit 0
 elif [[ "$1" == "bazel.with_abseil" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...

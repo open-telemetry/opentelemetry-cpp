@@ -19,6 +19,8 @@ Increment the:
 
 * Provide version major/minor/patch macros
   [#2014](https://github.com/open-telemetry/opentelemetry-cpp/pull/2014)
+* [BUILD] Add `OPENTELEMETRY_INSTALL` to allow user to skip install targets.
+  [#2022](https://github.com/open-telemetry/opentelemetry-cpp/pull/2022)
 * [SDK] Rename the global SDK version variables to avoid naming clash
   [#2011](https://github.com/open-telemetry/opentelemetry-cpp/pull/2011)
 * [BUILD] Fix typo in CMakeLists.txt
