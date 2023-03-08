@@ -25,7 +25,6 @@ RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE  \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
         -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
         -DBUILD_TESTING=OFF \
         -DWITH_OTLP=ON \

@@ -81,7 +81,6 @@ if [[ "$1" == "cmake.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
@@ -100,7 +99,6 @@ elif [[ "$1" == "cmake.maintainer.test" ]]; then
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=OFF \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
@@ -118,7 +116,6 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
@@ -376,7 +373,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
-  echo "thrift=0.14.1" >> third_party_release
   echo "abseil=20220623.1" >> third_party_release
   git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0

@@ -57,7 +57,6 @@ RUN apt-get install -y --no-install-recommends libcurl4-openssl-dev && git clone
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE  \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
         -DBUILD_TESTING=OFF \
         -DWITH_OTLP=ON \
         .. && \
