@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [REMOVAL] Remove the jeager exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
+
+Important changes:
+
+* [REMOVAL] Remove the jeager exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
+
 ## [1.8.3] 2023-03-06
 
 * Provide version major/minor/patch macros
