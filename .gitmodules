@@ -32,3 +32,8 @@ branch = main
 path = third_party/nlohmann-json
 url = https://github.com/nlohmann/json
 branch = master
+
+[submodule "third_party/opentracing-cpp"]
+path = third_party/opentracing-cpp
+url = https://github.com/opentracing/opentracing-cpp.git
+branch = master
