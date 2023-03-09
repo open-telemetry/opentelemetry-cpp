@@ -149,6 +149,45 @@ TEST(ResourceTest, Merge)
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
 
+TEST(ResourceTest, Merge_with_schemaurl)
+{
+  const std::string schema_url       = "https://opentelemetry.io/schemas/1.2.0";
+  const std::string schema_url1      = "https://opentelemetry.io/schemas/1.2.1";
+  const std::string empty_schema_url = "";
+
+  ResourceAttributes attributes = {};
+
+  auto resource_00       = Resource::Create(attributes, empty_schema_url);
+  auto resource_01       = Resource::Create(attributes, schema_url1);
+  auto merged_resource_0 = resource_00.Merge(resource_01);
+  auto new_schema_url_0  = merged_resource_0.GetSchemaURL();
+  EXPECT_EQ(new_schema_url_0, schema_url1);
+
+  auto resource_10       = Resource::Create(attributes, schema_url);
+  auto resource_11       = Resource::Create(attributes, empty_schema_url);
+  auto merged_resource_1 = resource_10.Merge(resource_11);
+  auto new_schema_url_1  = merged_resource_1.GetSchemaURL();
+  EXPECT_EQ(new_schema_url_1, schema_url);
+
+  auto resource_20       = Resource::Create(attributes, empty_schema_url);
+  auto resource_21       = Resource::Create(attributes, empty_schema_url);
+  auto merged_resource_2 = resource_20.Merge(resource_21);
+  auto new_schema_url_2  = merged_resource_2.GetSchemaURL();
+  EXPECT_EQ(new_schema_url_2, empty_schema_url);
+
+  auto resource_30       = Resource::Create(attributes, schema_url);
+  auto resource_31       = Resource::Create(attributes, schema_url);
+  auto merged_resource_3 = resource_30.Merge(resource_31);
+  auto new_schema_url_3  = merged_resource_3.GetSchemaURL();
+  EXPECT_EQ(new_schema_url_3, schema_url);
+
+  auto resource_40       = Resource::Create(attributes, schema_url);
+  auto resource_41       = Resource::Create(attributes, schema_url1);
+  auto merged_resource_4 = resource_40.Merge(resource_41);
+  auto new_schema_url_4  = merged_resource_4.GetSchemaURL();
+  EXPECT_EQ(new_schema_url_4, schema_url1);
+}
+
 TEST(ResourceTest, MergeEmptyString)
 {
   TestResource resource1({{"service", "backend"}, {"host", "service-host"}});

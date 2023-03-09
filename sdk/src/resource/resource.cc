@@ -17,11 +17,26 @@ Resource::Resource(const ResourceAttributes &attributes, const std::string &sche
     : attributes_(attributes), schema_url_(schema_url)
 {}
 
+//
+// To align with the spec below, `this` points to "old resource" and parmeter `other` is
+// "updating resource".
+// https://opentelemetry.io/docs/reference/specification/resource/sdk/#merge
+//
+
 Resource Resource::Merge(const Resource &other) const noexcept
 {
   ResourceAttributes merged_resource_attributes(other.attributes_);
   merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
-  return Resource(merged_resource_attributes, other.schema_url_);
+
+  // the last schema_url_ in below statement is undefined in the spec, so return "updating resource"
+  // schema_url as implementation detail.
+  const std::string &new_schema_url_ =
+      schema_url_.empty()
+          ? other.schema_url_
+          : (other.schema_url_.empty()
+                 ? schema_url_
+                 : (schema_url_ == other.schema_url_ ? schema_url_ : other.schema_url_));
+  return Resource(merged_resource_attributes, new_schema_url_);
 }
 
 Resource Resource::Create(const ResourceAttributes &attributes, const std::string &schema_url)
