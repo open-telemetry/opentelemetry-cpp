@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Make merging resource schema url in line with the spec
+  [#2039](https://github.com/open-telemetry/opentelemetry-cpp/pull/2039)
+
 ## [1.8.3] 2023-03-06
 
 * Provide version major/minor/patch macros
