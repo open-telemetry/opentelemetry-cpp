@@ -14,6 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+
 * [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
 
