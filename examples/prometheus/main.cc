@@ -61,8 +61,8 @@ void InitMetrics(const std::string &name, const std::string &addr)
       new metrics_sdk::InstrumentSelector(metrics_sdk::InstrumentType::kHistogram, histogram_name)};
   std::unique_ptr<metrics_sdk::MeterSelector> histogram_meter_selector{
       new metrics_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metrics_sdk::View> histogram_view{
-      new metrics_sdk::View{histogram_name, "description", metrics_sdk::AggregationType::kHistogram}};
+  std::unique_ptr<metrics_sdk::View> histogram_view{new metrics_sdk::View{
+      histogram_name, "description", metrics_sdk::AggregationType::kHistogram}};
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
   metrics_api::Provider::SetMeterProvider(provider);
