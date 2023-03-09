@@ -38,7 +38,7 @@ Increment the:
   [#1992](https://github.com/open-telemetry/opentelemetry-cpp/pull/1992)
 * [ETW Exporter] Support serialize span/log attributes into JSON
   [#1991](https://github.com/open-telemetry/opentelemetry-cpp/pull/1991)
-* ETW Exporter]Do not overwrite ParentId when setting attribute on Span
+* [ETW Exporter]Do not overwrite ParentId when setting attribute on Span
   [#1989](https://github.com/open-telemetry/opentelemetry-cpp/pull/1989)
 * Upgrade prometheus-cpp to v1.1.0
   [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
