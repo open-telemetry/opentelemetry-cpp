@@ -622,14 +622,14 @@ std::string GetOtlpDefaultLogsSslClientCertificateString()
 
 /*
   EXPERIMENTAL:
-  Waiting on Environment variable names to be added in the spec,
-  see https://github.com/open-telemetry/opentelemetry-specification/pull/3088
+  Environment variable names do not exist in the spec,
+  using the OTEL_CPP_ namespace.
 */
 
 std::string GetOtlpDefaultTracesSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_MIN_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
 
   std::string value;
   bool exists;
@@ -645,8 +645,8 @@ std::string GetOtlpDefaultTracesSslTlsMinVersion()
 
 std::string GetOtlpDefaultMetricsSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_MIN_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
 
   std::string value;
   bool exists;
@@ -662,8 +662,8 @@ std::string GetOtlpDefaultMetricsSslTlsMinVersion()
 
 std::string GetOtlpDefaultLogsSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_MIN_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
 
   std::string value;
   bool exists;
@@ -679,8 +679,8 @@ std::string GetOtlpDefaultLogsSslTlsMinVersion()
 
 std::string GetOtlpDefaultTracesSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_MAX_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
 
   std::string value;
   bool exists;
@@ -696,8 +696,8 @@ std::string GetOtlpDefaultTracesSslTlsMaxVersion()
 
 std::string GetOtlpDefaultMetricsSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_MAX_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
 
   std::string value;
   bool exists;
@@ -713,8 +713,8 @@ std::string GetOtlpDefaultMetricsSslTlsMaxVersion()
 
 std::string GetOtlpDefaultLogsSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_MAX_TLS";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
 
   std::string value;
   bool exists;
@@ -730,8 +730,8 @@ std::string GetOtlpDefaultLogsSslTlsMaxVersion()
 
 std::string GetOtlpDefaultTracesSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
 
   std::string value;
   bool exists;
@@ -747,8 +747,8 @@ std::string GetOtlpDefaultTracesSslTlsCipher()
 
 std::string GetOtlpDefaultMetricsSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
 
   std::string value;
   bool exists;
@@ -764,8 +764,8 @@ std::string GetOtlpDefaultMetricsSslTlsCipher()
 
 std::string GetOtlpDefaultLogsSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
 
   std::string value;
   bool exists;
@@ -781,8 +781,8 @@ std::string GetOtlpDefaultLogsSslTlsCipher()
 
 std::string GetOtlpDefaultTracesSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER_SUITE";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
 
   std::string value;
   bool exists;
@@ -798,8 +798,8 @@ std::string GetOtlpDefaultTracesSslTlsCipherSuite()
 
 std::string GetOtlpDefaultMetricsSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER_SUITE";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
 
   std::string value;
   bool exists;
@@ -815,8 +815,8 @@ std::string GetOtlpDefaultMetricsSslTlsCipherSuite()
 
 std::string GetOtlpDefaultLogsSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER_SUITE";
+  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
 
   std::string value;
   bool exists;
