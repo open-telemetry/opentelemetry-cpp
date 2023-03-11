@@ -111,6 +111,40 @@ using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
 struct HttpSslOptions
 {
+  HttpSslOptions() {}
+
+  HttpSslOptions(nostd::string_view url,
+                 bool input_ssl_insecure_skip_verify,
+                 nostd::string_view input_ssl_ca_cert_path,
+                 nostd::string_view input_ssl_ca_cert_string,
+                 nostd::string_view input_ssl_client_key_path,
+                 nostd::string_view input_ssl_client_key_string,
+                 nostd::string_view input_ssl_client_cert_path,
+                 nostd::string_view input_ssl_client_cert_string,
+                 nostd::string_view input_ssl_min_tls,
+                 nostd::string_view input_ssl_max_tls,
+                 nostd::string_view input_ssl_cipher,
+                 nostd::string_view input_ssl_cipher_suite)
+      : use_ssl(false),
+        ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
+        ssl_ca_cert_path(input_ssl_ca_cert_path),
+        ssl_ca_cert_string(input_ssl_ca_cert_string),
+        ssl_client_key_path(input_ssl_client_key_path),
+        ssl_client_key_string(input_ssl_client_key_string),
+        ssl_client_cert_path(input_ssl_client_cert_path),
+        ssl_client_cert_string(input_ssl_client_cert_string),
+        ssl_min_tls(input_ssl_min_tls),
+        ssl_max_tls(input_ssl_max_tls),
+        ssl_cipher(input_ssl_cipher),
+        ssl_cipher_suite(input_ssl_cipher_suite)
+  {
+    /* Use SSL if url starts with "https:" */
+    if (strncmp(url.data(), "https:", 6) == 0)
+    {
+      use_ssl = true;
+    }
+  }
+
   /**
     Use HTTPS (true) or HTTP (false).
   */

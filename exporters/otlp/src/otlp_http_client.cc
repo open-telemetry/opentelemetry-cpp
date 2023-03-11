@@ -703,7 +703,7 @@ OtlpHttpClient::~OtlpHttpClient()
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false), options_(options), ssl_options_(), http_client_(http_client)
+    : is_shutdown_(false), options_(options), http_client_(http_client)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -953,29 +953,6 @@ OtlpHttpClient::createSession(
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  // std::string starts_with is C++20
-  std::string candidate_scheme = options_.url.substr(0, 6);
-
-  if (candidate_scheme == "https:")
-  {
-    ssl_options_.use_ssl                  = true;
-    ssl_options_.ssl_insecure_skip_verify = options_.ssl_insecure_skip_verify;
-    ssl_options_.ssl_ca_cert_path         = options_.ssl_ca_cert_path;
-    ssl_options_.ssl_ca_cert_string       = options_.ssl_ca_cert_string;
-    ssl_options_.ssl_client_key_path      = options_.ssl_client_key_path;
-    ssl_options_.ssl_client_key_string    = options_.ssl_client_key_string;
-    ssl_options_.ssl_client_cert_path     = options_.ssl_client_cert_path;
-    ssl_options_.ssl_client_cert_string   = options_.ssl_client_cert_string;
-    ssl_options_.ssl_min_tls              = options_.ssl_min_tls;
-    ssl_options_.ssl_max_tls              = options_.ssl_max_tls;
-    ssl_options_.ssl_cipher               = options_.ssl_cipher;
-    ssl_options_.ssl_cipher_suite         = options_.ssl_cipher_suite;
-  }
-  else
-  {
-    ssl_options_.use_ssl = false;
-  }
-
   auto session = http_client_->CreateSession(options_.url);
 
   auto request = session->CreateRequest();
@@ -985,7 +962,7 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
-  request->SetSslOptions(ssl_options_);
+  request->SetSslOptions(options_.ssl_options);
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);

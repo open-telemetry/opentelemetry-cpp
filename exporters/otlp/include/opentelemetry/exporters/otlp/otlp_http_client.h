@@ -49,21 +49,8 @@ struct OtlpHttpClientOptions
 {
   std::string url;
 
-  bool ssl_insecure_skip_verify;
-
-  std::string ssl_ca_cert_path;
-  std::string ssl_ca_cert_string;
-
-  std::string ssl_client_key_path;
-  std::string ssl_client_key_string;
-
-  std::string ssl_client_cert_path;
-  std::string ssl_client_cert_string;
-
-  std::string ssl_min_tls;
-  std::string ssl_max_tls;
-  std::string ssl_cipher;
-  std::string ssl_cipher_suite;
+  /** SSL options. */
+  ext::http::client::HttpSslOptions ssl_options;
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -115,17 +102,18 @@ struct OtlpHttpClientOptions
                                std::size_t input_max_requests_per_connection = 8,
                                nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
-        ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
-        ssl_ca_cert_path(input_ssl_ca_cert_path),
-        ssl_ca_cert_string(input_ssl_ca_cert_string),
-        ssl_client_key_path(input_ssl_client_key_path),
-        ssl_client_key_string(input_ssl_client_key_string),
-        ssl_client_cert_path(input_ssl_client_cert_path),
-        ssl_client_cert_string(input_ssl_client_cert_string),
-        ssl_min_tls(input_ssl_min_tls),
-        ssl_max_tls(input_ssl_max_tls),
-        ssl_cipher(input_ssl_cipher),
-        ssl_cipher_suite(input_ssl_cipher_suite),
+        ssl_options(input_url,
+                    input_ssl_insecure_skip_verify,
+                    input_ssl_ca_cert_path,
+                    input_ssl_ca_cert_string,
+                    input_ssl_client_key_path,
+                    input_ssl_client_key_string,
+                    input_ssl_client_cert_path,
+                    input_ssl_client_cert_string,
+                    input_ssl_min_tls,
+                    input_ssl_max_tls,
+                    input_ssl_cipher,
+                    input_ssl_cipher_suite),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),
@@ -287,9 +275,6 @@ private:
 
   // The configuration options associated with this HTTP client.
   const OtlpHttpClientOptions options_;
-
-  /** SSL options. */
-  ext::http::client::HttpSslOptions ssl_options_;
 
   // Object that stores the HTTP sessions that have been created
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
