@@ -2,32 +2,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 #
-# The dependency on opentelemetry-proto can be provided different ways.
-# By order of decreasing priority, options are:
+# The dependency on opentelemetry-proto can be provided different ways. By order
+# of decreasing priority, options are:
 #
 # 1 - Use a provided package
 #
 # This is useful to build opentelemetry-cpp as part of a super project.
 #
-# The super project provides the path to the opentelemetry-proto
-# source code using variable ${OTELCPP_PROTO_PATH}
+# The super project provides the path to the opentelemetry-proto source code
+# using variable ${OTELCPP_PROTO_PATH}
 #
 # 2 - Search for a opentelemetry-proto git submodule
 #
-# When git submodule is used,
-# the opentelemetry-proto code is located in:
+# When git submodule is used, the opentelemetry-proto code is located in:
 # third_party/opentelemetry-proto
 #
 # 3 - Download opentelemetry-proto from github
 #
-# Code from the required version is used,
-# unless a specific release tag is provided
-# in variable ${opentelemetry-proto}
+# Code from the required version is used, unless a specific release tag is
+# provided in variable ${opentelemetry-proto}
 #
 
 if(OTELCPP_PROTO_PATH)
-  if(NOT EXISTS "${OTELCPP_PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
-    message(FATAL_ERROR "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
+  if(NOT EXISTS
+     "${OTELCPP_PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
+    message(
+      FATAL_ERROR
+        "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
   endif()
   message(STATUS "opentelemetry-proto dependency satisfied by: external path")
   set(PROTO_PATH ${OTELCPP_PROTO_PATH})
@@ -35,10 +36,12 @@ if(OTELCPP_PROTO_PATH)
 else()
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
     message(STATUS "opentelemetry-proto dependency satisfied by: git submodule")
-    set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
+    set(PROTO_PATH
+        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
     set(needs_proto_download FALSE)
   else()
-    message(STATUS "opentelemetry-proto dependency satisfied by: github download")
+    message(
+      STATUS "opentelemetry-proto dependency satisfied by: github download")
     if("${opentelemetry-proto}" STREQUAL "")
       set(opentelemetry-proto "v0.19.0")
     endif()
@@ -259,18 +262,20 @@ endif()
 set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 
-install(
-  TARGETS opentelemetry_proto
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_proto
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
-  DESTINATION include
-  FILES_MATCHING
-  PATTERN "*.h")
+  install(
+    DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
 
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
