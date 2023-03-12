@@ -17,6 +17,8 @@ Increment the:
 
 * [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [EXPORTER] Add OTLP HTTP SSL support
+  [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
 
 ## [1.8.3] 2023-03-06
 
