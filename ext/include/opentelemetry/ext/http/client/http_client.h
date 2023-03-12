@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <string>
 #include <vector>
