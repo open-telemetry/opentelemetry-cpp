@@ -5,6 +5,10 @@
 
 # set -e
 
+# To run tests in a local dev environment:
+# - make sure docker is running
+# - set BUILD_DIR to the top level build directory,
+
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 
 export CERT_DIR=../cert
@@ -100,3 +104,24 @@ echo ""
 
 cat report.log
 
+export PASSED_COUNT=`grep -c "PASSED" report.log`
+export FAILED_COUNT=`grep -c "FAILED" report.log`
+
+echo ""
+echo "###############################################################"
+echo "TEST VERDICT: ${PASSED_COUNT} PASSED, ${FAILED_COUNT} FAILED"
+echo "###############################################################"
+echo ""
+
+if [ ${FAILED_COUNT} != "0" ]; then
+  #
+  # CI FAILED
+  #
+
+  exit 1
+fi;
+
+#
+# CI PASSED
+#
+exit 0

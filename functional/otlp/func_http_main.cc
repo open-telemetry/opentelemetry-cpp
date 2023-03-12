@@ -102,7 +102,6 @@ void parse_info_msg(TestResult * /* result */, std::string /* msg */) {}
 
 void parse_debug_msg(TestResult *result, std::string msg)
 {
-
   static std::string export_success("Export 1 trace span(s) success");
 
   if (msg.find(export_success) != std::string::npos)

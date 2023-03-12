@@ -112,50 +112,9 @@ private:
   std::string trace_id_;
 };
 
-// FIXME: Use in OTLP tests
-
-class IsValidSslOptionsMatcher
-{
-public:
-  IsValidSslOptionsMatcher(const ext::http::client::HttpSslOptions &ssl_options)
-      : ssl_options_(ssl_options)
-  {}
-  bool MatchAndExplain(const ext::http::client::HttpSslOptions &opt,
-                       MatchResultListener * /* listener */) const
-  {
-    bool use_match = (ssl_options_.use_ssl == opt.use_ssl);
-
-    if (!ssl_options_.use_ssl)
-    {
-      return use_match;
-    }
-
-    return (use_match && (opt.ssl_insecure_skip_verify == ssl_options_.ssl_insecure_skip_verify) &&
-            (opt.ssl_ca_cert_path == ssl_options_.ssl_ca_cert_path) &&
-            (opt.ssl_ca_cert_string == ssl_options_.ssl_ca_cert_string) &&
-            (opt.ssl_client_key_path == ssl_options_.ssl_client_key_path) &&
-            (opt.ssl_client_key_string == ssl_options_.ssl_client_key_string) &&
-            (opt.ssl_client_cert_path == ssl_options_.ssl_client_cert_path) &&
-            (opt.ssl_client_cert_string == ssl_options_.ssl_client_cert_string));
-  }
-
-  void DescribeTo(std::ostream *os) const { *os << "ssl_options matches"; }
-
-  void DescribeNegationTo(std::ostream *os) const { *os << "ssl_options does not matche"; }
-
-private:
-  ext::http::client::HttpSslOptions ssl_options_;
-};
-
 PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
 {
   return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
-}
-
-PolymorphicMatcher<IsValidSslOptionsMatcher> IsValidSslOptions(
-    const ext::http::client::HttpSslOptions &ssl_options)
-{
-  return MakePolymorphicMatcher(IsValidSslOptionsMatcher(ssl_options));
 }
 
 // Create spans, let processor call Export()
@@ -207,9 +166,7 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
 
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
-
   EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
-
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},

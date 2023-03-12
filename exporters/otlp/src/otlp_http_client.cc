@@ -954,7 +954,6 @@ OtlpHttpClient::createSession(
   }
 
   auto session = http_client_->CreateSession(options_.url);
-
   auto request = session->CreateRequest();
 
   for (auto &header : options_.http_headers)
