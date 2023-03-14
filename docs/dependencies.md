@@ -104,3 +104,10 @@ Both these dependencies are listed here:
 
 - [Zpages](/ext/src/zpages):
   - None
+
+- [Opentracing](/opentracing-shim)
+  shim:
+  - [`opentracing-cpp`](https://github.com/opentracing/opentracing-cpp)
+    OpenTracing API for C++
+    - A bridge layer implementing the OpenTracing API using the OpenTelemetry API
+    - License: `Apache License 2.0`

@@ -55,19 +55,21 @@ if(MSVC)
   endif()
 endif()
 
-install(
-  TARGETS opentelemetry_exporter_jaeger_trace
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_exporter_jaeger_trace
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/jaeger
-  DESTINATION include/opentelemetry/exporters
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "recordable.h" EXCLUDE)
+  install(
+    DIRECTORY include/opentelemetry/exporters/jaeger
+    DESTINATION include/opentelemetry/exporters
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "recordable.h" EXCLUDE)
+endif()
 
 if(BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)

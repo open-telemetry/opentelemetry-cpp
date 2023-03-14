@@ -15,20 +15,59 @@ Increment the:
 
 ## [Unreleased]
 
-* [ETW Exporter]Support serialize span/log attributes into JSON
+* [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
+  [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+
+## [1.8.3] 2023-03-06
+
+* Provide version major/minor/patch macros
+  [#2014](https://github.com/open-telemetry/opentelemetry-cpp/pull/2014)
+* [BUILD] Add `OPENTELEMETRY_INSTALL` to allow user to skip install targets.
+  [#2022](https://github.com/open-telemetry/opentelemetry-cpp/pull/2022)
+* [SDK] Rename the global SDK version variables to avoid naming clash
+  [#2011](https://github.com/open-telemetry/opentelemetry-cpp/pull/2011)
+* [BUILD] Fix typo in CMakeLists.txt
+  [#2010](https://github.com/open-telemetry/opentelemetry-cpp/pull/2010)
+* [EXPORTER] fix Prometheus test iterator iterator increment
+  [#2006](https://github.com/open-telemetry/opentelemetry-cpp/pull/2006)
+* [SDK]Add attributes for InstrumentationScope
+  [#2004](https://github.com/open-telemetry/opentelemetry-cpp/pull/2004)
+* [METRICS SDK] Performance improvement in measurement processing
+  [#1993](https://github.com/open-telemetry/opentelemetry-cpp/pull/1993)
+* [EXAMPLE] Add example for logs ostream exporter
+  [#1992](https://github.com/open-telemetry/opentelemetry-cpp/pull/1992)
+* [ETW Exporter] Support serialize span/log attributes into JSON
   [#1991](https://github.com/open-telemetry/opentelemetry-cpp/pull/1991)
-* ETW Exporter]Do not overwrite ParentId when setting attribute on Span
+* [ETW Exporter]Do not overwrite ParentId when setting attribute on Span
   [#1989](https://github.com/open-telemetry/opentelemetry-cpp/pull/1989)
-* Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
-* Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* Upgrade prometheus-cpp to v1.1.0
+  [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* Convert Prometheus Exporter to Pull MetricReader
+  [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
+* [DOCS] Add alpine packages to INSTALL.md
+  [#1957](https://github.com/open-telemetry/opentelemetry-cpp/pull/1957)
+* [METRICS SDK] Add benchmark tests for Sum Aggregation.
+  [#1948](https://github.com/open-telemetry/opentelemetry-cpp/pull/1948)
 * [BUILD] Build OpenTelemetry SDK and exporters into DLL
   [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
-* [CI] Enforce copyright check in CI [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
+* [CI] Enforce copyright check in CI
+  [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
+* [BUILD] Fix typo GENENV -> GETENV
+  [#1972](https://github.com/open-telemetry/opentelemetry-cpp/pull/1972)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.18.0
   [#1974](https://github.com/open-telemetry/opentelemetry-cpp/pull/1974)
-* Fix Prometheus server crash on listening to already used port [#1986](https://github.com/open-telemetry/opentelemetry-cpp/pull/1986)
+* [EXT] Fix thread-safety when shutdown.
+  [#1977](https://github.com/open-telemetry/opentelemetry-cpp/pull/1977)
+* [SDK] Fix missing ObservedTimestamp.
+  [#1985](https://github.com/open-telemetry/opentelemetry-cpp/pull/1985)
+* [METRICS SDK] fix variable names
+  [#1987](https://github.com/open-telemetry/opentelemetry-cpp/pull/1987)
+* [EXPORTER] Fix Prometheus server crash on listening to already used port
+  [#1986](https://github.com/open-telemetry/opentelemetry-cpp/pull/1986)
 * [EXPORTER] Boolean environment variables not parsed per the spec
   [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
+* [EXPORTER] Opentracing shim
+  [#1909](https://github.com/open-telemetry/opentelemetry-cpp/pull/1909)
 
 ## [1.8.2] 2023-01-31
 
