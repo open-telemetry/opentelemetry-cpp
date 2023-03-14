@@ -59,7 +59,7 @@ Start the application and keep it running. Now we should be able to see the
 metrics at [http://localhost:9464/metrics](http://localhost:9464/metrics) from a
 web browser:
 
-![Browser UI](https://user-images.githubusercontent.com/71217171/168492500-12bd1c99-33ab-4515-a294-17bc349b5d13.png)
+![Browser UI](https://user-images.githubusercontent.com/9139451/224979531-beaa4d6e-98ec-4798-9934-ed25c6b196db.png)
 
 Now, we understand how we can configure `PrometheusExporter` to export metrics.
 Next, we are going to learn about how to use Prometheus to collect the metrics.
@@ -114,12 +114,12 @@ docker run -p 9090:9090 -v $(pwd):/etc/prometheus --network="host" prom/promethe
 
 To use the graphical interface for viewing our metrics with Prometheus, navigate
 to [http://localhost:9090/graph](http://localhost:9090/graph),
-and type `prometheus_metric_example_bucket` in the expression bar of the UI;
-finally, click the execute button.
+and type `prometheus_metric_example_histogram_bucket` in the expression bar of
+the UI; finally, click the execute button.
 
 We should be able to see the following chart from the browser:
 
-![Prometheus UI](https://user-images.githubusercontent.com/71217171/168492437-f9769db1-6f9e-49c6-8ef0-85f5e1188ba0.png)
+![Prometheus UI](https://user-images.githubusercontent.com/9139451/224979224-e7d3865a-f56e-4bb9-8aab-e3f81de40d6e.png)
 
 From the legend, we can see that the `instance` name and the `job` name are the
 values we have set in `prometheus.yml`.
@@ -164,7 +164,7 @@ Feel free to find some handy PromQL
 [here](https://promlabs.com/promql-cheat-sheet/).
 
 ![Grafana
-UI](https://user-images.githubusercontent.com/71217171/168492482-047a4429-4854-4b3c-a2dd-4d75362090d5.png)
+UI](https://user-images.githubusercontent.com/9139451/224979197-4f11abeb-7856-42b2-9b52-af5fd262c75c.png)
 
 ```mermaid
 graph TD
