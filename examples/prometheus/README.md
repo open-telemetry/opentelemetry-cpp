@@ -164,7 +164,7 @@ Feel free to find some handy PromQL
 [here](https://promlabs.com/promql-cheat-sheet/).
 
 ![Grafana
-UI](https://user-images.githubusercontent.com/9139451/224979197-4f11abeb-7856-42b2-9b52-af5fd262c75c.png)
+UI](https://user-images.githubusercontent.com/9139451/224983906-52e061b8-b561-4414-87e9-68823bbc3ad6.png)
 
 ```mermaid
 graph TD
