@@ -20,7 +20,9 @@ export PATH=${INSTALL_PREFIX}/bin:$PATH
 
 export CXX_ABI_FLAGS="-g -Og"
 
-for TEST in `cat ABI_CHECK_LIST`
+grep -v "^#" ABI_CHECK_LIST | grep -v "^[[:space:]]*$" > ABI_CHECK_LIST.tmp
+
+for TEST in `cat ABI_CHECK_LIST.tmp`
 do
 
 echo "Compiling ${TEST}.cc with ${ABI_CXX_NAME} ..."
@@ -40,7 +42,7 @@ set +e
 
 # TODO, compare abi
 
-for TEST in `cat ABI_CHECK_LIST`
+for TEST in `cat ABI_CHECK_LIST.tmp`
 do
 
 echo "Checking compliance for ${TEST} ..."
@@ -54,6 +56,7 @@ done
 
 done
 
+rm ABI_CHECK_LIST.tmp
 
 # Return OK to CI
 echo "Done"

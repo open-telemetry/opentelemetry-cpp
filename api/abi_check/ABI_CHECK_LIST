@@ -1,2 +1,10 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+#
+# List of abi tests to execute.
+# Format is one test name per line
+#
+
 abi_check_baggage
 abi_check_trace

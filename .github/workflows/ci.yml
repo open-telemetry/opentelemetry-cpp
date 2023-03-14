@@ -541,7 +541,7 @@ jobs:
 
   abi_check:
     name: ABI check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v3
     - name: setup abi check
@@ -553,6 +553,9 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
+        ABI_VERSION: 1
+        ABI_CXX_NAME: g++12
+        ABI_OS_NAME: ubuntu-22.04
       run: (cd ./api/abi_check; ./check-abi.sh)
     - name: upload check abi report
       uses: actions/upload-artifact@v3
