@@ -46,6 +46,12 @@ Important changes:
     * As a result, a behavior change for GRPC SSL is possible,
       because the endpoint scheme now takes precedence.
       Please verify configuration settings for the GRPC endpoint.
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+  * `LogRecordExporter` and `SpanExporter` add a new virtual function
+    `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+    `SpanExporter`, they should also implement this function.There should be no
+    influence if users only use factory to create exporters.
 
 ## [1.8.3] 2023-03-06
 
@@ -97,13 +103,6 @@ Important changes:
   [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
 * [EXPORTER] Opentracing shim
   [#1909](https://github.com/open-telemetry/opentelemetry-cpp/pull/1909)
-
-Important changes:
-
-* `LogRecordExporter` and `SpanExporter` add a new pure virtual function
-  `ForceFlush`, and if users implement any customized `LogRecordExporter` and
-  `SpanExporter`, they should also implement this function.There should be no
-  influence if users only use factory to create exporters.
 
 ## [1.8.2] 2023-01-31
 
