@@ -207,8 +207,22 @@ std::string GetOtlpDefaultHttpLogsEndpoint()
   return kDefault;
 }
 
-bool GetOtlpDefaultTracesIsInsecure()
+bool GetOtlpDefaultGrpcTracesIsInsecure()
 {
+  std::string endpoint = GetOtlpDefaultGrpcTracesEndpoint();
+
+  /* The trace endpoint, when providing a scheme, takes precedence. */
+
+  if (endpoint.substr(0, 6) == "https:")
+  {
+    return false;
+  }
+
+  if (endpoint.substr(0, 5) == "http:")
+  {
+    return true;
+  }
+
   constexpr char kSignalEnv[]     = "OTEL_EXPORTER_OTLP_TRACES_INSECURE";
   constexpr char kGenericEnv[]    = "OTEL_EXPORTER_OTLP_INSECURE";
   constexpr char kOldSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
@@ -253,6 +267,20 @@ bool GetOtlpDefaultTracesIsInsecure()
 
 bool GetOtlpDefaultMetricsIsInsecure()
 {
+  std::string endpoint = GetOtlpDefaultGrpcMetricsEndpoint();
+
+  /* The metrics endpoint, when providing a scheme, takes precedence. */
+
+  if (endpoint.substr(0, 6) == "https:")
+  {
+    return false;
+  }
+
+  if (endpoint.substr(0, 5) == "http:")
+  {
+    return true;
+  }
+
   constexpr char kSignalEnv[]     = "OTEL_EXPORTER_OTLP_METRICS_INSECURE";
   constexpr char kGenericEnv[]    = "OTEL_EXPORTER_OTLP_INSECURE";
   constexpr char kOldSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_SSL_ENABLE";
@@ -297,6 +325,20 @@ bool GetOtlpDefaultMetricsIsInsecure()
 
 bool GetOtlpDefaultLogsIsInsecure()
 {
+  std::string endpoint = GetOtlpDefaultGrpcLogsEndpoint();
+
+  /* The logs endpoint, when providing a scheme, takes precedence. */
+
+  if (endpoint.substr(0, 6) == "https:")
+  {
+    return false;
+  }
+
+  if (endpoint.substr(0, 5) == "http:")
+  {
+    return true;
+  }
+
   constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_INSECURE";
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_INSECURE";
 

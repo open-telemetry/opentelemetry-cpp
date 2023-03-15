@@ -22,7 +22,7 @@ struct OtlpGrpcExporterOptions
   std::string endpoint = GetOtlpDefaultGrpcEndpoint();
   // By default when false, uses grpc::InsecureChannelCredentials(); If true,
   // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
-  bool use_ssl_credentials = GetOtlpDefaultIsSslEnable();
+  bool use_ssl_credentials = GetOtlpDefaultGrpcIsSslEnable();
   // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
   std::string ssl_credentials_cacert_path = GetOtlpDefaultSslCertificatePath();
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
