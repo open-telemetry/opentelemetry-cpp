@@ -168,7 +168,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   const std::string cacert_str = "--begin and end fake cert--";
   setenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING", cacert_str.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_SSL_ENABLE", "True", 1);
-  const std::string endpoint = "http://localhost:9999";
+  const std::string endpoint = "https://localhost:9999";
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20050ms", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
