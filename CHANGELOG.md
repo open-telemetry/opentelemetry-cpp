@@ -17,12 +17,12 @@ Increment the:
 
 * [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
-* [EXPORTER] GRPC endpoint sheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
   [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
 
 Important changes:
 
-* [EXPORTER] GRPC endpoint sheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
   [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
   * The logic to decide whether or not an OTLP GRPC exporter uses SSL has
     changed to comply with the specification:
