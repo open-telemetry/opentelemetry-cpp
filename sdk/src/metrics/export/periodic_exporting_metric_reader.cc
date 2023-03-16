@@ -60,7 +60,18 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     auto end            = std::chrono::steady_clock::now();
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
-    cv_.wait_for(lk, remaining_wait_interval_ms);
+    cv_.wait_for(lk, remaining_wait_interval_ms, [this]() { 
+      if (is_force_wakeup_background_worker_.load(std::memory_order_acquire))
+      {
+        return true;
+      }
+      if (IsShutdown())
+      {
+        return true;
+      }
+      return false;
+    });
+    is_force_wakeup_background_worker_.store(false, std::memory_order_release);
   } while (IsShutdown() != true);
   // One last Collect and Export before shutdown
   auto status = CollectAndExportOnce();
@@ -96,11 +107,39 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
       break;
     }
   } while (status != std::future_status::ready);
+  bool notify_force_flush =
+        is_force_flush_pending_.exchange(false, std::memory_order_acq_rel);
+  if (notify_force_flush)
+  {
+    is_force_flush_notified_.store(true, std::memory_order_release);
+    force_flush_cv_.notify_one();
+  }
+  
   return true;
 }
 
 bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeout) noexcept
 {
+  std::unique_lock<std::mutex> lk_cv(force_flush_m_);
+  is_force_flush_pending_.store(true, std::memory_order_release);
+  auto break_condition = [this]() {
+    if (IsShutdown())
+    {
+      return true;
+    }
+
+    // Wake up the worker thread once.
+    if (is_force_flush_pending_.load(std::memory_order_acquire))
+    {
+      is_force_wakeup_background_worker_.store(true, std::memory_order_release);
+      cv_.notify_one();
+    }
+
+    return synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
+  };
+
+
+
   return exporter_->ForceFlush(timeout);
 }
 

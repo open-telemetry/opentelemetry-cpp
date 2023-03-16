@@ -56,6 +56,11 @@ private:
   std::chrono::milliseconds export_interval_millis_;
   std::chrono::milliseconds export_timeout_millis_;
 
+  std::mutex force_flush_m_;
+  std::atomic<bool> is_force_flush_pending_;
+  std::atomic<bool> is_force_wakeup_background_worker_;
+
+
   void DoBackgroundWork();
   bool CollectAndExportOnce();
 
