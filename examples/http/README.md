@@ -21,7 +21,7 @@ to server. The example shows several aspects of tracing such as:
     * [HTTP
       Server](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/server)
 
-2. Build and Deploy the opentelementry-cpp as described in
+2. Build and Deploy the opentelemetry-cpp as described in
    [INSTALL.md](../../INSTALL.md)
 
 3. Start the server from the `examples/http` directory

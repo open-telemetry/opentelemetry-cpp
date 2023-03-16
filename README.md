@@ -52,7 +52,7 @@ of the current project.
 | Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
 
 [1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
-  (required by OTLP expoter) don't build with this compiler. See gRPC [official
+  (required by OTLP exporter) don't build with this compiler. See gRPC [official
   support](https://grpc.io/docs/#official-support) document. CMake build doesn't
   build OTLP exporter with GCC 4.8.
 
