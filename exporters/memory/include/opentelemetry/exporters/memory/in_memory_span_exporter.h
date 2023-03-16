@@ -66,13 +66,6 @@ public:
   }
 
   /**
-   * Force flush the exporter.
-   * @param timeout an option timeout, default to max.
-   * @return return true when all data are exported, and false when timeout
-   */
-  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
-
-  /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
    * @return Returns the status of the operation
