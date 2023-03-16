@@ -265,7 +265,7 @@ bool GetOtlpDefaultGrpcTracesIsInsecure()
   return false;
 }
 
-bool GetOtlpDefaultMetricsIsInsecure()
+bool GetOtlpDefaultGrpcMetricsIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcMetricsEndpoint();
 
@@ -323,7 +323,7 @@ bool GetOtlpDefaultMetricsIsInsecure()
   return false;
 }
 
-bool GetOtlpDefaultLogsIsInsecure()
+bool GetOtlpDefaultGrpcLogsIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcLogsEndpoint();
 
