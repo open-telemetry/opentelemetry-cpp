@@ -17,6 +17,31 @@ Increment the:
 
 * [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+
+Important changes:
+
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+  * The logic to decide whether or not an OTLP GRPC exporter uses SSL has
+    changed to comply with the specification:
+    * Before this change, the following settings were evaluated, in order:
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * With this change, the following settings are evaluated, in order:
+      * The GRPC endpoint scheme, if provided:
+        * "https" imply with SSL,
+        * "http" imply without ssl.
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE
+      * OTEL_EXPORTER_OTLP_INSECURE
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * As a result, a behavior change for GRPC SSL is possible,
+      because the endpoint scheme now takes precedence.
+      Please verify configuration settings for the GRPC endpoint.
 
 ## [1.8.3] 2023-03-06
 
