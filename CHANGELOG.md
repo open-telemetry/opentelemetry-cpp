@@ -19,6 +19,8 @@ Increment the:
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
 * [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
   [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+* [BUILD] Restore detfault value of `OPENTELEMETRY_INSTALL` to `ON` when it's on
+  top level.[#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
 
 Important changes:
 
