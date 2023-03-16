@@ -60,9 +60,10 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
     auto end            = std::chrono::steady_clock::now();
     auto export_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     auto remaining_wait_interval_ms = export_interval_millis_ - export_time_ms;
-    cv_.wait_for(lk, remaining_wait_interval_ms, [this]() { 
+    cv_.wait_for(lk, remaining_wait_interval_ms, [this]() {
       if (is_force_wakeup_background_worker_.load(std::memory_order_acquire))
       {
+        is_force_wakeup_background_worker_.store(false, std::memory_order_release);
         return true;
       }
       if (IsShutdown())
@@ -71,14 +72,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       }
       return false;
     });
-    is_force_wakeup_background_worker_.store(false, std::memory_order_release);
   } while (IsShutdown() != true);
-  // One last Collect and Export before shutdown
-  auto status = CollectAndExportOnce();
-  if (!status)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader]  Collect-Export Cycle Failure.")
-  }
 }
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
@@ -107,14 +101,13 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
       break;
     }
   } while (status != std::future_status::ready);
-  bool notify_force_flush =
-        is_force_flush_pending_.exchange(false, std::memory_order_acq_rel);
+  bool notify_force_flush = is_force_flush_pending_.exchange(false, std::memory_order_acq_rel);
   if (notify_force_flush)
   {
     is_force_flush_notified_.store(true, std::memory_order_release);
     force_flush_cv_.notify_one();
   }
-  
+
   return true;
 }
 
@@ -134,13 +127,31 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       is_force_wakeup_background_worker_.store(true, std::memory_order_release);
       cv_.notify_one();
     }
-
-    return synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
   };
 
+  bool status = force_flush_cv_.wait_for(lk_cv, timeout, break_condition);
 
+  // If it will be already signaled, we must wait util notified.
+  // We use a spin lock here
+  if (false == is_force_flush_pending_.exchange(false, std::memory_order_acq_rel))
+  {
+    for (int retry_waiting_times = 0;
+         false == is_force_flush_notified_.load(std::memory_order_acquire); ++retry_waiting_times)
+    {
+      opentelemetry::common::SpinLockMutex::fast_yield();
+      if ((retry_waiting_times & 127) == 127)
+      {
+        std::this_thread::yield();
+      }
+    }
+  }
+  is_force_flush_notified_.store(false, std::memory_order_release);
+  if (status)
+  {
 
-  return exporter_->ForceFlush(timeout);
+    status = exporter_->ForceFlush(timeout);
+  }
+  return status;
 }
 
 bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept

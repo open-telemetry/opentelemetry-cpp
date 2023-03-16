@@ -56,11 +56,6 @@ private:
   std::chrono::milliseconds export_interval_millis_;
   std::chrono::milliseconds export_timeout_millis_;
 
-  std::mutex force_flush_m_;
-  std::atomic<bool> is_force_flush_pending_;
-  std::atomic<bool> is_force_wakeup_background_worker_;
-
-
   void DoBackgroundWork();
   bool CollectAndExportOnce();
 
@@ -68,8 +63,11 @@ private:
   std::thread worker_thread_;
 
   /* Synchronization primitives */
-  std::condition_variable cv_;
-  std::mutex cv_m_;
+  std::atomic<bool> is_force_flush_pending_;
+  std::atomic<bool> is_force_wakeup_background_worker_;
+  std::atomic<bool> is_force_flush_notified_;
+  std::condition_variable cv_, force_flush_cv_;
+  std::mutex cv_m_, force_flush_m_;
 };
 
 }  // namespace metrics
