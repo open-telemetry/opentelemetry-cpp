@@ -127,6 +127,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       is_force_wakeup_background_worker_.store(true, std::memory_order_release);
       cv_.notify_one();
     }
+    return is_force_flush_notified_.load(std::memory_order_acquire);
   };
 
   bool status = force_flush_cv_.wait_for(lk_cv, timeout, break_condition);
