@@ -24,7 +24,7 @@ of tracing such as:
 
     ``find_package(gRPC)``
 
-2. Build and Deploy the opentelementry-cpp as described in
+2. Build and Deploy the opentelemetry-cpp as described in
    [INSTALL.md](../../INSTALL.md). Building the project will build all of the
    examples and create new folders containing their executables within the
    'build' directory NOT the 'examples' directory.
