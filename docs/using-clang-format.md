@@ -48,6 +48,6 @@ For further guidance on editor integration, see these specific pages:
 
 No. For the project as a whole, using clang-format is just one optional way to
 format your code. While it will produce style-guide conformant code, other
-formattings would also satisfy the style guide. For certain modules it may be
+formats would also satisfy the style guide. For certain modules it may be
 appropriate to use alternate coding style. In those scenarios a local directory
 *.clang-format* settings file takes precedence over the one at top-level.

@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
+  [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+
 ## [1.8.3] 2023-03-06
 
 * Provide version major/minor/patch macros
