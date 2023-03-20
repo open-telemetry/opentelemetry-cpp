@@ -21,6 +21,10 @@ Increment the:
   [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
 * [BUILD] Restore detfault value of `OPENTELEMETRY_INSTALL` to `ON` when it's on
   top level.[#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
+  [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
 
 Important changes:
 
@@ -44,6 +48,12 @@ Important changes:
     * As a result, a behavior change for GRPC SSL is possible,
       because the endpoint scheme now takes precedence.
       Please verify configuration settings for the GRPC endpoint.
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+  * `LogRecordExporter` and `SpanExporter` add a new virtual function
+    `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+    `SpanExporter`, they should also implement this function.There should be no
+    influence if users only use factory to create exporters.
 
 ## [1.8.3] 2023-03-06
 

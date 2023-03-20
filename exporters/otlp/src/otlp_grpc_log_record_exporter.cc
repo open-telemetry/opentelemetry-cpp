@@ -90,6 +90,13 @@ bool OtlpGrpcLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */
   return true;
 }
 
+bool OtlpGrpcLogRecordExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  // TODO: When we implement async exporting in OTLP gRPC exporter in the future, we need wait the
+  //       running exporting finished here.
+  return true;
+}
+
 bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

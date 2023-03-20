@@ -98,6 +98,11 @@ void JaegerExporter::InitializeEndpoint()
   assert(false);
 }
 
+bool JaegerExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  return true;
+}
+
 bool JaegerExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
