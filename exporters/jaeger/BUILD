@@ -189,6 +189,7 @@ cc_library(
     deps = [
         ":jaeger_exporter",
         "//sdk/src/common:global_log_handler",
+        "//sdk/src/trace",
     ],
 )
 
