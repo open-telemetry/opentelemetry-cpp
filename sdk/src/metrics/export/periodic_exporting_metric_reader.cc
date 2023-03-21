@@ -165,7 +165,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       }
     }
   }
-  
+
   is_force_flush_notified_.store(false, std::memory_order_release);
   if (result)
   {
