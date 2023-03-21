@@ -15,10 +15,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
 
 # repository: https://github.com/open-telemetry/opentelemetry-specification
-SEMCONV_VERSION=1.19.0
+SEMCONV_VERSION=1.18.0
 
 # repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.17.0
+GENERATOR_VERSION=0.15.1
 
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
