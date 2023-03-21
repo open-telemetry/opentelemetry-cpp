@@ -113,6 +113,12 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+bool OStreamLogRecordExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  sout_.flush();
+  return true;
+}
+
 bool OStreamLogRecordExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
