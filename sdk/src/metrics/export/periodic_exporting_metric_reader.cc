@@ -91,6 +91,7 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
       return true;
     });
   });
+
   std::future_status status;
   do
   {
@@ -129,9 +130,9 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     }
     return is_force_flush_notified_.load(std::memory_order_acquire);
   };
+
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
-
   std::chrono::steady_clock::duration timeout_steady =
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
@@ -142,8 +143,8 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
   bool result = false;
   while (!result && timeout_steady > std::chrono::steady_clock::duration::zero())
   {
-    // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
-    // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
+    // When is_force_flush_notified_.store(true) and force_flush_cv_.notify_all() is called
+    // between is_force_flush_pending_.load() and force_flush_cv_.wait(). We must not wait
     // for ever
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
     result = force_flush_cv_.wait_for(lk_cv, export_interval_millis_, break_condition);
@@ -164,6 +165,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       }
     }
   }
+  
   is_force_flush_notified_.store(false, std::memory_order_release);
   if (result)
   {
