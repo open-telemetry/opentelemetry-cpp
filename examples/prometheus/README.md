@@ -81,14 +81,6 @@ global:
   scrape_interval: 5s
   scrape_timeout: 2s
   evaluation_interval: 5s
-alerting:
-  alertmanagers:
-  - follow_redirects: true
-    scheme: http
-    timeout: 5s
-    api_version: v2
-    static_configs:
-    - targets: [localhost:9464]
 scrape_configs:
   - job_name: otel
     static_configs:

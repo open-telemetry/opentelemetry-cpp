@@ -6,6 +6,7 @@ add_library(
   logger_provider.cc
   logger_provider_factory.cc
   logger.cc
+  exporter.cc
   event_logger_provider.cc
   event_logger_provider_factory.cc
   event_logger.cc

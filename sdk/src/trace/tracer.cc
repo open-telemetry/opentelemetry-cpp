@@ -104,12 +104,22 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
 {
-  (void)timeout;
+  if (context_)
+  {
+    context_->ForceFlush(
+        std::chrono::microseconds{static_cast<std::chrono::microseconds::rep>(timeout)});
+  }
 }
 
 void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
 {
-  (void)timeout;
+  // Trace context is shared by many tracers.So we just call ForceFlush to flush all pending spans
+  // and do not  shutdown it.
+  if (context_)
+  {
+    context_->ForceFlush(
+        std::chrono::microseconds{static_cast<std::chrono::microseconds::rep>(timeout)});
+  }
 }
 }  // namespace trace
 }  // namespace sdk
