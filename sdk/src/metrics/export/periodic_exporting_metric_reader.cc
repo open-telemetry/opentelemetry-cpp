@@ -129,8 +129,26 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     }
     return is_force_flush_notified_.load(std::memory_order_acquire);
   };
+  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+      timeout, std::chrono::microseconds::zero());
 
-  bool status = force_flush_cv_.wait_for(lk_cv, timeout, break_condition);
+  std::chrono::steady_clock::duration timeout_steady =
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
+  {
+    timeout_steady = std::chrono::steady_clock::duration::max();
+  }
+
+  bool result = false;
+  while (!result && timeout_steady > std::chrono::steady_clock::duration::zero())
+  {
+    // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
+    // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
+    // for ever
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    result = force_flush_cv_.wait_for(lk_cv, export_interval_millis_, break_condition);
+    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
+  }
 
   // If it will be already signaled, we must wait util notified.
   // We use a spin lock here
@@ -147,12 +165,12 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     }
   }
   is_force_flush_notified_.store(false, std::memory_order_release);
-  if (status)
+  if (result)
   {
 
-    status = exporter_->ForceFlush(timeout);
+    result = exporter_->ForceFlush(timeout);
   }
-  return status;
+  return result;
 }
 
 bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept
