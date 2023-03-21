@@ -69,10 +69,12 @@ private:
 class TestExporter final : public LogRecordExporter
 {
 public:
-  TestExporter(int *shutdown_counter,
+  TestExporter(int *force_flush_counter,
+               int *shutdown_counter,
                std::shared_ptr<std::vector<std::unique_ptr<TestLogRecordable>>> logs_received,
                size_t *batch_size_received)
-      : shutdown_counter_(shutdown_counter),
+      : force_flush_counter_(force_flush_counter),
+        shutdown_counter_(shutdown_counter),
         logs_received_(logs_received),
         batch_size_received(batch_size_received)
   {}
@@ -99,14 +101,27 @@ public:
     return ExportResult::kSuccess;
   }
 
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    if (nullptr != force_flush_counter_)
+    {
+      ++(*force_flush_counter_);
+    }
+    return true;
+  }
+
   // Increment the shutdown counter everytime this method is called
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
-    *shutdown_counter_ += 1;
+    if (nullptr != shutdown_counter_)
+    {
+      *shutdown_counter_ += 1;
+    }
     return true;
   }
 
 private:
+  int *force_flush_counter_;
   int *shutdown_counter_;
   std::shared_ptr<std::vector<std::unique_ptr<TestLogRecordable>>> logs_received_;
   size_t *batch_size_received;
@@ -122,7 +137,7 @@ TEST(SimpleLogRecordProcessorTest, SendReceivedLogsToExporter)
   size_t batch_size_received = 0;
 
   std::unique_ptr<TestExporter> exporter(
-      new TestExporter(nullptr, logs_received, &batch_size_received));
+      new TestExporter(nullptr, nullptr, logs_received, &batch_size_received));
 
   SimpleLogRecordProcessor processor(std::move(exporter));
 
@@ -152,7 +167,8 @@ TEST(SimpleLogRecordProcessorTest, ShutdownCalledOnce)
   // Create a TestExporter
   int num_shutdowns = 0;
 
-  std::unique_ptr<TestExporter> exporter(new TestExporter(&num_shutdowns, nullptr, nullptr));
+  std::unique_ptr<TestExporter> exporter(
+      new TestExporter(nullptr, &num_shutdowns, nullptr, nullptr));
 
   // Create a processor with the previous test exporter
   SimpleLogRecordProcessor processor(std::move(exporter));
@@ -167,11 +183,28 @@ TEST(SimpleLogRecordProcessorTest, ShutdownCalledOnce)
   EXPECT_EQ(1, num_shutdowns);
 }
 
+TEST(SimpleLogRecordProcessorTest, ForceFlush)
+{
+  // Create a TestExporter
+  int num_force_flush = 0;
+
+  std::unique_ptr<TestExporter> exporter(
+      new TestExporter(&num_force_flush, nullptr, nullptr, nullptr));
+
+  // Create a processor with the previous test exporter
+  SimpleLogRecordProcessor processor(std::move(exporter));
+
+  // The first time processor shutdown is called
+  EXPECT_EQ(0, num_force_flush);
+  EXPECT_EQ(true, processor.ForceFlush());
+  EXPECT_EQ(1, num_force_flush);
+}
+
 // A test exporter that always returns failure when shut down
-class FailShutDownExporter final : public LogRecordExporter
+class FailShutDownForceFlushExporter final : public LogRecordExporter
 {
 public:
-  FailShutDownExporter() {}
+  FailShutDownForceFlushExporter() {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
@@ -184,16 +217,29 @@ public:
     return ExportResult::kSuccess;
   }
 
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return false; }
+
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return false; }
 };
 
 // Tests for when when processor should fail to shutdown
 TEST(SimpleLogRecordProcessorTest, ShutDownFail)
 {
-  std::unique_ptr<FailShutDownExporter> exporter(new FailShutDownExporter());
+  std::unique_ptr<FailShutDownForceFlushExporter> exporter(new FailShutDownForceFlushExporter());
   SimpleLogRecordProcessor processor(std::move(exporter));
 
   // Expect failure result when exporter fails to shutdown
   EXPECT_EQ(false, processor.Shutdown());
 }
+
+// Tests for when when processor should fail to force flush
+TEST(SimpleLogRecordProcessorTest, ForceFlushFail)
+{
+  std::unique_ptr<FailShutDownForceFlushExporter> exporter(new FailShutDownForceFlushExporter());
+  SimpleLogRecordProcessor processor(std::move(exporter));
+
+  // Expect failure result when exporter fails to force flush
+  EXPECT_EQ(false, processor.ForceFlush());
+}
+
 #endif

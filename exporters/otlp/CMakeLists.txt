@@ -162,18 +162,20 @@ if(WITH_OTLP_HTTP)
        opentelemetry_exporter_otlp_http_metric)
 endif()
 
-install(
-  TARGETS ${OPENTELEMETRY_OTLP_TARGETS}
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS ${OPENTELEMETRY_OTLP_TARGETS}
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/otlp
-  DESTINATION include/opentelemetry/exporters
-  FILES_MATCHING
-  PATTERN "*.h")
+  install(
+    DIRECTORY include/opentelemetry/exporters/otlp
+    DESTINATION include/opentelemetry/exporters
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
 
 if(BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)

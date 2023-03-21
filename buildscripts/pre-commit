@@ -61,18 +61,18 @@ namespace sdk
 {
 namespace version
 {
-const int major_version = ${major};
-const int minor_version = ${minor};
-const int patch_version = ${patch};
-const char* pre_release = "${pre_release}";
-const char* build_metadata = "${build_metadata}";
+const int major_version     = ${major};
+const int minor_version     = ${minor};
+const int patch_version     = ${patch};
+const char *pre_release     = "${pre_release}";
+const char *build_metadata  = "${build_metadata}";
 const int count_new_commits = ${count_new_commits};
-const char* branch = "${branch}";
-const char* commit_hash = "${latest_commit_hash}";
-const char* short_version = "${short_version}";
-const char* full_version =
+const char *branch          = "${branch}";
+const char *commit_hash     = "${latest_commit_hash}";
+const char *short_version   = "${short_version}";
+const char *full_version =
     "${full_version}";
-const char* build_date = "$(date -u)";
+const char *build_date = "$(date -u)";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
