@@ -131,10 +131,10 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     return is_force_flush_notified_.load(std::memory_order_acquire);
   };
 
-  timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+  auto wait_timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
   std::chrono::steady_clock::duration timeout_steady =
-      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(wait_timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
     timeout_steady = std::chrono::steady_clock::duration::max();
@@ -167,10 +167,36 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
   }
 
   is_force_flush_notified_.store(false, std::memory_order_release);
+
+  if (timeout == std::chrono::steady_clock::duration::zero())
+  {
+  }
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
+  {
+    // forceflush timeout, exporter force-flush won't be triggered.
+    result = false;
+  }
+
   if (result)
   {
-    result = exporter_->ForceFlush(
-        std::chrono::duration_cast<std::chrono::microseconds>(timeout_steady));
+    // - If original `timeout` is `zero`, use that in exporter::forceflush
+    // - Else if remaining `timeout_steady` more than zero, use that in exporter::forceflush
+    // - Else don't invoke exporter::forceflush ( as remaining time is zero or less)
+    if (timeout <= std::chrono::steady_clock::duration::zero())
+    {
+      result =
+          exporter_->ForceFlush(std::chrono::duration_cast<std::chrono::microseconds>(timeout));
+    }
+    else if (timeout_steady > std::chrono::steady_clock::duration::zero())
+    {
+      result = exporter_->ForceFlush(
+          std::chrono::duration_cast<std::chrono::microseconds>(timeout_steady));
+    }
+    else
+    {
+      // remaining timeout_steady is zero or less
+      result = false;
+    }
   }
   return result;
 }
