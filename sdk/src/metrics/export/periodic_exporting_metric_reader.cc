@@ -165,17 +165,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       }
     }
   }
-
   is_force_flush_notified_.store(false, std::memory_order_release);
-
-  if (timeout == std::chrono::steady_clock::duration::zero())
-  {
-  }
-  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
-  {
-    // forceflush timeout, exporter force-flush won't be triggered.
-    result = false;
-  }
 
   if (result)
   {
