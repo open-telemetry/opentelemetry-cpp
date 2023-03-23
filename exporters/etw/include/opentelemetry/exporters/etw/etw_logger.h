@@ -228,6 +228,8 @@ public:
                    opentelemetry::trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
+    UNREFERENCED_PARAMETER(trace_flags);
+
 #  if defined(ENABLE_ENV_PROPERTIES)
 
     Properties env_properties_env = {};

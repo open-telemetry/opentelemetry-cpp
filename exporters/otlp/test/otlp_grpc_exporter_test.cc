@@ -168,7 +168,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   const std::string cacert_str = "--begin and end fake cert--";
   setenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING", cacert_str.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_SSL_ENABLE", "True", 1);
-  const std::string endpoint = "http://localhost:9999";
+  const std::string endpoint = "https://localhost:9999";
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20050ms", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
@@ -208,6 +208,76 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+}
+#  endif
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpsSecureFromEnv)
+{
+  // https takes precedence over insecure
+  const std::string endpoint = "https://localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
+  EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
+}
+#  endif
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpInsecureFromEnv)
+{
+  // http takes precedence over secure
+  const std::string endpoint = "http://localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
+  EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
+}
+#  endif
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownSecureFromEnv)
+{
+  const std::string endpoint = "localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
+  EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
+}
+#  endif
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
+{
+  const std::string endpoint = "localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
+  EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE");
 }
 #  endif
 

@@ -23,11 +23,13 @@ class MockSpanExporter final : public sdk::trace::SpanExporter
 public:
   MockSpanExporter(
       std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
+      std::shared_ptr<std::atomic<std::size_t>> shut_down_counter,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
       const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
       : spans_received_(spans_received),
+        shut_down_counter_(shut_down_counter),
         is_shutdown_(is_shutdown),
         is_export_completed_(is_export_completed),
         export_delay_(export_delay)
@@ -60,6 +62,12 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
+  bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
+  {
+    ++(*shut_down_counter_);
+    return true;
+  }
+
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     *is_shutdown_ = true;
@@ -70,6 +78,7 @@ public:
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received_;
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
@@ -104,14 +113,16 @@ public:
 
 TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 {
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
-  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(
-                                             new MockSpanExporter(spans_received, is_shutdown)),
-                                         sdk::trace::BatchSpanProcessorOptions()));
+  auto batch_processor =
+      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
+          std::unique_ptr<sdk::trace::SpanExporter>(
+              new MockSpanExporter(spans_received, shut_down_counter, is_shutdown)),
+          sdk::trace::BatchSpanProcessorOptions()));
   const int num_spans = 3;
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
@@ -136,14 +147,16 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 {
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
-  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(
-                                             new MockSpanExporter(spans_received, is_shutdown)),
-                                         sdk::trace::BatchSpanProcessorOptions()));
+  auto batch_processor =
+      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
+          std::unique_ptr<sdk::trace::SpanExporter>(
+              new MockSpanExporter(spans_received, shut_down_counter, is_shutdown)),
+          sdk::trace::BatchSpanProcessorOptions()));
   const int num_spans = 2048;
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
@@ -157,6 +170,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   EXPECT_TRUE(batch_processor->ForceFlush());
+  EXPECT_GE(shut_down_counter->load(), 1);
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -174,7 +188,9 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
+  auto shut_down_counter_before = shut_down_counter->load();
   EXPECT_TRUE(batch_processor->ForceFlush());
+  EXPECT_GT(shut_down_counter->load(), shut_down_counter_before);
 
   EXPECT_EQ(num_spans * 2, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -209,16 +225,18 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   auto log_handler = nostd::shared_ptr<sdk::common::internal_log::LogHandler>(new MockLogHandler());
   sdk::common::internal_log::GlobalLogHandler::SetLogHandler(log_handler);
 
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
   const int max_queue_size = 4096;
 
-  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(
-                                             new MockSpanExporter(spans_received, is_shutdown)),
-                                         sdk::trace::BatchSpanProcessorOptions()));
+  auto batch_processor =
+      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
+          std::unique_ptr<sdk::trace::SpanExporter>(
+              new MockSpanExporter(spans_received, shut_down_counter, is_shutdown)),
+          sdk::trace::BatchSpanProcessorOptions()));
 
   auto test_spans = GetTestSpans(batch_processor, max_queue_size);
 
@@ -259,16 +277,18 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
 {
   /* Test that no spans are lost when sending max_queue_size spans */
 
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
   const int num_spans = 2048;
 
-  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(
-                                             new MockSpanExporter(spans_received, is_shutdown)),
-                                         sdk::trace::BatchSpanProcessorOptions()));
+  auto batch_processor =
+      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
+          std::unique_ptr<sdk::trace::SpanExporter>(
+              new MockSpanExporter(spans_received, shut_down_counter, is_shutdown)),
+          sdk::trace::BatchSpanProcessorOptions()));
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
 
@@ -294,6 +314,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   /* Test that max_export_batch_size spans are exported every schedule_delay_millis
      seconds */
 
+  std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
@@ -305,8 +326,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
 
   auto batch_processor =
       std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
-          std::unique_ptr<sdk::trace::SpanExporter>(
-              new MockSpanExporter(spans_received, is_shutdown, is_export_completed, export_delay)),
+          std::unique_ptr<sdk::trace::SpanExporter>(new MockSpanExporter(
+              spans_received, shut_down_counter, is_shutdown, is_export_completed, export_delay)),
           options));
 
   auto test_spans = GetTestSpans(batch_processor, max_export_batch_size);

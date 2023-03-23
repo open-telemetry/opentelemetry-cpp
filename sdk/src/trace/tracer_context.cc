@@ -53,9 +53,9 @@ bool TracerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
   return processor_->ForceFlush(timeout);
 }
 
-bool TracerContext::Shutdown() noexcept
+bool TracerContext::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return processor_->Shutdown();
+  return processor_->Shutdown(timeout);
 }
 
 }  // namespace trace
