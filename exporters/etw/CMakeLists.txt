@@ -11,8 +11,12 @@ target_include_directories(
 set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
                                                             etw_exporter)
 
-target_link_libraries(opentelemetry_exporter_etw
-                      INTERFACE opentelemetry_api nlohmann_json::nlohmann_json)
+target_link_libraries(
+  opentelemetry_exporter_etw INTERFACE opentelemetry_api opentelemetry_trace
+                                       nlohmann_json::nlohmann_json)
+if(WITH_LOGS_PREVIEW)
+  target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs)
+endif()
 if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()
