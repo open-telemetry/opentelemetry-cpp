@@ -17,8 +17,43 @@ Increment the:
 
 * [RESOURCE SDK] Fix schema URL precedence bug in `Resource::Merge`.
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+* [BUILD] Restore detfault value of `OPENTELEMETRY_INSTALL` to `ON` when it's on
+  top level.[#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
 * [EXPORTER] Add OTLP HTTP SSL support
   [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
+
+Important changes:
+
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+  * The logic to decide whether or not an OTLP GRPC exporter uses SSL has
+    changed to comply with the specification:
+    * Before this change, the following settings were evaluated, in order:
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * With this change, the following settings are evaluated, in order:
+      * The GRPC endpoint scheme, if provided:
+        * "https" imply with SSL,
+        * "http" imply without ssl.
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE
+      * OTEL_EXPORTER_OTLP_INSECURE
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * As a result, a behavior change for GRPC SSL is possible,
+      because the endpoint scheme now takes precedence.
+      Please verify configuration settings for the GRPC endpoint.
+* [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+  * `LogRecordExporter` and `SpanExporter` add a new virtual function
+    `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+    `SpanExporter`, they should also implement this function.There should be no
+    influence if users only use factory to create exporters.
 
 ## [1.8.3] 2023-03-06
 

@@ -118,9 +118,8 @@ option(WITH_GSL
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
+set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(OPENTELEMETRY_INSTALL_default ON)
-else()
   set(OPENTELEMETRY_INSTALL_default OFF)
 endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"

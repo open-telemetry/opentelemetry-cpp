@@ -143,6 +143,11 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
 #endif
 }
 
+bool OtlpHttpExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return http_client_->ForceFlush(timeout);
+}
+
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   return http_client_->Shutdown(timeout);

@@ -793,34 +793,40 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   // Wait for all the sessions to finish
   std::unique_lock<std::mutex> lock(session_waker_lock_);
-  if (timeout <= std::chrono::microseconds::zero())
+
+  std::chrono::steady_clock::duration timeout_steady =
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    while (true)
+    timeout_steady = std::chrono::steady_clock::duration::max();
+  }
+
+  while (timeout_steady > std::chrono::steady_clock::duration::zero())
+  {
     {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      if (running_sessions_.empty())
       {
-        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-        if (running_sessions_.empty())
-        {
-          break;
-        }
-      }
-      // When changes of running_sessions_ and notify_one/notify_all happen between predicate
-      // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
-      // as possible to call FinishSession() and cleanup resources.
-      if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
-      {
-        cleanupGCSessions();
+        break;
       }
     }
-    return true;
+    // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+    // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
+    // as possible to call FinishSession() and cleanup resources.
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
+    {
+      cleanupGCSessions();
+    }
+    else
+    {
+      break;
+    }
+
+    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
-  else
-  {
-    return session_waker_.wait_for(lock, timeout, [this] {
-      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-      return running_sessions_.empty();
-    });
-  }
+
+  return timeout_steady > std::chrono::steady_clock::duration::zero();
 }
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept

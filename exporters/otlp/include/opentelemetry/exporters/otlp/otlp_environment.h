@@ -53,14 +53,14 @@ inline std::string GetOtlpDefaultMetricsEndpoint()
   return GetOtlpDefaultHttpMetricsEndpoint();
 }
 
-bool GetOtlpDefaultTracesIsInsecure();
-bool GetOtlpDefaultMetricsIsInsecure();
-bool GetOtlpDefaultLogsIsInsecure();
+bool GetOtlpDefaultGrpcTracesIsInsecure();
+bool GetOtlpDefaultGrpcMetricsIsInsecure();
+bool GetOtlpDefaultGrpcLogsIsInsecure();
 
 // Compatibility with OTELCPP 1.8.2
 inline bool GetOtlpDefaultIsSslEnable()
 {
-  return (!GetOtlpDefaultTracesIsInsecure());
+  return (!GetOtlpDefaultGrpcTracesIsInsecure());
 }
 
 std::string GetOtlpDefaultTracesSslCertificatePath();
