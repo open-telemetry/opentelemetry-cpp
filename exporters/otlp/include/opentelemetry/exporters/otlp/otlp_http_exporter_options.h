@@ -57,7 +57,7 @@ struct OtlpHttpExporterOptions
   std::size_t max_requests_per_connection = 8;
 #endif
 
-#ifdef ENABLE_OTLP_HTTP_SSL
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   bool ssl_insecure_skip_verify{false};
 
   std::string ssl_ca_cert_path   = GetOtlpDefaultTracesSslCertificatePath();
@@ -70,7 +70,7 @@ struct OtlpHttpExporterOptions
   std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 #endif
 
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   /** Minimum TLS version. */
   std::string ssl_min_tls = GetOtlpDefaultTracesSslTlsMinVersion();
   /** Maximum TLS version. */

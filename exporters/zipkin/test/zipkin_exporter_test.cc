@@ -65,7 +65,7 @@ public:
                const ext::http::client::Headers &),
               (noexcept, override));
 
-#  ifdef ENABLE_OTLP_HTTP_SSL
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
@@ -73,21 +73,21 @@ public:
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
-#  endif
+#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &, const ext::http::client::Headers &),
               (noexcept, override));
 
-#  ifdef ENABLE_OTLP_HTTP_SSL
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &,
                const ext::http::client::HttpSslOptions &,
                const ext::http::client::Headers &),
               (noexcept, override));
-#  endif
+#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 };
 
 class IsValidMessageMatcher

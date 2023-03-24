@@ -226,7 +226,7 @@ public:
     return GetImpl(url, no_ssl, headers);
   }
 
-#ifdef ENABLE_OTLP_HTTP_SSL
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
@@ -234,7 +234,7 @@ public:
   {
     return GetImpl(url, ssl_options, headers);
   }
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
   opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
@@ -245,7 +245,7 @@ public:
     return PostImpl(url, no_ssl, body, headers);
   }
 
-#ifdef ENABLE_OTLP_HTTP_SSL
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
@@ -254,7 +254,7 @@ public:
   {
     return PostImpl(url, ssl_options, body, headers);
   }
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
 private:
   opentelemetry::ext::http::client::Result GetImpl(

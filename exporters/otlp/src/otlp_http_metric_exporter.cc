@@ -29,7 +29,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-#ifdef ENABLE_OTLP_HTTP_SSL
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
                                                             options.ssl_insecure_skip_verify,
                                                             options.ssl_ca_cert_path,
                                                             options.ssl_ca_cert_string,
@@ -45,8 +45,8 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
                                                             "" /* ssl_client_key_string */,
                                                             "" /* ssl_client_cert_path */,
                                                             "" /* ssl_client_cert_string */,
-#endif
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
                                                             options.ssl_min_tls,
                                                             options.ssl_max_tls,
                                                             options.ssl_cipher,
@@ -56,7 +56,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
                                                             "" /* ssl_max_tls */,
                                                             "" /* ssl_cipher */,
                                                             "" /* ssl_cipher_suite */,
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
                                                             options.content_type,
                                                             options.json_bytes_mapping,
                                                             options.use_json_name,

@@ -660,7 +660,7 @@ std::string GetOtlpDefaultLogsSslClientCertificateString()
   return std::string{};
 }
 
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
 
 /*
   EXPERIMENTAL:
@@ -872,7 +872,7 @@ std::string GetOtlpDefaultLogsSslTlsCipherSuite()
   return std::string{};
 }
 
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS */
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout()
 {

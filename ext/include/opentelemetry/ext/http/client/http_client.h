@@ -358,7 +358,7 @@ public:
                       const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 
-#ifdef ENABLE_OTLP_HTTP_SSL
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   // ABI change, new virtual method
   virtual Result Get(const nostd::string_view &url,
                      const HttpSslOptions &ssl_options,
@@ -369,7 +369,7 @@ public:
                       const HttpSslOptions &ssl_options,
                       const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
   virtual ~HttpClientSync() = default;
 };
