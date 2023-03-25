@@ -66,11 +66,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
         is_force_wakeup_background_worker_.store(false, std::memory_order_release);
         return true;
       }
-      if (IsShutdown())
-      {
-        return true;
-      }
-      return false;
+      return IsShutdown();
     });
   } while (IsShutdown() != true);
 }
@@ -151,7 +147,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  // If it will be already signaled, we must wait util notified.
+  // If it will be already signaled, we must wait until notified.
   // We use a spin lock here
   if (false == is_force_flush_pending_.exchange(false, std::memory_order_acq_rel))
   {
