@@ -131,13 +131,31 @@ jobs:
         sudo ./ci/install_abseil.sh
         ./ci/do_ci.sh cmake.abseil.test
 
-  cmake_gcc_48_test:
-    name: CMake gcc 4.8 (without otlp exporter)
-    runs-on: ubuntu-18.04
+  cmake_opentracing_shim_test:
+    name: CMake test (with opentracing-shim)
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake tests (enable opentracing-shim)
+      run: ./ci/do_ci.sh cmake.opentracing_shim.test
+
+  cmake_gcc_48_test:
+    name: CMake gcc 4.8 (without otlp exporter)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: Add Ubuntu Xenial package sources
+      run: |
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -156,11 +174,15 @@ jobs:
 
   cmake_gcc_48_otlp_exporter_test:
     name: CMake gcc 4.8 (with otlp exporter)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: 'recursive'
+    - name: Add Ubuntu Xenial package sources
+      run: |
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
+          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -241,6 +263,22 @@ jobs:
       run: |
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_do_not_install_test:
+    name: CMake do not install test (with otlp-exporter)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.do_not_install.test
 
   plugin_test:
     name: Plugin -> CMake

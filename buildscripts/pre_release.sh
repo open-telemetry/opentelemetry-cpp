@@ -48,7 +48,7 @@ if [ ! -f $changelog_file ]; then
     exit 1
 fi
 
-if [ ! grep -q "^\#\# \[Unreleased\]$" $changelog_file ]; then
+if ! grep -q "^\#\# \[Unreleased\]$" "$changelog_file" ; then
     echo "Error: $changelog_file doesn't contain Unreleased information. Please update the file with changes and run this script again."
     exit 1
 fi
