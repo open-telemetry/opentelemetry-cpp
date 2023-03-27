@@ -26,7 +26,9 @@ namespace nostd = opentelemetry::nostd;
 class TestResource : public Resource
 {
 public:
-  TestResource(ResourceAttributes attributes = ResourceAttributes()) : Resource(attributes) {}
+  TestResource(ResourceAttributes attributes = ResourceAttributes(), std::string schema_url = {})
+      : Resource(attributes, schema_url)
+  {}
 };
 
 TEST(ResourceTest, create_without_servicename)
@@ -168,6 +170,32 @@ TEST(ResourceTest, MergeEmptyString)
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+}
+
+TEST(ResourceTest, MergeSchemaUrl)
+{
+  const std::string url = "https://opentelemetry.io/schemas/v3.1.4";
+
+  TestResource resource_empty_url({}, "");
+  TestResource resource_some_url({}, url);
+  TestResource resource_different_url({}, "different");
+
+  // Specified behavior:
+  auto merged_both_empty = resource_empty_url.Merge(resource_empty_url);
+  EXPECT_TRUE(merged_both_empty.GetSchemaURL().empty());
+
+  auto merged_old_empty = resource_empty_url.Merge(resource_some_url);
+  EXPECT_EQ(merged_old_empty.GetSchemaURL(), url);
+
+  auto merged_updating_empty = resource_some_url.Merge(resource_empty_url);
+  EXPECT_EQ(merged_updating_empty.GetSchemaURL(), url);
+
+  auto merged_same_url = resource_some_url.Merge(resource_some_url);
+  EXPECT_EQ(merged_same_url.GetSchemaURL(), url);
+
+  // Implementation-defined behavior:
+  auto merged_different_url = resource_different_url.Merge(resource_some_url);
+  EXPECT_EQ(merged_different_url.GetSchemaURL(), url);
 }
 
 #ifndef NO_GETENV

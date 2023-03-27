@@ -43,8 +43,12 @@ void SimpleLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noex
 /**
  *  The simple processor does not have any log records to flush so this method is not used
  */
-bool SimpleLogRecordProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+bool SimpleLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
+  if (exporter_ != nullptr)
+  {
+    return exporter_->ForceFlush(timeout);
+  }
   return true;
 }
 

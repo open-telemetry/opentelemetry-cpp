@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.18.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.19.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -39,6 +39,38 @@ static constexpr const char *kExceptionMessage = "exception.message";
  * representation is to be determined and documented by each language SIG.
  */
 static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
+
+/**
+ * HTTP request method.
+ */
+static constexpr const char *kHttpMethod = "http.method";
+
+/**
+ * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
+ */
+static constexpr const char *kHttpStatusCode = "http.status_code";
+
+/**
+ * Kind of HTTP protocol used.
+ */
+static constexpr const char *kHttpFlavor = "http.flavor";
+
+/**
+ * The URI scheme identifying the used protocol.
+ */
+static constexpr const char *kHttpScheme = "http.scheme";
+
+/**
+ * The matched route (path template in the format used by the respective server framework). See note
+below
+ *
+ * <p>Notes:
+  <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
+route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
+the <a href="/specification/trace/semantic_conventions/http.md#http-server-definitions">application
+root</a> if there is one.</li> </ul>
+ */
+static constexpr const char *kHttpRoute = "http.route";
 
 /**
  * The name identifies the event.
@@ -59,7 +91,7 @@ static constexpr const char *kEventDomain = "event.domain";
  Lambda-Runtime-Invoked-Function-Arn} header on the {@code /runtime/invocation/next} applicable).
  *
  * <p>Notes:
-  <ul> <li>This may be different from {@code faas.id} if an alias is involved.</li> </ul>
+  <ul> <li>This may be different from {@code cloud.resource_id} if an alias is involved.</li> </ul>
  */
 static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
 
@@ -255,7 +287,7 @@ static constexpr const char *kOtelStatusCode = "otel.status_code";
 static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
 /**
- * Type of the trigger which caused this function execution.
+ * Type of the trigger which caused this function invocation.
  *
  * <p>Notes:
   <ul> <li>For the server/consumer span on the incoming side,
@@ -268,9 +300,9 @@ lambda, which is often HTTP).</li> </ul>
 static constexpr const char *kFaasTrigger = "faas.trigger";
 
 /**
- * The execution ID of the current function execution.
+ * The invocation ID of the current function invocation.
  */
-static constexpr const char *kFaasExecution = "faas.execution";
+static constexpr const char *kFaasInvocationId = "faas.invocation_id";
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud
@@ -342,6 +374,30 @@ static constexpr const char *kFaasInvokedProvider = "faas.invoked_provider";
  function.</li> </ul>
  */
 static constexpr const char *kFaasInvokedRegion = "faas.invoked_region";
+
+/**
+ * The unique identifier of the feature flag.
+ */
+static constexpr const char *kFeatureFlagKey = "feature_flag.key";
+
+/**
+ * The name of the service provider that performs the flag evaluation.
+ */
+static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider_name";
+
+/**
+ * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the
+value can be used.
+ *
+ * <p>Notes:
+  <ul> <li>A semantic identifier, commonly referred to as a variant, provides a means
+for referring to a value without including the value itself. This can
+provide additional context for understanding the meaning behind a value.
+For example, the variant {@code red} maybe be used for the value {@code #c05543}.</li><li>A
+stringified version of the value can be used in situations where a semantic identifier is
+unavailable. String representation of the value should be determined by the implementer.</li> </ul>
+ */
+static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
 
 /**
  * Transport protocol used. See note below.
@@ -522,31 +578,6 @@ static constexpr const char *kCodeLineno = "code.lineno";
 static constexpr const char *kCodeColumn = "code.column";
 
 /**
- * HTTP request method.
- */
-static constexpr const char *kHttpMethod = "http.method";
-
-/**
- * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
- */
-static constexpr const char *kHttpStatusCode = "http.status_code";
-
-/**
- * Kind of HTTP protocol used.
- *
- * <p>Notes:
-  <ul> <li>If {@code net.transport} is not specified, it can be assumed to be {@code IP.TCP} except
- if {@code http.flavor} is {@code QUIC}, in which case {@code IP.UDP} is assumed.</li> </ul>
- */
-static constexpr const char *kHttpFlavor = "http.flavor";
-
-/**
- * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
- * User-Agent</a> header sent by the client.
- */
-static constexpr const char *kHttpUserAgent = "http.user_agent";
-
-/**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
  * headers and is often, but not always, present as the <a
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
@@ -584,25 +615,9 @@ static constexpr const char *kHttpUrl = "http.url";
 static constexpr const char *kHttpResendCount = "http.resend_count";
 
 /**
- * The URI scheme identifying the used protocol.
- */
-static constexpr const char *kHttpScheme = "http.scheme";
-
-/**
  * The full request target as passed in a HTTP request line or equivalent.
  */
 static constexpr const char *kHttpTarget = "http.target";
-
-/**
- * The matched route (path template in the format used by the respective server framework). See note
-below
- *
- * <p>Notes:
-  <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
-route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
-the <a href="#http-server-definitions">application root</a> if there is one.</li> </ul>
- */
-static constexpr const char *kHttpRoute = "http.route";
 
 /**
  * The IP address of the original client behind all proxies, if known (e.g. from <a
@@ -1054,7 +1069,79 @@ static constexpr const char *kRpcJsonrpcErrorCode = "rpc.jsonrpc.error_code";
  */
 static constexpr const char *kRpcJsonrpcErrorMessage = "rpc.jsonrpc.error_message";
 
+/**
+ * Whether this is a received or sent message.
+ */
+static constexpr const char *kMessageType = "message.type";
+
+/**
+ * MUST be calculated as two different counters starting from {@code 1} one for sent messages and
+ one for received message.
+ *
+ * <p>Notes:
+  <ul> <li>This way we guarantee that the values will be consistent between different
+ implementations.</li> </ul>
+ */
+static constexpr const char *kMessageId = "message.id";
+
+/**
+ * Compressed size of the message in bytes.
+ */
+static constexpr const char *kMessageCompressedSize = "message.compressed_size";
+
+/**
+ * Uncompressed size of the message in bytes.
+ */
+static constexpr const char *kMessageUncompressedSize = "message.uncompressed_size";
+
+/**
+ * The <a href="https://connect.build/docs/protocol/#error-codes">error codes</a> of the Connect
+ * request. Error codes are always string values.
+ */
+static constexpr const char *kRpcConnectRpcErrorCode = "rpc.connect_rpc.error_code";
+
+/**
+ * SHOULD be set to true if the exception event is recorded at a point where it is known that the
+exception is escaping the scope of the span.
+ *
+ * <p>Notes:
+  <ul> <li>An exception is considered to have escaped (or left) the scope of a span,
+if that span is ended while the exception is still logically &quot;in flight&quot;.
+This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
+is passed to a Context manager's {@code __exit__} method in Python) but will
+usually be caught at the point of recording the exception in most languages.</li><li>It is usually
+not possible to determine at the point where an exception is thrown whether it will escape the scope
+of a span. However, it is trivial to know that an exception will escape, if one checks for an active
+exception just before ending the span, as done in the <a href="#recording-an-exception">example
+above</a>.</li><li>It follows that an exception may still escape the scope of the span even if the
+{@code exception.escaped} attribute was not set or set to false, since the event might have been
+recorded at a time where it was not clear whether the exception will escape.</li> </ul>
+ */
+static constexpr const char *kExceptionEscaped = "exception.escaped";
+
+/**
+ * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
+ * User-Agent</a> header sent by the client.
+ */
+static constexpr const char *kUserAgentOriginal = "user_agent.original";
+
 // Enum definitions
+namespace HttpFlavorValues
+{
+/** HTTP/1.0. */
+static constexpr const char *kHttp10 = "1.0";
+/** HTTP/1.1. */
+static constexpr const char *kHttp11 = "1.1";
+/** HTTP/2. */
+static constexpr const char *kHttp20 = "2.0";
+/** HTTP/3. */
+static constexpr const char *kHttp30 = "3.0";
+/** SPDY protocol. */
+static constexpr const char *kSpdy = "SPDY";
+/** QUIC protocol. */
+static constexpr const char *kQuic = "QUIC";
+}  // namespace HttpFlavorValues
+
 namespace EventDomainValues
 {
 /** Events from browser apps. */
@@ -1336,22 +1423,6 @@ static constexpr const char *kNrnsa = "nrnsa";
 static constexpr const char *kLteCa = "lte_ca";
 }  // namespace NetHostConnectionSubtypeValues
 
-namespace HttpFlavorValues
-{
-/** HTTP/1.0. */
-static constexpr const char *kHttp10 = "1.0";
-/** HTTP/1.1. */
-static constexpr const char *kHttp11 = "1.1";
-/** HTTP/2. */
-static constexpr const char *kHttp20 = "2.0";
-/** HTTP/3. */
-static constexpr const char *kHttp30 = "3.0";
-/** SPDY protocol. */
-static constexpr const char *kSpdy = "SPDY";
-/** QUIC protocol. */
-static constexpr const char *kQuic = "QUIC";
-}  // namespace HttpFlavorValues
-
 namespace GraphqlOperationTypeValues
 {
 /** GraphQL query. */
@@ -1418,6 +1489,8 @@ static constexpr const char *kJavaRmi = "java_rmi";
 static constexpr const char *kDotnetWcf = "dotnet_wcf";
 /** Apache Dubbo. */
 static constexpr const char *kApacheDubbo = "apache_dubbo";
+/** Connect RPC. */
+static constexpr const char *kConnectRpc = "connect_rpc";
 }  // namespace RpcSystemValues
 
 namespace RpcGrpcStatusCodeValues
@@ -1457,6 +1530,50 @@ static constexpr const int kDataLoss = 15;
 /** UNAUTHENTICATED. */
 static constexpr const int kUnauthenticated = 16;
 }  // namespace RpcGrpcStatusCodeValues
+
+namespace MessageTypeValues
+{
+/** sent. */
+static constexpr const char *kSent = "SENT";
+/** received. */
+static constexpr const char *kReceived = "RECEIVED";
+}  // namespace MessageTypeValues
+
+namespace RpcConnectRpcErrorCodeValues
+{
+/** cancelled. */
+static constexpr const char *kCancelled = "cancelled";
+/** unknown. */
+static constexpr const char *kUnknown = "unknown";
+/** invalid_argument. */
+static constexpr const char *kInvalidArgument = "invalid_argument";
+/** deadline_exceeded. */
+static constexpr const char *kDeadlineExceeded = "deadline_exceeded";
+/** not_found. */
+static constexpr const char *kNotFound = "not_found";
+/** already_exists. */
+static constexpr const char *kAlreadyExists = "already_exists";
+/** permission_denied. */
+static constexpr const char *kPermissionDenied = "permission_denied";
+/** resource_exhausted. */
+static constexpr const char *kResourceExhausted = "resource_exhausted";
+/** failed_precondition. */
+static constexpr const char *kFailedPrecondition = "failed_precondition";
+/** aborted. */
+static constexpr const char *kAborted = "aborted";
+/** out_of_range. */
+static constexpr const char *kOutOfRange = "out_of_range";
+/** unimplemented. */
+static constexpr const char *kUnimplemented = "unimplemented";
+/** internal. */
+static constexpr const char *kInternal = "internal";
+/** unavailable. */
+static constexpr const char *kUnavailable = "unavailable";
+/** data_loss. */
+static constexpr const char *kDataLoss = "data_loss";
+/** unauthenticated. */
+static constexpr const char *kUnauthenticated = "unauthenticated";
+}  // namespace RpcConnectRpcErrorCodeValues
 
 }  // namespace SemanticConventions
 }  // namespace trace

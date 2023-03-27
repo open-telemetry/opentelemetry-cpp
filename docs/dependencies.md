@@ -46,7 +46,7 @@ Both these dependencies are listed here:
     - OTLP messages are constructed as protobuf payloads.
     - `protoc` compiler is used to generate C++ stubs for proto files provided
       by `opentelemetry-proto`.
-    - `libprotobuf` library is used for generating serialised trace/metrics/log
+    - `libprotobuf` library is used for generating serialized trace/metrics/log
       data to be sent to opentelemetry collector.
     - License: The library is licensed
       [here](https://github.com/protocolbuffers/protobuf/blob/master/LICENSE).
