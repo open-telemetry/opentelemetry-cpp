@@ -6,7 +6,6 @@
 
 #  include <atomic>
 #  include <memory>
-#  include <mutex>
 
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/logs/exporter.h"

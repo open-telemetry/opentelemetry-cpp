@@ -5,9 +5,6 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/logs/event_logger_provider.h"
-#  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/logs/logger.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it
@@ -19,6 +16,7 @@ namespace sdk
 namespace logs
 {
 class Logger;
+class EventLogger;
 
 class EventLoggerProvider final : public opentelemetry::logs::EventLoggerProvider
 {

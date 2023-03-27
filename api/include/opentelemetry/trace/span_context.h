@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"

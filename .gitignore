@@ -79,3 +79,16 @@ functional/cert/server_cert_b.csr
 functional/cert/server_cert_b.pem
 functional/cert/server_cert_b-key.pem
 functional/cert/unreadable.pem
+
+# Generated Windows files or directories
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
+# CMake generated files or directories
+**/CMakeFiles
+**/cmake_install.cmake
+**/CTestTestfile.cmake
+CMakeCache.txt
+DartConfiguration.tcl
+/cmake

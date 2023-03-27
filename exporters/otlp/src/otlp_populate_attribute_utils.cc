@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 namespace nostd = opentelemetry::nostd;
 

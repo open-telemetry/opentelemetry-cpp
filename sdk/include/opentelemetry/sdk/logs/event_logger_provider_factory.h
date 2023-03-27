@@ -5,10 +5,16 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/logs/event_logger_provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
+#  include <memory>
+
+#  include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace logs
+{
+class EventLoggerProvider;
+}  // namespace logs
+
 namespace sdk
 {
 namespace logs

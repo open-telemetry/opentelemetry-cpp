@@ -7,6 +7,8 @@
 #include "opentelemetry/sdk_config.h"
 #include "opentelemetry/version.h"
 
+#include <mutex>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

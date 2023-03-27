@@ -7,6 +7,7 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
 
 /*
   Make sure OtlpGrpcLogRecordExporterFactory does not require,

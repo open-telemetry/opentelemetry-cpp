@@ -4,8 +4,11 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 
 #  include <vector>
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;
 

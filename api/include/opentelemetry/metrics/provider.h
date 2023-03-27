@@ -7,7 +7,6 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 

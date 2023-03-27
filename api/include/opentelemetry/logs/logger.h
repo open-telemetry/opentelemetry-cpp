@@ -5,7 +5,6 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/string_view.h"
@@ -15,6 +14,9 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
+
+class LogRecord;
+
 /**
  * Handles log record creation.
  **/

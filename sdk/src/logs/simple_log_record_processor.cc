@@ -3,8 +3,10 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 
 #  include <chrono>
+#  include <mutex>
 #  include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE

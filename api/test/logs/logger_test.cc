@@ -8,6 +8,7 @@
 #  include <vector>
 
 #  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/logs/event_logger.h"
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"

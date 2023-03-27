@@ -3,10 +3,14 @@
 
 #pragma once
 
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class Tracer;
+}
+
 namespace plugin
 {
 /**

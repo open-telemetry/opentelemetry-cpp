@@ -5,14 +5,16 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
+
+class SpanExporter;
+class SpanProcessor;
 
 /**
  * Factory class for SimpleSpanProcessor.

@@ -10,13 +10,21 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
 #  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#  include "opentelemetry/version.h"
 
 #  include <chrono>
 #  include <cstddef>
 #  include <memory>
-#  include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class Recordable;
+}  // namespace trace
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp

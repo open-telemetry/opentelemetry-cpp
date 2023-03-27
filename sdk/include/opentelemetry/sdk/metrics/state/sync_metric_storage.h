@@ -17,6 +17,7 @@
 
 #include <list>
 #include <memory>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

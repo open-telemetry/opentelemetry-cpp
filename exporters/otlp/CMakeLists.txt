@@ -226,6 +226,7 @@ if(BUILD_TESTING)
   endif()
 
   if(WITH_OTLP_GRPC)
+    add_compile_options(-Wno-suggest-override)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -246,6 +247,7 @@ if(BUILD_TESTING)
       TEST_LIST otlp_grpc_exporter_factory_test)
 
     if(WITH_LOGS_PREVIEW)
+      add_compile_options(-Wno-suggest-override)
       add_executable(otlp_grpc_log_record_exporter_test
                      test/otlp_grpc_log_record_exporter_test.cc)
       target_link_libraries(

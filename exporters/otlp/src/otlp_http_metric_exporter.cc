@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"

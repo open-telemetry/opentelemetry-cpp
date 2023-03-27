@@ -15,8 +15,6 @@
  */
 #pragma once
 
-#include <unordered_map>
-
 #include "opentelemetry/exporters/etw/utils.h"
 
 /* clang-format off */

@@ -12,10 +12,17 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace resource
+{
+class Resource;
+}  // namespace resource
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp

@@ -7,6 +7,7 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/sdk/version/version.h"
 
 #include <cstdlib>
 #include <string>

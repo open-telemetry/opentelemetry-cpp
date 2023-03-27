@@ -5,6 +5,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 /*
   Make sure OtlpGrpcExporterFactory does not require,

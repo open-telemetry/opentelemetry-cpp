@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -15,6 +16,7 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #include <memory>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

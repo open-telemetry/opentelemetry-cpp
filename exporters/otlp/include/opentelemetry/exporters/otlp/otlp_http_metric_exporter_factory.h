@@ -3,16 +3,25 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-
 #include <memory>
 
+#include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
+class PushMetricExporter;
+}  // namespace metrics
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp
 {
+
+struct OtlpHttpMetricExporterOptions;
 
 /**
  * Factory class for OtlpHttpMetricExporter.

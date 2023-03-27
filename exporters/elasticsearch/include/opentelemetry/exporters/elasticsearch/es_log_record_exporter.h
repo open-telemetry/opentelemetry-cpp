@@ -4,22 +4,27 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "nlohmann/json.hpp"
 #  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
 
-#  include <time.h>
-#  include <atomic>
-#  include <condition_variable>
-#  include <cstddef>
-#  include <iostream>
-#  include <mutex>
+#  ifdef ENABLE_ASYNC_EXPORT
+#    include <condition_variable>
+#    include <mutex>
+#    include "opentelemetry/nostd/shared_ptr.h"
+#  endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace ext
+{
+namespace http
+{
+namespace client
+{
+class HttpClient;
+}  // namespace client
+}  // namespace http
+}  // namespace ext
 namespace exporter
 {
 namespace logs

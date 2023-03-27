@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/state/metric_storage.h"
-
 #include <memory>
+#include <vector>
+
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

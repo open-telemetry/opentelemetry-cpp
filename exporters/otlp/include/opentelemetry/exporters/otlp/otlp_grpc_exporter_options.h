@@ -4,8 +4,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-
-#include <memory>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

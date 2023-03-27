@@ -9,6 +9,8 @@
 #  include <mutex>
 #  include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#  include "opentelemetry/ext/http/client/http_client.h"
+#  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/sdk_config.h"
 
 namespace nostd       = opentelemetry::nostd;

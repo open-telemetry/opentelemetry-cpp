@@ -6,10 +6,10 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
 #include <chrono>
 #include <cstddef>
-#include <memory>
 #include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE

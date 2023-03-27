@@ -4,24 +4,17 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <algorithm>
-
 #  include <chrono>
 #  include <cstdint>
 #  include <cstdio>
 #  include <cstdlib>
 #  include <sstream>
 #  include <type_traits>
-
-#  include <fstream>
-
-#  include <map>
 #  include <unordered_map>
 
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/nostd/variant.h"
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
 

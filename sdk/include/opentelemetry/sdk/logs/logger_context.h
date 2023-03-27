@@ -5,9 +5,10 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <chrono>
 #  include <memory>
+#  include <vector>
 
-#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
@@ -16,6 +17,9 @@ namespace sdk
 {
 namespace logs
 {
+
+class LogRecordProcessor;
+
 /**
  * A class which stores the LoggerContext context.
  *

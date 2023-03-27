@@ -4,6 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/context/runtime_context.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/trace/provider.h"
 

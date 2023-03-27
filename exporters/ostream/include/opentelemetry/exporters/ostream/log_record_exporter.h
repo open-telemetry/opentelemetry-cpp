@@ -4,14 +4,17 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 
 #  include "opentelemetry/version.h"
 
 #  include <iostream>
-#  include <sstream>
+#  include <string>
+#  include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

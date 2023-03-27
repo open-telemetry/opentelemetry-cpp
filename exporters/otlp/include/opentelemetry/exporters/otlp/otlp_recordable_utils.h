@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/span.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -13,14 +13,21 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#include "opentelemetry/sdk/trace/recordable.h"
-
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/recordable.h"
-#endif
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace logs
+{
+class Recordable;
+}  // namespace logs
+namespace trace
+{
+class Recordable;
+}  // namespace trace
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp

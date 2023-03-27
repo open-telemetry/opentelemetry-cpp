@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/ostream/metric_exporter.h"
-#include <algorithm>
-#include <chrono>
-#include <map>
 #include "opentelemetry/exporters/ostream/common_utils.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk_config.h"
+
+#include <algorithm>
+#include <chrono>
+#include <map>
+#include <mutex>
 
 namespace
 {

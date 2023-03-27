@@ -10,6 +10,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/version.h"
 
 #include <atomic>
 #include <chrono>

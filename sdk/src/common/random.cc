@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/common/random.h"
+#include "src/common/fast_random_number_generator.h"
 #include "src/common/platform/fork.h"
 
 #include <cstring>

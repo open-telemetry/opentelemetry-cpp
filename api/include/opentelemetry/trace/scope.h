@@ -4,12 +4,14 @@
 #pragma once
 
 #include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+class Span;
+
 /**
  * Controls how long a span is active.
  *

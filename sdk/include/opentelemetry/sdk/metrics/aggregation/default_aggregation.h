@@ -4,7 +4,7 @@
 #pragma once
 
 #include <memory>
-#include "opentelemetry/common/spin_lock_mutex.h"
+
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
@@ -13,8 +13,6 @@
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-
-#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

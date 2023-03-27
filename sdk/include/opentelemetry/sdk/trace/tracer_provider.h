@@ -3,18 +3,14 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
 
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,6 +18,11 @@ namespace sdk
 {
 namespace trace
 {
+
+class Tracer;
+class SpanProcessor;
+class TracerContext;
+
 class TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:

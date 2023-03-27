@@ -6,6 +6,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 

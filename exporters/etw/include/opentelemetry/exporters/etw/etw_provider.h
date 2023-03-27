@@ -42,7 +42,6 @@
 #include <map>
 #include <mutex>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #ifdef HAVE_KRABS_TESTS

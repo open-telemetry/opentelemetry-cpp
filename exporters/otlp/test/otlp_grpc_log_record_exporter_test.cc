@@ -19,6 +19,7 @@
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk/trace/exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"

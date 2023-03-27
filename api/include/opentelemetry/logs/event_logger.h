@@ -4,15 +4,10 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <map>
-#  include <vector>
-
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
-#  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"

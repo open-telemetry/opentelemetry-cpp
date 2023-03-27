@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <chrono>
 #include <ctime>
 #include <iomanip>

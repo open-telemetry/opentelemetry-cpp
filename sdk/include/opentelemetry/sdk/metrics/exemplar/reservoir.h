@@ -3,14 +3,32 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
+
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace common
+{
+class SystemTimestamp;
+}  // namespace common
+
+namespace context
+{
+class Context;
+}  // namespace context
+
 namespace sdk
 {
+namespace common
+{
+class OrderedAttributeMap;
+}  // namespace common
+
 namespace metrics
 {
 /**

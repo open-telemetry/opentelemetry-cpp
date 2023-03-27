@@ -7,7 +7,6 @@
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
 #  include "opentelemetry/sdk_config.h"
 
-#  include <iostream>
 #  include <mutex>
 #  include <type_traits>
 

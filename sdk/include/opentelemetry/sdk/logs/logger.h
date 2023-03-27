@@ -5,7 +5,6 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <memory>
-#  include <vector>
 
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/logs/logger.h"

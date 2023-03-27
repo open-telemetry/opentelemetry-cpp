@@ -1,13 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <sstream>
-#include <string>
+#pragma once
+
+#include <ostream>
 #include <vector>
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 
-#pragma once
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

@@ -4,10 +4,8 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <map>
 #  include <sstream>
 #  include <type_traits>
-#  include <unordered_map>
 
 #  include "nlohmann/json.hpp"
 #  include "opentelemetry/common/macros.h"

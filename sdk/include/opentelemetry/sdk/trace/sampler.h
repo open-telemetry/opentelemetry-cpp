@@ -5,10 +5,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
 #include <map>
@@ -16,6 +13,13 @@
 #include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class SpanContext;
+class SpanContextKeyValueIterable;
+class TraceState;
+}  // namespace trace
+
 namespace sdk
 {
 namespace trace

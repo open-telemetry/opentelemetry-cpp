@@ -4,20 +4,21 @@
 #pragma once
 
 #include <chrono>
+#include <string>
 #include <unordered_map>
 #include <vector>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-
-#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -171,7 +172,8 @@ public:
    * @returns the attributes associated with the resource configured for TracerProvider
    */
 
-  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationScope() const noexcept
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
+      const noexcept
   {
     if (instrumentation_scope_ == nullptr)
     {
@@ -186,7 +188,8 @@ public:
   }
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
-  const opentelemetry::sdk::trace::InstrumentationScope &GetInstrumentationLibrary() const noexcept
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationLibrary()
+      const noexcept
   {
     return GetInstrumentationScope();
   }
@@ -284,7 +287,8 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
-  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept override
   {
     instrumentation_scope_ = &instrumentation_scope;
   }
@@ -302,7 +306,7 @@ private:
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   const opentelemetry::sdk::resource::Resource *resource_;
-  const InstrumentationScope *instrumentation_scope_;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_;
 };
 }  // namespace trace
 }  // namespace sdk

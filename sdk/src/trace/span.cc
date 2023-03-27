@@ -5,6 +5,7 @@
 #include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 

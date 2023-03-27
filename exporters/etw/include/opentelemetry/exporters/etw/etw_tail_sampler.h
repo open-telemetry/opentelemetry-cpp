@@ -1,10 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-#include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/trace/span.h"
 
 #pragma once
+
+#include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class Span;
+}  // namespace trace
+
 namespace exporter
 {
 namespace etw

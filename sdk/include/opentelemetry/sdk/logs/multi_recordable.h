@@ -10,7 +10,6 @@
 #  include <unordered_map>
 
 #  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
@@ -20,6 +19,9 @@ namespace sdk
 {
 namespace logs
 {
+
+class LogRecordProcessor;
+
 class MultiRecordable final : public Recordable
 {
 public:

@@ -8,26 +8,28 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/version.h"
-
-#include <map>
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace instrumentationscope
+{
+class InstrumentationScope;
+}  // namespace instrumentationscope
+namespace resource
+{
+class Resource;
+}  // namespace resource
 namespace trace
 {
 
-using namespace opentelemetry::sdk::instrumentationscope;
 class SpanData;
 
 /**
@@ -166,10 +168,13 @@ public:
    * @param instrumentation_scope the instrumentation scope to set
    */
   virtual void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept = 0;
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+          &instrumentation_scope) noexcept = 0;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
-  void SetInstrumentationLibrary(const InstrumentationScope &instrumentation_scope) noexcept
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+          &instrumentation_scope) noexcept
   {
     SetInstrumentationScope(instrumentation_scope);
   }

@@ -3,28 +3,13 @@
 
 #pragma once
 
-#include <algorithm>
 #include <atomic>
-
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-
-#include <fstream>
-#include <iomanip>
-#include <iostream>
 #include <map>
 #include <memory>
-#include <mutex>
-#include <sstream>
-#include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/variant.h"
-
-#include "opentelemetry/common/key_value_iterable_view.h"
 
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
@@ -32,6 +17,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
+#include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 

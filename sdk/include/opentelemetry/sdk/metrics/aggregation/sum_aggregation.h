@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-
-#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

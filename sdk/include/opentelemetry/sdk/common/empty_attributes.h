@@ -7,7 +7,6 @@
 #include "opentelemetry/common/macros.h"
 
 #include <array>
-#include <map>
 #include <string>
 #include <utility>
 
@@ -19,7 +18,7 @@ namespace sdk
  * This helps to avoid constructing a new empty container every time a call is made
  * with default attributes.
  */
-OPENTELEMETRY_MAYBE_UNUSED static const opentelemetry::common::KeyValueIterableView<
+OPENTELEMETRY_MAYBE_UNUSED static inline const opentelemetry::common::KeyValueIterableView<
     std::array<std::pair<std::string, int>, 0>>
     &GetEmptyAttributes() noexcept
 {

@@ -3,12 +3,23 @@
 
 #pragma once
 
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
+#include <memory>
+
+#include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+class Context;
+}  // namespace context
+
 namespace sdk
 {
+namespace common
+{
+class OrderedAttributeMap;
+}  // namespace common
+
 namespace metrics
 {
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;

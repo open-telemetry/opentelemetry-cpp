@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -11,14 +11,14 @@ namespace exporter
 namespace otlp
 {
 
-enum class JsonBytesMappingKind
+enum class JsonBytesMappingKind : int
 {
   kHexId,
   kHex,
   kBase64,
 };
 
-enum class HttpRequestContentType
+enum class HttpRequestContentType : int
 {
   kJson,
   kBinary,

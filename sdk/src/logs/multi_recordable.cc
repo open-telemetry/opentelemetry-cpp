@@ -4,10 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/logs/multi_recordable.h"
-
-#  include <cstddef>
-#  include <memory>
-#  include <unordered_map>
+#  include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -4,16 +4,25 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-
 #  include <memory>
 
+#  include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace logs
+{
+class LogRecordExporter;
+}  // namespace logs
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp
 {
+
+struct OtlpHttpLogRecordExporterOptions;
 
 /**
  * Factory class for OtlpHttpLogRecordExporter.

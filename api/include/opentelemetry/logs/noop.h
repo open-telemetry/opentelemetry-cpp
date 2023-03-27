@@ -15,6 +15,7 @@
 #  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/runtime_context.h"
+#  include "opentelemetry/logs/event_logger.h"
 #  include "opentelemetry/logs/event_logger_provider.h"
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/logs/logger_provider.h"
@@ -26,8 +27,6 @@
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_flags.h"
 #  include "opentelemetry/trace/trace_id.h"
-#  include "opentelemetry/version.h"
-
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

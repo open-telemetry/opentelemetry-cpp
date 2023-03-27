@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
-#include <memory>
-#include <vector>
+#include "opentelemetry/exporters/jaeger/jaeger_exporter.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/span_startoptions.h"
 
 #ifdef BAZEL_BUILD
 #  include "exporters/jaeger/src/thrift_sender.h"
@@ -15,6 +16,9 @@
 
 #include <gtest/gtest.h>
 #include "gmock/gmock.h"
+
+#include <memory>
+#include <vector>
 
 namespace trace      = opentelemetry::trace;
 namespace nostd      = opentelemetry::nostd;

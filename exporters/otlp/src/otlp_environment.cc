@@ -4,10 +4,11 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/sdk/version/version.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
+
+#include <unordered_set>
 
 namespace nostd      = opentelemetry::nostd;
 namespace sdk_common = opentelemetry::sdk::common;

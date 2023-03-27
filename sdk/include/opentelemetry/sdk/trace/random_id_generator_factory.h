@@ -5,13 +5,15 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
+
+class IdGenerator;
 
 /**
  * Factory class for RandomIdGenerator.

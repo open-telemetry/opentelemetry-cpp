@@ -7,8 +7,7 @@
 
 #include <jaeger_types.h>
 
-#include <opentelemetry/exporters/jaeger/thrift_include_suffix.h>
-
+#include <opentelemetry/sdk/common/attribute_utils.h>
 #include <opentelemetry/sdk/trace/recordable.h>
 #include <opentelemetry/version.h>
 

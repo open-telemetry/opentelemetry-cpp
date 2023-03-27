@@ -4,17 +4,17 @@
 #pragma once
 
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
+
+namespace trace_api = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -6,22 +6,27 @@
 // We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/exporters/otlp/otlp_http_client.h"
-
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
-
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/version.h"
 
 #include <chrono>
-#include <cstddef>
 #include <memory>
-#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class Recordable;
+}  // namespace trace
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp
 {
+
+class OtlpHttpClient;
 
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.

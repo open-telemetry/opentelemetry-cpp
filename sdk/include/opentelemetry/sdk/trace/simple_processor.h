@@ -9,6 +9,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

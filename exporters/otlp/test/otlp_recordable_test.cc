@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,
@@ -20,6 +22,7 @@ namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource  = opentelemetry::sdk::resource;
 namespace proto     = opentelemetry::proto;
+namespace instr_sdk = opentelemetry::sdk::instrumentationscope;
 
 namespace trace_sdk_2 = opentelemetry::sdk::trace;
 
@@ -69,7 +72,7 @@ TEST(OtlpRecordable, SetSpanKind)
 TEST(OtlpRecordable, SetInstrumentationScope)
 {
   OtlpRecordable rec;
-  auto inst_lib = trace_sdk::InstrumentationScope::Create("test", "v1");
+  auto inst_lib = instr_sdk::InstrumentationScope::Create("test", "v1");
   rec.SetInstrumentationScope(*inst_lib);
   auto proto_instr_libr = rec.GetProtoInstrumentationScope();
   EXPECT_EQ(proto_instr_libr.name(), inst_lib->GetName());
@@ -80,7 +83,7 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
 {
   OtlpRecordable rec;
   const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto inst_lib = trace_sdk::InstrumentationScope::Create("test", "v1", expected_schema_url);
+  auto inst_lib = instr_sdk::InstrumentationScope::Create("test", "v1", expected_schema_url);
   rec.SetInstrumentationScope(*inst_lib);
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
 }

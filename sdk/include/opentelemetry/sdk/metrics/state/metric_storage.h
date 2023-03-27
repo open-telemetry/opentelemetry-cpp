@@ -3,14 +3,26 @@
 
 #pragma once
 
-#include "opentelemetry/common/key_value_iterable_view.h"
+#include <unordered_map>
+
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
+namespace context
+{
+class Context;
+}  // namespace context
+
 namespace sdk
 {
 namespace metrics

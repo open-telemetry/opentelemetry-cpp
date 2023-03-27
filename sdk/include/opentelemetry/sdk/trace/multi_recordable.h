@@ -6,7 +6,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/version.h"
+#include "opentelemetry/sdk/version/version.h"
 
 #include <map>
 
@@ -144,7 +144,8 @@ public:
     }
   }
 
-  void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) noexcept override
+  void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
+                                   &instrumentation_scope) noexcept override
   {
     for (auto &recordable : recordables_)
     {

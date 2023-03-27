@@ -6,9 +6,12 @@
 #include "opentelemetry/version.h"
 
 #include <cstddef>
-#include <memory>
 #include <utility>
 #include <variant>
+
+#if __EXCEPTIONS
+#  include <exception>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace

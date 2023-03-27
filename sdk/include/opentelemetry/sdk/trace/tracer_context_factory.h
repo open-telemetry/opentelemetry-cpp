@@ -3,16 +3,26 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/version.h"
+#include <memory>
+#include <vector>
+
+#include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
 namespace trace
 {
+
+class IdGenerator;
+class Sampler;
+class SpanProcessor;
+class TracerContext;
 
 /**
  * Factory class for TracerContext.

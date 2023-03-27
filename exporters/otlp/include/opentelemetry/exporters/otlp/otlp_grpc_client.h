@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/version.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -25,6 +25,8 @@ namespace exporter
 {
 namespace otlp
 {
+
+struct OtlpGrpcExporterOptions;
 
 /**
  * The OTLP gRPC client contains utility functions of gRPC.

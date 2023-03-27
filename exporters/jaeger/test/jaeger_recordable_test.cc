@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "opentelemetry/exporters/jaeger/recordable.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -214,10 +215,11 @@ TEST(JaegerSpanRecordable, SetAttributes)
   }
   rec.SetAttribute("key2", nostd::span<const bool>{{false, true}});
   rec.SetAttribute("key3", nostd::span<const int32_t>{{-320, 320}});
-  rec.SetAttribute("key4", nostd::span<const int64_t>{{-640, 640}});
-  rec.SetAttribute("key5", nostd::span<const uint32_t>{{320, 322}});
+  rec.SetAttribute("key4", nostd::span<const int64_t>{{-640L, 640L}});
+  rec.SetAttribute("key5", nostd::span<const uint32_t>{{320u, 322u}});
   rec.SetAttribute("key6", nostd::span<const double>{{4.15, 5.15}});
-  rec.SetAttribute("key7", nostd::span<const nostd::string_view>{{"string_v1", "string_v2"}});
+  rec.SetAttribute("key7", nostd::span<const nostd::string_view>{
+                               {nostd::string_view{"string_v1"}, nostd::string_view{"string_v2"}}});
 
   auto tags = rec.Tags();
   EXPECT_EQ(tags.size(), values.size() + 12);

@@ -9,8 +9,6 @@
 #include "opentelemetry/sdk/trace/multi_recordable.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
-#include <iostream>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <thread>
 
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"

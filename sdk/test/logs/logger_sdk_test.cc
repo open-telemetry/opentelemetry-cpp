@@ -12,6 +12,10 @@
 #  include "opentelemetry/sdk/logs/event_logger_provider.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
+#  include "opentelemetry/sdk/trace/tracer.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/scope.h"
 

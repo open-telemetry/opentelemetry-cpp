@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

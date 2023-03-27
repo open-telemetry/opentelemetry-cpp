@@ -4,8 +4,11 @@
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 #include <vector>
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;

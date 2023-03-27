@@ -3,13 +3,19 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include <vector>
+
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace instrumentationscope
+{
+class InstrumentationScope;
+}  // namespace instrumentationscope
+
 namespace metrics
 {
 

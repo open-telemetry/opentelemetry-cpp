@@ -5,13 +5,15 @@
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
-#include "src/common/fast_random_number_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace common
 {
+
+class FastRandomNumberGenerator;
+
 /**
  * Utility methods for creating random data, based on a seeded thread-local
  * number generator.

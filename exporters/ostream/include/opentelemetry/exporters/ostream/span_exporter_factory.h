@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <iostream>
+#include <iosfwd>
 #include <memory>
 
 #include "opentelemetry/sdk/version/version.h"

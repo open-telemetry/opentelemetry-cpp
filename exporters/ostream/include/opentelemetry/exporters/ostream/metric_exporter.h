@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"

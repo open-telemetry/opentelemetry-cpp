@@ -3,9 +3,11 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include <chrono>
+#include <memory>
+#include <vector>
+
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/version.h"
@@ -15,6 +17,8 @@ namespace sdk
 {
 namespace trace
 {
+
+class SpanProcessor;
 
 /**
  * A class which stores the TracerProvider context.

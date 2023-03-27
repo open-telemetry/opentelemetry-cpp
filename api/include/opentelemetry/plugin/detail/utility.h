@@ -5,6 +5,9 @@
 
 #include <memory>
 #include <string>
+#if __EXCEPTIONS
+#  include <exception>
+#endif
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"

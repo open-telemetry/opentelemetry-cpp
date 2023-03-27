@@ -1,14 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <cstddef>
-#include <memory>
-#include <utility>
-#include "opentelemetry/nostd/shared_ptr.h"
-
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
+
+#include <cstddef>
+#include <mutex>
+#include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

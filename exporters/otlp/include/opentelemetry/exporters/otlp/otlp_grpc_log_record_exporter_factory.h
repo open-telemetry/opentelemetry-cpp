@@ -5,14 +5,25 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
+#  include <memory>
+
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace logs
+{
+class LogRecordExporter;
+}  // namespace logs
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp
 {
+
+struct OtlpGrpcExporterOptions;
 
 /**
  * Factory class for OtlpGrpcLogRecordExporter.

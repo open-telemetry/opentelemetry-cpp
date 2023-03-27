@@ -5,14 +5,23 @@
 
 #include <memory>
 
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
-#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace trace
+{
+class SpanExporter;
+}  // namespace trace
+}  // namespace sdk
+
 namespace exporter
 {
 namespace otlp
 {
+
+struct OtlpHttpExporterOptions;
 
 /**
  * Factory class for OtlpHttpExporter.

@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include <cstring>
+#include <iostream>
 #include <random>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
