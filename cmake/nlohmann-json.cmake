@@ -33,6 +33,8 @@ find_package(nlohmann_json QUIET)
 set(nlohmann_json_clone FALSE)
 if(nlohmann_json_FOUND)
   message(STATUS "nlohmann::json dependency satisfied by: package")
+elseif(TARGET nlohmann_json) 
+  message("nlohmann_json was already added as a third party CMake target!")
 elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
        AND EXISTS
            ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
