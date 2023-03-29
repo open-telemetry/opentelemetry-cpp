@@ -12,7 +12,7 @@ function install_prometheus_cpp_client
   [[ -d _build ]] && rm -rf ./_build
   mkdir _build && cd _build
   cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
-  make -j 4
+  make -j $(nproc)
   sudo make install
   popd
 }
@@ -87,7 +87,7 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
@@ -135,7 +135,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
-  make -k
+  make -k -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
@@ -151,7 +151,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.abseil.test" ]]; then
@@ -164,7 +164,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
@@ -174,7 +174,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
@@ -185,7 +185,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=20 \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
@@ -198,7 +198,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.test" ]]; then
@@ -210,7 +210,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_CXX_STANDARD=11 \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then

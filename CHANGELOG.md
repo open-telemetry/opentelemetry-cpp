@@ -23,6 +23,8 @@ Increment the:
   top level.[#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
 * [EXPORTERS]Add `ForceFlush` for `LogRecordExporter` and `SpanExporter`
   [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
+  [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
 * [EXPORTER] Add OTLP HTTP SSL support
   [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
 

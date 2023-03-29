@@ -15,10 +15,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
 
 # repository: https://github.com/open-telemetry/opentelemetry-specification
-SEMCONV_VERSION=1.18.0
+SEMCONV_VERSION=1.19.0
 
 # repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.15.1
+GENERATOR_VERSION=0.18.0
 
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
@@ -46,7 +46,7 @@ docker run --rm \
   -v ${SCRIPT_DIR}/templates:/templates \
   -v ${ROOT_DIR}/api/include/opentelemetry/trace/:/output \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span \
+  --only span,event,attribute_group,scope \
   -f /source code \
   --template /templates/SemanticAttributes.h.j2 \
   --output /output/semantic_conventions.h \
