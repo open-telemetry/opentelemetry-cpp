@@ -40,7 +40,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -61,7 +61,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -90,7 +90,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -111,7 +111,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -132,7 +132,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -154,7 +154,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -176,7 +176,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -197,7 +197,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -214,7 +214,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
