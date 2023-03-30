@@ -58,24 +58,36 @@ public:
 class MockHttpClient : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
                const ext::http::client::HttpSslOptions &,
-#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
+#  else
+  MOCK_METHOD(ext::http::client::Result,
+              Post,
+              (const nostd::string_view &,
+               const ext::http::client::Body &,
+               const ext::http::client::Headers &),
+              (noexcept, override));
+#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &,
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
                const ext::http::client::HttpSslOptions &,
-#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
                const ext::http::client::Headers &),
               (noexcept, override));
+#  else
+  MOCK_METHOD(ext::http::client::Result,
+              Get,
+              (const nostd::string_view &, const ext::http::client::Headers &),
+              (noexcept, override));
+#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 };
 
 class IsValidMessageMatcher
