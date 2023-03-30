@@ -58,7 +58,7 @@ public:
 class MockHttpClient : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#  ifdef ENABLE_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
@@ -73,9 +73,9 @@ public:
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
-#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#  ifdef ENABLE_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &,
@@ -87,7 +87,7 @@ public:
               Get,
               (const nostd::string_view &, const ext::http::client::Headers &),
               (noexcept, override));
-#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 };
 
 class IsValidMessageMatcher
@@ -166,11 +166,13 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
 
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
-  EXPECT_CALL(*mock_http_client, Post(expected_url,
+
 #  ifdef ENABLE_HTTP_SSL_PREVIEW
-                                      _, /* ssl */
-#  endif                                 /* ENABLE_HTTP_SSL_PREVIEW */
-                                      IsValidMessage(report_trace_id), _))
+  EXPECT_CALL(*mock_http_client, Post(expected_url, _, IsValidMessage(report_trace_id), _))
+#  else
+  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
+
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
@@ -194,11 +196,13 @@ TEST_F(ZipkinExporterTestPeer, ShutdownTest)
 
   // exporter should not be shutdown by default
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_http_client, Post(_,
+
 #  ifdef ENABLE_HTTP_SSL_PREVIEW
-                                      _, /* ssl */
-#  endif                                 /* ENABLE_HTTP_SSL_PREVIEW */
-                                      _, _))
+  EXPECT_CALL(*mock_http_client, Post(_, _, _, _))
+#  else
+  EXPECT_CALL(*mock_http_client, Post(_, _, _))
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
+
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
