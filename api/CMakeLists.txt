@@ -102,10 +102,14 @@ endif()
 if(WITH_OTLP_HTTP_SSL_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_HTTP_SSL_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_HTTP_SSL_PREVIEW)
 
   if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW)
     target_compile_definitions(opentelemetry_api
                                INTERFACE ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW)
+    target_compile_definitions(opentelemetry_api
+                               INTERFACE ENABLE_HTTP_SSL_TLS_PREVIEW)
   endif()
 endif()
 

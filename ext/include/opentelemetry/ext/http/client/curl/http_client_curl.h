@@ -57,10 +57,12 @@ public:
     method_ = method;
   }
 
+#ifdef ENABLE_HTTP_SSL_PREVIEW
   void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
   {
     ssl_options_ = ssl_options;
   }
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
@@ -90,7 +92,11 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
+
+#ifdef ENABLE_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
@@ -220,52 +226,18 @@ public:
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
-  {
-    HttpSslOptions no_ssl;
-    return GetImpl(url, no_ssl, headers);
-  }
-
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
-  opentelemetry::ext::http::client::Result Get(
-      const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
-  {
-    return GetImpl(url, ssl_options, headers);
-  }
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-
-  opentelemetry::ext::http::client::Result Post(
-      const nostd::string_view &url,
-      const Body &body,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
-  {
-    HttpSslOptions no_ssl;
-    return PostImpl(url, no_ssl, body, headers);
-  }
-
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
-  opentelemetry::ext::http::client::Result Post(
-      const nostd::string_view &url,
-      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-      const Body &body,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
-  {
-    return PostImpl(url, ssl_options, body, headers);
-  }
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-
-private:
-  opentelemetry::ext::http::client::Result GetImpl(
-      const nostd::string_view &url,
-      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept
   {
     opentelemetry::ext::http::client::Body body;
 
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
-                                 ssl_options, nullptr, headers, body);
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                 ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                 nullptr, headers, body);
 
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
@@ -285,14 +257,19 @@ private:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
-  opentelemetry::ext::http::client::Result PostImpl(
+  opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const Body &body,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-                                 ssl_options, nullptr, headers, body);
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                 ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                 nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -367,10 +344,6 @@ public:
 #endif
 
 private:
-  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSessionImpl(
-      nostd::string_view url,
-      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options) noexcept;
-
   void wakeupBackgroundThread();
   bool doAddSessions();
   bool doAbortSessions();

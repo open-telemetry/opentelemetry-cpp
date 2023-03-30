@@ -37,10 +37,12 @@ public:
     method_ = method;
   }
 
+#  ifdef ENABLE_HTTP_SSL_PREVIEW
   void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
   {
     ssl_options_ = ssl_options;
   }
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
@@ -64,7 +66,9 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
+#  ifdef ENABLE_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
+#  endif /* ENABLE_HTTP_SSL_PREVIEW */
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;

@@ -68,7 +68,7 @@ struct OtlpHttpExporterOptions
 
   std::string ssl_client_cert_path   = GetOtlpDefaultTracesSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
 #ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   /** Minimum TLS version. */
@@ -79,7 +79,7 @@ struct OtlpHttpExporterOptions
   std::string ssl_cipher = GetOtlpDefaultTracesSslTlsCipher();
   /** TLS cipher suite. */
   std::string ssl_cipher_suite = GetOtlpDefaultTracesSslTlsCipherSuite();
-#endif
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp
