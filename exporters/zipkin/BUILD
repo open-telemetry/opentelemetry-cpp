@@ -53,10 +53,9 @@ cc_test(
     ],
     deps = dll_deps([
         ":zipkin_recordable",
-    ]) + [
-        "@github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@github_nlohmann_json//:json",
+    ]),
 )
 
 cc_test(
@@ -69,9 +68,8 @@ cc_test(
     deps = dll_deps([
         ":zipkin_exporter",
         ":zipkin_recordable",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_library(

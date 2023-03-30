@@ -15,11 +15,10 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//sdk/src/trace",
-    ]) + [
-        "//examples/common/foo_library:common_foo_library",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -34,11 +33,10 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_http_exporter",
         "//sdk/src/trace",
-    ]) + [
-        "//examples/common/foo_library:common_foo_library",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -53,12 +51,11 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_http_exporter",
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//sdk/src/trace",
-    ]) + [
-        "//examples/common/logs_foo_library:common_logs_foo_library",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -73,12 +70,11 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_log_record_exporter",
         "//sdk/src/trace",
-    ]) + [
-        "//examples/common/logs_foo_library:common_logs_foo_library",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -93,10 +89,9 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
         "//sdk/src/metrics",
-    ]) + [
-        "//examples/common/metrics_foo_library:common_metrics_foo_library",
-    ],
+    ]),
 )

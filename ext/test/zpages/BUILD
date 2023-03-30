@@ -12,9 +12,8 @@ cc_test(
     deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -26,9 +25,8 @@ cc_test(
     deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -40,7 +38,6 @@ cc_test(
     deps = dll_deps([
         "//ext/src/zpages",
         "//sdk/src/trace",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

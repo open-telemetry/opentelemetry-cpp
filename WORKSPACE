@@ -15,6 +15,17 @@ new_local_repository(
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "ef83252dea2ed8254c27e65124b756fc9476be2b73a7799b7a2a0935937fc573",
+    strip_prefix = "bazel-lib-1.24.2",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.24.2/bazel-lib-v1.24.2.tar.gz",
+)
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains", "register_yq_toolchains")
+aspect_bazel_lib_dependencies()
+register_jq_toolchains()
+register_yq_toolchains()
+
+http_archive(
     name = "bazel_skylib",
     urls = [
         "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.3.0/bazel-skylib-1.3.0.tar.gz",

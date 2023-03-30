@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load( "//:dll_deps.bzl", "dll_deps" )
+load( "//:dll_deps.bzl", "dll_deps", "dll_cc_binary" )
 
 cc_binary(
     name = "example_simple",
@@ -14,8 +14,7 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
-        "//exporters/ostream:ostream_span_exporter",
-    ]) + [
         "//examples/common/foo_library:common_foo_library",
-    ],
+        "//exporters/ostream:ostream_span_exporter",
+    ]),
 )

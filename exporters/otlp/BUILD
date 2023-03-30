@@ -283,10 +283,9 @@ cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
-    ]) + [
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+    ]),
 )
 
 cc_test(
@@ -301,11 +300,10 @@ cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
-    ]) + [
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+    ]),
 )
 
 cc_test(
@@ -319,9 +317,8 @@ cc_test(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -335,9 +332,8 @@ cc_test(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//api",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -351,10 +347,9 @@ cc_test(
     deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
-    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -368,10 +363,9 @@ cc_test(
     deps = dll_deps([
         ":otlp_http_exporter",
         "//api",
-    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -385,10 +379,9 @@ cc_test(
     deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
-    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -402,10 +395,9 @@ cc_test(
     deps = dll_deps([
         ":otlp_http_log_record_exporter",
         "//api",
-    ]) + [
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -420,11 +412,10 @@ cc_test(
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
-    ]) + [
         "@com_google_googletest//:gtest_main",
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
         "@com_github_grpc_grpc//:grpc++",
-    ],
+    ]),
 )
 
 cc_test(
@@ -439,9 +430,8 @@ cc_test(
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -502,11 +492,10 @@ otel_cc_benchmark(
     ],
     deps = dll_deps([
         ":otlp_grpc_exporter",
-    ]) + [
         "//examples/common/foo_library:common_foo_library",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
-    ],
+    ]),
 )
 
 cc_library(

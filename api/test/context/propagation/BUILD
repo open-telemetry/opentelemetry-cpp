@@ -15,7 +15,6 @@ cc_test(
     ],
     deps = dll_deps([
         "//api",
-    ]) + [
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

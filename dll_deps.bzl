@@ -1,9 +1,35 @@
 # Very naive implementation
 # TODO: Scan the deps for known targets included in the otel_sdk, and remove them, while leaving the rest. This would avoid the concatenation needed.
+
+load("dll_deps_targets.bzl", "DLL_DEPS_TARGETS")
+
+def _absolute_label(label):
+    """ returns the absolute path to a lebel string """
+    # lifted from https://stackoverflow.com/a/66705640/18406610
+    if label.startswith("@") or label.startswith("/"):
+        return label
+    if label.startswith(":"):
+        return native.repository_name() + "//" + native.package_name() + label
+    return native.repository_name() + "//" + native.package_name() + ":" + label
+
+def _remove_static_libs(deps):
+    """ Removes references to the api/sdk/exporters/ext static libraries """
+    filtered_dll_deps = []
+    for dep in deps:
+        abs = _absolute_label(dep)
+        label = Label(abs)
+        parts = str(label.package).split('/')
+        if "test" in parts:
+            filtered_dll_deps.append(dep)
+        elif not parts[0] in ["api", "exporters", "sdk", "ext"]:
+            filtered_dll_deps.append(dep)
+    return filtered_dll_deps
+
 def dll_deps(deps):
-    """Selects proper dll dependencies"""
+    print(DLL_DEPS_TARGETS)
+    """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
-        "//:with_dll_enabled": ["//:dll"],
+        "//:with_dll_enabled": ["//:dll"] + _remove_static_libs(deps),
         "//conditions:default": deps
     })
 
@@ -32,3 +58,9 @@ force_compilation_mode = rule(
         ),
     }
 )
+
+def dll_cc_binary(**kwargs):
+    """ blah """
+    for k,v in kwargs.items():
+        print(k, v, type(k), type(v))
+    native.cc_binary(**kwargs)

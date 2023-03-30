@@ -19,7 +19,6 @@ cc_binary(
         "//ext:headers",
         "//ext/src/zpages",
         "//sdk/src/trace",
-    ]) + [
         "@github_nlohmann_json//:json"
-    ]
+    ]),
 )

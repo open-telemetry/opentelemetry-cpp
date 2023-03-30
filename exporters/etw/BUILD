@@ -34,10 +34,9 @@ cc_test(
     ],
     deps = dll_deps([
         ":etw_exporter",
-    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
-    ],
+    ]),
 )
 
 cc_test(
@@ -52,10 +51,9 @@ cc_test(
     ],
     deps = dll_deps([
         ":etw_exporter",
-    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
-    ],
+    ]),
 )
 
 cc_test(
@@ -70,10 +68,9 @@ cc_test(
     ],
     deps = dll_deps([
         ":etw_exporter",
-    ]) + [
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
-    ],
+    ]),
 )
 
 cc_library(

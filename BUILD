@@ -1,7 +1,13 @@
+# NOTE: This below code is Windows specific
+
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
+load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", pkg_strip_prefix = "strip_prefix", "pkg_filegroup")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 
 load("dll_deps.bzl", "force_compilation_mode")
 
@@ -35,37 +41,100 @@ config_setting(
     values = {"compilation_mode": "fastbuild"},
 )
 
+# List of all direct dependencies to be compiled in the otel_sdk dll
+cc_library(
+    name = "otel_sdk_deps",
+    deps = [
+        "//exporters/elasticsearch:es_log_record_exporter",
+        "//exporters/etw:etw_exporter",
+        "//exporters/memory:in_memory_span_exporter",
+        "//exporters/ostream:ostream_log_record_exporter",
+        "//exporters/ostream:ostream_metric_exporter",
+        "//exporters/ostream:ostream_span_exporter",
+        "//exporters/otlp:otlp_grpc_exporter", # span exporter
+        "//exporters/otlp:otlp_grpc_log_record_exporter",
+        "//exporters/otlp:otlp_grpc_metric_exporter",
+        "//exporters/otlp:otlp_http_exporter", # span exporter
+        "//exporters/otlp:otlp_http_log_record_exporter",
+        "//exporters/otlp:otlp_http_metric_exporter",
+        "//exporters/prometheus:prometheus_exporter",
+        "//exporters/zipkin:zipkin_exporter", # span exporter
+        "//ext/src/zpages",
+    ],
+    visibility = ["//visibility:private"],
+)
+
+# Expands to all transitive project dependencies, excluding external projects (repos)
+genquery(
+    name = "otel_sdk_all_project_deps",
+    # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
+    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps))",
+    scope = ["//:otel_sdk_deps"],
+)
+
+# expand_template(
+#     name = "dll_deps_targets",
+#     out = "dll_deps_targets.bzl",
+#     substitutions = {
+#         "@deps@": ["otel_sdk_deps_genquery"],
+#     },
+#     template = "dll_deps_targets.tpl.bzl"
+# )
+
+# genrule(
+#     name = "test",
+#     outs = ["test2"],
+#     srcs = [":otel_sdk_transitive_deps"],
+#     cmd_bat = """
+#     echo # Generated file > $(location :test2)
+#     echo DLL_DEPS_TARGETS = {k: None for k in >> $(location :test2)
+#     type $(location :otel_sdk_transitive_deps) >> $(location :test2)
+#     type $(location :otel_sdk_transitive_deps) >> $(location :test2)
+#     """,
+
+# )
+
+# expand_template(
+#     name = "test",
+#     template = "dll_deps_targets.tpl.bzl",
+#     out = "test2",
+#     data = ["otel_sdk_transitive_deps"],
+#     substitutions = {
+#         "@deps@": ["$(location otel_sdk_transitive_deps)"],
+#     }
+# )
+
+# write_file(
+#     name = "w",
+#     out = "wr",
+#     data = ["otel_sdk_deps_genquery"],
+#     content = [
+        
+#     ]
+# )
+
+# genrule(
+#     name = "otel_sdk_deps_genrule",
+#     srcs = ["otel_sdk_deps_genquery"],
+#     outs = ["dll_deps_targets.bzl"],
+#     cmd = "echo blah >> $@",
+# )
+
 [cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
-    srcs = [],
     target_compatible_with = select({ # Makes the build target compatible only with specific compilation mode, for example:
         otel_sdk_config_name: [],     # otel_sdk_r needs "-c opt", and otel_sdk_d "-c dbg" (otel_sdk_rd the default "-c fastbuild")
         "//conditions:default": ["@platforms//:incompatible"], # This would error out if say "bazel build -c dbg otel_sdk_r" is used.
     }),    
+    visibility = ["//visibility:private"],
 ) for (otel_sdk_binary, otel_sdk_config_name) in [("otel_sdk_r", ":release"), ("otel_sdk_d", ":debug"), ("otel_sdk_rd", ":reldeb")]]
 
 # Conveniently place all Open Telemetry C++ dependencies required to build otel_sdk
 [cc_binary(
     name = otel_sdk_binary,
-        deps = [
+    deps = [
         otel_sdk_binary + "_restrict_compilation_mode",
-        "//api",
-        "//exporters/elasticsearch:es_log_record_exporter",
-        "//exporters/etw:etw_exporter",
-        "//exporters/memory:in_memory_span_exporter",
-        "//exporters/ostream:ostream_metric_exporter",
-        "//exporters/ostream:ostream_span_exporter",
-        "//exporters/ostream:ostream_log_record_exporter",
-        "//exporters/otlp:otlp_http_exporter",
-        "//exporters/otlp:otlp_grpc_exporter",
-        "//exporters/otlp:otlp_http_metric_exporter",
-        "//exporters/otlp:otlp_grpc_metric_exporter",
-        "//exporters/otlp:otlp_http_log_record_exporter",
-        "//exporters/otlp:otlp_grpc_log_record_exporter",
-        "//exporters/prometheus:prometheus_exporter",
-        "//exporters/zipkin:zipkin_exporter",
-        "//ext/src/http/client/curl:http_client_curl",
-        "//ext/src/zpages",
+        "otel_sdk_deps",
     ],
 
     # Force generation of .pdb file for for opt builds
@@ -79,6 +148,7 @@ config_setting(
     # Make a .dll
     linkshared = True,
 
+    # https://learn.microsoft.com/en-us/cpp/build/reference/wholearchive-include-all-library-object-files?view=msvc-170
     linkopts = ["/WHOLEARCHIVE"],
 
     # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
@@ -205,7 +275,6 @@ pkg_files(
 ) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
 
 # TODO: Add sentry-cli.exe download to WORKSPACE and have it run over the .pdb to bundle the source code.
-
 # # Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
 # [run_binary(
 #     name = otel_sdk_binary + "_src_bundles",
@@ -263,4 +332,26 @@ pkg_zip(
     name = "otel_sdk_zip",
     out = "otel_sdk.zip",
     srcs = ["otel_sdk_files"],
+)
+
+cc_binary(
+    name = "dll_deps",
+    srcs = ["dll_deps.cpp"],
+    local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
+    data = ["otel_sdk_all_project_deps"],
+    deps = ["@bazel_tools//tools/cpp/runfiles"]
+)
+
+run_binary(
+    name = "get_otel_sdk_all_project_deps",
+    tool = "dll_deps",
+    srcs = [":otel_sdk_all_project_deps"],
+    args = ["$(location otel_sdk_dll_deps.bzl)"],
+    outs = ["otel_sdk_dll_deps.bzl"]
+)
+
+write_source_file(
+    name = "get_dll_deps_update",
+    in_file = "otel_sdk_dll_deps.bzl",
+    out_file = "blah.bzl",
 )

@@ -42,13 +42,12 @@ cc_binary(
     defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
     deps = dll_deps([
-        "//api",
-        "//sdk/src/trace",
-    ]) + [
         "messages_cc_grpc",
         ":tracer_common",
+        "//api",
+        "//sdk/src/trace",
         "@com_github_grpc_grpc//:grpc++",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -59,11 +58,10 @@ cc_binary(
     defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
     deps = dll_deps([
-        "//api",
-        "//sdk/src/trace",
-    ]) + [
         "messages_cc_grpc",
         ":tracer_common",
+        "//api",
+        "//sdk/src/trace",
         "@com_github_grpc_grpc//:grpc++",
-    ],
+    ]),
 )

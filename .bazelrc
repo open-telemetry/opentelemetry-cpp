@@ -4,6 +4,10 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
+# Needed for aspect-dev's write_source_file to actually write the file back on Windows (where runfiles are disabled by default)
+build --enable_runfiles
+test --enable_runfiles
+
 build --build_tag_filters=-jaeger
 test --test_tag_filters=-jaeger
 

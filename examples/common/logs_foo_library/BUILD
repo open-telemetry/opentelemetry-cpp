@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load( "//:dll_deps.bzl", "dll_deps" )
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -12,8 +14,8 @@ cc_library(
         "foo_library.h",
     ],
     defines = ["BAZEL_BUILD"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
-    ],
+    ]),
 )

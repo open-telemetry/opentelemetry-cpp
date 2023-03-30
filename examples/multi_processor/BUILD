@@ -14,10 +14,9 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/memory:in_memory_span_exporter",
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
-    ]) + [
-        "//examples/common/foo_library:common_foo_library",
-    ],
+    ]),
 )

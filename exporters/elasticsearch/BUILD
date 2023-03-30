@@ -43,11 +43,10 @@ cc_test(
     ],
     deps = dll_deps([
         ":es_log_record_exporter",
-    ]) + [
-        "@github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
         "@curl",
-    ],
+        "@github_nlohmann_json//:json",
+    ]),
 )
 
 cc_library(
