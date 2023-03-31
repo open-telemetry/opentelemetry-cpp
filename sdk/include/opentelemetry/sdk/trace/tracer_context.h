@@ -40,6 +40,8 @@ public:
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
 
+  virtual ~TracerContext() = default;
+
   /**
    * Attaches a span processor to list of configured processors to this tracer context.
    * Processor once attached can't be removed.
@@ -85,7 +87,7 @@ public:
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
   //  order of declaration is important here - resource object should be destroyed after processor.

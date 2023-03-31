@@ -4,27 +4,12 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <map>
-#  include <vector>
-
-#  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/trace/span_context.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -36,60 +21,6 @@ namespace logs
 class Logger
 {
 public:
-  /**
-   * Utility function to help to make a attribute view from initializer_list
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                     attributes) noexcept
-  {
-    return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-        attributes.begin(), attributes.end()};
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a span
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(
-      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a KeyValueIterable
-   *
-   * @param attributes
-   * @return common::KeyValueIterable
-   */
-  inline static const common::KeyValueIterable &MakeAttributes(
-      const common::KeyValueIterable &attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a key-value iterable object
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  template <
-      class ArgumentType,
-      nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
-  inline static common::KeyValueIterableView<ArgumentType> MakeAttributes(
-      const ArgumentType &arg) noexcept
-  {
-    return common::KeyValueIterableView<ArgumentType>(arg);
-  }
-
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
@@ -323,4 +254,4 @@ private:
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
 
-#endif
+#endif  // end of ENABLE_LOGS_PREVIEW

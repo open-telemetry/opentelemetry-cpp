@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter.h"
+#include "common.h"
+
 #include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -12,20 +14,6 @@
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
-
-class MockMetricReader : public MetricReader
-{
-public:
-  MockMetricReader() = default;
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) const noexcept override
-  {
-    return AggregationTemporality::kCumulative;
-  }
-  bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
-  bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
-  void OnInitialized() noexcept override {}
-};
 
 namespace
 {

@@ -13,6 +13,8 @@ set PATH=c:\windows\system32;c:\python311;
 pushd "%~dp0"
 rem "c:\program files\perforce\p4.exe" edit ... || goto:error
 
+"%__BAZEL__%" build -k --//:with_dll=true ... || goto:error
+
 rem Note that this builds (through the magic of force_debug/release/reldeb) all configurations (unlike tests).
 rem Note that `otel_sdk.zip` is built here for the default fastdbg (e.g. when no -c is specified)
 "%__BAZEL__%" build --//:with_dll=true ... || goto:error

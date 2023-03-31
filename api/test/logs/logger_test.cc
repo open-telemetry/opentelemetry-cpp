@@ -61,48 +61,54 @@ TEST(Logger, LogMethodOverloads)
   logger->EmitLogRecord(Severity::kDebug, m);
   logger->EmitLogRecord(Severity::kWarn, "Logging a map", m);
   logger->EmitLogRecord(Severity::kError,
-                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+                        opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->EmitLogRecord(Severity::kFatal, "Logging an initializer list",
-                        Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
-  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(m));
+                        opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->EmitLogRecord(Severity::kDebug, opentelemetry::common::MakeAttributes(m));
   logger->EmitLogRecord(Severity::kDebug,
                         common::KeyValueIterableView<std::map<std::string, std::string>>(m));
   std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
-  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(array));
+  logger->EmitLogRecord(Severity::kDebug, opentelemetry::common::MakeAttributes(array));
   std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
-  logger->EmitLogRecord(Severity::kDebug, Logger::MakeAttributes(vec));
+  logger->EmitLogRecord(Severity::kDebug, opentelemetry::common::MakeAttributes(vec));
 
   // Severity methods
   logger->Trace("Test log message");
   logger->Trace("Test log message", m);
-  logger->Trace("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Trace("Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Trace(m);
-  logger->Trace(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Trace(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug("Test log message");
   logger->Debug("Test log message", m);
-  logger->Debug("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Debug("Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug(m);
-  logger->Debug(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Debug(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info("Test log message");
   logger->Info("Test log message", m);
-  logger->Info("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Info("Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info(m);
-  logger->Info(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Info(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn("Test log message");
   logger->Warn("Test log message", m);
-  logger->Warn("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Warn("Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn(m);
-  logger->Warn(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Warn(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error("Test log message");
   logger->Error("Test log message", m);
-  logger->Error("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Error("Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error(m);
-  logger->Error(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Error(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal("Test log message");
   logger->Fatal("Test log message", m);
-  logger->Fatal("Test log message", Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Fatal("Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal(m);
-  logger->Fatal(Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Fatal(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
 }
 
 TEST(Logger, EventLogMethodOverloads)
@@ -120,17 +126,21 @@ TEST(Logger, EventLogMethodOverloads)
   event_logger->EmitEvent("event name", Severity::kInfo, "Test log message");
   event_logger->EmitEvent("event name", Severity::kDebug, m);
   event_logger->EmitEvent("event name", Severity::kWarn, "Logging a map", m);
-  event_logger->EmitEvent("event name", Severity::kError,
-                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
-  event_logger->EmitEvent("event name", Severity::kFatal, "Logging an initializer list",
-                          Logger::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
-  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(m));
+  event_logger->EmitEvent(
+      "event name", Severity::kError,
+      opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent(
+      "event name", Severity::kFatal, "Logging an initializer list",
+      opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  event_logger->EmitEvent("event name", Severity::kDebug, opentelemetry::common::MakeAttributes(m));
   event_logger->EmitEvent("event name", Severity::kDebug,
                           common::KeyValueIterableView<std::map<std::string, std::string>>(m));
   std::pair<nostd::string_view, common::AttributeValue> array[] = {{"key1", "value1"}};
-  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(array));
+  event_logger->EmitEvent("event name", Severity::kDebug,
+                          opentelemetry::common::MakeAttributes(array));
   std::vector<std::pair<std::string, std::string>> vec = {{"key1", "value1"}};
-  event_logger->EmitEvent("event name", Severity::kDebug, Logger::MakeAttributes(vec));
+  event_logger->EmitEvent("event name", Severity::kDebug,
+                          opentelemetry::common::MakeAttributes(vec));
 }
 
 // Define a basic Logger class
@@ -158,7 +168,7 @@ class TestProvider : public LoggerProvider
                                       bool /* include_trace_context */,
                                       const common::KeyValueIterable & /* attributes */) override
   {
-    return shared_ptr<Logger>(new TestLogger());
+    return nostd::shared_ptr<Logger>(new TestLogger());
   }
 };
 

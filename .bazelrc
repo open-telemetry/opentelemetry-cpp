@@ -8,8 +8,8 @@
 build --enable_runfiles
 test --enable_runfiles
 
-build --build_tag_filters=-jaeger
-test --test_tag_filters=-jaeger
+build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
+test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
 build --experimental_convenience_symlinks=clean
 

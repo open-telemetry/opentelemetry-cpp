@@ -10,6 +10,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "otlp_recordable",
     srcs = [
+        "src/otlp_environment.cc",
         "src/otlp_log_recordable.cc",
         "src/otlp_metric_utils.cc",
         "src/otlp_populate_attribute_utils.cc",
@@ -17,6 +18,7 @@ cc_library(
         "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
@@ -442,11 +444,11 @@ cc_test(
         "otlp_grpc_metric",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_grpc_metric_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -457,12 +459,12 @@ cc_test(
         "otlp_http_metric",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_metric_exporter",
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -473,12 +475,12 @@ cc_test(
         "otlp_http_metric",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_http_metric_exporter",
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(

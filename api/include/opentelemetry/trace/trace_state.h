@@ -29,7 +29,7 @@ namespace trace
  * For more information, see the W3C Trace Context specification:
  * https://www.w3.org/TR/trace-context
  */
-class TraceState
+class OPENTELEMETRY_EXPORT TraceState
 {
 public:
   static constexpr int kKeyMaxSize         = 256;
@@ -38,7 +38,7 @@ public:
   static constexpr auto kKeyValueSeparator = '=';
   static constexpr auto kMembersSeparator  = ',';
 
-  static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr<TraceState> GetDefault()
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TraceState> GetDefault()
   {
     static nostd::shared_ptr<TraceState> ts{new TraceState()};
     return ts;

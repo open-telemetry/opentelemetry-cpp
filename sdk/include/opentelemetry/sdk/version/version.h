@@ -5,7 +5,7 @@
 
 #include "opentelemetry/detail/preprocessor.h"
 
-#define OPENTELEMETRY_SDK_VERSION "1.8.2"
+#define OPENTELEMETRY_SDK_VERSION "1.8.3"
 
 #include "opentelemetry/version.h"
 
@@ -14,17 +14,17 @@ namespace sdk
 {
 namespace version
 {
-extern const int MAJOR_VERSION;
-extern const int MINOR_VERSION;
-extern const int PATCH_VERSION;
-extern const char *PRE_RELEASE;
-extern const char *BUILD_METADATA;
-extern const int COUNT_NEW_COMMITS;
-extern const char *BRANCH;
-extern const char *COMMIT_HASH;
-extern const char *FULL_VERSION;
-extern const char *FULL_VERSION_WITH_BRANCH_COMMITHASH;
-extern const char *BUILD_DATE;
+extern const int major_version;
+extern const int minor_version;
+extern const int patch_version;
+extern const char *pre_release;
+extern const char *build_metadata;
+extern const int count_new_commits;
+extern const char *branch;
+extern const char *commit_hash;
+extern const char *short_version;
+extern const char *full_version;
+extern const char *build_date;
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

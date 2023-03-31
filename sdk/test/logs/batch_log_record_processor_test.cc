@@ -70,10 +70,12 @@ class MockLogExporter final : public LogRecordExporter
 {
 public:
   MockLogExporter(std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received,
+                  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter,
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
                   const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
       : logs_received_(logs_received),
+        force_flush_counter_(force_flush_counter),
         is_shutdown_(is_shutdown),
         is_export_completed_(is_export_completed),
         export_delay_(export_delay)
@@ -109,6 +111,12 @@ public:
     return ExportResult::kSuccess;
   }
 
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    ++(*force_flush_counter_);
+    return true;
+  }
+
   // toggles the boolean flag marking this exporter as shut down
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
@@ -118,6 +126,7 @@ public:
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received_;
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   const std::chrono::milliseconds export_delay_;
@@ -134,6 +143,7 @@ public:
   // is_shutdown flag, and the processor configuration options (default if unspecified)
   std::shared_ptr<LogRecordProcessor> GetMockProcessor(
       std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received,
+      std::shared_ptr<std::atomic<std::size_t>> force_flush_counter,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
@@ -143,8 +153,8 @@ public:
       const size_t max_export_batch_size                     = 512)
   {
     return std::shared_ptr<LogRecordProcessor>(new BatchLogRecordProcessor(
-        std::unique_ptr<LogRecordExporter>(
-            new MockLogExporter(logs_received, is_shutdown, is_export_completed, export_delay)),
+        std::unique_ptr<LogRecordExporter>(new MockLogExporter(
+            logs_received, force_flush_counter, is_shutdown, is_export_completed, export_delay)),
         max_queue_size, scheduled_delay_millis, max_export_batch_size));
   }
 };
@@ -154,9 +164,10 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
   // initialize a batch log processor with the test exporter
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
       new std::vector<std::unique_ptr<MockLogRecordable>>);
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
 
-  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
 
   // Create a few test log records and send them to the processor
   const int num_logs = 3;
@@ -189,11 +200,12 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 
 TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
 {
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
       new std::vector<std::unique_ptr<MockLogRecordable>>);
 
-  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
   const int num_logs   = 2048;
 
   for (int i = 0; i < num_logs; ++i)
@@ -204,6 +216,7 @@ TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
   }
 
   EXPECT_TRUE(batch_processor->ForceFlush());
+  EXPECT_GT(force_flush_counter->load(), 0);
 
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
@@ -219,7 +232,9 @@ TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
     batch_processor->OnEmit(std::move(log));
   }
 
+  std::size_t force_flush_counter_before = force_flush_counter->load();
   EXPECT_TRUE(batch_processor->ForceFlush());
+  EXPECT_GT(force_flush_counter->load(), force_flush_counter_before);
 
   EXPECT_EQ(num_logs * 2, logs_received->size());
   for (int i = 0; i < num_logs * 2; ++i)
@@ -232,13 +247,14 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLoss)
 {
   /* Test that when exporting more than max_queue_size logs, some are most likely lost*/
 
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
       new std::vector<std::unique_ptr<MockLogRecordable>>);
 
   const int max_queue_size = 4096;
 
-  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
 
   // Create max_queue_size log records
   for (int i = 0; i < max_queue_size; ++i)
@@ -258,10 +274,11 @@ TEST_F(BatchLogRecordProcessorTest, TestManyLogsLossLess)
 {
   /* Test that no logs are lost when sending max_queue_size logs */
 
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
       new std::vector<std::unique_ptr<MockLogRecordable>>);
-  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
 
   const int num_logs = 2048;
 
@@ -286,6 +303,7 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
   /* Test that max_export_batch_size logs are exported every scheduled_delay_millis
      seconds */
 
+  std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received(
@@ -295,8 +313,9 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
   const std::chrono::milliseconds scheduled_delay_millis(2000);
   const size_t max_export_batch_size = 512;
 
-  auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
-                                          export_delay, scheduled_delay_millis);
+  auto batch_processor =
+      GetMockProcessor(logs_received, force_flush_counter, is_shutdown, is_export_completed,
+                       export_delay, scheduled_delay_millis);
 
   for (std::size_t i = 0; i < max_export_batch_size; ++i)
   {

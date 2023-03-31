@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -20,10 +21,14 @@ class OPENTELEMETRY_API AttributesProcessor
 {
 public:
   // Process the metric instrument attributes.
-  // @returns The processed attributes
+  // @returns integer with individual bits set if they are to be filtered.
+
   virtual MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept = 0;
-  virtual ~AttributesProcessor()                                                = default;
+
+  virtual bool isPresent(nostd::string_view key) const noexcept = 0;
+
+  virtual ~AttributesProcessor() = default;
 };
 
 /**
@@ -33,12 +38,15 @@ public:
 
 class OPENTELEMETRY_API DefaultAttributesProcessor : public AttributesProcessor
 {
+public:
   MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
   {
     MetricAttributes result(attributes);
     return result;
   }
+
+  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
 };
 
 /**
@@ -68,6 +76,11 @@ public:
           return true;
         });
     return result;
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override
+  {
+    return (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end());
   }
 
 private:

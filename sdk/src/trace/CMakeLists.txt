@@ -9,6 +9,7 @@ add_library(
   tracer_provider_factory.cc
   tracer.cc
   span.cc
+  exporter.cc
   batch_span_processor.cc
   batch_span_processor_factory.cc
   simple_processor_factory.cc
@@ -30,9 +31,11 @@ target_include_directories(
   opentelemetry_trace
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-install(
-  TARGETS opentelemetry_trace
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_trace
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

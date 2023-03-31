@@ -63,6 +63,8 @@ public:
 
   ~LoggerProvider() override;
 
+  using opentelemetry::logs::LoggerProvider::GetLogger;
+
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it

@@ -18,7 +18,7 @@ namespace trace
  * Built-in span processors are responsible for batching and conversion of
  * spans to exportable representation and passing batches to exporters.
  */
-class OPENTELEMETRY_API SpanProcessor
+class OPENTELEMETRY_EXPORT SpanProcessor
 {
 public:
   virtual ~SpanProcessor() = default;

@@ -88,24 +88,35 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
 
     sout_ << "  body               : ";
     opentelemetry::exporter::ostream_common::print_value(log_record->GetBody(), sout_);
-    sout_ << "\n";
+    sout_ << "\n  resource           : ";
+    printAttributes(log_record->GetResource().GetAttributes(), "\n    ");
 
-    sout_ << "  resource           : ";
-    printAttributes(log_record->GetResource().GetAttributes());
+    sout_ << "\n  attributes         : ";
 
-    sout_ << "\n"
-          << "  attributes         : ";
-
-    printAttributes(log_record->GetAttributes());
+    printAttributes(log_record->GetAttributes(), "\n    ");
 
     sout_ << "\n"
           << "  trace_id           : " << std::string(trace_id, trace_id_len) << "\n"
           << "  span_id            : " << std::string(span_id, span_id__len) << "\n"
           << "  trace_flags        : " << std::string(trace_flags, trace_flags_len) << "\n"
-          << "}\n";
+          << "  scope              : \n"
+          << "    name             : " << log_record->GetInstrumentationScope().GetName() << "\n"
+          << "    version          : " << log_record->GetInstrumentationScope().GetVersion() << "\n"
+          << "    schema_url       : " << log_record->GetInstrumentationScope().GetSchemaURL()
+          << "\n"
+          << "    attributes       : ";
+
+    printAttributes(log_record->GetInstrumentationScope().GetAttributes(), "\n      ");
+    sout_ << "\n}\n";
   }
 
   return sdk::common::ExportResult::kSuccess;
+}
+
+bool OStreamLogRecordExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  sout_.flush();
+  return true;
 }
 
 bool OStreamLogRecordExporter::Shutdown(std::chrono::microseconds) noexcept

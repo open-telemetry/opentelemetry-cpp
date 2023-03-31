@@ -25,7 +25,7 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR -- //...
+    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -46,6 +46,33 @@ switch ($action) {
       exit $exit
     }
     ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
+  "cmake.dll.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DOPENTELEMETRY_BUILD_DLL=1 `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build .
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    examples\simple\Debug\example_simple.exe
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -99,6 +126,28 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DWITH_OTPROTCOL=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build .
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
+  "cmake.exporter.otprotocol.dll.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DOPENTELEMETRY_BUILD_DLL=1 `
       -DWITH_OTPROTCOL=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

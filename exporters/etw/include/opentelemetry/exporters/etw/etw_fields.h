@@ -131,11 +131,12 @@
 #  define ETW_VALUE_SPAN_END        "SpanEnd"               /* ETW for Span Start      */
 
 
+# define ETW_FIELD_ENV_PROPERTIES   "env_properties"        /* ETW event_properties with JSON string */
+
 /* Log specific */
 # define ETW_FIELD_LOG_BODY               "body"                 /* Log body   */
 # define ETW_FIELD_LOG_SEVERITY_TEXT      "severityText"         /* Sev text  */
 # define ETW_FIELD_LOG_SEVERITY_NUM       "severityNumber"      /* Sev num   */
-
 
 #endif
 

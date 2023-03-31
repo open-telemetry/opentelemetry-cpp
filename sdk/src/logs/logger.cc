@@ -40,6 +40,9 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
   }
 
   auto recordable = context_->GetProcessor().MakeRecordable();
+
+  recordable->SetObservedTimestamp(std::chrono::system_clock::now());
+
   if (include_trace_context_ &&
       opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
   {

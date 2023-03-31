@@ -17,7 +17,7 @@ namespace trace
 /**
  * Factory class for SimpleSpanProcessor.
  */
-class OPENTELEMETRY_API SimpleSpanProcessorFactory
+class OPENTELEMETRY_EXPORT SimpleSpanProcessorFactory
 {
 public:
   /**

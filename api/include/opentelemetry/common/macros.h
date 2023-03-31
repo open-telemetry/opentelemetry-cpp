@@ -184,3 +184,32 @@ point.
 #  define OPENTELEMETRY_API_SINGLETON
 
 #endif
+
+/* clang-format on */
+//
+// The if/elif order matters here. If both OPENTELEMETRY_BUILD_IMPORT_DLL and
+// OPENTELEMETRY_BUILD_EXPORT_DLL are defined, the former takes precedence.
+//
+// TODO: consider define OPENTELEMETRY_EXPORT for cygwin/gcc, see below link.
+// https://gcc.gnu.org/wiki/Visibility#How_to_use_the_new_C.2B-.2B-_visibility_support
+//
+#if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
+
+#  define OPENTELEMETRY_EXPORT __declspec(dllimport)
+
+#elif defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
+
+#  define OPENTELEMETRY_EXPORT __declspec(dllexport)
+
+#else
+
+//
+// build OpenTelemetry as static library or not on Windows.
+//
+#  define OPENTELEMETRY_EXPORT
+
+#endif
+
+#ifndef OPENTELEMETRY_EXPORT
+#define OPENTELEMETRY_EXPORT OPENTELEMETRY_API
+#endif

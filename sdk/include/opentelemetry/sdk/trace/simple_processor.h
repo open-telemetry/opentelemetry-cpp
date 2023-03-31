@@ -55,7 +55,16 @@ public:
     }
   }
 
-  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
+  {
+    if (exporter_ != nullptr)
+    {
+      return exporter_->ForceFlush(timeout);
+    }
+
+    return true;
+  }
 
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override

@@ -1,7 +1,7 @@
 # Very naive implementation
 # TODO: Scan the deps for known targets included in the otel_sdk, and remove them, while leaving the rest. This would avoid the concatenation needed.
 
-load("dll_deps_targets.bzl", "DLL_DEPS_TARGETS")
+load("dll_deps_generated.bzl", "DLL_DEPS")
 
 def _absolute_label(label):
     """ returns the absolute path to a lebel string """
@@ -18,15 +18,16 @@ def _remove_static_libs(deps):
     for dep in deps:
         abs = _absolute_label(dep)
         label = Label(abs)
-        parts = str(label.package).split('/')
-        if "test" in parts:
+#       parts = str(label.package).split('/')
+        if not label in DLL_DEPS:
             filtered_dll_deps.append(dep)
-        elif not parts[0] in ["api", "exporters", "sdk", "ext"]:
-            filtered_dll_deps.append(dep)
+        # if "test" in parts:
+        #     filtered_dll_deps.append(dep)
+        # elif not parts[0] in ["api", "exporters", "sdk", "ext"]:
+        #     filtered_dll_deps.append(dep)
     return filtered_dll_deps
 
 def dll_deps(deps):
-    print(DLL_DEPS_TARGETS)
     """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
         "//:with_dll_enabled": ["//:dll"] + _remove_static_libs(deps),

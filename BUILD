@@ -351,7 +351,7 @@ run_binary(
 )
 
 write_source_file(
-    name = "get_dll_deps_update",
+    name = "dll_deps_update",
     in_file = "otel_sdk_dll_deps.bzl",
-    out_file = "blah.bzl",
+    out_file = "dll_deps_generated.bzl",
 )

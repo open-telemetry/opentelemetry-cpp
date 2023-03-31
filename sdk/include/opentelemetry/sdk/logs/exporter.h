@@ -20,10 +20,11 @@ namespace logs
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class OPENTELEMETRY_API LogRecordExporter
+class OPENTELEMETRY_EXPORT LogRecordExporter
 {
 public:
-  virtual ~LogRecordExporter() = default;
+  LogRecordExporter();
+  virtual ~LogRecordExporter();
 
   /**
    * Create a log recordable. This object will be used to record log data and
@@ -46,6 +47,12 @@ public:
    */
   virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
+
+  /**
+   * Force flush the log records pushed into this log exporter.
+   */
+  virtual bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

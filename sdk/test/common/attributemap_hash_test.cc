@@ -19,6 +19,7 @@ TEST(AttributeMapHashTest, BasicTests)
   }
 
   {
+    // hash algo returns same value irrespective of order of attributes.
     OrderedAttributeMap map1 = {{"k1", 10}, {"k2", true}, {"k3", 12.22}};
     OrderedAttributeMap map2 = {{"k3", 12.22}, {"k1", 10}, {"k2", true}};
     EXPECT_TRUE(GetHashForAttributeMap(map1) == GetHashForAttributeMap(map2));

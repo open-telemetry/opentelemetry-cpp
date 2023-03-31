@@ -130,13 +130,13 @@ cc_test(
         "test",
     ],
     deps = dll_deps([
-        "//api",
         "component_a",
         "component_b",
         "component_c",
         "component_d",
         "component_e",
         "component_f",
+        "//api",
         "@com_google_googletest//:gtest_main",
     ]),
 )
