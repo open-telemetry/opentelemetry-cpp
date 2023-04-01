@@ -167,7 +167,7 @@ public:
     return GetStorage();
   }
 
-  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
+  static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
     return context;

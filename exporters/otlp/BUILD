@@ -464,6 +464,8 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@github_nlohmann_json//:json",
     ]),
 )
 

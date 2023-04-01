@@ -41,25 +41,37 @@ config_setting(
     values = {"compilation_mode": "fastbuild"},
 )
 
-# List of all direct dependencies to be compiled in the otel_sdk dll
+# List of all extensions and exporters that are going to be linked in the otel_sdk.dll
+# The transitive form of this list is used to derive DLL_DEPS in dll_deps_generated.bzl
+# Which is then used to exclude (through dll_deps([])) the libs already linked in here.
+# There are some gotchas, as ideally only libs that have dllexport symbols should be in there
+# But it's impossible to know this in advance.
 cc_library(
     name = "otel_sdk_deps",
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
+
         "//exporters/etw:etw_exporter",
-        "//exporters/memory:in_memory_span_exporter",
+
+        "//exporters/memory:in_memory_span_exporter", # traces
+
+        "//exporters/ostream:ostream_span_exporter", # traces
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
-        "//exporters/ostream:ostream_span_exporter",
-        "//exporters/otlp:otlp_grpc_exporter", # span exporter
+
+        "//exporters/otlp:otlp_grpc_exporter", # traces
         "//exporters/otlp:otlp_grpc_log_record_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
-        "//exporters/otlp:otlp_http_exporter", # span exporter
+
+        "//exporters/otlp:otlp_http_exporter", # traces
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//exporters/otlp:otlp_http_metric_exporter",
-        "//exporters/prometheus:prometheus_exporter",
-        "//exporters/zipkin:zipkin_exporter", # span exporter
-        "//ext/src/zpages",
+
+        "//exporters/prometheus:prometheus_exporter", # metrics
+
+        "//exporters/zipkin:zipkin_exporter", # traces
+
+        "//ext/src/zpages", # traces
     ],
     visibility = ["//visibility:private"],
 )
@@ -343,7 +355,7 @@ cc_binary(
 )
 
 run_binary(
-    name = "get_otel_sdk_all_project_deps",
+    name = "dll_deps_uptodate",
     tool = "dll_deps",
     srcs = [":otel_sdk_all_project_deps"],
     args = ["$(location otel_sdk_dll_deps.bzl)"],

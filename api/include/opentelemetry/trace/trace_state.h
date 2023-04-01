@@ -38,7 +38,7 @@ public:
   static constexpr auto kKeyValueSeparator = '=';
   static constexpr auto kMembersSeparator  = ',';
 
-  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TraceState> GetDefault()
+  static nostd::shared_ptr<TraceState> GetDefault()
   {
     static nostd::shared_ptr<TraceState> ts{new TraceState()};
     return ts;

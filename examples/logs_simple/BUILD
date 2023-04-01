@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load ("//:dll_deps.bzl", "dll_deps")
+
 cc_binary(
     name = "example_logs_simple",
     srcs = [
@@ -10,10 +12,10 @@ cc_binary(
         "examples",
         "ostream",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_span_exporter",
-    ],
+    ]),
 )

@@ -177,11 +177,13 @@ point.
 #  endif
 
 #  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_API
+#  define OPENTELEMETRY_EXPORT OPENTELEMETRY_API
 
 #else
 
 #  define OPENTELEMETRY_API
 #  define OPENTELEMETRY_API_SINGLETON
+#  define OPENTELEMETRY_EXPORT
 
 #endif
 
@@ -193,6 +195,7 @@ point.
 // TODO: consider define OPENTELEMETRY_EXPORT for cygwin/gcc, see below link.
 // https://gcc.gnu.org/wiki/Visibility#How_to_use_the_new_C.2B-.2B-_visibility_support
 //
+#if 0
 #if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
 
 #  define OPENTELEMETRY_EXPORT __declspec(dllimport)
@@ -209,7 +212,4 @@ point.
 #  define OPENTELEMETRY_EXPORT
 
 #endif
-
-#ifndef OPENTELEMETRY_EXPORT
-#define OPENTELEMETRY_EXPORT OPENTELEMETRY_API
 #endif

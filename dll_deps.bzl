@@ -12,25 +12,20 @@ def _absolute_label(label):
         return native.repository_name() + "//" + native.package_name() + label
     return native.repository_name() + "//" + native.package_name() + ":" + label
 
-def _remove_static_libs(deps):
+# Filter libs that were compiled into the the otel_sdk.dll already
+def _filter_libs(deps):
     """ Removes references to the api/sdk/exporters/ext static libraries """
     filtered_dll_deps = []
     for dep in deps:
-        abs = _absolute_label(dep)
-        label = Label(abs)
-#       parts = str(label.package).split('/')
+        label = Label(_absolute_label(dep))
         if not label in DLL_DEPS:
             filtered_dll_deps.append(dep)
-        # if "test" in parts:
-        #     filtered_dll_deps.append(dep)
-        # elif not parts[0] in ["api", "exporters", "sdk", "ext"]:
-        #     filtered_dll_deps.append(dep)
     return filtered_dll_deps
 
 def dll_deps(deps):
     """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
-        "//:with_dll_enabled": ["//:dll"] + _remove_static_libs(deps),
+        "//:with_dll_enabled": ["//:dll"] + _filter_libs(deps),
         "//conditions:default": deps
     })
 

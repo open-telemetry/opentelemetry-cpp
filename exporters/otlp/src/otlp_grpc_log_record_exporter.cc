@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
-
 #  include <chrono>
 #  include <memory>
 
