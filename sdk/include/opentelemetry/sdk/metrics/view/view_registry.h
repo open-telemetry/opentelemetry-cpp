@@ -29,7 +29,7 @@ struct RegisteredView
   std::unique_ptr<opentelemetry::sdk::metrics::View> view_;
 };
 
-class OPENTELEMETRY_API ViewRegistry
+class OPENTELEMETRY_SDK_METRICS_EXPORT ViewRegistry
 {
 public:
   void AddView(std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> instrument_selector,

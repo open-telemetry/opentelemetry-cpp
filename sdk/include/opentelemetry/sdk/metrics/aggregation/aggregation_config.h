@@ -12,13 +12,13 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_API AggregationConfig
+class OPENTELEMETRY_SDK_METRICS_EXPORT AggregationConfig
 {
 public:
   virtual ~AggregationConfig() = default;
 };
 
-class OPENTELEMETRY_API HistogramAggregationConfig : public AggregationConfig
+class OPENTELEMETRY_SDK_METRICS_EXPORT HistogramAggregationConfig : public AggregationConfig
 {
 public:
   std::vector<double> boundaries_;

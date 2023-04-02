@@ -13,7 +13,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_API LongLastValueAggregation : public Aggregation
+class OPENTELEMETRY_SDK_METRICS_EXPORT LongLastValueAggregation : public Aggregation
 {
 public:
   LongLastValueAggregation();
@@ -35,7 +35,7 @@ private:
   LastValuePointData point_data_;
 };
 
-class OPENTELEMETRY_API DoubleLastValueAggregation : public Aggregation
+class OPENTELEMETRY_SDK_METRICS_EXPORT DoubleLastValueAggregation : public Aggregation
 {
 public:
   DoubleLastValueAggregation();

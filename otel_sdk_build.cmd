@@ -13,15 +13,13 @@ set PATH=c:\windows\system32;c:\python311;
 pushd "%~dp0"
 rem "c:\program files\perforce\p4.exe" edit ... || goto:error
 
-"%__BAZEL__%" build -k --//:with_dll=true ... || goto:error
-
 rem Note that this builds (through the magic of force_debug/release/reldeb) all configurations (unlike tests).
 rem Note that `otel_sdk.zip` is built here for the default fastdbg (e.g. when no -c is specified)
 "%__BAZEL__%" build --//:with_dll=true ... || goto:error
 
 rem We can't test dbg, fastbuild and opt at the same time, as done above ^^^ (no config "transition" possible when doing testing (AFAIK))
 rem TODO: Fix failing tests in debug only (e.g. add back the || goto:error)
-"%__BAZEL__%" test --//:with_dll=true -c dbg ...
+"%__BAZEL__%" test --//:with_dll=true -c dbg ... || goto:error
 "%__BAZEL__%" test --//:with_dll=true -c fastbuild ... || goto:error
 "%__BAZEL__%" test --//:with_dll=true -c opt ... || goto:error
 

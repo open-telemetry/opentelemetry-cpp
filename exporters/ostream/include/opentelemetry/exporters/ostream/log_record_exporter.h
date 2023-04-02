@@ -21,7 +21,7 @@ namespace logs
 /**
  * The OStreamLogRecordExporter exports logs through an ostream (default set to std::cout)
  */
-class OPENTELEMETRY_API OStreamLogRecordExporter final : public opentelemetry::sdk::logs::LogRecordExporter
+class OPENTELEMETRY_EXPORTERS_OSTREAM_EXPORT OStreamLogRecordExporter final : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**

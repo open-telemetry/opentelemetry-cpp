@@ -25,7 +25,7 @@ namespace logs
  * An Elasticsearch Recordable implemenation that stores the 10 fields of the Log Data Model inside
  * a JSON object,
  */
-class OPENTELEMETRY_API ElasticSearchRecordable final : public sdk::logs::Recordable
+class OPENTELEMETRY_EXPORTERS_ELASTICSEARCH_EXPORT ElasticSearchRecordable final : public sdk::logs::Recordable
 {
 private:
   /**

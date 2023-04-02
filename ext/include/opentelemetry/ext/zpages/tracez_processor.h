@@ -24,7 +24,7 @@ namespace zpages
  * The span processor passes and stores running and completed recordables (casted as span_data)
  * to be used by the TraceZ Data Aggregator.
  */
-class OPENTELEMETRY_API TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
+class OPENTELEMETRY_EXT_ZPAGES_EXPORT TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
 public:
   /*

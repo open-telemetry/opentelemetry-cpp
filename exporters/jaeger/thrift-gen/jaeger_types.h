@@ -50,19 +50,19 @@ std::ostream& operator<<(std::ostream& out, const SpanRefType::type& val);
 
 std::string to_string(const SpanRefType::type& val);
 
-class OPENTELEMETRY_API Tag;
+class Tag;
 
-class OPENTELEMETRY_API Log;
+class Log;
 
-class OPENTELEMETRY_API SpanRef;
+class SpanRef;
 
-class OPENTELEMETRY_API Span;
+class Span;
 
-class OPENTELEMETRY_API Process;
+class Process;
 
-class OPENTELEMETRY_API Batch;
+class Batch;
 
-class OPENTELEMETRY_API BatchSubmitResponse;
+class BatchSubmitResponse;
 
 typedef struct _Tag__isset {
   _Tag__isset() : vStr(false), vDouble(false), vBool(false), vLong(false), vBinary(false) {}
@@ -73,7 +73,7 @@ typedef struct _Tag__isset {
   bool vBinary :1;
 } _Tag__isset;
 
-class OPENTELEMETRY_API Tag : public virtual ::apache::thrift::TBase {
+class Tag : public virtual ::apache::thrift::TBase {
  public:
 
   Tag(const Tag&);
@@ -155,7 +155,7 @@ void swap(Tag &a, Tag &b);
 std::ostream& operator<<(std::ostream& out, const Tag& obj);
 
 
-class OPENTELEMETRY_API Log : public virtual ::apache::thrift::TBase {
+class Log : public virtual ::apache::thrift::TBase {
  public:
 
   Log(const Log&);
@@ -196,7 +196,7 @@ void swap(Log &a, Log &b);
 std::ostream& operator<<(std::ostream& out, const Log& obj);
 
 
-class OPENTELEMETRY_API SpanRef : public virtual ::apache::thrift::TBase {
+class SpanRef : public virtual ::apache::thrift::TBase {
  public:
 
   SpanRef(const SpanRef&);
@@ -257,7 +257,7 @@ typedef struct _Span__isset {
   bool logs :1;
 } _Span__isset;
 
-class OPENTELEMETRY_API Span : public virtual ::apache::thrift::TBase {
+class Span : public virtual ::apache::thrift::TBase {
  public:
 
   Span(const Span&);
@@ -355,7 +355,7 @@ typedef struct _Process__isset {
   bool tags :1;
 } _Process__isset;
 
-class OPENTELEMETRY_API Process : public virtual ::apache::thrift::TBase {
+class Process : public virtual ::apache::thrift::TBase {
  public:
 
   Process(const Process&);
@@ -400,7 +400,7 @@ void swap(Process &a, Process &b);
 std::ostream& operator<<(std::ostream& out, const Process& obj);
 
 
-class OPENTELEMETRY_API Batch : public virtual ::apache::thrift::TBase {
+class Batch : public virtual ::apache::thrift::TBase {
  public:
 
   Batch(const Batch&);
@@ -441,7 +441,7 @@ void swap(Batch &a, Batch &b);
 std::ostream& operator<<(std::ostream& out, const Batch& obj);
 
 
-class OPENTELEMETRY_API BatchSubmitResponse : public virtual ::apache::thrift::TBase {
+class BatchSubmitResponse : public virtual ::apache::thrift::TBase {
  public:
 
   BatchSubmitResponse(const BatchSubmitResponse&);

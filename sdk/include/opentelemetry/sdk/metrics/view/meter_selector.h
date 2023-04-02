@@ -11,7 +11,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_API MeterSelector
+class OPENTELEMETRY_SDK_METRICS_EXPORT MeterSelector
 {
 public:
   MeterSelector(opentelemetry::nostd::string_view name,

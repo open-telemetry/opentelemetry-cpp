@@ -15,7 +15,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_API SyncMultiMetricStorage : public SyncWritableMetricStorage
+class OPENTELEMETRY_SDK_METRICS_EXPORT SyncMultiMetricStorage : public SyncWritableMetricStorage
 {
 public:
   void AddStorage(std::shared_ptr<SyncWritableMetricStorage> storage)
@@ -65,7 +65,7 @@ private:
   std::vector<std::shared_ptr<SyncWritableMetricStorage>> storages_;
 };
 
-class OPENTELEMETRY_API AsyncMultiMetricStorage : public AsyncWritableMetricStorage
+class OPENTELEMETRY_SDK_METRICS_EXPORT AsyncMultiMetricStorage : public AsyncWritableMetricStorage
 {
 public:
   void AddStorage(std::shared_ptr<AsyncWritableMetricStorage> storage)

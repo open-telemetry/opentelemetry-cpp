@@ -29,7 +29,7 @@ namespace trace
  * references to Processor, Exporter, Recordable, Custom Iterator etc. should exist, and all
  *   associated pipelines will have been flushed.
  */
-class OPENTELEMETRY_API TracerContext
+class OPENTELEMETRY_SDK_TRACE_EXPORT TracerContext
 {
 public:
   explicit TracerContext(

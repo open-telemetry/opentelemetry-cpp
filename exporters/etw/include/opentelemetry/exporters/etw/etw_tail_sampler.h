@@ -10,7 +10,7 @@ namespace exporter
 namespace etw
 {
 
-class OPENTELEMETRY_API TailSampler
+class OPENTELEMETRY_EXPORTERS_ETW_EXPORT TailSampler
 {
 public:
   // convert to etw span if required for getters on span.
@@ -24,7 +24,7 @@ public:
   virtual ~TailSampler()                               = default;
 };
 
-class OPENTELEMETRY_API AlwaysOnTailSampler : public TailSampler
+class OPENTELEMETRY_EXPORTERS_ETW_EXPORT AlwaysOnTailSampler : public TailSampler
 {
 public:
   opentelemetry::sdk::trace::SamplingResult ShouldSample(

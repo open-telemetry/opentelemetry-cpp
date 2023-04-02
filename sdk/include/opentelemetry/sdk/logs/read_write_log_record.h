@@ -33,7 +33,7 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class OPENTELEMETRY_API ReadWriteLogRecord final : public ReadableLogRecord
+class OPENTELEMETRY_SDK_LOGS_EXPORT ReadWriteLogRecord final : public ReadableLogRecord
 {
 public:
   ReadWriteLogRecord();

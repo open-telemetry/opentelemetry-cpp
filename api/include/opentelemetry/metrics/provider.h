@@ -17,7 +17,7 @@ namespace metrics
 /**
  * Stores the singleton global MeterProvider.
  */
-class Provider
+class OPENTELEMETRY_EXPORT Provider
 {
 public:
   /**
@@ -42,13 +42,13 @@ public:
   }
 
 private:
-  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
+  static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
     return provider;
   }
 
-  OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
+  static common::SpinLockMutex &GetLock() noexcept
   {
     static common::SpinLockMutex lock;
     return lock;

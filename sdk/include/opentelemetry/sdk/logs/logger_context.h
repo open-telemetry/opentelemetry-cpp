@@ -29,7 +29,7 @@ namespace logs
  * references to Processor, Exporter, Recordable, Custom Iterator etc. should exist, and all
  *   associated pipelines will have been flushed.
  */
-class OPENTELEMETRY_API LoggerContext
+class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerContext
 {
 public:
   explicit LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,

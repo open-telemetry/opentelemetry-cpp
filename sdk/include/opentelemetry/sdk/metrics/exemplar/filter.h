@@ -17,7 +17,7 @@ using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
  * Exemplar filters are used to pre-filter measurements before attempting to store them in a
  * reservoir.
  */
-class OPENTELEMETRY_API ExemplarFilter
+class OPENTELEMETRY_SDK_METRICS_EXPORT ExemplarFilter
 {
 public:
   // Returns whether or not a reservoir should attempt to filter a measurement.

@@ -17,7 +17,7 @@ namespace zipkin
 /**
  * Factory class for ZipkinExporter.
  */
-class OPENTELEMETRY_API ZipkinExporterFactory
+class OPENTELEMETRY_EXPORTERS_ZIPKIN_EXPORT ZipkinExporterFactory
 {
 public:
   /**

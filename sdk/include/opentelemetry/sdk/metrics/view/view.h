@@ -20,7 +20,7 @@ namespace metrics
  * customize the metrics before exported.
  */
 
-class OPENTELEMETRY_API View
+class OPENTELEMETRY_SDK_METRICS_EXPORT View
 {
 public:
   View(const std::string &name,

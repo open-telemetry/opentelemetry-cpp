@@ -16,7 +16,7 @@ namespace memory
  * A wrapper class holding in memory exporter data
  */
 template <typename T>
-class OPENTELEMETRY_API InMemoryData
+class OPENTELEMETRY_EXPORTERS_MEMORY_EXPORT InMemoryData
 {
 public:
   /**

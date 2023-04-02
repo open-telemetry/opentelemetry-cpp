@@ -18,7 +18,7 @@ namespace metrics
  * A null Aggregation which denotes no aggregation should occur.
  */
 
-class OPENTELEMETRY_API DropAggregation : public Aggregation
+class OPENTELEMETRY_SDK_METRICS_EXPORT DropAggregation : public Aggregation
 {
 public:
   DropAggregation() = default;

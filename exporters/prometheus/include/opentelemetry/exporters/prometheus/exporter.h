@@ -49,7 +49,7 @@ struct PrometheusExporterOptions
   std::string url = GetPrometheusDefaultHttpEndpoint();
 };
 
-class OPENTELEMETRY_API PrometheusExporter : public sdk::metrics::MetricReader
+class OPENTELEMETRY_EXPORTERS_PROMETHEUS_EXPORT PrometheusExporter : public sdk::metrics::MetricReader
 {
 public:
   /**

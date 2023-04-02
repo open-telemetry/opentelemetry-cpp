@@ -100,7 +100,7 @@ struct AttributeConverter
 /**
  * Class for storing attributes.
  */
-class OPENTELEMETRY_API AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
+class OPENTELEMETRY_SDK_COMMON_EXPORT AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map
@@ -148,7 +148,7 @@ private:
 /**
  * Class for storing attributes.
  */
-class OPENTELEMETRY_API OrderedAttributeMap : public std::map<std::string, OwnedAttributeValue>
+class OPENTELEMETRY_SDK_COMMON_EXPORT OrderedAttributeMap : public std::map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map

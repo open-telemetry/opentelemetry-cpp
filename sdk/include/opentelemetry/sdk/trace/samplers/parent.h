@@ -15,7 +15,7 @@ namespace trace
  * The ParentBased sampler is a composite sampler. ParentBased(delegateSampler) either respects
  * the parent span's sampling decision or delegates to delegateSampler for root spans.
  */
-class OPENTELEMETRY_API ParentBasedSampler : public Sampler
+class OPENTELEMETRY_SDK_TRACE_EXPORT ParentBasedSampler : public Sampler
 {
 public:
   explicit ParentBasedSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept;

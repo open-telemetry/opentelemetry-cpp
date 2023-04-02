@@ -23,7 +23,7 @@ namespace resource
 
 using ResourceAttributes = opentelemetry::sdk::common::AttributeMap;
 
-class OPENTELEMETRY_API Resource
+class OPENTELEMETRY_SDK_RESOURCE_EXPORT Resource
 {
 public:
   Resource(const Resource &) = default;

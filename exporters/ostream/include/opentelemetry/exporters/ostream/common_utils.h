@@ -60,7 +60,7 @@ void print_value(const nostd::span<T> &vec, std::ostream &sout)
 // Prior to C++14, generic lambda is not available so fallback to functor.
 #if __cplusplus < 201402L
 
-class OPENTELEMETRY_API OwnedAttributeValueVisitor
+class OPENTELEMETRY_EXPORTERS_OSTREAM_EXPORT OwnedAttributeValueVisitor
 {
 public:
   OwnedAttributeValueVisitor(std::ostream &sout) : sout_(sout) {}
@@ -75,7 +75,7 @@ private:
   std::ostream &sout_;
 };
 
-class OPENTELEMETRY_API AttributeValueVisitor
+class OPENTELEMETRY_EXPORTERS_OSTREAM_EXPORT AttributeValueVisitor
 {
 public:
   AttributeValueVisitor(std::ostream &sout) : sout_(sout) {}

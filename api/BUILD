@@ -27,7 +27,7 @@ cc_library(
     hdrs = glob(["include/**/*.h"]),
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
-        "//:with_dll_enabled": ["ENABLE_LOGS_PREVIEW=1", "ENABLE_TEST=1", "OPENTELEMETRY_DLL=1", "HAVE_CPP_STDLIB=1", "OPENTELEMETRY_API=__declspec(dllexport)"],
+        "//:with_dll_enabled": ["ENABLE_LOGS_PREVIEW=1", "ENABLE_TEST=1", "OPENTELEMETRY_DLL=1", "HAVE_CPP_STDLIB=1", "OPENTELEMETRY_DLL_EXPORT=__declspec(dllexport)"],
         "//conditions:default": [],
     }),
     strip_include_prefix = "include",

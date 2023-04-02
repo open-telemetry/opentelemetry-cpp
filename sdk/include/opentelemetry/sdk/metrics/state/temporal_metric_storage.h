@@ -23,7 +23,7 @@ struct LastReportedMetrics
   opentelemetry::common::SystemTimestamp collection_ts;
 };
 
-class OPENTELEMETRY_API TemporalMetricStorage
+class OPENTELEMETRY_SDK_METRICS_EXPORT TemporalMetricStorage
 {
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,

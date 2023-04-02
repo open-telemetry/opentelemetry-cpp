@@ -20,7 +20,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_API HistogramExemplarReservoir : public FixedSizeExemplarReservoir
+class OPENTELEMETRY_SDK_METRICS_EXPORT HistogramExemplarReservoir : public FixedSizeExemplarReservoir
 {
 
 public:

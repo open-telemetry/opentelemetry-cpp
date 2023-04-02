@@ -37,7 +37,7 @@ struct ResourceMetrics
  * <p>Implementations must be thread-safe.
  */
 
-class OPENTELEMETRY_API MetricProducer
+class OPENTELEMETRY_SDK_METRICS_EXPORT MetricProducer
 {
 public:
   MetricProducer()          = default;

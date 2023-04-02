@@ -16,7 +16,7 @@ namespace common
  * Utility methods for creating random data, based on a seeded thread-local
  * number generator.
  */
-class OPENTELEMETRY_API Random
+class OPENTELEMETRY_SDK_COMMON_EXPORT Random
 {
 public:
   /**

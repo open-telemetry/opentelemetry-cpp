@@ -19,14 +19,14 @@ namespace jaegertracing { namespace agent { namespace thrift {
   #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
-class OPENTELEMETRY_API AgentIf {
+class AgentIf {
  public:
   virtual ~AgentIf() {}
   virtual void emitZipkinBatch(const std::vector< ::twitter::zipkin::thrift::Span> & spans) = 0;
   virtual void emitBatch(const  ::jaegertracing::thrift::Batch& batch) = 0;
 };
 
-class OPENTELEMETRY_API AgentIfFactory {
+class AgentIfFactory {
  public:
   typedef AgentIf Handler;
 
@@ -36,7 +36,7 @@ class OPENTELEMETRY_API AgentIfFactory {
   virtual void releaseHandler(AgentIf* /* handler */) = 0;
 };
 
-class OPENTELEMETRY_API AgentIfSingletonFactory : virtual public AgentIfFactory {
+class AgentIfSingletonFactory : virtual public AgentIfFactory {
  public:
   AgentIfSingletonFactory(const ::std::shared_ptr<AgentIf>& iface) : iface_(iface) {}
   virtual ~AgentIfSingletonFactory() {}
@@ -50,7 +50,7 @@ class OPENTELEMETRY_API AgentIfSingletonFactory : virtual public AgentIfFactory 
   ::std::shared_ptr<AgentIf> iface_;
 };
 
-class OPENTELEMETRY_API AgentNull : virtual public AgentIf {
+class AgentNull : virtual public AgentIf {
  public:
   virtual ~AgentNull() {}
   void emitZipkinBatch(const std::vector< ::twitter::zipkin::thrift::Span> & /* spans */) {
@@ -66,7 +66,7 @@ typedef struct _Agent_emitZipkinBatch_args__isset {
   bool spans :1;
 } _Agent_emitZipkinBatch_args__isset;
 
-class OPENTELEMETRY_API Agent_emitZipkinBatch_args {
+class Agent_emitZipkinBatch_args {
  public:
 
   Agent_emitZipkinBatch_args(const Agent_emitZipkinBatch_args&);
@@ -99,7 +99,7 @@ class OPENTELEMETRY_API Agent_emitZipkinBatch_args {
 };
 
 
-class OPENTELEMETRY_API Agent_emitZipkinBatch_pargs {
+class Agent_emitZipkinBatch_pargs {
  public:
 
 
@@ -115,7 +115,7 @@ typedef struct _Agent_emitBatch_args__isset {
   bool batch :1;
 } _Agent_emitBatch_args__isset;
 
-class OPENTELEMETRY_API Agent_emitBatch_args {
+class Agent_emitBatch_args {
  public:
 
   Agent_emitBatch_args(const Agent_emitBatch_args&);
@@ -148,7 +148,7 @@ class OPENTELEMETRY_API Agent_emitBatch_args {
 };
 
 
-class OPENTELEMETRY_API Agent_emitBatch_pargs {
+class Agent_emitBatch_pargs {
  public:
 
 
@@ -159,7 +159,7 @@ class OPENTELEMETRY_API Agent_emitBatch_pargs {
 
 };
 
-class OPENTELEMETRY_API AgentClient : virtual public AgentIf {
+class AgentClient : virtual public AgentIf {
  public:
   AgentClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
     setProtocol(prot);
@@ -195,7 +195,7 @@ class OPENTELEMETRY_API AgentClient : virtual public AgentIf {
   ::apache::thrift::protocol::TProtocol* oprot_;
 };
 
-class OPENTELEMETRY_API AgentProcessor : public ::apache::thrift::TDispatchProcessor {
+class AgentProcessor : public ::apache::thrift::TDispatchProcessor {
  protected:
   ::std::shared_ptr<AgentIf> iface_;
   virtual bool dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext);
@@ -215,7 +215,7 @@ class OPENTELEMETRY_API AgentProcessor : public ::apache::thrift::TDispatchProce
   virtual ~AgentProcessor() {}
 };
 
-class OPENTELEMETRY_API AgentProcessorFactory : public ::apache::thrift::TProcessorFactory {
+class AgentProcessorFactory : public ::apache::thrift::TProcessorFactory {
  public:
   AgentProcessorFactory(const ::std::shared_ptr< AgentIfFactory >& handlerFactory) :
       handlerFactory_(handlerFactory) {}
@@ -226,7 +226,7 @@ class OPENTELEMETRY_API AgentProcessorFactory : public ::apache::thrift::TProces
   ::std::shared_ptr< AgentIfFactory > handlerFactory_;
 };
 
-class OPENTELEMETRY_API AgentMultiface : virtual public AgentIf {
+class AgentMultiface : virtual public AgentIf {
  public:
   AgentMultiface(std::vector<std::shared_ptr<AgentIf> >& ifaces) : ifaces_(ifaces) {
   }
@@ -261,7 +261,7 @@ class OPENTELEMETRY_API AgentMultiface : virtual public AgentIf {
 // The 'concurrent' client is a thread safe client that correctly handles
 // out of order responses.  It is slower than the regular client, so should
 // only be used when you need to share a connection among multiple threads
-class OPENTELEMETRY_API AgentConcurrentClient : virtual public AgentIf {
+class AgentConcurrentClient : virtual public AgentIf {
  public:
   AgentConcurrentClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot, std::shared_ptr<::apache::thrift::async::TConcurrentClientSyncInfo> sync) : sync_(sync)
 {

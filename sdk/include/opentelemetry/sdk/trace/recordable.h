@@ -28,14 +28,14 @@ namespace trace
 {
 
 using namespace opentelemetry::sdk::instrumentationscope;
-class OPENTELEMETRY_API SpanData;
+class OPENTELEMETRY_SDK_TRACE_EXPORT SpanData;
 
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
  *
  * This class is thread-compatible.
  */
-class OPENTELEMETRY_API Recordable
+class OPENTELEMETRY_SDK_TRACE_EXPORT Recordable
 {
 public:
   virtual ~Recordable() = default;

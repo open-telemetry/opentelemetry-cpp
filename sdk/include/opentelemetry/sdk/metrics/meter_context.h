@@ -22,14 +22,14 @@ namespace metrics
 {
 
 // forward declaration
-class OPENTELEMETRY_API Meter;
-class OPENTELEMETRY_API MetricReader;
+class OPENTELEMETRY_SDK_METRICS_EXPORT Meter;
+class OPENTELEMETRY_SDK_METRICS_EXPORT MetricReader;
 
 /**
  * A class which stores the MeterProvider context.
 
  */
-class OPENTELEMETRY_API MeterContext : public std::enable_shared_from_this<MeterContext>
+class OPENTELEMETRY_SDK_METRICS_EXPORT MeterContext : public std::enable_shared_from_this<MeterContext>
 {
 public:
   /**

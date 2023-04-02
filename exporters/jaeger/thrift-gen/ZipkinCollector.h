@@ -19,13 +19,13 @@ namespace twitter { namespace zipkin { namespace thrift {
   #pragma warning (disable : 4250 ) //inheriting methods via dominance 
 #endif
 
-class OPENTELEMETRY_API ZipkinCollectorIf {
+class ZipkinCollectorIf {
  public:
   virtual ~ZipkinCollectorIf() {}
   virtual void submitZipkinBatch(std::vector<Response> & _return, const std::vector<Span> & spans) = 0;
 };
 
-class OPENTELEMETRY_API ZipkinCollectorIfFactory {
+class ZipkinCollectorIfFactory {
  public:
   typedef ZipkinCollectorIf Handler;
 
@@ -35,7 +35,7 @@ class OPENTELEMETRY_API ZipkinCollectorIfFactory {
   virtual void releaseHandler(ZipkinCollectorIf* /* handler */) = 0;
 };
 
-class OPENTELEMETRY_API ZipkinCollectorIfSingletonFactory : virtual public ZipkinCollectorIfFactory {
+class ZipkinCollectorIfSingletonFactory : virtual public ZipkinCollectorIfFactory {
  public:
   ZipkinCollectorIfSingletonFactory(const ::std::shared_ptr<ZipkinCollectorIf>& iface) : iface_(iface) {}
   virtual ~ZipkinCollectorIfSingletonFactory() {}
@@ -49,7 +49,7 @@ class OPENTELEMETRY_API ZipkinCollectorIfSingletonFactory : virtual public Zipki
   ::std::shared_ptr<ZipkinCollectorIf> iface_;
 };
 
-class OPENTELEMETRY_API ZipkinCollectorNull : virtual public ZipkinCollectorIf {
+class ZipkinCollectorNull : virtual public ZipkinCollectorIf {
  public:
   virtual ~ZipkinCollectorNull() {}
   void submitZipkinBatch(std::vector<Response> & /* _return */, const std::vector<Span> & /* spans */) {
@@ -62,7 +62,7 @@ typedef struct _ZipkinCollector_submitZipkinBatch_args__isset {
   bool spans :1;
 } _ZipkinCollector_submitZipkinBatch_args__isset;
 
-class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_args {
+class ZipkinCollector_submitZipkinBatch_args {
  public:
 
   ZipkinCollector_submitZipkinBatch_args(const ZipkinCollector_submitZipkinBatch_args&);
@@ -95,7 +95,7 @@ class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_args {
 };
 
 
-class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_pargs {
+class ZipkinCollector_submitZipkinBatch_pargs {
  public:
 
 
@@ -111,7 +111,7 @@ typedef struct _ZipkinCollector_submitZipkinBatch_result__isset {
   bool success :1;
 } _ZipkinCollector_submitZipkinBatch_result__isset;
 
-class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_result {
+class ZipkinCollector_submitZipkinBatch_result {
  public:
 
   ZipkinCollector_submitZipkinBatch_result(const ZipkinCollector_submitZipkinBatch_result&);
@@ -148,7 +148,7 @@ typedef struct _ZipkinCollector_submitZipkinBatch_presult__isset {
   bool success :1;
 } _ZipkinCollector_submitZipkinBatch_presult__isset;
 
-class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_presult {
+class ZipkinCollector_submitZipkinBatch_presult {
  public:
 
 
@@ -161,7 +161,7 @@ class OPENTELEMETRY_API ZipkinCollector_submitZipkinBatch_presult {
 
 };
 
-class OPENTELEMETRY_API ZipkinCollectorClient : virtual public ZipkinCollectorIf {
+class ZipkinCollectorClient : virtual public ZipkinCollectorIf {
  public:
   ZipkinCollectorClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
     setProtocol(prot);
@@ -196,7 +196,7 @@ class OPENTELEMETRY_API ZipkinCollectorClient : virtual public ZipkinCollectorIf
   ::apache::thrift::protocol::TProtocol* oprot_;
 };
 
-class OPENTELEMETRY_API ZipkinCollectorProcessor : public ::apache::thrift::TDispatchProcessor {
+class ZipkinCollectorProcessor : public ::apache::thrift::TDispatchProcessor {
  protected:
   ::std::shared_ptr<ZipkinCollectorIf> iface_;
   virtual bool dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext);
@@ -214,7 +214,7 @@ class OPENTELEMETRY_API ZipkinCollectorProcessor : public ::apache::thrift::TDis
   virtual ~ZipkinCollectorProcessor() {}
 };
 
-class OPENTELEMETRY_API ZipkinCollectorProcessorFactory : public ::apache::thrift::TProcessorFactory {
+class ZipkinCollectorProcessorFactory : public ::apache::thrift::TProcessorFactory {
  public:
   ZipkinCollectorProcessorFactory(const ::std::shared_ptr< ZipkinCollectorIfFactory >& handlerFactory) :
       handlerFactory_(handlerFactory) {}
@@ -225,7 +225,7 @@ class OPENTELEMETRY_API ZipkinCollectorProcessorFactory : public ::apache::thrif
   ::std::shared_ptr< ZipkinCollectorIfFactory > handlerFactory_;
 };
 
-class OPENTELEMETRY_API ZipkinCollectorMultiface : virtual public ZipkinCollectorIf {
+class ZipkinCollectorMultiface : virtual public ZipkinCollectorIf {
  public:
   ZipkinCollectorMultiface(std::vector<std::shared_ptr<ZipkinCollectorIf> >& ifaces) : ifaces_(ifaces) {
   }
@@ -252,7 +252,7 @@ class OPENTELEMETRY_API ZipkinCollectorMultiface : virtual public ZipkinCollecto
 // The 'concurrent' client is a thread safe client that correctly handles
 // out of order responses.  It is slower than the regular client, so should
 // only be used when you need to share a connection among multiple threads
-class OPENTELEMETRY_API ZipkinCollectorConcurrentClient : virtual public ZipkinCollectorIf {
+class ZipkinCollectorConcurrentClient : virtual public ZipkinCollectorIf {
  public:
   ZipkinCollectorConcurrentClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot, std::shared_ptr<::apache::thrift::async::TConcurrentClientSyncInfo> sync) : sync_(sync)
 {

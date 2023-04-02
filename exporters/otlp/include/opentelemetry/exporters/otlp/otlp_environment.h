@@ -22,89 +22,89 @@ namespace exporter
 namespace otlp
 {
 
-inline std::string OPENTELEMETRY_API GetOtlpDefaultUserAgent()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultUserAgent()
 {
   return "OTel-OTLP-Exporter-Cpp/" OPENTELEMETRY_SDK_VERSION;
 }
 
-std::string OPENTELEMETRY_API GetOtlpDefaultGrpcTracesEndpoint();
-std::string OPENTELEMETRY_API GetOtlpDefaultGrpcMetricsEndpoint();
-std::string OPENTELEMETRY_API GetOtlpDefaultGrpcLogsEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcTracesEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcMetricsEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcLogsEndpoint();
 
 // Compatibility with OTELCPP 1.8.2
-inline std::string OPENTELEMETRY_API GetOtlpDefaultGrpcEndpoint()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcEndpoint()
 {
   return GetOtlpDefaultGrpcTracesEndpoint();
 }
 
-std::string OPENTELEMETRY_API GetOtlpDefaultHttpTracesEndpoint();
-std::string OPENTELEMETRY_API GetOtlpDefaultHttpMetricsEndpoint();
-std::string OPENTELEMETRY_API GetOtlpDefaultHttpLogsEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultHttpTracesEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultHttpMetricsEndpoint();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultHttpLogsEndpoint();
 
 // Compatibility with OTELCPP 1.8.2
-inline std::string OPENTELEMETRY_API GetOtlpDefaultHttpEndpoint()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultHttpEndpoint()
 {
   return GetOtlpDefaultHttpTracesEndpoint();
 }
 
 // Compatibility with OTELCPP 1.8.2
-inline std::string OPENTELEMETRY_API GetOtlpDefaultMetricsEndpoint()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsEndpoint()
 {
   return GetOtlpDefaultHttpMetricsEndpoint();
 }
 
-bool OPENTELEMETRY_API GetOtlpDefaultGrpcTracesIsInsecure();
-bool OPENTELEMETRY_API GetOtlpDefaultGrpcMetricsIsInsecure();
-bool OPENTELEMETRY_API GetOtlpDefaultGrpcLogsIsInsecure();
+bool OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcTracesIsInsecure();
+bool OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcMetricsIsInsecure();
+bool OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultGrpcLogsIsInsecure();
 
 // Compatibility with OTELCPP 1.8.2
-inline bool OPENTELEMETRY_API GetOtlpDefaultIsSslEnable()
+inline bool OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultIsSslEnable()
 {
   return (!GetOtlpDefaultGrpcTracesIsInsecure());
 }
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslCertificatePath();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslCertificatePath();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslCertificatePath();
 
 // Compatibility with OTELCPP 1.8.2
-inline std::string OPENTELEMETRY_API GetOtlpDefaultSslCertificatePath()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultSslCertificatePath()
 {
   return GetOtlpDefaultTracesSslCertificatePath();
 }
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslCertificateString();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslCertificateString();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslCertificateString();
 
 // Compatibility with OTELCPP 1.8.2
-inline std::string OPENTELEMETRY_API GetOtlpDefaultSslCertificateString()
+inline std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultSslCertificateString()
 {
   return GetOtlpDefaultTracesSslCertificateString();
 }
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslClientKeyPath();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslClientKeyPath();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslClientKeyPath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslClientKeyPath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslClientKeyPath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslClientKeyPath();
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslClientKeyString();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslClientKeyString();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslClientKeyString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslClientKeyString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslClientKeyString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslClientKeyString();
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslClientCertificatePath();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslClientCertificatePath();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslClientCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslClientCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslClientCertificatePath();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslClientCertificatePath();
 
-std::string OPENTELEMETRY_API GetOtlpDefaultTracesSslClientCertificateString();
-std::string OPENTELEMETRY_API GetOtlpDefaultMetricsSslClientCertificateString();
-std::string OPENTELEMETRY_API GetOtlpDefaultLogsSslClientCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslClientCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslClientCertificateString();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslClientCertificateString();
 
-std::chrono::system_clock::duration OPENTELEMETRY_API GetOtlpDefaultTracesTimeout();
-std::chrono::system_clock::duration OPENTELEMETRY_API GetOtlpDefaultMetricsTimeout();
-std::chrono::system_clock::duration OPENTELEMETRY_API GetOtlpDefaultLogsTimeout();
+std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesTimeout();
+std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsTimeout();
+std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsTimeout();
 
 // Compatibility with OTELCPP 1.8.2
-inline std::chrono::system_clock::duration OPENTELEMETRY_API GetOtlpDefaultTimeout()
+inline std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTimeout()
 {
   return GetOtlpDefaultTracesTimeout();
 }
@@ -120,12 +120,12 @@ struct cmp_ic
 };
 using OtlpHeaders = std::multimap<std::string, std::string, cmp_ic>;
 
-OtlpHeaders OPENTELEMETRY_API GetOtlpDefaultTracesHeaders();
-OtlpHeaders OPENTELEMETRY_API GetOtlpDefaultMetricsHeaders();
-OtlpHeaders OPENTELEMETRY_API GetOtlpDefaultLogsHeaders();
+OtlpHeaders OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesHeaders();
+OtlpHeaders OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsHeaders();
+OtlpHeaders OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsHeaders();
 
 // Compatibility with OTELCPP 1.8.2
-inline OtlpHeaders OPENTELEMETRY_API GetOtlpDefaultHeaders()
+inline OtlpHeaders OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultHeaders()
 {
   return GetOtlpDefaultTracesHeaders();
 }

@@ -20,7 +20,7 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_API MultiRecordable final : public Recordable
+class OPENTELEMETRY_SDK_LOGS_EXPORT MultiRecordable final : public Recordable
 {
 public:
   MultiRecordable() = default;

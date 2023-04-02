@@ -11,7 +11,7 @@ namespace http
 {
 namespace client
 {
-class OPENTELEMETRY_API HttpClientFactory
+class OPENTELEMETRY_EXT_HTTP_CLIENT_EXPORT HttpClientFactory
 {
 public:
   static std::shared_ptr<HttpClientSync> CreateSync();

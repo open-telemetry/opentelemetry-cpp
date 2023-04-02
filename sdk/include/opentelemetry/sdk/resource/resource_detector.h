@@ -12,12 +12,12 @@ namespace sdk
 namespace resource
 {
 
-class OPENTELEMETRY_API Resource;
+class OPENTELEMETRY_SDK_RESOURCE_EXPORT Resource;
 
 /**
  * Interface for a Resource Detector
  */
-class OPENTELEMETRY_API ResourceDetector
+class OPENTELEMETRY_SDK_RESOURCE_EXPORT ResourceDetector
 {
 public:
   ResourceDetector()          = default;
@@ -29,7 +29,7 @@ public:
  * OTelResourceDetector to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
-class OPENTELEMETRY_API OTELResourceDetector : public ResourceDetector
+class OPENTELEMETRY_SDK_RESOURCE_EXPORT OTELResourceDetector : public ResourceDetector
 {
 public:
   Resource Detect() noexcept override;

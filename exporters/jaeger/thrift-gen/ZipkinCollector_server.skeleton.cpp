@@ -14,7 +14,7 @@ using namespace ::apache::thrift::server;
 
 using namespace  ::twitter::zipkin::thrift;
 
-class OPENTELEMETRY_API ZipkinCollectorHandler : virtual public ZipkinCollectorIf {
+class ZipkinCollectorHandler : virtual public ZipkinCollectorIf {
  public:
   ZipkinCollectorHandler() {
     // Your initialization goes here

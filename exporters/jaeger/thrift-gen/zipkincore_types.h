@@ -39,15 +39,15 @@ std::ostream& operator<<(std::ostream& out, const AnnotationType::type& val);
 
 std::string to_string(const AnnotationType::type& val);
 
-class OPENTELEMETRY_API Endpoint;
+class Endpoint;
 
-class OPENTELEMETRY_API Annotation;
+class Annotation;
 
-class OPENTELEMETRY_API BinaryAnnotation;
+class BinaryAnnotation;
 
-class OPENTELEMETRY_API Span;
+class Span;
 
-class OPENTELEMETRY_API Response;
+class Response;
 
 typedef struct _Endpoint__isset {
   _Endpoint__isset() : ipv4(false), port(false), service_name(false), ipv6(false) {}
@@ -66,7 +66,7 @@ typedef struct _Endpoint__isset {
  * allows zipkin to display network context of uninstrumented services, or
  * clients such as web browsers.
  */
-class OPENTELEMETRY_API Endpoint : public virtual ::apache::thrift::TBase {
+class Endpoint : public virtual ::apache::thrift::TBase {
  public:
 
   Endpoint(const Endpoint&);
@@ -151,7 +151,7 @@ typedef struct _Annotation__isset {
  * An annotation is similar to a log statement. It includes a host field which
  * allows these events to be attributed properly, and also aggregatable.
  */
-class OPENTELEMETRY_API Annotation : public virtual ::apache::thrift::TBase {
+class Annotation : public virtual ::apache::thrift::TBase {
  public:
 
   Annotation(const Annotation&);
@@ -233,7 +233,7 @@ typedef struct _BinaryAnnotation__isset {
  * rewriting, like "/api/v1/myresource" vs "/myresource. Via the host field,
  * you can see the different points of view, which often help in debugging.
  */
-class OPENTELEMETRY_API BinaryAnnotation : public virtual ::apache::thrift::TBase {
+class BinaryAnnotation : public virtual ::apache::thrift::TBase {
  public:
 
   BinaryAnnotation(const BinaryAnnotation&);
@@ -320,7 +320,7 @@ typedef struct _Span__isset {
  * usually the longest interval in the trace, starting with a SERVER_RECV
  * annotation and ending with a SERVER_SEND.
  */
-class OPENTELEMETRY_API Span : public virtual ::apache::thrift::TBase {
+class Span : public virtual ::apache::thrift::TBase {
  public:
 
   Span(const Span&);
@@ -453,7 +453,7 @@ void swap(Span &a, Span &b);
 std::ostream& operator<<(std::ostream& out, const Span& obj);
 
 
-class OPENTELEMETRY_API Response : public virtual ::apache::thrift::TBase {
+class Response : public virtual ::apache::thrift::TBase {
  public:
 
   Response(const Response&);

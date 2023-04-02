@@ -22,7 +22,7 @@ namespace metrics
 /**
  * A Reservoir cell pre-allocated memories for Exemplar data.
  */
-class OPENTELEMETRY_API ReservoirCell
+class OPENTELEMETRY_SDK_METRICS_EXPORT ReservoirCell
 {
 public:
   ReservoirCell() = default;

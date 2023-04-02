@@ -23,12 +23,12 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_API MetricStorage;
-class OPENTELEMETRY_API SyncWritableMetricStorage;
-class OPENTELEMETRY_API AsyncWritableMetricsStorge;
-class OPENTELEMETRY_API ObservableRegistry;
+class OPENTELEMETRY_SDK_METRICS_EXPORT MetricStorage;
+class OPENTELEMETRY_SDK_METRICS_EXPORT SyncWritableMetricStorage;
+class OPENTELEMETRY_SDK_METRICS_EXPORT AsyncWritableMetricsStorge;
+class OPENTELEMETRY_SDK_METRICS_EXPORT ObservableRegistry;
 
-class OPENTELEMETRY_API Meter final : public opentelemetry::metrics::Meter
+class OPENTELEMETRY_SDK_METRICS_EXPORT Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */

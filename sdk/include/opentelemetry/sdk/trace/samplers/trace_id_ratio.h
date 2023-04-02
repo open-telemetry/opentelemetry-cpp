@@ -14,7 +14,7 @@ namespace trace
  * The TraceIdRatioBased sampler computes and returns a decision based on the
  * provided trace_id and the configured ratio.
  */
-class OPENTELEMETRY_API TraceIdRatioBasedSampler : public Sampler
+class OPENTELEMETRY_SDK_TRACE_EXPORT TraceIdRatioBasedSampler : public Sampler
 {
 public:
   /**

@@ -22,7 +22,7 @@ namespace instrumentationscope
 
 using InstrumentationScopeAttributes = opentelemetry::sdk::common::AttributeMap;
 
-class OPENTELEMETRY_API InstrumentationScope
+class OPENTELEMETRY_SDK_INSTRUMENTATIONSCOPE_EXPORT InstrumentationScope
 {
 public:
   InstrumentationScope(const InstrumentationScope &) = default;
