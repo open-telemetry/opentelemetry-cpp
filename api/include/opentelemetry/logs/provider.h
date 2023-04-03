@@ -65,20 +65,20 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);
     return provider;
   }
 
-  static nostd::shared_ptr<EventLoggerProvider>
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<EventLoggerProvider>
       &GetEventProvider() noexcept
   {
     static nostd::shared_ptr<EventLoggerProvider> provider(new NoopEventLoggerProvider);
     return provider;
   }
 
-  static common::SpinLockMutex &GetLock() noexcept
+  OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
     static common::SpinLockMutex lock;
     return lock;

@@ -20,7 +20,7 @@ namespace common
   @param [out] value Variable value, if it exists
   @return true if the variable exists
 */
-OPENTELEMETRY_EXPORT bool GetBoolEnvironmentVariable(const char *env_var_name, bool &value);
+OPENTELEMETRY_SDK_COMMON_EXPORT bool GetBoolEnvironmentVariable(const char *env_var_name, bool &value);
 
 /**
   Read a duration environment variable.
@@ -28,7 +28,7 @@ OPENTELEMETRY_EXPORT bool GetBoolEnvironmentVariable(const char *env_var_name, b
   @param [out] value Variable value, if it exists
   @return true if the variable exists
 */
-OPENTELEMETRY_EXPORT bool GetDurationEnvironmentVariable(const char *env_var_name,
+OPENTELEMETRY_SDK_COMMON_EXPORT bool GetDurationEnvironmentVariable(const char *env_var_name,
                                     std::chrono::system_clock::duration &value);
 
 /**
@@ -37,7 +37,7 @@ OPENTELEMETRY_EXPORT bool GetDurationEnvironmentVariable(const char *env_var_nam
   @param [out] value Variable value, if it exists
   @return true if the variable exists
 */
-OPENTELEMETRY_EXPORT bool GetStringEnvironmentVariable(const char *env_var_name, std::string &value);
+OPENTELEMETRY_SDK_COMMON_EXPORT bool GetStringEnvironmentVariable(const char *env_var_name, std::string &value);
 
 #if defined(_MSC_VER)
 inline int setenv(const char *name, const char *value, int)

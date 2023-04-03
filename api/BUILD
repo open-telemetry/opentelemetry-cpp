@@ -11,18 +11,6 @@ bool_flag(
 )
 
 cc_library(
-    name = "headers",
-    hdrs = glob(["include/**/*.h"]),
-    strip_include_prefix = "include",
-)
-
-# This is used for otel_sdk.zip packaging
-filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
-)
-
-cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = select({
@@ -45,3 +33,16 @@ config_setting(
     name = "with_external_abseil",
     flag_values = {":with_abseil": "true"},
 )
+
+cc_library(
+    name = "headers",
+    hdrs = glob(["include/**/*.h"]),
+    strip_include_prefix = "include",
+)
+
+# This is used for otel_sdk.zip packaging
+filegroup(
+    name="header_files",
+    srcs=glob(["include/**/*.h"]),
+)
+

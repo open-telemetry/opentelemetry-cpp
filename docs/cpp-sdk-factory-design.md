@@ -86,7 +86,7 @@ OtlpGrpcExporterFactory::Create() actually returns a abstract SpanExporter
 object, instead of a concrete OtlpGrpcExporter object.
 
 As a result, the application binary is not even aware of the implementation
-class OPENTELEMETRY_API OtlpGrpcExporter.
+class OtlpGrpcExporter.
 
 This property makes it possible to:
 
@@ -102,12 +102,12 @@ to have a stronger dependency on the SDK internals.
 For example, with
 
 ```cpp
-class OPENTELEMETRY_API MyFancyOtlpGrpcExporter : public OtlpGrpcExporter {...}
+class MyFancyOtlpGrpcExporter : public OtlpGrpcExporter {...}
 ```
 
 the build depends on the actual SDK implementation.
 
-class OPENTELEMETRY_API OtlpGrpcExporter is visible in the SDK public header files,
+Class OtlpGrpcExporter is visible in the SDK public header files,
 to allow this pattern.
 
 Using shared libraries in this case is not recommended,

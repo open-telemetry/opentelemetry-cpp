@@ -102,7 +102,7 @@ In the OStreamExporter there is no cleanup to be done, so there is no need to
 use the timeout within the `Shutdown` function as it will never be blocking.
 
 ```cpp
-class OPENTELEMETRY_API StreamSpanExporter final : public sdktrace::SpanExporter
+class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 
 private:
@@ -195,7 +195,7 @@ controller or through manual calls in the case of a pull controller.
 Shutdown() is currently not required for the OStreamMetricsExporter.
 
 ```cpp
-class OPENTELEMETRY_API StreamMetricsExporter final : public sdkmeter::MetricsExporter
+class StreamMetricsExporter final : public sdkmeter::MetricsExporter
 {
 
 private:

@@ -38,13 +38,13 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<TextMapPropagator> &GetPropagator() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TextMapPropagator> &GetPropagator() noexcept
   {
     static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
     return propagator;
   }
 
-  static common::SpinLockMutex &GetLock() noexcept
+  OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
     static common::SpinLockMutex lock;
     return lock;

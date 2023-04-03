@@ -161,13 +161,13 @@ public:
     return GetRuntimeContextStorage();
   }
 
-public:
+private:
   static nostd::shared_ptr<RuntimeContextStorage> GetRuntimeContextStorage() noexcept
   {
     return GetStorage();
   }
 
-  static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
     return context;
@@ -183,7 +183,7 @@ inline Token::~Token() noexcept
 // RuntimeContextStorage and provides a wrapper for propagating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
-class OPENTELEMETRY_EXPORT ThreadLocalContextStorage : public RuntimeContextStorage
+class ThreadLocalContextStorage : public RuntimeContextStorage
 {
 public:
   ThreadLocalContextStorage() noexcept = default;
@@ -316,7 +316,7 @@ private:
     Context *base_;
   };
 
-  Stack &GetStack()
+  OPENTELEMETRY_API_SINGLETON Stack &GetStack()
   {
     static thread_local Stack stack_ = Stack();
     return stack_;
