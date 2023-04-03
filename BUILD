@@ -25,7 +25,7 @@ config_setting(
 )
 
 # TODO: Version is not correct here.
-otel_sdk_prefix = "otel_sdk/" + "1.8.2-wip" + "/"
+otel_sdk_prefix = "otel_sdk/" + "1.8.3-wip" + "/"
 
 # Build configuration settings mimicking MSVC: debug=dbg, release=opt, reldeb=fastbuild
 config_setting(
@@ -355,15 +355,15 @@ cc_binary(
 )
 
 run_binary(
-    name = "dll_deps_uptodate",
+    name = "dll_deps_update_binary",
     tool = "dll_deps",
     srcs = [":otel_sdk_all_project_deps"],
-    args = ["$(location otel_sdk_dll_deps.bzl)"],
-    outs = ["otel_sdk_dll_deps.bzl"]
+    args = ["$(location dll_deps_generated_internally.bzl)"],
+    outs = ["dll_deps_generated_internally.bzl"]
 )
 
 write_source_file(
     name = "dll_deps_update",
-    in_file = "otel_sdk_dll_deps.bzl",
+    in_file = "dll_deps_generated_internally.bzl",
     out_file = "dll_deps_generated.bzl",
 )
