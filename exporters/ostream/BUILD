@@ -3,6 +3,8 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_library(
     name = "ostream_log_record_exporter",
     srcs = [
@@ -38,6 +40,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ostream_metric_test",
+    srcs = ["test/ostream_metric_test.cc"],
+    tags = [
+        "ostream",
+        "test",
+    ],
+    deps = dll_deps([
+        ":ostream_metric_exporter",
+        "@com_google_googletest//:gtest_main",
+    ]),
+)
+
 cc_library(
     name = "ostream_span_exporter",
     srcs = [
@@ -54,6 +69,31 @@ cc_library(
     deps = [
         "//sdk/src/trace",
     ],
+)
+
+cc_library(
+    name = "ostream_capture",
+    hdrs = [
+        "test/ostream_capture.h",
+    ],
+    tags = ["ostream"],
+    deps = [
+        "//api",
+    ],
+)
+
+cc_test(
+    name = "ostream_span_test",
+    srcs = ["test/ostream_span_test.cc"],
+    tags = [
+        "ostream",
+        "test",
+    ],
+    deps = dll_deps([
+        ":ostream_capture",
+        ":ostream_span_exporter",
+        "@com_google_googletest//:gtest_main",
+    ]),
 )
 
 cc_library(
