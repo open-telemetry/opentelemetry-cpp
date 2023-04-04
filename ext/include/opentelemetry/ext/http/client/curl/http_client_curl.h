@@ -152,9 +152,7 @@ public:
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
 
-  // https://stackoverflow.com/a/51033485/743263
-  Session(const Session &) = delete;
-  Session &operator=(const Session &) = delete;  
+  Session(Session &&) = default;
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {

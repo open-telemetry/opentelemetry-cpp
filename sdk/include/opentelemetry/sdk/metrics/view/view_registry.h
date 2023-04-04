@@ -43,10 +43,8 @@ public:
     registered_views_.push_back(std::move(registered_view));
   }
 
-  // https://stackoverflow.com/a/51033485/743263
   ViewRegistry() = default;
-  ViewRegistry(const ViewRegistry &) = delete;
-  ViewRegistry &operator=(const ViewRegistry &) = delete;
+  ViewRegistry(ViewRegistry &&) = default;
 
   bool FindViews(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,

@@ -160,7 +160,7 @@ void UpdateStatus(T &t, Properties &props)
  */
 
 class OPENTELEMETRY_EXPORTERS_ETW_EXPORT Tracer : public opentelemetry::trace::Tracer,
-               public std::enable_shared_from_this<opentelemetry::trace::Tracer>
+               public std::enable_shared_from_this<trace::Tracer>
 {
 
   /**
@@ -490,8 +490,8 @@ public:
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
-      auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
-          new (std::nothrow) opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+      auto noopSpan = nostd::shared_ptr<trace::Span>{
+          new (std::nothrow) trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
       return noopSpan;
     }
 

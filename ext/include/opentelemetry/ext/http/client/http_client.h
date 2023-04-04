@@ -178,11 +178,9 @@ public:
   Result(std::unique_ptr<Response> res, SessionState session_state)
       : response_(std::move(res)), session_state_(session_state)
   {}
-  // https://stackoverflow.com/a/51033485/743263
   Result(Result&& other) = default;
   Result& operator=(Result&& other) = default;
-  Result(const Result &) = delete;
-  Result &operator=(const Result &) = delete;  
+
   operator bool() const { return session_state_ == SessionState::Response; }
   Response &GetResponse()
   {

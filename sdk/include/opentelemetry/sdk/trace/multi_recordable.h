@@ -29,8 +29,6 @@ class OPENTELEMETRY_SDK_TRACE_EXPORT MultiRecordable : public Recordable
 public:
   MultiRecordable() = default;
   MultiRecordable(MultiRecordable &&) = default;
-  MultiRecordable(const MultiRecordable &) = delete;
-  MultiRecordable& operator=(const MultiRecordable &) = delete;  
 
   void AddRecordable(const SpanProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept

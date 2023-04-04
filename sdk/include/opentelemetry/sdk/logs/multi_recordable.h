@@ -24,8 +24,7 @@ class OPENTELEMETRY_SDK_LOGS_EXPORT MultiRecordable final : public Recordable
 {
 public:
   MultiRecordable() = default;
-  MultiRecordable(const MultiRecordable&) = delete;
-  MultiRecordable& operator=(const MultiRecordable&) = delete;
+  MultiRecordable(MultiRecordable&&) = default;
 
   void AddRecordable(const LogRecordProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept;

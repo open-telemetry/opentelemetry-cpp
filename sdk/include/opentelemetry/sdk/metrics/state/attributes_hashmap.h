@@ -45,11 +45,8 @@ public:
     return nullptr;
   }
 
-  // https://stackoverflow.com/a/51033485/743263
   AttributesHashMap() = default;
-  AttributesHashMap(const AttributesHashMap &) = delete;
-  AttributesHashMap &operator=(const AttributesHashMap &) = delete;  
-
+  AttributesHashMap(AttributesHashMap &&) = default;
 
   /**
    * @return check if key is present in hash

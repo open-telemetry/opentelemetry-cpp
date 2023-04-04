@@ -21,6 +21,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ostream_log_test",
+    srcs = ["test/ostream_log_test.cc"],
+    tags = [
+        "ostream",
+        "test",
+    ],
+    deps = dll_deps([
+        ":ostream_log_record_exporter",
+        "@com_google_googletest//:gtest_main",
+    ]),
+)
+
 cc_library(
     name = "ostream_metric_exporter",
     srcs = [

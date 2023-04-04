@@ -31,8 +31,7 @@ public:
   MultiLogRecordProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
   ~MultiLogRecordProcessor() override;
 
-  MultiLogRecordProcessor(const MultiLogRecordProcessor&) = delete;
-  MultiLogRecordProcessor& operator=(const MultiLogRecordProcessor&) = delete;
+  MultiLogRecordProcessor(MultiLogRecordProcessor&&) = default;
 
   void AddProcessor(std::unique_ptr<LogRecordProcessor> &&processor);
 

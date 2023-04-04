@@ -23,10 +23,7 @@ public:
   SpanExporter();
   virtual ~SpanExporter();
 
-  SpanExporter(const SpanExporter &) = delete;
-  SpanExporter &operator=(const SpanExporter &) = delete;    
   SpanExporter(SpanExporter &&) = delete;
-  SpanExporter &operator=(SpanExporter &&) = delete;    
 
   /**
    * Create a span recordable. This object will be used to record span data and
