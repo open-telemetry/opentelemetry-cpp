@@ -39,7 +39,7 @@ void THttpTransport::write(const uint8_t *buf, uint32_t len)
 
 bool THttpTransport::sendSpans()
 {
-  auto result = client->Post(endpoint, request_buffer, headers);
+  auto result = client->PostNoSsl(endpoint, request_buffer, headers);
   request_buffer.clear();
 
   // TODO: Add logging once global log handling is available.

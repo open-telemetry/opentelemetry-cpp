@@ -15,7 +15,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP metrics exporter options.
+ * Struct to hold OTLP GRPC metrics exporter options.
  */
 struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
 {
