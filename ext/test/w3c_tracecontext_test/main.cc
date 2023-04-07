@@ -93,8 +93,6 @@ public:
                nostd::string_view /* reason */) noexcept override
   {}
 
-  void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
-
   void OnResponse(http_client::Response & /* response */) noexcept override {}
 };
 }  // namespace

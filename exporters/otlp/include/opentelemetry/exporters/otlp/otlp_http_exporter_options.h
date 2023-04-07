@@ -19,7 +19,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP exporter options.
+ * Struct to hold OTLP HTTP traces exporter options.
  */
 struct OtlpHttpExporterOptions
 {
@@ -43,7 +43,6 @@ struct OtlpHttpExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug = false;
 
-  // TODO: Enable/disable to verify SSL certificate
   std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
 
   // Additional HTTP headers
@@ -57,6 +56,30 @@ struct OtlpHttpExporterOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 #endif
+
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  bool ssl_insecure_skip_verify{false};
+
+  std::string ssl_ca_cert_path   = GetOtlpDefaultTracesSslCertificatePath();
+  std::string ssl_ca_cert_string = GetOtlpDefaultTracesSslCertificateString();
+
+  std::string ssl_client_key_path   = GetOtlpDefaultTracesSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultTracesSslClientKeyString();
+
+  std::string ssl_client_cert_path   = GetOtlpDefaultTracesSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+  /** Minimum TLS version. */
+  std::string ssl_min_tls = GetOtlpDefaultTracesSslTlsMinVersion();
+  /** Maximum TLS version. */
+  std::string ssl_max_tls = GetOtlpDefaultTracesSslTlsMaxVersion();
+  /** TLS cipher. */
+  std::string ssl_cipher = GetOtlpDefaultTracesSslTlsCipher();
+  /** TLS cipher suite. */
+  std::string ssl_cipher_suite = GetOtlpDefaultTracesSslTlsCipherSuite();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp
