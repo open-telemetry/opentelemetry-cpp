@@ -7,9 +7,7 @@
 // GCC 9 has likely attribute but do not support declare it at the beginning of statement
 #  if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
 #    if __has_cpp_attribute(likely)
-#      define OPENTELEMETRY_LIKELY_IF(...) \
-        if (__VA_ARGS__)                   \
-        [[likely]]
+#      define OPENTELEMETRY_LIKELY_IF(...) if (__VA_ARGS__) [[likely]]
 #    endif
 #  endif
 #endif
@@ -174,6 +172,29 @@ point.
 
 #  define OPENTELEMETRY_API_SINGLETON
 
+#endif
+
+//
+// Atomic wrappers based on compiler intrinsics for memory read/write.
+// The tailing number is read/write length in bits.
+//
+// N.B. Compiler instrinsic is used because the usage of C++ standard library is restricted in the
+// OpenTelemetry C++ API.
+//
+#if defined(__GNUC__)
+
+#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) __atomic_load_n(ptr, __ATOMIC_SEQ_CST)
+#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_SEQ_CST)
+
+#elif defined(_MSC_VER)
+
+#  include <intrin.h>
+
+#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) _InterlockedCompareExchange8(ptr, 0, 0)
+#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) _InterlockedExchange8(ptr, value)
+
+#else
+#  error port atomics read/write for the current platform
 #endif
 
 /* clang-format on */

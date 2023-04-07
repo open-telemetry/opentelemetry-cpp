@@ -35,7 +35,7 @@ public:
 
   virtual nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view library_name,
+      nostd::string_view library_name            = "",
       nostd::string_view library_version         = "",
       nostd::string_view schema_url              = "",
       bool include_trace_context                 = true,

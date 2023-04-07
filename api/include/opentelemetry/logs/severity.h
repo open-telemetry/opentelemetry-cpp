@@ -16,8 +16,8 @@ namespace logs
  */
 enum class Severity : uint8_t
 {
-  kInvalid,
-  kTrace,
+  kInvalid = 0,
+  kTrace   = 1,
   kTrace2,
   kTrace3,
   kTrace4,
@@ -42,6 +42,8 @@ enum class Severity : uint8_t
   kFatal3,
   kFatal4
 };
+
+const uint8_t kMaxSeverity = 255;
 
 /**
  * Mapping of the severity enum above, to a severity text string (in all caps).
