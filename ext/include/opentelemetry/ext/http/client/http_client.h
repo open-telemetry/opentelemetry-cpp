@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <string>
 #include <vector>
@@ -94,10 +95,9 @@ enum class SessionState
   Cancelled            // (manually) cancelled
 };
 
-using Byte           = uint8_t;
-using StatusCode     = uint16_t;
-using Body           = std::vector<Byte>;
-using SSLCertificate = std::vector<Byte>;
+using Byte       = uint8_t;
+using StatusCode = uint16_t;
+using Body       = std::vector<Byte>;
 
 struct cmp_ic
 {
@@ -110,12 +110,140 @@ struct cmp_ic
 };
 using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+struct HttpSslOptions
+{
+  HttpSslOptions() {}
+
+  HttpSslOptions(nostd::string_view url,
+                 bool input_ssl_insecure_skip_verify,
+                 nostd::string_view input_ssl_ca_cert_path,
+                 nostd::string_view input_ssl_ca_cert_string,
+                 nostd::string_view input_ssl_client_key_path,
+                 nostd::string_view input_ssl_client_key_string,
+                 nostd::string_view input_ssl_client_cert_path,
+                 nostd::string_view input_ssl_client_cert_string
+#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
+                 ,
+                 nostd::string_view input_ssl_min_tls,
+                 nostd::string_view input_ssl_max_tls,
+                 nostd::string_view input_ssl_cipher,
+                 nostd::string_view input_ssl_cipher_suite
+#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
+                 )
+      : use_ssl(false),
+        ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
+        ssl_ca_cert_path(input_ssl_ca_cert_path),
+        ssl_ca_cert_string(input_ssl_ca_cert_string),
+        ssl_client_key_path(input_ssl_client_key_path),
+        ssl_client_key_string(input_ssl_client_key_string),
+        ssl_client_cert_path(input_ssl_client_cert_path),
+        ssl_client_cert_string(input_ssl_client_cert_string)
+
+#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
+        ,
+        ssl_min_tls(input_ssl_min_tls),
+        ssl_max_tls(input_ssl_max_tls),
+        ssl_cipher(input_ssl_cipher),
+        ssl_cipher_suite(input_ssl_cipher_suite)
+#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
+  {
+    /* Use SSL if url starts with "https:" */
+    if (strncmp(url.data(), "https:", 6) == 0)
+    {
+      use_ssl = true;
+    }
+  }
+
+  /**
+    Use HTTPS (true) or HTTP (false).
+  */
+  bool use_ssl{false};
+  /**
+    Skip SSL/TLS verifications.
+    Setting this flag to true is insecure.
+  */
+  bool ssl_insecure_skip_verify{false};
+  /**
+    Path to the CA CERT file.
+  */
+  std::string ssl_ca_cert_path{};
+  /**
+    CA CERT.
+    Used only if @p ssl_ca_cert_path is empty.
+  */
+  std::string ssl_ca_cert_string{};
+  /**
+    Path to the client key file.
+  */
+  std::string ssl_client_key_path{};
+  /**
+    Client key.
+    Used only if @p ssl_client_key_path is empty.
+  */
+  std::string ssl_client_key_string{};
+  /**
+    Path to the client cert file.
+  */
+  std::string ssl_client_cert_path{};
+  /**
+    Client cert.
+    Used only if @p ssl_client_cert_path is empty.
+  */
+  std::string ssl_client_cert_string{};
+
+#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
+  /**
+    Minimum SSL version to use.
+    Valid values are:
+    - empty (no minimum version required)
+    - "1.0" (TLSv1.0)
+    - "1.1" (TLSv1.1)
+    - "1.2" (TLSv1.2)
+    - "1.3" (TLSv1.3)
+  */
+  std::string ssl_min_tls{};
+
+  /**
+    Maximum SSL version to use.
+    Valid values are:
+    - empty (no maximum version required)
+    - "1.0" (TLSv1.0)
+    - "1.1" (TLSv1.1)
+    - "1.2" (TLSv1.2)
+    - "1.3" (TLSv1.3)
+  */
+  std::string ssl_max_tls{};
+
+  /**
+    TLS Cipher.
+    This is for TLS 1.0, 1.1 and 1.2.
+    The list is delimited by colons (":").
+    Cipher names depends on the underlying CURL implementation.
+  */
+  std::string ssl_cipher{};
+
+  /**
+    TLS Cipher suite.
+    This is for TLS 1.3.
+    The list is delimited by colons (":").
+    Cipher names depends on the underlying CURL implementation.
+  */
+  std::string ssl_cipher_suite{};
+#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
+};
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
 class Request
 {
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
   virtual void SetUri(nostd::string_view uri) noexcept = 0;
+
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  virtual void SetSslOptions(const HttpSslOptions &options) noexcept = 0;
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   virtual void SetBody(Body &body) noexcept = 0;
 
@@ -205,8 +333,6 @@ public:
 
   virtual void OnEvent(SessionState, nostd::string_view) noexcept = 0;
 
-  virtual void OnConnecting(const SSLCertificate &) noexcept {}
-
   virtual ~EventHandler() = default;
 };
 
@@ -243,9 +369,38 @@ public:
 class HttpClientSync
 {
 public:
-  virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;
+  Result GetNoSsl(const nostd::string_view &url, const Headers &headers = {{}}) noexcept
+  {
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+    static const HttpSslOptions no_ssl;
+    return Get(url, no_ssl, headers);
+#else
+    return Get(url, headers);
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+  }
+
+  virtual Result PostNoSsl(const nostd::string_view &url,
+                           const Body &body,
+                           const Headers &headers = {{"content-type", "application/json"}}) noexcept
+  {
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+    static const HttpSslOptions no_ssl;
+    return Post(url, no_ssl, body, headers);
+#else
+    return Post(url, body, headers);
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+  }
+
+  virtual Result Get(const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                     const HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                     const Headers & = {{}}) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                      const HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
                       const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 

@@ -99,6 +99,26 @@ std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslClientCer
 std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslClientCertificateString();
 std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslClientCertificateString();
 
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslTlsMinVersion();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslTlsMinVersion();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslTlsMinVersion();
+
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslTlsMaxVersion();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslTlsMaxVersion();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslTlsMaxVersion();
+
+// For TLS 1.0, 1.1, 1.2
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslTlsCipher();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslTlsCipher();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslTlsCipher();
+
+// For TLS 1.3
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesSslTlsCipherSuite();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsSslTlsCipherSuite();
+std::string OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsSslTlsCipherSuite ();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+
 std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultMetricsTimeout();
 std::chrono::system_clock::duration OPENTELEMETRY_EXPORTERS_OTLP_EXPORT GetOtlpDefaultLogsTimeout();

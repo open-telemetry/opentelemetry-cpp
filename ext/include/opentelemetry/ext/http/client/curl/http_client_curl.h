@@ -57,6 +57,13 @@ public:
     method_ = method;
   }
 
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
+  {
+    ssl_options_ = ssl_options;
+  }
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
     body_ = std::move(body);
@@ -85,6 +92,11 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
+
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
@@ -220,11 +232,19 @@ public:
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     opentelemetry::ext::http::client::Body body;
-    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(), nullptr,
-                                 headers, body);
+
+    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                 ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                 nullptr, headers, body);
+
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -245,10 +265,16 @@ public:
 
   opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+      const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const Body &body,
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                 ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
                                  nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
@@ -269,6 +295,7 @@ public:
     return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
+public:
   ~HttpClientSync() override {}
 
 private:
