@@ -43,7 +43,6 @@ public:
         break;
     }
   }
-  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
   ~CustomEventHandler() override = default;
   bool is_called_                = false;
   bool got_response_             = false;
@@ -291,6 +290,10 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 {
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  http_client::HttpSslOptions no_ssl;
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
   GetEventHandler *handler = new GetEventHandler();
 
   const char *b          = "test-data";
@@ -299,16 +302,25 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
 
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get",
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                       no_ssl,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                       handler, headers, body, true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get",
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                       no_ssl,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                       handler, headers, body, true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
-                                       false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get",
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                                       no_ssl,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+                                       handler, headers, body, false);
   http_operations3.Send();
   delete handler;
 }
@@ -319,7 +331,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result             = http_client.Get("http://127.0.0.1:19000/get/", m1);
+  auto result             = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
@@ -330,7 +342,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result             = http_client.Get("https://192.0.2.0:19000/get/", m1);
+  auto result             = http_client.GetNoSsl("https://192.0.2.0:19000/get/", m1);
   EXPECT_EQ(result, false);
 
   // When network is under proxy, it may connect success but closed by peer when send data
@@ -345,7 +357,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequestSync)
 
   http_client::Headers m1 = {};
   http_client::Body body  = {};
-  auto result             = http_client.Post("http://127.0.0.1:19000/post/", body, m1);
+  auto result             = http_client.PostNoSsl("http://127.0.0.1:19000/post/", body, m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }

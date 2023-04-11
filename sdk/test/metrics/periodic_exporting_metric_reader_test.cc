@@ -70,6 +70,7 @@ TEST(PeriodicExporingMetricReader, BasicTests)
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  EXPECT_NO_THROW(reader.ForceFlush());
   reader.Shutdown();
   EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());
