@@ -1,8 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# bazel configurations for running tests under sanitizers.
-# Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
+common --enable_platform_specific_config
 
 # Needed for aspect-dev's write_source_file to actually write the file back on Windows (where runfiles are disabled by default)
 build --enable_runfiles
@@ -12,7 +11,6 @@ build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
 build --experimental_convenience_symlinks=clean
-
 build --experimental_cc_implementation_deps
 build --incompatible_use_platforms_repo_for_constraints=false
 
@@ -22,16 +20,15 @@ build --incompatible_use_platforms_repo_for_constraints=false
 
 # Needed by gRPC to build on some platforms.
 
-# build --strip=never --cxxopt="-std:c++17" --host_cxxopt="-std:c++17"
-build --strip=never --cxxopt="-std=c++17" --host_cxxopt="-std=c++17"
-build --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
-build --action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
-build --action_env=_CL_="/Z7 /guard:cf /Brepro"
-build --action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
-build --host_action_env=BAZEL_VC_FULL_VERSION=14.29.30133
-build --host_action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
-build --host_action_env=_CL_="/Z7 /guard:cf /Brepro"
-build --host_action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
+build:windows --strip=never --cxxopt="-std:c++17" --host_cxxopt="-std:c++17"
+build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
+build:windows --action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
+build:windows --action_env=_CL_="/Z7 /guard:cf /Brepro /JMC-"
+build:windows --action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
+build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.29.30133
+build:windows --host_action_env=BAZEL_VC="C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC"
+build:windows --host_action_env=_CL_="/Z7 /guard:cf /Brepro /JMC-"
+build:windows --host_action_env=_LINK_="/guard:cf /CETCOMPAT /DEBUG:FULL /FUNCTIONPADMIN /SWAPRUN:NET,CD /Brepro /DEBUGTYPE:CV,PDATA,FIXUP"
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
@@ -52,3 +49,4 @@ common:tsan --cc_output_directory_tag=tsan
 # https://github.com/google/sanitizers/issues/953
 common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
 
+try-import %workspace%/../top.bazelrc
