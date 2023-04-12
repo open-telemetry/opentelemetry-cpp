@@ -25,6 +25,8 @@ Increment the:
   [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
   [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.20.0
+  [#2088](https://github.com/open-telemetry/opentelemetry-cpp/pull/2088)
 * [EXPORTER] Add OTLP HTTP SSL support
   [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
 * [METRICS SDK] Use sdk_start_ts for MetricData start_ts for instruments having
