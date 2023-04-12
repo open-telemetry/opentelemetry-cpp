@@ -21,7 +21,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.19.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.20.0";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -49,11 +49,6 @@ static constexpr const char *kHttpMethod = "http.method";
  * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
  */
 static constexpr const char *kHttpStatusCode = "http.status_code";
-
-/**
- * Kind of HTTP protocol used.
- */
-static constexpr const char *kHttpFlavor = "http.flavor";
 
 /**
  * The URI scheme identifying the used protocol.
@@ -85,6 +80,17 @@ static constexpr const char *kEventName = "event.name";
 unrelated events.</li> </ul>
  */
 static constexpr const char *kEventDomain = "event.domain";
+
+/**
+ * A unique identifier for the Log Record.
+ *
+ * <p>Notes:
+  <ul> <li>If an id is provided, other log records with the same id will be considered duplicates
+and can be removed safely. This means, that two distinguishable log records MUST have different
+values. The id MAY be an <a href="https://github.com/ulid/spec">Universally Unique Lexicographically
+Sortable Identifier (ULID)</a>, but other identifiers (e.g. UUID) may be used as needed.</li> </ul>
+ */
+static constexpr const char *kLogRecordUid = "log.record.uid";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -175,9 +181,6 @@ static constexpr const char *kDbName = "db.name";
 
 /**
  * The database statement being executed.
- *
- * <p>Notes:
-  <ul> <li>The value may be sanitized to exclude sensitive information.</li> </ul>
  */
 static constexpr const char *kDbStatement = "db.statement";
 
@@ -274,6 +277,46 @@ static constexpr const char *kDbMongodbCollection = "db.mongodb.collection";
  set.</li> </ul>
  */
 static constexpr const char *kDbSqlTable = "db.sql.table";
+
+/**
+ * Unique Cosmos client instance id.
+ */
+static constexpr const char *kDbCosmosdbClientId = "db.cosmosdb.client_id";
+
+/**
+ * CosmosDB Operation Type.
+ */
+static constexpr const char *kDbCosmosdbOperationType = "db.cosmosdb.operation_type";
+
+/**
+ * Cosmos client connection mode.
+ */
+static constexpr const char *kDbCosmosdbConnectionMode = "db.cosmosdb.connection_mode";
+
+/**
+ * Cosmos DB container name.
+ */
+static constexpr const char *kDbCosmosdbContainer = "db.cosmosdb.container";
+
+/**
+ * Request payload size in bytes
+ */
+static constexpr const char *kDbCosmosdbRequestContentLength = "db.cosmosdb.request_content_length";
+
+/**
+ * Cosmos DB status code.
+ */
+static constexpr const char *kDbCosmosdbStatusCode = "db.cosmosdb.status_code";
+
+/**
+ * Cosmos DB sub status code.
+ */
+static constexpr const char *kDbCosmosdbSubStatusCode = "db.cosmosdb.sub_status_code";
+
+/**
+ * RU consumed for that operation
+ */
+static constexpr const char *kDbCosmosdbRequestCharge = "db.cosmosdb.request_charge";
 
 /**
  * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code
@@ -407,18 +450,18 @@ static constexpr const char *kNetTransport = "net.transport";
 /**
  * Application layer protocol used. The value SHOULD be normalized to lowercase.
  */
-static constexpr const char *kNetAppProtocolName = "net.app.protocol.name";
+static constexpr const char *kNetProtocolName = "net.protocol.name";
 
 /**
  * Version of the application layer protocol used. See note below.
  *
  * <p>Notes:
-  <ul> <li>{@code net.app.protocol.version} refers to the version of the protocol used and might be
+  <ul> <li>{@code net.protocol.version} refers to the version of the protocol used and might be
  different from the protocol client's version. If the HTTP client used has a version of {@code
  0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
  </ul>
  */
-static constexpr const char *kNetAppProtocolVersion = "net.app.protocol.version";
+static constexpr const char *kNetProtocolVersion = "net.protocol.version";
 
 /**
  * Remote socket peer name.
@@ -637,6 +680,12 @@ the closest proxy.</li> </ul>
 static constexpr const char *kHttpClientIp = "http.client_ip";
 
 /**
+ * The AWS request ID as returned in the response headers {@code x-amz-request-id} or {@code
+ * x-amz-requestid}.
+ */
+static constexpr const char *kAwsRequestId = "aws.request_id";
+
+/**
  * The keys in the {@code RequestItems} object field.
  */
 static constexpr const char *kAwsDynamodbTableNames = "aws.dynamodb.table_names";
@@ -755,6 +804,117 @@ static constexpr const char *kAwsDynamodbGlobalSecondaryIndexUpdates =
     "aws.dynamodb.global_secondary_index_updates";
 
 /**
+ * The S3 bucket name the request refers to. Corresponds to the {@code --bucket} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> operations.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code bucket} attribute is applicable to all S3 operations that reference a bucket,
+i.e. that require the bucket name as a mandatory parameter. This applies to almost all S3 operations
+except {@code list-buckets}.</li> </ul>
+ */
+static constexpr const char *kAwsS3Bucket = "aws.s3.bucket";
+
+/**
+ * The S3 object key the request refers to. Corresponds to the {@code --key} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> operations.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code key} attribute is applicable to all object-related S3 operations, i.e. that
+require the object key as a mandatory parameter. This applies in particular to the following
+operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html">get-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html">head-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html">put-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/restore-object.html">restore-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/select-object-content.html">select-object-content</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html">complete-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/create-multipart-upload.html">create-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html">list-parts</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3Key = "aws.s3.key";
+
+/**
+ * The source object (in the form {@code bucket}/{@code key}) for the copy operation.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code copy_source} attribute applies to S3 copy operations and corresponds to the
+{@code --copy-source} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object operation
+within the S3 API</a>. This applies in particular to the following operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3CopySource = "aws.s3.copy_source";
+
+/**
+ * Upload ID that identifies the multipart upload.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code upload_id} attribute applies to S3 multipart-upload operations and corresponds
+to the {@code --upload-id} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> multipart
+operations. This applies in particular to the following operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html">complete-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html">list-parts</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3UploadId = "aws.s3.upload_id";
+
+/**
+ * The delete request container that specifies the objects to be deleted.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code delete} attribute is only applicable to the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a>
+operation. The {@code delete} attribute corresponds to the {@code --delete} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html">delete-objects
+operation within the S3 API</a>.</li> </ul>
+ */
+static constexpr const char *kAwsS3Delete = "aws.s3.delete";
+
+/**
+ * The part number of the part being uploaded in a multipart-upload operation. This is a positive
+integer between 1 and 10,000.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code part_number} attribute is only applicable to the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a> and
+<a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>
+operations. The {@code part_number} attribute corresponds to the {@code --part-number} parameter of
+the <a href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part
+operation within the S3 API</a>.</li> </ul>
+ */
+static constexpr const char *kAwsS3PartNumber = "aws.s3.part_number";
+
+/**
  * The name of the operation being executed.
  */
 static constexpr const char *kGraphqlOperationName = "graphql.operation.name";
@@ -807,11 +967,6 @@ the broker.</li> </ul>
 static constexpr const char *kMessagingDestinationName = "messaging.destination.name";
 
 /**
- * The kind of message destination
- */
-static constexpr const char *kMessagingDestinationKind = "messaging.destination.kind";
-
-/**
  * Low cardinality representation of the messaging destination name
  *
  * <p>Notes:
@@ -843,11 +998,6 @@ broker. If the broker does not have such notion, the source name SHOULD uniquely
 broker.</li> </ul>
  */
 static constexpr const char *kMessagingSourceName = "messaging.source.name";
-
-/**
- * The kind of message source
- */
-static constexpr const char *kMessagingSourceKind = "messaging.source.kind";
 
 /**
  * Low cardinality representation of the messaging source name
@@ -1126,22 +1276,6 @@ static constexpr const char *kExceptionEscaped = "exception.escaped";
 static constexpr const char *kUserAgentOriginal = "user_agent.original";
 
 // Enum definitions
-namespace HttpFlavorValues
-{
-/** HTTP/1.0. */
-static constexpr const char *kHttp10 = "1.0";
-/** HTTP/1.1. */
-static constexpr const char *kHttp11 = "1.1";
-/** HTTP/2. */
-static constexpr const char *kHttp20 = "2.0";
-/** HTTP/3. */
-static constexpr const char *kHttp30 = "3.0";
-/** SPDY protocol. */
-static constexpr const char *kSpdy = "SPDY";
-/** QUIC protocol. */
-static constexpr const char *kQuic = "QUIC";
-}  // namespace HttpFlavorValues
-
 namespace EventDomainValues
 {
 /** Events from browser apps. */
@@ -1264,6 +1398,8 @@ static constexpr const char *kOpensearch = "opensearch";
 static constexpr const char *kClickhouse = "clickhouse";
 /** Cloud Spanner. */
 static constexpr const char *kSpanner = "spanner";
+/** Trino. */
+static constexpr const char *kTrino = "trino";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
@@ -1291,6 +1427,48 @@ static constexpr const char *kSerial = "serial";
 /** local_serial. */
 static constexpr const char *kLocalSerial = "local_serial";
 }  // namespace DbCassandraConsistencyLevelValues
+
+namespace DbCosmosdbOperationTypeValues
+{
+/** invalid. */
+static constexpr const char *kInvalid = "Invalid";
+/** create. */
+static constexpr const char *kCreate = "Create";
+/** patch. */
+static constexpr const char *kPatch = "Patch";
+/** read. */
+static constexpr const char *kRead = "Read";
+/** read_feed. */
+static constexpr const char *kReadFeed = "ReadFeed";
+/** delete. */
+static constexpr const char *kDelete = "Delete";
+/** replace. */
+static constexpr const char *kReplace = "Replace";
+/** execute. */
+static constexpr const char *kExecute = "Execute";
+/** query. */
+static constexpr const char *kQuery = "Query";
+/** head. */
+static constexpr const char *kHead = "Head";
+/** head_feed. */
+static constexpr const char *kHeadFeed = "HeadFeed";
+/** upsert. */
+static constexpr const char *kUpsert = "Upsert";
+/** batch. */
+static constexpr const char *kBatch = "Batch";
+/** query_plan. */
+static constexpr const char *kQueryPlan = "QueryPlan";
+/** execute_javascript. */
+static constexpr const char *kExecuteJavascript = "ExecuteJavaScript";
+}  // namespace DbCosmosdbOperationTypeValues
+
+namespace DbCosmosdbConnectionModeValues
+{
+/** Gateway (HTTP) connections mode. */
+static constexpr const char *kGateway = "gateway";
+/** Direct connection. */
+static constexpr const char *kDirect = "direct";
+}  // namespace DbCosmosdbConnectionModeValues
 
 namespace OtelStatusCodeValues
 {
@@ -1432,22 +1610,6 @@ static constexpr const char *kMutation = "mutation";
 /** GraphQL subscription. */
 static constexpr const char *kSubscription = "subscription";
 }  // namespace GraphqlOperationTypeValues
-
-namespace MessagingDestinationKindValues
-{
-/** A message sent to a queue. */
-static constexpr const char *kQueue = "queue";
-/** A message sent to a topic. */
-static constexpr const char *kTopic = "topic";
-}  // namespace MessagingDestinationKindValues
-
-namespace MessagingSourceKindValues
-{
-/** A message received from a queue. */
-static constexpr const char *kQueue = "queue";
-/** A message received from a topic. */
-static constexpr const char *kTopic = "topic";
-}  // namespace MessagingSourceKindValues
 
 namespace MessagingOperationValues
 {
