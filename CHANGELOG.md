@@ -53,6 +53,9 @@ Deprecations:
   [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
 * [SDK] Fix schema URL precedence bug in `Resource::Merge`
   [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [SDK] Use sdk_start_ts for MetricData start_ts for instruments having
+  cumulative aggregation temporality.
+  [#2086](https://github.com/open-telemetry/opentelemetry-cpp/pull/2086)
 
 * [EXPORTER] Add OTLP HTTP SSL support
   [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
