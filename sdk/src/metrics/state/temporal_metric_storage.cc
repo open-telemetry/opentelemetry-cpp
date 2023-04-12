@@ -89,7 +89,6 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   auto reported = last_reported_metrics_.find(collector);
   if (reported != last_reported_metrics_.end())
   {
-    last_collection_ts     = last_reported_metrics_[collector].collection_ts;
     auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
     if (aggregation_temporarily == AggregationTemporality::kCumulative)
     {
@@ -110,6 +109,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             }
             return true;
           });
+    }
+    else
+    {
+      last_collection_ts = last_reported_metrics_[collector].collection_ts;
     }
     last_reported_metrics_[collector] =
         LastReportedMetrics{std::move(merged_metrics), collection_ts};
