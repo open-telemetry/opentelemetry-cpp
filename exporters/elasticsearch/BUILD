@@ -45,6 +45,8 @@ cc_test(
         ":es_log_record_exporter",
         "@com_google_googletest//:gtest_main",
         "@curl",
+        # This was not exported in the "dll" version, hence it needs to be linked in statically
+        # In the non-dll version, it'll be just a duplicate dependency, and would be ignored        
         "@github_nlohmann_json//:json",
     ]),
 )

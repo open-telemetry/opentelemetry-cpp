@@ -45,4 +45,4 @@ LICENSE*                text
 ## bazel files
 WORKSPACE               text eol=lf
 BUILD                   text eol=lf
-dll_deps_generated.bzl  text eol=auto
+dll_deps_generated.bzl  text eol=lf

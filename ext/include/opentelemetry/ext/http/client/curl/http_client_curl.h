@@ -226,10 +226,8 @@ class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 public:
   HttpClientSync() : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()) {}
 
-  // https://stackoverflow.com/a/51033485/743263
-  HttpClientSync(const HttpClientSync &) = delete;
-  HttpClientSync &operator=(const HttpClientSync &) = delete;  
-
+  HttpClientSync(HttpClientSync&&) = default;
+  
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
 #ifdef ENABLE_HTTP_SSL_PREVIEW

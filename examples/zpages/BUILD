@@ -19,6 +19,8 @@ cc_binary(
         "//ext:headers",
         "//ext/src/zpages",
         "//sdk/src/trace",
+        # This was not exported in the "dll" version, hence it needs to be linked in statically
+        # In the non-dll version, it'll be just a duplicate dependency, and would be ignored
         "@github_nlohmann_json//:json"
     ]),
 )
