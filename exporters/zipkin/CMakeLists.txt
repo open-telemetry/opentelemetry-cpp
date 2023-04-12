@@ -7,6 +7,11 @@ add_library(
   opentelemetry_exporter_zipkin_trace
   src/zipkin_exporter.cc src/zipkin_exporter_factory.cc src/recordable.cc)
 
+target_include_directories(
+  opentelemetry_exporter_zipkin_trace
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
   PUBLIC opentelemetry_trace opentelemetry_http_client_curl

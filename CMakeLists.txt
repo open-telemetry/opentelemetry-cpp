@@ -118,9 +118,8 @@ option(WITH_GSL
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
+set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(OPENTELEMETRY_INSTALL_default ON)
-else()
   set(OPENTELEMETRY_INSTALL_default OFF)
 endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
@@ -220,8 +219,18 @@ option(
   "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
   OFF)
 
+option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
+
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
+       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
@@ -232,6 +241,13 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
+endif()
+
+if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
+  message(
+    FATAL_ERROR
+      "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
+  )
 endif()
 
 find_package(Threads)
@@ -584,6 +600,9 @@ if(NOT WITH_API_ONLY)
   endif()
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
+  endif()
+  if(WITH_FUNC_TESTS)
+    add_subdirectory(functional)
   endif()
 endif()
 

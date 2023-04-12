@@ -14,7 +14,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP exporter options.
+ * Struct to hold OTLP GRPC traces exporter options.
  */
 struct OtlpGrpcExporterOptions
 {

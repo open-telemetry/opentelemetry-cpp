@@ -53,14 +53,14 @@ inline std::string GetOtlpDefaultMetricsEndpoint()
   return GetOtlpDefaultHttpMetricsEndpoint();
 }
 
-bool GetOtlpDefaultTracesIsInsecure();
-bool GetOtlpDefaultMetricsIsInsecure();
-bool GetOtlpDefaultLogsIsInsecure();
+bool GetOtlpDefaultGrpcTracesIsInsecure();
+bool GetOtlpDefaultGrpcMetricsIsInsecure();
+bool GetOtlpDefaultGrpcLogsIsInsecure();
 
 // Compatibility with OTELCPP 1.8.2
 inline bool GetOtlpDefaultIsSslEnable()
 {
-  return (!GetOtlpDefaultTracesIsInsecure());
+  return (!GetOtlpDefaultGrpcTracesIsInsecure());
 }
 
 std::string GetOtlpDefaultTracesSslCertificatePath();
@@ -98,6 +98,26 @@ std::string GetOtlpDefaultLogsSslClientCertificatePath();
 std::string GetOtlpDefaultTracesSslClientCertificateString();
 std::string GetOtlpDefaultMetricsSslClientCertificateString();
 std::string GetOtlpDefaultLogsSslClientCertificateString();
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+std::string GetOtlpDefaultTracesSslTlsMinVersion();
+std::string GetOtlpDefaultMetricsSslTlsMinVersion();
+std::string GetOtlpDefaultLogsSslTlsMinVersion();
+
+std::string GetOtlpDefaultTracesSslTlsMaxVersion();
+std::string GetOtlpDefaultMetricsSslTlsMaxVersion();
+std::string GetOtlpDefaultLogsSslTlsMaxVersion();
+
+// For TLS 1.0, 1.1, 1.2
+std::string GetOtlpDefaultTracesSslTlsCipher();
+std::string GetOtlpDefaultMetricsSslTlsCipher();
+std::string GetOtlpDefaultLogsSslTlsCipher();
+
+// For TLS 1.3
+std::string GetOtlpDefaultTracesSslTlsCipherSuite();
+std::string GetOtlpDefaultMetricsSslTlsCipherSuite();
+std::string GetOtlpDefaultLogsSslTlsCipherSuite();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout();
