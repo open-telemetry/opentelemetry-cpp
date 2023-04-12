@@ -29,6 +29,8 @@ Increment the:
   [#2088](https://github.com/open-telemetry/opentelemetry-cpp/pull/2088)
 * [EXPORTER] Add OTLP HTTP SSL support
   [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
+* [METRICS SDK] Use sdk_start_ts for MetricData start_ts for instruments having
+  cumulative aggregation temporality. [#2086](https://github.com/open-telemetry/opentelemetry-cpp/pull/2086)
 
 Important changes:
 
