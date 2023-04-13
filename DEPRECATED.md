@@ -108,7 +108,7 @@ exporter (both OTLP HTTP and OTLP GRPC are supported).
 
 #### Planned removal (Jaeger)
 
-* Date: After April 1st, 2023
+* Date: July, 2023
 
 ## [Documentation]
 
