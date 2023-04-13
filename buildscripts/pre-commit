@@ -43,7 +43,10 @@ short_version="${major}.${minor}.${patch}"
 full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
 
 # Update api version.h
-sed -i "/^\#define OPENTELEMETRY_VERSION/c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION /c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MAJOR /c\#define OPENTELEMETRY_VERSION_MAJOR ${major}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MINOR /c\#define OPENTELEMETRY_VERSION_MINOR ${minor}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_PATCH /c\#define OPENTELEMETRY_VERSION_PATCH ${patch}"  "$(pwd)/api/include/opentelemetry/version.h"
 git add "$(pwd)/api/include/opentelemetry/version.h"
 
 # Update sdk version.cc
