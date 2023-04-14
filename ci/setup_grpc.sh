@@ -10,11 +10,11 @@ new_grpc_version='v1.49.2'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 install_grpc_version=${new_grpc_version}
-grpc_version='v1.39.0'
 install_dir='/usr/local/'
+build_shared_libs=''
 usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
 
-while getopts ":v:i:r:s:" o; do
+while getopts ":v:i:r:s:TH" o; do
     case "${o}" in
         v)
             gcc_version=${OPTARG}
@@ -27,6 +27,12 @@ while getopts ":v:i:r:s:" o; do
             ;;
         s)
             std_version=${OPTARG}
+            ;;
+        T)
+            build_shared_libs="OFF"
+            ;;
+        H)
+            build_shared_libs="ON"
             ;;
         *)
             usage
@@ -54,19 +60,34 @@ pushd grpc
 git submodule init
 git submodule update --depth 1
 mkdir -p "third_party/abseil-cpp/build" && pushd "third_party/abseil-cpp/build"
-cmake -DCMAKE_BUILD_TYPE=Release  \
-      -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE \
-      -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR ..
-make -j${nproc} install && popd
+set -x
+
+ABSEIL_CPP_BUILD_OPTIONS=(
+    -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+)
+if [ ! -z "$build_shared_libs" ]; then
+    ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
+fi
+cmake  ${ABSEIL_CPP_BUILD_OPTIONS[@]} ..
+cmake --build . -j${nproc} --target install && popd
 mkdir -p build && pushd build
-cmake -DgRPC_INSTALL=ON \
-    -DCMAKE_CXX_STANDARD=${std_version} \
-    -DgRPC_BUILD_TESTS=OFF \
-    -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
-    -DCMAKE_PREFIX_PATH=$INSTALL_DIR \
-    ..
-make -j $(nproc)
-make install
+
+GRPC_BUILD_OPTIONS=(
+    -DgRPC_INSTALL=ON
+    -DCMAKE_CXX_STANDARD=${std_version}
+    -DgRPC_BUILD_TESTS=OFF
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR
+    -DCMAKE_PREFIX_PATH=$INSTALL_DIR
+)
+if [ ! -z "$build_shared_libs" ]; then
+    GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
+fi
+
+cmake ${GRPC_BUILD_OPTIONS[@]} ..
+cmake --build . -j$(nproc)
+cmake --install .
 popd
 popd
 

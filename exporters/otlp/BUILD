@@ -63,6 +63,9 @@ cc_library(
         "//sdk/src/common:global_log_handler",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
     ],
 )
 
@@ -270,7 +273,6 @@ cc_library(
         ":otlp_grpc_client",
         "//ext:headers",
         "//sdk/src/logs",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         # For gRPC
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
     ],
@@ -411,11 +413,13 @@ cc_test(
         "test",
     ],
     deps = dll_deps([
+        ":otlp_grpc_exporter",
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
         "@com_github_grpc_grpc//:grpc++",
     ]),
 )
