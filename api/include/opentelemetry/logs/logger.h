@@ -470,7 +470,7 @@ private:
   // read/write should be handled. And std::atomic can not be used here because it is not ABI
   // compatible for OpenTelemetry C++ API.
   //
-  uint8_t minimum_severity_{kMaxSeverity};
+  mutable uint8_t minimum_severity_{kMaxSeverity};
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

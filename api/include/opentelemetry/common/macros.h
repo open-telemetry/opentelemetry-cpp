@@ -190,8 +190,10 @@ point.
 
 #  include <intrin.h>
 
-#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) _InterlockedCompareExchange8(ptr, 0, 0)
-#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) _InterlockedExchange8(ptr, value)
+#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) \
+    static_cast<uint8_t>(_InterlockedCompareExchange8(reinterpret_cast<char *>(ptr), 0, 0))
+#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) \
+    _InterlockedExchange8(reinterpret_cast<char *>(ptr), static_cast<char>(value))
 
 #else
 #  error port atomics read/write for the current platform

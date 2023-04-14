@@ -12,6 +12,7 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
+using opentelemetry::logs::EventId;
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
@@ -52,6 +53,13 @@ TEST(Logger, LogMethodOverloads)
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
 
+  EventId trace_event_id{0x1, "TraceEventId"};
+  EventId debug_event_id{0x2, "DebugEventId"};
+  EventId info_event_id{0x3, "InfoEventId"};
+  EventId warn_event_id{0x4, "WarnEventId"};
+  EventId error_event_id{0x5, "ErrorEventId"};
+  EventId fatal_event_id{0x6, "FatalEventId"};
+
   // Create a map to test the logs with
   std::map<std::string, std::string> m = {{"key1", "value1"}};
 
@@ -79,36 +87,65 @@ TEST(Logger, LogMethodOverloads)
                 opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Trace(m);
   logger->Trace(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Trace(trace_event_id, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Trace(trace_event_id.id_, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+
   logger->Debug("Test log message");
   logger->Debug("Test log message", m);
   logger->Debug("Test log message",
                 opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Debug(m);
   logger->Debug(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Debug(debug_event_id, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Debug(debug_event_id.id_, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+
   logger->Info("Test log message");
   logger->Info("Test log message", m);
   logger->Info("Test log message",
                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Info(m);
   logger->Info(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Info(info_event_id, "Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Info(info_event_id.id_, "Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+
   logger->Warn("Test log message");
   logger->Warn("Test log message", m);
   logger->Warn("Test log message",
                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Warn(m);
   logger->Warn(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Warn(warn_event_id, "Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Warn(warn_event_id.id_, "Test log message",
+               opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+
   logger->Error("Test log message");
   logger->Error("Test log message", m);
   logger->Error("Test log message",
                 opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Error(m);
   logger->Error(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Error(error_event_id, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Error(error_event_id.id_, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+
   logger->Fatal("Test log message");
   logger->Fatal("Test log message", m);
   logger->Fatal("Test log message",
                 opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
   logger->Fatal(m);
   logger->Fatal(opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Fatal(fatal_event_id, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
+  logger->Fatal(fatal_event_id.id_, "Test log message",
+                opentelemetry::common::MakeAttributes({{"key1", "value 1"}, {"key2", 2}}));
 }
 
 TEST(Logger, EventLogMethodOverloads)
