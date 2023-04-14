@@ -25,7 +25,7 @@ config_setting(
 )
 
 # TODO: Version is not correct here.
-otel_sdk_prefix = "otel_sdk/" + "1.8.3-wip" + "/"
+otel_sdk_prefix = "otel_sdk/" + "1.9.0" + "/"
 
 # Build configuration settings mimicking MSVC: debug=dbg, release=opt, reldeb=fastbuild
 config_setting(
