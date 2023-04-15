@@ -16,4 +16,3 @@ if(WITH_BENCHMARK)
   target_link_libraries(logger_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
 endif()
-
