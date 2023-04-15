@@ -278,7 +278,17 @@ if(TARGET protobuf::libprotobuf)
 else() # cmake 3.8 or lower
   target_include_directories(opentelemetry_proto
                              PUBLIC ${Protobuf_INCLUDE_DIRS})
-  target_link_libraries(opentelemetry_proto INTERFACE ${Protobuf_LIBRARIES})
+  target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
+endif()
+
+if(WITH_OTLP_GRPC)
+  if(WITH_ABSEIL)
+    find_package(absl CONFIG)
+    if(TARGET absl::synchronization)
+      target_link_libraries(opentelemetry_proto INTERFACE absl::synchronization)
+    endif()
+  endif()
+  target_link_libraries(opentelemetry_proto PUBLIC gRPC::grpc++)
 endif()
 
 if(BUILD_SHARED_LIBS)

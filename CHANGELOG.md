@@ -17,6 +17,8 @@ Increment the:
 
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+* [BUILD] Allow build shared opentelemetry_proto on non-Windows platform.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
 
 Deprecations:
 
