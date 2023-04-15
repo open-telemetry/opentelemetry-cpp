@@ -23,9 +23,7 @@ namespace otlp
 OtlpGrpcExporter::OtlpGrpcExporter() : OtlpGrpcExporter(OtlpGrpcExporterOptions()) {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options)
-    : options_(options),
-      trace_service_stub_(
-          OtlpGrpcClient::MakeServiceStub<proto::collector::trace::v1::TraceService>(options))
+    : options_(options), trace_service_stub_(OtlpGrpcClient::MakeTraceServiceStub(options))
 {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(
@@ -60,7 +58,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   auto context = OtlpGrpcClient::MakeClientContext(options_);
   proto::collector::trace::v1::ExportTraceServiceResponse response;
 
-  grpc::Status status = trace_service_stub_->Export(context.get(), request, &response);
+  grpc::Status status =
+      OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), context.get(), request, &response);
 
   if (!status.ok())
   {

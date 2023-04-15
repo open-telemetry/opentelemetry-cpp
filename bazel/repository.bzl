@@ -147,7 +147,10 @@ def opentelemetry_cpp_deps():
         build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
         sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
         strip_prefix = "curl-7.73.0",
-        urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
+        urls = [
+            "https://curl.haxx.se/download/curl-7.73.0.tar.gz",
+            "https://github.com/curl/curl/releases/download/curl-7_73_0/curl-7.73.0.tar.gz",
+        ],
     )
 
     # libthrift (optional)
