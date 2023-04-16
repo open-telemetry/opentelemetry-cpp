@@ -22,24 +22,23 @@ endif()
 target_link_libraries(opentelemetry_otlp_recordable
                       PUBLIC opentelemetry_metrics)
 
-set(OPENTELEMETRY_PROTO_LINK_NAME opentelemetry_proto)
 if(WITH_OTLP_GRPC)
-  # Because opentelemetry_proto may depend on gRPC, and gRPC can only be linked
-  # in one dynamic library or executable (otherwise, there may be conflicts with
-  # some global variables in certain versions of gRPC), we have switched the
-  # link for opentelemetry_exporter_otlp_grpc_client into all targets that
-  # depend on opentelemetry_proto.
-  set(OPENTELEMETRY_PROTO_LINK_NAME opentelemetry_exporter_otlp_grpc_client)
   find_package(gRPC REQUIRED)
   add_library(opentelemetry_exporter_otlp_grpc_client src/otlp_grpc_client.cc
                                                       src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
+
+  # Because opentelemetry_proto_grpc depends on gRPC, and gRPC can only be
+  # linked in one dynamic library or executable (otherwise, there may be
+  # conflicts with some global variables in certain versions of gRPC), we have
+  # switched the link for opentelemetry_exporter_otlp_grpc_client into all
+  # targets that depend on opentelemetry_proto_grpc.
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_client
     PUBLIC opentelemetry_sdk opentelemetry_ext
-           # gRPC::grpc++ must be linked before opentelemetry_proto.
-           opentelemetry_proto gRPC::grpc++)
+           # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
+           opentelemetry_proto_grpc gRPC::grpc++)
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
@@ -105,8 +104,8 @@ if(WITH_OTLP_HTTP)
                         PROPERTIES EXPORT_NAME otlp_http_client)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk ${OPENTELEMETRY_PROTO_LINK_NAME}
-           opentelemetry_http_client_curl nlohmann_json::nlohmann_json)
+    PUBLIC opentelemetry_sdk opentelemetry_proto opentelemetry_http_client_curl
+           nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_http_client
                      nlohmann_json::nlohmann_json)
@@ -167,8 +166,7 @@ endif()
 
 target_link_libraries(
   opentelemetry_otlp_recordable
-  PUBLIC opentelemetry_trace opentelemetry_resources
-         ${OPENTELEMETRY_PROTO_LINK_NAME})
+  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(

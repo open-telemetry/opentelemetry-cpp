@@ -238,9 +238,11 @@ else()
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
 endif()
 
-list(
-  APPEND
-  OTELCPP_PROTO_TARGET_OPTIONS
+list(APPEND OTELCPP_PROTO_TARGET_OPTIONS)
+
+set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
+add_library(
+  opentelemetry_proto
   ${COMMON_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
   ${TRACE_PB_CPP_FILE}
@@ -249,12 +251,20 @@ list(
   ${TRACE_SERVICE_PB_CPP_FILE}
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
-if(WITH_OTLP_GRPC)
-  list(APPEND OTELCPP_PROTO_TARGET_OPTIONS ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
-       ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
-endif()
 
-add_library(opentelemetry_proto ${OTELCPP_PROTO_TARGET_OPTIONS})
+if(WITH_OTLP_GRPC)
+  add_library(
+    opentelemetry_proto_grpc
+    ${TRACE_SERVICE_GRPC_PB_CPP_FILE} ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
+    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+
+  list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
+  target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
+
+  set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
+                                                            proto_grpc)
+  patch_protobuf_targets(opentelemetry_proto_grpc)
+endif()
 
 if(needs_proto_download)
   add_dependencies(opentelemetry_proto opentelemetry-proto)
@@ -264,7 +274,7 @@ patch_protobuf_targets(opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(
-    TARGETS opentelemetry_proto
+    TARGETS ${OPENTELEMETRY_PROTO_TARGETS}
     EXPORT "${PROJECT_NAME}-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -289,11 +299,13 @@ if(WITH_OTLP_GRPC)
   if(WITH_ABSEIL)
     find_package(absl CONFIG)
     if(TARGET absl::synchronization)
-      target_link_libraries(opentelemetry_proto PRIVATE absl::synchronization)
+      target_link_libraries(opentelemetry_proto_grpc PRIVATE absl::synchronization)
     endif()
   endif()
 endif()
 
 if(BUILD_SHARED_LIBS)
-  set_property(TARGET opentelemetry_proto PROPERTY POSITION_INDEPENDENT_CODE ON)
+  foreach(proto_target ${OPENTELEMETRY_PROTO_TARGETS})
+    set_property(TARGET proto_target PROPERTY POSITION_INDEPENDENT_CODE ON)
+  endforeach()
 endif()
