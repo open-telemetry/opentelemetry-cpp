@@ -439,12 +439,13 @@ public:
 
 protected:
   // TODO: discuss with community about naming for internal methods.
-  virtual bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept
+  virtual bool EnabledImplementation(Severity /*severity*/,
+                                     const EventId & /*event_id*/) const noexcept
   {
     return false;
   }
 
-  virtual bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept
+  virtual bool EnabledImplementation(Severity /*severity*/, int64_t /*event_id*/) const noexcept
   {
     return false;
   }

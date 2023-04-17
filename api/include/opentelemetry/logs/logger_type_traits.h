@@ -48,7 +48,7 @@ template <>
 struct LogRecordSetterTrait<EventId>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType && /*arg*/) noexcept
   {
     // TODO: set log_record
     return log_record;
