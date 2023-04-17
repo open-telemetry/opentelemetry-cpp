@@ -89,7 +89,7 @@ static void ThreadRoutine(Barrier &barrier,
   barrier.Wait();
 }
 
-void MultiThreadRunner(benchmark::State &state, std::function<void(benchmark::State &state)> func)
+void MultiThreadRunner(benchmark::State &state, std::function<void()> func)
 {
   int num_threads = std::thread::hardware_concurrency();
 
@@ -117,7 +117,7 @@ static void BM_UnstructuredLog(benchmark::State &state)
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         logger->Trace("This is a simple unstructured log message");
@@ -138,7 +138,7 @@ static void BM_StructuredLogWithTwoAttributes(benchmark::State &state)
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         logger->Trace(
@@ -161,7 +161,7 @@ static void BM_StructuredLogWithEventIdAndTwoAttributes(benchmark::State &state)
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         logger->Trace(
@@ -186,7 +186,7 @@ static void BM_StructuredLogWithEventIdStructAndTwoAttributes(benchmark::State &
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger, &function_name_event_id](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger, &function_name_event_id]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         logger->Trace(
@@ -210,7 +210,7 @@ static void BM_EnabledOnSeverityReturnFalse(benchmark::State &state)
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         if (logger->Enabled(Severity::kTrace))
@@ -234,7 +234,7 @@ static void BM_EnabledOnSeverityAndEventIdReturnFalse(benchmark::State &state)
   {
     state.PauseTiming();
 
-    MultiThreadRunner(state, [&logger](benchmark::State &state) {
+    MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         if (logger->Enabled(Severity::kTrace, 0x12345678), false)
