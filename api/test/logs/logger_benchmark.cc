@@ -68,7 +68,7 @@ private:
 static void ThreadRoutine(Barrier &barrier,
                           benchmark::State &state,
                           int thread_id,
-                          std::function<void(benchmark::State &state)> func)
+                          std::function<void()> func)
 {
   barrier.Wait();
 
@@ -79,7 +79,7 @@ static void ThreadRoutine(Barrier &barrier,
 
   barrier.Wait();
 
-  func(state);
+  func();
 
   if (thread_id == 0)
   {
