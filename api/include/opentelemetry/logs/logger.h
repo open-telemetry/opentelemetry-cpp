@@ -304,7 +304,7 @@ public:
     this->EmitLogRecord(severity, message);
   }
 
-  // Convenient wrappers based on virtual Log() virtual methods.
+  // Convenient wrappers based on virtual methods Log().
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
 
   inline void Trace(const EventId &event_id,

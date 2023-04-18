@@ -237,7 +237,7 @@ static void BM_EnabledOnSeverityAndEventIdReturnFalse(benchmark::State &state)
     MultiThreadRunner(state, [&logger]() {
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
-        if (logger->Enabled(Severity::kTrace, 0x12345678), false)
+        if (logger->Enabled(Severity::kTrace, 0x12345678))
         {
           logger->Trace("This log line would not be called");
         }
