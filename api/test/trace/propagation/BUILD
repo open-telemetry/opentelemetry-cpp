@@ -47,6 +47,7 @@ cc_test(
         "api",
         "test",
         "trace",
+        "jaeger",
     ],
     deps = [
         "//api",

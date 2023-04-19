@@ -25,7 +25,16 @@ build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
 # upb\upb\def.c(617) : error C4700: uninitialized local variable 'ret' used
 # upb\upb\msg.c(366) : error C4703: potentially uninitialized local pointer variable 'compar' used
 # api/test/trace/propagation/jaeger_propagation_test.cc(34): error C4996: 'opentelemetry::v1::trace::propagation::JaegerPropagator': was declared deprecated 
-build:windows  --copt="/wd4146"  --copt="/wd4700" --copt="/wd4703" --copt="/wd4996"
+build:windows --copt="/wd4146"  --copt="/wd4700" --copt="/wd4703"
+
+# extra silence of C++17 msvc warnings (these happen only with abseil so far)
+build:windows --copt="-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS"
+
+# external/com_github_grpc_grpc/src/core/lib/iomgr/tcp_server_windows.cc(502): error C4996: 'WSASocketA': Use WSASocketW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+# Use this define, instead of disabling 4996 - /wd4996
+build:windows --copt="-D_WINSOCK_DEPRECATED_NO_WARNINGS"
+
+# --copt="/wd4996"
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
