@@ -1,0 +1,6 @@
+[log]
+level=info
+
+[dif]
+max_upload_size=500mb
+max_item_size=500mb

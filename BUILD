@@ -1,8 +1,6 @@
 # NOTE: This below code is Windows specific
 
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
-load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", pkg_strip_prefix = "strip_prefix", "pkg_filegroup")
@@ -83,54 +81,6 @@ genquery(
     expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps))",
     scope = ["//:otel_sdk_deps"],
 )
-
-# expand_template(
-#     name = "dll_deps_targets",
-#     out = "dll_deps_targets.bzl",
-#     substitutions = {
-#         "@deps@": ["otel_sdk_deps_genquery"],
-#     },
-#     template = "dll_deps_targets.tpl.bzl"
-# )
-
-# genrule(
-#     name = "test",
-#     outs = ["test2"],
-#     srcs = [":otel_sdk_transitive_deps"],
-#     cmd_bat = """
-#     echo # Generated file > $(location :test2)
-#     echo DLL_DEPS_TARGETS = {k: None for k in >> $(location :test2)
-#     type $(location :otel_sdk_transitive_deps) >> $(location :test2)
-#     type $(location :otel_sdk_transitive_deps) >> $(location :test2)
-#     """,
-
-# )
-
-# expand_template(
-#     name = "test",
-#     template = "dll_deps_targets.tpl.bzl",
-#     out = "test2",
-#     data = ["otel_sdk_transitive_deps"],
-#     substitutions = {
-#         "@deps@": ["$(location otel_sdk_transitive_deps)"],
-#     }
-# )
-
-# write_file(
-#     name = "w",
-#     out = "wr",
-#     data = ["otel_sdk_deps_genquery"],
-#     content = [
-        
-#     ]
-# )
-
-# genrule(
-#     name = "otel_sdk_deps_genrule",
-#     srcs = ["otel_sdk_deps_genquery"],
-#     outs = ["dll_deps_targets.bzl"],
-#     cmd = "echo blah >> $@",
-# )
 
 [cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
@@ -286,28 +236,34 @@ pkg_files(
     ]
 ) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
 
-# TODO: Add sentry-cli.exe download to WORKSPACE and have it run over the .pdb to bundle the source code.
-# # Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
-# [run_binary(
-#     name = otel_sdk_binary + "_src_bundles",
-#     srcs = [otel_sdk_binary + "_pdb_file", ".sentryclirc"],
-#     outs = [otel_sdk_binary + ".src.zip"],
-#     tool = "sentry-cli.exe",
-#     args = [
-#         "debug-files", # Called `difutil` in the online docs, but the tool lists it as `debug-files`
-#         "bundle-sources",
-#         "$(location " + otel_sdk_binary + "_pdb_file" + ")",
-#         "$(location " + otel_sdk_binary + "_demo" + "_pdb" + ")"
-#     ]
-# ) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+# Same as above, but for the binaries
+[force_compilation_mode(
+    compilation_mode = compilation_mode,
+    name = otel_sdk_binary + "_src_bundle" + "_force",
+    data = [
+        otel_sdk_binary + "_make_src_bundle", 
+    ]
+) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
 
-# # Package `src` files under `otel_sdk/<version>/src`
-# pkg_files(
-#     name = "otel_sdk_src_files",
-#     srcs = ["otel_sdk_demo.cpp"],
-#     prefix = otel_sdk_prefix + "src",
-#     strip_prefix = pkg_strip_prefix.from_pkg()
-# )
+# Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
+[run_binary(
+    name = otel_sdk_binary + "_make_src_bundle",
+    srcs = [otel_sdk_binary + "_pdb_file", ".sentryclirc"],
+    outs = [otel_sdk_binary + ".src.zip"],
+    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
+    args = [
+        "debug-files", # Called `difutil` in the online docs, but the tool lists it as `debug-files`
+        "bundle-sources",
+        "$(location " + otel_sdk_binary + "_pdb_file" + ")",
+    ]
+) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+
+[pkg_files(
+    name = otel_sdk_binary + "_src_bundle",
+    srcs = [otel_sdk_binary + "_src_bundle_force"],
+    prefix = otel_sdk_prefix,
+    strip_prefix = pkg_strip_prefix.from_pkg()
+) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
 
 # Package `lib` files under `otel_sdk/<version>/(debug/|reldeb/|/)lib`
 [pkg_files(
@@ -329,14 +285,16 @@ pkg_files(
 pkg_filegroup(
     name = "otel_sdk_files",
     srcs = [
-        # "otel_sdk_src_files", 
         "otel_sdk_header_files",
         "otel_sdk_r_bin_files", 
-        "otel_sdk_d_bin_files", 
-        "otel_sdk_rd_bin_files", 
         "otel_sdk_r_lib_files", 
+        "otel_sdk_r_src_bundle", 
+        "otel_sdk_d_bin_files", 
         "otel_sdk_d_lib_files", 
+        "otel_sdk_d_src_bundle", 
+        "otel_sdk_rd_bin_files", 
         "otel_sdk_rd_lib_files", 
+        "otel_sdk_rd_src_bundle", 
     ]
 )
 

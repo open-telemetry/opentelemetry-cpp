@@ -12,7 +12,7 @@ new_local_repository(
     path = "",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
     name = "aspect_bazel_lib",
@@ -59,3 +59,13 @@ grpc_deps()
 # Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 grpc_extra_deps()
+
+http_file(
+    name = "sentry_cli_windows_amd64",
+    downloaded_file_path = "sentry-cli.exe",
+    executable = True,
+    sha256 = "3971a181dac9b265fd0db168e244c1e2fb08cbeeb659bd60c1ef32da9e9b9204",
+    urls = [
+        "https://github.com/getsentry/sentry-cli/releases/download/2.17.3/sentry-cli-Windows-x86_64.exe",
+    ],
+)

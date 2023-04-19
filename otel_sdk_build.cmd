@@ -11,7 +11,6 @@ if "%__BAZEL__%"=="" goto:no-bazel
 rem Python311 is something we need to solve better here!
 set PATH=c:\windows\system32;c:\python311;
 pushd "%~dp0"
-rem "c:\program files\perforce\p4.exe" edit ... || goto:error
 
 rem Note that this builds (through the magic of force_debug/release/reldeb) all configurations (unlike tests).
 rem Note that `otel_sdk.zip` is built here for the default fastdbg (e.g. when no -c is specified)
@@ -26,8 +25,9 @@ rem TODO: Fix failing tests in debug only (e.g. add back the || goto:error)
 for /F "usebackq" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
 for /F "usebackq" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
 
+if "%__ZIP__%"=="" goto:broken-build-zip-file
+
 for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /D /Y || goto:error
-rem "c:\program files\perforce\p4.exe" revert -a ... || goto:error
 
 echo. ALL GOOD!
 popd
@@ -40,4 +40,8 @@ goto:eof
 
 :error
 echo FAILED!
+goto:eof
+
+:broken-build-zip-file
+echo The BUILD has broken otel_sdk.zip that can't be build for all compilation_modes
 goto:eof
