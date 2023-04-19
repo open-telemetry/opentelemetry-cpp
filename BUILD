@@ -269,17 +269,17 @@ pkg_files(
 [pkg_files(
     name = otel_sdk_binary + "_lib_files",
     srcs = [otel_sdk_binary + "_lib_file_force"],
-    prefix = otel_sdk_prefix + prefix + "/lib",
+    prefix = otel_sdk_prefix + prefix + "lib",
     strip_prefix = pkg_strip_prefix.from_pkg()
-) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug"), ("otel_sdk_rd", "reldeb")]]
+) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug/"), ("otel_sdk_rd", "reldeb/")]]
 
 # Package `bin` files under `otel_sdk/<version>/(debug/|reldeb/|/)bin`
 [pkg_files(
     name = otel_sdk_binary + "_bin_files",
     srcs = [otel_sdk_binary + "_bin_file_force"],
-    prefix = otel_sdk_prefix + prefix + "/bin",
+    prefix = otel_sdk_prefix + prefix + "bin",
     strip_prefix = pkg_strip_prefix.from_pkg()
-) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug"), ("otel_sdk_rd", "reldeb")]]
+) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug/"), ("otel_sdk_rd", "reldeb/")]]
 
 # Group all files into one group
 pkg_filegroup(
