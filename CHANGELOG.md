@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
+  [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+
 Deprecations:
 
 * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
