@@ -111,7 +111,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
-  make -k
+  make -k -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
@@ -312,7 +312,7 @@ EOF
         -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
         -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
         "${SRC_DIR}"
-  make example_plugin
+  make example_plugin -j $(nproc)
   cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
 
   # Verify we can load the plugin
@@ -321,7 +321,7 @@ EOF
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
-  make load_plugin_example
+  make load_plugin_example -j $(nproc)
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
@@ -403,7 +403,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   lcov --directory $PWD --capture --output-file coverage.info
   # removing test http server coverage from the total coverage. We don't use this server completely.

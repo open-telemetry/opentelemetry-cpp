@@ -22,6 +22,7 @@
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
