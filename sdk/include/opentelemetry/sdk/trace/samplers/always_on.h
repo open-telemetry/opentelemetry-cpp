@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

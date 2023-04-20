@@ -5,6 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/logs/event_logger_provider.h"
+#  include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it

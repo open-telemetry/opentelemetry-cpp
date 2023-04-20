@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 #include <algorithm>
 #include <cstring>

@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context

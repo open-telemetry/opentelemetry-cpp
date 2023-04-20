@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context

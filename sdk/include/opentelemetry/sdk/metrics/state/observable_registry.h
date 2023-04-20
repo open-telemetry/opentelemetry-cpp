@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/version.h"
 
 #include <memory>
 #include <mutex>

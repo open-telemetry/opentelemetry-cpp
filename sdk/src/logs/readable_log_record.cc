@@ -7,6 +7,7 @@
 #  include <type_traits>
 
 #  include "opentelemetry/sdk/logs/readable_log_record.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

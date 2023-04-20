@@ -12,6 +12,7 @@
 #  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/logger_context.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

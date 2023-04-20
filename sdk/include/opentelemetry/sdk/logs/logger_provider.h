@@ -16,6 +16,7 @@
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_context.h"
 #  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it

@@ -11,6 +11,7 @@
 #  include "opentelemetry/logs/event_logger.h"
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

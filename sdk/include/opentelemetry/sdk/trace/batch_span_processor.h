@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/circular_buffer.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
-
 #include <atomic>
 #include <condition_variable>
 #include <thread>
+
+#include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

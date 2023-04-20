@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk_config.h"
 
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

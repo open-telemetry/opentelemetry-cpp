@@ -11,6 +11,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 #if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
 #  include <regex>

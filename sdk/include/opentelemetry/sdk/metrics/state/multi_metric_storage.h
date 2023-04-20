@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

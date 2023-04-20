@@ -3,7 +3,11 @@
 
 #pragma once
 
+#include <list>
+#include <memory>
+#include <mutex>
 #include <utility>
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -14,10 +18,7 @@
 
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-
-#include <list>
-#include <memory>
-#include <mutex>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -12,6 +12,7 @@
 #  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/logs/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs

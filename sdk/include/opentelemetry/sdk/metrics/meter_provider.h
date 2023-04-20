@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"

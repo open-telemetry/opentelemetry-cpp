@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -12,6 +13,7 @@
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

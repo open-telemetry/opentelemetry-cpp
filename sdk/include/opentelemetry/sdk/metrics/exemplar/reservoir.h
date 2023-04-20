@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

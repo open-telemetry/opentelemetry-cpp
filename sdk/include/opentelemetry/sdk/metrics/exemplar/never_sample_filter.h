@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <memory>
 #include <vector>
+
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -13,6 +14,7 @@
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

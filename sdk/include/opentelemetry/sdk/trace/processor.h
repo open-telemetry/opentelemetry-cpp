@@ -6,7 +6,7 @@
 #include <chrono>
 #include <memory>
 
-#include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

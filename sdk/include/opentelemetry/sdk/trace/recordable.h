@@ -13,6 +13,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
 

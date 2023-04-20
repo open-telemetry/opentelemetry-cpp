@@ -8,6 +8,7 @@
 
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

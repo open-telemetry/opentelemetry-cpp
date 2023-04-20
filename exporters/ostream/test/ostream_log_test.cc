@@ -10,6 +10,7 @@
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #  include <gtest/gtest.h>
 #  include <iostream>

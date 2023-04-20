@@ -5,6 +5,7 @@
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

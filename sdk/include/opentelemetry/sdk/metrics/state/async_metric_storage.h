@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/version.h"
 
 #include <memory>
 #include <mutex>

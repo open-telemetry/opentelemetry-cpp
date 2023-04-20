@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/version.h"
 
 #include <array>
 #include <string>

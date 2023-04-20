@@ -5,7 +5,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/version/version.h"
+#  include "opentelemetry/version.h"
 
 #  include <chrono>
 #  include <cstddef>
