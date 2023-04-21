@@ -24,6 +24,8 @@ add_library(
 
 set_target_properties(opentelemetry_trace PROPERTIES EXPORT_NAME trace)
 
+set_target_version(opentelemetry_trace)
+
 target_link_libraries(opentelemetry_trace PUBLIC opentelemetry_common
                                                  opentelemetry_resources)
 

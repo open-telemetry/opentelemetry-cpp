@@ -188,6 +188,9 @@ option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 
+option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
+       OFF)
+
 set(OTELCPP_PROTO_PATH
     ""
     CACHE PATH "Path to opentelemetry-proto")
@@ -265,6 +268,14 @@ function(install_windows_deps)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
       PARENT_SCOPE)
+endfunction()
+
+function(set_target_version target_name)
+  if(OTELCPP_VERSIONED_LIBS)
+    set_target_properties(
+      ${target_name} PROPERTIES VERSION ${OPENTELEMETRY_VERSION}
+                                SOVERSION ${OPENTELEMETRY_VERSION})
+  endif()
 endfunction()
 
 if(WITH_JAEGER)

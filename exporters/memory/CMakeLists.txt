@@ -12,6 +12,8 @@ target_include_directories(
 set_target_properties(opentelemetry_exporter_in_memory
                       PROPERTIES EXPORT_NAME in_memory_span_exporter)
 
+set_target_version(opentelemetry_exporter_in_memory)
+
 target_link_libraries(opentelemetry_exporter_in_memory
                       PUBLIC opentelemetry_trace)
 
