@@ -13,6 +13,7 @@
 #  include <future>
 #endif
 
+#include <functional>
 #include <map>
 #include <regex>
 #include <sstream>
