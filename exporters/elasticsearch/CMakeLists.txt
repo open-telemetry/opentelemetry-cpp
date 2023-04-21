@@ -6,7 +6,6 @@ add_library(opentelemetry_exporter_elasticsearch_logs
 
 set_target_properties(opentelemetry_exporter_elasticsearch_logs
                       PROPERTIES EXPORT_NAME elasticsearch_log_record_exporter)
-
 set_target_version(opentelemetry_exporter_elasticsearch_logs)
 
 target_include_directories(

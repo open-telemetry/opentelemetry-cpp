@@ -6,7 +6,6 @@ add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc
 
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
-
 set_target_version(opentelemetry_exporter_ostream_span)
 
 target_include_directories(

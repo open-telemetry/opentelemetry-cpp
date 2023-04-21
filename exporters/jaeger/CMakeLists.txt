@@ -35,7 +35,6 @@ add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
 
 set_target_properties(opentelemetry_exporter_jaeger_trace
                       PROPERTIES EXPORT_NAME jaeger_trace_exporter)
-
 set_target_version(opentelemetry_exporter_jaeger_trace)
 
 target_include_directories(
