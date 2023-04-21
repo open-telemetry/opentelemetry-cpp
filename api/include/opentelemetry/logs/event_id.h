@@ -23,6 +23,7 @@ public:
     id_   = id;
     name_ = nostd::unique_ptr<char[]>{new char[name.length() + 1]};
     std::copy(name.begin(), name.end(), name_.get());
+    name_.get()[name.length()] = 0;
   }
 
 public:
