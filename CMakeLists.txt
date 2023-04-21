@@ -191,6 +191,10 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
+endif()
+
 set(OTELCPP_PROTO_PATH
     ""
     CACHE PATH "Path to opentelemetry-proto")
