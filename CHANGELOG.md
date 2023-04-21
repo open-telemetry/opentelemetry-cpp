@@ -17,6 +17,8 @@ Increment the:
 
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+* [API] Add user facing Logging API and Benchmarks
+  [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
 
 Deprecations:
 
