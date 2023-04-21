@@ -11,7 +11,6 @@ endif()
 add_library(opentelemetry_common ${COMMON_SRCS})
 
 set_target_properties(opentelemetry_common PROPERTIES EXPORT_NAME common)
-
 set_target_version(opentelemetry_common)
 
 target_link_libraries(
