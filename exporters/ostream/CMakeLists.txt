@@ -43,7 +43,6 @@ endif() # BUILD_TESTING
 add_library(opentelemetry_exporter_ostream_metrics src/metric_exporter.cc)
 set_target_properties(opentelemetry_exporter_ostream_metrics
                       PROPERTIES EXPORT_NAME ostream_metrics_exporter)
-
 set_target_version(opentelemetry_exporter_ostream_metrics)
 
 target_include_directories(
@@ -80,6 +79,8 @@ if(WITH_LOGS_PREVIEW)
   add_library(opentelemetry_exporter_ostream_logs src/log_record_exporter.cc)
   set_target_properties(opentelemetry_exporter_ostream_logs
                         PROPERTIES EXPORT_NAME ostream_log_record_exporter)
+  set_target_version(opentelemetry_exporter_ostream_logs)
+
   target_include_directories(
     opentelemetry_exporter_ostream_logs
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
