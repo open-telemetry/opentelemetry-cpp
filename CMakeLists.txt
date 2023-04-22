@@ -161,6 +161,13 @@ endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
+if(WITH_OTLP)
+  message(
+    WARNING
+      "WITH_OTLP is deprecated and will be removed in future. Please set either WITH_OTLP_GRPC or WITH_OTLP_HTTP, or even both."
+  )
+endif()
+
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
