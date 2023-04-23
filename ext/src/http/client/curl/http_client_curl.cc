@@ -257,7 +257,7 @@ void HttpClient::CleanupSession(uint64_t session_id)
       }
       else if (session->IsSessionActive() && session->GetOperation())
       {
-        // If this session is alread waiting to be removed, just wakeup background thread to call
+        // If this session is already running, give it to the background thread for cleanup.
         pending_to_abort_sessions_[session_id] = std::move(session);
         wakeupBackgroundThread();
       }
