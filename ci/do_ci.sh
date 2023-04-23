@@ -60,7 +60,7 @@ mkdir -p "${BUILD_DIR}"
 mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
-BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
+BAZEL_OPTIONS="--cxxopt=-std=c++14 --host_cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
@@ -163,6 +163,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
+        -DCMAKE_CXX_STANDARD=14 \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
@@ -413,7 +414,7 @@ elif [[ "$1" == "code.coverage" ]]; then
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
   echo "thrift=0.14.1" >> third_party_release
-  echo "abseil=20220623.1" >> third_party_release
+  echo "abseil=20230125.2" >> third_party_release
   git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi

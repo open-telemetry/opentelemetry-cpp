@@ -8,12 +8,12 @@ export DEBIAN_FRONTEND=noninteractive
 
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
-TAG=20220623.1
+TAG=20230125.2
 pushd $BUILD_DIR
 git clone --depth=1 -b ${TAG} https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
 mkdir build && pushd build
-cmake -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=11 \
+cmake -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=14 \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     ..
 make -j $(nproc)
