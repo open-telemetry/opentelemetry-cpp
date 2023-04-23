@@ -112,9 +112,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
+        sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip",
         ],
     )
 
