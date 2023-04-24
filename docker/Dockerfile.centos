@@ -37,7 +37,7 @@ RUN git clone --depth=1 -b $GRPC_VERSION  https://github.com/grpc/grpc.git \
     make -j${nproc} install && make clean && ldconfig
 
 # install thrift
-ARG THRIFT_VERSION=0.14.1
+ARG THRIFT_VERSION=0.18.1
 RUN yum install -y \
         boost169-devel \
         libevent-devel \

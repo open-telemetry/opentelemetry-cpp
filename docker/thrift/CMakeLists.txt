@@ -51,7 +51,7 @@ message("OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
 message("OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
 set(THRIFT_VERSION
-    "0.14.1"
+    "0.18.1"
     CACHE STRING "thrift version")
 
 include(ExternalProject)

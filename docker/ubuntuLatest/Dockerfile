@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y build-essential autoconf libtool pkg-co
     cd ../..
 
 #install thrift
-ARG THRIFT_VERSION=0.14.1
+ARG THRIFT_VERSION=0.18.1
 RUN apt-get install -y --no-install-recommends \
         libboost-all-dev \
         libevent-dev \

@@ -34,7 +34,7 @@ Help()
 
 base_image=${base_image:="alpine"}
 grpc_git_tag=${grpc_git_tag:="v1.43.2"}
-thrift_version=${thrift_version:="0.14.1"}
+thrift_version=${thrift_version:="0.18.1"}
 otel_git_tag=${otel_git_tag:="v1.3.0"}
 cores=${cores:=1}
 

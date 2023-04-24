@@ -158,10 +158,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_thrift",
         build_file_content = _ALL_CONTENT,
-        sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
-        strip_prefix = "thrift-0.14.1",
+        sha256 = "9cea30b9700153329ae1926cc05a20bbe3e8451ae270b0c8c5c5fe9929924cb3",
+        strip_prefix = "thrift-0.18.1",
         urls = [
-            "https://github.com/apache/thrift/archive/refs/tags/v0.14.1.tar.gz",
+            "https://github.com/apache/thrift/archive/refs/tags/v0.18.1.tar.gz",
         ],
     )
 

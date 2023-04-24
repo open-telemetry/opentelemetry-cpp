@@ -5,7 +5,7 @@ ARG BASE_IMAGE=ubuntu:latest
 FROM ${BASE_IMAGE} AS thrift
 
 ARG CORES=${nproc}
-ARG THRIFT_VERSION=0.14.1
+ARG THRIFT_VERSION=0.18.1
 
 RUN mkdir mkdir -p /opt/third_party/thrift
 

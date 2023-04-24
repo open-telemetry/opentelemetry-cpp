@@ -26,7 +26,7 @@ FROM base as thrift
 RUN apt-get install -y --no-install-recommends wget
 
 # install thrift
-ARG THRIFT_VERSION=0.14.1
+ARG THRIFT_VERSION=0.18.1
 ADD setup_thrift.sh .
 RUN ./setup_thrift.sh -i "/opt/otel-cpp"
 

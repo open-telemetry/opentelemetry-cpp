@@ -5,7 +5,7 @@
 
 set -e
 export DEBIAN_FRONTEND=noninteractive
-export THRIFT_VERSION=0.14.1
+export THRIFT_VERSION=0.18.1
 
 install_dir='/usr/local/'
 while getopts ":i:" o; do
