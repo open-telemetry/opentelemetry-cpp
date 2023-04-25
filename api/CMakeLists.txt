@@ -113,6 +113,11 @@ if(WITH_OTLP_HTTP_SSL_PREVIEW)
   endif()
 endif()
 
+if (WITH_OTLP_GRPC_MTLS_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_GRPC_MTLS_PREVIEW)
+endif()
+
 if(WITH_METRICS_EXEMPLAR_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)

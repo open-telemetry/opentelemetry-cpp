@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "absl/types/optional.h"
+#include "absl/types/variant.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <memory>
@@ -28,6 +30,19 @@ struct OtlpGrpcExporterOptions
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
   // SSL encryption.
   std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
+
+#ifdef ENABLE_OTLP_GRPC_MTLS_PREVIEW
+  // At most one of ssl_client_key_* should be non-empty. If use_ssl_credentials, they will
+  // be read to allow for mTLS.
+  std::string ssl_client_key_path   = GetOtlpDefaultTracesSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultTracesSslClientKeyString();
+
+  // At most one of ssl_client_cert_* should be non-empty. If use_ssl_credentials, they will
+  // be read to allow for mTLS.
+  std::string ssl_client_cert_path   = GetOtlpDefaultTracesSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
+#endif
+
   // Timeout for grpc deadline
   std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
   // Additional HTTP headers
