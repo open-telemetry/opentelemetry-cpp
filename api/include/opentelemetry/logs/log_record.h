@@ -64,7 +64,7 @@ public:
    * @param name Optional event name to set
    */
   // TODO: mark this as pure virtual once all exporters have been updated
-  virtual void SetEventId(int64_t id, nostd::string_view name = {}) noexcept {}
+  virtual void SetEventId(int64_t id, nostd::string_view name = {}) noexcept = 0;
 
   /**
    * Set the trace id for this log.

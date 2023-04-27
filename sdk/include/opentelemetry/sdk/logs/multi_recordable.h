@@ -56,6 +56,13 @@ public:
   void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override;
 
   /**
+   * Set the Event Id
+   * @param id the event id to set
+   * @param name  the event name to set
+   */
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override {}
+
+  /**
    * Set the trace id for this log.
    * @param trace_id the trace id to set
    */
