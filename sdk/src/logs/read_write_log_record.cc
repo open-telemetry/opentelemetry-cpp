@@ -65,6 +65,22 @@ const opentelemetry::common::AttributeValue &ReadWriteLogRecord::GetBody() const
   return body_;
 }
 
+void ReadWriteLogRecord::SetEventId(int64_t id, nostd::string_view name) noexcept
+{
+  event_id_   = id;
+  event_name_ = std::string{name};
+}
+
+int64_t ReadWriteLogRecord::GetEventId() const noexcept
+{
+  return event_id_;
+}
+
+nostd::string_view ReadWriteLogRecord::GetEventName() const noexcept
+{
+  return nostd::string_view{event_name_};
+}
+
 void ReadWriteLogRecord::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   if (!trace_state_)

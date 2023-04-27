@@ -48,9 +48,22 @@ template <>
 struct LogRecordSetterTrait<EventId>
 {
   template <class ArgumentType>
-  inline static LogRecord *Set(LogRecord *log_record, ArgumentType && /*arg*/) noexcept
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
-    // TODO: set log_record
+    log_record->SetEventId(arg.id_, nostd::string_view{arg.name_.get()});
+
+    return log_record;
+  }
+};
+
+template <>
+struct LogRecordSetterTrait<int64_t>
+{
+  template <class ArgumentType>
+  inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
+  {
+    log_record->SetEventId(arg, nostd::string_view{});
+
     return log_record;
   }
 };
