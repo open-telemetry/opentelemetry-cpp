@@ -13,35 +13,40 @@ namespace logs
 /**
  * Severity Levels assigned to log events, based on Log Data Model,
  * with the addition of kInvalid (mapped to a severity number of 0).
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
  */
 enum class Severity : uint8_t
 {
-  kInvalid,
-  kTrace,
-  kTrace2,
-  kTrace3,
-  kTrace4,
-  kDebug,
-  kDebug2,
-  kDebug3,
-  kDebug4,
-  kInfo,
-  kInfo2,
-  kInfo3,
-  kInfo4,
-  kWarn,
-  kWarn2,
-  kWarn3,
-  kWarn4,
-  kError,
-  kError2,
-  kError3,
-  kError4,
-  kFatal,
-  kFatal2,
-  kFatal3,
-  kFatal4
+  kInvalid = 0,
+  kTrace   = 1,
+  kTrace2  = 2,
+  kTrace3  = 3,
+  kTrace4  = 4,
+  kDebug   = 5,
+  kDebug2  = 6,
+  kDebug3  = 7,
+  kDebug4  = 8,
+  kInfo    = 9,
+  kInfo2   = 10,
+  kInfo3   = 11,
+  kInfo4   = 12,
+  kWarn    = 13,
+  kWarn2   = 14,
+  kWarn3   = 15,
+  kWarn4   = 16,
+  kError   = 17,
+  kError2  = 18,
+  kError3  = 19,
+  kError4  = 20,
+  kFatal   = 21,
+  kFatal2  = 22,
+  kFatal3  = 23,
+  kFatal4  = 24
 };
+
+const uint8_t kMaxSeverity = 255;
 
 /**
  * Mapping of the severity enum above, to a severity text string (in all caps).

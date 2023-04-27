@@ -12,6 +12,8 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
+set_target_version(opentelemetry_exporter_zipkin_trace)
+
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
   PUBLIC opentelemetry_trace opentelemetry_http_client_curl
