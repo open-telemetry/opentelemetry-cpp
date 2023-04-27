@@ -4,9 +4,6 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/logs/event_id.h"
-#  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/string_view.h"
@@ -14,8 +11,17 @@
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
 namespace logs
 {
+
+class EventId;
+class LogRecord;
+
 /**
  * Handles log record creation.
  **/

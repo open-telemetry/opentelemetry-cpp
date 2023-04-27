@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/plugin/detail/loader_info.h"
-#include "opentelemetry/plugin/factory.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
@@ -41,6 +40,11 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
+
+struct LoaderInfo;
+class Factory;
+class FactoryImpl;
+
 using OpenTelemetryHook =
     nostd::unique_ptr<Factory::FactoryImpl> (*)(const LoaderInfo &loader_info,
                                                 nostd::unique_ptr<char[]> &error_message);

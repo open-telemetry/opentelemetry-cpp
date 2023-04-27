@@ -14,6 +14,7 @@
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/scope.h"
+#  include "opentelemetry/trace/tracer.h"
 
 #  include <gtest/gtest.h>
 

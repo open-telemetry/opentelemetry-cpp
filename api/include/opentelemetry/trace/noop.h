@@ -7,17 +7,17 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
+#include <memory>
+
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
 
 namespace trace_api = opentelemetry::trace;
 
@@ -102,15 +102,14 @@ public:
 /**
  * No-op implementation of a TracerProvider.
  */
-class OPENTELEMETRY_EXPORT NoopTracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT NoopTracerProvider final : public trace_api::TracerProvider
 {
 public:
   NoopTracerProvider() noexcept
-      : tracer_{nostd::shared_ptr<opentelemetry::trace::NoopTracer>(
-            new opentelemetry::trace::NoopTracer)}
+      : tracer_{nostd::shared_ptr<trace_api::NoopTracer>(new trace_api::NoopTracer)}
   {}
 
-  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+  nostd::shared_ptr<trace_api::Tracer> GetTracer(
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */) noexcept override
@@ -119,7 +118,7 @@ public:
   }
 
 private:
-  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  nostd::shared_ptr<trace_api::Tracer> tracer_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

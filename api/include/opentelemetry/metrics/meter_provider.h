@@ -3,13 +3,16 @@
 
 #pragma once
 
-#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
+
+class Meter;
+
 /**
  * Creates new Meter instances.
  */
