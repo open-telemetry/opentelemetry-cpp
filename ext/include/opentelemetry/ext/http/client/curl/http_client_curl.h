@@ -359,7 +359,7 @@ private:
   std::recursive_mutex session_ids_m_;
   std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions_;
   std::unordered_set<uint64_t> pending_to_add_session_ids_;
-  std::unordered_set<uint64_t> pending_to_abort_session_ids_;
+  std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
   std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles_;
   std::list<std::shared_ptr<Session>> pending_to_remove_sessions_;
 
