@@ -123,7 +123,7 @@ public:
 
   void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
 
-  void SetEventId(int64_t id, nostd::string_view event_name) noexcept override {}
+  void SetEventId(int64_t, nostd::string_view) noexcept override {}
 
   void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
 
