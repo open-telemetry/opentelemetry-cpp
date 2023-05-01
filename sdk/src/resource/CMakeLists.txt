@@ -4,6 +4,7 @@
 add_library(opentelemetry_resources resource.cc resource_detector.cc)
 
 set_target_properties(opentelemetry_resources PROPERTIES EXPORT_NAME resources)
+set_target_version(opentelemetry_resources)
 
 target_link_libraries(opentelemetry_resources opentelemetry_common)
 

@@ -10,6 +10,7 @@
 #      define OPENTELEMETRY_LIKELY_IF(...) \
         if (__VA_ARGS__)                   \
         [[likely]]
+
 #    endif
 #  endif
 #endif
@@ -174,6 +175,31 @@ point.
 
 #  define OPENTELEMETRY_API_SINGLETON
 
+#endif
+
+//
+// Atomic wrappers based on compiler intrinsics for memory read/write.
+// The tailing number is read/write length in bits.
+//
+// N.B. Compiler instrinsic is used because the usage of C++ standard library is restricted in the
+// OpenTelemetry C++ API.
+//
+#if defined(__GNUC__)
+
+#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) __atomic_load_n(ptr, __ATOMIC_SEQ_CST)
+#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_SEQ_CST)
+
+#elif defined(_MSC_VER)
+
+#  include <intrin.h>
+
+#  define OPENTELEMETRY_ATOMIC_READ_8(ptr) \
+    static_cast<uint8_t>(_InterlockedCompareExchange8(reinterpret_cast<char *>(ptr), 0, 0))
+#  define OPENTELEMETRY_ATOMIC_WRITE_8(ptr, value) \
+    _InterlockedExchange8(reinterpret_cast<char *>(ptr), static_cast<char>(value))
+
+#else
+#  error port atomics read/write for the current platform
 #endif
 
 /* clang-format on */
