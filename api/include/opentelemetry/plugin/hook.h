@@ -42,7 +42,6 @@ namespace plugin
 {
 
 struct LoaderInfo;
-class Factory;
 class FactoryImpl;
 
 using OpenTelemetryHook =

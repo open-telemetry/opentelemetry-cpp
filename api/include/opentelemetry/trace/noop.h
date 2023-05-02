@@ -19,8 +19,6 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
-namespace trace_api = opentelemetry::trace;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -88,8 +86,8 @@ public:
   {
     // Don't allocate a no-op span for every StartSpan call, but use a static
     // singleton for this case.
-    static nostd::shared_ptr<trace_api::Span> noop_span(
-        new trace_api::NoopSpan{this->shared_from_this()});
+    static nostd::shared_ptr<trace::Span> noop_span(
+        new trace::NoopSpan{this->shared_from_this()});
 
     return noop_span;
   }
@@ -102,14 +100,14 @@ public:
 /**
  * No-op implementation of a TracerProvider.
  */
-class OPENTELEMETRY_EXPORT NoopTracerProvider final : public trace_api::TracerProvider
+class OPENTELEMETRY_EXPORT NoopTracerProvider final : public trace::TracerProvider
 {
 public:
   NoopTracerProvider() noexcept
-      : tracer_{nostd::shared_ptr<trace_api::NoopTracer>(new trace_api::NoopTracer)}
+      : tracer_{nostd::shared_ptr<trace::NoopTracer>(new trace::NoopTracer)}
   {}
 
-  nostd::shared_ptr<trace_api::Tracer> GetTracer(
+  nostd::shared_ptr<trace::Tracer> GetTracer(
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */) noexcept override
@@ -118,7 +116,7 @@ public:
   }
 
 private:
-  nostd::shared_ptr<trace_api::Tracer> tracer_;
+  nostd::shared_ptr<trace::Tracer> tracer_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
