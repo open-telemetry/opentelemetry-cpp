@@ -101,7 +101,7 @@ void MultiRecordable::SetBody(const opentelemetry::common::AttributeValue &messa
   }
 }
 
-void SetEventId(int64_t id, nostd::string_view name) noexcept
+void MultiRecordable::SetEventId(int64_t id, nostd::string_view name) noexcept
 {
   for (auto &recordable : recordables_)
   {
