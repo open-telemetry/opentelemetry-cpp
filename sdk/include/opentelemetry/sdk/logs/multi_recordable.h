@@ -60,8 +60,7 @@ public:
    * @param id the event id to set
    * @param name  the event name to set
    */
-  // TODO: implement set event id
-  void SetEventId(int64_t /* id */, nostd::string_view /* name */) noexcept override {}
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override;
 
   /**
    * Set the trace id for this log.

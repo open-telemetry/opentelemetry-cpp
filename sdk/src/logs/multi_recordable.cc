@@ -101,6 +101,17 @@ void MultiRecordable::SetBody(const opentelemetry::common::AttributeValue &messa
   }
 }
 
+void SetEventId(int64_t id, nostd::string_view name) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetEventId(id, name);
+    }
+  }
+}
+
 void MultiRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   for (auto &recordable : recordables_)
