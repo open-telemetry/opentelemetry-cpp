@@ -36,7 +36,8 @@ if(WITH_OTLP_GRPC)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_client
-    PUBLIC opentelemetry_sdk opentelemetry_ext opentelemetry_proto)
+    PUBLIC opentelemetry_sdk opentelemetry_common opentelemetry_ext
+           opentelemetry_proto)
 
   target_link_libraries(opentelemetry_exporter_otlp_grpc_client
                         PRIVATE gRPC::grpc++)
