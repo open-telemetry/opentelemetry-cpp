@@ -6,6 +6,11 @@
 #include <memory>
 #include <string>
 
+#ifdef _WIN32
+#  include "opentelemetry/plugin/detail/dynamic_load_windows.h"
+#else
+#  include "opentelemetry/plugin/detail/dynamic_load_unix.h"
+#endif
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
