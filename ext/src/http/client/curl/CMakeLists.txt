@@ -8,7 +8,8 @@ add_library(
 set_target_properties(opentelemetry_http_client_curl
                       PROPERTIES EXPORT_NAME http_client_curl)
 set_target_version(opentelemetry_http_client_curl)
-
+target_link_libraries(opentelemetry_http_client_curl
+                      PUBLIC opentelemetry_common)
 if(TARGET CURL::libcurl)
   target_link_libraries(
     opentelemetry_http_client_curl
