@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] SDK support for the new OTel log
+  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
 * [API] Add user facing Logging API and Benchmarks
