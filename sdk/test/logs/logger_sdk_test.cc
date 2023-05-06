@@ -79,6 +79,12 @@ public:
 
   void SetBody(const std::string &message) noexcept { body_ = message; }
 
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override
+  {
+    event_id_              = id;
+    log_record_event_name_ = static_cast<std::string>(name);
+  }
+
   void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
   {
     trace_id_ = trace_id;
@@ -145,6 +151,8 @@ public:
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
+  int64_t event_id_;
+  std::string log_record_event_name_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;

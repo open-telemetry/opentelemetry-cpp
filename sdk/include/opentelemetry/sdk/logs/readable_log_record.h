@@ -65,6 +65,18 @@ public:
   virtual const opentelemetry::common::AttributeValue &GetBody() const noexcept = 0;
 
   /**
+   * Get the Event id.
+   * @return the event id
+   */
+  virtual int64_t GetEventId() const noexcept = 0;
+
+  /**
+   * Get the Event Name.
+   * @return the event name
+   */
+  virtual nostd::string_view GetEventName() const noexcept = 0;
+
+  /**
    * Get the trace id of this log.
    * @return the trace id of this log
    */

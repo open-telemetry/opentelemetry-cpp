@@ -295,7 +295,7 @@ public:
                    nostd::string_view format,
                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->EmitLogRecord(severity, event_id, format, attributes);
+    this->EmitLogRecord(severity, EventId{event_id}, format, attributes);
   }
 
   virtual void Log(Severity severity,
@@ -324,7 +324,7 @@ public:
                     nostd::string_view format,
                     const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, event_id, format, attributes);
+    this->Log(Severity::kTrace, EventId{event_id}, format, attributes);
   }
 
   inline void Trace(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
@@ -345,7 +345,7 @@ public:
                     nostd::string_view format,
                     const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kDebug, event_id, format, attributes);
+    this->Log(Severity::kDebug, EventId{event_id}, format, attributes);
   }
 
   inline void Debug(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
@@ -366,7 +366,7 @@ public:
                    nostd::string_view format,
                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kInfo, event_id, format, attributes);
+    this->Log(Severity::kInfo, EventId{event_id}, format, attributes);
   }
 
   inline void Info(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
@@ -387,7 +387,7 @@ public:
                    nostd::string_view format,
                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kWarn, event_id, format, attributes);
+    this->Log(Severity::kWarn, EventId{event_id}, format, attributes);
   }
 
   inline void Warn(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
@@ -408,7 +408,7 @@ public:
                     nostd::string_view format,
                     const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kError, event_id, format, attributes);
+    this->Log(Severity::kError, EventId{event_id}, format, attributes);
   }
 
   inline void Error(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
@@ -429,7 +429,7 @@ public:
                     nostd::string_view format,
                     const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kFatal, event_id, format, attributes);
+    this->Log(Severity::kFatal, EventId{event_id}, format, attributes);
   }
 
   inline void Fatal(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
