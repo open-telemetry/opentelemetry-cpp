@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #include <memory>
 #include <string>
 
@@ -39,9 +40,8 @@ public:
    * @param error_message on failure this will contain an error message.
    * @return a Tracer on success or nullptr on failure.
    */
-  std::shared_ptr<opentelemetry::trace::Tracer> MakeTracer(
-      nostd::string_view tracer_config,
-      std::string &error_message) const noexcept
+  std::shared_ptr<trace::Tracer> MakeTracer(nostd::string_view tracer_config,
+                                            std::string &error_message) const noexcept
   {
     nostd::unique_ptr<char[]> plugin_error_message;
     auto tracer_handle = factory_impl_->MakeTracerHandle(tracer_config, plugin_error_message);
@@ -50,8 +50,8 @@ public:
       detail::CopyErrorMessage(plugin_error_message.get(), error_message);
       return nullptr;
     }
-    return std::shared_ptr<opentelemetry::trace::Tracer>{
-        new (std::nothrow) Tracer{library_handle_, std::move(tracer_handle)}};
+    return std::shared_ptr<trace::Tracer>{new (std::nothrow)
+                                              Tracer{library_handle_, std::move(tracer_handle)}};
   }
 
 private:
