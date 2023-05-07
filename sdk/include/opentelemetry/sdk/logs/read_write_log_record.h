@@ -88,6 +88,25 @@ public:
   const opentelemetry::common::AttributeValue &GetBody() const noexcept override;
 
   /**
+   * Set the Event Id object
+   * @param id  the event Id to set
+   * @param name the event name to set
+   */
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override;
+
+  /**
+   * Get event Id of this log.
+   * @return the event Id of this log.
+   */
+  int64_t GetEventId() const noexcept override;
+
+  /**
+   * Get event name of this log.
+   * @return the event name of this log.
+   */
+  nostd::string_view GetEventName() const noexcept override;
+
+  /**
    * Set the trace id for this log.
    * @param trace_id the trace id to set
    */
@@ -175,6 +194,9 @@ private:
   opentelemetry::common::AttributeValue body_;
   opentelemetry::common::SystemTimestamp timestamp_;
   opentelemetry::common::SystemTimestamp observed_timestamp_;
+
+  int64_t event_id_;
+  std::string event_name_;
 
   // We do not pay for trace state when not necessary
   struct TraceState

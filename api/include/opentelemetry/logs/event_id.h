@@ -18,13 +18,14 @@ namespace logs
 class EventId
 {
 public:
-  EventId(int64_t id, nostd::string_view name) noexcept
+  EventId(int64_t id, nostd::string_view name) noexcept : id_{id}
   {
-    id_   = id;
     name_ = nostd::unique_ptr<char[]>{new char[name.length() + 1]};
     std::copy(name.begin(), name.end(), name_.get());
     name_.get()[name.length()] = 0;
   }
+
+  EventId(int64_t id) noexcept : id_{id}, name_{nullptr} {}
 
 public:
   int64_t id_;
