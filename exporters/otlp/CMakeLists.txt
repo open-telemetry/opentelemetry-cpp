@@ -8,6 +8,7 @@ add_library(
   src/otlp_metric_utils.cc)
 set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
                                                                otlp_recordable)
+set_target_version(opentelemetry_otlp_recordable)
 
 target_include_directories(
   opentelemetry_otlp_recordable
@@ -28,6 +29,7 @@ if(WITH_OTLP_GRPC)
                                                       src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
+  set_target_version(opentelemetry_exporter_otlp_grpc_client)
 
   # Because opentelemetry_proto_grpc depends on gRPC, and gRPC can only be
   # linked in one dynamic library or executable (otherwise, there may be
@@ -36,10 +38,11 @@ if(WITH_OTLP_GRPC)
   # targets that depend on opentelemetry_proto_grpc.
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_client
-    PUBLIC opentelemetry_sdk opentelemetry_ext
+    PUBLIC opentelemetry_sdk opentelemetry_common opentelemetry_ext
            # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
            opentelemetry_proto_grpc
     PRIVATE gRPC::grpc++)
+
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
@@ -60,6 +63,7 @@ if(WITH_OTLP_GRPC)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
+  set_target_version(opentelemetry_exporter_otlp_grpc)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc
@@ -75,6 +79,7 @@ if(WITH_OTLP_GRPC)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_log
                         PROPERTIES EXPORT_NAME otlp_grpc_log_record_exporter)
+  set_target_version(opentelemetry_exporter_otlp_grpc_log)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_log
@@ -89,6 +94,7 @@ if(WITH_OTLP_GRPC)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
                         PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter)
+  set_target_version(opentelemetry_exporter_otlp_grpc_metrics)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_metrics
@@ -103,6 +109,8 @@ if(WITH_OTLP_HTTP)
   add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_http_client
                         PROPERTIES EXPORT_NAME otlp_http_client)
+  set_target_version(opentelemetry_exporter_otlp_http_client)
+
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_sdk opentelemetry_proto opentelemetry_http_client_curl
@@ -124,6 +132,7 @@ if(WITH_OTLP_HTTP)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)
+  set_target_version(opentelemetry_exporter_otlp_http)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http
@@ -140,6 +149,7 @@ if(WITH_OTLP_HTTP)
 
     set_target_properties(opentelemetry_exporter_otlp_http_log
                           PROPERTIES EXPORT_NAME otlp_http_log_record_exporter)
+    set_target_version(opentelemetry_exporter_otlp_http_log)
 
     target_link_libraries(
       opentelemetry_exporter_otlp_http_log
@@ -155,6 +165,7 @@ if(WITH_OTLP_HTTP)
 
   set_target_properties(opentelemetry_exporter_otlp_http_metric
                         PROPERTIES EXPORT_NAME otlp_http_metric_exporter)
+  set_target_version(opentelemetry_exporter_otlp_http_metric)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_metric

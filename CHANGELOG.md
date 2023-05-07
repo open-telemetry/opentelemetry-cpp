@@ -15,10 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] SDK support for the new OTel log
+  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
 * [BUILD] Allow build shared opentelemetry_proto on non-Windows platform.
   [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+* [API] Add user facing Logging API and Benchmarks
+  [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
 
 Deprecations:
 
@@ -467,7 +471,7 @@ update the semantic convention in instrumentation library is needed.
 * [BUILD] Don't require applications using jaeger exporter to know about libcurl
   [#1518](https://github.com/open-telemetry/opentelemetry-cpp/pull/1518)
 * [EXPORTER] Inline print_value() in ostream exporter [#1512](https://github.com/open-telemetry/opentelemetry-cpp/pull/1512)
-* [SDK] fix: urlPaser will incorrect parsing url like "http://abc.com/xxx@xxx/a/b"
+* [SDK] fix: urlPaser will incorrect parsing url like `http://abc.com/xxx@xxx/a/b`
   [#1511](https://github.com/open-telemetry/opentelemetry-cpp/pull/1511)
 * [SDK] Rename `InstrumentationLibrary` to `InstrumentationScope` [#1507](https://github.com/open-telemetry/opentelemetry-cpp/pull/1507)
 * [BUILD] Try to build nlohmann-json only it's depended. [#1505](https://github.com/open-telemetry/opentelemetry-cpp/pull/1505)

@@ -34,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "1f71c72ce08d2c1310011ea6436b31e39ccab8c2db94186d26657d41747c85d6",
-        strip_prefix = "benchmark-1.6.0",
+        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
+        strip_prefix = "benchmark-1.7.1",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.6.0.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
         ],
     )
 
@@ -112,9 +112,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
+        sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip",
         ],
     )
 
