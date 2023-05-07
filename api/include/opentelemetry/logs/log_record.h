@@ -59,6 +59,14 @@ public:
                             const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
   /**
+   * Set the Event Id.
+   * @param id The event id to set
+   * @param name Optional event name to set
+   */
+  // TODO: mark this as pure virtual once all exporters have been updated
+  virtual void SetEventId(int64_t id, nostd::string_view name = {}) noexcept = 0;
+
+  /**
    * Set the trace id for this log.
    * @param trace_id the trace id to set
    */
