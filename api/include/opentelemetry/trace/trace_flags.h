@@ -4,7 +4,6 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"

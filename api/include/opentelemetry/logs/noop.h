@@ -9,28 +9,21 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to logger.h for documentation on these interfaces.
 
-#  include <memory>
-
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/context/runtime_context.h"
+#  include "opentelemetry/logs/event_logger.h"
 #  include "opentelemetry/logs/event_logger_provider.h"
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/logs/logger_provider.h"
-#  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
-#  include "opentelemetry/version.h"
-
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
 namespace logs
 {
 /**
@@ -52,13 +45,10 @@ public:
 /**
  * No-op implementation of a LoggerProvider.
  */
-class NoopLoggerProvider final : public opentelemetry::logs::LoggerProvider
+class NoopLoggerProvider final : public LoggerProvider
 {
 public:
-  NoopLoggerProvider()
-      : logger_{
-            nostd::shared_ptr<opentelemetry::logs::NoopLogger>(new opentelemetry::logs::NoopLogger)}
-  {}
+  NoopLoggerProvider() : logger_{nostd::shared_ptr<NoopLogger>(new NoopLogger())} {}
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
                                       nostd::string_view /* library_name */,
@@ -71,7 +61,7 @@ public:
   }
 
 private:
-  nostd::shared_ptr<opentelemetry::logs::Logger> logger_;
+  nostd::shared_ptr<Logger> logger_;
 };
 
 class NoopEventLogger final : public EventLogger

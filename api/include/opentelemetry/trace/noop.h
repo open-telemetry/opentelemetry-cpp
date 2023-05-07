@@ -7,17 +7,17 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
+#include <memory>
+
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
 
 namespace trace_api = opentelemetry::trace;
 
@@ -88,8 +88,7 @@ public:
   {
     // Don't allocate a no-op span for every StartSpan call, but use a static
     // singleton for this case.
-    static nostd::shared_ptr<trace_api::Span> noop_span(
-        new trace_api::NoopSpan{this->shared_from_this()});
+    static nostd::shared_ptr<trace::Span> noop_span(new trace::NoopSpan{this->shared_from_this()});
 
     return noop_span;
   }
@@ -102,24 +101,22 @@ public:
 /**
  * No-op implementation of a TracerProvider.
  */
-class OPENTELEMETRY_EXPORT NoopTracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT NoopTracerProvider final : public trace::TracerProvider
 {
 public:
   NoopTracerProvider() noexcept
-      : tracer_{nostd::shared_ptr<opentelemetry::trace::NoopTracer>(
-            new opentelemetry::trace::NoopTracer)}
+      : tracer_{nostd::shared_ptr<trace::NoopTracer>(new trace::NoopTracer)}
   {}
 
-  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
-      nostd::string_view /* library_name */,
-      nostd::string_view /* library_version */,
-      nostd::string_view /* schema_url */) noexcept override
+  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* library_name */,
+                                             nostd::string_view /* library_version */,
+                                             nostd::string_view /* schema_url */) noexcept override
   {
     return tracer_;
   }
 
 private:
-  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  nostd::shared_ptr<trace::Tracer> tracer_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

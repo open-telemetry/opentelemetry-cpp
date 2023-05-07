@@ -6,7 +6,6 @@
 #include <mutex>
 
 #include "opentelemetry/context/propagation/noop_propagator.h"
-#include "opentelemetry/context/propagation/text_map_propagator.h"
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
@@ -19,6 +18,8 @@ namespace context
 {
 namespace propagation
 {
+
+class TextMapPropagator;
 
 /* Stores the singleton TextMapPropagator */
 
