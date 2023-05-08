@@ -92,6 +92,14 @@ public:
     return attributes_map_;
   }
 
+  void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override {
+    id_ = id;
+  }
+
+  int64_t GetEventId(void) const noexcept {
+    return id_;
+  }
+
   void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
   {
     trace_id_ = trace_id;
@@ -124,6 +132,7 @@ private:
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;
+  int64_t id_;
 };
 
 /**
