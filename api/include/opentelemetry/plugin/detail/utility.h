@@ -3,10 +3,12 @@
 
 #pragma once
 
-#include <memory>
+#if __EXCEPTIONS
+#  include <new>
+#endif  // __EXCEPTIONS
+
 #include <string>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

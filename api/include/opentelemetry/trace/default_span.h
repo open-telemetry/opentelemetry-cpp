@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

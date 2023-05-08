@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

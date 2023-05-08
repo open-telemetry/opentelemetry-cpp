@@ -26,14 +26,12 @@ public:
   static constexpr char kMembersSeparator   = ',';
   static constexpr char kMetadataSeparator  = ';';
 
-  Baggage() noexcept : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
-  Baggage(size_t size) noexcept
-      : kv_properties_(new opentelemetry::common::KeyValueProperties(size))
-  {}
+  Baggage() noexcept : kv_properties_(new common::KeyValueProperties()) {}
+  Baggage(size_t size) noexcept : kv_properties_(new common::KeyValueProperties(size)) {}
 
   template <class T>
   Baggage(const T &keys_and_values) noexcept
-      : kv_properties_(new opentelemetry::common::KeyValueProperties(keys_and_values))
+      : kv_properties_(new common::KeyValueProperties(keys_and_values))
   {}
 
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<Baggage> GetDefault()
@@ -293,7 +291,7 @@ private:
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
+  nostd::unique_ptr<common::KeyValueProperties> kv_properties_;
 };
 
 }  // namespace baggage
