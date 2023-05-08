@@ -165,7 +165,7 @@ static void BM_StructuredLogWithEventIdAndTwoAttributes(benchmark::State &state)
       for (int64_t i = 0; i < kMaxIterations; i++)
       {
         logger->Trace(
-            "This is a simple structured log message from {process_id}:{thread_id}",
+            0x12345678, "This is a simple structured log message from {process_id}:{thread_id}",
             opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
       }
     });
