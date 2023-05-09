@@ -238,11 +238,10 @@ else()
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
 endif()
 
-list(APPEND OTELCPP_PROTO_TARGET_OPTIONS)
-
 set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
 add_library(
   opentelemetry_proto
+  ${OTELCPP_PROTO_TARGET_OPTIONS}
   ${COMMON_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
   ${TRACE_PB_CPP_FILE}
@@ -255,8 +254,8 @@ add_library(
 if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
-    ${TRACE_SERVICE_GRPC_PB_CPP_FILE} ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
-    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+    ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
+    ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
