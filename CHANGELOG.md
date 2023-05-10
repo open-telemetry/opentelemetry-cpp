@@ -19,10 +19,21 @@ Increment the:
   [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
-* [BUILD] Allow build shared opentelemetry_proto on non-Windows platform.
+* [BUILD] Add opentelemetry_proto_grpc and allow build shared opentelemetry_proto
+  and opentelemetry_proto_grpc on non-Windows platform.
   [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
 * [API] Add user facing Logging API and Benchmarks
   [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
+
+Breaking changes:
+
+* Add opentelemetry_proto_grpc and move gRPC sources into it.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+  * There will be no breaking changes for users who only use OTLP exporters and
+    do not directly use opentelemetry-cpp::proto. However, it is important to
+    note that `opentelemetry-cpp::proto` no longer contains generated gRPC codes
+    , and all components that depend on these gRPC codes should also link to
+    `opentelemetry-cpp::proto_grpc`.
 
 Deprecations:
 
