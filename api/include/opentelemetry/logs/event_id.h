@@ -5,6 +5,9 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <algorithm>
+
+#  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/version.h"
 

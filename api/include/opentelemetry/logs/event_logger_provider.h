@@ -4,16 +4,17 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/logs/event_logger.h"
-#  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
+
+class EventLogger;
+class Logger;
+
 /**
  * Creates new EventLogger instances.
  */

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/plugin/dynamic_load.h"
+#include "opentelemetry/plugin/factory.h"
 
 #include <gtest/gtest.h>
 
