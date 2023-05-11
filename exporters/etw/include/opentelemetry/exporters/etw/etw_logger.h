@@ -18,6 +18,7 @@
 #  include <map>
 #  include <unordered_map>
 
+
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
@@ -27,6 +28,9 @@
 
 #  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_provider.h"
+#  include "opentelemetry/logs/severity.h"
+#  include "opentelemetry/logs/logger.h"
+
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_id.h"
 
