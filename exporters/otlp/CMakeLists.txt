@@ -16,9 +16,6 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 
 set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
-target_link_libraries(
-  opentelemetry_otlp_recordable
-  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 if(WITH_LOGS_PREVIEW)
   target_link_libraries(opentelemetry_otlp_recordable PUBLIC opentelemetry_logs)
@@ -34,13 +31,18 @@ if(WITH_OTLP_GRPC)
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   set_target_version(opentelemetry_exporter_otlp_grpc_client)
 
+  # Because opentelemetry_proto_grpc depends on gRPC, and gRPC can only be
+  # linked in one dynamic library or executable (otherwise, there may be
+  # conflicts with some global variables in certain versions of gRPC), we have
+  # switched the link for opentelemetry_exporter_otlp_grpc_client into all
+  # targets that depend on opentelemetry_proto_grpc.
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_client
     PUBLIC opentelemetry_sdk opentelemetry_common opentelemetry_ext
-           opentelemetry_proto)
+           # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
+           opentelemetry_proto_grpc
+    PRIVATE gRPC::grpc++)
 
-  target_link_libraries(opentelemetry_exporter_otlp_grpc_client
-                        PRIVATE gRPC::grpc++)
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
   if(GRPC_INCLUDE_DIRECTORY)
@@ -173,6 +175,10 @@ if(WITH_OTLP_HTTP)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_metric)
 endif()
+
+target_link_libraries(
+  opentelemetry_otlp_recordable
+  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(
