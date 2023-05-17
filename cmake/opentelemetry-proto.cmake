@@ -263,6 +263,13 @@ if(WITH_OTLP_GRPC)
   set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
                                                             proto_grpc)
   patch_protobuf_targets(opentelemetry_proto_grpc)
+  get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
+                      INTERFACE_INCLUDE_DIRECTORIES)
+  if(GRPC_INCLUDE_DIRECTORY)
+    target_include_directories(
+      opentelemetry_proto_grpc
+      PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
+  endif()
 endif()
 
 if(needs_proto_download)
