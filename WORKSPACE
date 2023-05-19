@@ -16,11 +16,13 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "97fa63d95cc9af006c4c7b2123ddd2a91fb8d273012f17648e6423bae2c69470",
-    strip_prefix = "bazel-lib-1.30.2",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.30.2/bazel-lib-v1.30.2.tar.gz",
+    sha256 = "e3151d87910f69cf1fc88755392d7c878034a69d6499b287bcfc00b1cf9bb415",
+    strip_prefix = "bazel-lib-1.32.1",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.32.1/bazel-lib-v1.32.1.tar.gz",
 )
+
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
+
 aspect_bazel_lib_dependencies()
 
 http_archive(
@@ -34,13 +36,14 @@ http_archive(
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "rules_pkg",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.0/rules_pkg-0.9.0.tar.gz",
-        "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.0/rules_pkg-0.9.0.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
     ],
-    sha256 = "335632735e625d408870ec3e361e192e99ef7462315caa887417f4d88c4c8fb8",
+    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
 )
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
@@ -64,8 +67,8 @@ http_file(
     name = "sentry_cli_windows_amd64",
     downloaded_file_path = "sentry-cli.exe",
     executable = True,
-    sha256 = "3971a181dac9b265fd0db168e244c1e2fb08cbeeb659bd60c1ef32da9e9b9204",
+    #sha256 = "3971a181dac9b265fd0db168e244c1e2fb08cbeeb659bd60c1ef32da9e9b9204",
     urls = [
-        "https://github.com/getsentry/sentry-cli/releases/download/2.17.3/sentry-cli-Windows-x86_64.exe",
+        "https://github.com/getsentry/sentry-cli/releases/download/2.17.5/sentry-cli-Windows-x86_64.exe",
     ],
 )
