@@ -8,6 +8,11 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+// CURL_VERSION_BITS was added in CURL 7.43.0
+#ifndef CURL_VERSION_BITS
+#  define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {

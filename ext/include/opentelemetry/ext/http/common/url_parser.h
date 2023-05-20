@@ -84,7 +84,7 @@ public:
     pos = url_.find_first_of("/?", cpos);
     if (pos == std::string::npos)
     {
-      path_ = "/";  // use default path
+      path_ = std::string("/");  // use default path
       if (is_port)
       {
         port_ = static_cast<uint16_t>(
@@ -123,7 +123,7 @@ public:
       }
       return;
     }
-    path_ = "/";
+    path_ = std::string("/");
     if (url_[cpos] == '?')
     {
       query_ = std::string(url_.begin() + cpos, url_.begin() + url_.length());

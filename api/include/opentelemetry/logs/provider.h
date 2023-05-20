@@ -8,14 +8,17 @@
 
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/logs/event_logger_provider.h"
-#  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/logs/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
+
+class EventLoggerProvider;
+class LoggerProvider;
+
 /**
  * Stores the singleton global LoggerProvider.
  */

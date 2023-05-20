@@ -12,6 +12,7 @@ add_library(
   ../../include/opentelemetry/ext/zpages/tracez_http_server.h)
 
 set_target_properties(opentelemetry_zpages PROPERTIES EXPORT_NAME zpages)
+set_target_version(opentelemetry_zpages)
 
 target_link_libraries(opentelemetry_zpages PUBLIC opentelemetry_ext
                                                   opentelemetry_trace)

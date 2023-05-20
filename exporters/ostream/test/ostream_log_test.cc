@@ -20,6 +20,8 @@ namespace nostd        = opentelemetry::nostd;
 namespace exporterlogs = opentelemetry::exporter::logs;
 namespace common       = opentelemetry::common;
 
+using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -103,6 +105,8 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
+      "  event_id           : 0\n"
+      "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",
@@ -176,6 +180,8 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
+      "  event_id           : 0\n"
+      "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",
@@ -248,6 +254,8 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
       "    key1: val1\n",
       "  attributes         : \n",
       "    a: 1\n",
+      "  event_id           : 0\n"
+      "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",
@@ -327,6 +335,8 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
       "    res1: [1,2,3]\n",
       "  attributes         : \n",
       "    attr1: [0,1,0]\n",
+      "  event_id           : 0\n"
+      "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",
@@ -398,6 +408,79 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
+      "  event_id           : 0\n"
+      "  event_name         : \n",
+      "  trace_id           : 00000000000000000000000000000000\n",
+      "  span_id            : 0000000000000000\n",
+      "  trace_flags        : 00\n",
+      "  scope              : \n",
+      "    name             : opentelelemtry_library\n",
+      "    version          : " OPENTELEMETRY_SDK_VERSION "\n",
+      "    schema_url       : https://opentelemetry.io/schemas/1.11.0\n",
+      "    attributes       : \n",
+      "      scope.attr.key: 123\n",
+      "}\n"};
+
+  std::string ostream_output = stdcoutOutput.str();
+  for (auto &expected : expected_output)
+  {
+    std::string::size_type result = ostream_output.find(expected);
+    if (result == std::string::npos)
+    {
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+    }
+    ASSERT_NE(result, std::string::npos);
+  }
+}
+
+// Test using the simple log processor and ostream exporter to cout
+// and use the rest of the logging pipeline (Logger, LoggerProvider, Provider) and user-facing API
+// as well
+TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
+{
+  // Initialize a logger
+  auto exporter =
+      std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogRecordExporter);
+  auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
+  sdkProvider->AddProcessor(std::unique_ptr<sdklogs::LogRecordProcessor>(
+      new sdklogs::SimpleLogRecordProcessor(std::move(exporter))));
+  auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
+  auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
+  logs_api::Provider::SetLoggerProvider(provider);
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
+      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url, true,
+      {{"scope.attr.key", 123}});
+
+  // Back up cout's streambuf
+  std::streambuf *original = std::cout.rdbuf();
+
+  // Redirect cout to our string stream
+  std::stringstream stdcoutOutput;
+  std::cout.rdbuf(stdcoutOutput.rdbuf());
+
+  logs_api::EventId event_id{12345678, "test_event_id"};
+
+  // Write a log to ostream exporter
+  logger->Debug(event_id, "Hello {key1} {key2}",
+                common::MakeKeyValueIterableView<Attributes>({{"key1", 123}, {"key2", "value2"}}));
+
+  // Restore cout's original streambuf
+  std::cout.rdbuf(original);
+
+  // Compare actual vs expected outputs
+  std::vector<std::string> expected_output{
+      "  severity_num       : 5\n"
+      "  severity_text      : DEBUG\n"
+      "  body               : Hello {key1} {key2}\n",
+      "  resource           : \n",
+      "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "    service.name: unknown_service\n",
+      "    telemetry.sdk.name: opentelemetry\n",
+      "    telemetry.sdk.language: cpp\n",
+      "  attributes         : \n",
+      "  event_id           : 12345678\n"
+      "  event_name         : test_event_id\n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",

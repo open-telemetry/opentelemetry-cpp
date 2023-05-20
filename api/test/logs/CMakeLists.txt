@@ -10,3 +10,9 @@ foreach(testname provider_test logger_test)
     TEST_PREFIX logs.
     TEST_LIST logs_api_${testname})
 endforeach()
+
+if(WITH_BENCHMARK)
+  add_executable(logger_benchmark logger_benchmark.cc)
+  target_link_libraries(logger_benchmark benchmark::benchmark
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+endif()

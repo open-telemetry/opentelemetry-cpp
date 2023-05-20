@@ -3,10 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/metrics/async_instruments.h"
-#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
@@ -14,6 +11,18 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
+
+template <typename T>
+class Counter;
+
+template <typename T>
+class Histogram;
+
+template <typename T>
+class UpDownCounter;
+
+class ObservableInstrument;
+
 /**
  * Handles instrument creation and provides a facility for batch recording.
  *

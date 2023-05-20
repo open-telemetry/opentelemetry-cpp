@@ -22,8 +22,10 @@ add_library(
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
+set_target_version(opentelemetry_metrics)
 
-target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common)
+target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common
+                                                   opentelemetry_resources)
 
 target_include_directories(
   opentelemetry_metrics
