@@ -42,7 +42,7 @@ N/A
 
 #### Motivation (C++11)
 
-Opentelemetry-cpp supports a "bring your own dependency" model.
+This repository, opentelemetry-cpp, supports a "bring your own dependency" model.
 
 In this model,
 the build scripts can be configured to:
@@ -85,7 +85,7 @@ instead of C++11.
 
 #### Planned end of life (C++11)
 
-Opentelemetry-cpp support for C++11 will end on September 2023.
+Support for C++11 in opentelemetry-cpp will end on September 2023.
 
 After this date, opentelemetry-cpp may still build properly in C++11 mode,
 assuming a suitable, old, version for each dependency is used,
