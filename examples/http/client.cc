@@ -39,7 +39,7 @@ void sendRequest(const std::string &url)
   prop->Inject(carrier, current_ctx);
 
   // send http request
-  http_client::Result result = http_client->Get(url, carrier.headers_);
+  http_client::Result result = http_client->GetNoSsl(url, carrier.headers_);
   if (result)
   {
     // set span attributes

@@ -95,6 +95,10 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        if (temporality == AggregationTemporality::kCumulative)
+        {
+          EXPECT_EQ(metric_data.start_ts, sdk_start_ts);
+        }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -234,6 +238,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        if (temporality == AggregationTemporality::kCumulative)
+        {
+          EXPECT_EQ(metric_data.start_ts, sdk_start_ts);
+        }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);

@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/string_view.h"
-
 #include <algorithm>
 #include <cstring>
+
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

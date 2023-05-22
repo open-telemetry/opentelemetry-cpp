@@ -3,18 +3,17 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/version.h"
-
-#include <chrono>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

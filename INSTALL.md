@@ -229,7 +229,7 @@ load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 opentelemetry_cpp_deps()
 
-# Load extra dependencies required for OpenTelemetry
+# (required after v1.8.0) Load extra dependencies required for OpenTelemetry
 load("@io_opentelemetry_cpp//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
 
 opentelemetry_extra_deps()

@@ -6,6 +6,8 @@ trap { $host.SetShouldExit(1) }
 
 $action = $args[0]
 
+$nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
+
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
 $BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
@@ -40,7 +42,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -61,7 +63,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -89,7 +91,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -110,7 +112,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -131,7 +133,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -153,7 +155,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -175,7 +177,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -196,7 +198,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -213,7 +215,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
