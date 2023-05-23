@@ -76,7 +76,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   }
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
-  auto result = http_client_->Post(url_parser_.url_, body_v, options_.headers);
+  auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
   if (result &&
       (result.GetResponse().GetStatusCode() == 200 || result.GetResponse().GetStatusCode() == 202))
   {
@@ -108,6 +108,11 @@ void ZipkinExporter::InitializeLocalEndpoint()
     local_end_point_["ipv6"] = options_.ipv6;
   }
   local_end_point_["port"] = url_parser_.port_;
+}
+
+bool ZipkinExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+{
+  return true;
 }
 
 bool ZipkinExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept

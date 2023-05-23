@@ -7,6 +7,7 @@ add_library(${this_target} src/shim_utils.cc src/span_shim.cc
                            src/span_context_shim.cc src/tracer_shim.cc)
 
 set_target_properties(${this_target} PROPERTIES EXPORT_NAME opentracing_shim)
+set_target_version(${this_target})
 
 target_include_directories(
   ${this_target} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"

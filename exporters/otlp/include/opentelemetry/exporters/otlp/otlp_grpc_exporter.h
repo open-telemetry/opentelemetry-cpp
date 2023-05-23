@@ -53,6 +53,14 @@ public:
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   /**
+   * Force flush the exporter.
+   * @param timeout an option timeout, default to max.
+   * @return return true when all data are exported, and false when timeout
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+
+  /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
@@ -67,6 +75,7 @@ private:
 
   // For testing
   friend class OtlpGrpcExporterTestPeer;
+  friend class OtlpGrpcLogRecordExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;

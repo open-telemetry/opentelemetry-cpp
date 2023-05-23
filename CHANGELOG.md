@@ -15,6 +15,122 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] SDK support for the new OTel log
+  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
+* [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
+  [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+* [BUILD] Add opentelemetry_proto_grpc and allow build shared opentelemetry_proto
+  and opentelemetry_proto_grpc on non-Windows platform.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+* [API] Add user facing Logging API and Benchmarks
+  [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
+* [DEPRECATION] Drop C++11 support
+  [#2146](https://github.com/open-telemetry/opentelemetry-cpp/pull/2146)
+
+Breaking changes:
+
+* Add opentelemetry_proto_grpc and move gRPC sources into it.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+  * There will be no breaking changes for users who only use OTLP exporters and
+    do not directly use opentelemetry-cpp::proto. However, it is important to
+    note that `opentelemetry-cpp::proto` no longer contains generated gRPC codes
+    , and all components that depend on these gRPC codes should also link to
+    `opentelemetry-cpp::proto_grpc`.
+
+Deprecations:
+
+* The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+* C++11 support is to end, C++14 will be supported instead,
+  see [DEPRECATED](./DEPRECATED.md) for details.
+
+## [1.9.0] 2023-04-12
+
+* [CI] Make build environment parallel (Windows)
+  [#2080](https://github.com/open-telemetry/opentelemetry-cpp/pull/2080)
+* [CI] Make build environment parallel (Linux)
+  [#2076](https://github.com/open-telemetry/opentelemetry-cpp/pull/2076)
+* [CI] Remove separate run of metrics ostream example
+  [#2030](https://github.com/open-telemetry/opentelemetry-cpp/pull/2030)
+
+* [BUILD] Include directory path added for Zipkin exporter example
+  [#2069](https://github.com/open-telemetry/opentelemetry-cpp/pull/2069)
+* [BUILD] Ignore more warning in generated protobuf files
+  [#2067](https://github.com/open-telemetry/opentelemetry-cpp/pull/2067)
+* [BUILD] Clean warnings in ETW exporters
+  [#2063](https://github.com/open-telemetry/opentelemetry-cpp/pull/2063)
+* [BUILD] Fix default value of OPENTELEMETRY_INSTALL_default
+  [#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
+
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.20.0
+  [#2088](https://github.com/open-telemetry/opentelemetry-cpp/pull/2088)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
+  [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
+
+* [API] Checking indices before dereference in string utils
+  [#2040](https://github.com/open-telemetry/opentelemetry-cpp/pull/2040)
+* [API] Export factory class of log provider
+  [#2041](https://github.com/open-telemetry/opentelemetry-cpp/pull/2041)
+
+* [SDK] Implement Forceflush for Periodic Metric Reader
+  [#2064](https://github.com/open-telemetry/opentelemetry-cpp/pull/2064)
+* [SDK] Add `ForceFlush` for all `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+* [SDK] Fix schema URL precedence bug in `Resource::Merge`
+  [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [SDK] Use sdk_start_ts for MetricData start_ts for instruments having
+  cumulative aggregation temporality.
+  [#2086](https://github.com/open-telemetry/opentelemetry-cpp/pull/2086)
+
+* [EXPORTER] Add OTLP HTTP SSL support
+  [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+
+* [EXAMPLES] Remove unused 'alerting' section from prometheus.yml in examples
+  [#2055](https://github.com/open-telemetry/opentelemetry-cpp/pull/2055)
+* [EXAMPLES] Fix view names in Prometheus example
+  [#2034](https://github.com/open-telemetry/opentelemetry-cpp/pull/2034)
+
+* [DOC] Fix some docs typo
+  [#2057](https://github.com/open-telemetry/opentelemetry-cpp/pull/2057)
+* [DOC] Update OpenTracing shim README.md
+  [#2028](https://github.com/open-telemetry/opentelemetry-cpp/pull/2028)
+* [DOC] INSTALL doc clarifications
+  [#2078](https://github.com/open-telemetry/opentelemetry-cpp/pull/2078)
+
+Important changes:
+
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+  * The logic to decide whether or not an OTLP GRPC exporter uses SSL has
+    changed to comply with the specification:
+    * Before this change, the following settings were evaluated, in order:
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * With this change, the following settings are evaluated, in order:
+      * The GRPC endpoint scheme, if provided:
+        * "https" imply with SSL,
+        * "http" imply without ssl.
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE
+      * OTEL_EXPORTER_OTLP_INSECURE
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * As a result, a behavior change for GRPC SSL is possible,
+      because the endpoint scheme now takes precedence.
+      Please verify configuration settings for the GRPC endpoint.
+* [SDK] Add `ForceFlush` for all `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+  * `LogRecordExporter` and `SpanExporter` add a new virtual function
+    `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+    `SpanExporter`, they should also implement this function.
+    There should be no impact if users only use factory to create exporters.
+
+Deprecations:
+
+* The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+
 ## [1.8.3] 2023-03-06
 
 * Provide version major/minor/patch macros
@@ -370,7 +486,7 @@ update the semantic convention in instrumentation library is needed.
 * [BUILD] Don't require applications using jaeger exporter to know about libcurl
   [#1518](https://github.com/open-telemetry/opentelemetry-cpp/pull/1518)
 * [EXPORTER] Inline print_value() in ostream exporter [#1512](https://github.com/open-telemetry/opentelemetry-cpp/pull/1512)
-* [SDK] fix: urlPaser will incorrect parsing url like "http://abc.com/xxx@xxx/a/b"
+* [SDK] fix: urlPaser will incorrect parsing url like `http://abc.com/xxx@xxx/a/b`
   [#1511](https://github.com/open-telemetry/opentelemetry-cpp/pull/1511)
 * [SDK] Rename `InstrumentationLibrary` to `InstrumentationScope` [#1507](https://github.com/open-telemetry/opentelemetry-cpp/pull/1507)
 * [BUILD] Try to build nlohmann-json only it's depended. [#1505](https://github.com/open-telemetry/opentelemetry-cpp/pull/1505)

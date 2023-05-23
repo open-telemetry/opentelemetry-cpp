@@ -103,6 +103,60 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
   return context;
 }
 
+std::unique_ptr<grpc::CompletionQueue> OtlpGrpcClient::MakeCompletionQueue()
+{
+  return std::unique_ptr<grpc::CompletionQueue>(new grpc::CompletionQueue());
+}
+
+std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>
+OtlpGrpcClient::MakeTraceServiceStub(const OtlpGrpcExporterOptions &options)
+{
+  return proto::collector::trace::v1::TraceService::NewStub(MakeChannel(options));
+}
+
+std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
+OtlpGrpcClient::MakeMetricsServiceStub(const OtlpGrpcExporterOptions &options)
+{
+  return proto::collector::metrics::v1::MetricsService::NewStub(MakeChannel(options));
+}
+
+#ifdef ENABLE_LOGS_PREVIEW
+std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
+OtlpGrpcClient::MakeLogsServiceStub(const OtlpGrpcExporterOptions &options)
+{
+  return proto::collector::logs::v1::LogsService::NewStub(MakeChannel(options));
+}
+#endif
+
+grpc::Status OtlpGrpcClient::DelegateExport(
+    proto::collector::trace::v1::TraceService::StubInterface *stub,
+    grpc::ClientContext *context,
+    const proto::collector::trace::v1::ExportTraceServiceRequest &request,
+    proto::collector::trace::v1::ExportTraceServiceResponse *response)
+{
+  return stub->Export(context, request, response);
+}
+
+grpc::Status OtlpGrpcClient::DelegateExport(
+    proto::collector::metrics::v1::MetricsService::StubInterface *stub,
+    grpc::ClientContext *context,
+    const proto::collector::metrics::v1::ExportMetricsServiceRequest &request,
+    proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
+{
+  return stub->Export(context, request, response);
+}
+
+#ifdef ENABLE_LOGS_PREVIEW
+grpc::Status OtlpGrpcClient::DelegateExport(
+    proto::collector::logs::v1::LogsService::StubInterface *stub,
+    grpc::ClientContext *context,
+    const proto::collector::logs::v1::ExportLogsServiceRequest &request,
+    proto::collector::logs::v1::ExportLogsServiceResponse *response)
+{
+  return stub->Export(context, request, response);
+}
+#endif
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

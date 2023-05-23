@@ -30,6 +30,7 @@ public:
   opentelemetry::sdk::trace::SamplingResult ShouldSample(
       const opentelemetry::trace::Span &span) noexcept override
   {
+    UNREFERENCED_PARAMETER(span);
     return {opentelemetry::sdk::trace::Decision::RECORD_AND_SAMPLE};
   }
 };

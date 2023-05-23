@@ -6,6 +6,12 @@
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+
+// CURL_VERSION_BITS was added in CURL 7.43.0
+#ifndef CURL_VERSION_BITS
+#  define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -229,6 +235,9 @@ void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState
 
 HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              std::string url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                             const HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
                              opentelemetry::ext::http::client::EventHandler *event_handle,
                              // Default empty headers and empty request body
                              const opentelemetry::ext::http::client::Headers &request_headers,
@@ -249,6 +258,9 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       event_handle_(event_handle),
       method_(method),
       url_(url),
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+      ssl_options_(ssl_options),
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
@@ -339,8 +351,8 @@ void HttpOperation::Cleanup()
     case opentelemetry::ext::http::client::SessionState::Connecting:
     case opentelemetry::ext::http::client::SessionState::Connected:
     case opentelemetry::ext::http::client::SessionState::Sending: {
-      DispatchEvent(opentelemetry::ext::http::client::SessionState::Cancelled,
-                    curl_easy_strerror(last_curl_result_));
+      const char *message = GetCurlErrorMessage(last_curl_result_);
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::Cancelled, message);
       break;
     }
     default:
@@ -398,6 +410,152 @@ void HttpOperation::Cleanup()
   }
 }
 
+/*
+  Support for TLS min version, TLS max version.
+
+  To represent versions, the following symbols are needed:
+
+  Added in CURL 7.34.0:
+  - CURL_SSLVERSION_TLSv1_0
+  - CURL_SSLVERSION_TLSv1_1
+  - CURL_SSLVERSION_TLSv1_2
+
+  Added in CURL 7.52.0:
+  - CURL_SSLVERSION_TLSv1_3
+
+  Added in CURL 7.54.0:
+  - CURL_SSLVERSION_MAX_TLSv1_0
+  - CURL_SSLVERSION_MAX_TLSv1_1
+  - CURL_SSLVERSION_MAX_TLSv1_2
+  - CURL_SSLVERSION_MAX_TLSv1_3
+
+  For 7.34.0 <= CURL < 7.54.0,
+  we don't want to get into partial support.
+
+  CURL 7.54.0 is required.
+*/
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 54, 0)
+#  define HAVE_TLS_VERSION
+#endif
+
+#ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
+static long parse_min_ssl_version(std::string version)
+{
+#  ifdef HAVE_TLS_VERSION
+  if (version == "1.0")
+  {
+    return CURL_SSLVERSION_TLSv1_0;
+  }
+
+  if (version == "1.1")
+  {
+    return CURL_SSLVERSION_TLSv1_1;
+  }
+
+  if (version == "1.2")
+  {
+    return CURL_SSLVERSION_TLSv1_2;
+  }
+
+  if (version == "1.3")
+  {
+    return CURL_SSLVERSION_TLSv1_3;
+  }
+#  endif
+
+  return 0;
+}
+
+static long parse_max_ssl_version(std::string version)
+{
+#  ifdef HAVE_TLS_VERSION
+  if (version == "1.0")
+  {
+    return CURL_SSLVERSION_MAX_TLSv1_0;
+  }
+
+  if (version == "1.1")
+  {
+    return CURL_SSLVERSION_MAX_TLSv1_1;
+  }
+
+  if (version == "1.2")
+  {
+    return CURL_SSLVERSION_MAX_TLSv1_2;
+  }
+
+  if (version == "1.3")
+  {
+    return CURL_SSLVERSION_MAX_TLSv1_3;
+  }
+#  endif
+
+  return 0;
+}
+#endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
+
+const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
+{
+  const char *message;
+
+  if (curl_error_message_[0] != '\0')
+  {
+    // Will contain contextual data
+    message = curl_error_message_;
+  }
+  else
+  {
+    // Generic message
+    message = curl_easy_strerror(code);
+  }
+
+  return message;
+}
+
+CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
+{
+  CURLcode rc;
+
+  /*
+    curl_easy_setopt() is a macro with variadic arguments, type unsafe.
+    Various SetCurlXxxOption() helpers ensure it is called with a pointer,
+    which can be:
+    - a string (const char*)
+    - a blob (struct curl_blob*)
+    - a headers chunk (curl_slist *)
+  */
+  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+
+  if (rc != CURLE_OK)
+  {
+    const char *message = GetCurlErrorMessage(rc);
+    OTEL_INTERNAL_LOG_ERROR("CURL, set option <" << std::to_string(option) << "> failed: <"
+                                                 << message << ">");
+  }
+
+  return rc;
+}
+
+CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
+{
+  CURLcode rc;
+
+  /*
+    curl_easy_setopt() is a macro with variadic arguments, type unsafe.
+    SetCurlLongOption() ensures it is called with a long.
+  */
+  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+
+  if (rc != CURLE_OK)
+  {
+    const char *message = GetCurlErrorMessage(rc);
+    OTEL_INTERNAL_LOG_ERROR("CURL, set option <" << std::to_string(option) << "> failed: <"
+                                                 << message << ">");
+  }
+
+  return rc;
+}
+
 CURLcode HttpOperation::Setup()
 {
   if (!curl_resource_.easy_handle)
@@ -405,54 +563,403 @@ CURLcode HttpOperation::Setup()
     return CURLE_FAILED_INIT;
   }
 
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_VERBOSE, 0);
+  CURLcode rc;
+
+  curl_error_message_[0] = '\0';
+  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
+
+  rc = SetCurlLongOption(CURLOPT_VERBOSE, 0L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 
   // Specify target URL
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_URL, url_.c_str());
+  rc = SetCurlStrOption(CURLOPT_URL, url_.c_str());
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 
-  // TODO: support ssl cert verification for https request
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYPEER, 0);  // 1L
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  if (ssl_options_.use_ssl)
+  {
+    /* 1 - CA CERT */
+
+    if (!ssl_options_.ssl_ca_cert_path.empty())
+    {
+      const char *path = ssl_options_.ssl_ca_cert_path.c_str();
+
+      rc = SetCurlStrOption(CURLOPT_CAINFO, path);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+    else if (!ssl_options_.ssl_ca_cert_string.empty())
+    {
+#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 77, 0)
+      const char *data = ssl_options_.ssl_ca_cert_string.c_str();
+      size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
+
+      struct curl_blob stblob;
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
+      stblob.flags = CURL_BLOB_COPY;
+
+      rc = SetCurlBlobOption(CURLOPT_CAINFO_BLOB, &stblob);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+#  else
+      // CURL 7.77.0 required for CURLOPT_CAINFO_BLOB.
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.77.0 required for CA CERT STRING");
+      return CURLE_UNKNOWN_OPTION;
+#  endif
+    }
+
+    /* 2 - CLIENT KEY */
+
+    if (!ssl_options_.ssl_client_key_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_key_path.c_str();
+
+      rc = SetCurlStrOption(CURLOPT_SSLKEY, path);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlStrOption(CURLOPT_SSLKEYTYPE, "PEM");
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+    else if (!ssl_options_.ssl_client_key_string.empty())
+    {
+#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
+      const char *data = ssl_options_.ssl_client_key_string.c_str();
+      size_t data_len  = ssl_options_.ssl_client_key_string.length();
+
+      struct curl_blob stblob;
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
+      stblob.flags = CURL_BLOB_COPY;
+
+      rc = SetCurlBlobOption(CURLOPT_SSLKEY_BLOB, &stblob);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlStrOption(CURLOPT_SSLKEYTYPE, "PEM");
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+#  else
+      // CURL 7.71.0 required for CURLOPT_SSLKEY_BLOB.
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT KEY STRING");
+      return CURLE_UNKNOWN_OPTION;
+#  endif
+    }
+
+    /* 3 - CLIENT CERT */
+
+    if (!ssl_options_.ssl_client_cert_path.empty())
+    {
+      const char *path = ssl_options_.ssl_client_cert_path.c_str();
+
+      rc = SetCurlStrOption(CURLOPT_SSLCERT, path);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlStrOption(CURLOPT_SSLCERTTYPE, "PEM");
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+    else if (!ssl_options_.ssl_client_cert_string.empty())
+    {
+#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
+      const char *data = ssl_options_.ssl_client_cert_string.c_str();
+      size_t data_len  = ssl_options_.ssl_client_cert_string.length();
+
+      struct curl_blob stblob;
+      stblob.data  = const_cast<char *>(data);
+      stblob.len   = data_len;
+      stblob.flags = CURL_BLOB_COPY;
+
+      rc = SetCurlBlobOption(CURLOPT_SSLCERT_BLOB, &stblob);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlStrOption(CURLOPT_SSLCERTTYPE, "PEM");
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+#  else
+      // CURL 7.71.0 required for CURLOPT_SSLCERT_BLOB.
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT CERT STRING");
+      return CURLE_UNKNOWN_OPTION;
+#  endif
+    }
+
+#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
+    /* 4 - TLS */
+
+    long min_ssl_version = 0;
+
+    if (!ssl_options_.ssl_min_tls.empty())
+    {
+#    ifdef HAVE_TLS_VERSION
+      min_ssl_version = parse_min_ssl_version(ssl_options_.ssl_min_tls);
+
+      if (min_ssl_version == 0)
+      {
+        OTEL_INTERNAL_LOG_ERROR("Unknown min TLS version <" << ssl_options_.ssl_min_tls << ">");
+        return CURLE_UNKNOWN_OPTION;
+      }
+#    else
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MIN TLS");
+      return CURLE_UNKNOWN_OPTION;
+#    endif
+    }
+
+    long max_ssl_version = 0;
+
+    if (!ssl_options_.ssl_max_tls.empty())
+    {
+#    ifdef HAVE_TLS_VERSION
+      max_ssl_version = parse_max_ssl_version(ssl_options_.ssl_max_tls);
+
+      if (max_ssl_version == 0)
+      {
+        OTEL_INTERNAL_LOG_ERROR("Unknown max TLS version <" << ssl_options_.ssl_max_tls << ">");
+        return CURLE_UNKNOWN_OPTION;
+      }
+#    else
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MAX TLS");
+      return CURLE_UNKNOWN_OPTION;
+#    endif
+    }
+
+    long version_range = min_ssl_version | max_ssl_version;
+    if (version_range != 0)
+    {
+      rc = SetCurlLongOption(CURLOPT_SSLVERSION, version_range);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+
+    /* 5 - CIPHER */
+
+    if (!ssl_options_.ssl_cipher.empty())
+    {
+      /* TLS 1.0, 1.1, 1.2 */
+      const char *cipher_list = ssl_options_.ssl_cipher.c_str();
+
+      rc = SetCurlStrOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+
+    if (!ssl_options_.ssl_cipher_suite.empty())
+    {
+#    if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 61, 0)
+      /* TLS 1.3 */
+      const char *cipher_list = ssl_options_.ssl_cipher_suite.c_str();
+
+      rc = SetCurlStrOption(CURLOPT_TLS13_CIPHERS, cipher_list);
+#    else
+      // CURL 7.61.0 required for CURLOPT_TLS13_CIPHERS.
+      OTEL_INTERNAL_LOG_ERROR("CURL 7.61.0 required for CIPHER SUITE");
+      return CURLE_UNKNOWN_OPTION;
+#    endif
+
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
+
+    if (ssl_options_.ssl_insecure_skip_verify)
+    {
+      /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, (long)CURLUSESSL_NONE);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlLongOption(CURLOPT_SSL_VERIFYPEER, 0L);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlLongOption(CURLOPT_SSL_VERIFYHOST, 0L);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+    else
+    {
+      /* 6 - ENFORCE VERIFICATION */
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlLongOption(CURLOPT_SSL_VERIFYPEER, 1L);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+
+      rc = SetCurlLongOption(CURLOPT_SSL_VERIFYHOST, 2L);
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+  }
+  else
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+  {
+    rc = SetCurlLongOption(CURLOPT_SSL_VERIFYPEER, 0L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlLongOption(CURLOPT_SSL_VERIFYHOST, 0L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+  }
 
   if (curl_resource_.headers_chunk != nullptr)
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_HTTPHEADER, curl_resource_.headers_chunk);
+    rc = SetCurlListOption(CURLOPT_HTTPHEADER, curl_resource_.headers_chunk);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
 
   // TODO: control local port to use
   // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_TIMEOUT_MS, http_conn_timeout_.count());
+  rc = SetCurlLongOption(CURLOPT_TIMEOUT_MS, http_conn_timeout_.count());
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 
   // abort if slower than 4kb/sec during 30 seconds
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_LOW_SPEED_TIME, 30L);
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_LOW_SPEED_LIMIT, 4096);
+  rc = SetCurlLongOption(CURLOPT_LOW_SPEED_TIME, 30L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlLongOption(CURLOPT_LOW_SPEED_LIMIT, 4096L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
   if (reuse_connection_)
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_FRESH_CONNECT, 0L);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_FORBID_REUSE, 0L);
+    rc = SetCurlLongOption(CURLOPT_FRESH_CONNECT, 0L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlLongOption(CURLOPT_FORBID_REUSE, 0L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_FRESH_CONNECT, 1L);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_FORBID_REUSE, 1L);
+    rc = SetCurlLongOption(CURLOPT_FRESH_CONNECT, 1L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+    rc = SetCurlLongOption(CURLOPT_FORBID_REUSE, 1L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
 
   if (is_raw_response_)
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_HEADER, true);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_WRITEFUNCTION,
-                     (void *)&HttpOperation::WriteMemoryCallback);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_WRITEDATA, (void *)this);
+    rc = SetCurlLongOption(CURLOPT_HEADER, 1L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, (void *)&HttpOperation::WriteMemoryCallback);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, (void *)this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else
   {
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_WRITEFUNCTION,
-                     (void *)&HttpOperation::WriteVectorBodyCallback);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_WRITEDATA, (void *)this);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_HEADERFUNCTION,
-                     (void *)&HttpOperation::WriteVectorHeaderCallback);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_HEADERDATA, (void *)this);
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, (void *)&HttpOperation::WriteVectorBodyCallback);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, (void *)this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc =
+        SetCurlPtrOption(CURLOPT_HEADERFUNCTION, (void *)&HttpOperation::WriteVectorHeaderCallback);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_HEADERDATA, (void *)this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
 
   // TODO: only two methods supported for now - POST and GET
@@ -461,12 +968,35 @@ CURLcode HttpOperation::Setup()
     // Request buffer
     const curl_off_t req_size = static_cast<curl_off_t>(request_body_.size());
     // POST
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_POSTFIELDS, NULL);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_POSTFIELDSIZE_LARGE, req_size);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_READFUNCTION,
-                     (void *)&HttpOperation::ReadMemoryCallback);
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_READDATA, (void *)this);
+    rc = SetCurlLongOption(CURLOPT_POST, 1L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlStrOption(CURLOPT_POSTFIELDS, NULL);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlLongOption(CURLOPT_POSTFIELDSIZE_LARGE, req_size);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_READFUNCTION, (void *)&HttpOperation::ReadMemoryCallback);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_READDATA, (void *)this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else if (method_ == opentelemetry::ext::http::client::Method::Get)
   {
@@ -474,23 +1004,48 @@ CURLcode HttpOperation::Setup()
   }
   else
   {
+    OTEL_INTERNAL_LOG_ERROR("Unexpected HTTP method");
     return CURLE_UNSUPPORTED_PROTOCOL;
   }
 
 #if LIBCURL_VERSION_NUM >= 0x072000
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_XFERINFOFUNCTION,
-                   (void *)&HttpOperation::OnProgressCallback);
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_XFERINFODATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_XFERINFOFUNCTION, (void *)&HttpOperation::OnProgressCallback);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlPtrOption(CURLOPT_XFERINFODATA, (void *)this);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 #else
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PROGRESSFUNCTION,
-                   (void *)&HttpOperation::OnProgressCallback);
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PROGRESSDATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_PROGRESSFUNCTION, (void *)&HttpOperation::OnProgressCallback);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlPtrOption(CURLOPT_PROGRESSDATA, (void *)this);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 #endif
 
 #if LIBCURL_VERSION_NUM >= 0x075000
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PREREQFUNCTION,
-                   (void *)&HttpOperation::PreRequestCallback);
-  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PREREQDATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_PREREQFUNCTION, (void *)&HttpOperation::PreRequestCallback);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
+  rc = SetCurlPtrOption(CURLOPT_PREREQDATA, (void *)this);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
 #endif
 
   return CURLE_OK;
@@ -509,8 +1064,8 @@ CURLcode HttpOperation::Send()
   last_curl_result_ = Setup();
   if (last_curl_result_ != CURLE_OK)
   {
-    DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed,
-                  curl_easy_strerror(last_curl_result_));
+    const char *message = GetCurlErrorMessage(last_curl_result_);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed, message);
     return last_curl_result_;
   }
 
@@ -553,6 +1108,8 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   last_curl_result_ = code;
   if (code != CURLE_OK)
   {
+    const char *message = GetCurlErrorMessage(code);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed, message);
     return code;
   }
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, session);
@@ -634,8 +1191,9 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
     switch (GetSessionState())
     {
       case opentelemetry::ext::http::client::SessionState::Connecting: {
+        const char *message = GetCurlErrorMessage(code);
         DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed,
-                      curl_easy_strerror(code));  // couldn't connect - stage 1
+                      message);  // couldn't connect - stage 1
         break;
       }
       case opentelemetry::ext::http::client::SessionState::Connected:
@@ -645,8 +1203,8 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
           DispatchEvent(opentelemetry::ext::http::client::SessionState::Sending);
         }
 
-        DispatchEvent(opentelemetry::ext::http::client::SessionState::SendFailed,
-                      curl_easy_strerror(code));
+        const char *message = GetCurlErrorMessage(code);
+        DispatchEvent(opentelemetry::ext::http::client::SessionState::SendFailed, message);
       }
       default:
         break;

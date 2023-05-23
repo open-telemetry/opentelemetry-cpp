@@ -118,9 +118,8 @@ option(WITH_GSL
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
+set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(OPENTELEMETRY_INSTALL_default ON)
-else()
   set(OPENTELEMETRY_INSTALL_default OFF)
 endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
@@ -162,6 +161,13 @@ endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
+if(WITH_OTLP)
+  message(
+    WARNING
+      "WITH_OTLP is deprecated and will be removed in future. Please set either WITH_OTLP_GRPC or WITH_OTLP_HTTP, or even both."
+  )
+endif()
+
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
@@ -188,6 +194,13 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
+
+option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
+       OFF)
+
+if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
+endif()
 
 set(OTELCPP_PROTO_PATH
     ""
@@ -220,8 +233,18 @@ option(
   "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
   OFF)
 
+option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
+
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
+       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
@@ -232,6 +255,13 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
+endif()
+
+if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
+  message(
+    FATAL_ERROR
+      "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
+  )
 endif()
 
 find_package(Threads)
@@ -254,6 +284,14 @@ function(install_windows_deps)
     Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
   )
 
+endfunction()
+
+function(set_target_version target_name)
+  if(OTELCPP_VERSIONED_LIBS)
+    set_target_properties(
+      ${target_name} PROPERTIES VERSION ${OPENTELEMETRY_VERSION}
+                                SOVERSION ${OPENTELEMETRY_ABI_VERSION_NO})
+  endif()
 endfunction()
 
 if(WITH_JAEGER)
@@ -590,6 +628,9 @@ if(NOT WITH_API_ONLY)
   endif()
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
+  endif()
+  if(WITH_FUNC_TESTS)
+    add_subdirectory(functional)
   endif()
 endif()
 

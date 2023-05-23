@@ -118,7 +118,7 @@ Examples:
   NGINX's dynamic module capability, tracing can be supported as a plugin. For
   instance, the [nginx-opentracing
   module](https://github.com/opentracing-contrib/nginx-opentracing) provides
-  this type of extension and is used by projects such as Kubernete's [ingress
+  this type of extension and is used by projects such as Kubernetes [ingress
   controller](https://kubernetes.github.io/ingress-nginx/user-guide/third-party-addons/opentracing/).
 * The CPython binary also has no knowledge of OpenTelemetry, but C++ Python
   extension modules can be instrumented for OpenTelemetry.

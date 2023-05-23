@@ -35,6 +35,7 @@ add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
 
 set_target_properties(opentelemetry_exporter_jaeger_trace
                       PROPERTIES EXPORT_NAME jaeger_trace_exporter)
+set_target_version(opentelemetry_exporter_jaeger_trace)
 
 target_include_directories(
   opentelemetry_exporter_jaeger_trace
@@ -43,7 +44,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_jaeger_trace
-  PUBLIC opentelemetry_resources opentelemetry_http_client_curl
+  PUBLIC opentelemetry_resources opentelemetry_trace
+         opentelemetry_http_client_curl
   PRIVATE thrift::thrift)
 
 if(MSVC)
