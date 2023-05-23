@@ -56,7 +56,7 @@ hence the "bring your own" denomination.
 To have an up to date build, projects are encouraged to use up to date
 versions of third party libraries, to benefit from bug fixes.
 
-Now, many third party now deliver new versions that require C++14, bug fixes
+Now, many third party deliver new versions that require C++14, bug fixes
 releases for C++11 are no longer available.
 
 In particular, the following libraries:
