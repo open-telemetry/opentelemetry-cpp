@@ -19,9 +19,13 @@ jobs:
       run: |
         rm -rf third_party
     - name: Setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+        GOOGLETEST_VERSION: 1.13.0
       run: |
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_cmake.sh
-        sudo CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
       with:

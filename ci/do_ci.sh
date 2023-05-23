@@ -226,6 +226,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DCMAKE_CXX_STANDARD=20 \
         -DWITH_STL=ON \
         ${IWYU} \
         "${SRC_DIR}"
