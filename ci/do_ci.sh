@@ -138,6 +138,31 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   make -k -j $(nproc)
   make test
   exit 0
+elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=11 \
+        -DWITH_OTLP=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
+        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=OFF \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        "${SRC_DIR}"
+  make -k -j $(nproc)
+  make test
+  exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
