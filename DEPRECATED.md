@@ -48,25 +48,25 @@ In this model,
 the build scripts can be configured to:
 
 * pick a given version for a third party library,
-* build opentelemetry-cpp with the third party library given.
+* build opentelemetry-cpp with the library given.
 
-The makefiles do not mandate to use a particular version for a third party,
+The makefiles do not mandate to use a particular version,
 hence the "bring your own" denomination.
 
 To have an up to date build, projects are encouraged to use up to date
 versions of third party libraries, to benefit from bug fixes.
 
-Now, many third party deliver new versions that require C++14, bug fixes
+Now, many libraries deliver new versions that require C++14, bug fixes
 releases for C++11 are no longer available.
 
-In particular, the following libraries:
+In particular, the following components:
 
 * GRPC C++
 * abseil
 * googletest
 
 now require C++14, per
-https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md
+[google support policies](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md)
 
 As a result, to stay up to date, opentelemetry-cpp needs to upgrade its
 minimum build requirements to use C++14 instead of C++11.

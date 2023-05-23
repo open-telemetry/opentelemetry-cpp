@@ -40,7 +40,8 @@ Breaking changes:
 Deprecations:
 
 * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
-* C++11 support is to end, C++14 will be supported instead, see [DEPRECATED](./DEPRECATED.md) for details.
+* C++11 support is to end, C++14 will be supported instead,
+  see [DEPRECATED](./DEPRECATED.md) for details.
 
 ## [1.9.0] 2023-04-12
 
