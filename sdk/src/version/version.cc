@@ -16,12 +16,12 @@ const int minor_version     = 9;
 const int patch_version     = 1;
 const char *pre_release     = "NONE";
 const char *build_metadata  = "NONE";
-const int count_new_commits = 0;
+const int count_new_commits = 21;
 const char *branch          = "make_release_1.9.1";
-const char *commit_hash     = "96d6fbd2666c26eaf52792d57cc682d8a798817f";
+const char *commit_hash     = "61e8741a70cde8f273b3de49a772f05a12566e80";
 const char *short_version   = "1.9.1";
 const char *full_version =
-    "1.9.1-NONE-NONE-0-make_release_1.9.1-96d6fbd2666c26eaf52792d57cc682d8a798817f";
+    "1.9.1-NONE-NONE-21-make_release_1.9.1-61e8741a70cde8f273b3de49a772f05a12566e80";
 const char *build_date = "Tue 23 May 2023 09:29:31 AM UTC";
 }  // namespace version
 }  // namespace sdk
