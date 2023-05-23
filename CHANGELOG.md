@@ -24,6 +24,8 @@ Increment the:
   [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
 * [API] Add user facing Logging API and Benchmarks
   [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
+* [DEPRECATION] Drop C++11 support
+  [#2146](https://github.com/open-telemetry/opentelemetry-cpp/pull/2146)
 
 Breaking changes:
 
@@ -38,6 +40,8 @@ Breaking changes:
 Deprecations:
 
 * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+* C++11 support is to end, C++14 will be supported instead,
+  see [DEPRECATED](./DEPRECATED.md) for details.
 
 ## [1.9.0] 2023-04-12
 
