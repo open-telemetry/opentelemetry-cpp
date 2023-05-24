@@ -50,12 +50,11 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
-    - name: run cmake gcc (maintainer mode, async)
+    - name: run cmake gcc (maintainer mode, C++11, async)
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.cpp11.async.test
     - name: generate test cert
       env:
