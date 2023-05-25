@@ -113,7 +113,7 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk
+    PUBLIC opentelemetry_sdk opentelemetry_ext
     PRIVATE opentelemetry_proto opentelemetry_http_client_curl
             nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)
