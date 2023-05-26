@@ -55,7 +55,7 @@ struct AdaptingIntegerArrayClear
   template <typename T>
   void operator()(std::vector<T> &backing)
   {
-    backing.assign(backing.size(), 0);
+    std::fill(backing.begin(), backing.end(), 0);
   }
 };
 
@@ -64,7 +64,10 @@ struct AdaptingIntegerArrayCopy
   template <class T1, class T2>
   void operator()(const std::vector<T1> &from, std::vector<T2> &to)
   {
-    std::copy(from.begin(), from.end(), to.begin());
+    for (size_t i = 0; i < from.size(); i++)
+    {
+      to[i] = static_cast<T2>(from[i]);
+    }
   }
 };
 
