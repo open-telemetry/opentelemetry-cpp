@@ -24,7 +24,7 @@ struct AdaptingIntegerArrayIncrement
     const uint64_t result = current + count;
     OPENTELEMETRY_LIKELY_IF(result <= uint64_t(std::numeric_limits<decltype(current)>::max()))
     {
-      backing[index] = result;
+      backing[index] = static_cast<decltype(current)>(result);
       return 0;
     }
     return result;
