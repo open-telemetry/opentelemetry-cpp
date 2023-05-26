@@ -21,9 +21,9 @@ namespace metrics
  * This class is NOT thread-safe. It is expected to be behind a synchronized incrementer.
  *
  * Instances start by attempting to store one-byte per-cell in the integer array. As values grow,
- * this will automatically instantiate the next-size integer array (byte => short => int => long)
- * and copy over values into the larger array. This class expects most usage to remain within the
- * uint8_t boundary (e.g. cell values < 256).
+ * this will automatically instantiate the next-size integer array (uint8_t -> uint16_t -> uint32_t
+ * -> uint64_t) and copy over values into the larger array. This class expects most usage to remain
+ * within the uint8_t boundary (e.g. cell values < 256).
  */
 class AdaptingIntegerArray
 {
@@ -132,7 +132,7 @@ public:
    *
    * @return the number of recordings for the index, or 0 if the index is out of bounds.
    */
-  uint64_t Get(int index);
+  uint64_t Get(size_t index);
 
 private:
   size_t ToBufferIndex(size_t index) const;

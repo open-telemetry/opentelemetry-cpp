@@ -154,7 +154,7 @@ bool AdaptingCircularBufferCounter::Increment(size_t index, uint64_t delta)
   return true;
 }
 
-uint64_t AdaptingCircularBufferCounter::Get(int index)
+uint64_t AdaptingCircularBufferCounter::Get(size_t index)
 {
   if (index < start_index_ || index > end_index_)
   {
