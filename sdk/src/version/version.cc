@@ -16,13 +16,13 @@ const int minor_version     = 9;
 const int patch_version     = 1;
 const char *pre_release     = "NONE";
 const char *build_metadata  = "NONE";
-const int count_new_commits = 21;
+const int count_new_commits = 22;
 const char *branch          = "make_release_1.9.1";
-const char *commit_hash     = "61e8741a70cde8f273b3de49a772f05a12566e80";
+const char *commit_hash     = "5592180d539b59c4e8293bc927f5a6431fcbacdf";
 const char *short_version   = "1.9.1";
 const char *full_version =
-    "1.9.1-NONE-NONE-21-make_release_1.9.1-61e8741a70cde8f273b3de49a772f05a12566e80";
-const char *build_date = "Tue 23 May 2023 09:29:31 AM UTC";
+    "1.9.1-NONE-NONE-22-make_release_1.9.1-5592180d539b59c4e8293bc927f5a6431fcbacdf";
+const char *build_date = "Fri 26 May 2023 07:14:07 AM UTC";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

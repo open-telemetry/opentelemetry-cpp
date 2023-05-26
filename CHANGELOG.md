@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.9.1] 2023-05-23
+## [1.9.1] 2023-05-26
 
 * [DEPRECATION] Drop C++11 support
   [#2146](https://github.com/open-telemetry/opentelemetry-cpp/pull/2146)
@@ -46,6 +46,8 @@ Increment the:
   [#2107](https://github.com/open-telemetry/opentelemetry-cpp/pull/2107)
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+* [BUILD] Transitive dependency issue with the otlp http exporter
+  [#2154](https://github.com/open-telemetry/opentelemetry-cpp/pull/2154)
 
 * [TEST] Add unit test for log body implicit conversions.
   [#2136](https://github.com/open-telemetry/opentelemetry-cpp/pull/2136)
@@ -62,7 +64,6 @@ Increment the:
 
 * [EXPORTER] Fixed HTTP session cleanup on shutdown
   [#2111](https://github.com/open-telemetry/opentelemetry-cpp/pull/2111)
-
 * [EXPORTER] Delegate all API calls of gRPC into
   opentelemetry_exporter_otlp_grpc_client,
   and make it contains all symbols needed.
