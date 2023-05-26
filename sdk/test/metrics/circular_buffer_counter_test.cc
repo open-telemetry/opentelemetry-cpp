@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
+
 #include <gtest/gtest.h>
 #include <limits>
 
 using namespace opentelemetry::sdk::metrics;
-namespace nostd = opentelemetry::nostd;
 
 class AdaptingIntegerArrayTest : public testing::TestWithParam<uint64_t>
 {};
