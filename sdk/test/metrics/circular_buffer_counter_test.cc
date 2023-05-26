@@ -96,16 +96,19 @@ TEST(AdaptingCircularBufferCounterTest, ExpandLower)
 
 TEST(AdaptingCircularBufferCounterTest, ShouldFailAtLimit)
 {
-  AdaptingCircularBufferCounter counter{160};
-  EXPECT_TRUE(counter.Increment(0, 1));
-  EXPECT_TRUE(counter.Increment(120, 1));
+  AdaptingCircularBufferCounter counter{10};
+  EXPECT_TRUE(counter.Increment(10, 1));
+  EXPECT_TRUE(counter.Increment(15, 2));
+  EXPECT_TRUE(counter.Increment(6, 3));
   // Check state
-  EXPECT_EQ(counter.StartIndex(), 0);
-  EXPECT_EQ(counter.EndIndex(), 120);
-  EXPECT_EQ(counter.Get(0), 1);
-  EXPECT_EQ(counter.Get(120), 1);
+  EXPECT_EQ(counter.StartIndex(), 6);
+  EXPECT_EQ(counter.EndIndex(), 15);
+  EXPECT_EQ(counter.Get(6), 3);
+  EXPECT_EQ(counter.Get(10), 1);
+  EXPECT_EQ(counter.Get(15), 2);
   // Adding over the maximum # of buckets
-  EXPECT_FALSE(counter.Increment(3000, 1));
+  EXPECT_FALSE(counter.Increment(5, 1));
+  EXPECT_FALSE(counter.Increment(16, 1));
 }
 
 TEST(AdaptingCircularBufferCounterTest, ShouldCopyCounters)

@@ -18,13 +18,12 @@ struct AdaptingIntegerArrayIncrement
   uint64_t count;
 
   template <typename T>
-  uint64_t operator()(T &backing)
+  uint64_t operator()(std::vector<T> &backing)
   {
-    const auto current    = backing[index];
-    const uint64_t result = current + count;
-    OPENTELEMETRY_LIKELY_IF(result <= uint64_t(std::numeric_limits<decltype(current)>::max()))
+    const uint64_t result = backing[index] + count;
+    OPENTELEMETRY_LIKELY_IF(result <= uint64_t(std::numeric_limits<T>::max()))
     {
-      backing[index] = static_cast<decltype(current)>(result);
+      backing[index] = static_cast<T>(result);
       return 0;
     }
     return result;
@@ -36,7 +35,7 @@ struct AdaptingIntegerArrayGet
   size_t index;
 
   template <typename T>
-  uint64_t operator()(T &backing)
+  uint64_t operator()(const std::vector<T> &backing)
   {
     return backing[index];
   }
@@ -45,7 +44,7 @@ struct AdaptingIntegerArrayGet
 struct AdaptingIntegerArraySize
 {
   template <typename T>
-  uint64_t operator()(T &backing)
+  uint64_t operator()(const std::vector<T> &backing)
   {
     return backing.size();
   }
@@ -54,7 +53,7 @@ struct AdaptingIntegerArraySize
 struct AdaptingIntegerArrayClear
 {
   template <typename T>
-  void operator()(T &backing)
+  void operator()(std::vector<T> &backing)
   {
     backing.assign(backing.size(), 0);
   }
@@ -63,7 +62,7 @@ struct AdaptingIntegerArrayClear
 struct AdaptingIntegerArrayCopy
 {
   template <class T1, class T2>
-  void operator()(const T1 &from, T2 &to)
+  void operator()(const std::vector<T1> &from, std::vector<T2> &to)
   {
     std::copy(from.begin(), from.end(), to.begin());
   }
@@ -151,8 +150,7 @@ bool AdaptingCircularBufferCounter::Increment(size_t index, uint64_t delta)
     }
     start_index_ = index;
   }
-  const size_t realIdx = ToBufferIndex(index);
-  backing_.Increment(realIdx, delta);
+  backing_.Increment(ToBufferIndex(index), delta);
   return true;
 }
 
@@ -170,14 +168,10 @@ size_t AdaptingCircularBufferCounter::ToBufferIndex(size_t index) const
   // Figure out the index relative to the start of the circular buffer.
   if (index < base_index_)
   {
+    // If index is before the base one, wrap around.
     return index + backing_.Size() - base_index_;
   }
-  size_t result = index - base_index_;
-  if (result >= backing_.Size())
-  {
-    result -= backing_.Size();
-  }
-  return result;
+  return index - base_index_;
 }
 
 }  // namespace metrics
