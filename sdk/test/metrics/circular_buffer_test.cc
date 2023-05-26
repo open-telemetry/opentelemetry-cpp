@@ -126,3 +126,21 @@ TEST(AdaptingCircularBufferCounterTest, ShouldCopyCounters)
   EXPECT_EQ(copy.Get(2), 2);
   EXPECT_EQ(counter.Get(2), 1);
 }
+
+TEST(AdaptingCircularBufferCounterTest, Clear)
+{
+  AdaptingCircularBufferCounter counter{10};
+  EXPECT_TRUE(counter.Empty());
+  EXPECT_TRUE(counter.Increment(2, 1));
+  EXPECT_FALSE(counter.Empty());
+  EXPECT_TRUE(counter.Increment(8, 1));
+  // Check state.
+  EXPECT_EQ(counter.StartIndex(), 2);
+  EXPECT_EQ(counter.EndIndex(), 8);
+  EXPECT_EQ(counter.Get(2), 1);
+  EXPECT_EQ(counter.Get(8), 1);
+  // Clear and verify.
+  EXPECT_FALSE(counter.Empty());
+  counter.Clear();
+  EXPECT_TRUE(counter.Empty());
+}
