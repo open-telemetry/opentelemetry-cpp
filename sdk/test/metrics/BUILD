@@ -271,6 +271,21 @@ cc_test(
 )
 
 cc_test(
+    name = "circular_buffer_test",
+    srcs = [
+        "circular_buffer_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "histogram_aggregation_test",
     srcs = [
         "histogram_aggregation_test.cc",
