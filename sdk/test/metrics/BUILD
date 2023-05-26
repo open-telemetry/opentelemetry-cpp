@@ -271,9 +271,9 @@ cc_test(
 )
 
 cc_test(
-    name = "circular_buffer_test",
+    name = "circular_buffer_counter_test",
     srcs = [
-        "circular_buffer_test.cc",
+        "circular_buffer_counter_test.cc",
     ],
     tags = [
         "metrics",
