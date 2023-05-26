@@ -278,7 +278,12 @@ function(install_windows_deps)
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE)
+      CACHE FILEPATH "")
+  message(
+    "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
+    Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
+  )
+
 endfunction()
 
 function(set_target_version target_name)
@@ -548,9 +553,10 @@ if(BUILD_TESTING)
         ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest REQUIRED)
+    find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
+      include(${CMAKE_TOOLCHAIN_FILE})
       find_package(GTest REQUIRED)
     endif()
   else()
