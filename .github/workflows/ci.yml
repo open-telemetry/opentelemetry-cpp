@@ -29,6 +29,43 @@ jobs:
         sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
+  #
+  # This build uses the latest libraries compatible
+  # with C++11
+  #
+  cmake_gcc_maintainer_cpp11_async_test:
+    name: CMake gcc 12 (maintainer mode, C++11, async)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+        GOOGLETEST_VERSION: 1.12.1
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake gcc (maintainer mode, C++11, async)
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.cpp11.async.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 12 (maintainer mode, sync)
     runs-on: ubuntu-latest
