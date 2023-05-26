@@ -159,12 +159,10 @@ if(WITH_STL)
   endif()
 endif()
 
-option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
-
-if(WITH_OTLP)
+if(DEFINED WITH_OTLP)
   message(
-    WARNING
-      "WITH_OTLP is deprecated and will be removed in future. Please set either WITH_OTLP_GRPC or WITH_OTLP_HTTP, or even both."
+      FATAL_ERROR
+      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
   )
 endif()
 
@@ -355,11 +353,10 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_OTLP)
+if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_GRPC}))
+  if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -377,9 +374,7 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(NOT gRPC_FOUND
-       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
-                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
+    if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
       find_package(gRPC)
     endif()
     if(WIN32)

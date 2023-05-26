@@ -59,7 +59,7 @@ RUN apt-get install -y --no-install-recommends libcurl4-openssl-dev && git clone
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DBUILD_TESTING=OFF \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         .. && \
     make -j${nproc} install && ldconfig && \
     cd ../..

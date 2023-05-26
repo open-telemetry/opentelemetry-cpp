@@ -28,7 +28,6 @@ RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
         -DWITH_JAEGER=ON \
         -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
         -DBUILD_TESTING=OFF \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_GRPC=ON \
         -DBUILD_SHARED_LIBS=ON \
         .. \

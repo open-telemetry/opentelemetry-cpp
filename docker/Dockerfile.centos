@@ -80,6 +80,6 @@ RUN git clone --depth=1 https://github.com/open-telemetry/opentelemetry-cpp.git 
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DBUILD_TESTING=OFF \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         .. \
     && make -j${nproc} install && ldconfig

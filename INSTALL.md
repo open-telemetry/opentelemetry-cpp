@@ -82,7 +82,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
       Please refer to note [below](#building-shared-libs-for-windows) for
       Windows DLL support.
-   - `-DWITH_OTLP=ON` : To enable building OTLP exporter.
+   - `-DWITH_OTLP_GRPC=ON` : To enable building OTLP exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
 3. Once the build configuration is created, build the CMake targets - this
