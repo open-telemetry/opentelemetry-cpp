@@ -64,16 +64,7 @@ TEST_P(AdaptingIntegerArrayTest, Clear)
   EXPECT_EQ(counter.Get(0), 1);
 }
 
-class AdaptingCircularBufferCounterTest : public ::testing::Test
-{
-protected:
-  AdaptingCircularBufferCounter newCounter(int maxBuckets)
-  {
-    return AdaptingCircularBufferCounter(maxBuckets);
-  }
-};
-
-TEST_F(AdaptingCircularBufferCounterTest, ReturnsZeroOutsidePopulatedRange)
+TEST(AdaptingCircularBufferCounterTest, ReturnsZeroOutsidePopulatedRange)
 {
   AdaptingCircularBufferCounter counter{10};
   EXPECT_EQ(counter.Get(0), 0);
@@ -84,7 +75,7 @@ TEST_F(AdaptingCircularBufferCounterTest, ReturnsZeroOutsidePopulatedRange)
   EXPECT_EQ(counter.Get(100), 0);
 }
 
-TEST_F(AdaptingCircularBufferCounterTest, ExpandLower)
+TEST(AdaptingCircularBufferCounterTest, ExpandLower)
 {
   AdaptingCircularBufferCounter counter{160};
   EXPECT_TRUE(counter.Increment(10, 1));
@@ -103,7 +94,7 @@ TEST_F(AdaptingCircularBufferCounterTest, ExpandLower)
   EXPECT_EQ(counter.EndIndex(), 20);
 }
 
-TEST_F(AdaptingCircularBufferCounterTest, ShouldFailAtLimit)
+TEST(AdaptingCircularBufferCounterTest, ShouldFailAtLimit)
 {
   AdaptingCircularBufferCounter counter{160};
   EXPECT_TRUE(counter.Increment(0, 1));
@@ -117,7 +108,7 @@ TEST_F(AdaptingCircularBufferCounterTest, ShouldFailAtLimit)
   EXPECT_FALSE(counter.Increment(3000, 1));
 }
 
-TEST_F(AdaptingCircularBufferCounterTest, ShouldCopyCounters)
+TEST(AdaptingCircularBufferCounterTest, ShouldCopyCounters)
 {
   AdaptingCircularBufferCounter counter{2};
   EXPECT_TRUE(counter.Increment(2, 1));
