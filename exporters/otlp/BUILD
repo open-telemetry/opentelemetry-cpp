@@ -132,6 +132,7 @@ cc_library(
         "//sdk:headers",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@github_nlohmann_json//:json",
+        "@com_google_absl//absl/strings",
     ],
 )
 
