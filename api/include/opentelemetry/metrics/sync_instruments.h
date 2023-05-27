@@ -97,14 +97,14 @@ public:
   /**
    * Records a value.
    *
-   * @param value The increment amount. May be positive, negative or zero.
+   * @param value The measurement value. MUST be non-negative.
    */
   virtual void Record(T value, const context::Context &context) noexcept = 0;
 
   /**
    * Records a value with a set of attributes.
    *
-   * @param value The increment amount. May be positive, negative or zero.
+   * @param value The measurement value. MUST be non-negative.
    * @param attributes A set of attributes to associate with the count.
    */
   virtual void Record(T value,
