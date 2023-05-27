@@ -25,9 +25,9 @@ while getopts ":v:i:p:r:s:TH" o; do
             install_dir=${OPTARG}
             ;;
         p)
-            if [[ "${OPTARG}" == "protobuf" ]]; then
+            if [ "${OPTARG}" == "protobuf" ]; then
                 GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DgRPC_PROTOBUF_PROVIDER=package")
-            elif [[ "${OPTARG}" == "abseil-cpp" ]]; then
+            elif [ "${OPTARG}" == "abseil-cpp" ]; then
                 GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DgRPC_ABSL_PROVIDER=package")
                 build_internal_abseil_cpp=0
             fi
@@ -100,7 +100,7 @@ if [ ! -z "$build_shared_libs" ]; then
     GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
 fi
 
-cmake ${GRPC_BUILD_OPTIONS[@]} "$@" ..
+cmake ${GRPC_BUILD_OPTIONS[@]} ..
 cmake --build . -j$(nproc)
 cmake --install .
 popd
