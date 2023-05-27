@@ -17,7 +17,8 @@ namespace metrics
 
 using ValueType = nostd::variant<int64_t, double>;
 
-// TODO: remove ctors and initializers from below classes when GCC<5 stops shipping on Ubuntu
+// TODO: remove ctors and initializers from below classes when GCC<5 stops
+// shipping on Ubuntu
 
 class SumPointData
 {
@@ -62,6 +63,28 @@ public:
   std::vector<uint64_t> counts_   = {};
   uint64_t count_                 = {};
   bool record_min_max_            = true;
+};
+
+class ExponentialHistogramPointData
+{
+public:
+  // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
+  ExponentialHistogramPointData(ExponentialHistogramPointData &&) = default;
+  ExponentialHistogramPointData &operator=(ExponentialHistogramPointData &&) = default;
+  ExponentialHistogramPointData(const ExponentialHistogramPointData &)       = default;
+  ExponentialHistogramPointData()                                            = default;
+
+  uint64_t count_      = {};
+  double sum_          = {};
+  int32_t scale_       = {};
+  uint64_t zero_count_ = {};
+  AdaptingCircularBufferCounter positive_buckets_{0};
+  AdaptingCircularBufferCounter negative_buckets_{0};
+  double min_            = {};
+  double max_            = {};
+  double zero_threshold_ = {};
+  bool record_min_max_   = true;
+  size_t max_buckets_    = {};
 };
 
 class DropPointData
