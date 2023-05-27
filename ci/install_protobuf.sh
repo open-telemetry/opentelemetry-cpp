@@ -31,9 +31,21 @@ set -e
 # when calling this script
 #
 
+CPP_PROTOBUF_BUILD_OPTIONS=(
+  "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+  "-Dprotobuf_BUILD_TESTS=OFF"
+  "-Dprotobuf_BUILD_EXAMPLES=OFF"
+  "-Dprotobuf_MODULE_COMPATIBLE=ON"
+)
+
+if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
+  CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-Dprotobuf_MODULE_COMPATIBLE=ON")
+fi
+
 if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
   export CPP_PROTOBUF_VERSION="${PROTOBUF_VERSION}"
   CPP_PROTOBUF_PACKAGE_NAME="protobuf-${CPP_PROTOBUF_VERSION}"
+  CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-Dprotobuf_ABSL_PROVIDER=package")
 else
   export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
   CPP_PROTOBUF_PACKAGE_NAME="protobuf-cpp-${CPP_PROTOBUF_VERSION}"
@@ -42,7 +54,14 @@ fi
 cd /
 wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz
 tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
-cd protobuf-${CPP_PROTOBUF_VERSION}
-./configure
-make -j $(nproc) && make install
+
+mkdir protobuf-${CPP_PROTOBUF_VERSION}/build && pushd protobuf-${CPP_PROTOBUF_VERSION}/build
+if [ -e "../CMakeLists.txt" ]; then
+  cmake .. ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+else
+  cmake ../cmake ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+fi
+cmake --build . -j $(nproc)
+cmake --install .
+popd
 ldconfig
