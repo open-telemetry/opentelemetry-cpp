@@ -251,6 +251,10 @@ add_library(
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
 
+if(WITH_ABSEIL AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
+  target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
+endif()
+
 if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
