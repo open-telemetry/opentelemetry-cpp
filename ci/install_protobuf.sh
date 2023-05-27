@@ -31,11 +31,17 @@ set -e
 # when calling this script
 #
 
-export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
+if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
+  export CPP_PROTOBUF_VERSION="${PROTOBUF_VERSION}"
+  CPP_PROTOBUF_PACKAGE_NAME="protobuf-${CPP_PROTOBUF_VERSION}"
+else
+  export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
+  CPP_PROTOBUF_PACKAGE_NAME="protobuf-cpp-${CPP_PROTOBUF_VERSION}"
+fi
 
 cd /
-wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz
-tar zxf protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz --no-same-owner
+wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz
+tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
 cd protobuf-${CPP_PROTOBUF_VERSION}
 ./configure
 make -j $(nproc) && make install

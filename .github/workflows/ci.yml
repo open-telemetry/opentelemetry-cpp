@@ -387,6 +387,29 @@ jobs:
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
+  cmake_modern_protobuf_test:
+    name: CMake test (with modern protobuf and otlp-exporter)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        PROTOBUF_VERSION: '23.2'
+        ABSEIL_CPP_VERSION: '20230125.3'
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_abseil.sh
+        sudo ./ci/install_protobuf.sh
+    - name: run otlp exporter tests
+      env:
+        WITH_ABSEIL: 'ON'
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
     runs-on: ubuntu-20.04

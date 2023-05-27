@@ -20,7 +20,9 @@
 #include "google/protobuf/stubs/stringpiece.h"
 #include "nlohmann/json.hpp"
 
-#if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
+#if defined(HAVE_ABSEIL)
+#  include "absl/strings/escaping.h"
+#elif defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
 #  include "google/protobuf/stubs/strutil.h"
 #else
 #  include "google/protobuf/stubs/port.h"
@@ -414,14 +416,22 @@ static std::string BytesMapping(const std::string &bytes,
       else
       {
         std::string base64_value;
+#if defined(HAVE_ABSEIL)
+        absl::Base64Escape(bytes, &base64_value);
+#else
         google::protobuf::Base64Escape(bytes, &base64_value);
+#endif
         return base64_value;
       }
     }
     case JsonBytesMappingKind::kBase64: {
       // Base64 is the default bytes mapping of protobuf
       std::string base64_value;
+#if defined(HAVE_ABSEIL)
+      absl::Base64Escape(bytes, &base64_value);
+#else
       google::protobuf::Base64Escape(bytes, &base64_value);
+#endif
       return base64_value;
     }
     case JsonBytesMappingKind::kHex:

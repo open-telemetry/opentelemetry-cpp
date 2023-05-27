@@ -258,9 +258,13 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  if [[ -z "$WITH_ABSEIL" ]]; then
+    WITH_ABSEIL="OFF"
+  fi
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_ABSEIL=$WITH_ABSEIL \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
