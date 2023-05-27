@@ -407,7 +407,7 @@ jobs:
       env:
         WITH_ABSEIL: 'ON'
       run: |
-        sudo ./ci/setup_grpc.sh -r v1.54.2
+        sudo ./ci/setup_grpc.sh -r v1.54.2 -p protobuf -p abseil-cpp
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:
