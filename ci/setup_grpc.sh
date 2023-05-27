@@ -56,8 +56,8 @@ done
 if [ -z "${gcc_version}" ]; then
     gcc_version=`gcc --version | awk '/gcc/  {print $NF}'`
 fi
-if [[ "${gcc_version}" < "${gcc_version_for_new_grpc}" ]]; then
-    echo "less"
+if [[ "${gcc_version}" < "${gcc_version_for_new_grpc}" ]] && [[ "${gcc_version:1:1}" == "." ]]; then
+    echo "${gcc_version} less than ${gcc_version_for_new_grpc}"
     std_version='11'
     install_grpc_version=${old_grpc_version}
 fi
