@@ -387,8 +387,8 @@ jobs:
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
-  cmake_modern_protobuf_test:
-    name: CMake test (with modern protobuf and otlp-exporter)
+  cmake_modern_protobuf_grpc_test:
+    name: CMake test (with modern protobuf and grpc)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -407,7 +407,7 @@ jobs:
       env:
         WITH_ABSEIL: 'ON'
       run: |
-        sudo ./ci/setup_grpc.sh
+        sudo ./ci/setup_grpc.sh -r v1.54.2
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:

@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Support protobuf 3.22 or upper
+  [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
+
 ## [1.9.1] 2023-05-26
 
 * [DEPRECATION] Drop C++11 support
@@ -24,7 +27,7 @@ Increment the:
   [#2118](https://github.com/open-telemetry/opentelemetry-cpp/pull/2118)
 * [CI] Upgrade Google Benchmark version from 1.6.0 to 1.7.1
   [#2116](https://github.com/open-telemetry/opentelemetry-cpp/pull/2116)
-* [CI] Upgrade Nlohmann JSON library version from 3.10.5 to 3.11.2
+* [CI] Upgrade Nlohmann JSON library version from 3.10.5 to 3.11.
   [#2115](https://github.com/open-telemetry/opentelemetry-cpp/pull/2115)
 
 * [BUILD] Missed include
