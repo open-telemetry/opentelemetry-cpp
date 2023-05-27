@@ -263,7 +263,6 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  CMAKE_OPTIONS=()
   if [[ ! -z "${WITH_ABSEIL}" ]]; then
     CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DWITH_ABSEIL=${WITH_ABSEIL}")
   fi

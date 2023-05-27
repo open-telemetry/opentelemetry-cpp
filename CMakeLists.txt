@@ -363,10 +363,10 @@ if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
   if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
-    if(WITH_ABSEIL)
+    if(NOT WITH_ABSEIL)
       message(
         FATAL_ERROR
-          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125.0 or upper)"
+          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125.3 or upper)"
       )
     endif()
   endif()
