@@ -401,13 +401,13 @@ jobs:
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_abseil.sh
-        sudo ./ci/install_protobuf.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
     - name: run otlp exporter tests
       env:
         WITH_ABSEIL: 'ON'
       run: |
-        sudo ./ci/setup_grpc.sh -r v1.54.2 -p protobuf -p abseil-cpp
+        sudo -E ./ci/setup_grpc.sh -r v1.54.2 -p protobuf -p abseil-cpp
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:

@@ -51,7 +51,7 @@ else
   CPP_PROTOBUF_PACKAGE_NAME="protobuf-cpp-${CPP_PROTOBUF_VERSION}"
 fi
 
-cd /
+cd /tmp
 wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz
 tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
 

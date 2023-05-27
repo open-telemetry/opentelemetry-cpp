@@ -3,7 +3,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+set -ex
 export DEBIAN_FRONTEND=noninteractive
 [ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20220623.1"
 
