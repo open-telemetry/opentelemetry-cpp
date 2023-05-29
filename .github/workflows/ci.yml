@@ -409,7 +409,7 @@ jobs:
         WITH_ABSEIL: 'ON'
         CXX_STANDARD: '17'
       run: |
-        sudo -E ./ci/setup_grpc.sh -r v1.55.0 -p protobuf -p abseil-cpp
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:

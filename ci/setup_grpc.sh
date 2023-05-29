@@ -7,6 +7,7 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
 new_grpc_version='v1.49.2'
+moderd_grpc_version='v1.55.0'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 if [ ! -z "${CXX_STANDARD}" ]; then
@@ -19,7 +20,7 @@ build_internal_abseil_cpp=1
 GRPC_BUILD_OPTIONS=()
 usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
 
-while getopts ":v:i:p:r:s:TH" o; do
+while getopts ":v:i:mp:r:s:TH" o; do
     case "${o}" in
         v)
             gcc_version=${OPTARG}
@@ -37,6 +38,9 @@ while getopts ":v:i:p:r:s:TH" o; do
             ;;
         r)
             install_grpc_version=${OPTARG}
+            ;;
+        m)
+            install_grpc_version=${moderd_grpc_version}
             ;;
         s)
             std_version=${OPTARG}

@@ -320,3 +320,73 @@ if(BUILD_SHARED_LIBS)
     set_property(TARGET ${proto_target} PROPERTY POSITION_INDEPENDENT_CODE ON)
   endforeach()
 endif()
+
+if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
+  project_build_tools_patch_default_imported_config(
+    absl::bad_variant_access
+    absl::raw_logging_internal
+    absl::log_severity
+    protobuf::libprotobuf
+    ZLIB::ZLIB
+    absl::log_internal_check_op
+    absl::log_internal_nullguard
+    absl::strings
+    absl::strings_internal
+    absl::base
+    absl::spinlock_wait
+    absl::int128
+    absl::throw_delegate
+    absl::log_internal_message
+    absl::examine_stack
+    absl::stacktrace
+    absl::debugging_internal
+    absl::symbolize
+    absl::demangle_internal
+    absl::malloc_internal
+    absl::log_internal_format
+    absl::log_internal_globals
+    absl::time
+    absl::civil_time
+    absl::time_zone
+    absl::str_format_internal
+    absl::log_internal_proto
+    absl::log_internal_log_sink_set
+    absl::log_globals
+    absl::hash
+    absl::city
+    absl::bad_optional_access
+    absl::low_level_hash
+    absl::log_entry
+    absl::log_sink
+    absl::synchronization
+    absl::graphcycles_internal
+    absl::strerror
+    absl::log_internal_conditions
+    absl::cord
+    absl::cord_internal
+    absl::crc_cord_state
+    absl::crc32c
+    absl::crc_cpu_detect
+    absl::crc_internal
+    absl::cordz_functions
+    absl::exponential_biased
+    absl::cordz_info
+    absl::cordz_handle
+    absl::leak_check
+    absl::die_if_null
+    absl::flags
+    absl::flags_commandlineflag
+    absl::flags_commandlineflag_internal
+    absl::flags_config
+    absl::flags_program_name
+    absl::flags_internal
+    absl::flags_marshalling
+    absl::flags_reflection
+    absl::flags_private_handle_accessor
+    absl::raw_hash_set
+    absl::hashtablez_sampler
+    absl::log_initialize
+    absl::status
+    absl::statusor
+    utf8_range::utf8_validity)
+endif()
