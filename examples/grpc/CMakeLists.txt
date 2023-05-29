@@ -33,16 +33,20 @@ include_directories(
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 if(TARGET protobuf::libprotobuf)
-  target_link_libraries(example_grpc_proto gRPC::grpc++ protobuf::libprotobuf)
+  target_link_libraries(example_grpc_proto PUBLIC gRPC::grpc++
+                                                  protobuf::libprotobuf)
 else()
-  target_include_directories(example_grpc_proto ${Protobuf_INCLUDE_DIRS})
-  target_link_libraries(example_grpc_proto ${Protobuf_LIBRARIES})
+  target_include_directories(example_grpc_proto PUBLIC ${Protobuf_INCLUDE_DIRS})
+  target_link_libraries(example_grpc_proto PUBLIC gRPC::grpc++
+                                                  ${Protobuf_LIBRARIES})
+endif()
+if(WITH_ABSEIL)
+  target_link_libraries(example_grpc_proto PUBLIC absl::bad_variant_access)
 endif()
 
 foreach(_target client server)
   add_executable(${_target} "${_target}.cc")
-  target_link_libraries(
-    ${_target} example_grpc_proto protobuf::libprotobuf gRPC::grpc++
-    opentelemetry_trace opentelemetry_exporter_ostream_span)
+  target_link_libraries(${_target} example_grpc_proto opentelemetry_trace
+                        opentelemetry_exporter_ostream_span)
   patch_protobuf_targets(${_target})
 endforeach()
