@@ -176,10 +176,12 @@ function(project_build_tools_patch_default_imported_config)
           set_target_properties(
             ${TARGET_NAME} PROPERTIES "${PATCH_IMPORTED_KEY}"
                                       "${PATCH_IMPORTED_VALUE}")
-          message(
-            STATUS
-              "Patch: ${TARGET_NAME} ${PATCH_IMPORTED_KEY} will use ${PATCH_IMPORTED_KEY}_${PATCH_IMPORTED_CONFIGURATION}(\"${PATCH_IMPORTED_VALUE}\") by default."
-          )
+          if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            message(
+              STATUS
+                "Patch: ${TARGET_NAME} ${PATCH_IMPORTED_KEY} will use ${PATCH_IMPORTED_KEY}_${PATCH_IMPORTED_CONFIGURATION}(\"${PATCH_IMPORTED_VALUE}\") by default."
+            )
+          endif()
         endif()
       endforeach()
     endif()

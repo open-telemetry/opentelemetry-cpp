@@ -128,6 +128,8 @@ endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
        ${OPENTELEMETRY_INSTALL_default})
 
+include("${PROJECT_SOURCE_DIR}/cmake/tools.cmake")
+
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   if(WITH_STL)
     # Require at least C++17. C++20 is needed to avoid gsl::span
@@ -587,6 +589,15 @@ if(BUILD_TESTING)
     # Benchmark respects the CMAKE_PREFIX_PATH
     find_package(benchmark CONFIG REQUIRED)
   endif()
+  project_build_tools_patch_default_imported_config(
+    GTest::gtest
+    GTest::gtest_main
+    GTest::gmock
+    GTest::gmock_main
+    GTest::GTest
+    GTest::Main
+    benchmark::benchmark
+    benchmark::benchmark_main)
 endif()
 
 include(CMakePackageConfigHelpers)

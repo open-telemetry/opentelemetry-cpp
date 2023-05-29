@@ -65,8 +65,6 @@ else()
   endif()
 endif()
 
-include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)
-
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO
     "${PROTO_PATH}/opentelemetry/proto/resource/v1/resource.proto")
@@ -167,6 +165,26 @@ if(WITH_OTLP_GRPC)
     endif()
   endif()
   message(STATUS "gRPC_CPP_PLUGIN_EXECUTABLE=${gRPC_CPP_PLUGIN_EXECUTABLE}")
+
+  project_build_tools_patch_default_imported_config(
+    gRPC::cares
+    gRPC::re2
+    gRPC::ssl
+    gRPC::crypto
+    gRPC::zlibstatic
+    gRPC::address_sorting
+    gRPC::gpr
+    gRPC::grpc
+    gRPC::grpc_unsecure
+    gRPC::grpc++
+    gRPC::grpc++_alts
+    gRPC::grpc++_error_details
+    gRPC::grpc++_reflection
+    gRPC::grpc++_unsecure
+    gRPC::grpc_authorization_provider
+    gRPC::grpc_plugin_support
+    gRPC::grpcpp_channelz
+    gRPC::upb)
 endif()
 
 if(WITH_OTLP_GRPC)
