@@ -17,7 +17,6 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/stringpiece.h"
 #include "nlohmann/json.hpp"
 
 #if defined(HAVE_ABSEIL)
@@ -26,6 +25,7 @@
 #  include "google/protobuf/stubs/strutil.h"
 #else
 #  include "google/protobuf/stubs/port.h"
+#  include "google/protobuf/stubs/stringpiece.h"
 namespace google
 {
 namespace protobuf
