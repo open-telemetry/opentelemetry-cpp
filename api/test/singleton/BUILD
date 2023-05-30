@@ -117,6 +117,36 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "component_g",
+    srcs = [
+        "component_g.cc",
+    ],
+    copts = select({
+        "//bazel:windows": DEFAULT_WIN_COPTS,
+        "//conditions:default": DEFAULT_NOWIN_COPTS,
+    }),
+    linkstatic = False,
+    deps = [
+        "//api",
+    ],
+)
+
+cc_library(
+    name = "component_h",
+    srcs = [
+        "component_h.cc",
+    ],
+    copts = select({
+        "//bazel:windows": HIDDEN_WIN_COPTS,
+        "//conditions:default": HIDDEN_NOWIN_COPTS,
+    }),
+    linkstatic = False,
+    deps = [
+        "//api",
+    ],
+)
+
 cc_test(
     name = "singleton_test",
     srcs = [

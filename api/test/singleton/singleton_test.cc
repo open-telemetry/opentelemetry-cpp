@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <assert.h>
-#include <iostream>
 #include <dlfcn.h>
+#include <iostream>
 
 #include "component_a.h"
 #include "component_b.h"
@@ -37,7 +37,7 @@ void do_something()
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
   assert(component_g != nullptr);
 
-  auto *func_g = (void(*)())dlsym(component_g, "do_something_in_g");
+  auto *func_g = (void (*)())dlsym(component_g, "do_something_in_g");
   assert(func_g != nullptr);
 
   (*func_g)();
@@ -49,7 +49,7 @@ void do_something()
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
   assert(component_h != nullptr);
 
-  auto *func_h = (void(*)())dlsym(component_h, "do_something_in_h");
+  auto *func_h = (void (*)())dlsym(component_h, "do_something_in_h");
   assert(func_h != nullptr);
 
   (*func_h)();
