@@ -5,10 +5,6 @@
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/version.h"
 
-#define BUILD_COMPONENT_E
-
-#include "component_e.h"
-
 namespace trace = opentelemetry::trace;
 namespace nostd = opentelemetry::nostd;
 
@@ -31,11 +27,12 @@ static void f2()
   f1();
 }
 
+extern "C"
 
 #if defined(_MSC_VER)
-// component_g is a DLL
+    // component_g is a DLL
 
-__declspec(dllexport)
+    __declspec(dllexport)
 
 #else
 // component_g is a shared library (*.so)
@@ -43,8 +40,7 @@ __declspec(dllexport)
 __attribute__((visibility("default")))
 #endif
 
-extern "C"
-void do_something_in_h()
+        void do_something_in_h()
 {
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("H::library"));
 
