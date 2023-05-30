@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <assert.h>
 #include <dlfcn.h>
 #include <iostream>
 
@@ -35,10 +34,10 @@ void do_something()
   /* Call do_something_in_g() */
 
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
-  assert(component_g != nullptr);
+  EXPECT_NE(component_g, nullptr);
 
   auto *func_g = (void (*)())dlsym(component_g, "do_something_in_g");
-  assert(func_g != nullptr);
+  EXPECT_NE(func_g, nullptr);
 
   (*func_g)();
 
@@ -47,10 +46,10 @@ void do_something()
   /* Call do_something_in_h() */
 
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
-  assert(component_h != nullptr);
+  EXPECT_NE(component_h, nullptr);
 
   auto *func_h = (void (*)())dlsym(component_h, "do_something_in_h");
-  assert(func_h != nullptr);
+  EXPECT_NE(func_h, nullptr);
 
   (*func_h)();
 

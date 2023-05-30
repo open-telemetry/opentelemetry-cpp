@@ -118,7 +118,7 @@ cc_library(
 )
 
 cc_library(
-    name = "component_g",
+    name = "libcomponent_g.so",
     srcs = [
         "component_g.cc",
     ],
@@ -133,7 +133,7 @@ cc_library(
 )
 
 cc_library(
-    name = "component_h",
+    name = "libcomponent_h.so",
     srcs = [
         "component_h.cc",
     ],
