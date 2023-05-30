@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <dlfcn.h>
 
 #include "component_a.h"
 #include "component_b.h"
@@ -30,6 +31,30 @@ void do_something()
   do_something_in_d();
   do_something_in_e();
   do_something_in_f();
+
+  /* Call do_something_in_g() */
+
+  void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
+  assert(component_g != nullptr);
+
+  auto *func_g = (void(*)())dlsym(component_g, "do_something_in_g");
+  assert(func_g != nullptr);
+
+  (*func_g)();
+
+  dlclose(component_g);
+
+  /* Call do_something_in_h() */
+
+  void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
+  assert(component_h != nullptr);
+
+  auto *func_h = (void(*)())dlsym(component_h, "do_something_in_h");
+  assert(func_h != nullptr);
+
+  (*func_h)();
+
+  dlclose(component_h);
 }
 
 int span_a_lib_count   = 0;
@@ -50,6 +75,12 @@ int span_e_f2_count    = 0;
 int span_f_lib_count   = 0;
 int span_f_f1_count    = 0;
 int span_f_f2_count    = 0;
+int span_g_lib_count   = 0;
+int span_g_f1_count    = 0;
+int span_g_f2_count    = 0;
+int span_h_lib_count   = 0;
+int span_h_f1_count    = 0;
+int span_h_f2_count    = 0;
 int unknown_span_count = 0;
 
 void reset_counts()
@@ -72,6 +103,12 @@ void reset_counts()
   span_f_lib_count   = 0;
   span_f_f1_count    = 0;
   span_f_f2_count    = 0;
+  span_g_lib_count   = 0;
+  span_g_f1_count    = 0;
+  span_g_f2_count    = 0;
+  span_h_lib_count   = 0;
+  span_h_f1_count    = 0;
+  span_h_f2_count    = 0;
   unknown_span_count = 0;
 }
 
@@ -162,6 +199,30 @@ public:
     {
       span_f_f2_count++;
     }
+    else if (name == "G::library")
+    {
+      span_g_lib_count++;
+    }
+    else if (name == "G::f1")
+    {
+      span_g_f1_count++;
+    }
+    else if (name == "G::f2")
+    {
+      span_g_f2_count++;
+    }
+    else if (name == "H::library")
+    {
+      span_h_lib_count++;
+    }
+    else if (name == "H::f1")
+    {
+      span_h_f1_count++;
+    }
+    else if (name == "H::f2")
+    {
+      span_h_f2_count++;
+    }
     else
     {
       unknown_span_count++;
@@ -236,6 +297,12 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
+  EXPECT_EQ(span_g_lib_count, 0);
+  EXPECT_EQ(span_g_f1_count, 0);
+  EXPECT_EQ(span_g_f2_count, 0);
+  EXPECT_EQ(span_h_lib_count, 0);
+  EXPECT_EQ(span_h_f1_count, 0);
+  EXPECT_EQ(span_h_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -261,6 +328,12 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 1);
   EXPECT_EQ(span_f_f1_count, 2);
   EXPECT_EQ(span_f_f2_count, 1);
+  EXPECT_EQ(span_g_lib_count, 1);
+  EXPECT_EQ(span_g_f1_count, 2);
+  EXPECT_EQ(span_g_f2_count, 1);
+  EXPECT_EQ(span_h_lib_count, 1);
+  EXPECT_EQ(span_h_f1_count, 2);
+  EXPECT_EQ(span_h_f2_count, 1);
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
@@ -286,5 +359,11 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 0);
   EXPECT_EQ(span_f_f1_count, 0);
   EXPECT_EQ(span_f_f2_count, 0);
+  EXPECT_EQ(span_g_lib_count, 0);
+  EXPECT_EQ(span_g_f1_count, 0);
+  EXPECT_EQ(span_g_f2_count, 0);
+  EXPECT_EQ(span_h_lib_count, 0);
+  EXPECT_EQ(span_h_f1_count, 0);
+  EXPECT_EQ(span_h_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 }
