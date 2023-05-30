@@ -153,6 +153,9 @@ cc_test(
         "singleton_test.cc",
     ],
     linkstatic = False,
+    linkopts = [
+        "-ldl",
+    ],
     tags = [
         "api",
         "test",

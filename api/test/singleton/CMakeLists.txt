@@ -50,7 +50,7 @@ if(NOT WIN32)
     component_f
     ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
-    -ldl
+    ${CMAKE_DL_LIBS}
     opentelemetry_api)
 
   gtest_add_tests(
