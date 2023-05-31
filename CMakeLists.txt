@@ -408,10 +408,13 @@ if(WITH_OTLP)
         )
       endif()
     endif()
-    # Latest Protobuf uses mixed case instead of uppercase
-    if(Protobuf_PROTOC_EXECUTABLE)
-      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
-    endif()
+  endif()
+  # Latest Protobuf uses mixed case instead of uppercase
+  if(TARGET protobuf::protoc)
+    project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
+                                              protobuf::protoc)
+  elseif(Protobuf_PROTOC_EXECUTABLE)
+    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   include(CMakeDependentOption)
 
