@@ -31,7 +31,9 @@ public:
   // Construct an adapting integer array of a given size.
   explicit AdaptingIntegerArray(size_t size) : backing_(std::vector<uint8_t>(size, 0)) {}
   AdaptingIntegerArray(const AdaptingIntegerArray &other) = default;
+  AdaptingIntegerArray(AdaptingIntegerArray &&other)      = default;
   AdaptingIntegerArray &operator=(const AdaptingIntegerArray &other) = default;
+  AdaptingIntegerArray &operator=(AdaptingIntegerArray &&other) = default;
 
   /**
    * Increments the value at the specified index by the given count in the array.
@@ -85,7 +87,9 @@ class AdaptingCircularBufferCounter
 public:
   explicit AdaptingCircularBufferCounter(size_t max_size) : backing_(max_size) {}
   AdaptingCircularBufferCounter(const AdaptingCircularBufferCounter &other) = default;
+  AdaptingCircularBufferCounter(AdaptingCircularBufferCounter &&other)      = default;
   AdaptingCircularBufferCounter &operator=(const AdaptingCircularBufferCounter &other) = default;
+  AdaptingCircularBufferCounter &operator=(AdaptingCircularBufferCounter &&other) = default;
 
   /**
    * The first index with a recording. May be negative.
@@ -94,7 +98,7 @@ public:
    *
    * @return the first index with a recording.
    */
-  size_t StartIndex() const { return start_index_; }
+  int32_t StartIndex() const { return start_index_; }
 
   /**
    * The last index with a recording. May be negative.
@@ -103,7 +107,7 @@ public:
    *
    * @return The last index with a recording.
    */
-  size_t EndIndex() const { return end_index_; }
+  int32_t EndIndex() const { return end_index_; }
 
   /**
    * Returns true if no recordings, false if at least one recording.
@@ -125,23 +129,23 @@ public:
    * @param delta How much to increment the index by.
    * @return success status.
    */
-  bool Increment(size_t index, uint64_t delta);
+  bool Increment(int32_t index, uint64_t delta);
 
   /**
    * Get the number of recordings for the given index.
    *
    * @return the number of recordings for the index, or 0 if the index is out of bounds.
    */
-  uint64_t Get(size_t index);
+  uint64_t Get(int32_t index);
 
 private:
-  size_t ToBufferIndex(size_t index) const;
+  size_t ToBufferIndex(int32_t index) const;
 
-  static constexpr size_t kNullIndex = std::numeric_limits<size_t>::max();
+  static constexpr int32_t kNullIndex = std::numeric_limits<int32_t>::min();
 
-  size_t start_index_ = kNullIndex;
-  size_t end_index_   = kNullIndex;
-  size_t base_index_  = kNullIndex;
+  int32_t start_index_ = kNullIndex;
+  int32_t end_index_   = kNullIndex;
+  int32_t base_index_  = kNullIndex;
   AdaptingIntegerArray backing_;
 };
 

@@ -44,7 +44,7 @@ struct AdaptingIntegerArrayGet
 struct AdaptingIntegerArraySize
 {
   template <typename T>
-  uint64_t operator()(const std::vector<T> &backing)
+  size_t operator()(const std::vector<T> &backing)
   {
     return backing.size();
   }
@@ -55,7 +55,7 @@ struct AdaptingIntegerArrayClear
   template <typename T>
   void operator()(std::vector<T> &backing)
   {
-    std::fill(backing.begin(), backing.end(), 0);
+    std::fill(backing.begin(), backing.end(), static_cast<T>(0));
   }
 };
 
@@ -124,7 +124,7 @@ void AdaptingCircularBufferCounter::Clear()
   backing_.Clear();
 }
 
-bool AdaptingCircularBufferCounter::Increment(size_t index, uint64_t delta)
+bool AdaptingCircularBufferCounter::Increment(int32_t index, uint64_t delta)
 {
   if (Empty())
   {
@@ -157,7 +157,7 @@ bool AdaptingCircularBufferCounter::Increment(size_t index, uint64_t delta)
   return true;
 }
 
-uint64_t AdaptingCircularBufferCounter::Get(size_t index)
+uint64_t AdaptingCircularBufferCounter::Get(int32_t index)
 {
   if (index < start_index_ || index > end_index_)
   {
@@ -166,15 +166,15 @@ uint64_t AdaptingCircularBufferCounter::Get(size_t index)
   return backing_.Get(ToBufferIndex(index));
 }
 
-size_t AdaptingCircularBufferCounter::ToBufferIndex(size_t index) const
+size_t AdaptingCircularBufferCounter::ToBufferIndex(int32_t index) const
 {
   // Figure out the index relative to the start of the circular buffer.
   if (index < base_index_)
   {
     // If index is before the base one, wrap around.
-    return index + backing_.Size() - base_index_;
+    return static_cast<size_t>(index + backing_.Size() - base_index_);
   }
-  return index - base_index_;
+  return static_cast<size_t>(index - base_index_);
 }
 
 }  // namespace metrics
