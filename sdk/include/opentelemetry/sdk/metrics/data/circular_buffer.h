@@ -143,9 +143,13 @@ private:
 
   static constexpr int32_t kNullIndex = std::numeric_limits<int32_t>::min();
 
+  // Index of the first populated element, may be kNullIndex if container is empty.
   int32_t start_index_ = kNullIndex;
-  int32_t end_index_   = kNullIndex;
-  int32_t base_index_  = kNullIndex;
+  // Index of the last populated element, may be kNullIndex if container is empty.
+  int32_t end_index_ = kNullIndex;
+  // Index corresponding to the element located at the start of the backing array, may be kNullIndex
+  // if container is empty.
+  int32_t base_index_ = kNullIndex;
   AdaptingIntegerArray backing_;
 };
 
