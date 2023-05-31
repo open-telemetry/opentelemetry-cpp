@@ -141,7 +141,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \

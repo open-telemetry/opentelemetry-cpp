@@ -166,6 +166,9 @@ if(DEFINED WITH_OTLP)
   )
 endif()
 
+option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
+       OFF)
+
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
@@ -391,10 +394,6 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
     endif()
   endif()
   include(CMakeDependentOption)
-
-  cmake_dependent_option(
-    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
-    "gRPC_FOUND" OFF)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
