@@ -284,13 +284,23 @@ TEST(OtlpRecordable, SetArrayAttribute)
   }
 }
 
-// Test empty array.
-TEST(OtlpRecordable, SetEmptyArrayAttribute)
+template <typename T>
+struct EmptyArrayAttributeTest : public testing::Test
 {
+  using ElementType = T;
+};
+
+using ArrayElementTypes =
+    testing::Types<bool, double, nostd::string_view, uint8_t, int, int64_t, unsigned int, uint64_t>;
+TYPED_TEST_SUITE(EmptyArrayAttributeTest, ArrayElementTypes);
+
+// Test empty arrays.
+TYPED_TEST(EmptyArrayAttributeTest, SetEmptyArrayAttribute)
+{
+  using ArrayElementType = typename TestFixture::ElementType;
   OtlpRecordable rec;
 
-  std::vector<int64_t> empty_array = {};
-  nostd::span<const int64_t> span(empty_array);
+  nostd::span<const ArrayElementType> span = {};
   rec.SetAttribute("empty_arr_attr", span);
 
   EXPECT_TRUE(rec.span().attributes(0).value().has_array_value());
