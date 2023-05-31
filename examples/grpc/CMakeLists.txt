@@ -23,7 +23,6 @@ add_custom_command(
 add_library(example_grpc_proto ${example_grpc_srcs} ${example_grpc_hdrs}
                                ${example_proto_srcs} ${example_proto_hdrs})
 
-include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)
 patch_protobuf_targets(example_grpc_proto)
 
 include_directories(
