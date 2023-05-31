@@ -589,15 +589,6 @@ if(BUILD_TESTING)
     # Benchmark respects the CMAKE_PREFIX_PATH
     find_package(benchmark CONFIG REQUIRED)
   endif()
-  project_build_tools_patch_default_imported_config(
-    GTest::gtest
-    GTest::gtest_main
-    GTest::gmock
-    GTest::gmock_main
-    GTest::GTest
-    GTest::Main
-    benchmark::benchmark
-    benchmark::benchmark_main)
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -660,6 +651,8 @@ if(NOT WITH_API_ONLY)
     add_subdirectory(functional)
   endif()
 endif()
+
+include("${PROJECT_SOURCE_DIR}/cmake/patch-imported-config.cmake")
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)
