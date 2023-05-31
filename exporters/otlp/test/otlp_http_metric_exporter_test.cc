@@ -160,8 +160,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -171,9 +171,9 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["sum"]["data_points"];
-          EXPECT_EQ(10.0, data_points[0]["as_double"].get<double>());
-          EXPECT_EQ(20.0, data_points[1]["as_double"].get<double>());
+          auto data_points = metric["sum"]["dataPoints"];
+          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+          EXPECT_EQ(20.0, data_points[1]["asDouble"].get<double>());
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -341,8 +341,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -352,9 +352,9 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["gauge"]["data_points"];
-          EXPECT_EQ(10.0, data_points[0]["as_double"].get<double>());
-          EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["as_int"]));
+          auto data_points = metric["gauge"]["dataPoints"];
+          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+          EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["asInt"]));
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -536,8 +536,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -547,43 +547,43 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["histogram"]["data_points"];
+          auto data_points = metric["histogram"]["dataPoints"];
           EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[0]["count"]));
           EXPECT_EQ(900.5, data_points[0]["sum"].get<double>());
           EXPECT_EQ(1.8, data_points[0]["min"].get<double>());
           EXPECT_EQ(19, data_points[0]["max"].get<double>());
-          EXPECT_EQ(4, data_points[0]["bucket_counts"].size());
-          if (4 == data_points[0]["bucket_counts"].size())
+          EXPECT_EQ(4, data_points[0]["bucketCounts"].size());
+          if (4 == data_points[0]["bucketCounts"].size())
           {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][3]));
+            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][0]));
+            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][1]));
+            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][2]));
+            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][3]));
           }
-          EXPECT_EQ(3, data_points[0]["explicit_bounds"].size());
-          if (3 == data_points[0]["explicit_bounds"].size())
+          EXPECT_EQ(3, data_points[0]["explicitBounds"].size());
+          if (3 == data_points[0]["explicitBounds"].size())
           {
-            EXPECT_EQ(10.1, data_points[0]["explicit_bounds"][0].get<double>());
-            EXPECT_EQ(20.2, data_points[0]["explicit_bounds"][1].get<double>());
-            EXPECT_EQ(30.2, data_points[0]["explicit_bounds"][2].get<double>());
+            EXPECT_EQ(10.1, data_points[0]["explicitBounds"][0].get<double>());
+            EXPECT_EQ(20.2, data_points[0]["explicitBounds"][1].get<double>());
+            EXPECT_EQ(30.2, data_points[0]["explicitBounds"][2].get<double>());
           }
 
           EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[1]["count"]));
           EXPECT_EQ(900.0, data_points[1]["sum"].get<double>());
-          EXPECT_EQ(4, data_points[1]["bucket_counts"].size());
-          if (4 == data_points[1]["bucket_counts"].size())
+          EXPECT_EQ(4, data_points[1]["bucketCounts"].size());
+          if (4 == data_points[1]["bucketCounts"].size())
           {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][3]));
+            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][0]));
+            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][1]));
+            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][2]));
+            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][3]));
           }
-          EXPECT_EQ(3, data_points[1]["explicit_bounds"].size());
-          if (3 == data_points[1]["explicit_bounds"].size())
+          EXPECT_EQ(3, data_points[1]["explicitBounds"].size());
+          if (3 == data_points[1]["explicitBounds"].size())
           {
-            EXPECT_EQ(10.0, data_points[1]["explicit_bounds"][0].get<double>());
-            EXPECT_EQ(20.0, data_points[1]["explicit_bounds"][1].get<double>());
-            EXPECT_EQ(30.0, data_points[1]["explicit_bounds"][2].get<double>());
+            EXPECT_EQ(10.0, data_points[1]["explicitBounds"][0].get<double>());
+            EXPECT_EQ(20.0, data_points[1]["explicitBounds"][1].get<double>());
+            EXPECT_EQ(30.0, data_points[1]["explicitBounds"][2].get<double>());
           }
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
