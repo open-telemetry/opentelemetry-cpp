@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Common dependencies
 project_build_tools_patch_default_imported_config(ZLIB::ZLIB)
 
