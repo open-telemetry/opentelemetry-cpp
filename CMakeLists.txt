@@ -565,10 +565,14 @@ if(BUILD_TESTING)
     set(GTEST_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    set(GTEST_BOTH_LIBRARIES
-        ${CMAKE_BINARY_DIR}/lib/libgtest.a
-        ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-        ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    if(TARGET gtest)
+      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
+    else()
+      set(GTEST_BOTH_LIBRARIES
+          ${CMAKE_BINARY_DIR}/lib/libgtest.a
+          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
+          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
@@ -580,8 +584,18 @@ if(BUILD_TESTING)
   else()
     # Prefer GTest installed by OS distro, brew or vcpkg package manager
     find_package(GTest REQUIRED)
+    if(NOT GTEST_BOTH_LIBRARIES)
+      # New GTest package names
+      if(TARGET GTest::gtest)
+        set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+      elseif(TARGET GTest::GTest)
+        set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
+      endif()
+    endif()
   endif()
-  include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  if(GTEST_INCLUDE_DIRS)
+    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  endif()
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
