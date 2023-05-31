@@ -284,6 +284,19 @@ TEST(OtlpRecordable, SetArrayAttribute)
   }
 }
 
+// Test empty array.
+TEST(OtlpRecordable, SetEmptyArrayAttribute)
+{
+  OtlpRecordable rec;
+
+  std::vector<int64_t> empty_array = {};
+  nostd::span<const int64_t> span(empty_array);
+  rec.SetAttribute("empty_arr_attr", span);
+
+  EXPECT_TRUE(rec.span().attributes(0).value().has_array_value());
+  EXPECT_TRUE(rec.span().attributes(0).value().array_value().values().empty());
+}
+
 /**
  * AttributeValue can contain different int types, such as int, int64_t,
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
