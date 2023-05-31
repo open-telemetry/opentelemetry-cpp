@@ -165,10 +165,10 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resource_spans"].begin();
-          auto scope_span        = *resource_span["scope_spans"].begin();
+          auto resource_span     = *check_json["resourceSpans"].begin();
+          auto scope_span        = *resource_span["scopeSpans"].begin();
           auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["trace_id"].get<std::string>();
+          auto received_trace_id = span["traceId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -256,10 +256,10 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resource_spans"].begin();
-          auto scope_span        = *resource_span["scope_spans"].begin();
+          auto resource_span     = *check_json["resourceSpans"].begin();
+          auto scope_span        = *resource_span["scopeSpans"].begin();
           auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["trace_id"].get<std::string>();
+          auto received_trace_id = span["traceId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
