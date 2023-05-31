@@ -161,7 +161,7 @@ endif()
 
 if(DEFINED WITH_OTLP)
   message(
-      FATAL_ERROR
+    FATAL_ERROR
       "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
   )
 endif()
