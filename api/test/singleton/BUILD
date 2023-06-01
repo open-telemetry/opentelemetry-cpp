@@ -163,15 +163,15 @@ cc_binary(
 #
 
 cc_test(
-    copts = ["-DBUILD_WITH_BAZEL=1"],
     name = "singleton_test",
     srcs = [
         "singleton_test.cc",
     ],
-    linkstatic = False,
+    copts = ["-DBUILD_WITH_BAZEL=1"],
     linkopts = [
         "-ldl",
     ],
+    linkstatic = False,
     tags = [
         "api",
         "test",

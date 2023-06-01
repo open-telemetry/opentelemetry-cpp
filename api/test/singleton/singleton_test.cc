@@ -31,15 +31,15 @@ void do_something()
   do_something_in_e();
   do_something_in_f();
 
-/*
-  See https://github.com/bazelbuild/bazel/issues/4218
+  /*
+    See https://github.com/bazelbuild/bazel/issues/4218
 
-  There is no way to set LD_LIBRARY_PATH in bazel,
-  for dlopen() to find the library.
+    There is no way to set LD_LIBRARY_PATH in bazel,
+    for dlopen() to find the library.
 
-  Verified manually that dlopen("/full/path/to/libcomponent_g.so") works,
-  and that the test passes in this case.
-*/
+    Verified manually that dlopen("/full/path/to/libcomponent_g.so") works,
+    and that the test passes in this case.
+  */
 
 #ifndef BUILD_WITH_BAZEL
   /* Call do_something_in_g() */
