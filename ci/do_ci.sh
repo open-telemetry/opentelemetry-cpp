@@ -94,7 +94,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
@@ -118,7 +117,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
@@ -143,7 +141,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
@@ -245,7 +242,7 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -259,7 +256,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -272,7 +269,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DBUILD_SHARED_LIBS=ON \
         "${SRC_DIR}"
@@ -286,7 +283,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -300,7 +297,7 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOPENTELEMETRY_INSTALL=OFF \
