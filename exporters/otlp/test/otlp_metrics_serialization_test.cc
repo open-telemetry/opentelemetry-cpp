@@ -43,6 +43,33 @@ static metrics_sdk::MetricData CreateSumAggregationData()
   return data;
 }
 
+static metrics_sdk::MetricData CreateUpDownCounterAggregationData()
+{
+  metrics_sdk::MetricData data;
+  data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  metrics_sdk::InstrumentDescriptor inst_desc = {"UpDownCounter", "Robot Pose Y", "Meter",
+                                                 metrics_sdk::InstrumentType::kUpDownCounter,
+                                                 metrics_sdk::InstrumentValueType::kDouble};
+  metrics_sdk::SumPointData s_data_1, s_data_2;
+  s_data_2.value_ = 1.35;
+  s_data_2.value_ = 1.37;
+
+  data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
+  data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  data.instrument_descriptor = inst_desc;
+  metrics_sdk::PointDataAttributes point_data_attr_1, point_data_attr_2;
+  point_data_attr_1.attributes = {{"environment_id", "DEV-AYS"}};
+  point_data_attr_1.point_data = s_data_1;
+
+  point_data_attr_2.attributes = {{"robot_id", "DEV-AYS-03-02"}};
+  point_data_attr_2.point_data = s_data_1;
+  std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
+  point_data_attr.push_back(point_data_attr_1);
+  point_data_attr.push_back(point_data_attr_2);
+  data.point_data_attr_ = std::move(point_data_attr);
+  return data;
+}
+
 static metrics_sdk::MetricData CreateHistogramAggregationData()
 {
   metrics_sdk::MetricData data;
@@ -116,6 +143,20 @@ TEST(OtlpMetricSerializationTest, Counter)
     auto proto_number_point = sum.data_points(i);
     EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 10.2 : 20.2);
   }
+
+  EXPECT_EQ(1, 1);
+}
+
+TEST(OtlpMetricSerializationTest, UpDownCounter)
+{
+  metrics_sdk::MetricData data = CreateUpDownCounterAggregationData();
+  opentelemetry::proto::metrics::v1::Sum sum;
+  otlp_exporter::OtlpMetricUtils::ConvertSumMetric(data, &sum);
+  EXPECT_EQ(sum.aggregation_temporality(),
+            proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
+  EXPECT_EQ(sum.is_monotonic(), false);
+  EXPECT_EQ(sum.data_points(0).as_double(), 1.35);
+  EXPECT_EQ(sum.data_points(1).as_double(), 1.37);
 
   EXPECT_EQ(1, 1);
 }
