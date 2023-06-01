@@ -31,6 +31,17 @@ void do_something()
   do_something_in_e();
   do_something_in_f();
 
+/*
+  See https://github.com/bazelbuild/bazel/issues/4218
+
+  There is no way to set LD_LIBRARY_PATH in bazel,
+  for dlopen() to find the library.
+
+  Verified manually that dlopen("/full/path/to/libcomponent_g.so") works,
+  and that the test passes in this case.
+*/
+
+#ifndef BUILD_WITH_BAZEL
   /* Call do_something_in_g() */
 
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
@@ -54,6 +65,7 @@ void do_something()
   (*func_h)();
 
   dlclose(component_h);
+#endif
 }
 
 int span_a_lib_count   = 0;
@@ -327,12 +339,16 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_lib_count, 1);
   EXPECT_EQ(span_f_f1_count, 2);
   EXPECT_EQ(span_f_f2_count, 1);
+
+#ifndef BUILD_WITH_BAZEL
   EXPECT_EQ(span_g_lib_count, 1);
   EXPECT_EQ(span_g_f1_count, 2);
   EXPECT_EQ(span_g_f2_count, 1);
   EXPECT_EQ(span_h_lib_count, 1);
   EXPECT_EQ(span_h_f1_count, 2);
   EXPECT_EQ(span_h_f2_count, 1);
+#endif
+
   EXPECT_EQ(unknown_span_count, 0);
 
   reset_counts();
