@@ -138,7 +138,7 @@ bool AdaptingCircularBufferCounter::Increment(int32_t index, uint64_t delta)
   if (index > end_index_)
   {
     // Move end, check max size.
-    if (index + 1 > backing_.Size() + start_index_)
+    if (index + 1 > static_cast<int32_t>(backing_.Size()) + start_index_)
     {
       return false;
     }
@@ -147,7 +147,7 @@ bool AdaptingCircularBufferCounter::Increment(int32_t index, uint64_t delta)
   else if (index < start_index_)
   {
     // Move end, check max size.
-    if (end_index_ + 1 > backing_.Size() + index)
+    if (end_index_ + 1 > static_cast<int32_t>(backing_.Size()) + index)
     {
       return false;
     }
