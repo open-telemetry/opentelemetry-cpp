@@ -286,6 +286,21 @@ cc_test(
 )
 
 cc_test(
+    name = "base2_exponential_histogram_indexer_test",
+    srcs = [
+        "base2_exponential_histogram_indexer_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "histogram_aggregation_test",
     srcs = [
         "histogram_aggregation_test.cc",
