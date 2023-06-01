@@ -99,7 +99,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
-        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
