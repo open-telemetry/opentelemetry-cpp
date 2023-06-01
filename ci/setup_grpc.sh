@@ -7,7 +7,7 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 old_grpc_version='v1.33.2'
 new_grpc_version='v1.49.2'
-moderd_grpc_version='v1.55.0'
+modern_grpc_version='v1.55.0'
 gcc_version_for_new_grpc='5.1'
 std_version='14'
 if [ ! -z "${CXX_STANDARD}" ]; then
@@ -40,7 +40,7 @@ while getopts ":v:i:mp:r:s:TH" o; do
             install_grpc_version=${OPTARG}
             ;;
         m)
-            install_grpc_version=${moderd_grpc_version}
+            install_grpc_version=${modern_grpc_version}
             ;;
         s)
             std_version=${OPTARG}
