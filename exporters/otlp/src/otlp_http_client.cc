@@ -451,7 +451,7 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   {
     const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
     nlohmann::json &child_value = options.use_json_name ? value[field_descriptor->json_name()]
-                                                        : value[field_descriptor->name()];
+                                                        : value[field_descriptor->camelcase_name()];
     if (field_descriptor->is_repeated())
     {
       ConvertListFieldToJson(child_value, message, field_descriptor, options);
