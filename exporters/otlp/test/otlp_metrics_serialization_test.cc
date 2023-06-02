@@ -35,7 +35,7 @@ static metrics_sdk::MetricData CreateSumAggregationData()
   point_data_attr_1.point_data = s_data_1;
 
   point_data_attr_2.attributes = {{"k2", "v2"}};
-  point_data_attr_2.point_data = s_data_1;
+  point_data_attr_2.point_data = s_data_2;
   std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
   point_data_attr.push_back(point_data_attr_1);
   point_data_attr.push_back(point_data_attr_2);
@@ -51,7 +51,7 @@ static metrics_sdk::MetricData CreateUpDownCounterAggregationData()
                                                  metrics_sdk::InstrumentType::kUpDownCounter,
                                                  metrics_sdk::InstrumentValueType::kDouble};
   metrics_sdk::SumPointData s_data_1, s_data_2;
-  s_data_2.value_ = 1.35;
+  s_data_1.value_ = 1.35;
   s_data_2.value_ = 1.37;
 
   data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
@@ -62,7 +62,7 @@ static metrics_sdk::MetricData CreateUpDownCounterAggregationData()
   point_data_attr_1.point_data = s_data_1;
 
   point_data_attr_2.attributes = {{"robot_id", "DEV-AYS-03-02"}};
-  point_data_attr_2.point_data = s_data_1;
+  point_data_attr_2.point_data = s_data_2;
   std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
   point_data_attr.push_back(point_data_attr_1);
   point_data_attr.push_back(point_data_attr_2);
@@ -95,7 +95,7 @@ static metrics_sdk::MetricData CreateHistogramAggregationData()
   point_data_attr_1.point_data = s_data_1;
 
   point_data_attr_2.attributes = {{"k2", "v2"}};
-  point_data_attr_2.point_data = s_data_1;
+  point_data_attr_2.point_data = s_data_2;
   std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
   point_data_attr.push_back(point_data_attr_1);
   point_data_attr.push_back(point_data_attr_2);
@@ -122,7 +122,7 @@ static metrics_sdk::MetricData CreateObservableGaugeAggregationData()
   point_data_attr_1.point_data = s_data_1;
 
   point_data_attr_2.attributes = {{"k2", "v2"}};
-  point_data_attr_2.point_data = s_data_1;
+  point_data_attr_2.point_data = s_data_2;
   std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
   point_data_attr.push_back(point_data_attr_1);
   point_data_attr.push_back(point_data_attr_2);
