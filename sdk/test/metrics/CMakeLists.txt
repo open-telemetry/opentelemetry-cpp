@@ -14,6 +14,7 @@ foreach(
   histogram_aggregation_test
   attributes_processor_test
   attributes_hashmap_test
+  base2_exponential_histogram_indexer_test
   circular_buffer_counter_test
   histogram_test
   sync_metric_storage_counter_test
