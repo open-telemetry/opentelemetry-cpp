@@ -12,7 +12,7 @@ function install_prometheus_cpp_client
   [[ -d _build ]] && rm -rf ./_build
   mkdir _build && cd _build
   cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
-  make -j 4
+  make -j $(nproc)
   sudo make install
   popd
 }
@@ -87,26 +87,77 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
-elif [[ "$1" == "cmake.maintainer.test" ]]; then
+elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
+        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
+        -DWITH_JAEGER=OFF \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        "${SRC_DIR}"
+  make -k
+  make test
+  exit 0
+elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
+        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=OFF \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
-  make -k
+  make -k -j $(nproc)
+  make test
+  exit 0
+elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=11 \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
+        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=OFF \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        "${SRC_DIR}"
+  make -k -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
@@ -122,7 +173,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.abseil.test" ]]; then
@@ -135,7 +186,17 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
+  make test
+  exit 0
+elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
+        -DWITH_OPENTRACING=ON \
+        "${SRC_DIR}"
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
@@ -146,7 +207,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=20 \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
@@ -159,7 +220,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=ON \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.test" ]]; then
@@ -171,7 +232,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_CXX_STANDARD=11 \
         "${SRC_DIR}"
-  make
+  make -j $(nproc)
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
@@ -181,7 +242,7 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -195,8 +256,22 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        "${SRC_DIR}"
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
+  exit 0
+elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DBUILD_SHARED_LIBS=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
@@ -208,9 +283,24 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        "${SRC_DIR}"
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
+  exit 0
+elif [[ "$1" == "cmake.do_not_install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOPENTELEMETRY_INSTALL=OFF \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
@@ -279,25 +369,24 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
-  # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test
+  # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
+  # that make this test always fail. Ignore these packages in the noexcept test here.
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
-  # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
+  # that make this test always fail. Ignore these packages in the nortti test here.
   bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
   bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti --build_tag_filters=-jaeger $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//exporters/jaeger/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS run --config=asan $BAZEL_TEST_OPTIONS_ASYNC \
-  //examples/metrics_simple:metrics_ostream_example > /dev/null
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS run --config=tsan $BAZEL_TEST_OPTIONS_ASYNC \
-  //examples/metrics_simple:metrics_ostream_example > /dev/null
+# TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
+# https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...

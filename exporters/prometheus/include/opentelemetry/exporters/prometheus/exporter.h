@@ -12,7 +12,7 @@
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
 /**
@@ -33,8 +33,11 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
   constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
   constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
 
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kPrometheusEndpointEnv);
-  return endpoint.size() ? endpoint : kPrometheusEndpointDefault;
+  std::string endpoint;
+
+  auto exists =
+      opentelemetry::sdk::common::GetStringEnvironmentVariable(kPrometheusEndpointEnv, endpoint);
+  return exists ? endpoint : kPrometheusEndpointDefault;
 }
 
 /**
@@ -46,7 +49,7 @@ struct PrometheusExporterOptions
   std::string url = GetPrometheusDefaultHttpEndpoint();
 };
 
-class PrometheusExporter : public sdk::metrics::PushMetricExporter
+class PrometheusExporter : public sdk::metrics::MetricReader
 {
 public:
   /**
@@ -56,54 +59,12 @@ public:
    */
   PrometheusExporter(const PrometheusExporterOptions &options);
 
-  /**
-   * Get the AggregationTemporality for Prometheus exporter
-   *
-   * @return AggregationTemporality
-   */
   sdk::metrics::AggregationTemporality GetAggregationTemporality(
       sdk::metrics::InstrumentType instrument_type) const noexcept override;
-
-  /**
-   * Exports a batch of Metric Records.
-   * @param records: a collection of records to export
-   * @return: returns a ReturnCode detailing a success, or type of failure
-   */
-  sdk::common::ExportResult Export(const sdk::metrics::ResourceMetrics &data) noexcept override;
-
-  /**
-   * Force flush the exporter.
-   */
-  bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
-
-  /**
-   * Shuts down the exporter and does cleanup.
-   * Since Prometheus is a pull based interface,
-   * we cannot serve data remaining in the intermediate
-   * collection to to client an HTTP request being sent,
-   * so we flush the data.
-   */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
-
-  /**
-   * @return: returns a shared_ptr to
-   * the PrometheusCollector instance
-   */
-  std::shared_ptr<PrometheusCollector> &GetCollector();
-
-  /**
-   * @return: Gets the shutdown status of the exporter
-   */
-  bool IsShutdown() const;
 
 private:
   // The configuration options associated with this exporter.
   const PrometheusExporterOptions options_;
-  /**
-   * exporter shutdown status
-   */
-  bool is_shutdown_;
 
   /**
    * Pointer to a
@@ -117,16 +78,11 @@ private:
    */
   std::unique_ptr<::prometheus::Exposer> exposer_;
 
-  /**
-   * friend class for testing
-   */
-  friend class PrometheusExporterTest;
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override;
 
-  /**
-   * PrometheusExporter constructor with no parameters
-   * Used for testing only
-   */
-  PrometheusExporter();
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override;
+
+  void OnInitialized() noexcept override;
 };
 }  // namespace metrics
 }  // namespace exporter

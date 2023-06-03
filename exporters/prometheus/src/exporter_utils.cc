@@ -28,103 +28,94 @@ namespace metrics
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
-    const std::vector<std::unique_ptr<sdk::metrics::ResourceMetrics>> &data)
+    const sdk::metrics::ResourceMetrics &data)
 {
-  if (data.empty())
-  {
-    return {};
-  }
 
   // initialize output vector
   std::vector<prometheus_client::MetricFamily> output;
 
-  // iterate through the vector and set result data into it
-  for (const auto &r : data)
+  for (const auto &instrumentation_info : data.scope_metric_data_)
   {
-    for (const auto &instrumentation_info : r->scope_metric_data_)
+    for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      for (const auto &metric_data : instrumentation_info.metric_data_)
+      auto origin_name = metric_data.instrument_descriptor.name_;
+      auto unit        = metric_data.instrument_descriptor.unit_;
+      auto sanitized   = SanitizeNames(origin_name);
+      prometheus_client::MetricFamily metric_family;
+      metric_family.name = sanitized + "_" + unit;
+      metric_family.help = metric_data.instrument_descriptor.description_;
+      auto time          = metric_data.start_ts.time_since_epoch();
+      for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
-        auto origin_name = metric_data.instrument_descriptor.name_;
-        auto unit        = metric_data.instrument_descriptor.unit_;
-        auto sanitized   = SanitizeNames(origin_name);
-        prometheus_client::MetricFamily metric_family;
-        metric_family.name = sanitized + "_" + unit;
-        metric_family.help = metric_data.instrument_descriptor.description_;
-        auto time          = metric_data.start_ts.time_since_epoch();
-        for (const auto &point_data_attr : metric_data.point_data_attr_)
+        auto kind         = getAggregationType(point_data_attr.point_data);
+        bool is_monotonic = true;
+        if (kind == sdk::metrics::AggregationType::kSum)
         {
-          auto kind         = getAggregationType(point_data_attr.point_data);
-          bool is_monotonic = true;
-          if (kind == sdk::metrics::AggregationType::kSum)
+          is_monotonic =
+              nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
+        }
+        const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
+        metric_family.type                       = type;
+        if (type == prometheus_client::MetricType::Histogram)  // Histogram
+        {
+          auto histogram_point_data =
+              nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
+          auto boundaries = histogram_point_data.boundaries_;
+          auto counts     = histogram_point_data.counts_;
+          double sum      = 0.0;
+          if (nostd::holds_alternative<double>(histogram_point_data.sum_))
           {
-            is_monotonic =
-                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
+            sum = nostd::get<double>(histogram_point_data.sum_);
           }
-          const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-          metric_family.type                       = type;
-          if (type == prometheus_client::MetricType::Histogram)  // Histogram
+          else
           {
-            auto histogram_point_data =
-                nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
-            auto boundaries = histogram_point_data.boundaries_;
-            auto counts     = histogram_point_data.counts_;
-            double sum      = 0.0;
-            if (nostd::holds_alternative<double>(histogram_point_data.sum_))
-            {
-              sum = nostd::get<double>(histogram_point_data.sum_);
-            }
-            else
-            {
-              sum = nostd::get<int64_t>(histogram_point_data.sum_);
-            }
-            SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
-                    counts, point_data_attr.attributes, time, &metric_family);
+            sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
-          else if (type == prometheus_client::MetricType::Gauge)
+          SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
+                  point_data_attr.attributes, time, &metric_family);
+        }
+        else if (type == prometheus_client::MetricType::Gauge)
+        {
+          if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
+                  point_data_attr.point_data))
           {
-            if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
-                    point_data_attr.point_data))
-            {
-              auto last_value_point_data =
-                  nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
-              std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-              SetData(values, point_data_attr.attributes, type, time, &metric_family);
-            }
-            else if (nostd::holds_alternative<sdk::metrics::SumPointData>(
-                         point_data_attr.point_data))
-            {
-              auto sum_point_data =
-                  nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
-              std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-              SetData(values, point_data_attr.attributes, type, time, &metric_family);
-            }
-            else
-            {
-              OTEL_INTERNAL_LOG_WARN(
-                  "[Prometheus Exporter] TranslateToPrometheus - "
-                  "invalid LastValuePointData type");
-            }
+            auto last_value_point_data =
+                nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
+            SetData(values, point_data_attr.attributes, type, time, &metric_family);
           }
-          else  // Counter, Untyped
+          else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
-            if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
-            {
-              auto sum_point_data =
-                  nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
-              std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-              SetData(values, point_data_attr.attributes, type, time, &metric_family);
-            }
-            else
-            {
-              OTEL_INTERNAL_LOG_WARN(
-                  "[Prometheus Exporter] TranslateToPrometheus - "
-                  "invalid SumPointData type");
-            }
+            auto sum_point_data =
+                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+          }
+          else
+          {
+            OTEL_INTERNAL_LOG_WARN(
+                "[Prometheus Exporter] TranslateToPrometheus - "
+                "invalid LastValuePointData type");
           }
         }
-        output.emplace_back(metric_family);
+        else  // Counter, Untyped
+        {
+          if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
+          {
+            auto sum_point_data =
+                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+          }
+          else
+          {
+            OTEL_INTERNAL_LOG_WARN(
+                "[Prometheus Exporter] TranslateToPrometheus - "
+                "invalid SumPointData type");
+          }
+        }
       }
+      output.emplace_back(metric_family);
     }
   }
   return output;

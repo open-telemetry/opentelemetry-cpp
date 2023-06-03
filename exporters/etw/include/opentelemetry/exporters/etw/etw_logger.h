@@ -222,12 +222,51 @@ public:
   virtual void Log(opentelemetry::logs::Severity severity,
                    nostd::string_view name,
                    nostd::string_view body,
-                   Properties &evt,
+                   Properties &input_evt,
                    opentelemetry::trace::TraceId trace_id,
                    opentelemetry::trace::SpanId span_id,
                    opentelemetry::trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
+    UNREFERENCED_PARAMETER(trace_flags);
+
+#  if defined(ENABLE_ENV_PROPERTIES)
+
+    Properties env_properties_env = {};
+    bool has_customer_attribute   = false;
+    if (input_evt.size() > 0)
+    {
+      nlohmann::json env_properties_json = nlohmann::json::object();
+      for (auto &kv : input_evt)
+      {
+        nostd::string_view key = kv.first.data();
+
+        // don't serialize fields propagated from span data.
+        if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+            key == ETW_FIELD_SPAN_PARENTID)
+        {
+          env_properties_env[key.data()] = kv.second;
+        }
+        else
+        {
+          utils::PopulateAttribute(env_properties_json, key, kv.second);
+          has_customer_attribute = true;
+        }
+      }
+      if (has_customer_attribute)
+      {
+        env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+      }
+    }
+
+    Properties &evt = has_customer_attribute ? env_properties_env : input_evt;
+
+#  else
+
+    Properties &evt = input_evt;
+
+#  endif  // defined(ENABLE_ENV_PROPERTIES)
+
     // Populate Etw.EventName attribute at envelope level
     evt[ETW_FIELD_NAME] = ETW_VALUE_LOG;
 
@@ -317,44 +356,17 @@ public:
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view options,
       nostd::string_view library_name,
-      nostd::string_view version    = "",
-      nostd::string_view schema_url = "") override
+      nostd::string_view version                 = "",
+      nostd::string_view schema_url              = "",
+      bool include_trace_context                 = true,
+      const common::KeyValueIterable &attributes = common::NoopKeyValueIterable()) override
   {
-    UNREFERENCED_PARAMETER(options);
     UNREFERENCED_PARAMETER(library_name);
     UNREFERENCED_PARAMETER(version);
     UNREFERENCED_PARAMETER(schema_url);
-    ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<opentelemetry::logs::Logger>{
-        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
-  }
-
-  /**
-   * @brief Obtain ETW Tracer.
-   * @param name ProviderId (instrumentation name) - Name or GUID
-   * @param args Additional arguments that controls `codec` of the provider.
-   * Possible values are:
-   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
-   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
-   * - "XML"            - XML events (reserved for future use)
-   * @param library_name Library name
-   * @param version Library version
-   * @param schema_url schema URL
-   * @return
-   */
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view logger_name,
-      nostd::span<nostd::string_view> args,
-      nostd::string_view library_name,
-      nostd::string_view version    = "",
-      nostd::string_view schema_url = "") override
-  {
-    UNREFERENCED_PARAMETER(args);
-    UNREFERENCED_PARAMETER(library_name);
-    UNREFERENCED_PARAMETER(version);
-    UNREFERENCED_PARAMETER(schema_url);
+    UNREFERENCED_PARAMETER(include_trace_context);
+    UNREFERENCED_PARAMETER(attributes);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<opentelemetry::logs::Logger>{
         new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};

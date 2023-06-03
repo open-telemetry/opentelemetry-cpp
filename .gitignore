@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Ref. https://github.com/github/gitignore/blob/master/C%2B%2B.gitignore
 # Prerequisites
 *.d
@@ -16,6 +19,7 @@
 *.so
 *.dylib
 *.dll
+*.pdb
 
 # Fortran module files
 *.mod
@@ -51,3 +55,27 @@
 
 tags
 .cache/clangd/*
+
+# Temporary dir used when generating semconv
+./buildscripts/semantic-convention/opentelemetry-specification
+
+# Generated cert keys in functional tests
+functional/cert/ca.csr
+functional/cert/ca.pem
+functional/cert/ca-key.pem
+functional/cert/client_cert.csr
+functional/cert/client_cert.pem
+functional/cert/client_cert-key.pem
+functional/cert/server_cert.csr
+functional/cert/server_cert.pem
+functional/cert/server_cert-key.pem
+functional/cert/ca_b.csr
+functional/cert/ca_b.pem
+functional/cert/ca_b-key.pem
+functional/cert/client_cert_b.csr
+functional/cert/client_cert_b.pem
+functional/cert/client_cert_b-key.pem
+functional/cert/server_cert_b.csr
+functional/cert/server_cert_b.pem
+functional/cert/server_cert_b-key.pem
+functional/cert/unreadable.pem

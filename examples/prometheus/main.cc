@@ -34,21 +34,16 @@ void InitMetrics(const std::string &name, const std::string &addr)
   }
   std::puts("PrometheusExporter example program running ...");
 
-  std::unique_ptr<metrics_sdk::PushMetricExporter> exporter{
-      new metrics_exporter::PrometheusExporter(opts)};
-
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
+  std::shared_ptr<metrics_sdk::MetricReader> prometheus_exporter(
+      new metrics_exporter::PrometheusExporter(opts));
+
   // Initialize and set the global MeterProvider
-  metrics_sdk::PeriodicExportingMetricReaderOptions options;
-  options.export_interval_millis = std::chrono::milliseconds(1000);
-  options.export_timeout_millis  = std::chrono::milliseconds(500);
-  std::unique_ptr<metrics_sdk::MetricReader> reader{
-      new metrics_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metrics_sdk::MeterProvider());
   auto p        = std::static_pointer_cast<metrics_sdk::MeterProvider>(provider);
-  p->AddMetricReader(std::move(reader));
+  p->AddMetricReader(prometheus_exporter);
 
   // counter view
   std::string counter_name = name + "_counter";
@@ -57,7 +52,7 @@ void InitMetrics(const std::string &name, const std::string &addr)
   std::unique_ptr<metrics_sdk::MeterSelector> meter_selector{
       new metrics_sdk::MeterSelector(name, version, schema)};
   std::unique_ptr<metrics_sdk::View> sum_view{
-      new metrics_sdk::View{name, "description", metrics_sdk::AggregationType::kSum}};
+      new metrics_sdk::View{counter_name, "description", metrics_sdk::AggregationType::kSum}};
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
   // histogram view
@@ -66,8 +61,8 @@ void InitMetrics(const std::string &name, const std::string &addr)
       new metrics_sdk::InstrumentSelector(metrics_sdk::InstrumentType::kHistogram, histogram_name)};
   std::unique_ptr<metrics_sdk::MeterSelector> histogram_meter_selector{
       new metrics_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metrics_sdk::View> histogram_view{
-      new metrics_sdk::View{name, "description", metrics_sdk::AggregationType::kHistogram}};
+  std::unique_ptr<metrics_sdk::View> histogram_view{new metrics_sdk::View{
+      histogram_name, "description", metrics_sdk::AggregationType::kHistogram}};
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
   metrics_api::Provider::SetMeterProvider(provider);
@@ -83,7 +78,7 @@ void CleanupMetrics()
 int main(int argc, char **argv)
 {
   std::string example_type;
-  std::string addr{"localhost:8080"};
+  std::string addr{"localhost:9464"};
   if (argc == 1)
   {
     std::puts("usage: $prometheus_example <example type> <url>");

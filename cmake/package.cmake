@@ -1,3 +1,5 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
 set(CPACK_PACKAGE_DESCRIPTION "OpenTelemetry C++ for Linux")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenTelemetry C++ for Linux - C++ Implementation of OpenTelemetry Specification")
@@ -54,7 +56,7 @@ elseif(WIN32)
     find_program(NUGETCAPABLE nuget)
     if(NOT NUGETCAPABLE MATCHES "NOTFOUND")
         set(CPACK_NUGET_PACKAGE_NAME "${CPACK_PROJECT_NAME}")
-        set(CPACK_NUGET_PACKAGE_VERSION "${OPENTELEMETRY_VERSIOM}")
+        set(CPACK_NUGET_PACKAGE_VERSION "${OPENTELEMETRY_VERSION}")
         set(CPACK_NUGET_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION}")
         set(CPACK_NUGET_PACKAGE_AUTHORS "${CPACK_PACKAGE_VENDOR}")
         set(CPACK_NUGET_PACKAGE_TITLE "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")

@@ -49,9 +49,10 @@ TEST(ETWLogger, LoggerCheckWithBody)
   exporter::etw::LoggerProvider lp;
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-  auto logger        = lp.GetLogger(providerName, "", schema_url);
+  auto logger        = lp.GetLogger(providerName, schema_url);
   Properties attribs = {{"attrib1", 1}, {"attrib2", 2}};
-  EXPECT_NO_THROW(logger->Log(opentelemetry::logs::Severity::kDebug, "This is test log body"));
+  EXPECT_NO_THROW(
+      logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug, "This is test log body"));
 }
 
 /**
@@ -91,10 +92,11 @@ TEST(ETWLogger, LoggerCheckWithAttributes)
   exporter::etw::LoggerProvider lp;
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-  auto logger = lp.GetLogger(providerName, "", schema_url);
+  auto logger = lp.GetLogger(providerName, schema_url);
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", 2}};
-  EXPECT_NO_THROW(logger->Log(opentelemetry::logs::Severity::kDebug, attribs));
+  EXPECT_NO_THROW(logger->EmitLogRecord(opentelemetry::logs::Severity::kDebug,
+                                        opentelemetry::common::MakeAttributes(attribs)));
 }
 
 #  endif  // _WIN32

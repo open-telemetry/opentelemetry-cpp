@@ -4,14 +4,15 @@
 #pragma once
 
 #include <cstdint>
-#include <cstring>
 #include <string>
 
 #include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 #if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
 #  include <regex>
@@ -29,7 +30,7 @@ namespace trace
  * For more information, see the W3C Trace Context specification:
  * https://www.w3.org/TR/trace-context
  */
-class TraceState
+class OPENTELEMETRY_EXPORT TraceState
 {
 public:
   static constexpr int kKeyMaxSize         = 256;
@@ -73,7 +74,7 @@ public:
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState
-        ts->kv_properties_.reset(new opentelemetry::common::KeyValueProperties());
+        ts->kv_properties_.reset(new common::KeyValueProperties());
         break;
       }
 
@@ -229,8 +230,8 @@ public:
   }
 
 private:
-  TraceState() : kv_properties_(new opentelemetry::common::KeyValueProperties()) {}
-  TraceState(size_t size) : kv_properties_(new opentelemetry::common::KeyValueProperties(size)) {}
+  TraceState() : kv_properties_(new common::KeyValueProperties()) {}
+  TraceState(size_t size) : kv_properties_(new common::KeyValueProperties(size)) {}
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
@@ -311,7 +312,7 @@ private:
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
+  nostd::unique_ptr<common::KeyValueProperties> kv_properties_;
 };
 
 }  // namespace trace

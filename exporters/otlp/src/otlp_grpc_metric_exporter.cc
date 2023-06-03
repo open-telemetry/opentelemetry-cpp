@@ -25,8 +25,7 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptio
     : options_(options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      metrics_service_stub_(
-          OtlpGrpcClient::MakeServiceStub<proto::collector::metrics::v1::MetricsService>(options))
+      metrics_service_stub_(OtlpGrpcClient::MakeMetricsServiceStub(options))
 {}
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
@@ -67,7 +66,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   auto context = OtlpGrpcClient::MakeClientContext(options_);
   proto::collector::metrics::v1::ExportMetricsServiceResponse response;
 
-  grpc::Status status = metrics_service_stub_->Export(context.get(), request, &response);
+  grpc::Status status = OtlpGrpcClient::DelegateExport(metrics_service_stub_.get(), context.get(),
+                                                       request, &response);
 
   if (!status.ok())
   {

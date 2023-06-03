@@ -20,7 +20,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP exporter options.
+ * Struct to hold OTLP HTTP logs exporter options.
  */
 struct OtlpHttpLogRecordExporterOptions
 {
@@ -28,7 +28,7 @@ struct OtlpHttpLogRecordExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpLogEndpoint();
+  std::string url = GetOtlpDefaultHttpLogsEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -44,11 +44,10 @@ struct OtlpHttpLogRecordExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug = false;
 
-  // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogTimeout();
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogsTimeout();
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
+  OtlpHeaders http_headers = GetOtlpDefaultLogsHeaders();
 
 #  ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
@@ -58,6 +57,30 @@ struct OtlpHttpLogRecordExporterOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 #  endif
+
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  bool ssl_insecure_skip_verify{false};
+
+  std::string ssl_ca_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
+  std::string ssl_ca_cert_string = GetOtlpDefaultLogsSslCertificateString();
+
+  std::string ssl_client_key_path   = GetOtlpDefaultLogsSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultLogsSslClientKeyString();
+
+  std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
+#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+  /** Minimum TLS version. */
+  std::string ssl_min_tls = GetOtlpDefaultLogsSslTlsMinVersion();
+  /** Maximum TLS version. */
+  std::string ssl_max_tls = GetOtlpDefaultLogsSslTlsMaxVersion();
+  /** TLS cipher. */
+  std::string ssl_cipher = GetOtlpDefaultLogsSslTlsCipher();
+  /** TLS cipher suite. */
+  std::string ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
+#  endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp

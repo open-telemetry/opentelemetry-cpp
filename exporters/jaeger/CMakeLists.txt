@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 include_directories(thrift-gen)
 
 find_package(Thrift REQUIRED)
@@ -32,6 +35,7 @@ add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
 
 set_target_properties(opentelemetry_exporter_jaeger_trace
                       PROPERTIES EXPORT_NAME jaeger_trace_exporter)
+set_target_version(opentelemetry_exporter_jaeger_trace)
 
 target_include_directories(
   opentelemetry_exporter_jaeger_trace
@@ -40,7 +44,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_jaeger_trace
-  PUBLIC opentelemetry_resources opentelemetry_http_client_curl
+  PUBLIC opentelemetry_resources opentelemetry_trace
+         opentelemetry_http_client_curl
   PRIVATE thrift::thrift)
 
 if(MSVC)
@@ -52,19 +57,21 @@ if(MSVC)
   endif()
 endif()
 
-install(
-  TARGETS opentelemetry_exporter_jaeger_trace
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_exporter_jaeger_trace
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/jaeger
-  DESTINATION include/opentelemetry/exporters
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "recordable.h" EXCLUDE)
+  install(
+    DIRECTORY include/opentelemetry/exporters/jaeger
+    DESTINATION include/opentelemetry/exporters
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "recordable.h" EXCLUDE)
+endif()
 
 if(BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)

@@ -1,3 +1,9 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+add_library(metrics_common_test_utils common.cc)
+target_link_libraries(metrics_common_test_utils opentelemetry_metrics)
+
 foreach(
   testname
   meter_provider_sdk_test
@@ -8,6 +14,8 @@ foreach(
   histogram_aggregation_test
   attributes_processor_test
   attributes_hashmap_test
+  base2_exponential_histogram_indexer_test
+  circular_buffer_counter_test
   histogram_test
   sync_metric_storage_counter_test
   sync_metric_storage_histogram_test
@@ -24,7 +32,7 @@ foreach(
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_resources opentelemetry_metrics)
+    metrics_common_test_utils opentelemetry_resources)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.
@@ -45,8 +53,17 @@ if(WITH_BENCHMARK)
                  histogram_aggregation_benchmark.cc)
   target_link_libraries(
     histogram_aggregation_benchmark benchmark::benchmark
-    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common opentelemetry_metrics
+    ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_common
     opentelemetry_resources)
+
+  add_executable(measurements_benchmark measurements_benchmark.cc)
+  target_link_libraries(
+    measurements_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
+  target_link_libraries(
+    sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
 add_subdirectory(exemplar)

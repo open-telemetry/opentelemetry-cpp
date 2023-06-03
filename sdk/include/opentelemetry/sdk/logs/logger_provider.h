@@ -63,38 +63,24 @@ public:
 
   ~LoggerProvider() override;
 
+  using opentelemetry::logs::LoggerProvider::GetLogger;
+
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
    * @param logger_name The name of the logger to be created.
-   * @param options The options for the logger. TODO: Once the logging spec defines it,
-   * give a list of options that the logger supports.
    * @param library_name The version of the library.
    * @param library_version The version of the library.
    * @param schema_url The schema URL.
    */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
-      nostd::string_view options,
       nostd::string_view library_name,
       nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
-  /**
-   * Creates a logger with the given name, and returns a shared pointer to it.
-   * If a logger with that name already exists, return a shared pointer to it
-   * @param name The name of the logger to be created.
-   * @param args The arguments for the logger. TODO: Once the logging spec defines it,
-   * give a list of arguments that the logger supports.
-   * @param library_name The version of the library.
-   * @param library_version The version of the library.
-   * @param schema_url The schema URL.
-   */
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view logger_name,
-      nostd::span<nostd::string_view> args,
-      nostd::string_view library_name,
-      nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view schema_url      = "",
+      bool include_trace_context         = true,
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::NoopKeyValueIterable()) noexcept override;
 
   /**
    * Add the processor that is stored internally in the logger provider.

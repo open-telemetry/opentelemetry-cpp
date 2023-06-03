@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /work
@@ -56,7 +59,8 @@ RUN apt-get install -y --no-install-recommends libcurl4-openssl-dev && git clone
         -DWITH_ZIPKIN=ON \
         -DWITH_JAEGER=ON \
         -DBUILD_TESTING=OFF \
-        -DWITH_OTLP=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
         .. && \
     make -j${nproc} install && ldconfig && \
     cd ../..

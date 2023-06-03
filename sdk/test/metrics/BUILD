@@ -1,4 +1,22 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+cc_library(
+    name = "metrics_common_test_utils",
+    srcs = [
+        "common.cc",
+    ],
+    hdrs = ["common.h"],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
 
 cc_test(
     name = "meter_test",
@@ -10,7 +28,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -25,7 +43,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -41,7 +59,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -57,7 +75,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -73,7 +91,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -89,7 +107,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -105,7 +123,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -121,7 +139,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -137,7 +155,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -153,7 +171,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -169,7 +187,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -184,7 +202,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -200,7 +218,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -216,7 +234,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
@@ -232,7 +250,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -247,7 +265,37 @@ cc_test(
         "test",
     ],
     deps = [
+        "metrics_common_test_utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "circular_buffer_counter_test",
+    srcs = [
+        "circular_buffer_counter_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
         "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "base2_exponential_histogram_indexer_test",
+    srcs = [
+        "base2_exponential_histogram_indexer_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -262,7 +310,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -277,7 +325,7 @@ cc_test(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -293,7 +341,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
     ],
 )
 
@@ -308,7 +356,7 @@ otel_cc_benchmark(
         "test",
     ],
     deps = [
-        "//sdk/src/metrics",
+        "metrics_common_test_utils",
     ],
 )
 
@@ -316,6 +364,40 @@ otel_cc_benchmark(
     name = "histogram_aggregation_benchmark",
     srcs = [
         "histogram_aggregation_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "sum_aggregation_benchmark",
+    srcs = [
+        "sum_aggregation_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "measurements_benchmark",
+    srcs = [
+        "measurements_benchmark.cc",
     ],
     tags = [
         "benchmark",

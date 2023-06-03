@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cc_test(
     name = "logger_provider_sdk_test",
     srcs = [
@@ -25,6 +28,7 @@ cc_test(
     ],
     deps = [
         "//sdk/src/logs",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )

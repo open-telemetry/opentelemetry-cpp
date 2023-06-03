@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
@@ -158,5 +161,17 @@ otel_cc_benchmark(
     deps = [
         "//api",
         "//sdk:headers",
+    ],
+)
+
+cc_test(
+    name = "env_var_test",
+    srcs = [
+        "env_var_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//sdk/src/common:env_variables",
+        "@com_google_googletest//:gtest_main",
     ],
 )

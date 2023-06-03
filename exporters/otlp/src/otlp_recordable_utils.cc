@@ -117,8 +117,18 @@ void OtlpRecordableUtils::PopulateRequest(
 
         if (!output_scope_log->has_scope())
         {
-          output_scope_log->mutable_scope()->set_name(input_scope_log.first->GetName());
-          output_scope_log->mutable_scope()->set_version(input_scope_log.first->GetVersion());
+          auto proto_scope = output_scope_log->mutable_scope();
+          if (proto_scope != nullptr)
+          {
+            proto_scope->set_name(input_scope_log.first->GetName());
+            proto_scope->set_version(input_scope_log.first->GetVersion());
+
+            for (auto &scope_attribute : input_scope_log.first->GetAttributes())
+            {
+              OtlpPopulateAttributeUtils::PopulateAttribute(
+                  proto_scope->add_attributes(), scope_attribute.first, scope_attribute.second);
+            }
+          }
           output_scope_log->set_schema_url(input_scope_log.first->GetSchemaURL());
         }
 

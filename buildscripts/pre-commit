@@ -43,11 +43,17 @@ short_version="${major}.${minor}.${patch}"
 full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
 
 # Update api version.h
-sed -i "/^\#define OPENTELEMETRY_VERSION/c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION /c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MAJOR /c\#define OPENTELEMETRY_VERSION_MAJOR ${major}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MINOR /c\#define OPENTELEMETRY_VERSION_MINOR ${minor}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_PATCH /c\#define OPENTELEMETRY_VERSION_PATCH ${patch}"  "$(pwd)/api/include/opentelemetry/version.h"
 git add "$(pwd)/api/include/opentelemetry/version.h"
 
 # Update sdk version.cc
 cat > "$(pwd)/sdk/src/version/version.cc" <<END
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
 
@@ -58,18 +64,18 @@ namespace sdk
 {
 namespace version
 {
-const int MAJOR_VERSION = ${major};
-const int MINOR_VERSION = ${minor};
-const int PATCH_VERSION = ${patch};
-const char* PRE_RELEASE = "${pre_release}";
-const char* BUILD_METADATA = "${build_metadata}";
-const int COUNT_NEW_COMMITS = ${count_new_commits};
-const char* BRANCH = "${branch}";
-const char* COMMIT_HASH = "${latest_commit_hash}";
-const char* SHORT_VERSION = "${short_version}";
-const char* FULL_VERSION =
+const int major_version     = ${major};
+const int minor_version     = ${minor};
+const int patch_version     = ${patch};
+const char *pre_release     = "${pre_release}";
+const char *build_metadata  = "${build_metadata}";
+const int count_new_commits = ${count_new_commits};
+const char *branch          = "${branch}";
+const char *commit_hash     = "${latest_commit_hash}";
+const char *short_version   = "${short_version}";
+const char *full_version =
     "${full_version}";
-const char* BUILD_DATE = "$(date -u)";
+const char *build_date = "$(date -u)";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

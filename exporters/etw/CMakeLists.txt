@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 add_library(opentelemetry_exporter_etw INTERFACE)
 
 target_include_directories(
@@ -8,29 +11,37 @@ target_include_directories(
 set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
                                                             etw_exporter)
 
-target_link_libraries(opentelemetry_exporter_etw
-                      INTERFACE opentelemetry_api nlohmann_json::nlohmann_json)
+target_link_libraries(
+  opentelemetry_exporter_etw INTERFACE opentelemetry_api opentelemetry_trace
+                                       nlohmann_json::nlohmann_json)
+if(WITH_LOGS_PREVIEW)
+  target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs)
+endif()
 if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()
 
-install(
-  TARGETS opentelemetry_exporter_etw
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_exporter_etw
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/etw
-  DESTINATION include/opentelemetry/exporters
-  FILES_MATCHING
-  PATTERN "*.h")
+  install(
+    DIRECTORY include/opentelemetry/exporters/etw
+    DESTINATION include/opentelemetry/exporters
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
 
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
   add_executable(etw_logger_test test/etw_logger_test.cc)
+  add_executable(etw_tracer_test_enable_env_properties test/etw_tracer_test.cc)
+  add_executable(etw_logger_test_enable_env_properties test/etw_logger_test.cc)
 
   target_link_libraries(etw_provider_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
@@ -40,6 +51,18 @@ if(BUILD_TESTING)
 
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(
+    etw_tracer_test_enable_env_properties ${GTEST_BOTH_LIBRARIES}
+    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  target_compile_definitions(etw_tracer_test_enable_env_properties
+                             PRIVATE ENABLE_ENV_PROPERTIES)
+
+  target_link_libraries(
+    etw_logger_test_enable_env_properties ${GTEST_BOTH_LIBRARIES}
+    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+  target_compile_definitions(etw_logger_test_enable_env_properties
+                             PRIVATE ENABLE_ENV_PROPERTIES)
 
   if(WITH_BENCHMARK)
     add_executable(etw_perf_test test/etw_perf_test.cc)
@@ -60,5 +83,13 @@ if(BUILD_TESTING)
     TARGET etw_logger_test
     TEST_PREFIX exporter.
     TEST_LIST etw_logger_test)
+  gtest_add_tests(
+    TARGET etw_tracer_test_enable_env_properties
+    TEST_PREFIX exporter.with_env_properties.
+    TEST_LIST etw_tracer_test_enable_env_properties)
+  gtest_add_tests(
+    TARGET etw_logger_test_enable_env_properties
+    TEST_PREFIX exporter.with_env_properties.
+    TEST_LIST etw_logger_test_enable_env_properties)
 
 endif() # BUILD_TESTING

@@ -45,7 +45,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
 ### Building as standalone CMake Project
 
-1. Getting the opentelementry-cpp source with its submodules:
+1. Getting the opentelemetry-cpp source with its submodules:
 
    ```console
    # Change to the directory where you want to create the code repository
@@ -82,7 +82,8 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
       Please refer to note [below](#building-shared-libs-for-windows) for
       Windows DLL support.
-   - `-DWITH_OTLP=ON` : To enable building OTLP exporter.
+   - `-DWITH_OTLP_GRPC=ON` : To enable building OTLP GRPC exporter.
+   - `-DWITH_OTLP_HTTP=ON` : To enable building OTLP HTTP exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
 3. Once the build configuration is created, build the CMake targets - this
@@ -136,7 +137,7 @@ To use the library from a CMake project, you can locate it directly with
  `find_package` and use the imported targets from generated package
  configurations. As of now, this will import targets for both API and SDK. In
  future, there may be separate packages for API and SDK which can be installed
- and imported separtely according to need.
+ and imported separately according to need.
 
 ```cmake
 # CMakeLists.txt
@@ -171,7 +172,7 @@ Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
 
 ### Building as standalone Bazel Project
 
-1. Getting the opentelementry-cpp source:
+1. Getting the opentelemetry-cpp source:
 
    ```console
    # Change to the directory where you want to create the code repository
@@ -188,7 +189,7 @@ Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
    the source code:
 
    ```console
-   $ cd opentelemtry-cpp
+   $ cd opentelemetry-cpp
    $ bazel build //...
    bazel build -- //... -//exporters/otlp/... -//exporters/prometheus/...
    Extracting Bazel installation...
@@ -229,7 +230,7 @@ load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 opentelemetry_cpp_deps()
 
-# Load extra dependencies required for OpenTelemetry
+# (required after v1.8.0) Load extra dependencies required for OpenTelemetry
 load("@io_opentelemetry_cpp//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
 
 opentelemetry_extra_deps()
@@ -264,14 +265,12 @@ cc_library(
 
 ## Building shared libs for Windows
 
-Windows DLL build is not supported. There are some constraints on how C++ DLLs
-work on Windows, specifically we can't safely allocate memory in one DLL and
-free it in another. For now, OpenTelemetry C++ targets need to be statically
-linked into the Windows applications.
+Windows DLL build is supported under **preview**. Please check the
+[doc](./docs/build-as-dll.md) for more details.
 
-## Generatring binary packages
+## Generating binary packages
 
-OpenTelemetry C++ supports generating plateform specific binary packages from CMake
+OpenTelemetry C++ supports generating platform specific binary packages from CMake
 configuration. The packages generated through this mayn't be production ready,
 and user may have to customize it further before using it as distribution.
 
@@ -319,6 +318,10 @@ package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
 with `vcpkg install opentelemetry-cpp` and follow the then displayed
 descriptions. Please see the vcpkg project for any issues regarding the
 packaging.
+
+If you are using [alpine linux](https://www.alpinelinux.org/) you can install
+the [opentelemetry-cpp packages](https://pkgs.alpinelinux.org/packages?name=opentelemetry-cpp-*)
+with `apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/testing opentelemetry-cpp-dev`.
 
 Please note, these packages are not officially provided and maintained by
 OpenTelemetry C++ project, and are just listed here to consolidate all such

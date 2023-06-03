@@ -1,7 +1,12 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 $ErrorActionPreference = "Stop";
 trap { $host.SetShouldExit(1) }
 
 $action = $args[0]
+
+$nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
@@ -22,7 +27,7 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR -- //...
+    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -37,7 +42,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -48,17 +53,46 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.dll.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DOPENTELEMETRY_BUILD_DLL=1 `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    examples\simple\Debug\example_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
+      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DWITH_JAEGER=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -79,7 +113,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -100,7 +134,29 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
+  "cmake.exporter.otprotocol.dll.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DOPENTELEMETRY_BUILD_DLL=1 `
+      -DWITH_OTPROTCOL=ON `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -122,7 +178,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -143,7 +199,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -160,7 +216,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit

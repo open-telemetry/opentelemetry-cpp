@@ -19,7 +19,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP exporter options.
+ * Struct to hold OTLP HTTP metrics exporter options.
  */
 struct OtlpHttpMetricExporterOptions
 {
@@ -61,6 +61,30 @@ struct OtlpHttpMetricExporterOptions
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
 #endif
+
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  bool ssl_insecure_skip_verify{false};
+
+  std::string ssl_ca_cert_path   = GetOtlpDefaultMetricsSslCertificatePath();
+  std::string ssl_ca_cert_string = GetOtlpDefaultMetricsSslCertificateString();
+
+  std::string ssl_client_key_path   = GetOtlpDefaultMetricsSslClientKeyPath();
+  std::string ssl_client_key_string = GetOtlpDefaultMetricsSslClientKeyString();
+
+  std::string ssl_client_cert_path   = GetOtlpDefaultMetricsSslClientCertificatePath();
+  std::string ssl_client_cert_string = GetOtlpDefaultMetricsSslClientCertificateString();
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+  /** Minimum TLS version. */
+  std::string ssl_min_tls = GetOtlpDefaultMetricsSslTlsMinVersion();
+  /** Maximum TLS version. */
+  std::string ssl_max_tls = GetOtlpDefaultMetricsSslTlsMaxVersion();
+  /** TLS cipher. */
+  std::string ssl_cipher = GetOtlpDefaultMetricsSslTlsCipher();
+  /** TLS cipher suite. */
+  std::string ssl_cipher_suite = GetOtlpDefaultMetricsSslTlsCipherSuite();
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 cc_test(
     name = "no_exemplar_reservoir_test",
     srcs = [
