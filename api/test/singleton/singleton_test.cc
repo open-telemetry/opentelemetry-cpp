@@ -3,7 +3,15 @@
 
 #include <gtest/gtest.h>
 
-#include <dlfcn.h>
+/*
+  TODO:
+  Once singleton are supported for windows,
+  expand this test to use ::LoadLibrary, ::GetProcAddress, ::FreeLibrary
+*/
+#ifndef _WIN32
+#  include <dlfcn.h>
+#endif
+
 #include <iostream>
 
 #include "component_a.h"
