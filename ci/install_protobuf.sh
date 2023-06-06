@@ -42,8 +42,10 @@ if [ ! -z "${CXX_STANDARD}" ]; then
 fi
 
 # After protobuf 22/4.22, protobuf depends on absl and we can use
-# "-Dprotobuf_ABSL_PROVIDER=package" to tell protobuf to find absl
-# from the system. Otherwise, it will build absl from source.
+# "-Dprotobuf_ABSL_PROVIDER=package" to tell protobuf to find absl from the
+# system. Otherwise, it will build absl from source.
+# 4.XX.YY and 3.XX.YY are alias of XX.YY, and source pacakges are moved into the
+# tag of XX.YY and without -cpp suffix from protobuf v22.
 if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
   export CPP_PROTOBUF_VERSION="${PROTOBUF_VERSION}"
   CPP_PROTOBUF_PACKAGE_NAME="protobuf-${CPP_PROTOBUF_VERSION}"

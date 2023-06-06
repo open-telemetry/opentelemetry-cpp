@@ -37,7 +37,7 @@ while getopts ":v:hi:mp:r:s:TH" o; do
         v)
             gcc_version=${OPTARG}
             ;;
-        h) 
+        h)
             usage
             exit 0;
             ;;
