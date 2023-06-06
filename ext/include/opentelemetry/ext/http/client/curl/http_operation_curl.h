@@ -269,6 +269,8 @@ private:
 
   CURLcode SetCurlLongOption(CURLoption option, long value);
 
+  CURLcode SetCurlOffOption(CURLoption option, curl_off_t value);
+
   const char *GetCurlErrorMessage(CURLcode code);
 
   std::atomic<bool> is_aborted_;   // Set to 'true' when async callback is aborted
