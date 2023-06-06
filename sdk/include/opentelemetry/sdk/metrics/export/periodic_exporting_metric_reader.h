@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/version.h"
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <thread>
+
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

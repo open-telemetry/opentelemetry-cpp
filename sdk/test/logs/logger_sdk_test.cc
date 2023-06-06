@@ -6,12 +6,16 @@
 #  include <chrono>
 #  include <string>
 
+#  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/logs/event_logger.h"
 #  include "opentelemetry/sdk/logs/event_logger_provider.h"
 #  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/trace/processor.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/scope.h"
 #  include "opentelemetry/trace/tracer.h"

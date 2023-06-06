@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 
 using namespace opentelemetry::sdk::metrics;

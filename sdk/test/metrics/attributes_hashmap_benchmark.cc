@@ -9,6 +9,8 @@
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 #include <functional>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 using namespace opentelemetry::sdk::metrics;
