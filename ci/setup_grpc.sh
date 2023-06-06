@@ -18,12 +18,28 @@ install_dir='/usr/local/'
 build_shared_libs=''
 build_internal_abseil_cpp=1
 GRPC_BUILD_OPTIONS=()
-usage() { echo "Usage: $0 [-v <gcc-version>] [-i <install_dir>"] 1>&2; exit 1;}
+usage() {
+    echo "Usage: $0 [options...]" 1>&2;
+    echo "Available options:" 1>&2;
+    echo "    -v <gcc-version>              Set GCC version" 1>&2;
+    echo "    -h                            Show help message and exit" 1>&2;
+    echo "    -i <install_dir>              Set installation prefix" 1>&2;
+    echo "    -m                            Use the modern gRPC version" 1>&2;
+    echo "    -p <protobuf|abseil-cpp>      Let gRPC find protobuf or abseil-cpp by CONFIG package" 1>&2;
+    echo "    -r <gRPC version>             Specify the version of gRPC" 1>&2;
+    echo "    -s <STD version>              Specify std version(CMAKE_CXX_STANDARD)" 1>&2;
+    echo "    -T                            Build static libraries" 1>&2;
+    echo "    -H                            Build shared libraries" 1>&2;
+}
 
-while getopts ":v:i:mp:r:s:TH" o; do
+while getopts ":v:hi:mp:r:s:TH" o; do
     case "${o}" in
         v)
             gcc_version=${OPTARG}
+            ;;
+        h) 
+            usage
+            exit 0;
             ;;
         i)
             install_dir=${OPTARG}
@@ -53,6 +69,7 @@ while getopts ":v:i:mp:r:s:TH" o; do
             ;;
         *)
             usage
+            exit 1;
             ;;
     esac
 done

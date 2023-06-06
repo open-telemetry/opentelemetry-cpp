@@ -35,17 +35,15 @@ CPP_PROTOBUF_BUILD_OPTIONS=(
   "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
   "-Dprotobuf_BUILD_TESTS=OFF"
   "-Dprotobuf_BUILD_EXAMPLES=OFF"
-  "-Dprotobuf_MODULE_COMPATIBLE=ON"
 )
 
 if [ ! -z "${CXX_STANDARD}" ]; then
     CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
 
-if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
-  CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-Dprotobuf_MODULE_COMPATIBLE=ON")
-fi
-
+# After protobuf 22/4.22, protobuf depends on absl and we can use
+# "-Dprotobuf_ABSL_PROVIDER=package" to tell protobuf to find absl
+# from the system. Otherwise, it will build absl from source.
 if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
   export CPP_PROTOBUF_VERSION="${PROTOBUF_VERSION}"
   CPP_PROTOBUF_PACKAGE_NAME="protobuf-${CPP_PROTOBUF_VERSION}"

@@ -1,6 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+# Some prebuilt or installed targets may have different CONFIG settings than
+# what we use to configure otel-cpp. This file applies patches to the imported
+# targets in order to use compatible CONFIG settings for fallback.
+
 # Common dependencies
 project_build_tools_patch_default_imported_config(ZLIB::ZLIB)
 

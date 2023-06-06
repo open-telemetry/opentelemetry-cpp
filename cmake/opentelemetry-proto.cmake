@@ -169,6 +169,8 @@ endif()
 
 set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
                           "--cpp_out=${GENERATED_PROTOBUF_PATH}")
+# --experimental_allow_proto3_optional is available from 3.13 and be stable and
+# enabled by default from 3.16
 if(Protobuf_VERSION AND Protobuf_VERSION VERSION_LESS "3.16")
   list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
 elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")

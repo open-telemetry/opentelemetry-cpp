@@ -366,7 +366,6 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
-  set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
   if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
     if(NOT WITH_ABSEIL)
@@ -407,11 +406,12 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
       endif()
     endif()
   endif()
-  # Latest Protobuf uses mixed case instead of uppercase
+  # Latest Protobuf imported targets and without legacy module support
   if(TARGET protobuf::protoc)
     project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
                                               protobuf::protoc)
   elseif(Protobuf_PROTOC_EXECUTABLE)
+    # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
     set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   include(CMakeDependentOption)
