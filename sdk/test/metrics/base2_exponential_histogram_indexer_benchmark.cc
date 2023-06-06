@@ -40,7 +40,7 @@ void BM_ComputeIndex(benchmark::State &state)
   std::array<double, 1000> batch;
   std::default_random_engine generator;
   std::uniform_real_distribution<double> distribution(0, 1000);
-  Base2ExponentialHistogramIndexer indexer(state.range(0));
+  Base2ExponentialHistogramIndexer indexer(static_cast<int32_t>(state.range(0)));
 
   while (state.KeepRunningBatch(static_cast<benchmark::IterationCount>(batch.size())))
   {
