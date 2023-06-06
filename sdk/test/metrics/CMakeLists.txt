@@ -53,7 +53,7 @@ if(WITH_BENCHMARK)
                  base2_exponential_histogram_indexer_benchmark.cc)
   target_link_libraries(
     base2_exponential_histogram_indexer_benchmark benchmark::benchmark
-    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)
