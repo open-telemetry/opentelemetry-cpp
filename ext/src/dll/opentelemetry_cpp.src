@@ -7,7 +7,11 @@ EXPORTS
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanExporter,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanExporter> > __cdecl opentelemetry::v1::exporter::trace::OStreamSpanExporterFactory::Create(void)
     ?Create@OStreamSpanExporterFactory@trace@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@XZ
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanProcessor,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanProcessor> > __cdecl opentelemetry::v1::sdk::trace::SimpleSpanProcessorFactory::Create(class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanExporter,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanExporter> > && __ptr64)
+#if defined(_WIN64)
     ?Create@SimpleSpanProcessorFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
+#else
+    ?Create@SimpleSpanProcessorFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@std@@$$QAV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
+#endif
     // public: static class std::unique_ptr<class opentelemetry::v1::trace::TracerProvider,struct std::default_delete<class opentelemetry::v1::trace::TracerProvider> > __cdecl opentelemetry::v1::sdk::trace::TracerProviderFactory::Create(class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanProcessor,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanProcessor> >)
     ?Create@TracerProviderFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VTracerProvider@trace@v1@opentelemetry@@U?$default_delete@VTracerProvider@trace@v1@opentelemetry@@@std@@@std@@V?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
 #if defined(WITH_OTLP_GRPC)
