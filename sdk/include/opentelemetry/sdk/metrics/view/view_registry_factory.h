@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -11,11 +11,12 @@ namespace sdk
 namespace metrics
 {
 
+class ViewRegistry;
+
 class ViewRegistryFactory
 {
 public:
   static std::unique_ptr<ViewRegistry> Create();
-
 };
 }  // namespace metrics
 }  // namespace sdk

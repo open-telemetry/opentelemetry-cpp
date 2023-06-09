@@ -11,6 +11,7 @@ add_library(
   metric_reader.cc
   instrument_metadata_validator.cc
   export/periodic_exporting_metric_reader.cc
+  export/periodic_exporting_metric_reader_factory.cc
   state/metric_collector.cc
   state/observable_registry.cc
   state/sync_metric_storage.cc
@@ -21,6 +22,7 @@ add_library(
   data/circular_buffer.cc
   exemplar/filter.cc
   exemplar/reservoir.cc
+  view/view_registry_factory.cc
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
