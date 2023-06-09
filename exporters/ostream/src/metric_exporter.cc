@@ -4,6 +4,7 @@
 #include "opentelemetry/exporters/ostream/metric_exporter.h"
 #include <algorithm>
 #include <chrono>
+#include <ctime>
 #include <map>
 #include "opentelemetry/exporters/ostream/common_utils.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
