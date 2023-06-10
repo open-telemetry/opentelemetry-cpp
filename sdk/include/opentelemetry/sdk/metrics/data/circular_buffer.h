@@ -25,7 +25,7 @@ namespace metrics
  * -> uint64_t) and copy over values into the larger array. This class expects most usage to remain
  * within the uint8_t boundary (e.g. cell values < 256).
  */
-class AdaptingIntegerArray
+class OPENTELEMETRY_SDK_METRICS_EXPORT AdaptingIntegerArray
 {
 public:
   // Construct an adapting integer array of a given size.
@@ -82,7 +82,7 @@ private:
  *
  * This class is NOT thread-safe. It is expected to be behind a synchronized incrementer.
  */
-class AdaptingCircularBufferCounter
+class OPENTELEMETRY_SDK_METRICS_EXPORT AdaptingCircularBufferCounter
 {
 public:
   explicit AdaptingCircularBufferCounter(size_t max_size) : backing_(max_size) {}

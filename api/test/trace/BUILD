@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "default_span_test",
@@ -13,10 +14,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -29,10 +30,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -45,10 +46,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -60,7 +61,7 @@ otel_cc_benchmark(
         "test",
         "trace",
     ],
-    deps = ["//api"],
+    deps = dll_deps(["//api"]),
 )
 
 otel_cc_benchmark(
@@ -72,7 +73,7 @@ otel_cc_benchmark(
         "test",
         "trace",
     ],
-    deps = ["//api"],
+    deps = dll_deps(["//api"]),
 )
 
 cc_test(
@@ -85,10 +86,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -101,10 +102,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -117,10 +118,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -133,10 +134,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -149,10 +150,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -165,10 +166,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -181,10 +182,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -197,8 +198,8 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

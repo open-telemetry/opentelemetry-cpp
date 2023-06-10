@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_library(
     name = "metrics_common_test_utils",
@@ -13,9 +14,9 @@ cc_library(
         "metrics",
         "test",
     ],
-    deps = [
-        "//sdk/src/metrics",
-    ],
+    deps = dll_deps([
+       "//sdk/src/metrics",
+    ]),
 )
 
 cc_test(
@@ -27,10 +28,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -42,11 +43,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -58,11 +59,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -74,11 +75,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -90,11 +91,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -106,11 +107,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -122,11 +123,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -138,11 +139,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -154,11 +155,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -170,11 +171,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -186,10 +187,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -201,11 +202,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -217,11 +218,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -233,11 +234,11 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -249,10 +250,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -264,10 +265,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -279,10 +280,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -294,10 +295,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -309,10 +310,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -324,10 +325,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -340,9 +341,9 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -355,9 +356,9 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -370,9 +371,9 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -385,11 +386,11 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -402,11 +403,11 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/metrics",
         "//sdk/src/resource",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -419,8 +420,8 @@ otel_cc_benchmark(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/metrics",
         "//sdk/src/resource",
-    ],
+    ]),
 )

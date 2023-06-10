@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_test(
     name = "logger_provider_sdk_test",
     srcs = [
@@ -10,11 +12,11 @@ cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -26,11 +28,11 @@ cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/logs",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -42,10 +44,10 @@ cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -57,10 +59,10 @@ cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -72,8 +74,8 @@ cc_test(
         "logs",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "random_test",
@@ -9,10 +10,10 @@ cc_test(
         "random_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:random",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -21,10 +22,10 @@ cc_test(
         "fast_random_number_generator_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:random",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -34,7 +35,7 @@ otel_cc_benchmark(
         "benchmark",
         "test",
     ],
-    deps = ["//sdk/src/common:random"],
+    deps = dll_deps(["//sdk/src/common:random"]),
 )
 
 cc_test(
@@ -43,11 +44,11 @@ cc_test(
         "atomic_unique_ptr_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -56,11 +57,11 @@ cc_test(
         "circular_buffer_range_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -69,9 +70,9 @@ cc_test(
         "random_fork_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:random",
-    ],
+    ]),
 )
 
 cc_library(
@@ -80,9 +81,9 @@ cc_library(
         "baseline_circular_buffer.h",
     ],
     include_prefix = "test/common",
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -92,10 +93,10 @@ otel_cc_benchmark(
         "benchmark",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":baseline_circular_buffer",
         "//sdk:headers",
-    ],
+    ]),
 )
 
 cc_test(
@@ -104,11 +105,11 @@ cc_test(
         "empty_attributes_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -117,11 +118,11 @@ cc_test(
         "attribute_utils_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -130,12 +131,12 @@ cc_test(
         "global_log_handle_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/common:global_log_handler",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -144,11 +145,11 @@ cc_test(
         "attributemap_hash_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -158,10 +159,10 @@ otel_cc_benchmark(
         "benchmark",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
-    ],
+    ]),
 )
 
 cc_test(
@@ -170,8 +171,8 @@ cc_test(
         "env_var_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:env_variables",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

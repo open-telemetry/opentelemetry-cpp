@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "baggage_test",
@@ -12,10 +13,10 @@ cc_test(
         "api",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -26,5 +27,5 @@ otel_cc_benchmark(
         "benchmark",
         "test",
     ],
-    deps = ["//api"],
+    deps = dll_deps(["//api"]),
 )

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "http_text_format_test",
@@ -14,10 +15,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -31,10 +32,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -49,8 +50,8 @@ cc_test(
         "trace",
         "jaeger",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

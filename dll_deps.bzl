@@ -1,10 +1,7 @@
-# Very naive implementation
-# TODO: Scan the deps for known targets included in the otel_sdk, and remove them, while leaving the rest. This would avoid the concatenation needed.
-
 load("dll_deps_generated.bzl", "DLL_DEPS")
 
 def _absolute_label(label):
-    """ returns the absolute path to a lebel string """
+    """ returns the absolute path to a label string """
     # lifted from https://stackoverflow.com/a/66705640/18406610
     if label.startswith("@") or label.startswith("/"):
         return label
@@ -54,9 +51,3 @@ force_compilation_mode = rule(
         ),
     }
 )
-
-def dll_cc_binary(**kwargs):
-    """ blah """
-    for k,v in kwargs.items():
-        print(k, v, type(k), type(v))
-    native.cc_binary(**kwargs)

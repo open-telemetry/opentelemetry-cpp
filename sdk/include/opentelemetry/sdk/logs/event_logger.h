@@ -18,7 +18,7 @@ namespace sdk
 namespace logs
 {
 
-class EventLogger final : public opentelemetry::logs::EventLogger
+class OPENTELEMETRY_SDK_LOGS_EXPORT EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:
   /**

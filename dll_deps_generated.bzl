@@ -28,8 +28,6 @@ DLL_DEPS = {
   Label("@//sdk:headers"): None,
   Label("@//sdk/src/common:env_variables"): None,
   Label("@//sdk/src/common:global_log_handler"): None,
-  Label("@//sdk/src/common:random"): None,
-  Label("@//sdk/src/common/platform:fork"): None,
   Label("@//sdk/src/logs:logs"): None,
   Label("@//sdk/src/metrics:metrics"): None,
   Label("@//sdk/src/resource:resource"): None,

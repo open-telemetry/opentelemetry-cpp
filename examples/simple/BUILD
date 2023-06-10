@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load( "//:dll_deps.bzl", "dll_deps", "dll_cc_binary" )
+load( "//:dll_deps.bzl", "dll_deps" )
 
 cc_binary(
     name = "example_simple",

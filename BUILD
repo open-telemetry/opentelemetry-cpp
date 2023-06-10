@@ -78,7 +78,8 @@ cc_library(
 genquery(
     name = "otel_sdk_all_project_deps",
     # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
-    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps))",
+    # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
+    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps except //sdk/src/common:random except //sdk/src/common/platform:fork))",
     scope = ["//:otel_sdk_deps"],
 )
 
@@ -305,21 +306,23 @@ pkg_zip(
 )
 
 cc_binary(
-    name = "dll_deps",
-    srcs = ["dll_deps.cpp"],
+    name = "dll_deps_update_binary",
+    srcs = ["dll_deps_update.cpp"],
     local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
     data = ["otel_sdk_all_project_deps"],
     deps = ["@bazel_tools//tools/cpp/runfiles"]
 )
 
 run_binary(
-    name = "dll_deps_update_binary",
-    tool = "dll_deps",
+    name = "dll_deps_update_run",
+    tool = "dll_deps_update_binary",
     srcs = [":otel_sdk_all_project_deps"],
     args = ["$(location dll_deps_generated_internally.bzl)"],
     outs = ["dll_deps_generated_internally.bzl"]
 )
 
+# To update the dll_deps_generated.bzl files, do this:
+#    bazel run dll_deps_update
 write_source_file(
     name = "dll_deps_update",
     in_file = "dll_deps_generated_internally.bzl",

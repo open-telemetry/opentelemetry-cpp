@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//:dll_deps.bzl", "dll_deps")
+
 cc_test(
     name = "dynamic_load_test",
     srcs = [
@@ -13,8 +15,8 @@ cc_test(
         "api",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

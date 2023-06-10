@@ -35,7 +35,7 @@ protected:
 };
 
 template <typename T>
-class OPENTELEMETRY_SDK_METRICS_EXPORT LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
+class /* OPENTELEMETRY_SDK_METRICS_EXPORT */ LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
@@ -141,7 +141,7 @@ public:
 };
 
 template <typename T>
-class OPENTELEMETRY_SDK_METRICS_EXPORT LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
+class /* OPENTELEMETRY_SDK_METRICS_EXPORT */ LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,

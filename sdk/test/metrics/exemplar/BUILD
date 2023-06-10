@@ -1,5 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "no_exemplar_reservoir_test",
@@ -10,12 +11,12 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -27,12 +28,12 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -44,12 +45,12 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -61,12 +62,12 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -78,12 +79,12 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -95,10 +96,10 @@ cc_test(
         "metrics",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )

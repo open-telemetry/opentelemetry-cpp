@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+load("//:dll_deps.bzl", "dll_deps")
 
 cc_test(
     name = "tracer_provider_test",
@@ -12,11 +13,11 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -28,10 +29,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -43,11 +44,11 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -59,10 +60,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -74,12 +75,12 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -91,10 +92,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -106,10 +107,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -121,10 +122,10 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -136,11 +137,11 @@ cc_test(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:random",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 otel_cc_benchmark(
@@ -151,9 +152,9 @@ otel_cc_benchmark(
         "test",
         "trace",
     ],
-    deps = [
+    deps = dll_deps([
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
-    ],
+    ]),
 )
