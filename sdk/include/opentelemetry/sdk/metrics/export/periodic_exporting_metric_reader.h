@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
 #include <atomic>
