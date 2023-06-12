@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

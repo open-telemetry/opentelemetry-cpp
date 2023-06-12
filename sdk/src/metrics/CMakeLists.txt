@@ -8,6 +8,7 @@ add_library(
   meter_provider_factory.cc
   meter.cc
   meter_context.cc
+  meter_context_factory.cc
   metric_reader.cc
   instrument_metadata_validator.cc
   export/periodic_exporting_metric_reader.cc

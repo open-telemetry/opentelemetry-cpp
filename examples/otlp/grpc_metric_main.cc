@@ -7,6 +7,7 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 
@@ -27,32 +28,47 @@ namespace otlp_exporter = opentelemetry::exporter::otlp;
 namespace
 {
 
-otlp_exporter::OtlpGrpcMetricExporterOptions options;
+otlp_exporter::OtlpGrpcMetricExporterOptions exporter_options;
 
 void InitMetrics()
 {
-  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(options);
+  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
   // Initialize and set the global MeterProvider
-  metric_sdk::PeriodicExportingMetricReaderOptions options;
-  options.export_interval_millis = std::chrono::milliseconds(1000);
-  options.export_timeout_millis  = std::chrono::milliseconds(500);
+  metric_sdk::PeriodicExportingMetricReaderOptions reader_options;
+  reader_options.export_interval_millis = std::chrono::milliseconds(1000);
+  reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
+
+  // #define OLD
+
+#ifdef OLD
+
+  // TODO: To cleanup for final review.
 
   std::unique_ptr<metric_sdk::MetricReader> reader{
-      new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
-
-  auto reader2 =
-      metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
-
+      new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), reader_options)};
   auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
-
-  auto provider2 = metric_sdk::MeterProviderFactory::Create();
 
   auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
   p->AddMetricReader(std::move(reader));
+#else
+
+  auto reader =
+      metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), reader_options);
+
+  auto context = metric_sdk::MeterContextFactory::Create();
+  context->AddMetricReader(std::move(reader));
+
+  // FIXME: MeterProvider / MeterProviderFactory should take a unique_ptr
+  std::shared_ptr<metric_sdk::MeterContext> s_context(std::move(context));
+
+  auto u_provider = metric_sdk::MeterProviderFactory::Create(s_context);
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
+
+#endif
 
   metrics_api::Provider::SetMeterProvider(provider);
 }
@@ -69,14 +85,14 @@ int main(int argc, char *argv[])
   std::string example_type;
   if (argc > 1)
   {
-    options.endpoint = argv[1];
+    exporter_options.endpoint = argv[1];
     if (argc > 2)
     {
       example_type = argv[2];
       if (argc > 3)
       {
-        options.use_ssl_credentials         = true;
-        options.ssl_credentials_cacert_path = argv[3];
+        exporter_options.use_ssl_credentials         = true;
+        exporter_options.ssl_credentials_cacert_path = argv[3];
       }
     }
   }
