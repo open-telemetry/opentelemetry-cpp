@@ -287,7 +287,8 @@ cc_test(
 )
 
 cc_test(
-    name = "base2_exponential_histogram_indexer_test",
+    #name = "base2_exponential_histogram_indexer_test",
+    name = "b2exphist_idx_test",
     srcs = [
         "base2_exponential_histogram_indexer_test.cc",
     ],
@@ -362,7 +363,8 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
-    name = "base2_exponential_histogram_indexer_benchmark",
+    #name = "base2_exponential_histogram_indexer_benchmark",
+    name = "b2exphist_idx_benchmark",
     srcs = [
         "base2_exponential_histogram_indexer_benchmark.cc",
     ],
