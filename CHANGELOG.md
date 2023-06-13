@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Remove include_trace_context
+  [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
 ## [1.9.1] 2023-05-26
 
 * [DEPRECATION] Drop C++11 support

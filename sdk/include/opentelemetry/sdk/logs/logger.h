@@ -33,8 +33,7 @@ public:
       opentelemetry::nostd::string_view name,
       std::shared_ptr<LoggerContext> context,
       std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope =
-          instrumentationscope::InstrumentationScope::Create(""),
-      bool include_trace_context = true) noexcept;
+          instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
   /**
    * Returns the name of this logger.
@@ -67,8 +66,6 @@ private:
   // logger-context.
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
-
-  bool include_trace_context_;
 };
 
 }  // namespace logs

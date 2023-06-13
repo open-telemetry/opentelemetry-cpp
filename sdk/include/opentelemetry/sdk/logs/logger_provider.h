@@ -78,7 +78,6 @@ public:
       nostd::string_view library_name,
       nostd::string_view library_version = "",
       nostd::string_view schema_url      = "",
-      bool include_trace_context         = true,
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::NoopKeyValueIterable()) noexcept override;
 

@@ -143,7 +143,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
@@ -260,7 +260,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
@@ -385,7 +385,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
@@ -498,7 +498,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
