@@ -43,7 +43,7 @@ else()
     message(
       STATUS "opentelemetry-proto dependency satisfied by: github download")
     if("${opentelemetry-proto}" STREQUAL "")
-      set(opentelemetry-proto "v0.19.0")
+      set(opentelemetry-proto "v0.20.0")
     endif()
     include(ExternalProject)
     ExternalProject_Add(
