@@ -100,7 +100,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=OFF \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \
@@ -123,7 +122,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=OFF \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_LOGS_PREVIEW=ON \

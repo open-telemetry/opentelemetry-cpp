@@ -183,25 +183,3 @@ def opentelemetry_cpp_deps():
             "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
         ],
     )
-
-    # boost headers from vcpkg
-    maybe(
-        native.new_local_repository,
-        name = "boost_all_hdrs",
-        build_file_content = """
-package(default_visibility = ["//visibility:public"])
-cc_library(
-  name = "boost_all_hdrs",
-  hdrs = glob(
-      ["include/**/*.h*"],
-  ),
-  strip_include_prefix = "include",
-  copts = [
-      "-isystem include",
-      "-fexceptions",
-    ],
-    visibility = ["//visibility:public"],
-)
-        """,
-        path = "tools/vcpkg/installed/x64-windows/",
-    )
