@@ -170,7 +170,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
     std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
     attributes["service.name"]     = "unit_test_service";
