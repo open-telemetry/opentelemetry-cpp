@@ -361,6 +361,21 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
+    name = "base2_exponential_histogram_indexer_benchmark",
+    srcs = [
+        "base2_exponential_histogram_indexer_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+    ],
+)
+
+otel_cc_benchmark(
     name = "histogram_aggregation_benchmark",
     srcs = [
         "histogram_aggregation_benchmark.cc",

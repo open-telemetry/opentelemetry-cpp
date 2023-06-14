@@ -712,12 +712,13 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
-  opentelemetry::sdk::common::ExportResult session_result =
-      opentelemetry::sdk::common::ExportResult::kSuccess;
+  std::shared_ptr<opentelemetry::sdk::common::ExportResult> session_result =
+      std::make_shared<opentelemetry::sdk::common::ExportResult>(
+          opentelemetry::sdk::common::ExportResult::kSuccess);
   opentelemetry::sdk::common::ExportResult export_result = Export(
       message,
-      [&session_result](opentelemetry::sdk::common::ExportResult result) {
-        session_result = result;
+      [session_result](opentelemetry::sdk::common::ExportResult result) {
+        *session_result = result;
         return result == opentelemetry::sdk::common::ExportResult::kSuccess;
       },
       0);
@@ -727,7 +728,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     return export_result;
   }
 
-  return session_result;
+  return *session_result;
 }
 
 sdk::common::ExportResult OtlpHttpClient::Export(
