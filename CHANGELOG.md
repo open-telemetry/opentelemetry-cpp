@@ -13,20 +13,18 @@ Increment the:
 * MINOR version when you add functionality in a backwards compatible manner, and
 * PATCH version when you make backwards compatible bug fixes.
 
-## [Planned July 2023]
-
-* [REMOVAL] Remove the jeager exporter
-  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
-
-Important changes:
-
-* [REMOVAL] Remove the jeager exporter
-  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
-
 ## [Unreleased]
+
+* [REMOVAL] Remove the jaeger exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
 
 * [API] Remove include_trace_context
   [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
+Important changes:
+
+* [REMOVAL] Remove the jaeger exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
 
 ## [1.9.1] 2023-05-26
 
