@@ -30,7 +30,66 @@ N/A
 
 ## [Compilers]
 
-N/A
+### Drop C++11 support
+
+#### Announcement (C++11)
+
+* Date: 2022-12-01
+* Issue: [DEPRECATION] Drop C++11 support
+  [#1830](https://github.com/open-telemetry/opentelemetry-cpp/pull/1830)
+* This announcement has been pinned,
+  visible in the issues pages since December 2022.
+
+#### Motivation (C++11)
+
+This repository, opentelemetry-cpp, supports a "bring your own dependency" model.
+
+In this model,
+the build scripts can be configured to:
+
+* pick a given version for a third party library,
+* build opentelemetry-cpp with the library given.
+
+The makefiles do not mandate to use a particular version,
+hence the "bring your own" denomination.
+
+To have an up to date build, projects are encouraged to use up to date
+versions of third party libraries, to benefit from bug fixes.
+
+Now, many libraries deliver new versions that require C++14, bug fixes
+releases for C++11 are no longer available.
+
+In particular, the following components:
+
+* GRPC C++
+* abseil
+* googletest
+
+now require C++14, per
+[google support policies](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md)
+
+As a result, to stay up to date, opentelemetry-cpp needs to upgrade its
+minimum build requirements to use C++14 instead of C++11.
+
+#### Scope (C++11)
+
+Continuous Integration (CI) builds will use C++14 instead of C++11.
+
+The CI build for gcc 4.8 is now deprecated, to be decommissioned when C++11
+support is dropped.
+
+#### Mitigation (C++11)
+
+Building the code with recent third party libraries will require C++14
+instead of C++11.
+
+#### Planned end of life (C++11)
+
+Support for C++11 in opentelemetry-cpp will end on September 2023.
+
+After this date, opentelemetry-cpp may still build properly in C++11 mode,
+assuming a suitable, old, version for each dependency is used,
+but the C++11 build will no longer be tested for each new release.
 
 ## [Third party dependencies]
 

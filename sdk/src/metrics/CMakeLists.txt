@@ -14,9 +14,11 @@ add_library(
   state/observable_registry.cc
   state/sync_metric_storage.cc
   state/temporal_metric_storage.cc
+  aggregation/base2_exponential_histogram_indexer.cc
   aggregation/histogram_aggregation.cc
   aggregation/lastvalue_aggregation.cc
   aggregation/sum_aggregation.cc
+  data/circular_buffer.cc
   exemplar/filter.cc
   exemplar/reservoir.cc
   sync_instruments.cc)

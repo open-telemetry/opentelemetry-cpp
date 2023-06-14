@@ -16,14 +16,13 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name,
-               std::shared_ptr<LoggerContext> context,
-               std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope,
-               bool include_trace_context) noexcept
+Logger::Logger(
+    nostd::string_view name,
+    std::shared_ptr<LoggerContext> context,
+    std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
       instrumentation_scope_(std::move(instrumentation_scope)),
-      context_(context),
-      include_trace_context_(include_trace_context)
+      context_(context)
 {}
 
 const nostd::string_view Logger::GetName() noexcept
@@ -43,8 +42,7 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  if (include_trace_context_ &&
-      opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
+  if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
   {
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(

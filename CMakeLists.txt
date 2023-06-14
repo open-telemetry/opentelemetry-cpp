@@ -159,14 +159,15 @@ if(WITH_STL)
   endif()
 endif()
 
-option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
-
-if(WITH_OTLP)
+if(DEFINED WITH_OTLP)
   message(
-    WARNING
-      "WITH_OTLP is deprecated and will be removed in future. Please set either WITH_OTLP_GRPC or WITH_OTLP_HTTP, or even both."
+    FATAL_ERROR
+      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
   )
 endif()
+
+option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
+       OFF)
 
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
@@ -276,7 +277,12 @@ function(install_windows_deps)
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE)
+      CACHE FILEPATH "")
+  message(
+    "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
+    Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
+  )
+
 endfunction()
 
 function(set_target_version target_name)
@@ -329,11 +335,10 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_OTLP)
+if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_GRPC}))
+  if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -351,9 +356,7 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(NOT gRPC_FOUND
-       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
-                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
+    if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -370,10 +373,6 @@ if(WITH_OTLP)
     endif()
   endif()
   include(CMakeDependentOption)
-
-  cmake_dependent_option(
-    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
-    "gRPC_FOUND" OFF)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
@@ -526,9 +525,10 @@ if(BUILD_TESTING)
         ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest REQUIRED)
+    find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
+      include(${CMAKE_TOOLCHAIN_FILE})
       find_package(GTest REQUIRED)
     endif()
   else()

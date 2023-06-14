@@ -556,6 +556,26 @@ CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
   return rc;
 }
 
+CURLcode HttpOperation::SetCurlOffOption(CURLoption option, curl_off_t value)
+{
+  CURLcode rc;
+
+  /*
+    curl_easy_setopt() is a macro with variadic arguments, type unsafe.
+    SetCurlOffOption() ensures it is called with a curl_off_t.
+  */
+  rc = curl_easy_setopt(curl_resource_.easy_handle, option, value);
+
+  if (rc != CURLE_OK)
+  {
+    const char *message = GetCurlErrorMessage(rc);
+    OTEL_INTERNAL_LOG_ERROR("CURL, set option <" << std::to_string(option) << "> failed: <"
+                                                 << message << ">");
+  }
+
+  return rc;
+}
+
 CURLcode HttpOperation::Setup()
 {
   if (!curl_resource_.easy_handle)
@@ -980,7 +1000,7 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlLongOption(CURLOPT_POSTFIELDSIZE_LARGE, req_size);
+    rc = SetCurlOffOption(CURLOPT_POSTFIELDSIZE_LARGE, req_size);
     if (rc != CURLE_OK)
     {
       return rc;

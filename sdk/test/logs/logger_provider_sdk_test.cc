@@ -75,7 +75,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 
-  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url, true,
+  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url,
                                {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
   auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
@@ -89,7 +89,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
   std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
   auto logger4 =
-      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, true, scope_attributes);
+      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, scope_attributes);
   auto sdk_logger4 = static_cast<opentelemetry::sdk::logs::Logger *>(logger4.get());
 
   EXPECT_EQ(sdk_logger4->GetInstrumentationScope().GetAttributes().size(), 1);

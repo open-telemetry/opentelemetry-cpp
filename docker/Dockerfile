@@ -27,8 +27,8 @@ RUN git clone --recurse-submodules -j ${CORES} --depth=1 \
         -DWITH_ZIPKIN=ON \
         -DCMAKE_INSTALL_PREFIX=/opt/third_party/install \
         -DBUILD_TESTING=OFF \
-        -DWITH_OTLP=ON \
         -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
         -DBUILD_SHARED_LIBS=ON \
         .. \
     && cmake --build . -j ${CORES} --target install

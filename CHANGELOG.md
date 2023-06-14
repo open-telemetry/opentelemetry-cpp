@@ -25,15 +25,65 @@ Important changes:
 
 ## [Unreleased]
 
-* [SDK] SDK support for the new OTel log
-  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
+* [API] Remove include_trace_context
+  [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
+## [1.9.1] 2023-05-26
+
+* [DEPRECATION] Drop C++11 support
+  [#2146](https://github.com/open-telemetry/opentelemetry-cpp/pull/2146)
+
+* [CI] Upgrade Bazel and Bazelisk version
+  [#2118](https://github.com/open-telemetry/opentelemetry-cpp/pull/2118)
+* [CI] Upgrade Google Benchmark version from 1.6.0 to 1.7.1
+  [#2116](https://github.com/open-telemetry/opentelemetry-cpp/pull/2116)
+* [CI] Upgrade Nlohmann JSON library version from 3.10.5 to 3.11.2
+  [#2115](https://github.com/open-telemetry/opentelemetry-cpp/pull/2115)
+
+* [BUILD] Missed include
+  [#2143](https://github.com/open-telemetry/opentelemetry-cpp/pull/2143)
+* [BUILD] Add opentelemetry_proto_grpc and allow build shared
+  opentelemetry_proto and opentelemetry_proto_grpc on non-Windows platform.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+* [BUILD] Warning cleanup, single character wrapped by std::string
+  [#2137](https://github.com/open-telemetry/opentelemetry-cpp/pull/2137)
+* [BUILD] Add missing target dependencies
+  [#2128](https://github.com/open-telemetry/opentelemetry-cpp/pull/2128)
+* [BUILD] Fix if JSON library already added another CMake target
+  [#2126](https://github.com/open-telemetry/opentelemetry-cpp/pull/2126)
+* [BUILD] shared libraries with version suffix, along with the symbolic link
+  [#2109](https://github.com/open-telemetry/opentelemetry-cpp/pull/2109)
+* [BUILD] Show warning message if WITH_OTLP is enabled
+  [#2112](https://github.com/open-telemetry/opentelemetry-cpp/pull/2112)
+* [BUILD] Add missing STL header.
+  [#2107](https://github.com/open-telemetry/opentelemetry-cpp/pull/2107)
 * [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
   [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
-* [BUILD] Add opentelemetry_proto_grpc and allow build shared opentelemetry_proto
-  and opentelemetry_proto_grpc on non-Windows platform.
-  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+* [BUILD] Transitive dependency issue with the otlp http exporter
+  [#2154](https://github.com/open-telemetry/opentelemetry-cpp/pull/2154)
+
+* [TEST] Add unit test for log body implicit conversions.
+  [#2136](https://github.com/open-telemetry/opentelemetry-cpp/pull/2136)
+* [TEST] Add event id to logger benchmark method
+  [#2133](https://github.com/open-telemetry/opentelemetry-cpp/pull/2133)
+
+* [API] Fix inclusion header files and use forward declaration
+  [#2124](https://github.com/open-telemetry/opentelemetry-cpp/pull/2124)
 * [API] Add user facing Logging API and Benchmarks
   [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
+
+* [SDK] SDK support for the new OTel log
+  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
+
+* [EXPORTER] Fixed HTTP session cleanup on shutdown
+  [#2111](https://github.com/open-telemetry/opentelemetry-cpp/pull/2111)
+* [EXPORTER] Delegate all API calls of gRPC into
+  opentelemetry_exporter_otlp_grpc_client,
+  and make it contains all symbols needed.
+  [#2005](https://github.com/open-telemetry/opentelemetry-cpp/pull/2005)
+
+* [DOC] Add Marc as maintainer.
+  [#2027](https://github.com/open-telemetry/opentelemetry-cpp/pull/2027)
 
 Breaking changes:
 
@@ -48,6 +98,8 @@ Breaking changes:
 Deprecations:
 
 * The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+* C++11 support is to end, C++14 will be supported instead,
+  see [DEPRECATED](./DEPRECATED.md) for details.
 
 ## [1.9.0] 2023-04-12
 

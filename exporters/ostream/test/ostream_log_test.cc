@@ -377,7 +377,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url, true,
+      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
       {{"scope.attr.key", 123}});
 
   // Back up cout's streambuf
@@ -449,7 +449,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url, true,
+      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
       {{"scope.attr.key", 123}});
 
   // Back up cout's streambuf

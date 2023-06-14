@@ -143,7 +143,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
@@ -160,15 +160,15 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resource_logs"].begin();
-          auto scope_logs        = *resource_logs["scope_logs"].begin();
+          auto resource_logs     = *check_json["resourceLogs"].begin();
+          auto scope_logs        = *resource_logs["scopeLogs"].begin();
           auto scope             = scope_logs["scope"];
-          auto log               = *scope_logs["log_records"].begin();
-          auto received_trace_id = log["trace_id"].get<std::string>();
-          auto received_span_id  = log["span_id"].get<std::string>();
+          auto log               = *scope_logs["logRecords"].begin();
+          auto received_trace_id = log["traceId"].get<std::string>();
+          auto received_span_id  = log["spanId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
+          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -188,7 +188,7 @@ public:
             if ("scope_key1" == attribute["key"])
             {
               check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute["value"]["string_value"].get<std::string>());
+              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
             }
           }
           ASSERT_TRUE(check_scope_attribute);
@@ -260,7 +260,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
@@ -277,21 +277,21 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resource_logs"].begin();
-          auto scope_logs        = *resource_logs["scope_logs"].begin();
-          auto schema_url        = scope_logs["schema_url"].get<std::string>();
+          auto resource_logs     = *check_json["resourceLogs"].begin();
+          auto scope_logs        = *resource_logs["scopeLogs"].begin();
+          auto schema_url        = scope_logs["schemaUrl"].get<std::string>();
           auto scope             = scope_logs["scope"];
           auto scope_name        = scope["name"];
           auto scope_version     = scope["version"];
-          auto log               = *scope_logs["log_records"].begin();
-          auto received_trace_id = log["trace_id"].get<std::string>();
-          auto received_span_id  = log["span_id"].get<std::string>();
+          auto log               = *scope_logs["logRecords"].begin();
+          auto received_trace_id = log["traceId"].get<std::string>();
+          auto received_span_id  = log["spanId"].get<std::string>();
           EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
           EXPECT_EQ(scope_name, "opentelelemtry_library");
           EXPECT_EQ(scope_version, "1.2.0");
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
+          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -311,7 +311,7 @@ public:
             if ("scope_key1" == attribute["key"])
             {
               check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute["value"]["string_value"].get<std::string>());
+              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
             }
           }
           ASSERT_TRUE(check_scope_attribute);
@@ -385,7 +385,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
@@ -498,7 +498,7 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
