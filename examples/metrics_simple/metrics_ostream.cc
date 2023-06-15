@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <thread>
+
 #include "opentelemetry/exporters/ostream/metric_exporter.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -10,6 +11,7 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/metrics_foo_library/foo_library.h"
@@ -39,8 +41,10 @@ void InitMetrics(const std::string &name)
   options.export_timeout_millis  = std::chrono::milliseconds(500);
   std::unique_ptr<metric_sdk::MetricReader> reader{
       new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
-  auto p        = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
+
+  auto u_provider = metric_sdk::MeterProviderFactory::Create();
+  auto *p = static_cast<metric_sdk::MeterProvider*>(u_provider.get());
+
   p->AddMetricReader(std::move(reader));
 
   // counter view
@@ -80,6 +84,8 @@ void InitMetrics(const std::string &name)
       name, "description", metric_sdk::AggregationType::kHistogram, aggregation_config}};
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
+
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
   metrics_api::Provider::SetMeterProvider(provider);
 }
 

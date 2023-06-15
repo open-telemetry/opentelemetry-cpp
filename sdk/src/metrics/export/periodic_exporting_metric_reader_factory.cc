@@ -13,7 +13,7 @@ namespace metrics
 {
 
 std::unique_ptr<MetricReader> PeriodicExportingMetricReaderFactory::Create(
-    std::unique_ptr<PushMetricExporter> &&exporter,
+    std::unique_ptr<PushMetricExporter> exporter,
     const PeriodicExportingMetricReaderOptions &option)
 {
   std::unique_ptr<MetricReader> reader(

@@ -42,20 +42,6 @@ void InitMetrics()
   reader_options.export_interval_millis = std::chrono::milliseconds(1000);
   reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
 
-  // #define OLD
-
-#ifdef OLD
-
-  // TODO: To cleanup for final review.
-
-  std::unique_ptr<metric_sdk::MetricReader> reader{
-      new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), reader_options)};
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
-
-  auto p = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
-  p->AddMetricReader(std::move(reader));
-#else
-
   auto reader =
       metric_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), reader_options);
 
@@ -67,8 +53,6 @@ void InitMetrics()
 
   auto u_provider = metric_sdk::MeterProviderFactory::Create(s_context);
   std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-
-#endif
 
   metrics_api::Provider::SetMeterProvider(provider);
 }

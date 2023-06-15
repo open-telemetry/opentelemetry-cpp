@@ -19,7 +19,7 @@ class PushMetricExporter;
 class PeriodicExportingMetricReaderFactory
 {
 public:
-  static std::unique_ptr<MetricReader> Create(std::unique_ptr<PushMetricExporter> &&exporter,
+  static std::unique_ptr<MetricReader> Create(std::unique_ptr<PushMetricExporter> exporter,
                                               const PeriodicExportingMetricReaderOptions &option);
 };
 
