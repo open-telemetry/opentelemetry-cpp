@@ -37,7 +37,8 @@ public:
   /**
    * Creates an OStreamMetricExporter writing to the given location.
    */
-  static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(std::ostream &sout);
+  static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
+      std::ostream &sout);
 
   static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
       std::ostream &sout,

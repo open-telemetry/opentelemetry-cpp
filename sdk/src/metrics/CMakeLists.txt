@@ -23,6 +23,9 @@ add_library(
   data/circular_buffer.cc
   exemplar/filter.cc
   exemplar/reservoir.cc
+  view/instrument_selector_factory.cc
+  view/meter_selector_factory.cc
+  view/view_factory.cc
   view/view_registry_factory.cc
   sync_instruments.cc)
 
