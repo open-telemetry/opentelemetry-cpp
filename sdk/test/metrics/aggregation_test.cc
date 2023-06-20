@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"

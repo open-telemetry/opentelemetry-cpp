@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"

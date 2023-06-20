@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
 #include <gtest/gtest.h>
 

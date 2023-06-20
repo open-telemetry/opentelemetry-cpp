@@ -5,6 +5,9 @@
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
+#include <sstream>
+#include <string>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
