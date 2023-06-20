@@ -286,6 +286,21 @@ cc_test(
 )
 
 cc_test(
+    name = "base2_exponential_histogram_indexer_test",
+    srcs = [
+        "base2_exponential_histogram_indexer_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "histogram_aggregation_test",
     srcs = [
         "histogram_aggregation_test.cc",
@@ -334,6 +349,21 @@ otel_cc_benchmark(
     name = "attributes_hashmap_benchmark",
     srcs = [
         "attributes_hashmap_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "metrics_common_test_utils",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "base2_exponential_histogram_indexer_benchmark",
+    srcs = [
+        "base2_exponential_histogram_indexer_benchmark.cc",
     ],
     tags = [
         "benchmark",

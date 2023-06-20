@@ -200,13 +200,13 @@ TEST(LoggerSDK, LogToAProcessor)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
   nostd::shared_ptr<opentelemetry::trace::Span> include_span;
@@ -261,7 +261,7 @@ TEST(LoggerSDK, EventLog)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, false);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   auto api_elp      = std::shared_ptr<logs_api::EventLoggerProvider>(new EventLoggerProvider());
   auto event_logger = api_elp->CreateEventLogger(logger, "otel-cpp.event_domain");
