@@ -10,6 +10,7 @@
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/recordable.h"

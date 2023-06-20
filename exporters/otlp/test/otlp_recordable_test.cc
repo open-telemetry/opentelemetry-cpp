@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,

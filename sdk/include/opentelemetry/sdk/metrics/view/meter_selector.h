@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/view/predicate_factory.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

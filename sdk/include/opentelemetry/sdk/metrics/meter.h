@@ -4,15 +4,22 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
-
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk_config.h"
 #include "opentelemetry/version.h"

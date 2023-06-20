@@ -2,11 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 #include <gtest/gtest.h>
+
 #include <algorithm>
 #include <chrono>
 #include <list>

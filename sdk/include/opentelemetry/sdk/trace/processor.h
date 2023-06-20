@@ -5,13 +5,21 @@
 
 #include <chrono>
 #include <memory>
-#include "opentelemetry/sdk/trace/recordable.h"
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class SpanContext;
+}  // namespace trace
+
 namespace sdk
 {
 namespace trace
 {
+class Recordable;
+
 /**
  * Span processor allow hooks for span start and end method invocations.
  *

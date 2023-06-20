@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/metrics/async_instruments.h"
-
 #include <memory>
 #include <mutex>
 #include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

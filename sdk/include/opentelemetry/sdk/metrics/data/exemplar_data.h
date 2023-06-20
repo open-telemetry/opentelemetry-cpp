@@ -6,11 +6,10 @@
 #include <memory>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/common/macros.h"
-
 #include <array>
-#include <map>
 #include <string>
 #include <utility>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
