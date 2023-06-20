@@ -105,7 +105,6 @@ For edit access, get in touch on
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 * [Josh Suereth](https://github.com/jsuereth), Google
-* [Reiley Yang](https://github.com/reyang), Microsoft
 * [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
@@ -116,6 +115,7 @@ Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/ma
 * [Jodee Varney](https://github.com/jodeev)
 * [Johannes Tax](https://github.com/pyohannes)
 * [Max Golovanov](https://github.com/maxgolov)
+* [Reiley Yang](https://github.com/reyang)
 * [Ryan Burn](https://github.com/rnburn)
 
 ### Thanks to all the people who have contributed
