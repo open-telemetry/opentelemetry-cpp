@@ -4,7 +4,9 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include "opentelemetry/exporters/ostream/common_utils.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>

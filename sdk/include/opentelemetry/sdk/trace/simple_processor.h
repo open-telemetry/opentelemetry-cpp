@@ -4,11 +4,16 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
+#include <memory>
 #include <mutex>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

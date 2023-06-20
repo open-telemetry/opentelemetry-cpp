@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <map>

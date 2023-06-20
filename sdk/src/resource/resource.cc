@@ -5,6 +5,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

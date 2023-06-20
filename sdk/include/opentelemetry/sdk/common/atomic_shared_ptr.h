@@ -6,6 +6,7 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

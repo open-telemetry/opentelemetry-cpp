@@ -3,12 +3,11 @@
 
 #pragma once
 
+#include <vector>
+
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
-
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

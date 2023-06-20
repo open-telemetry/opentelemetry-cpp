@@ -44,7 +44,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       prometheus_client::MetricFamily metric_family;
       metric_family.name = sanitized + "_" + unit;
       metric_family.help = metric_data.instrument_descriptor.description_;
-      auto time          = metric_data.start_ts.time_since_epoch();
+      auto time          = metric_data.end_ts.time_since_epoch();
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
         auto kind         = getAggregationType(point_data_attr.point_data);

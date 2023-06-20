@@ -4,6 +4,12 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#  include "opentelemetry/logs/severity.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_flags.h"
+#  include "opentelemetry/trace/trace_id.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
