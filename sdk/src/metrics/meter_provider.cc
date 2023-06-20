@@ -3,6 +3,8 @@
 
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"

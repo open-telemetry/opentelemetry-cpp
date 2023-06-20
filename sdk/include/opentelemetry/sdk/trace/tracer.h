@@ -3,40 +3,46 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
 namespace trace
 {
+class IdGenerator;
+class SpanProcessor;
 
 using namespace opentelemetry::sdk::instrumentationscope;
 
-class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
+class Tracer final : public opentelemetry::trace::Tracer,
+                     public std::enable_shared_from_this<Tracer>
 {
 public:
   /** Construct a new Tracer with the given context pipeline. */
-  explicit Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
+  explicit Tracer(std::shared_ptr<TracerContext> context,
                   std::unique_ptr<InstrumentationScope> instrumentation_scope =
                       InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<trace_api::Span> StartSpan(
+  nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const trace_api::SpanContextKeyValueIterable &links,
-      const trace_api::StartSpanOptions &options = {}) noexcept override;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links,
+      const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override;
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;
 
@@ -70,7 +76,7 @@ private:
   // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.
   std::shared_ptr<InstrumentationScope> instrumentation_scope_;
-  std::shared_ptr<sdk::trace::TracerContext> context_;
+  std::shared_ptr<TracerContext> context_;
 };
 }  // namespace trace
 }  // namespace sdk

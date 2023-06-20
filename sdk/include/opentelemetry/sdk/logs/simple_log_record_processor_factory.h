@@ -7,14 +7,15 @@
 
 #  include <memory>
 
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class LogRecordExporter;
+class LogRecordProcessor;
 
 /**
  * Factory class for SimpleLogRecordProcessor.

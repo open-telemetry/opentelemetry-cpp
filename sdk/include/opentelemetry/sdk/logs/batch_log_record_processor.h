@@ -8,6 +8,7 @@
 #  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/version.h"
 
 #  include <atomic>
 #  include <condition_variable>

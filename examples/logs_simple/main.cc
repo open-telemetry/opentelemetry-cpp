@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
@@ -10,6 +12,7 @@
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 
 #  ifdef BAZEL_BUILD
