@@ -167,7 +167,7 @@ cc_test(
     srcs = [
         "singleton_test.cc",
     ],
-    copts = ["-DBUILD_WITH_BAZEL=1"],
+    defines = ["BAZEL_BUILD"],
     linkopts = [
         "-ldl",
     ],

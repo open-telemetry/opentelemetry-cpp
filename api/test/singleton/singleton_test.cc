@@ -49,7 +49,7 @@ void do_something()
     and that the test passes in this case.
   */
 
-#ifndef BUILD_WITH_BAZEL
+#ifndef BAZEL_BUILD
   /* Call do_something_in_g() */
 
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
@@ -348,7 +348,7 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_f_f1_count, 2);
   EXPECT_EQ(span_f_f2_count, 1);
 
-#ifndef BUILD_WITH_BAZEL
+#ifndef BAZEL_BUILD
   EXPECT_EQ(span_g_lib_count, 1);
   EXPECT_EQ(span_g_f1_count, 2);
   EXPECT_EQ(span_g_f2_count, 1);
