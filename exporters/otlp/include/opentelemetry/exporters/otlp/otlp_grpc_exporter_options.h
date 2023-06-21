@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "absl/types/optional.h"
-#include "absl/types/variant.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <memory>
