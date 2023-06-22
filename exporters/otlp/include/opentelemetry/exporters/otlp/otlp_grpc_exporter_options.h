@@ -29,7 +29,7 @@ struct OtlpGrpcExporterOptions
   // SSL encryption.
   std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
 
-#ifdef ENABLE_OTLP_GRPC_MTLS_PREVIEW
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
   // At most one of ssl_client_key_* should be non-empty. If use_ssl_credentials, they will
   // be read to allow for mTLS.
   std::string ssl_client_key_path   = GetOtlpDefaultTracesSslClientKeyPath();

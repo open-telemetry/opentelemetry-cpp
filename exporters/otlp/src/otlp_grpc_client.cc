@@ -69,17 +69,17 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
 
   if (options.use_ssl_credentials) {
-    grpc::SslCredentialsOptions ssl_opts = {
-      .pem_root_certs = GetFileContentsOrInMemoryContents(
-          options.ssl_credentials_cacert_path,
-          options.ssl_credentials_cacert_as_string),
-#if ENABLE_OTLP_GRPC_MTLS_PREVIEW
-      .pem_private_key = GetFileContentsOrInMemoryContents(
-          options.ssl_client_key_path,
-          options.ssl_client_key_string),
-      .pem_cert_chain = GetFileContentsOrInMemoryContents(
-          options.ssl_client_cert_path,
-          options.ssl_client_cert_string)
+    grpc::SslCredentialsOptions ssl_opts;
+    ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
+        options.ssl_credentials_cacert_path,
+        options.ssl_credentials_cacert_as_string);
+#if ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+    ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(
+      options.ssl_client_key_path,
+      options.ssl_client_key_string);
+    ssl_opts.pem_cert_chain = GetFileContentsOrInMemoryContents(
+      options.ssl_client_cert_path,
+      options.ssl_client_cert_string);
 #endif
     };
     channel =
