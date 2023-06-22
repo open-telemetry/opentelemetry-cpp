@@ -34,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "1f71c72ce08d2c1310011ea6436b31e39ccab8c2db94186d26657d41747c85d6",
-        strip_prefix = "benchmark-1.6.0",
+        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
+        strip_prefix = "benchmark-1.7.1",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.6.0.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
         ],
     )
 
@@ -100,10 +100,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "464bc2b348e674a1a03142e403cbccb01be8655b6de0f8bfe733ea31fcd421be",
-        strip_prefix = "opentelemetry-proto-0.19.0",
+        sha256 = "6ab267cf82832ed60ad075d574c78da736193eecb9693e8a8d02f65d6d3f3520",
+        strip_prefix = "opentelemetry-proto-0.20.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.19.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.20.0.tar.gz",
         ],
     )
 
@@ -112,9 +112,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
+        sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip",
         ],
     )
 
@@ -147,7 +147,10 @@ def opentelemetry_cpp_deps():
         build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
         sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
         strip_prefix = "curl-7.73.0",
-        urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
+        urls = [
+            "https://curl.haxx.se/download/curl-7.73.0.tar.gz",
+            "https://github.com/curl/curl/releases/download/curl-7_73_0/curl-7.73.0.tar.gz",
+        ],
     )
 
     # libthrift (optional)
@@ -179,6 +182,17 @@ def opentelemetry_cpp_deps():
         urls = [
             "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
             "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        ],
+    )
+
+    # Opentracing
+    maybe(
+        http_archive,
+        name = "com_github_opentracing",
+        sha256 = "5b170042da4d1c4c231df6594da120875429d5231e9baa5179822ee8d1054ac3",
+        strip_prefix = "opentracing-cpp-1.6.0",
+        urls = [
+            "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
         ],
     )
 

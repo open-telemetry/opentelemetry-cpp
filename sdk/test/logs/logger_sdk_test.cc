@@ -3,16 +3,22 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <chrono>
 #  include <string>
 
+#  include "opentelemetry/logs/logger_provider.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/logs/event_logger.h"
 #  include "opentelemetry/sdk/logs/event_logger_provider.h"
 #  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/trace/processor.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/scope.h"
+#  include "opentelemetry/trace/tracer.h"
 
 #  include <gtest/gtest.h>
 
@@ -43,7 +49,16 @@ class MockLogRecordable final : public opentelemetry::sdk::logs::Recordable
 public:
   void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
 
-  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+  void SetObservedTimestamp(
+      opentelemetry::common::SystemTimestamp observed_timestamp) noexcept override
+  {
+    observed_timestamp_ = observed_timestamp;
+  }
+
+  const opentelemetry::common::SystemTimestamp &GetObservedTimestamp() const noexcept
+  {
+    return observed_timestamp_;
+  }
 
   opentelemetry::logs::Severity GetSeverity() const noexcept { return severity_; }
 
@@ -67,6 +82,12 @@ public:
   }
 
   void SetBody(const std::string &message) noexcept { body_ = message; }
+
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override
+  {
+    event_id_              = id;
+    log_record_event_name_ = static_cast<std::string>(name);
+  }
 
   void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
   {
@@ -121,23 +142,28 @@ public:
 
   void CopyFrom(const MockLogRecordable &other)
   {
-    severity_     = other.severity_;
-    body_         = other.body_;
-    trace_id_     = other.trace_id_;
-    span_id_      = other.span_id_;
-    trace_flags_  = other.trace_flags_;
-    event_name_   = other.event_name_;
-    event_domain_ = other.event_domain_;
+    severity_           = other.severity_;
+    body_               = other.body_;
+    trace_id_           = other.trace_id_;
+    span_id_            = other.span_id_;
+    trace_flags_        = other.trace_flags_;
+    event_name_         = other.event_name_;
+    event_domain_       = other.event_domain_;
+    observed_timestamp_ = other.observed_timestamp_;
   }
 
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
+  int64_t event_id_;
+  std::string log_record_event_name_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;
   std::string event_name_;
   std::string event_domain_;
+  opentelemetry::common::SystemTimestamp observed_timestamp_ =
+      std::chrono::system_clock::from_time_t(0);
 };
 
 class MockProcessor final : public LogRecordProcessor
@@ -178,13 +204,13 @@ TEST(LoggerSDK, LogToAProcessor)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
   nostd::shared_ptr<opentelemetry::trace::Span> include_span;
@@ -195,6 +221,8 @@ TEST(LoggerSDK, LogToAProcessor)
     include_span = trace_provider->GetTracer("logger")->StartSpan("test_logger");
   }
   opentelemetry::trace::Scope trace_scope{include_span};
+
+  auto now = std::chrono::system_clock::now();
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
   ASSERT_EQ(sdk_logger->GetInstrumentationScope().GetName(), "opentelelemtry_library");
@@ -226,6 +254,10 @@ TEST(LoggerSDK, LogToAProcessor)
   std::string span_id_text_in_span{span_id_in_span, sizeof(span_id_in_span)};
   ASSERT_EQ(trace_id_text_in_logger, trace_id_text_in_span);
   ASSERT_EQ(span_id_text_in_logger, span_id_text_in_span);
+
+  ASSERT_GE(
+      static_cast<std::chrono::system_clock::time_point>(shared_recordable->GetObservedTimestamp()),
+      now);
 }
 
 TEST(LoggerSDK, EventLog)
@@ -233,7 +265,7 @@ TEST(LoggerSDK, EventLog)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, false);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   auto api_elp      = std::shared_ptr<logs_api::EventLoggerProvider>(new EventLoggerProvider());
   auto event_logger = api_elp->CreateEventLogger(logger, "otel-cpp.event_domain");

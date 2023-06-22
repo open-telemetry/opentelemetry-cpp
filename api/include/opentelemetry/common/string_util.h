@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -14,11 +15,11 @@ class StringUtil
 public:
   static nostd::string_view Trim(nostd::string_view str, size_t left, size_t right) noexcept
   {
-    while (str[static_cast<std::size_t>(left)] == ' ' && left <= right)
+    while (left <= right && str[static_cast<std::size_t>(left)] == ' ')
     {
       left++;
     }
-    while (str[static_cast<std::size_t>(right)] == ' ' && left <= right)
+    while (left <= right && str[static_cast<std::size_t>(right)] == ' ')
     {
       right--;
     }

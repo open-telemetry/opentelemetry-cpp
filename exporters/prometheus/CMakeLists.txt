@@ -11,6 +11,8 @@ add_library(opentelemetry_exporter_prometheus src/exporter.cc src/collector.cc
 
 set_target_properties(opentelemetry_exporter_prometheus
                       PROPERTIES EXPORT_NAME prometheus_exporter)
+set_target_version(opentelemetry_exporter_prometheus)
+
 target_include_directories(
   opentelemetry_exporter_prometheus
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
@@ -26,18 +28,21 @@ endif()
 target_link_libraries(
   opentelemetry_exporter_prometheus
   PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core)
-install(
-  TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/prometheus
-  DESTINATION include/opentelemetry/exporters/
-  FILES_MATCHING
-  PATTERN "*.h")
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+  install(
+    DIRECTORY include/opentelemetry/exporters/prometheus
+    DESTINATION include/opentelemetry/exporters/
+    FILES_MATCHING
+    PATTERN "*.h")
+endif()
 
 if(BUILD_TESTING)
   add_subdirectory(test)

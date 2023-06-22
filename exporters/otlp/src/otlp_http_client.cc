@@ -451,7 +451,7 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   {
     const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
     nlohmann::json &child_value = options.use_json_name ? value[field_descriptor->json_name()]
-                                                        : value[field_descriptor->name()];
+                                                        : value[field_descriptor->camelcase_name()];
     if (field_descriptor->is_repeated())
     {
       ConvertListFieldToJson(child_value, message, field_descriptor, options);
@@ -712,12 +712,13 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
-  opentelemetry::sdk::common::ExportResult session_result =
-      opentelemetry::sdk::common::ExportResult::kSuccess;
+  std::shared_ptr<opentelemetry::sdk::common::ExportResult> session_result =
+      std::make_shared<opentelemetry::sdk::common::ExportResult>(
+          opentelemetry::sdk::common::ExportResult::kSuccess);
   opentelemetry::sdk::common::ExportResult export_result = Export(
       message,
-      [&session_result](opentelemetry::sdk::common::ExportResult result) {
-        session_result = result;
+      [session_result](opentelemetry::sdk::common::ExportResult result) {
+        *session_result = result;
         return result == opentelemetry::sdk::common::ExportResult::kSuccess;
       },
       0);
@@ -727,7 +728,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     return export_result;
   }
 
-  return session_result;
+  return *session_result;
 }
 
 sdk::common::ExportResult OtlpHttpClient::Export(
@@ -793,34 +794,40 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   // Wait for all the sessions to finish
   std::unique_lock<std::mutex> lock(session_waker_lock_);
-  if (timeout <= std::chrono::microseconds::zero())
+
+  std::chrono::steady_clock::duration timeout_steady =
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    while (true)
+    timeout_steady = std::chrono::steady_clock::duration::max();
+  }
+
+  while (timeout_steady > std::chrono::steady_clock::duration::zero())
+  {
     {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      if (running_sessions_.empty())
       {
-        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-        if (running_sessions_.empty())
-        {
-          break;
-        }
-      }
-      // When changes of running_sessions_ and notify_one/notify_all happen between predicate
-      // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
-      // as possible to call FinishSession() and cleanup resources.
-      if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
-      {
-        cleanupGCSessions();
+        break;
       }
     }
-    return true;
+    // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+    // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
+    // as possible to call FinishSession() and cleanup resources.
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
+    {
+      cleanupGCSessions();
+    }
+    else
+    {
+      break;
+    }
+
+    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
-  else
-  {
-    return session_waker_.wait_for(lock, timeout, [this] {
-      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-      return running_sessions_.empty();
-    });
-  }
+
+  return timeout_steady > std::chrono::steady_clock::duration::zero();
 }
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
@@ -961,6 +968,9 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  request->SetSslOptions(options_.ssl_options);
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);

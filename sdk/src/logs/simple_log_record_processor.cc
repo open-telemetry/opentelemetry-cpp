@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
-#  include <chrono>
-#  include <vector>
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
+
+#  include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -43,8 +46,12 @@ void SimpleLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noex
 /**
  *  The simple processor does not have any log records to flush so this method is not used
  */
-bool SimpleLogRecordProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+bool SimpleLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
+  if (exporter_ != nullptr)
+  {
+    return exporter_->ForceFlush(timeout);
+  }
   return true;
 }
 

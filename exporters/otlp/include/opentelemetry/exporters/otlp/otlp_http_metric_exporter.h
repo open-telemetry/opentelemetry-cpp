@@ -8,7 +8,6 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
-#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 
 #include <chrono>
 #include <cstddef>

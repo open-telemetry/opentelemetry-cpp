@@ -8,6 +8,7 @@
 #  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/version.h"
 
 #  include <atomic>
 #  include <condition_variable>
@@ -117,6 +118,7 @@ protected:
     std::atomic<bool> is_force_wakeup_background_worker;
     std::atomic<bool> is_force_flush_pending;
     std::atomic<bool> is_force_flush_notified;
+    std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us;
     std::atomic<bool> is_shutdown;
   };
 
@@ -128,6 +130,7 @@ protected:
    * @param synchronization_data Synchronization data to be notified.
    */
   static void NotifyCompletion(bool notify_force_flush,
+                               const std::unique_ptr<LogRecordExporter> &exporter,
                                const std::shared_ptr<SynchronizationData> &synchronization_data);
 
   void GetWaitAdjustedTime(std::chrono::microseconds &timeout,

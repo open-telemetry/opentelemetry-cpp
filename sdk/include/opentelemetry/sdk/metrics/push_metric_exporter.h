@@ -3,21 +3,20 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/version.h"
-
 #include <chrono>
-#include <memory>
+
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
 class MetricData;
+struct ResourceMetrics;
+
 /**
  * PushMetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.

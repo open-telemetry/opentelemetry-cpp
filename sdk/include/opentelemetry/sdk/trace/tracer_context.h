@@ -3,7 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include <chrono>
+#include <memory>
+#include <vector>
+
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
@@ -87,7 +90,7 @@ public:
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
   //  order of declaration is important here - resource object should be destroyed after processor.

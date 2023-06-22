@@ -4,14 +4,17 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 
 #  include "opentelemetry/version.h"
 
 #  include <iostream>
 #  include <sstream>
+#  include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -38,6 +41,14 @@ public:
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept
       override;
+
+  /**
+   * Force flush the exporter.
+   * @param timeout an option timeout, default to max.
+   * @return return true when all data are exported, and false when timeout
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
    * Marks the OStream Log Exporter as shut down.

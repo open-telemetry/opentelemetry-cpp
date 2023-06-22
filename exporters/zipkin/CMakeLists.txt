@@ -7,24 +7,33 @@ add_library(
   opentelemetry_exporter_zipkin_trace
   src/zipkin_exporter.cc src/zipkin_exporter_factory.cc src/recordable.cc)
 
+target_include_directories(
+  opentelemetry_exporter_zipkin_trace
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+set_target_version(opentelemetry_exporter_zipkin_trace)
+
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
   PUBLIC opentelemetry_trace opentelemetry_http_client_curl
          nlohmann_json::nlohmann_json)
 
-install(
-  TARGETS opentelemetry_exporter_zipkin_trace
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_exporter_zipkin_trace
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-install(
-  DIRECTORY include/opentelemetry/exporters/zipkin
-  DESTINATION include/opentelemetry/exporters
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "recordable.h" EXCLUDE)
+  install(
+    DIRECTORY include/opentelemetry/exporters/zipkin
+    DESTINATION include/opentelemetry/exporters
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "recordable.h" EXCLUDE)
+endif()
 
 if(BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)

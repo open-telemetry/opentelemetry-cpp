@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
@@ -14,6 +13,9 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
+
+class DynamicLibraryHandle;
+
 class Span final : public trace::Span
 {
 public:

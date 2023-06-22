@@ -23,16 +23,16 @@ if(WITH_OTLP_HTTP)
 endif()
 
 if(WITH_LOGS_PREVIEW)
+  target_link_libraries(opentelemetry_cpp PRIVATE opentelemetry_logs)
+
   if(WITH_OTLP_GRPC)
-    target_link_libraries(
-      opentelemetry_cpp PRIVATE opentelemetry_logs
-                                opentelemetry_exporter_otlp_grpc_log)
+    target_link_libraries(opentelemetry_cpp
+                          PRIVATE opentelemetry_exporter_otlp_grpc_log)
   endif()
 
   if(WITH_OTLP_HTTP)
-    target_link_libraries(
-      opentelemetry_cpp PRIVATE opentelemetry_logs
-                                opentelemetry_exporter_otlp_http_log)
+    target_link_libraries(opentelemetry_cpp
+                          PRIVATE opentelemetry_exporter_otlp_http_log)
   endif()
 endif()
 
@@ -45,9 +45,11 @@ add_custom_command(
     ${OPENTELEMETRY_EXPORT_DEF}
   COMMAND_EXPAND_LISTS VERBATIM)
 
-install(
-  TARGETS opentelemetry_cpp
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_cpp
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

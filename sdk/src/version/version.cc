@@ -11,18 +11,14 @@ namespace sdk
 {
 namespace version
 {
-const int MAJOR_VERSION     = 1;
-const int MINOR_VERSION     = 8;
-const int PATCH_VERSION     = 2;
-const char *PRE_RELEASE     = "NONE";
-const char *BUILD_METADATA  = "NONE";
-const int COUNT_NEW_COMMITS = 37;
-const char *BRANCH          = "pre_release_1.8.2";
-const char *COMMIT_HASH     = "435ce60f233b6718aaa04bb7068dd641b536299b";
-const char *SHORT_VERSION   = "1.8.2";
-const char *FULL_VERSION =
-    "1.8.2-NONE-NONE-37-pre_release_1.8.2-435ce60f233b6718aaa04bb7068dd641b536299b";
-const char *BUILD_DATE = "Tue 31 Jan 2023 04:01:10 PM UTC";
+const int major_version    = 1;
+const int minor_version    = 9;
+const int patch_version    = 1;
+const char *pre_release    = "NONE";
+const char *build_metadata = "NONE";
+const char *short_version  = "1.9.1";
+const char *full_version   = "1.9.1-NONE-NONE";
+const char *build_date     = "Fri 26 May 2023 07:14:07 AM UTC";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

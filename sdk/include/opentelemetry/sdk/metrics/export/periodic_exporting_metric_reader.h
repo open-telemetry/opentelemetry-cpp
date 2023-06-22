@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/version.h"
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <thread>
+
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -63,8 +65,11 @@ private:
   std::thread worker_thread_;
 
   /* Synchronization primitives */
-  std::condition_variable cv_;
-  std::mutex cv_m_;
+  std::atomic<bool> is_force_flush_pending_;
+  std::atomic<bool> is_force_wakeup_background_worker_;
+  std::atomic<bool> is_force_flush_notified_;
+  std::condition_variable cv_, force_flush_cv_;
+  std::mutex cv_m_, force_flush_m_;
 };
 
 }  // namespace metrics

@@ -5,14 +5,15 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <memory>
-#  include <vector>
+#  include <string>
 
 #  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -33,8 +34,7 @@ public:
       opentelemetry::nostd::string_view name,
       std::shared_ptr<LoggerContext> context,
       std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope =
-          instrumentationscope::InstrumentationScope::Create(""),
-      bool include_trace_context = true) noexcept;
+          instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
   /**
    * Returns the name of this logger.
@@ -67,8 +67,6 @@ private:
   // logger-context.
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
-
-  bool include_trace_context_;
 };
 
 }  // namespace logs

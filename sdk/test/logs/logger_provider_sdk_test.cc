@@ -10,6 +10,7 @@
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
@@ -65,9 +66,6 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 
 TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 {
-  // Currently, arguments are not supported by the loggers.
-  // TODO: Once the logging spec defines what arguments are allowed, add more
-  // detail to this test
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
@@ -78,12 +76,30 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 
-  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url, true,
-                               {{"scope_key1", "scope_value"}, {"scope_key1", 2}});
+  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url,
+                               {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
+
+  auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
+  EXPECT_EQ(sdk_logger3->GetInstrumentationScope().GetAttributes().size(), 2);
+  {
+    auto attibute = sdk_logger3->GetInstrumentationScope().GetAttributes().find("scope_key1");
+    ASSERT_FALSE(attibute == sdk_logger3->GetInstrumentationScope().GetAttributes().end());
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::string>(attibute->second));
+    EXPECT_EQ(opentelemetry::nostd::get<std::string>(attibute->second), "scope_value");
+  }
 
   std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
   auto logger4 =
-      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, true, scope_attributes);
+      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, scope_attributes);
+  auto sdk_logger4 = static_cast<opentelemetry::sdk::logs::Logger *>(logger4.get());
+
+  EXPECT_EQ(sdk_logger4->GetInstrumentationScope().GetAttributes().size(), 1);
+  {
+    auto attibute = sdk_logger4->GetInstrumentationScope().GetAttributes().find("scope_key");
+    ASSERT_FALSE(attibute == sdk_logger4->GetInstrumentationScope().GetAttributes().end());
+    ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::string>(attibute->second));
+    EXPECT_EQ(opentelemetry::nostd::get<std::string>(attibute->second), "scope_value");
+  }
 }
 
 TEST(LoggerProviderSDK, EventLoggerProviderFactory)
@@ -107,6 +123,8 @@ public:
   void SetSeverity(opentelemetry::logs::Severity) noexcept override {}
 
   void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
+
+  void SetEventId(int64_t, nostd::string_view) noexcept override {}
 
   void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
 

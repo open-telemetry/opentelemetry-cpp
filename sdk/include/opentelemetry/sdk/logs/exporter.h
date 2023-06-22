@@ -4,26 +4,28 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include <chrono>
 #  include <memory>
-#  include <vector>
 
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
+
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class LogRecordExporter
+class OPENTELEMETRY_EXPORT LogRecordExporter
 {
 public:
-  virtual ~LogRecordExporter() = default;
+  LogRecordExporter();
+  virtual ~LogRecordExporter();
 
   /**
    * Create a log recordable. This object will be used to record log data and
@@ -46,6 +48,12 @@ public:
    */
   virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
+
+  /**
+   * Force flush the log records pushed into this log exporter.
+   */
+  virtual bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

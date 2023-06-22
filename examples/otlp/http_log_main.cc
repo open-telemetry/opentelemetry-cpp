@@ -8,11 +8,19 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
+#  include "opentelemetry/sdk/trace/processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
 
+// sdk::TracerProvider and sdk::LoggerProvider is just used to call ForceFlush and prevent to cancel
+// running exportings when destroy and shutdown exporters.It's optional to users.
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
+
+#  include <iostream>
 #  include <string>
 
 #  ifdef BAZEL_BUILD
@@ -32,11 +40,27 @@ namespace internal_log = opentelemetry::sdk::common::internal_log;
 namespace
 {
 
-opentelemetry::exporter::otlp::OtlpHttpExporterOptions opts;
+opentelemetry::exporter::otlp::OtlpHttpExporterOptions trace_opts;
 void InitTracer()
 {
+  if (trace_opts.url.size() > 9)
+  {
+    if (trace_opts.url.substr(trace_opts.url.size() - 8) == "/v1/logs")
+    {
+      trace_opts.url = trace_opts.url.substr(0, trace_opts.url.size() - 8) + "/v1/traces";
+    }
+    else if (trace_opts.url.substr(trace_opts.url.size() - 9) == "/v1/logs/")
+    {
+      trace_opts.url = trace_opts.url.substr(0, trace_opts.url.size() - 9) + "/v1/traces";
+    }
+    else
+    {
+      trace_opts.url = opentelemetry::exporter::otlp::GetOtlpDefaultHttpTracesEndpoint();
+    }
+  }
+  std::cout << "Using " << trace_opts.url << " to export trace spans." << std::endl;
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpHttpExporterFactory::Create(opts);
+  auto exporter  = otlp::OtlpHttpExporterFactory::Create(trace_opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor));
@@ -46,6 +70,14 @@ void InitTracer()
 
 void CleanupTracer()
 {
+  // We call ForceFlush to prevent to cancel running exportings, It's optional.
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace::Provider::GetTracerProvider();
+  if (provider)
+  {
+    static_cast<trace_sdk::TracerProvider *>(provider.get())->ForceFlush();
+  }
+
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace::Provider::SetTracerProvider(none);
 }
@@ -53,6 +85,7 @@ void CleanupTracer()
 opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
 void InitLogger()
 {
+  std::cout << "Using " << logger_opts.url << " to export log records." << std::endl;
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpHttpLogRecordExporterFactory::Create(logger_opts);
@@ -65,6 +98,14 @@ void InitLogger()
 
 void CleanupLogger()
 {
+  // We call ForceFlush to prevent to cancel running exportings, It's optional.
+  opentelemetry::nostd::shared_ptr<logs::LoggerProvider> provider =
+      logs::Provider::GetLoggerProvider();
+  if (provider)
+  {
+    static_cast<logs_sdk::LoggerProvider *>(provider.get())->ForceFlush();
+  }
+
   std::shared_ptr<logs::LoggerProvider> none;
   opentelemetry::logs::Provider::SetLoggerProvider(none);
 }
@@ -83,12 +124,12 @@ int main(int argc, char *argv[])
 {
   if (argc > 1)
   {
-    opts.url        = argv[1];
+    trace_opts.url  = argv[1];
     logger_opts.url = argv[1];
     if (argc > 2)
     {
-      std::string debug  = argv[2];
-      opts.console_debug = debug != "" && debug != "0" && debug != "no";
+      std::string debug        = argv[2];
+      trace_opts.console_debug = debug != "" && debug != "0" && debug != "no";
     }
 
     if (argc > 3)
@@ -96,13 +137,13 @@ int main(int argc, char *argv[])
       std::string binary_mode = argv[3];
       if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
       {
-        opts.content_type        = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+        trace_opts.content_type  = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
         logger_opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
       }
     }
   }
 
-  if (opts.console_debug)
+  if (trace_opts.console_debug)
   {
     internal_log::GlobalLogHandler::SetLogLevel(internal_log::LogLevel::Debug);
   }

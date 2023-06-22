@@ -3,9 +3,14 @@
 
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 
 #include <vector>
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -30,6 +35,7 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
   synchronization_data_->is_force_wakeup_background_worker.store(false);
   synchronization_data_->is_force_flush_pending.store(false);
   synchronization_data_->is_force_flush_notified.store(false);
+  synchronization_data_->force_flush_timeout_us.store(0);
   synchronization_data_->is_shutdown.store(false);
 }
 
@@ -77,6 +83,7 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
 
   synchronization_data_->is_force_flush_pending.store(true, std::memory_order_release);
+  synchronization_data_->force_flush_timeout_us.store(timeout.count(), std::memory_order_release);
   auto break_condition = [this]() {
     if (synchronization_data_->is_shutdown.load() == true)
     {
@@ -97,23 +104,23 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   // Fix timeout to meet requirement of wait_for
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
-  bool result;
-  if (timeout <= std::chrono::microseconds::zero())
+  std::chrono::steady_clock::duration timeout_steady =
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    bool wait_result = false;
-    while (!wait_result)
-    {
-      // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
-      // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
-      // for ever
-      wait_result = synchronization_data_->force_flush_cv.wait_for(lk_cv, schedule_delay_millis_,
-                                                                   break_condition);
-    }
-    result = true;
+    timeout_steady = std::chrono::steady_clock::duration::max();
   }
-  else
+
+  bool result = false;
+  while (!result && timeout_steady > std::chrono::steady_clock::duration::zero())
   {
-    result = synchronization_data_->force_flush_cv.wait_for(lk_cv, timeout, break_condition);
+    // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
+    // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
+    // for ever
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    result = synchronization_data_->force_flush_cv.wait_for(lk_cv, schedule_delay_millis_,
+                                                            break_condition);
+    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
   // If it will be already signaled, we must wait util notified.
@@ -192,7 +199,7 @@ void BatchSpanProcessor::Export()
 
     if (num_records_to_export == 0)
     {
-      NotifyCompletion(notify_force_flush, synchronization_data_);
+      NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
       break;
     }
     buffer_.Consume(num_records_to_export,
@@ -206,12 +213,13 @@ void BatchSpanProcessor::Export()
                     });
 
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
-    NotifyCompletion(notify_force_flush, synchronization_data_);
+    NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
   } while (true);
 }
 
 void BatchSpanProcessor::NotifyCompletion(
     bool notify_force_flush,
+    const std::unique_ptr<SpanExporter> &exporter,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
   if (!synchronization_data)
@@ -221,6 +229,15 @@ void BatchSpanProcessor::NotifyCompletion(
 
   if (notify_force_flush)
   {
+    if (exporter)
+    {
+      std::chrono::microseconds timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
+          std::chrono::microseconds{
+              synchronization_data->force_flush_timeout_us.load(std::memory_order_acquire)},
+          std::chrono::microseconds::zero());
+      exporter->ForceFlush(timeout);
+    }
+
     synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
     synchronization_data->force_flush_cv.notify_one();
   }

@@ -4,8 +4,10 @@
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk_config.h"
-#include "opentelemetry/version.h"
+
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

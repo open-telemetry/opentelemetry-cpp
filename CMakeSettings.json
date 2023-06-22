@@ -14,7 +14,7 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "WITH_OTLP",
+          "name": "WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
@@ -40,7 +40,7 @@
       "cmakeToolchain": "",
       "variables": [
         {
-          "name": "WITH_OTLP",
+          "name": "WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
@@ -70,7 +70,7 @@
           "type": "BOOL"
         },
         {
-          "name": "WITH_OTLP",
+          "name": "WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
@@ -106,7 +106,7 @@
           "type": "BOOL"
         },
         {
-          "name": "WITH_OTLP",
+          "name": "WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },

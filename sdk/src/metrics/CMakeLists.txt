@@ -14,24 +14,30 @@ add_library(
   state/observable_registry.cc
   state/sync_metric_storage.cc
   state/temporal_metric_storage.cc
+  aggregation/base2_exponential_histogram_indexer.cc
   aggregation/histogram_aggregation.cc
   aggregation/lastvalue_aggregation.cc
   aggregation/sum_aggregation.cc
+  data/circular_buffer.cc
   exemplar/filter.cc
   exemplar/reservoir.cc
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
+set_target_version(opentelemetry_metrics)
 
-target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common)
+target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common
+                                                   opentelemetry_resources)
 
 target_include_directories(
   opentelemetry_metrics
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-install(
-  TARGETS opentelemetry_metrics
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_metrics
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()

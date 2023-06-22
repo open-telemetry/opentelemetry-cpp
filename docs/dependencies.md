@@ -46,7 +46,7 @@ Both these dependencies are listed here:
     - OTLP messages are constructed as protobuf payloads.
     - `protoc` compiler is used to generate C++ stubs for proto files provided
       by `opentelemetry-proto`.
-    - `libprotobuf` library is used for generating serialised trace/metrics/log
+    - `libprotobuf` library is used for generating serialized trace/metrics/log
       data to be sent to opentelemetry collector.
     - License: The library is licensed
       [here](https://github.com/protocolbuffers/protobuf/blob/master/LICENSE).
@@ -80,7 +80,7 @@ Both these dependencies are listed here:
   - [Thrift](https://github.com/apache/thrift) - Serialization and RPC
     framework.
     - `thrift` compiler to generate C++ stubs for IDL data model for Jaeger.
-    - `libthrift`  library to generate serialised trace/metrics/log data to be
+    - `libthrift`  library to generate serialized trace/metrics/log data to be
       sent to remote Jaeger service. Note: libthrift **0.12.0** doesn't work
       with this Jaeger exporter. See
       [#1680](https://github.com/open-telemetry/opentelemetry-cpp/issues/1680).
@@ -104,3 +104,10 @@ Both these dependencies are listed here:
 
 - [Zpages](/ext/src/zpages):
   - None
+
+- [Opentracing](/opentracing-shim)
+  shim:
+  - [`opentracing-cpp`](https://github.com/opentracing/opentracing-cpp)
+    OpenTracing API for C++
+    - A bridge layer implementing the OpenTracing API using the OpenTelemetry API
+    - License: `Apache License 2.0`

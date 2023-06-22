@@ -117,22 +117,25 @@ TEST(ETWTracer, TracerCheck)
   auto tracer = tp.GetTracer(providerName);
 
   // Span attributes
-  Properties attribs =
+  Properties outer_attribs =
   {
     {"attrib1", 1},
     {"attrib2", 2}
   };
+  // copy the outer attributes
+  Properties inner_attribs = outer_attribs;
+
   {
     auto topSpan = tracer->StartSpan("MySpanTop");
     auto topScope = tracer->WithActiveSpan(topSpan);
     {
-      auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
+      auto outerSpan = tracer->StartSpan("MySpanL2", outer_attribs);
       auto outerScope = tracer->WithActiveSpan(outerSpan);
 
       // Create nested span. Note how we share the attributes here.
       // It is Okay to either reuse/share or have your own attributes.
       {
-        auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
+        auto innerSpan = tracer->StartSpan("MySpanL3", inner_attribs);
         auto innerScope = tracer->WithActiveSpan(innerSpan);
 
         // Add span attribute

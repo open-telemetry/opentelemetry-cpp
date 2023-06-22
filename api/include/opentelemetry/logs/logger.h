@@ -4,92 +4,30 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <map>
-#  include <vector>
-
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/logs/log_record.h"
 #  include "opentelemetry/logs/logger_type_traits.h"
 #  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/trace/span_context.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
 namespace logs
 {
+
+class EventId;
+class LogRecord;
+
 /**
  * Handles log record creation.
  **/
 class Logger
 {
 public:
-  /**
-   * Utility function to help to make a attribute view from initializer_list
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                     attributes) noexcept
-  {
-    return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-        attributes.begin(), attributes.end()};
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a span
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  inline static nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-  MakeAttributes(
-      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a KeyValueIterable
-   *
-   * @param attributes
-   * @return common::KeyValueIterable
-   */
-  inline static const common::KeyValueIterable &MakeAttributes(
-      const common::KeyValueIterable &attributes) noexcept
-  {
-    return attributes;
-  }
-
-  /**
-   * Utility function to help to make a attribute view from a key-value iterable object
-   *
-   * @param attributes
-   * @return nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>
-   */
-  template <
-      class ArgumentType,
-      nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
-  inline static common::KeyValueIterableView<ArgumentType> MakeAttributes(
-      const ArgumentType &arg) noexcept
-  {
-    return common::KeyValueIterableView<ArgumentType>(arg);
-  }
-
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
@@ -315,10 +253,225 @@ public:
     this->EmitLogRecord(Severity::kFatal, std::forward<ArgumentType>(args)...);
   }
 
+  //
+  // OpenTelemetry C++ user-facing Logs API
+  //
+
+  inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
+  {
+    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    return EnabledImplementation(severity, event_id);
+  }
+
+  inline bool Enabled(Severity severity, int64_t event_id) const noexcept
+  {
+    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    return EnabledImplementation(severity, event_id);
+  }
+
+  inline bool Enabled(Severity severity) const noexcept
+  {
+    return static_cast<uint8_t>(severity) >= OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+  }
+
+  /**
+   * Log an event
+   *
+   * @severity severity of the log
+   * @event_id event identifier of the log
+   * @format an utf-8 string following https://messagetemplates.org/
+   * @attributes key value pairs of the log
+   */
+  virtual void Log(Severity severity,
+                   const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->EmitLogRecord(severity, event_id, format, attributes);
+  }
+
+  virtual void Log(Severity severity,
+                   int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->EmitLogRecord(severity, EventId{event_id}, format, attributes);
+  }
+
+  virtual void Log(Severity severity,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->EmitLogRecord(severity, format, attributes);
+  }
+
+  virtual void Log(Severity severity, nostd::string_view message) noexcept
+  {
+    this->EmitLogRecord(severity, message);
+  }
+
+  // Convenient wrappers based on virtual methods Log().
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
+
+  inline void Trace(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kTrace, event_id, format, attributes);
+  }
+
+  inline void Trace(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kTrace, EventId{event_id}, format, attributes);
+  }
+
+  inline void Trace(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kTrace, format, attributes);
+  }
+
+  inline void Trace(nostd::string_view message) noexcept { this->Log(Severity::kTrace, message); }
+
+  inline void Debug(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kDebug, event_id, format, attributes);
+  }
+
+  inline void Debug(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kDebug, EventId{event_id}, format, attributes);
+  }
+
+  inline void Debug(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kDebug, format, attributes);
+  }
+
+  inline void Debug(nostd::string_view message) noexcept { this->Log(Severity::kDebug, message); }
+
+  inline void Info(const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kInfo, event_id, format, attributes);
+  }
+
+  inline void Info(int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kInfo, EventId{event_id}, format, attributes);
+  }
+
+  inline void Info(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kInfo, format, attributes);
+  }
+
+  inline void Info(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
+
+  inline void Warn(const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kWarn, event_id, format, attributes);
+  }
+
+  inline void Warn(int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kWarn, EventId{event_id}, format, attributes);
+  }
+
+  inline void Warn(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kWarn, format, attributes);
+  }
+
+  inline void Warn(nostd::string_view message) noexcept { this->Log(Severity::kWarn, message); }
+
+  inline void Error(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kError, event_id, format, attributes);
+  }
+
+  inline void Error(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kError, EventId{event_id}, format, attributes);
+  }
+
+  inline void Error(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kError, format, attributes);
+  }
+
+  inline void Error(nostd::string_view message) noexcept { this->Log(Severity::kError, message); }
+
+  inline void Fatal(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kFatal, event_id, format, attributes);
+  }
+
+  inline void Fatal(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kFatal, EventId{event_id}, format, attributes);
+  }
+
+  inline void Fatal(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(Severity::kFatal, format, attributes);
+  }
+
+  inline void Fatal(nostd::string_view message) noexcept { this->Log(Severity::kFatal, message); }
+
+  //
+  // End of OpenTelemetry C++ user-facing Log API.
+  //
+
+protected:
+  // TODO: discuss with community about naming for internal methods.
+  virtual bool EnabledImplementation(Severity /*severity*/,
+                                     const EventId & /*event_id*/) const noexcept
+  {
+    return false;
+  }
+
+  virtual bool EnabledImplementation(Severity /*severity*/, int64_t /*event_id*/) const noexcept
+  {
+    return false;
+  }
+
+  void SetMinimumSeverity(uint8_t severity_or_max) noexcept
+  {
+    OPENTELEMETRY_ATOMIC_WRITE_8(&minimum_severity_, severity_or_max);
+  }
+
 private:
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}
+
+  //
+  // minimum_severity_ can be updated concurrently by multiple threads/cores, so race condition on
+  // read/write should be handled. And std::atomic can not be used here because it is not ABI
+  // compatible for OpenTelemetry C++ API.
+  //
+  mutable uint8_t minimum_severity_{kMaxSeverity};
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

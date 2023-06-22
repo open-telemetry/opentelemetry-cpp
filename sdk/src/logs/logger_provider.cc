@@ -5,12 +5,10 @@
 
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
-
-#  include <memory>
-#  include <mutex>
-#  include <string>
-#  include <unordered_map>
-#  include <vector>
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_context.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -61,8 +59,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url,
-    bool include_trace_context,
-    const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
   std::lock_guard<std::mutex> lock_guard{lock_};
@@ -96,17 +93,16 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   if (library_name.empty())
   {
     lib = instrumentationscope::InstrumentationScope::Create(logger_name, library_version,
-                                                             schema_url);
+                                                             schema_url, attributes);
   }
   else
   {
     lib = instrumentationscope::InstrumentationScope::Create(library_name, library_version,
-                                                             schema_url);
+                                                             schema_url, attributes);
   }
-  // TODO: attributes should be added into InstrumentationScope once it implement attributes.
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
-      new Logger(logger_name, context_, std::move(lib), include_trace_context)));
+      new Logger(logger_name, context_, std::move(lib))));
   return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 

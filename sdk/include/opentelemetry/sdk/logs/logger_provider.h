@@ -6,16 +6,13 @@
 
 #  include <memory>
 #  include <mutex>
-#  include <string>
 #  include <vector>
 
 #  include "opentelemetry/logs/logger_provider.h"
-#  include "opentelemetry/logs/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/atomic_shared_ptr.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it
@@ -27,6 +24,8 @@ namespace sdk
 namespace logs
 {
 class Logger;
+class LoggerContext;
+class LogRecordProcessor;
 
 class LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
@@ -63,6 +62,8 @@ public:
 
   ~LoggerProvider() override;
 
+  using opentelemetry::logs::LoggerProvider::GetLogger;
+
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
@@ -76,7 +77,6 @@ public:
       nostd::string_view library_name,
       nostd::string_view library_version = "",
       nostd::string_view schema_url      = "",
-      bool include_trace_context         = true,
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::NoopKeyValueIterable()) noexcept override;
 

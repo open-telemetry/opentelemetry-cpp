@@ -15,13 +15,220 @@ Increment the:
 
 ## [Unreleased]
 
-* Convert Prometheus Exporter to Pull MetricReader [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
-* Upgrade prometheus-cpp to v1.1.0 [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* [API] Remove include_trace_context
+  [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
+## [1.9.1] 2023-05-26
+
+* [DEPRECATION] Drop C++11 support
+  [#2146](https://github.com/open-telemetry/opentelemetry-cpp/pull/2146)
+
+* [CI] Upgrade Bazel and Bazelisk version
+  [#2118](https://github.com/open-telemetry/opentelemetry-cpp/pull/2118)
+* [CI] Upgrade Google Benchmark version from 1.6.0 to 1.7.1
+  [#2116](https://github.com/open-telemetry/opentelemetry-cpp/pull/2116)
+* [CI] Upgrade Nlohmann JSON library version from 3.10.5 to 3.11.2
+  [#2115](https://github.com/open-telemetry/opentelemetry-cpp/pull/2115)
+
+* [BUILD] Missed include
+  [#2143](https://github.com/open-telemetry/opentelemetry-cpp/pull/2143)
+* [BUILD] Add opentelemetry_proto_grpc and allow build shared
+  opentelemetry_proto and opentelemetry_proto_grpc on non-Windows platform.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+* [BUILD] Warning cleanup, single character wrapped by std::string
+  [#2137](https://github.com/open-telemetry/opentelemetry-cpp/pull/2137)
+* [BUILD] Add missing target dependencies
+  [#2128](https://github.com/open-telemetry/opentelemetry-cpp/pull/2128)
+* [BUILD] Fix if JSON library already added another CMake target
+  [#2126](https://github.com/open-telemetry/opentelemetry-cpp/pull/2126)
+* [BUILD] shared libraries with version suffix, along with the symbolic link
+  [#2109](https://github.com/open-telemetry/opentelemetry-cpp/pull/2109)
+* [BUILD] Show warning message if WITH_OTLP is enabled
+  [#2112](https://github.com/open-telemetry/opentelemetry-cpp/pull/2112)
+* [BUILD] Add missing STL header.
+  [#2107](https://github.com/open-telemetry/opentelemetry-cpp/pull/2107)
+* [BUILD] Build break with old curl, macro CURL_VERSION_BITS unknown
+  [#2102](https://github.com/open-telemetry/opentelemetry-cpp/pull/2102)
+* [BUILD] Transitive dependency issue with the otlp http exporter
+  [#2154](https://github.com/open-telemetry/opentelemetry-cpp/pull/2154)
+
+* [TEST] Add unit test for log body implicit conversions.
+  [#2136](https://github.com/open-telemetry/opentelemetry-cpp/pull/2136)
+* [TEST] Add event id to logger benchmark method
+  [#2133](https://github.com/open-telemetry/opentelemetry-cpp/pull/2133)
+
+* [API] Fix inclusion header files and use forward declaration
+  [#2124](https://github.com/open-telemetry/opentelemetry-cpp/pull/2124)
+* [API] Add user facing Logging API and Benchmarks
+  [#2094](https://github.com/open-telemetry/opentelemetry-cpp/pull/2094)
+
+* [SDK] SDK support for the new OTel log
+  [#2123](https://github.com/open-telemetry/opentelemetry-cpp/pull/2123)
+
+* [EXPORTER] Fixed HTTP session cleanup on shutdown
+  [#2111](https://github.com/open-telemetry/opentelemetry-cpp/pull/2111)
+* [EXPORTER] Delegate all API calls of gRPC into
+  opentelemetry_exporter_otlp_grpc_client,
+  and make it contains all symbols needed.
+  [#2005](https://github.com/open-telemetry/opentelemetry-cpp/pull/2005)
+
+* [DOC] Add Marc as maintainer.
+  [#2027](https://github.com/open-telemetry/opentelemetry-cpp/pull/2027)
+
+Breaking changes:
+
+* Add opentelemetry_proto_grpc and move gRPC sources into it.
+  [#2097](https://github.com/open-telemetry/opentelemetry-cpp/pull/2097)
+  * There will be no breaking changes for users who only use OTLP exporters and
+    do not directly use opentelemetry-cpp::proto. However, it is important to
+    note that `opentelemetry-cpp::proto` no longer contains generated gRPC codes
+    , and all components that depend on these gRPC codes should also link to
+    `opentelemetry-cpp::proto_grpc`.
+
+Deprecations:
+
+* The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+* C++11 support is to end, C++14 will be supported instead,
+  see [DEPRECATED](./DEPRECATED.md) for details.
+
+## [1.9.0] 2023-04-12
+
+* [CI] Make build environment parallel (Windows)
+  [#2080](https://github.com/open-telemetry/opentelemetry-cpp/pull/2080)
+* [CI] Make build environment parallel (Linux)
+  [#2076](https://github.com/open-telemetry/opentelemetry-cpp/pull/2076)
+* [CI] Remove separate run of metrics ostream example
+  [#2030](https://github.com/open-telemetry/opentelemetry-cpp/pull/2030)
+
+* [BUILD] Include directory path added for Zipkin exporter example
+  [#2069](https://github.com/open-telemetry/opentelemetry-cpp/pull/2069)
+* [BUILD] Ignore more warning in generated protobuf files
+  [#2067](https://github.com/open-telemetry/opentelemetry-cpp/pull/2067)
+* [BUILD] Clean warnings in ETW exporters
+  [#2063](https://github.com/open-telemetry/opentelemetry-cpp/pull/2063)
+* [BUILD] Fix default value of OPENTELEMETRY_INSTALL_default
+  [#2062](https://github.com/open-telemetry/opentelemetry-cpp/pull/2062)
+
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.20.0
+  [#2088](https://github.com/open-telemetry/opentelemetry-cpp/pull/2088)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.19.0
+  [#2017](https://github.com/open-telemetry/opentelemetry-cpp/pull/2017)
+
+* [API] Checking indices before dereference in string utils
+  [#2040](https://github.com/open-telemetry/opentelemetry-cpp/pull/2040)
+* [API] Export factory class of log provider
+  [#2041](https://github.com/open-telemetry/opentelemetry-cpp/pull/2041)
+
+* [SDK] Implement Forceflush for Periodic Metric Reader
+  [#2064](https://github.com/open-telemetry/opentelemetry-cpp/pull/2064)
+* [SDK] Add `ForceFlush` for all `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+* [SDK] Fix schema URL precedence bug in `Resource::Merge`
+  [#2036](https://github.com/open-telemetry/opentelemetry-cpp/pull/2036)
+* [SDK] Use sdk_start_ts for MetricData start_ts for instruments having
+  cumulative aggregation temporality.
+  [#2086](https://github.com/open-telemetry/opentelemetry-cpp/pull/2086)
+
+* [EXPORTER] Add OTLP HTTP SSL support
+  [#1793](https://github.com/open-telemetry/opentelemetry-cpp/pull/1793)
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+
+* [EXAMPLES] Remove unused 'alerting' section from prometheus.yml in examples
+  [#2055](https://github.com/open-telemetry/opentelemetry-cpp/pull/2055)
+* [EXAMPLES] Fix view names in Prometheus example
+  [#2034](https://github.com/open-telemetry/opentelemetry-cpp/pull/2034)
+
+* [DOC] Fix some docs typo
+  [#2057](https://github.com/open-telemetry/opentelemetry-cpp/pull/2057)
+* [DOC] Update OpenTracing shim README.md
+  [#2028](https://github.com/open-telemetry/opentelemetry-cpp/pull/2028)
+* [DOC] INSTALL doc clarifications
+  [#2078](https://github.com/open-telemetry/opentelemetry-cpp/pull/2078)
+
+Important changes:
+
+* [EXPORTER] GRPC endpoint scheme should take precedence over OTEL_EXPORTER_OTLP_TRACES_INSECURE
+  [#2060](https://github.com/open-telemetry/opentelemetry-cpp/pull/2060)
+  * The logic to decide whether or not an OTLP GRPC exporter uses SSL has
+    changed to comply with the specification:
+    * Before this change, the following settings were evaluated, in order:
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_INSECURE (starting with 1.8.3)
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * With this change, the following settings are evaluated, in order:
+      * The GRPC endpoint scheme, if provided:
+        * "https" imply with SSL,
+        * "http" imply without ssl.
+      * OTEL_EXPORTER_OTLP_TRACES_INSECURE
+      * OTEL_EXPORTER_OTLP_INSECURE
+      * OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE
+      * OTEL_EXPORTER_OTLP_SSL_ENABLE
+    * As a result, a behavior change for GRPC SSL is possible,
+      because the endpoint scheme now takes precedence.
+      Please verify configuration settings for the GRPC endpoint.
+* [SDK] Add `ForceFlush` for all `LogRecordExporter` and `SpanExporter`
+  [#2000](https://github.com/open-telemetry/opentelemetry-cpp/pull/2000)
+  * `LogRecordExporter` and `SpanExporter` add a new virtual function
+    `ForceFlush`, and if users implement any customized `LogRecordExporter` and
+    `SpanExporter`, they should also implement this function.
+    There should be no impact if users only use factory to create exporters.
+
+Deprecations:
+
+* The Jaeger Exporter is deprecated, see [DEPRECATED](./DEPRECATED.md) for details.
+
+## [1.8.3] 2023-03-06
+
+* Provide version major/minor/patch macros
+  [#2014](https://github.com/open-telemetry/opentelemetry-cpp/pull/2014)
+* [BUILD] Add `OPENTELEMETRY_INSTALL` to allow user to skip install targets.
+  [#2022](https://github.com/open-telemetry/opentelemetry-cpp/pull/2022)
+* [SDK] Rename the global SDK version variables to avoid naming clash
+  [#2011](https://github.com/open-telemetry/opentelemetry-cpp/pull/2011)
+* [BUILD] Fix typo in CMakeLists.txt
+  [#2010](https://github.com/open-telemetry/opentelemetry-cpp/pull/2010)
+* [EXPORTER] fix Prometheus test iterator iterator increment
+  [#2006](https://github.com/open-telemetry/opentelemetry-cpp/pull/2006)
+* [SDK]Add attributes for InstrumentationScope
+  [#2004](https://github.com/open-telemetry/opentelemetry-cpp/pull/2004)
+* [METRICS SDK] Performance improvement in measurement processing
+  [#1993](https://github.com/open-telemetry/opentelemetry-cpp/pull/1993)
+* [EXAMPLE] Add example for logs ostream exporter
+  [#1992](https://github.com/open-telemetry/opentelemetry-cpp/pull/1992)
+* [ETW Exporter] Support serialize span/log attributes into JSON
+  [#1991](https://github.com/open-telemetry/opentelemetry-cpp/pull/1991)
+* [ETW Exporter]Do not overwrite ParentId when setting attribute on Span
+  [#1989](https://github.com/open-telemetry/opentelemetry-cpp/pull/1989)
+* Upgrade prometheus-cpp to v1.1.0
+  [#1954](https://github.com/open-telemetry/opentelemetry-cpp/pull/1954)
+* Convert Prometheus Exporter to Pull MetricReader
+  [#1953](https://github.com/open-telemetry/opentelemetry-cpp/pull/1953)
+* [DOCS] Add alpine packages to INSTALL.md
+  [#1957](https://github.com/open-telemetry/opentelemetry-cpp/pull/1957)
+* [METRICS SDK] Add benchmark tests for Sum Aggregation.
+  [#1948](https://github.com/open-telemetry/opentelemetry-cpp/pull/1948)
 * [BUILD] Build OpenTelemetry SDK and exporters into DLL
   [#1932](https://github.com/open-telemetry/opentelemetry-cpp/pull/1932)
-* [CI] Enforce copyright check in CI [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
+* [CI] Enforce copyright check in CI
+  [#1965](https://github.com/open-telemetry/opentelemetry-cpp/pull/1965)
+* [BUILD] Fix typo GENENV -> GETENV
+  [#1972](https://github.com/open-telemetry/opentelemetry-cpp/pull/1972)
 * [SEMANTIC CONVENTIONS] Upgrade to version 1.18.0
   [#1974](https://github.com/open-telemetry/opentelemetry-cpp/pull/1974)
+* [EXT] Fix thread-safety when shutdown.
+  [#1977](https://github.com/open-telemetry/opentelemetry-cpp/pull/1977)
+* [SDK] Fix missing ObservedTimestamp.
+  [#1985](https://github.com/open-telemetry/opentelemetry-cpp/pull/1985)
+* [METRICS SDK] fix variable names
+  [#1987](https://github.com/open-telemetry/opentelemetry-cpp/pull/1987)
+* [EXPORTER] Fix Prometheus server crash on listening to already used port
+  [#1986](https://github.com/open-telemetry/opentelemetry-cpp/pull/1986)
+* [EXPORTER] Boolean environment variables not parsed per the spec
+  [#1982](https://github.com/open-telemetry/opentelemetry-cpp/pull/1982)
+* [EXPORTER] Opentracing shim
+  [#1909](https://github.com/open-telemetry/opentelemetry-cpp/pull/1909)
 
 ## [1.8.2] 2023-01-31
 
@@ -327,7 +534,7 @@ update the semantic convention in instrumentation library is needed.
 * [BUILD] Don't require applications using jaeger exporter to know about libcurl
   [#1518](https://github.com/open-telemetry/opentelemetry-cpp/pull/1518)
 * [EXPORTER] Inline print_value() in ostream exporter [#1512](https://github.com/open-telemetry/opentelemetry-cpp/pull/1512)
-* [SDK] fix: urlPaser will incorrect parsing url like "http://abc.com/xxx@xxx/a/b"
+* [SDK] fix: urlPaser will incorrect parsing url like `http://abc.com/xxx@xxx/a/b`
   [#1511](https://github.com/open-telemetry/opentelemetry-cpp/pull/1511)
 * [SDK] Rename `InstrumentationLibrary` to `InstrumentationScope` [#1507](https://github.com/open-telemetry/opentelemetry-cpp/pull/1507)
 * [BUILD] Try to build nlohmann-json only it's depended. [#1505](https://github.com/open-telemetry/opentelemetry-cpp/pull/1505)

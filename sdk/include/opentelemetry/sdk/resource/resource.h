@@ -3,17 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable_view.h"
+#include <string>
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
-#include <sstream>
-#include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -35,6 +28,10 @@ public:
    * Returns a new, merged {@link Resource} by merging the current Resource
    * with the other Resource. In case of a collision, the other Resource takes
    * precedence.
+   *
+   * The specification notes that if schema urls collide, the resulting
+   * schema url is implementation-defined. In the C++ implementation, the
+   * schema url of @param other is picked.
    *
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.

@@ -2,9 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
+
+// sdk::TracerProvider is just used to call ForceFlush and prevent to cancel running exportings when
+// destroy and shutdown exporters.It's optional to users.
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -32,6 +37,14 @@ void InitTracer()
 
 void CleanupTracer()
 {
+  // We call ForceFlush to prevent to cancel running exportings, It's optional.
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+      trace::Provider::GetTracerProvider();
+  if (provider)
+  {
+    static_cast<trace_sdk::TracerProvider *>(provider.get())->ForceFlush();
+  }
+
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace::Provider::SetTracerProvider(none);
 }

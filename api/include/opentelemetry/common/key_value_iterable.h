@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

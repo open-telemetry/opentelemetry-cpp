@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -50,7 +51,8 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
 {
   sum->set_aggregation_temporality(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
-  sum->set_is_monotonic(true);
+  sum->set_is_monotonic(metric_data.instrument_descriptor.type_ ==
+                        metric_sdk::InstrumentType::kCounter);
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
@@ -96,7 +98,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     // sum
     if ((nostd::holds_alternative<int64_t>(histogram_data.sum_)))
     {
-      proto_histogram_point_data->set_sum(nostd::get<int64_t>(histogram_data.sum_));
+      // Use static_cast to avoid C4244 in MSVC
+      proto_histogram_point_data->set_sum(
+          static_cast<double>(nostd::get<int64_t>(histogram_data.sum_)));
     }
     else
     {
@@ -108,7 +112,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
     {
       if (nostd::holds_alternative<int64_t>(histogram_data.min_))
       {
-        proto_histogram_point_data->set_min(nostd::get<int64_t>(histogram_data.min_));
+        // Use static_cast to avoid C4244 in MSVC
+        proto_histogram_point_data->set_min(
+            static_cast<double>(nostd::get<int64_t>(histogram_data.min_)));
       }
       else
       {
@@ -116,7 +122,9 @@ void OtlpMetricUtils::ConvertHistogramMetric(
       }
       if (nostd::holds_alternative<int64_t>(histogram_data.max_))
       {
-        proto_histogram_point_data->set_max(nostd::get<int64_t>(histogram_data.max_));
+        // Use static_cast to avoid C4244 in MSVC
+        proto_histogram_point_data->set_max(
+            static_cast<double>(nostd::get<int64_t>(histogram_data.max_)));
       }
       else
       {

@@ -9,31 +9,33 @@ target_include_directories(
 
 set_target_properties(opentelemetry_api PROPERTIES EXPORT_NAME api)
 
-install(
-  TARGETS opentelemetry_api
-  EXPORT "${PROJECT_NAME}-target"
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_api
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-set(LOGS_EXCLUDE_PATTERN "")
-if(NOT WITH_LOGS_PREVIEW)
-  set(LOGS_EXCLUDE_PATTERN "logs")
+  set(LOGS_EXCLUDE_PATTERN "")
+  if(NOT WITH_LOGS_PREVIEW)
+    set(LOGS_EXCLUDE_PATTERN "logs")
+  endif()
+
+  install(
+    DIRECTORY include/opentelemetry
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "metrics" EXCLUDE)
+
+  install(
+    DIRECTORY include/opentelemetry
+    DESTINATION include
+    FILES_MATCHING
+    PATTERN "*.h"
+    PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
 endif()
-
-install(
-  DIRECTORY include/opentelemetry
-  DESTINATION include
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "metrics" EXCLUDE)
-
-install(
-  DIRECTORY include/opentelemetry
-  DESTINATION include
-  FILES_MATCHING
-  PATTERN "*.h"
-  PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
 
 if(BUILD_TESTING)
   add_subdirectory(test)
@@ -94,6 +96,21 @@ endif()
 
 if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
+endif()
+
+# A better place should be in sdk, not api
+if(WITH_OTLP_HTTP_SSL_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_HTTP_SSL_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_HTTP_SSL_PREVIEW)
+
+  if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW)
+    target_compile_definitions(opentelemetry_api
+                               INTERFACE ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW)
+    target_compile_definitions(opentelemetry_api
+                               INTERFACE ENABLE_HTTP_SSL_TLS_PREVIEW)
+  endif()
 endif()
 
 if(WITH_METRICS_EXEMPLAR_PREVIEW)

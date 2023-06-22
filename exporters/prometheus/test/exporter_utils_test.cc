@@ -14,6 +14,22 @@ namespace metric_api        = opentelemetry::metrics;
 namespace prometheus_client = ::prometheus;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace exporter
+{
+namespace metrics
+{
+class SanitizeNameTester
+{
+public:
+  static std::string sanitize(std::string name)
+  {
+    return PrometheusExporterUtils::SanitizeNames(name);
+  }
+};
+}  // namespace metrics
+}  // namespace exporter
+
 template <typename T>
 void assert_basic(prometheus_client::MetricFamily &metric,
                   const std::string &sanitized_name,
@@ -22,9 +38,9 @@ void assert_basic(prometheus_client::MetricFamily &metric,
                   int label_num,
                   std::vector<T> vals)
 {
-  ASSERT_EQ(metric.name, sanitized_name);  // name sanitized
-  ASSERT_EQ(metric.help, description);     // description not changed
-  ASSERT_EQ(metric.type, type);            // type translated
+  ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
+  ASSERT_EQ(metric.help, description);               // description not changed
+  ASSERT_EQ(metric.type, type);                      // type translated
 
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
@@ -65,12 +81,12 @@ void assert_histogram(prometheus_client::MetricFamily &metric,
   int cumulative_count = 0;
   auto buckets         = metric.metric[0].histogram.bucket;
   auto boundary_it     = boundaries.cbegin();
-  for (size_t i = 0; i < buckets.size(); i++, ++boundary_it)
+  for (size_t i = 0; i < buckets.size(); i++)
   {
     auto bucket = buckets[i];
     if (i != buckets.size() - 1)
     {
-      ASSERT_DOUBLE_EQ(*boundary_it, bucket.upper_bound);
+      ASSERT_DOUBLE_EQ(*boundary_it++, bucket.upper_bound);
     }
     else
     {
@@ -127,6 +143,16 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 1,
                vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
+}
+
+TEST(PrometheusExporterUtils, SanitizeName)
+{
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name"), "name");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?"), "name_");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name???"), "name_");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__"), "name_");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name"), "name_name");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name:"), "name_name:");
 }
 
 OPENTELEMETRY_END_NAMESPACE

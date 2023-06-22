@@ -10,7 +10,6 @@
 #  include <unordered_map>
 
 #  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
@@ -20,6 +19,8 @@ namespace sdk
 {
 namespace logs
 {
+class LogRecordProcessor;
+
 class MultiRecordable final : public Recordable
 {
 public:
@@ -54,6 +55,13 @@ public:
    * @param message the body to set
    */
   void SetBody(const opentelemetry::common::AttributeValue &message) noexcept override;
+
+  /**
+   * Set the event id
+   * @param id the event id to set
+   * @param name  the event name to set
+   */
+  void SetEventId(int64_t id, nostd::string_view name) noexcept override;
 
   /**
    * Set the trace id for this log.

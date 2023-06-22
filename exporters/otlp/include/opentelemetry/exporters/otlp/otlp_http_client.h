@@ -49,6 +49,11 @@ struct OtlpHttpClientOptions
 {
   std::string url;
 
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  /** SSL options. */
+  ext::http::client::HttpSslOptions ssl_options;
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
 
@@ -63,11 +68,10 @@ struct OtlpHttpClientOptions
   // Whether to print the status of the HTTP client in the console
   bool console_debug = false;
 
-  // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  std::chrono::system_clock::duration timeout;
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+  OtlpHeaders http_headers;
 
   // Concurrent requests
   std::size_t max_concurrent_requests = 64;
@@ -76,9 +80,24 @@ struct OtlpHttpClientOptions
   std::size_t max_requests_per_connection = 8;
 
   // User agent
-  std::string user_agent = GetOtlpDefaultUserAgent();
+  std::string user_agent;
 
   inline OtlpHttpClientOptions(nostd::string_view input_url,
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+                               bool input_ssl_insecure_skip_verify,
+                               nostd::string_view input_ssl_ca_cert_path,
+                               nostd::string_view input_ssl_ca_cert_string,
+                               nostd::string_view input_ssl_client_key_path,
+                               nostd::string_view input_ssl_client_key_string,
+                               nostd::string_view input_ssl_client_cert_path,
+                               nostd::string_view input_ssl_client_cert_string,
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+                               nostd::string_view input_ssl_min_tls,
+                               nostd::string_view input_ssl_max_tls,
+                               nostd::string_view input_ssl_cipher,
+                               nostd::string_view input_ssl_cipher_suite,
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
                                bool input_use_json_name,
@@ -89,6 +108,24 @@ struct OtlpHttpClientOptions
                                std::size_t input_max_requests_per_connection = 8,
                                nostd::string_view input_user_agent = GetOtlpDefaultUserAgent())
       : url(input_url),
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+        ssl_options(input_url,
+                    input_ssl_insecure_skip_verify,
+                    input_ssl_ca_cert_path,
+                    input_ssl_ca_cert_string,
+                    input_ssl_client_key_path,
+                    input_ssl_client_key_string,
+                    input_ssl_client_cert_path,
+                    input_ssl_client_cert_string
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+                    ,
+                    input_ssl_min_tls,
+                    input_ssl_max_tls,
+                    input_ssl_cipher,
+                    input_ssl_cipher_suite
+#  endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+                    ),
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),

@@ -4,7 +4,10 @@
 #pragma once
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_context_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -26,7 +29,7 @@ template <typename T>
 class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  HttpTextMapCarrier<T>(T &headers) : headers_(headers) {}
+  HttpTextMapCarrier(T &headers) : headers_(headers) {}
   HttpTextMapCarrier() = default;
   virtual opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override
