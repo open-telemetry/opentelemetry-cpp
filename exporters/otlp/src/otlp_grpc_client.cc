@@ -81,7 +81,6 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
       options.ssl_client_cert_path,
       options.ssl_client_cert_string);
 #endif
-    };
     channel =
         grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
   }
