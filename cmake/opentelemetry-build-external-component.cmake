@@ -5,7 +5,7 @@
 # The config options are
 #  - OPENTELEMETRY_EXTERNAL_COMPONENT_PATH - Setting local path of the external
 # component as env variable
-#  - OPENTELEMETRY_EXTERNAL_COMPONENT_URL Setting githb-repo of external component
+#  - OPENTELEMETRY_EXTERNAL_COMPONENT_URL Setting github-repo of external component
 #  as env variable
 
 
