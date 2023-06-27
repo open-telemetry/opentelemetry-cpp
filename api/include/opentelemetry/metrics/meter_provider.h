@@ -29,6 +29,12 @@ public:
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  virtual void RemoveMeter(nostd::string_view library_name,
+                           nostd::string_view library_version = "",
+                           nostd::string_view schema_url      = "") noexcept = 0;
+#endif
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

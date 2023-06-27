@@ -115,6 +115,10 @@ public:
    */
   void AddMeter(std::shared_ptr<Meter> meter);
 
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url);
+
   /**
    * Force all active Collectors to flush any buffered meter data
    * within the given timeout.

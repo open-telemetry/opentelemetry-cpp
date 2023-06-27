@@ -57,6 +57,21 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   return nostd::shared_ptr<metrics_api::Meter>{meter};
 }
 
+void MeterProvider::RemoveMeter(nostd::string_view name,
+                                nostd::string_view version,
+                                nostd::string_view schema_url) noexcept
+{
+  if (name.data() == nullptr || name == "")
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterProvider::RemoveMeter] Library name is empty.");
+    name = "";
+  }
+
+  const std::lock_guard<std::mutex> guard(lock_);
+
+  context_->RemoveMeter(name, version, schema_url);
+}
+
 const resource::Resource &MeterProvider::GetResource() const noexcept
 {
   return context_->GetResource();

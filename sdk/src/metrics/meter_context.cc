@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk_config.h"
@@ -77,6 +78,26 @@ void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
   meters_.push_back(meter);
+}
+
+void MeterContext::RemoveMeter(nostd::string_view name,
+                               nostd::string_view version,
+                               nostd::string_view schema_url)
+{
+  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+
+  std::vector<std::shared_ptr<Meter>> filtered_meters;
+
+  for (auto &meter : meters_)
+  {
+    auto scope = meter->GetInstrumentationScope();
+    if (!scope->equal(name, version, schema_url))
+    {
+      filtered_meters.push_back(meter);
+    }
+  }
+
+  meters_.swap(filtered_meters);
 }
 
 bool MeterContext::Shutdown() noexcept

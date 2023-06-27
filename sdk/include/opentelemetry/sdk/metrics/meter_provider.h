@@ -53,6 +53,17 @@ public:
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url) noexcept override;
+#else
+  /* Only in the SDK, not API, for ABI VERSION 1 */
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url) noexcept;
+#endif
+
   /**
    * Obtain the resource associated with this meter provider.
    * @return The resource for this meter provider.
