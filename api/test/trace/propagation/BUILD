@@ -36,3 +36,20 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "jaeger_propagation_test",
+    srcs = [
+        "jaeger_propagation_test.cc",
+        "util.h",
+    ],
+    tags = [
+        "api",
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
