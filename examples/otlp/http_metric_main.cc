@@ -52,7 +52,6 @@ void InitMetrics()
   auto context = metric_sdk::MeterContextFactory::Create();
   context->AddMetricReader(std::move(reader));
 
-  // FIXME: MeterProvider / MeterProviderFactory should take a unique_ptr
   std::shared_ptr<metric_sdk::MeterContext> s_context(std::move(context));
 
   auto u_provider = metric_sdk::MeterProviderFactory::Create(s_context);
