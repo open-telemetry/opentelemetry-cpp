@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
@@ -25,14 +27,16 @@ namespace common        = opentelemetry::common;
 namespace metrics_api   = opentelemetry::metrics;
 namespace otlp_exporter = opentelemetry::exporter::otlp;
 
+namespace internal_log = opentelemetry::sdk::common::internal_log;
+
 namespace
 {
 
-otlp_exporter::OtlpGrpcMetricExporterOptions exporter_options;
+otlp_exporter::OtlpHttpMetricExporterOptions exporter_options;
 
 void InitMetrics()
 {
-  auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
+  auto exporter = otlp_exporter::OtlpHttpMetricExporterFactory::Create(exporter_options);
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
@@ -63,25 +67,53 @@ void CleanupMetrics()
 }
 }  // namespace
 
+/*
+  Usage:
+  - example_otlp_http_metric
+  - example_otlp_http_metric <URL>
+  - example_otlp_http_metric <URL> <EXAMPLE>
+  - example_otlp_http_metric <URL> <EXAMPLE> <DEBUG>
+  - example_otlp_http_metric <URL> <EXAMPLE> <DEBUG> <BIN>
+  <EXAMPLE> = counter|observable_counter|histogram|all
+  <DEBUG> = yes|no, to turn console debug on or off
+  <BIN> = bin, to export in binary format
+*/
 int main(int argc, char *argv[])
 {
   std::string example_type;
   if (argc > 1)
   {
-    exporter_options.endpoint = argv[1];
-    if (argc > 2)
+    exporter_options.url = argv[1];
+  }
+
+  if (argc > 2)
+  {
+    example_type = argv[2];
+  }
+
+  if (argc > 3)
+  {
+    std::string debug              = argv[3];
+    exporter_options.console_debug = debug != "" && debug != "0" && debug != "no";
+  }
+
+  if (argc > 4)
+  {
+    std::string binary_mode = argv[4];
+    if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
     {
-      example_type = argv[2];
-      if (argc > 3)
-      {
-        exporter_options.use_ssl_credentials         = true;
-        exporter_options.ssl_credentials_cacert_path = argv[3];
-      }
+      exporter_options.content_type = otlp_exporter::HttpRequestContentType::kBinary;
     }
   }
+
+  if (exporter_options.console_debug)
+  {
+    internal_log::GlobalLogHandler::SetLogLevel(internal_log::LogLevel::Debug);
+  }
+
   // Removing this line will leave the default noop MetricProvider in place.
   InitMetrics();
-  std::string name{"otlp_grpc_metric_example"};
+  std::string name{"otlp_http_metric_example"};
 
   if (example_type == "counter")
   {
