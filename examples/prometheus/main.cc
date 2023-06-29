@@ -3,13 +3,18 @@
 
 #include <memory>
 #include <thread>
-#include "opentelemetry/exporters/prometheus/exporter.h"
+
+#include "opentelemetry/exporters/prometheus/exporter_factory.h"
+#include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/metrics_foo_library/foo_library.h"
@@ -37,34 +42,42 @@ void InitMetrics(const std::string &name, const std::string &addr)
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
-  std::shared_ptr<metrics_sdk::MetricReader> prometheus_exporter(
-      new metrics_exporter::PrometheusExporter(opts));
+  auto prometheus_exporter = metrics_exporter::PrometheusExporterFactory::Create(opts);
 
   // Initialize and set the global MeterProvider
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metrics_sdk::MeterProvider());
-  auto p        = std::static_pointer_cast<metrics_sdk::MeterProvider>(provider);
-  p->AddMetricReader(prometheus_exporter);
+  auto u_provider = metrics_sdk::MeterProviderFactory::Create();
+  auto *p         = static_cast<metrics_sdk::MeterProvider *>(u_provider.get());
+
+  p->AddMetricReader(std::move(prometheus_exporter));
 
   // counter view
   std::string counter_name = name + "_counter";
-  std::unique_ptr<metrics_sdk::InstrumentSelector> instrument_selector{
-      new metrics_sdk::InstrumentSelector(metrics_sdk::InstrumentType::kCounter, counter_name)};
-  std::unique_ptr<metrics_sdk::MeterSelector> meter_selector{
-      new metrics_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metrics_sdk::View> sum_view{
-      new metrics_sdk::View{counter_name, "description", metrics_sdk::AggregationType::kSum}};
+
+  auto instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kCounter, counter_name);
+
+  auto meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto sum_view = metrics_sdk::ViewFactory::Create(counter_name, "description",
+                                                   metrics_sdk::AggregationType::kSum);
+
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
   // histogram view
   std::string histogram_name = name + "_histogram";
-  std::unique_ptr<metrics_sdk::InstrumentSelector> histogram_instrument_selector{
-      new metrics_sdk::InstrumentSelector(metrics_sdk::InstrumentType::kHistogram, histogram_name)};
-  std::unique_ptr<metrics_sdk::MeterSelector> histogram_meter_selector{
-      new metrics_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metrics_sdk::View> histogram_view{new metrics_sdk::View{
-      histogram_name, "description", metrics_sdk::AggregationType::kHistogram}};
+
+  auto histogram_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kHistogram, histogram_name);
+
+  auto histogram_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto histogram_view = metrics_sdk::ViewFactory::Create(histogram_name, "description",
+                                                         metrics_sdk::AggregationType::kHistogram);
+
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
+
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
   metrics_api::Provider::SetMeterProvider(provider);
 }
 
