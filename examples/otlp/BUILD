@@ -76,7 +76,7 @@ cc_binary(
 )
 
 cc_binary(
-    name = "example_otlp_grpc_metrics",
+    name = "example_otlp_grpc_metric",
     srcs = [
         "grpc_metric_main.cc",
     ],
@@ -90,6 +90,25 @@ cc_binary(
         "//examples/common/metrics_foo_library:common_metrics_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
+        "//sdk/src/metrics",
+    ],
+)
+
+cc_binary(
+    name = "example_otlp_http_metric",
+    srcs = [
+        "http_metric_main.cc",
+    ],
+    tags = [
+        "examples",
+        "metrics",
+        "otlp",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
+        "//exporters/otlp:otlp_http_exporter",
+        "//exporters/otlp:otlp_http_metric_exporter",
         "//sdk/src/metrics",
     ],
 )

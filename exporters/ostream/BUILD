@@ -36,10 +36,12 @@ cc_library(
     name = "ostream_metric_exporter",
     srcs = [
         "src/metric_exporter.cc",
+        "src/metric_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/metric_exporter.h",
+        "include/opentelemetry/exporters/ostream/metric_exporter_factory.h",
     ],
     strip_include_prefix = "include",
     tags = [
