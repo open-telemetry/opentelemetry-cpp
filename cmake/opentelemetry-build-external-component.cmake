@@ -8,9 +8,14 @@
 #  - OPENTELEMETRY_EXTERNAL_COMPONENT_URL Setting github-repo of external component
 #  as env variable
 
-
 # Add custom vendor component from local path, or GitHub repo
-if(DEFINED $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
+# Prefer CMake option, then env variable, then URL.
+if(OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
+  # Add custom component path to build tree and consolidate binary artifacts in
+  # current project binary output directory.
+  add_subdirectory(${OPENTELEMETRY_EXTERNAL_COMPONENT_PATH}
+                   ${PROJECT_BINARY_DIR}/external)
+elseif(DEFINED ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
   # Add custom component path to build tree and consolidate binary artifacts in
   # current project binary output directory.
   add_subdirectory($ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH}
