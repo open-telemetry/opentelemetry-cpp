@@ -30,13 +30,13 @@ static void f2()
 extern "C"
 
 #if defined(_MSC_VER)
-    // component_g is a DLL
+    // component_h is a DLL
 
     __declspec(dllexport)
 
 #else
-// component_g is a shared library (*.so)
-// component_g is compiled with visibility("hidden"),
+// component_h is a shared library (*.so)
+// component_h is compiled with visibility("hidden"),
 __attribute__((visibility("default")))
 #endif
 
