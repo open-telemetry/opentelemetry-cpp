@@ -5,12 +5,10 @@
 
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
-
-#  include <memory>
-#  include <mutex>
-#  include <string>
-#  include <unordered_map>
-#  include <vector>
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_context.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -61,7 +59,6 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url,
-    bool include_trace_context,
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
@@ -105,7 +102,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   }
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
-      new Logger(logger_name, context_, std::move(lib), include_trace_context)));
+      new Logger(logger_name, context_, std::move(lib))));
   return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 

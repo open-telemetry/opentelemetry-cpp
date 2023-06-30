@@ -18,6 +18,9 @@ Increment the:
 * [EXPORTER] Support protobuf 3.22 or upper
   [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
 
+* [API] Remove include_trace_context
+  [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
 ## [1.9.1] 2023-05-26
 
 * [DEPRECATION] Drop C++11 support

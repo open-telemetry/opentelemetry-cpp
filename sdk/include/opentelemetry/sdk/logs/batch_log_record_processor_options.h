@@ -5,10 +5,10 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/version/version.h"
-
 #  include <chrono>
 #  include <cstddef>
+
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

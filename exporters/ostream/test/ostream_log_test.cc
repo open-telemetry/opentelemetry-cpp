@@ -3,15 +3,18 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 
-#  include <array>
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #  include <gtest/gtest.h>
+
+#  include <array>
 #  include <iostream>
 
 namespace sdklogs      = opentelemetry::sdk::logs;
@@ -377,7 +380,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url, true,
+      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
       {{"scope.attr.key", 123}});
 
   // Back up cout's streambuf
@@ -449,7 +452,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
   logs_api::Provider::SetLoggerProvider(provider);
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
-      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url, true,
+      "Logger", "opentelelemtry_library", OPENTELEMETRY_SDK_VERSION, schema_url,
       {{"scope.attr.key", 123}});
 
   // Back up cout's streambuf

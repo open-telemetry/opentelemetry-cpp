@@ -266,6 +266,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"

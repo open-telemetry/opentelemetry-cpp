@@ -665,6 +665,8 @@ endif()
 
 include("${PROJECT_SOURCE_DIR}/cmake/patch-imported-config.cmake")
 
+include(cmake/opentelemetry-build-external-component.cmake)
+
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)
   # Write config file for find_packages(opentelemetry-cpp CONFIG)

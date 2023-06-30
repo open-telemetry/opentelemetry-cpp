@@ -19,8 +19,10 @@
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/trace/provider.h"
@@ -170,7 +172,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
     std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
     attributes["service.name"]     = "unit_test_service";

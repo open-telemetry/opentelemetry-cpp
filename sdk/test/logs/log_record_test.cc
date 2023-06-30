@@ -12,6 +12,7 @@
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_id.h"
 
@@ -118,7 +119,6 @@ public:
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */,
-      bool /* include_trace_context */,
       const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return nostd::shared_ptr<opentelemetry::logs::Logger>(new TestBodyLogger());
@@ -132,8 +132,7 @@ TEST(LogBody, BodyConversation)
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger =
-      lp.GetLogger("TestBodyProvider", "opentelelemtry_library", "", schema_url, false, {});
+  auto logger = lp.GetLogger("TestBodyProvider", "opentelelemtry_library", "", schema_url, {});
 
   auto real_logger = static_cast<TestBodyLogger *>(logger.get());
 

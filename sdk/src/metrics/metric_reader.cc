@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
 #include <mutex>

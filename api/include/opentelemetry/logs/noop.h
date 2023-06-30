@@ -54,7 +54,6 @@ public:
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
                                       nostd::string_view /* schema_url */,
-                                      bool /* include_trace_context */,
                                       const common::KeyValueIterable & /* attributes */) override
   {
     return logger_;
