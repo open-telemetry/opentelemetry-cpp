@@ -99,7 +99,8 @@ if(WITH_ASYNC_EXPORT_PREVIEW)
 endif()
 
 if(WITH_ABI_VERSION_2_PREVIEW)
-  target_compile_definitions(opentelemetry_api INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
 endif()
 
 # A better place should be in sdk, not api

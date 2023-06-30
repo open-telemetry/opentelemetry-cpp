@@ -92,28 +92,27 @@ endif()
 #
 # ABI VERSION 1 is frozen, and can not change.
 #
-# For fixes or features that causes an API/ABI breaking change,
-# the change is implemented in ABI VERSION 2.
+# For fixes or features that causes an API/ABI breaking change, the change is
+# implemented in ABI VERSION 2.
 #
-# ABI VERSION 2 is still experimental, unstable,
-# and will by definition change when more breaking changes
-# are implemented.
+# ABI VERSION 2 is still experimental, unstable, and will by definition change
+# when more breaking changes are implemented.
 #
-# When version 2 is sufficiently mature and contains a coherent
-# set of new features, it will be marked stable and published.
+# When version 2 is sufficiently mature and contains a coherent set of new
+# features, it will be marked stable and published.
 #
-# The goal is to avoid incrementing the ABI version on individual fixes,
-# and release a stable set less frequently, to minimize disruption to users.
+# The goal is to avoid incrementing the ABI version on individual fixes, and
+# release a stable set less frequently, to minimize disruption to users.
 #
-# Until ABI_VERSION_2 is marked stable, use WITH_ABI_VERSION_2_PREVIEW=ON
-# at your own risk, as there are no compatibility guarantees.
+# Until ABI_VERSION_2 is marked stable, use WITH_ABI_VERSION_2_PREVIEW=ON at
+# your own risk, as there are no compatibility guarantees.
 #
 option(WITH_ABI_VERSION_2_PREVIEW "EXPERIMENTAL: ABI version 2 preview" OFF)
 
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 
-if (WITH_ABI_VERSION_2_PREVIEW)
+if(WITH_ABI_VERSION_2_PREVIEW)
   set(OPENTELEMETRY_ABI_VERSION_NO "2")
 else()
   if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
@@ -122,7 +121,7 @@ else()
   else()
     message(
       FATAL_ERROR
-      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
     )
   endif()
 endif()
@@ -300,14 +299,18 @@ endif()
 # ABI_VERSION_2 is not stable, do not build shared libraries with it.
 #
 if(OTELCPP_VERSIONED_LIBS AND WITH_ABI_VERSION_2_PREVIEW)
-  message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires WITH_ABI_VERSION_2_PREVIEW=OFF")
+  message(
+    FATAL_ERROR
+      "OTELCPP_VERSIONED_LIBS=ON requires WITH_ABI_VERSION_2_PREVIEW=OFF")
 endif()
 
 #
 # ABI_VERSION_2 is not stable, do not build DLL with it.
 #
 if(DEFINED OPENTELEMETRY_BUILD_DLL AND WITH_ABI_VERSION_2_PREVIEW)
-  message(FATAL_ERROR "OPENTELEMETRY_BUILD_DLL requires WITH_ABI_VERSION_2_PREVIEW=OFF")
+  message(
+    FATAL_ERROR
+      "OPENTELEMETRY_BUILD_DLL requires WITH_ABI_VERSION_2_PREVIEW=OFF")
 endif()
 
 find_package(Threads)
