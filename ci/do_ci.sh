@@ -59,6 +59,16 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
+IWYU=""
+MAKE_COMMAND="make -k -j \$(nproc)"
+if [[ "${CXX}" == *clang* ]]; then
+  MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
+  IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
+fi
+
+echo "make command: ${MAKE_COMMAND}"
+echo "IWYU option: ${IWYU}"
+
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
 BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
@@ -109,8 +119,9 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        ${IWYU} \
         "${SRC_DIR}"
-  make -k
+  eval "$MAKE_COMMAND"
   make test
   exit 0
 elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
@@ -132,8 +143,9 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        ${IWYU} \
         "${SRC_DIR}"
-  make -k -j $(nproc)
+  eval "$MAKE_COMMAND"
   make test
   exit 0
 elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
@@ -206,8 +218,9 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=20 \
+        ${IWYU} \
         "${SRC_DIR}"
-  make -j $(nproc)
+  eval "$MAKE_COMMAND"
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
@@ -219,8 +232,9 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=ON \
+        ${IWYU} \
         "${SRC_DIR}"
-  make -j $(nproc)
+  eval "$MAKE_COMMAND"
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.test" ]]; then
