@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <regex>
 #include <sstream>
+#include <string>
 #include <utility>
 #include <vector>
 #include "prometheus/metric_family.h"
@@ -38,13 +40,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      auto origin_name = metric_data.instrument_descriptor.name_;
-      auto unit        = metric_data.instrument_descriptor.unit_;
-      auto sanitized   = SanitizeNames(origin_name);
-      prometheus_client::MetricFamily metric_family;
-      metric_family.name = sanitized + "_" + unit;
-      metric_family.help = metric_data.instrument_descriptor.description_;
-      auto time          = metric_data.end_ts.time_since_epoch();
+      auto time = metric_data.end_ts.time_since_epoch();
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
         auto kind         = getAggregationType(point_data_attr.point_data);
@@ -55,7 +51,11 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
               nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
         }
         const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-        metric_family.type                       = type;
+        prometheus_client::MetricFamily metric_family;
+        metric_family.type = type;
+        metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
+                                                 metric_data.instrument_descriptor.unit_, type);
+        metric_family.help = metric_data.instrument_descriptor.description_;
         if (type == prometheus_client::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
@@ -114,8 +114,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 "invalid SumPointData type");
           }
         }
+        output.emplace_back(metric_family);
       }
-      output.emplace_back(metric_family);
     }
   }
   return output;
@@ -165,6 +165,156 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
     return std::string{name.begin(), end};
   }
   return name;
+}
+
+std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
+std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
+std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
+std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
+std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
+
+std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
+    const std::string &raw_metric_unit_name)
+{
+  if (raw_metric_unit_name.empty())
+  {
+    return raw_metric_unit_name;
+  }
+
+  std::string converted_metric_unit_name = RemoveUnitPortionInBraces(raw_metric_unit_name);
+  converted_metric_unit_name = ConvertRateExpressedToPrometheusUnit(converted_metric_unit_name);
+
+  return CleanUpString(GetPrometheusUnit(converted_metric_unit_name));
+}
+
+std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_abbreviation)
+{
+  static std::map<std::string, std::string> units{// Time
+                                                  {"d", "days"},
+                                                  {"h", "hours"},
+                                                  {"min", "minutes"},
+                                                  {"s", "seconds"},
+                                                  {"ms", "milliseconds"},
+                                                  {"us", "microseconds"},
+                                                  {"ns", "nanoseconds"},
+                                                  // Bytes
+                                                  {"By", "bytes"},
+                                                  {"KiBy", "kibibytes"},
+                                                  {"MiBy", "mebibytes"},
+                                                  {"GiBy", "gibibytes"},
+                                                  {"TiBy", "tibibytes"},
+                                                  {"KBy", "kilobytes"},
+                                                  {"MBy", "megabytes"},
+                                                  {"GBy", "gigabytes"},
+                                                  {"TBy", "terabytes"},
+                                                  {"B", "bytes"},
+                                                  {"KB", "kilobytes"},
+                                                  {"MB", "megabytes"},
+                                                  {"GB", "gigabytes"},
+                                                  {"TB", "terabytes"},
+                                                  // SI
+                                                  {"m", "meters"},
+                                                  {"V", "volts"},
+                                                  {"A", "amperes"},
+                                                  {"J", "joules"},
+                                                  {"W", "watts"},
+                                                  {"g", "grams"},
+                                                  // Misc
+                                                  {"Cel", "celsius"},
+                                                  {"Hz", "hertz"},
+                                                  {"1", ""},
+                                                  {"%", "percent"},
+                                                  {"$", "dollars"}};
+  auto res_it = units.find(unit_abbreviation);
+  if (res_it == units.end())
+  {
+    return unit_abbreviation;
+  }
+  return res_it->second;
+}
+
+std::string PrometheusExporterUtils::GetPrometheusPerUnit(const std::string &per_unit_abbreviation)
+{
+  static std::map<std::string, std::string> per_units{
+      {"s", "second"}, {"m", "minute"}, {"h", "hour"}, {"d", "day"},
+      {"w", "week"},   {"mo", "month"}, {"y", "year"}};
+  auto res_it = per_units.find(per_unit_abbreviation);
+  if (res_it == per_units.end())
+  {
+    return per_unit_abbreviation;
+  }
+  return res_it->second;
+}
+
+std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string &unit)
+{
+  return std::regex_replace(unit, CHARACTERS_BETWEEN_BRACES_PATTERN, "");
+}
+
+std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
+    const std::string &rate_expressed_unit)
+{
+  if (rate_expressed_unit.find("/") == std::string::npos)
+  {
+    return rate_expressed_unit;
+  }
+
+  std::vector<std::string> rate_entities;
+  size_t pos = rate_expressed_unit.find("/");
+  rate_entities.push_back(rate_expressed_unit.substr(0, pos));
+  rate_entities.push_back(rate_expressed_unit.substr(pos + 1));
+
+  if (rate_entities[1].empty())
+  {
+    return rate_expressed_unit;
+  }
+
+  std::string prometheus_unit     = GetPrometheusUnit(rate_entities[0]);
+  std::string prometheus_per_unit = GetPrometheusPerUnit(rate_entities[1]);
+
+  return prometheus_unit + "_per_" + prometheus_per_unit;
+}
+
+std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
+{
+  std::string cleaned_string = std::regex_replace(str, INVALID_CHARACTERS_PATTERN, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_CONSECUTIVE_UNDERSCORES, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_TRAILING_UNDERSCORES, "");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_LEADING_UNDERSCORES, "");
+
+  return cleaned_string;
+}
+
+std::string PrometheusExporterUtils::MapToPrometheusName(
+    const std::string &name,
+    const std::string &unit,
+    prometheus_client::MetricType prometheus_type)
+{
+  auto sanitized_name                    = SanitizeNames(name);
+  std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+
+  // Append prometheus unit if not null or empty.
+  if (!prometheus_equivalent_unit.empty() &&
+      sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
+  {
+    sanitized_name += "_" + prometheus_equivalent_unit;
+  }
+
+  // Special case - counter
+  if (prometheus_type == prometheus_client::MetricType::Counter &&
+      sanitized_name.find("total") == std::string::npos)
+  {
+    sanitized_name += "_total";
+  }
+
+  // Special case - gauge
+  if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
+      sanitized_name.find("ratio") == std::string::npos)
+  {
+    sanitized_name += "_ratio";
+  }
+
+  return CleanUpString(SanitizeNames(sanitized_name));
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
