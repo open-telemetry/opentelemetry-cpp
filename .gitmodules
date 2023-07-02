@@ -37,3 +37,6 @@ branch = master
 path = third_party/opentracing-cpp
 url = https://github.com/opentracing/opentracing-cpp.git
 branch = master
+[submodule "third_party/fuzztest"]
+	path = third_party/fuzztest
+	url = https://github.com/google/fuzztest.git

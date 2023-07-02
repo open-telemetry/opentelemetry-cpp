@@ -41,3 +41,7 @@ add_subdirectory(src)
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
+
+if(WITH_FUZZ)
+  add_subdirectory(fuzz)
+endif()

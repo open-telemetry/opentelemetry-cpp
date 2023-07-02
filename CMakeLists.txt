@@ -197,6 +197,11 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+option(WITH_FUZZ "Whether to build fuzz targets" OFF)
+
+if(WITH_FUZZ)
+  add_subdirectory(third_party/fuzztest)
+endif()
 #
 # This option is experimental, subject to change in the spec:
 #
