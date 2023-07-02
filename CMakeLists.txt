@@ -182,8 +182,6 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
 
-option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
-
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
@@ -295,25 +293,6 @@ function(set_target_version target_name)
   endif()
 endfunction()
 
-if(WITH_JAEGER)
-  if(WITH_NO_DEPRECATED_CODE)
-    message(FATAL_ERROR "Jaeger is DEPRECATED.")
-  else()
-    message(WARNING "Jaeger is DEPRECATED.")
-  endif()
-
-  find_package(Thrift QUIET)
-  if(Thrift_FOUND)
-    find_package(Boost REQUIRED)
-    include_directories(${Boost_INCLUDE_DIR})
-  else()
-    # Install Thrift and propagate via vcpkg toolchain file
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
-  endif()
-endif()
-
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
@@ -405,7 +384,6 @@ endif()
 
 if(WITH_OTLP_HTTP
    OR WITH_ELASTICSEARCH
-   OR WITH_JAEGER
    OR WITH_ZIPKIN
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_EXAMPLES_HTTP)
