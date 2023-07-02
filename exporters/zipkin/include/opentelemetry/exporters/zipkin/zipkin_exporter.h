@@ -78,7 +78,7 @@ private:
   // For testing
   friend class ZipkinExporterTestPeer;
   /**
-   * Create an ZipkinExporter using the specified thrift sender.
+   * Create an ZipkinExporter using the specified http client.
    * Only tests can call this constructor directly.
    * @param http_client the http client to be used for exporting
    */

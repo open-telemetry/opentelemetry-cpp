@@ -15,8 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [REMOVAL] Remove the jaeger exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
+
 * [API] Remove include_trace_context
   [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
+
+Important changes:
+
+* [REMOVAL] Remove the jaeger exporter
+  [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
+  * The CMake `WITH_JAEGER` option has been removed
+  * Please remove usage of `WITH_JAEGER` from user scripts and makefiles.
 
 ## [1.9.1] 2023-05-26
 
