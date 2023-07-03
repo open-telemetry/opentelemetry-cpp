@@ -26,7 +26,6 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
   #
@@ -88,7 +87,6 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
       env:
@@ -122,7 +120,6 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
       env:
@@ -156,7 +153,6 @@ jobs:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
       env:
@@ -190,7 +186,6 @@ jobs:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
       env:
@@ -268,7 +263,6 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
@@ -488,7 +482,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -510,7 +503,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -532,7 +524,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -554,7 +545,6 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -576,7 +566,6 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -598,7 +587,6 @@ jobs:
         key: bazel_nortti
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -620,7 +608,6 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -642,7 +629,6 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -771,7 +757,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_thrift.ps1
         ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build
