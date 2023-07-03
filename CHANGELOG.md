@@ -33,7 +33,7 @@ Important changes:
 
 * [API] Remove Meters
   [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
-  * The CMake option `WITH_REMOVE_METERS_PREVIEW` was added.
+  * The CMake option `WITH_REMOVE_METER_PREVIEW` was added.
   * This option is experimental, and may change in the future.
   * Enabling it is an ABI breaking change.
 

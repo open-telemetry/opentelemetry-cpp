@@ -202,8 +202,8 @@ option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
 #
 # * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
 #
-option(WITH_REMOVE_METERS_PREVIEW
-       "EXPERIMENTAL, ABI BREAKING: Allow to remove meters" OFF)
+option(WITH_REMOVE_METER_PREVIEW
+       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
 
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
