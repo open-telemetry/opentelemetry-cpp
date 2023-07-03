@@ -197,6 +197,11 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+#
+# This option is experimental, subject to change in the spec:
+#
+# - https://github.com/open-telemetry/opentelemetry-specification/issues/2232
+#
 option(WITH_REMOVE_METERS_PREVIEW
        "EXPERIMENTAL, ABI BREAKING: Allow to remove meters" OFF)
 

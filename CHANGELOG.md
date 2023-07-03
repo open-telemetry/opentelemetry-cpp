@@ -21,12 +21,21 @@ Increment the:
 * [API] Remove include_trace_context
   [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
 
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+
 Important changes:
 
 * [REMOVAL] Remove the jaeger exporter
   [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
   * The CMake `WITH_JAEGER` option has been removed
   * Please remove usage of `WITH_JAEGER` from user scripts and makefiles.
+
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+  * The CMake option `WITH_REMOVE_METERS_PREVIEW` was added.
+  * This option is experimental, and may change in the future.
+  * Enabling it is an ABI breaking change.
 
 ## [1.9.1] 2023-05-26
 
