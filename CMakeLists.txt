@@ -197,7 +197,8 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
-option(WITH_REMOVE_METERS_PREVIEW "EXPERIMENTAL, ABI BREAKING: Allow to remove meters" OFF)
+option(WITH_REMOVE_METERS_PREVIEW
+       "EXPERIMENTAL, ABI BREAKING: Allow to remove meters" OFF)
 
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")

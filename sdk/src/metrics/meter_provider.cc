@@ -57,6 +57,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   return nostd::shared_ptr<metrics_api::Meter>{meter};
 }
 
+#ifdef ENABLE_REMOVE_METERS_PREVIEW
 void MeterProvider::RemoveMeter(nostd::string_view name,
                                 nostd::string_view version,
                                 nostd::string_view schema_url) noexcept
@@ -71,6 +72,7 @@ void MeterProvider::RemoveMeter(nostd::string_view name,
 
   context_->RemoveMeter(name, version, schema_url);
 }
+#endif
 
 const resource::Resource &MeterProvider::GetResource() const noexcept
 {
