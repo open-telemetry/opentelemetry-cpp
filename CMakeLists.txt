@@ -89,45 +89,17 @@ if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
-#
-# ABI VERSION 1 is frozen, and can not change.
-#
-# For fixes or features that causes an API/ABI breaking change, the change is
-# implemented in ABI VERSION 2.
-#
-# ABI VERSION 2 is still experimental, unstable, and will by definition change
-# when more breaking changes are implemented.
-#
-# When version 2 is sufficiently mature and contains a coherent set of new
-# features, it will be marked stable and published.
-#
-# The goal is to avoid incrementing the ABI version on individual fixes, and
-# release a stable set less frequently, to minimize disruption to users.
-#
-# Until ABI_VERSION_2 is marked stable, use WITH_ABI_VERSION_2_PREVIEW=ON at
-# your own risk, as there are no compatibility guarantees.
-#
-option(WITH_ABI_VERSION_2_PREVIEW "EXPERIMENTAL: ABI version 2 preview" OFF)
-
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
-
-if(WITH_ABI_VERSION_2_PREVIEW)
-  set(OPENTELEMETRY_ABI_VERSION_NO "2")
+if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+   "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
+  math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
 else()
-  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
-  else()
-    message(
-      FATAL_ERROR
-        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-    )
-  endif()
+  message(
+    FATAL_ERROR
+      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+  )
 endif()
-
-message(STATUS "OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO}")
-
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
    "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
   set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
@@ -137,8 +109,6 @@ else()
       "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
   )
 endif()
-
-message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
@@ -227,6 +197,8 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+option(WITH_REMOVE_METERS_PREVIEW "EXPERIMENTAL, ABI BREAKING: Allow to remove meters" OFF)
+
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
@@ -291,24 +263,6 @@ if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
     FATAL_ERROR
       "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
   )
-endif()
-
-#
-# ABI_VERSION_2 is not stable, do not build shared libraries with it.
-#
-if(OTELCPP_VERSIONED_LIBS AND WITH_ABI_VERSION_2_PREVIEW)
-  message(
-    FATAL_ERROR
-      "OTELCPP_VERSIONED_LIBS=ON requires WITH_ABI_VERSION_2_PREVIEW=OFF")
-endif()
-
-#
-# ABI_VERSION_2 is not stable, do not build DLL with it.
-#
-if(DEFINED OPENTELEMETRY_BUILD_DLL AND WITH_ABI_VERSION_2_PREVIEW)
-  message(
-    FATAL_ERROR
-      "OPENTELEMETRY_BUILD_DLL requires WITH_ABI_VERSION_2_PREVIEW=OFF")
 endif()
 
 find_package(Threads)

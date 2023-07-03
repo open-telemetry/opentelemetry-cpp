@@ -98,9 +98,9 @@ if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
 endif()
 
-if(WITH_ABI_VERSION_2_PREVIEW)
+if(WITH_REMOVE_METERS_PREVIEW)
   target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
+                             INTERFACE ENABLE_REMOVE_METERS_PREVIEW)
 endif()
 
 # A better place should be in sdk, not api
