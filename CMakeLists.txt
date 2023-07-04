@@ -512,7 +512,6 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
-  set(CMAKE_CXX_STANDARD 20)
   add_definitions(-DENABLE_TEST)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with

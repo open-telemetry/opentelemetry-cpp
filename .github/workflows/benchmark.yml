@@ -24,8 +24,6 @@ jobs:
           path: /home/runner/.cache/bazel
           key: bazel_benchmark
       - name: setup
-        env:
-          GOOGLETEST_VERSION: 1.13.0
         run: |
           sudo -E ./ci/setup_cmake.sh
           sudo -E ./ci/setup_ci_environment.sh

@@ -22,7 +22,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh

@@ -18,7 +18,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -77,7 +76,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.13.0
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -110,7 +108,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.13.0
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -143,7 +140,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.13.0
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -176,7 +172,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.13.0
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -223,7 +218,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -242,8 +236,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -260,8 +252,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -287,6 +277,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: 1.10.0
       run: |
         sudo -E ./ci/setup_cmake.sh
     - name: run tests
@@ -314,6 +305,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        GOOGLETEST_VERSION: 1.10.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_grpc.sh -v 4.8
@@ -333,7 +325,6 @@ jobs:
     - name: setup
       env:
         CMAKE_VERSION: 3.20.6
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -355,7 +346,6 @@ jobs:
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
         CMAKE_VERSION: 3.20.6
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -380,8 +370,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -398,8 +386,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -416,8 +402,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -437,7 +421,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
@@ -767,7 +750,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
-        GOOGLETEST_VERSION: 1.13.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
