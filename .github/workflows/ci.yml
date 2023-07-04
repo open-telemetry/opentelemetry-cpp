@@ -396,9 +396,9 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        PROTOBUF_VERSION: '23.2'
+        PROTOBUF_VERSION: '23.3'
         ABSEIL_CPP_VERSION: '20230125.3'
-        CXX_STANDARD: '17'
+        CXX_STANDARD: '14'
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
@@ -407,7 +407,7 @@ jobs:
     - name: run otlp exporter tests
       env:
         WITH_ABSEIL: 'ON'
-        CXX_STANDARD: '17'
+        CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
