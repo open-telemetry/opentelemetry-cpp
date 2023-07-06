@@ -21,7 +21,9 @@ namespace metrics
 namespace resource    = opentelemetry::sdk::resource;
 namespace metrics_api = opentelemetry::metrics;
 
-MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : context_{context} {}
+MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
+    : context_(std::move(context))
+{}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
