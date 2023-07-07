@@ -11,7 +11,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 class KeyValueIterable;
-};
+}
 
 namespace metrics
 {
