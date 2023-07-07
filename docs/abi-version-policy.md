@@ -51,7 +51,7 @@ This is achieved with ABI versions.
 
 ### Inline namespaces
 
-For the sake of illustration, let's consider a fictious API such as:
+For the sake of illustration, let's consider a fictitious API such as:
 
 ```cpp
 namespace opentelemetry
@@ -314,7 +314,7 @@ In this state, two ABI versions are available.
 
 CMake offers the following options:
 
-```
+```cmake
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 ```
@@ -335,7 +335,7 @@ the ABI offered by default is the conservative ABI v1.
 
 CMake offers the following options:
 
-```
+```cmake
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "ABI version 2" OFF)
 ```
@@ -357,7 +357,7 @@ the ABI offered by default is the newer ABI v2.
 
 CMake offers the following options:
 
-```
+```cmake
 option(WITH_ABI_VERSION_1 "DEPRECATED: ABI version 1" OFF)
 option(WITH_ABI_VERSION_2 "ABI version 2" ON)
 ```
@@ -375,7 +375,7 @@ ABI v1 is no longer supported.
 
 CMake offers the following options:
 
-```
+```cmake
 option(WITH_ABI_VERSION_2 "ABI version 2" ON)
 ```
 
@@ -421,4 +421,50 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 }
 OPENTELEMETRY_END_NAMESPACE
 ```
+
+## Practical Example
+
+### Fixing issue #2033
+
+The problem is to change the MeterProvider::GetMeter() prototype,
+to follow specification changes.
+
+See the issue description for all details:
+
+* [Metrics API/SDK] Add InstrumentationScope attributes in MeterProvider::GetMeter() #2033
+
+#### API change
+
+In the API, class MeterProvider is changed as follows:
+
+```cpp
+class MeterProvider
+{
+public:
+  virtual ~MeterProvider() = default;
+  /**
+   * Gets or creates a named Meter instance.
+   *
+   * Optionally a version can be passed to create a named and versioned Meter
+   * instance.
+   */
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
+                                            nostd::string_view library_version = "",
+                                            nostd::string_view schema_url = "",
+                                            const common::KeyValueIterable *attributes = nullptr) noexcept = 0;
+#else
+  virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
+                                            nostd::string_view library_version = "",
+                                            nostd::string_view schema_url      = "") noexcept = 0;
+#endif
+};
+
+```
+
+#### SDK change
+
+TODO
+
+
 
