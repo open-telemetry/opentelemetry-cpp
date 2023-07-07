@@ -20,7 +20,9 @@ TEST(TracerProvider, GetTracer)
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors), Resource::Create({})));
+  std::unique_ptr<TracerContext> context1(
+      new TracerContext(std::move(processors), Resource::Create({})));
+  TracerProvider tp1(std::move(context1));
   auto t1 = tp1.GetTracer("test");
   auto t2 = tp1.GetTracer("test");
   auto t3 = tp1.GetTracer("different", "1.0.0");
@@ -49,10 +51,11 @@ TEST(TracerProvider, GetTracer)
   std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
   std::vector<std::unique_ptr<SpanProcessor>> processors2;
   processors2.push_back(std::move(processor2));
-  TracerProvider tp2(
-      std::make_shared<TracerContext>(std::move(processors2), Resource::Create({}),
-                                      std::unique_ptr<Sampler>(new AlwaysOffSampler()),
-                                      std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
+  std::unique_ptr<TracerContext> context2(
+      new TracerContext(std::move(processors2), Resource::Create({}),
+                        std::unique_ptr<Sampler>(new AlwaysOffSampler()),
+                        std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
+  TracerProvider tp2(std::move(context2));
 #ifdef OPENTELEMETRY_RTTI_ENABLED
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
 #else
@@ -81,7 +84,8 @@ TEST(TracerProvider, Shutdown)
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
 
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors)));
+  std::unique_ptr<TracerContext> context1(new TracerContext(std::move(processors)));
+  TracerProvider tp1(std::move(context1));
 
   EXPECT_TRUE(tp1.Shutdown());
 

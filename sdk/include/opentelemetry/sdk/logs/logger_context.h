@@ -9,6 +9,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
@@ -17,7 +18,6 @@ namespace sdk
 {
 namespace logs
 {
-class LogRecordProcessor;
 
 /**
  * A class which stores the LoggerContext context.
@@ -40,10 +40,10 @@ public:
                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
-   * Attaches a log processor to list of configured processors to this tracer context.
+   * Attaches a log processor to list of configured processors to this logger context.
    * Processor once attached can't be removed.
    * @param processor The new log processor for this tracer. This must not be
-   * a nullptr. Ownership is given to the `TracerContext`.
+   * a nullptr. Ownership is given to the `LoggerContext`.
    *
    * Note: This method is not thread safe.
    */
