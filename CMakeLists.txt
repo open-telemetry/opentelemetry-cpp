@@ -89,17 +89,27 @@ if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
+option(WITH_ABI_VERSION_2_PREVIEW "EXPERIMENTAL: ABI version 2 preview" OFF)
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
-if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-   "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-  math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
+
+if (WITH_ABI_VERSION_2_PREVIEW)
+  set(OPENTELEMETRY_ABI_VERSION_NO "2")
 else()
-  message(
-    FATAL_ERROR
-      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-  )
+  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
+    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
+  else()
+    message(
+      FATAL_ERROR
+        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+    )
+  endif()
 endif()
+
+message(STATUS "OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO}")
+
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
    "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
   set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
@@ -109,6 +119,8 @@ else()
       "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
   )
 endif()
+
+message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
