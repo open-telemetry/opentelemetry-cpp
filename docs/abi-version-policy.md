@@ -268,11 +268,7 @@ ABI v2.
 
 This solution reduces the maintenance burden on the source code itself.
 
-
-
-TODO
-
-## Versions lifecycle 
+## Versions lifecycle
 
 For a given ABI, the lifecycle is:
 
@@ -301,21 +297,128 @@ next (v2).
 
 ### STABLE V1
 
-TODO
+In this state, only one ABI version is available, and it is closed to
+changes.
+
+Instrumented applications are built against ABI v1 by default.
+
+opentelemetry-cpp produces a library for ABI v1 by default.
+
+Fixes introducing breaking changes can __not__ be delivered.
+
+This is the current status as of opentelemetry-cpp version 1.9.1
 
 ### STABLE V1, EXPERIMENTAL V2
 
-TODO
+In this state, two ABI versions are available.
+
+CMake offers the following options:
+
+```
+option(WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+```
+
+Instrumented applications are built against ABI v1 by default,
+but may ask to use ABI v2 instead.
+
+opentelemetry-cpp produces a library for ABI v1 by default,
+but can be configured to provide ABI v2 instead.
+
+Fixes introducing breaking changes can only be delivered in the experimental
+ABI v2.
 
 ### STABLE V1, STABLE V2
 
-TODO
+In this state, two ABI versions are available,
+the ABI offered by default is the conservative ABI v1.
+
+CMake offers the following options:
+
+```
+option(WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(WITH_ABI_VERSION_2 "ABI version 2" OFF)
+```
+
+Instrumented applications are built against ABI v1 by default,
+but may ask to use ABI v2 instead.
+
+opentelemetry-cpp produces a library for ABI v1 by default,
+but can be configured to provide ABI v2 instead.
+
+Fixes introducing breaking changes can not be delivered ABI v2, because it
+is declared stable. These fixes can either wait, or an experimental ABI v3
+can be created.
 
 ### DEPRECATED V1, STABLE V2
 
-TODO
+In this state, two ABI versions are available,
+the ABI offered by default is the newer ABI v2.
+
+CMake offers the following options:
+
+```
+option(WITH_ABI_VERSION_1 "DEPRECATED: ABI version 1" OFF)
+option(WITH_ABI_VERSION_2 "ABI version 2" ON)
+```
+
+Instrumented applications are built against ABI v2 by default,
+but may ask to use ABI v1 instead.
+
+opentelemetry-cpp produces a library for ABI v2 by default,
+but can be configured to provide ABI v1 instead.
 
 ### (REMOVED V1), STABLE V2
 
-TODO
+In this state, only ABI v2 is available.
+ABI v1 is no longer supported.
+
+CMake offers the following options:
+
+```
+option(WITH_ABI_VERSION_2 "ABI version 2" ON)
+```
+
+Instrumented applications and the opentelemetry-cpp library are build using
+ABI v2.
+
+Now that ABI v1 no longer exists, the code:
+
+```cpp
+OPENTELEMETRY_BEGIN_NAMESPACE
+{
+  namespace common
+  {
+    class OtelUtil
+    {
+      virtual void DoSomething() = 0;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      // Added in ABI v2
+      virtual void DoSomethingMore() = 0;
+#endif
+
+    };
+  }
+}
+OPENTELEMETRY_END_NAMESPACE
+```
+
+can be simplified to:
+
+```cpp
+OPENTELEMETRY_BEGIN_NAMESPACE
+{
+  namespace common
+  {
+    class OtelUtil
+    {
+      virtual void DoSomething() = 0;
+      virtual void DoSomethingMore() = 0;
+
+    };
+  }
+}
+OPENTELEMETRY_END_NAMESPACE
+```
 

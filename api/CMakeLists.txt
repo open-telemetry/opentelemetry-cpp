@@ -98,8 +98,12 @@ if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
 endif()
 
-if(WITH_ABI_VERSION_2_PREVIEW)
-  target_compile_definitions(opentelemetry_api INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
+if(WITH_ABI_VERSION_2)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
+elseif(WITH_ABI_VERSION_1)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=1)
 endif()
 
 # A better place should be in sdk, not api
