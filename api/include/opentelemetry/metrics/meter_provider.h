@@ -8,6 +8,11 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+};
+
 namespace metrics
 {
 
@@ -26,9 +31,18 @@ public:
    * Optionally a version can be passed to create a named and versioned Meter
    * instance.
    */
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  virtual nostd::shared_ptr<Meter> GetMeter(
+      nostd::string_view library_name,
+      nostd::string_view library_version         = "",
+      nostd::string_view schema_url              = "",
+      const common::KeyValueIterable *attributes = nullptr) noexcept = 0;
+#else
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
+#endif
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

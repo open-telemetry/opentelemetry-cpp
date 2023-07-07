@@ -48,10 +48,18 @@ public:
    */
   explicit MeterProvider(std::unique_ptr<MeterContext> context) noexcept;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
+      nostd::string_view name,
+      nostd::string_view version                                = "",
+      nostd::string_view schema_url                             = "",
+      const opentelemetry::common::KeyValueIterable *attributes = nullptr) noexcept override;
+#else
   nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") noexcept override;
+#endif
 
   /**
    * Obtain the resource associated with this meter provider.

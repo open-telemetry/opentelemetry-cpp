@@ -26,13 +26,15 @@ namespace metrics
 namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
-Meter::Meter(
-    std::weak_ptr<MeterContext> meter_context,
-    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+Meter::Meter(std::weak_ptr<MeterContext> meter_context,
+             std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope,
+             const opentelemetry::common::KeyValueIterable *attributes) noexcept
     : scope_{std::move(instrumentation_scope)},
       meter_context_{meter_context},
       observable_registry_(new ObservableRegistry())
-{}
+{
+  // FIXME: use attributes
+}
 
 nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
     nostd::string_view name,

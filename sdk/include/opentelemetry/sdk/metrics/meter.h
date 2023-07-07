@@ -42,7 +42,8 @@ public:
   explicit Meter(
       std::weak_ptr<sdk::metrics::MeterContext> meter_context,
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
-          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
+          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(""),
+      const opentelemetry::common::KeyValueIterable *attributes = nullptr) noexcept;
 
   nostd::unique_ptr<opentelemetry::metrics::Counter<uint64_t>> CreateUInt64Counter(
       nostd::string_view name,
