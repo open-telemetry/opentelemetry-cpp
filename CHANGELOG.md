@@ -27,7 +27,7 @@ Increment the:
 * [SDK] TracerProvider should own TracerContext, not share it
   [#2221](https://github.com/open-telemetry/opentelemetry-cpp/pull/2221)
 
-Important changes:
+Breaking changes:
 
 * [REMOVAL] Remove the jaeger exporter
   [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
