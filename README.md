@@ -98,14 +98,13 @@ For edit access, get in touch on
 
 * [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
+* [Marc Alff](https://github.com/marcalff), Oracle
 * [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 [Approvers](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 * [Josh Suereth](https://github.com/jsuereth), Google
-* [Marc Alff](https://github.com/marcalff), Oracle
-* [Reiley Yang](https://github.com/reyang), Microsoft
 * [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
@@ -116,6 +115,7 @@ Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/ma
 * [Jodee Varney](https://github.com/jodeev)
 * [Johannes Tax](https://github.com/pyohannes)
 * [Max Golovanov](https://github.com/maxgolov)
+* [Reiley Yang](https://github.com/reyang)
 * [Ryan Burn](https://github.com/rnburn)
 
 ### Thanks to all the people who have contributed

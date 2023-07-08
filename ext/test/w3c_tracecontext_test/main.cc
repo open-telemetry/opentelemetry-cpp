@@ -6,6 +6,7 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
@@ -92,8 +93,6 @@ public:
   void OnEvent(http_client::SessionState /* state */,
                nostd::string_view /* reason */) noexcept override
   {}
-
-  void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
 
   void OnResponse(http_client::Response & /* response */) noexcept override {}
 };

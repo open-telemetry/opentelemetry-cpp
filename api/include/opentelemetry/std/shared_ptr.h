@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 #include <memory>
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace

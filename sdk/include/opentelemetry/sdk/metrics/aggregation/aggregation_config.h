@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 #include <vector>
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

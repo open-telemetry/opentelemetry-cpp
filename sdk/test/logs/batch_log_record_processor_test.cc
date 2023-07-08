@@ -42,6 +42,8 @@ public:
 
   void SetBody(const std::string &message) noexcept { body_ = message; }
 
+  void SetEventId(int64_t, nostd::string_view) noexcept override {}
+
   void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
 
   void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}

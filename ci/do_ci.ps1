@@ -6,6 +6,8 @@ trap { $host.SetShouldExit(1) }
 
 $action = $args[0]
 
+$nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
+
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
 $BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
@@ -40,7 +42,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -61,7 +63,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -83,14 +85,13 @@ switch ($action) {
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_JAEGER=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -111,7 +112,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -132,7 +133,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -154,7 +155,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -176,7 +177,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -197,7 +198,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -214,7 +215,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build .
+    cmake --build . -j $nproc
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit

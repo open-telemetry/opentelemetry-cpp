@@ -29,8 +29,17 @@ if(NOT WIN32)
   set_target_properties(component_f PROPERTIES CXX_VISIBILITY_PRESET hidden)
   target_link_libraries(component_f opentelemetry_api)
 
+  add_library(component_g SHARED component_g.cc)
+  set_target_properties(component_g PROPERTIES CXX_VISIBILITY_PRESET default)
+  target_link_libraries(component_g opentelemetry_api)
+
+  add_library(component_h SHARED component_h.cc)
+  set_target_properties(component_h PROPERTIES CXX_VISIBILITY_PRESET hidden)
+  target_link_libraries(component_h opentelemetry_api)
+
   add_executable(singleton_test singleton_test.cc)
 
+  # Not linking with component_g and component_h on purpose
   target_link_libraries(
     singleton_test
     component_a
@@ -41,6 +50,7 @@ if(NOT WIN32)
     component_f
     ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${CMAKE_DL_LIBS}
     opentelemetry_api)
 
   gtest_add_tests(

@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_LOGS_PREVIEW
+
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/context/runtime_context.h"
+#  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/trace/provider.h"
 
@@ -16,14 +19,13 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name,
-               std::shared_ptr<LoggerContext> context,
-               std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope,
-               bool include_trace_context) noexcept
+Logger::Logger(
+    nostd::string_view name,
+    std::shared_ptr<LoggerContext> context,
+    std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
       instrumentation_scope_(std::move(instrumentation_scope)),
-      context_(context),
-      include_trace_context_(include_trace_context)
+      context_(context)
 {}
 
 const nostd::string_view Logger::GetName() noexcept
@@ -43,16 +45,15 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  if (include_trace_context_ &&
-      opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
+  if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
   {
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
             opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(context_value))
+    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
     {
-      nostd::shared_ptr<trace::Span> &data =
-          nostd::get<nostd::shared_ptr<trace::Span>>(context_value);
+      nostd::shared_ptr<opentelemetry::trace::Span> &data =
+          nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value);
       if (data)
       {
         recordable->SetTraceId(data->GetContext().trace_id());

@@ -4,7 +4,9 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #  include "opentelemetry/exporters/ostream/common_utils.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #  include "opentelemetry/sdk/logs/read_write_log_record.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>
@@ -52,6 +54,8 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
       continue;
     }
 
+    int64_t event_id = log_record->GetEventId();
+
     // Convert trace, spanid, traceflags into exportable representation
     constexpr int trace_id_len    = 32;
     constexpr int span_id__len    = 16;
@@ -96,6 +100,8 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
     printAttributes(log_record->GetAttributes(), "\n    ");
 
     sout_ << "\n"
+          << "  event_id           : " << event_id << "\n"
+          << "  event_name         : " << log_record->GetEventName() << "\n"
           << "  trace_id           : " << std::string(trace_id, trace_id_len) << "\n"
           << "  span_id            : " << std::string(span_id, span_id__len) << "\n"
           << "  trace_flags        : " << std::string(trace_flags, trace_flags_len) << "\n"

@@ -9,6 +9,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -33,7 +34,7 @@ public:
    */
   virtual void Add(T value) noexcept = 0;
 
-  virtual void Add(T value, const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void Add(T value, const context::Context &context) noexcept = 0;
 
   /**
    * Add adds the value to the counter's sum. The attributes should contain
@@ -48,19 +49,19 @@ public:
 
   virtual void Add(T value,
                    const common::KeyValueIterable &attributes,
-                   const opentelemetry::context::Context &context) noexcept = 0;
+                   const context::Context &context) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    auto context = opentelemetry::context::Context{};
+    auto context = context::Context{};
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  void Add(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
+  void Add(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
@@ -69,7 +70,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    auto context = opentelemetry::context::Context{};
+    auto context = context::Context{};
     this->Add(value,
               nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                   attributes.begin(), attributes.end()},
@@ -78,7 +79,7 @@ public:
 
   void Add(T value,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           const opentelemetry::context::Context &context) noexcept
+           const context::Context &context) noexcept
   {
     this->Add(value,
               nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
@@ -96,23 +97,23 @@ public:
   /**
    * Records a value.
    *
-   * @param value The increment amount. May be positive, negative or zero.
+   * @param value The measurement value. MUST be non-negative.
    */
-  virtual void Record(T value, const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void Record(T value, const context::Context &context) noexcept = 0;
 
   /**
    * Records a value with a set of attributes.
    *
-   * @param value The increment amount. May be positive, negative or zero.
+   * @param value The measurement value. MUST be non-negative.
    * @param attributes A set of attributes to associate with the count.
    */
   virtual void Record(T value,
                       const common::KeyValueIterable &attributes,
-                      const opentelemetry::context::Context &context) noexcept = 0;
+                      const context::Context &context) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  void Record(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
+  void Record(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Record(value, common::KeyValueIterableView<U>{attributes}, context);
   }
@@ -120,7 +121,7 @@ public:
   void Record(
       T value,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      const opentelemetry::context::Context &context) noexcept
+      const context::Context &context) noexcept
   {
     this->Record(value,
                  nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
@@ -142,7 +143,7 @@ public:
    */
   virtual void Add(T value) noexcept = 0;
 
-  virtual void Add(T value, const opentelemetry::context::Context &context) noexcept = 0;
+  virtual void Add(T value, const context::Context &context) noexcept = 0;
 
   /**
    * Add a value with a set of attributes.
@@ -154,19 +155,19 @@ public:
 
   virtual void Add(T value,
                    const common::KeyValueIterable &attributes,
-                   const opentelemetry::context::Context &context) noexcept = 0;
+                   const context::Context &context) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    auto context = opentelemetry::context::Context{};
+    auto context = context::Context{};
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  void Add(T value, const U &attributes, const opentelemetry::context::Context &context) noexcept
+  void Add(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
   }
@@ -175,7 +176,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    auto context = opentelemetry::context::Context{};
+    auto context = context::Context{};
     this->Add(value,
               nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                   attributes.begin(), attributes.end()},
@@ -184,7 +185,7 @@ public:
 
   void Add(T value,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           const opentelemetry::context::Context &context) noexcept
+           const context::Context &context) noexcept
   {
     this->Add(value,
               nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{

@@ -4,10 +4,10 @@
 #pragma once
 
 #include <iterator>
-#include <type_traits>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/type_traits.h"

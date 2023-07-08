@@ -4,6 +4,7 @@
 add_library(opentelemetry_version version.cc)
 
 set_target_properties(opentelemetry_version PROPERTIES EXPORT_NAME version)
+set_target_version(opentelemetry_version)
 
 target_link_libraries(opentelemetry_version PUBLIC opentelemetry_api
                                                    opentelemetry_sdk)

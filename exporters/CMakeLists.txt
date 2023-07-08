@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(WITH_OTLP)
+if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   add_subdirectory(otlp)
 endif()
 
@@ -22,8 +22,4 @@ endif()
 
 if(WITH_ETW)
   add_subdirectory(etw)
-endif()
-
-if(WITH_JAEGER)
-  add_subdirectory(jaeger)
 endif()

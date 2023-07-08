@@ -6,6 +6,7 @@ add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc
 
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
+set_target_version(opentelemetry_exporter_ostream_span)
 
 target_include_directories(
   opentelemetry_exporter_ostream_span
@@ -39,9 +40,12 @@ if(BUILD_TESTING)
     TEST_LIST ostream_span_test)
 endif() # BUILD_TESTING
 
-add_library(opentelemetry_exporter_ostream_metrics src/metric_exporter.cc)
+add_library(opentelemetry_exporter_ostream_metrics
+            src/metric_exporter.cc src/metric_exporter_factory.cc)
 set_target_properties(opentelemetry_exporter_ostream_metrics
                       PROPERTIES EXPORT_NAME ostream_metrics_exporter)
+set_target_version(opentelemetry_exporter_ostream_metrics)
+
 target_include_directories(
   opentelemetry_exporter_ostream_metrics
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
@@ -76,6 +80,8 @@ if(WITH_LOGS_PREVIEW)
   add_library(opentelemetry_exporter_ostream_logs src/log_record_exporter.cc)
   set_target_properties(opentelemetry_exporter_ostream_logs
                         PROPERTIES EXPORT_NAME ostream_log_record_exporter)
+  set_target_version(opentelemetry_exporter_ostream_logs)
+
   target_include_directories(
     opentelemetry_exporter_ostream_logs
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")

@@ -416,7 +416,8 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
 #  endif
 }
 
-bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool ElasticsearchLogRecordExporter::ForceFlush(
+    std::chrono::microseconds timeout OPENTELEMETRY_MAYBE_UNUSED) noexcept
 {
 #  ifdef ENABLE_ASYNC_EXPORT
   std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};

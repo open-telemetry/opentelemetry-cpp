@@ -451,7 +451,7 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   {
     const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
     nlohmann::json &child_value = options.use_json_name ? value[field_descriptor->json_name()]
-                                                        : value[field_descriptor->name()];
+                                                        : value[field_descriptor->camelcase_name()];
     if (field_descriptor->is_repeated())
     {
       ConvertListFieldToJson(child_value, message, field_descriptor, options);
@@ -712,12 +712,13 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
-  opentelemetry::sdk::common::ExportResult session_result =
-      opentelemetry::sdk::common::ExportResult::kSuccess;
+  std::shared_ptr<opentelemetry::sdk::common::ExportResult> session_result =
+      std::make_shared<opentelemetry::sdk::common::ExportResult>(
+          opentelemetry::sdk::common::ExportResult::kSuccess);
   opentelemetry::sdk::common::ExportResult export_result = Export(
       message,
-      [&session_result](opentelemetry::sdk::common::ExportResult result) {
-        session_result = result;
+      [session_result](opentelemetry::sdk::common::ExportResult result) {
+        *session_result = result;
         return result == opentelemetry::sdk::common::ExportResult::kSuccess;
       },
       0);
@@ -727,7 +728,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     return export_result;
   }
 
-  return session_result;
+  return *session_result;
 }
 
 sdk::common::ExportResult OtlpHttpClient::Export(
@@ -967,6 +968,9 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  request->SetSslOptions(options_.ssl_options);
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);

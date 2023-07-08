@@ -67,58 +67,66 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const bool>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_bool_value(val);
+      array_value->add_values()->set_bool_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const int>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const int>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const double>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_double_value(val);
+      array_value->add_values()->set_double_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_string_value(val.data(), val.size());
+      array_value->add_values()->set_string_value(val.data(), val.size());
     }
   }
 }
@@ -168,51 +176,58 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<std::vector<bool>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto val : nostd::get<std::vector<bool>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_bool_value(val);
+      array_value->add_values()->set_bool_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<int32_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<int32_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<int64_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<int64_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<double>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<double>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_double_value(val);
+      array_value->add_values()->set_double_value(val);
     }
   }
   else if (nostd::holds_alternative<std::vector<std::string>>(value))
   {
+    auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<std::string>>(value))
     {
-      proto_value->mutable_array_value()->add_values()->set_string_value(val);
+      array_value->add_values()->set_string_value(val);
     }
   }
 }

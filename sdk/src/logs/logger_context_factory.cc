@@ -4,6 +4,9 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/logs/logger_context_factory.h"
+#  include "opentelemetry/sdk/logs/logger_context.h"
+#  include "opentelemetry/sdk/logs/processor.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 
 #  include <memory>
 #  include <vector>

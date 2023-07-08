@@ -14,6 +14,8 @@ foreach(
   histogram_aggregation_test
   attributes_processor_test
   attributes_hashmap_test
+  base2_exponential_histogram_indexer_test
+  circular_buffer_counter_test
   histogram_test
   sync_metric_storage_counter_test
   sync_metric_storage_histogram_test
@@ -46,6 +48,12 @@ if(WITH_BENCHMARK)
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
   target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+
+  add_executable(base2_exponential_histogram_indexer_benchmark
+                 base2_exponential_histogram_indexer_benchmark.cc)
+  target_link_libraries(
+    base2_exponential_histogram_indexer_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)

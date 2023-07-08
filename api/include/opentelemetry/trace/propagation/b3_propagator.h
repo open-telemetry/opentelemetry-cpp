@@ -3,13 +3,14 @@
 
 #pragma once
 
+#include <array>
+
 #include "detail/hex.h"
 #include "detail/string.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
-
-#include <array>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -41,11 +42,11 @@ static const int kSpanIdHexStrLength  = 16;
 // providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
 
-class B3PropagatorExtractor : public opentelemetry::context::propagation::TextMapPropagator
+class B3PropagatorExtractor : public context::propagation::TextMapPropagator
 {
 public:
   // Returns the context that is stored in the HTTP header carrier.
-  context::Context Extract(const opentelemetry::context::propagation::TextMapCarrier &carrier,
+  context::Context Extract(const context::propagation::TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
     SpanContext span_context = ExtractImpl(carrier);
@@ -77,7 +78,7 @@ public:
   }
 
 private:
-  static SpanContext ExtractImpl(const opentelemetry::context::propagation::TextMapCarrier &carrier)
+  static SpanContext ExtractImpl(const context::propagation::TextMapCarrier &carrier)
   {
     nostd::string_view trace_id_hex;
     nostd::string_view span_id_hex;
@@ -128,7 +129,7 @@ class B3Propagator : public B3PropagatorExtractor
 {
 public:
   // Sets the context for a HTTP header carrier with self defined rules.
-  void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
+  void Inject(context::propagation::TextMapCarrier &carrier,
               const context::Context &context) noexcept override
   {
     SpanContext span_context = trace::GetSpan(context)->GetContext();
@@ -160,7 +161,7 @@ public:
 class B3PropagatorMultiHeader : public B3PropagatorExtractor
 {
 public:
-  void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
+  void Inject(context::propagation::TextMapCarrier &carrier,
               const context::Context &context) noexcept override
   {
     SpanContext span_context = GetSpan(context)->GetContext();

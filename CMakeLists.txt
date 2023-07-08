@@ -159,7 +159,15 @@ if(WITH_STL)
   endif()
 endif()
 
-option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+if(DEFINED WITH_OTLP)
+  message(
+    FATAL_ERROR
+      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
+  )
+endif()
+
+option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
+       OFF)
 
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
@@ -174,8 +182,6 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
 
-option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
-
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
@@ -187,6 +193,13 @@ option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
 
 option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
+
+option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
+       OFF)
+
+if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
+  message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
+endif()
 
 set(OTELCPP_PROTO_PATH
     ""
@@ -219,8 +232,18 @@ option(
   "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
   OFF)
 
+option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
+
 option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+
+# EXPERIMENTAL
+option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
+       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
@@ -231,6 +254,13 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
+endif()
+
+if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
+  message(
+    FATAL_ERROR
+      "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
+  )
 endif()
 
 find_package(Threads)
@@ -247,27 +277,21 @@ function(install_windows_deps)
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE)
+      CACHE FILEPATH "")
+  message(
+    "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
+    Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
+  )
+
 endfunction()
 
-if(WITH_JAEGER)
-  if(WITH_NO_DEPRECATED_CODE)
-    message(FATAL_ERROR "Jaeger is DEPRECATED.")
-  else()
-    message(WARNING "Jaeger is DEPRECATED.")
+function(set_target_version target_name)
+  if(OTELCPP_VERSIONED_LIBS)
+    set_target_properties(
+      ${target_name} PROPERTIES VERSION ${OPENTELEMETRY_VERSION}
+                                SOVERSION ${OPENTELEMETRY_ABI_VERSION_NO})
   endif()
-
-  find_package(Thrift QUIET)
-  if(Thrift_FOUND)
-    find_package(Boost REQUIRED)
-    include_directories(${Boost_INCLUDE_DIR})
-  else()
-    # Install Thrift and propagate via vcpkg toolchain file
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
-  endif()
-endif()
+endfunction()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
@@ -311,11 +335,10 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_OTLP)
+if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_GRPC}))
+  if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -333,9 +356,7 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(NOT gRPC_FOUND
-       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
-                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
+    if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -353,10 +374,6 @@ if(WITH_OTLP)
   endif()
   include(CMakeDependentOption)
 
-  cmake_dependent_option(
-    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
-    "gRPC_FOUND" OFF)
-
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
 endif()
@@ -367,7 +384,6 @@ endif()
 
 if(WITH_OTLP_HTTP
    OR WITH_ELASTICSEARCH
-   OR WITH_JAEGER
    OR WITH_ZIPKIN
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_EXAMPLES_HTTP)
@@ -509,9 +525,10 @@ if(BUILD_TESTING)
         ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest REQUIRED)
+    find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
+      include(${CMAKE_TOOLCHAIN_FILE})
       find_package(GTest REQUIRED)
     endif()
   else()
@@ -584,7 +601,12 @@ if(NOT WITH_API_ONLY)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
+  if(WITH_FUNC_TESTS)
+    add_subdirectory(functional)
+  endif()
 endif()
+
+include(cmake/opentelemetry-build-external-component.cmake)
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)

@@ -10,7 +10,7 @@ if [[ ! -w "$(pwd)/sdk/src/version/version.cc"  && ! -w "$(pwd)/api/include/open
     exit 1
 fi
 
-# format: "v<MAJOR>.<MINOR>.<PATCH>-<PRERELEASE>+<BUILDMETADATA>-<NUMBER_OF_NEW_COMMITS>-g<LAST_COMMIT_HASH>""
+# format: "v<MAJOR>.<MINOR>.<PATCH>-<PRERELEASE>+<BUILDMETADATA>-<NUMBER_OF_NEW_COMMITS>-g<LAST_COMMIT_HASH>"
 semver_regex="^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(\\-([0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*))?(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?-([0-9]+)-g([0-9|a-z]+)$"
 git_tag=$(git describe --tags --long 2>/dev/null) || true
 if [[ ! -z $git_tag ]] && [[ $git_tag =~ $semver_regex ]]; then
@@ -22,7 +22,7 @@ if [[ ! -z $git_tag ]] && [[ $git_tag =~ $semver_regex ]]; then
     count_new_commits="${BASH_REMATCH[9]}"
     latest_commit_hash="${BASH_REMATCH[10]}"
     if [[ -z ${major} ]] || [[ -z ${minor} ]] || [[ -z ${patch} ]] || [[ -z ${count_new_commits} ]] || [[ -z ${latest_commit_hash} ]]; then
-        echo "Error: Incorrect tag format recevived. Exiting.."
+        echo "Error: Incorrect tag format received. Exiting.."
         exit 1
     fi
 else
@@ -38,12 +38,14 @@ if [[ -z ${latest_commit_hash} ]]; then
     exit 1
 fi
 
-branch="$(git rev-parse --abbrev-ref HEAD)"
 short_version="${major}.${minor}.${patch}"
-full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
+full_version="${short_version}-${pre_release}-${build_metadata}"
 
 # Update api version.h
-sed -i "/^\#define OPENTELEMETRY_VERSION/c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION /c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MAJOR /c\#define OPENTELEMETRY_VERSION_MAJOR ${major}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_MINOR /c\#define OPENTELEMETRY_VERSION_MINOR ${minor}"  "$(pwd)/api/include/opentelemetry/version.h"
+sed -i "/^\#define OPENTELEMETRY_VERSION_PATCH /c\#define OPENTELEMETRY_VERSION_PATCH ${patch}"  "$(pwd)/api/include/opentelemetry/version.h"
 git add "$(pwd)/api/include/opentelemetry/version.h"
 
 # Update sdk version.cc
@@ -61,18 +63,14 @@ namespace sdk
 {
 namespace version
 {
-const int major_version     = ${major};
-const int minor_version     = ${minor};
-const int patch_version     = ${patch};
-const char *pre_release     = "${pre_release}";
-const char *build_metadata  = "${build_metadata}";
-const int count_new_commits = ${count_new_commits};
-const char *branch          = "${branch}";
-const char *commit_hash     = "${latest_commit_hash}";
-const char *short_version   = "${short_version}";
-const char *full_version =
-    "${full_version}";
-const char *build_date = "$(date -u)";
+const int major_version    = ${major};
+const int minor_version    = ${minor};
+const int patch_version    = ${patch};
+const char *pre_release    = "${pre_release}";
+const char *build_metadata = "${build_metadata}";
+const char *short_version  = "${short_version}";
+const char *full_version   = "${full_version}";
+const char *build_date     = "$(date -u)";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

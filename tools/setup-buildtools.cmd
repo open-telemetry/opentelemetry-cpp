@@ -9,6 +9,7 @@ if defined VCPKG_ROOT (
   set "PATH=%VCPKG_ROOT%;%PATH%"
 ) else (
   set "PATH=%~dp0vcpkg;%PATH%"
+  set "VCPKG_ROOT=%~dp0vcpkg"
 )
 pushd %~dp0
 
@@ -53,9 +54,6 @@ where /Q vcpkg.exe
 if %ERRORLEVEL% == 1 (
   REM Build our own vcpkg from source
   REM Prefer building in VCPKG_ROOT
-  if not defined VCPKG_ROOT (
-    set "VCPKG_ROOT=%~dp0\vcpkg"
-  )
   pushd "!VCPKG_ROOT!"
   call bootstrap-vcpkg.bat
   popd

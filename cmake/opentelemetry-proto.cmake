@@ -43,7 +43,7 @@ else()
     message(
       STATUS "opentelemetry-proto dependency satisfied by: github download")
     if("${opentelemetry-proto}" STREQUAL "")
-      set(opentelemetry-proto "v0.19.0")
+      set(opentelemetry-proto "v1.0.0")
     endif()
     include(ExternalProject)
     ExternalProject_Add(
@@ -229,31 +229,47 @@ endif()
 
 include_directories("${GENERATED_PROTOBUF_PATH}")
 
+unset(OTELCPP_PROTO_TARGET_OPTIONS)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
+  list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
+elseif(NOT DEFINED BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
+  list(APPEND OTELCPP_PROTO_TARGET_OPTIONS SHARED)
+else()
+  list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
+endif()
+
+set(OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto)
+add_library(
+  opentelemetry_proto
+  ${OTELCPP_PROTO_TARGET_OPTIONS}
+  ${COMMON_PB_CPP_FILE}
+  ${RESOURCE_PB_CPP_FILE}
+  ${TRACE_PB_CPP_FILE}
+  ${LOGS_PB_CPP_FILE}
+  ${METRICS_PB_CPP_FILE}
+  ${TRACE_SERVICE_PB_CPP_FILE}
+  ${LOGS_SERVICE_PB_CPP_FILE}
+  ${METRICS_SERVICE_PB_CPP_FILE})
+
 if(WITH_OTLP_GRPC)
   add_library(
-    opentelemetry_proto STATIC
-    ${COMMON_PB_CPP_FILE}
-    ${RESOURCE_PB_CPP_FILE}
-    ${TRACE_PB_CPP_FILE}
-    ${LOGS_PB_CPP_FILE}
-    ${METRICS_PB_CPP_FILE}
-    ${TRACE_SERVICE_PB_CPP_FILE}
-    ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
-    ${LOGS_SERVICE_PB_CPP_FILE}
-    ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
-    ${METRICS_SERVICE_PB_CPP_FILE}
-    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
-else()
-  add_library(
-    opentelemetry_proto STATIC
-    ${COMMON_PB_CPP_FILE}
-    ${RESOURCE_PB_CPP_FILE}
-    ${TRACE_PB_CPP_FILE}
-    ${LOGS_PB_CPP_FILE}
-    ${METRICS_PB_CPP_FILE}
-    ${TRACE_SERVICE_PB_CPP_FILE}
-    ${LOGS_SERVICE_PB_CPP_FILE}
-    ${METRICS_SERVICE_PB_CPP_FILE})
+    opentelemetry_proto_grpc
+    ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
+    ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+
+  list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
+  target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
+
+  set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
+                                                            proto_grpc)
+  patch_protobuf_targets(opentelemetry_proto_grpc)
+  get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
+                      INTERFACE_INCLUDE_DIRECTORIES)
+  if(GRPC_INCLUDE_DIRECTORY)
+    target_include_directories(
+      opentelemetry_proto_grpc
+      PUBLIC "$<BUILD_INTERFACE:${GRPC_INCLUDE_DIRECTORY}>")
+  endif()
 endif()
 
 if(needs_proto_download)
@@ -264,7 +280,7 @@ patch_protobuf_targets(opentelemetry_proto)
 
 if(OPENTELEMETRY_INSTALL)
   install(
-    TARGETS opentelemetry_proto
+    TARGETS ${OPENTELEMETRY_PROTO_TARGETS}
     EXPORT "${PROJECT_NAME}-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -282,9 +298,21 @@ if(TARGET protobuf::libprotobuf)
 else() # cmake 3.8 or lower
   target_include_directories(opentelemetry_proto
                              PUBLIC ${Protobuf_INCLUDE_DIRS})
-  target_link_libraries(opentelemetry_proto INTERFACE ${Protobuf_LIBRARIES})
+  target_link_libraries(opentelemetry_proto PUBLIC ${Protobuf_LIBRARIES})
+endif()
+
+if(WITH_OTLP_GRPC)
+  if(WITH_ABSEIL)
+    find_package(absl CONFIG)
+    if(TARGET absl::synchronization)
+      target_link_libraries(opentelemetry_proto_grpc
+                            PRIVATE absl::synchronization)
+    endif()
+  endif()
 endif()
 
 if(BUILD_SHARED_LIBS)
-  set_property(TARGET opentelemetry_proto PROPERTY POSITION_INDEPENDENT_CODE ON)
+  foreach(proto_target ${OPENTELEMETRY_PROTO_TARGETS})
+    set_property(TARGET ${proto_target} PROPERTY POSITION_INDEPENDENT_CODE ON)
+  endforeach()
 endif()

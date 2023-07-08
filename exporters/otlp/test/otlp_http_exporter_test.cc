@@ -17,6 +17,7 @@
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
+#  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/trace/provider.h"
@@ -59,7 +60,21 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
+      options.url,
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+      false,                              /* ssl_insecure_skip_verify */
+      "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
+      "",                                 /* ssl_client_key_path */
+      "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
+      "",                                 /* ssl_client_cert_string */
+#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+      "", /* ssl_min_tls */
+      "", /* ssl_max_tls */
+      "", /* ssl_cipher */
+      "", /* ssl_cipher_suite */
+#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+      options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
   {
@@ -151,10 +166,10 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resource_spans"].begin();
-          auto scope_span        = *resource_span["scope_spans"].begin();
+          auto resource_span     = *check_json["resourceSpans"].begin();
+          auto scope_span        = *resource_span["scopeSpans"].begin();
           auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["trace_id"].get<std::string>();
+          auto received_trace_id = span["traceId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -242,10 +257,10 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_span     = *check_json["resource_spans"].begin();
-          auto scope_span        = *resource_span["scope_spans"].begin();
+          auto resource_span     = *check_json["resourceSpans"].begin();
+          auto scope_span        = *resource_span["scopeSpans"].begin();
           auto span              = *scope_span["spans"].begin();
-          auto received_trace_id = span["trace_id"].get<std::string>();
+          auto received_trace_id = span["traceId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");

@@ -5,11 +5,13 @@
 
 #  include <unordered_map>
 
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #  include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
@@ -17,7 +19,13 @@
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/recordable.h"
 #  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
+#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#  include "opentelemetry/trace/provider.h"
 
 #  include <gtest/gtest.h>
 
@@ -43,6 +51,13 @@ public:
   {
     return std::unique_ptr<sdk::logs::LogRecordExporter>(
         new OtlpGrpcLogRecordExporter(std::move(stub_interface)));
+  }
+
+  std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
+      std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface)
+  {
+    return std::unique_ptr<sdk::trace::SpanExporter>(
+        new OtlpGrpcExporter(std::move(stub_interface)));
   }
 
   // Get the options associated with the given exporter.
@@ -135,29 +150,54 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
                                                               '3', '2', '1', '0'};
   opentelemetry::trace::SpanId span_id{span_id_bin};
 
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
-                                    {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
-  std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
-  attributes["service.name"]     = "unit_test_service";
-  attributes["tenant.id"]        = "test_user";
-  attributes["bool_value"]       = true;
-  attributes["int32_value"]      = static_cast<int32_t>(1);
-  attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  attributes["double_value"]     = static_cast<double>(3.1);
-  attributes["vec_bool_value"]   = attribute_storage_bool_value;
-  attributes["vec_int32_value"]  = attribute_storage_int32_value;
-  attributes["vec_uint32_value"] = attribute_storage_uint32_value;
-  attributes["vec_int64_value"]  = attribute_storage_int64_value;
-  attributes["vec_uint64_value"] = attribute_storage_uint64_value;
-  attributes["vec_double_value"] = attribute_storage_double_value;
-  attributes["vec_string_value"] = attribute_storage_string_value;
-  logger->EmitLogRecord(
-      opentelemetry::logs::Severity::kInfo, "Log message", attributes, trace_id, span_id,
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-      std::chrono::system_clock::now());
+  auto trace_mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_stub_interface(
+      trace_mock_stub);
+
+  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>(
+      opentelemetry::sdk::trace::TracerProviderFactory::Create(
+          opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(
+              GetExporter(trace_stub_interface))));
+
+  // Trace and Logs should both receive datas when links static gRPC on ELF ABI.
+  EXPECT_CALL(*trace_mock_stub, Export(_, _, _))
+      .Times(AtLeast(1))
+      .WillRepeatedly(Return(grpc::Status::OK));
+
+  {
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+
+    auto tracer = trace_provider->GetTracer("opentelelemtry_library", "", schema_url);
+    opentelemetry::trace::Provider::SetTracerProvider(std::move(trace_provider));
+    auto trace_span = tracer->StartSpan("test_log");
+    opentelemetry::trace::Scope trace_scope{trace_span};
+
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
+    std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
+    attributes["service.name"]     = "unit_test_service";
+    attributes["tenant.id"]        = "test_user";
+    attributes["bool_value"]       = true;
+    attributes["int32_value"]      = static_cast<int32_t>(1);
+    attributes["uint32_value"]     = static_cast<uint32_t>(2);
+    attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
+    attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
+    attributes["double_value"]     = static_cast<double>(3.1);
+    attributes["vec_bool_value"]   = attribute_storage_bool_value;
+    attributes["vec_int32_value"]  = attribute_storage_int32_value;
+    attributes["vec_uint32_value"] = attribute_storage_uint32_value;
+    attributes["vec_int64_value"]  = attribute_storage_int64_value;
+    attributes["vec_uint64_value"] = attribute_storage_uint64_value;
+    attributes["vec_double_value"] = attribute_storage_double_value;
+    attributes["vec_string_value"] = attribute_storage_string_value;
+    logger->EmitLogRecord(opentelemetry::logs::Severity::kInfo, "Log message", attributes,
+                          trace_span->GetContext(), std::chrono::system_clock::now());
+  }
+
+  opentelemetry::trace::Provider::SetTracerProvider(
+      opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+          new opentelemetry::trace::NoopTracerProvider()));
+  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>();
 }
 
 }  // namespace otlp

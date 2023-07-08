@@ -3,13 +3,19 @@
 
 #include <memory>
 #include <thread>
-#include "opentelemetry/exporters/ostream/metric_exporter.h"
+
+#include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view_factory.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/metrics_foo_library/foo_library.h"
@@ -17,7 +23,7 @@
 #  include "metrics_foo_library/foo_library.h"
 #endif
 
-namespace metric_sdk      = opentelemetry::sdk::metrics;
+namespace metrics_sdk     = opentelemetry::sdk::metrics;
 namespace common          = opentelemetry::common;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 namespace metrics_api     = opentelemetry::metrics;
@@ -27,59 +33,75 @@ namespace
 
 void InitMetrics(const std::string &name)
 {
-  std::unique_ptr<metric_sdk::PushMetricExporter> exporter{
-      new exportermetrics::OStreamMetricExporter};
+  auto exporter = exportermetrics::OStreamMetricExporterFactory::Create();
 
   std::string version{"1.2.0"};
   std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
   // Initialize and set the global MeterProvider
-  metric_sdk::PeriodicExportingMetricReaderOptions options;
+  metrics_sdk::PeriodicExportingMetricReaderOptions options;
   options.export_interval_millis = std::chrono::milliseconds(1000);
   options.export_timeout_millis  = std::chrono::milliseconds(500);
-  std::unique_ptr<metric_sdk::MetricReader> reader{
-      new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), options)};
-  auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
-  auto p        = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
+
+  auto reader =
+      metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
+
+  auto u_provider = metrics_sdk::MeterProviderFactory::Create();
+  auto *p         = static_cast<metrics_sdk::MeterProvider *>(u_provider.get());
+
   p->AddMetricReader(std::move(reader));
 
   // counter view
   std::string counter_name = name + "_counter";
-  std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
-      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, counter_name)};
-  std::unique_ptr<metric_sdk::MeterSelector> meter_selector{
-      new metric_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metric_sdk::View> sum_view{
-      new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
+
+  auto instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kCounter, counter_name);
+
+  auto meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto sum_view =
+      metrics_sdk::ViewFactory::Create(name, "description", metrics_sdk::AggregationType::kSum);
+
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
   // observable counter view
   std::string observable_counter_name = name + "_observable_counter";
-  std::unique_ptr<metric_sdk::InstrumentSelector> observable_instrument_selector{
-      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kObservableCounter,
-                                         observable_counter_name)};
-  std::unique_ptr<metric_sdk::MeterSelector> observable_meter_selector{
-      new metric_sdk::MeterSelector(name, version, schema)};
-  std::unique_ptr<metric_sdk::View> observable_sum_view{
-      new metric_sdk::View{name, "test_description", metric_sdk::AggregationType::kSum}};
+
+  auto observable_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kObservableCounter, observable_counter_name);
+
+  auto observable_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description",
+                                                              metrics_sdk::AggregationType::kSum);
+
   p->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
              std::move(observable_sum_view));
 
   // histogram view
   std::string histogram_name = name + "_histogram";
-  std::unique_ptr<metric_sdk::InstrumentSelector> histogram_instrument_selector{
-      new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kHistogram, histogram_name)};
-  std::unique_ptr<metric_sdk::MeterSelector> histogram_meter_selector{
-      new metric_sdk::MeterSelector(name, version, schema)};
-  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config{
-      new opentelemetry::sdk::metrics::HistogramAggregationConfig};
-  static_cast<opentelemetry::sdk::metrics::HistogramAggregationConfig *>(aggregation_config.get())
-      ->boundaries_ = std::vector<double>{0.0,    50.0,   100.0,  250.0,   500.0,  750.0,
-                                          1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
-  std::unique_ptr<metric_sdk::View> histogram_view{new metric_sdk::View{
-      name, "description", metric_sdk::AggregationType::kHistogram, aggregation_config}};
+
+  auto histogram_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
+      metrics_sdk::InstrumentType::kHistogram, histogram_name);
+
+  auto histogram_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
+
+  auto histogram_aggregation_config = std::unique_ptr<metrics_sdk::HistogramAggregationConfig>(
+      new metrics_sdk::HistogramAggregationConfig);
+
+  histogram_aggregation_config->boundaries_ = std::vector<double>{
+      0.0, 50.0, 100.0, 250.0, 500.0, 750.0, 1000.0, 2500.0, 5000.0, 10000.0, 20000.0};
+
+  std::shared_ptr<metrics_sdk::AggregationConfig> aggregation_config(
+      std::move(histogram_aggregation_config));
+
+  auto histogram_view = metrics_sdk::ViewFactory::Create(
+      name, "description", metrics_sdk::AggregationType::kHistogram, aggregation_config);
+
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
+
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
   metrics_api::Provider::SetMeterProvider(provider);
 }
 

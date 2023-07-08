@@ -8,22 +8,32 @@
 #  include <unordered_map>
 
 #  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
-#  include "opentelemetry/sdk/common/empty_attributes.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class SpanId;
+class TraceId;
+class TraceFlags;
+}  // namespace trace
+
 namespace sdk
 {
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
+namespace instrumentationscope
+{
+class InstrumentationScope;
+}  // namespace instrumentationscope
+
 namespace logs
 {
 /**
@@ -63,6 +73,18 @@ public:
    * @return the body field for this log.
    */
   virtual const opentelemetry::common::AttributeValue &GetBody() const noexcept = 0;
+
+  /**
+   * Get the Event id.
+   * @return the event id
+   */
+  virtual int64_t GetEventId() const noexcept = 0;
+
+  /**
+   * Get the Event Name.
+   * @return the event name
+   */
+  virtual nostd::string_view GetEventName() const noexcept = 0;
 
   /**
    * Get the trace id of this log.
