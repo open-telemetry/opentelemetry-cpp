@@ -46,7 +46,7 @@ std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Cre
 }
 
 std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
-    std::shared_ptr<sdk::metrics::MeterContext> context)
+    std::unique_ptr<sdk::metrics::MeterContext> context)
 {
   std::unique_ptr<opentelemetry::metrics::MeterProvider> provider(
       new metrics_sdk::MeterProvider(std::move(context)));

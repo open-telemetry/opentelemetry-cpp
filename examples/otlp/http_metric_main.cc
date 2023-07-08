@@ -52,9 +52,7 @@ void InitMetrics()
   auto context = metric_sdk::MeterContextFactory::Create();
   context->AddMetricReader(std::move(reader));
 
-  std::shared_ptr<metric_sdk::MeterContext> s_context(std::move(context));
-
-  auto u_provider = metric_sdk::MeterProviderFactory::Create(s_context);
+  auto u_provider = metric_sdk::MeterProviderFactory::Create(std::move(context));
   std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
 
   metrics_api::Provider::SetMeterProvider(provider);

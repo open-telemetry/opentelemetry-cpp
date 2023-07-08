@@ -100,10 +100,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "6ab267cf82832ed60ad075d574c78da736193eecb9693e8a8d02f65d6d3f3520",
-        strip_prefix = "opentelemetry-proto-0.20.0",
+        sha256 = "a13a1a7b76a1f22a0ca2e6c293e176ffef031413ab8ba653a82a1dbc286a3a33",
+        strip_prefix = "opentelemetry-proto-1.0.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.20.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.0.0.tar.gz",
         ],
     )
 
@@ -153,18 +153,6 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # libthrift (optional)
-    maybe(
-        http_archive,
-        name = "com_github_thrift",
-        build_file_content = _ALL_CONTENT,
-        sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
-        strip_prefix = "thrift-0.14.1",
-        urls = [
-            "https://github.com/apache/thrift/archive/refs/tags/v0.14.1.tar.gz",
-        ],
-    )
-
     # rules foreign cc
     maybe(
         http_archive,
@@ -194,26 +182,4 @@ def opentelemetry_cpp_deps():
         urls = [
             "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
         ],
-    )
-
-    # boost headers from vcpkg
-    maybe(
-        native.new_local_repository,
-        name = "boost_all_hdrs",
-        build_file_content = """
-package(default_visibility = ["//visibility:public"])
-cc_library(
-  name = "boost_all_hdrs",
-  hdrs = glob(
-      ["include/**/*.h*"],
-  ),
-  strip_include_prefix = "include",
-  copts = [
-      "-isystem include",
-      "-fexceptions",
-    ],
-    visibility = ["//visibility:public"],
-)
-        """,
-        path = "tools/vcpkg/installed/x64-windows/",
     )
