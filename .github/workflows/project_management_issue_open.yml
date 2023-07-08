@@ -5,6 +5,7 @@ on:
       - reopened
       - opened
   pull_request:
+    types:
       - reopened
       - opened
 jobs:
