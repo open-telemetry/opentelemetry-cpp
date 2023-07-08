@@ -57,9 +57,9 @@ public:
 
   /**
    * Initialize a new tracer provider with a specified context
-   * @param context The shared tracer configuration/pipeline for this provider.
+   * @param context The owned tracer configuration/pipeline for this provider.
    */
-  explicit TracerProvider(std::shared_ptr<TracerContext> context) noexcept;
+  explicit TracerProvider(std::unique_ptr<TracerContext> context) noexcept;
 
   ~TracerProvider() override;
 

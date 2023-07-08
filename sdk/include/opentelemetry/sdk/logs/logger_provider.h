@@ -56,9 +56,9 @@ public:
 
   /**
    * Initialize a new logger provider with a specified context
-   * @param context The shared logger configuration/pipeline for this provider.
+   * @param context The owned logger configuration/pipeline for this provider.
    */
-  explicit LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept;
+  explicit LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept;
 
   ~LoggerProvider() override;
 
@@ -106,7 +106,7 @@ public:
 private:
   // order of declaration is important here - loggers should destroy only after context.
   std::vector<std::shared_ptr<opentelemetry::sdk::logs::Logger>> loggers_;
-  std::shared_ptr<sdk::logs::LoggerContext> context_;
+  std::shared_ptr<LoggerContext> context_;
   std::mutex lock_;
 };
 }  // namespace logs
