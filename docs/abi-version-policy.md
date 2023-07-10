@@ -458,13 +458,63 @@ public:
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
 #endif
+
+  /* ... */
 };
 
 ```
 
+Note how the ABI changes, while the API stays compatible, requiring no code
+change in the caller when providing up to 3 parameters.
+
 #### SDK change
 
-TODO
+In the SDK class declaration, implement the expected API.
 
+```
+class MeterProvider final : public opentelemetry::metrics::MeterProvider
+{
+public:
 
+  /* ... */
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
+      nostd::string_view name,
+      nostd::string_view version                                = "",
+      nostd::string_view schema_url                             = "",
+      const opentelemetry::common::KeyValueIterable *attributes = nullptr) noexcept override;
+#else
+  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
+      nostd::string_view name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") noexcept override;
+#endif
+
+  /* ... */
+};
+```
+
+In the SDK implementation:
+
+* either get the new parameters from the extended ABI v2 method
+* or provide default values for the old ABI v1 method
+
+```
+nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
+    nostd::string_view name,
+    nostd::string_view version,
+    nostd::string_view schema_url
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    ,
+    const opentelemetry::common::KeyValueIterable *attributes
+#endif
+    ) noexcept
+{
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  const opentelemetry::common::KeyValueIterable *attributes = nullptr;
+#endif
+
+  /* common implementation, use attributes */
+}
+```
