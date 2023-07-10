@@ -431,7 +431,8 @@ to follow specification changes.
 
 See the issue description for all details:
 
-* [Metrics API/SDK] Add InstrumentationScope attributes in MeterProvider::GetMeter() #2033
+* [Metrics API/SDK]
+  Add InstrumentationScope attributes in MeterProvider::GetMeter() #2033
 
 #### API change
 
@@ -471,7 +472,7 @@ change in the caller when providing up to 3 parameters.
 
 In the SDK class declaration, implement the expected API.
 
-```
+```cpp
 class MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
@@ -500,7 +501,7 @@ In the SDK implementation:
 * either get the new parameters from the extended ABI v2 method
 * or provide default values for the old ABI v1 method
 
-```
+```cpp
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,

@@ -101,6 +101,8 @@ endif()
 if(WITH_REMOVE_METER_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_REMOVE_METER_PREVIEW)
+endif()
+
 if(WITH_ABI_VERSION_2)
   target_compile_definitions(opentelemetry_api
                              INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
