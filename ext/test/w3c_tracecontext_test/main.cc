@@ -55,9 +55,10 @@ void initTracer()
       new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<trace_sdk::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  auto context = std::make_shared<trace_sdk::TracerContext>(std::move(processors));
-  auto provider =
-      nostd::shared_ptr<trace_api::TracerProvider>(new trace_sdk::TracerProvider(context));
+  auto context = std::unique_ptr<trace_sdk::TracerContext>(
+      new trace_sdk::TracerContext(std::move(processors)));
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
+      new trace_sdk::TracerProvider(std::move(context)));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }

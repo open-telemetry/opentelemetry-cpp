@@ -78,7 +78,7 @@ public:
   /* Create with a tracer context. */
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
-      std::shared_ptr<TracerContext> context);
+      std::unique_ptr<TracerContext> context);
 };
 
 }  // namespace trace
