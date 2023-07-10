@@ -8,45 +8,6 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
-VERSION_COMPARE_SIGN=""
-GOOGLETEST_LATEST_VERSION=1.13.0
-
-function version_compare()
-{
-  if [[ $1 == $2 ]]
-    then
-        VERSION_COMPARE_SIGN="="
-        return
-  fi
-  local IFS=.
-  local i left=($1) right=($2)
-  # fill empty fields in left with zeros
-  for ((i=${#left[@]}; i<${#right[@]}; i++))
-  do
-      left[i]=0
-  done
-  for ((i=0; i<${#left[@]}; i++))
-  do
-      if [[ -z ${right[i]} ]]
-      then
-          # fill empty fields in right with zeros
-          right[i]=0
-      fi
-      if ((10#${left[i]} > 10#${right[i]}))
-      then
-          VERSION_COMPARE_SIGN=">"
-          return
-      fi
-      if ((10#${left[i]} < 10#${right[i]}))
-      then
-          VERSION_COMPARE_SIGN="<"
-          return
-      fi
-  done
-
-  VERSION_COMPARE_SIGN="="
-}
-
 if [ "x$CMAKE_VERSION" = "x" ]; then
   # By default, CMake version set the following version.
   export CMAKE_VERSION=3.15.2
@@ -57,14 +18,14 @@ fi
 # Also with this version, release version path needs to be adapted.
 if [ -z "${GOOGLETEST_VERSION}" ]; then
   # By default, GoogleTest version set the following version.
-  export GOOGLETEST_VERSION=${GOOGLETEST_LATEST_VERSION}
+  export GOOGLETEST_VERSION=1.13.0
 fi
 
-version_compare ${GOOGLETEST_VERSION} ${GOOGLETEST_LATEST_VERSION}
+OLD_GOOGLETEST_VERSION_REGEXP="^1\.([0-9]|10|11|12)(\..*)?$"
 
 # If GoogleTest version less than ${GOOGLETEST_LATEST_VERSION}
 # Else otherwise
-if [ "${VERSION_COMPARE_SIGN}" == "<" ]; then
+if [[ "${GOOGLETEST_VERSION}" =~ "${OLD_GOOGLETEST_VERSION_REGEXP}" ]]; then
   GOOGLETEST_VERSION_PATH="release-${GOOGLETEST_VERSION}"
   GOOGLETEST_FOLDER_PATH="googletest-release-${GOOGLETEST_VERSION}"
 else
