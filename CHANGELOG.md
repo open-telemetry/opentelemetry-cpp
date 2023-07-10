@@ -21,10 +21,24 @@ Increment the:
 * [API] Remove include_trace_context
   [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
 
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+
 * [SDK] MeterProvider should own MeterContext, not share it
   [#2218](https://github.com/open-telemetry/opentelemetry-cpp/pull/2218)
 
+* [SDK] TracerProvider should own TracerContext, not share it
+  [#2221](https://github.com/open-telemetry/opentelemetry-cpp/pull/2221)
+
 Important changes:
+
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+  * The CMake option `WITH_REMOVE_METER_PREVIEW` was added.
+  * This option is experimental, and may change in the future.
+  * Enabling it is an ABI breaking change.
+
+Breaking changes:
 
 * [REMOVAL] Remove the jaeger exporter
   [#2031](https://github.com/open-telemetry/opentelemetry-cpp/pull/2031)
@@ -35,6 +49,14 @@ Important changes:
   [#2218](https://github.com/open-telemetry/opentelemetry-cpp/pull/2218)
   * The `MeterProvider` constructor now takes a `unique_ptr` on
     `MeterContext`, instead of a `shared_ptr`.
+  * Please adjust SDK configuration code accordingly.
+
+* [SDK] TracerProvider should own TracerContext, not share it
+  [#2221](https://github.com/open-telemetry/opentelemetry-cpp/pull/2221)
+  * The `TracerProvider` constructor now takes a `unique_ptr` on
+    `TracerContext`, instead of a `shared_ptr`.
+  * The `LoggerProvider` constructor now takes a `unique_ptr` on
+    `LoggerContext`, instead of a `shared_ptr`.
   * Please adjust SDK configuration code accordingly.
 
 ## [1.9.1] 2023-05-26

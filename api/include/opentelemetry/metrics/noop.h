@@ -214,6 +214,13 @@ public:
   }
 #endif
 
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+  void RemoveMeter(nostd::string_view /* name */,
+                   nostd::string_view /* version */,
+                   nostd::string_view /* schema_url */) noexcept override
+  {}
+#endif
+
 private:
   nostd::shared_ptr<Meter> meter_;
 };

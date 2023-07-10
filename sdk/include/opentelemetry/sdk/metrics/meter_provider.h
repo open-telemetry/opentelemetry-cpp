@@ -61,6 +61,12 @@ public:
       nostd::string_view schema_url = "") noexcept override;
 #endif
 
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url) noexcept override;
+#endif
+
   /**
    * Obtain the resource associated with this meter provider.
    * @return The resource for this meter provider.

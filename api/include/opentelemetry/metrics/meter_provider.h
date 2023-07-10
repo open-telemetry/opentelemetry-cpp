@@ -43,6 +43,12 @@ public:
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
 #endif
+
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+  virtual void RemoveMeter(nostd::string_view library_name,
+                           nostd::string_view library_version = "",
+                           nostd::string_view schema_url      = "") noexcept = 0;
+#endif
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
