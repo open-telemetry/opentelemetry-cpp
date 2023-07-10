@@ -21,11 +21,22 @@ Increment the:
 * [API] Remove include_trace_context
   [#2194](https://github.com/open-telemetry/opentelemetry-cpp/pull/2194)
 
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+
 * [SDK] MeterProvider should own MeterContext, not share it
   [#2218](https://github.com/open-telemetry/opentelemetry-cpp/pull/2218)
 
 * [SDK] TracerProvider should own TracerContext, not share it
   [#2221](https://github.com/open-telemetry/opentelemetry-cpp/pull/2221)
+
+Important changes:
+
+* [API] Remove Meters
+  [#2205](https://github.com/open-telemetry/opentelemetry-cpp/pull/2205)
+  * The CMake option `WITH_REMOVE_METER_PREVIEW` was added.
+  * This option is experimental, and may change in the future.
+  * Enabling it is an ABI breaking change.
 
 Breaking changes:
 
