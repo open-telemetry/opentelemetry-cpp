@@ -91,7 +91,13 @@ void MeterContext::RemoveMeter(nostd::string_view name,
   for (auto &meter : meters_)
   {
     auto scope = meter->GetInstrumentationScope();
-    if (!scope->equal(name, version, schema_url))
+    if (scope->equal(name, version, schema_url))
+    {
+      OTEL_INTERNAL_LOG_INFO("[MeterContext::RemoveMeter] removing meter name <"
+                             << name << ">, version <" << version << ">, URL <" << schema_url
+                             << ">");
+    }
+    else
     {
       filtered_meters.push_back(meter);
     }
