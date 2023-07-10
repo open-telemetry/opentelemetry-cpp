@@ -21,7 +21,9 @@ namespace metrics
 namespace resource    = opentelemetry::sdk::resource;
 namespace metrics_api = opentelemetry::metrics;
 
-MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : context_{context} {}
+MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
+    : context_(std::move(context))
+{}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
@@ -56,6 +58,23 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   context_->AddMeter(meter);
   return nostd::shared_ptr<metrics_api::Meter>{meter};
 }
+
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+void MeterProvider::RemoveMeter(nostd::string_view name,
+                                nostd::string_view version,
+                                nostd::string_view schema_url) noexcept
+{
+  if (name.data() == nullptr || name == "")
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterProvider::RemoveMeter] Library name is empty.");
+    name = "";
+  }
+
+  const std::lock_guard<std::mutex> guard(lock_);
+
+  context_->RemoveMeter(name, version, schema_url);
+}
+#endif
 
 const resource::Resource &MeterProvider::GetResource() const noexcept
 {
