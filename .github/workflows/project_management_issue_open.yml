@@ -4,10 +4,6 @@ on:
     types:
       - reopened
       - opened
-  pull_request:
-    types:
-      - reopened
-      - opened
 jobs:
   label_issues:
     runs-on: ubuntu-latest
