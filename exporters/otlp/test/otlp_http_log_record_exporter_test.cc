@@ -68,11 +68,11 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_client_cert_string */
 #  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 #  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
-      "",  /* ssl_min_tls */
-      "",  /* ssl_max_tls */
-      "",  /* ssl_cipher */
-      "",  /* ssl_cipher_suite */
-#  endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+      "", /* ssl_min_tls */
+      "", /* ssl_max_tls */
+      "", /* ssl_cipher */
+      "", /* ssl_cipher_suite */
+#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
