@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include <cstddef>
 #  include <type_traits>
 
@@ -189,4 +187,3 @@ void ReadWriteLogRecord::SetInstrumentationScope(
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

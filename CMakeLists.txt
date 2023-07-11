@@ -242,7 +242,10 @@ option(
 
 option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
 
-option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+if(DEFINED WITH_LOGS_PREVIEW)
+  message(WARNING "WITH_LOGS_PREVIEW is removed because logs signal is stable")
+endif()
+
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
 # EXPERIMENTAL

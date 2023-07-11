@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <atomic>
-#  include <chrono>
-#  include <memory>
+#include <atomic>
+#include <chrono>
+#include <memory>
 
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -58,4 +57,3 @@ private:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

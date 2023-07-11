@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
@@ -243,5 +241,3 @@ TEST(SimpleLogRecordProcessorTest, ForceFlushFail)
   // Expect failure result when exporter fails to force flush
   EXPECT_EQ(false, processor.ForceFlush());
 }
-
-#endif

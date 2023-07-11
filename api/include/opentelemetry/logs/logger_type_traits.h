@@ -2,24 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <type_traits>
+#include <chrono>
+#include <type_traits>
 
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/logs/event_id.h"
-#  include "opentelemetry/logs/log_record.h"
-#  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
-#  include "opentelemetry/trace/span_context.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/event_id.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -198,5 +197,3 @@ struct LogRecordHasType<ValueType, TargetType, ArgumentType...>
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

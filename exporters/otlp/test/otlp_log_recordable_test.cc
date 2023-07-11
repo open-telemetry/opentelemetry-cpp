@@ -1,16 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
+#include <chrono>
 
-#  include <chrono>
-
-#  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -220,5 +218,3 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

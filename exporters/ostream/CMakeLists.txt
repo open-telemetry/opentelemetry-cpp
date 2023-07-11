@@ -76,38 +76,36 @@ if(BUILD_TESTING)
     TEST_LIST ostream_metric_test)
 endif()
 
-if(WITH_LOGS_PREVIEW)
-  add_library(opentelemetry_exporter_ostream_logs src/log_record_exporter.cc)
-  set_target_properties(opentelemetry_exporter_ostream_logs
-                        PROPERTIES EXPORT_NAME ostream_log_record_exporter)
-  set_target_version(opentelemetry_exporter_ostream_logs)
+add_library(opentelemetry_exporter_ostream_logs src/log_record_exporter.cc)
+set_target_properties(opentelemetry_exporter_ostream_logs
+                      PROPERTIES EXPORT_NAME ostream_log_record_exporter)
+set_target_version(opentelemetry_exporter_ostream_logs)
 
-  target_include_directories(
-    opentelemetry_exporter_ostream_logs
-    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
-  target_link_libraries(opentelemetry_exporter_ostream_logs
-                        PUBLIC opentelemetry_logs)
+target_include_directories(
+  opentelemetry_exporter_ostream_logs
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+target_link_libraries(opentelemetry_exporter_ostream_logs
+                      PUBLIC opentelemetry_logs)
 
-  if(OPENTELEMETRY_INSTALL)
-    install(
-      TARGETS opentelemetry_exporter_ostream_logs
-      EXPORT "${PROJECT_NAME}-target"
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    install(
-      DIRECTORY include/opentelemetry/exporters/ostream
-      DESTINATION include/opentelemetry/exporters
-      PATTERN "log_record_exporter.h")
-  endif()
+if(OPENTELEMETRY_INSTALL)
+  install(
+    TARGETS opentelemetry_exporter_ostream_logs
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  install(
+    DIRECTORY include/opentelemetry/exporters/ostream
+    DESTINATION include/opentelemetry/exporters
+    PATTERN "log_record_exporter.h")
+endif()
 
-  if(BUILD_TESTING)
-    add_executable(ostream_log_test test/ostream_log_test.cc)
-    target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
-                          opentelemetry_exporter_ostream_logs)
-    gtest_add_tests(
-      TARGET ostream_log_test
-      TEST_PREFIX exporter.
-      TEST_LIST ostream_log_test)
-  endif()
+if(BUILD_TESTING)
+  add_executable(ostream_log_test test/ostream_log_test.cc)
+  target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_ostream_logs)
+  gtest_add_tests(
+    TARGET ostream_log_test
+    TEST_PREFIX exporter.
+    TEST_LIST ostream_log_test)
 endif()

@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include <array>
 #  include <unordered_map>
 
@@ -191,5 +189,3 @@ TEST(LoggerProviderSDK, ForceFlush)
 
   EXPECT_TRUE(lp.ForceFlush());
 }
-
-#endif

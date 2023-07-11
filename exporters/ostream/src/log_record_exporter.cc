@@ -1,17 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
-#  include "opentelemetry/exporters/ostream/common_utils.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk_config.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk_config.h"
 
-#  include <iostream>
-#  include <mutex>
-#  include <type_traits>
+#include <iostream>
+#include <mutex>
+#include <type_traits>
 
 namespace nostd     = opentelemetry::nostd;
 namespace sdklogs   = opentelemetry::sdk::logs;
@@ -163,4 +162,3 @@ void OStreamLogRecordExporter::printAttributes(
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

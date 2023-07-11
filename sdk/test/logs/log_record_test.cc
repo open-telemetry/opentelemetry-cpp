@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include <stdint.h>
 #  include <algorithm>
 #  include <string>
@@ -322,5 +320,3 @@ TEST(LogBody, BodyConversation)
     }
   }
 }
-
-#endif

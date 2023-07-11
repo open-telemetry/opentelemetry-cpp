@@ -1,15 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <sstream>  // std::stringstream
 
-#  include <sstream>  // std::stringstream
-
-#  include <condition_variable>
-#  include <mutex>
-#  include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
-#  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
-#  include "opentelemetry/sdk_config.h"
+#include <condition_variable>
+#include <mutex>
+#include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
+#include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/sdk_config.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;
@@ -182,7 +180,7 @@ private:
   bool console_debug_ = false;
 };
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 /**
  * This class handles the async response message from the Elasticsearch request
  */
@@ -287,21 +285,21 @@ private:
   // Whether to print the results from the callback
   bool console_debug_ = false;
 };
-#  endif
+#endif
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
     : options_{ElasticsearchExporterOptions()}, http_client_
 {
   ext::http::client::HttpClientFactory::Create()
 }
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 , synchronization_data_(new SynchronizationData())
-#  endif
+#endif
 {
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   synchronization_data_->finished_session_counter_.store(0);
   synchronization_data_->session_counter_.store(0);
-#  endif
+#endif
 }
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
@@ -351,7 +349,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   std::vector<uint8_t> body_vec(body.begin(), body.end());
   request->SetBody(body_vec);
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   // Send the request
   synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
   std::size_t span_count    = records.size();
@@ -378,7 +376,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
       options_.console_debug_);
   session->SendRequest(handler);
   return sdk::common::ExportResult::kSuccess;
-#  else
+#else
   // Send the request
   auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
   session->SendRequest(handler);
@@ -413,13 +411,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   }
 
   return sdk::common::ExportResult::kSuccess;
-#  endif
+#endif
 }
 
 bool ElasticsearchLogRecordExporter::ForceFlush(
     std::chrono::microseconds timeout OPENTELEMETRY_MAYBE_UNUSED) noexcept
 {
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
   std::size_t running_counter =
       synchronization_data_->session_counter_.load(std::memory_order_acquire);
@@ -455,9 +453,9 @@ bool ElasticsearchLogRecordExporter::ForceFlush(
   }
 
   return timeout_steady > std::chrono::steady_clock::duration::zero();
-#  else
+#else
   return true;
-#  endif
+#endif
 }
 
 bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
@@ -480,4 +478,3 @@ bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

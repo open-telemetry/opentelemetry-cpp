@@ -13,10 +13,7 @@
 
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
-
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
-#endif
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
@@ -60,13 +57,11 @@ public:
   static std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
   MakeMetricsServiceStub(const OtlpGrpcExporterOptions &options);
 
-#ifdef ENABLE_LOGS_PREVIEW
   /**
    * Create logs service stub to communicate with the OpenTelemetry Collector.
    */
   static std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
   MakeLogsServiceStub(const OtlpGrpcExporterOptions &options);
-#endif
 
   static grpc::Status DelegateExport(
       proto::collector::trace::v1::TraceService::StubInterface *stub,
@@ -80,13 +75,11 @@ public:
       const proto::collector::metrics::v1::ExportMetricsServiceRequest &request,
       proto::collector::metrics::v1::ExportMetricsServiceResponse *response);
 
-#ifdef ENABLE_LOGS_PREVIEW
   static grpc::Status DelegateExport(
       proto::collector::logs::v1::LogsService::StubInterface *stub,
       grpc::ClientContext *context,
       const proto::collector::logs::v1::ExportLogsServiceRequest &request,
       proto::collector::logs::v1::ExportLogsServiceResponse *response);
-#endif
 };
 }  // namespace otlp
 }  // namespace exporter

@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
@@ -341,4 +339,3 @@ TEST_F(BatchLogRecordProcessorTest, TestScheduledDelayMillis)
     EXPECT_EQ("Log" + std::to_string(i), logs_received->at(i)->GetBody());
   }
 }
-#endif

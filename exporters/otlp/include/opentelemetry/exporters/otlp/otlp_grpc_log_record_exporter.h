@@ -2,20 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
 // clang-format off
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
 
-#  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -95,5 +94,3 @@ private:
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

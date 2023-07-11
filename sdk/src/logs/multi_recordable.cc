@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include "opentelemetry/sdk/logs/multi_recordable.h"
 
 #  include <cstddef>
@@ -185,4 +183,3 @@ void MultiRecordable::SetInstrumentationScope(
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -17,11 +17,6 @@ if(OPENTELEMETRY_INSTALL)
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-  set(LOGS_EXCLUDE_PATTERN "")
-  if(NOT WITH_LOGS_PREVIEW)
-    set(LOGS_EXCLUDE_PATTERN "logs")
-  endif()
-
   install(
     DIRECTORY include/opentelemetry
     DESTINATION include
@@ -33,8 +28,7 @@ if(OPENTELEMETRY_INSTALL)
     DIRECTORY include/opentelemetry
     DESTINATION include
     FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
+    PATTERN "*.h")
 endif()
 
 if(BUILD_TESTING)
@@ -77,10 +71,6 @@ if(WITH_GSL)
     target_include_directories(
       opentelemetry_api INTERFACE "$<BUILD_INTERFACE:${GSL_DIR}/include>")
   endif()
-endif()
-
-if(WITH_LOGS_PREVIEW)
-  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_LOGS_PREVIEW)
 endif()
 
 if(WITH_NO_GETENV)

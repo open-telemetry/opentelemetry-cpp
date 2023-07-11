@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
@@ -74,4 +72,3 @@ bool SimpleLogRecordProcessor::IsShutdown() const noexcept
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include <chrono>
 #  include <string>
 
@@ -288,5 +286,3 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
 }
-
-#endif

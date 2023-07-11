@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 #  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
@@ -22,4 +20,3 @@ std::unique_ptr<LogRecordProcessor> SimpleLogRecordProcessorFactory::Create(
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif
