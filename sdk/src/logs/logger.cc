@@ -1,12 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/context/runtime_context.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

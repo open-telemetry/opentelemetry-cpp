@@ -1,10 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#  include <cstddef>
-#  include <type_traits>
+#include <cstddef>
+#include <type_traits>
 
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

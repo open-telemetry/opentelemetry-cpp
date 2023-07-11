@@ -1,15 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
-#  include <chrono>
-#  include <thread>
+#include <chrono>
+#include <thread>
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;

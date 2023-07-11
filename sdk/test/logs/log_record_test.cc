@@ -1,20 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#  include <stdint.h>
-#  include <algorithm>
-#  include <string>
-#  include <vector>
+#include <stdint.h>
+#include <algorithm>
+#include <string>
+#include <vector>
 
-#  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using opentelemetry::sdk::logs::ReadWriteLogRecord;
 namespace trace_api = opentelemetry::trace;

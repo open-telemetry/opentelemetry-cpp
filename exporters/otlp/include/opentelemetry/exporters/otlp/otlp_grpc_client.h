@@ -11,9 +11,9 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
-#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 

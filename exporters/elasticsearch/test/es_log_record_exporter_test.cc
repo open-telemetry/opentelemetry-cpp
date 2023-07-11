@@ -21,7 +21,7 @@ TEST(ElasticsearchLogsExporterTests, Dummy)
   // to enable linking
 }
 
-#  if 0
+#if 0
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
@@ -79,4 +79,4 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }
-#  endif
+#endif

@@ -15,7 +15,7 @@
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it
-#  define MAX_LOGGER_COUNT 100
+#define MAX_LOGGER_COUNT 100
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

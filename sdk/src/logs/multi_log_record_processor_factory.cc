@@ -1,12 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#  include "opentelemetry/sdk/logs/multi_log_record_processor_factory.h"
-#  include "opentelemetry/sdk/logs/multi_log_record_processor.h"
+#include "opentelemetry/sdk/logs/multi_log_record_processor_factory.h"
+#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 
-#  include <chrono>
-#  include <memory>
-#  include <vector>
+#include <chrono>
+#include <memory>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

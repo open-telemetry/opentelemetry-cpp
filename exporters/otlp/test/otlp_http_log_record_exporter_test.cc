@@ -66,7 +66,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#  endif                                /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 #  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
       "",  /* ssl_min_tls */
       "",  /* ssl_max_tls */
