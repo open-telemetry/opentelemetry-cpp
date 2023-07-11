@@ -29,6 +29,9 @@ Increment the:
 * [CI] opentelemetry-cpp project CI
   [#2071](https://github.com/open-telemetry/opentelemetry-cpp/pull/2071)
 
+* [CI] Do not tag pull_request with the "need-triage" label
+  [#2228](https://github.com/open-telemetry/opentelemetry-cpp/pull/2228)
+
 * [BUILD] Fixing CMake to build GTest on Windows
   [#1887](https://github.com/open-telemetry/opentelemetry-cpp/pull/1887)
 
