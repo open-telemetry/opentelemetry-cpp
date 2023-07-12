@@ -99,13 +99,13 @@ public:
     }
   }
 
-  const opentelemetry::v1::common::AttributeValue &GetLastLogRecord() const noexcept
+  const opentelemetry::common::AttributeValue &GetLastLogRecord() const noexcept
   {
     return last_body_;
   }
 
 private:
-  opentelemetry::v1::common::AttributeValue last_body_;
+  opentelemetry::common::AttributeValue last_body_;
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
