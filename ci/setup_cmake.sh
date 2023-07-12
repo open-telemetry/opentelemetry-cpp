@@ -13,22 +13,19 @@ if [ "x$CMAKE_VERSION" = "x" ]; then
   export CMAKE_VERSION=3.15.2
 fi
 
-# This variable not set on CI pipeline for only legacy environment(GCC 4.8).
-# With 1.13.0 version, C++14 must be set which does not supported by legacy environment anymore.
-# Also with this version, release version path needs to be adapted.
 if [ -z "${GOOGLETEST_VERSION}" ]; then
-  # By default, GoogleTest version set the following version.
+  # Version by default. Requires C++14.
   export GOOGLETEST_VERSION=1.13.0
 fi
 
 OLD_GOOGLETEST_VERSION_REGEXP="^1\.([0-9]|10|11|12)(\..*)?$"
 
-# If GoogleTest version less than ${GOOGLETEST_LATEST_VERSION}
-# Else otherwise
 if [[ ${GOOGLETEST_VERSION} =~ ${OLD_GOOGLETEST_VERSION_REGEXP} ]]; then
+  # Old (up to 1.12.x included) download URL format.
   GOOGLETEST_VERSION_PATH="release-${GOOGLETEST_VERSION}"
   GOOGLETEST_FOLDER_PATH="googletest-release-${GOOGLETEST_VERSION}"
 else
+  # New (since 1.13.0) download URL format.
   GOOGLETEST_VERSION_PATH="v${GOOGLETEST_VERSION}"
   GOOGLETEST_FOLDER_PATH="googletest-${GOOGLETEST_VERSION}"
 fi
