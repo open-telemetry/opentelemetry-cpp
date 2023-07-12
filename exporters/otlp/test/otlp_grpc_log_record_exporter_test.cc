@@ -154,7 +154,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_stub_interface(
       trace_mock_stub);
 
-  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>(
+  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       opentelemetry::sdk::trace::TracerProviderFactory::Create(
           opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(
               GetExporter(trace_stub_interface))));
@@ -174,7 +174,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 
     auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
-    std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
+    std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes;
     attributes["service.name"]     = "unit_test_service";
     attributes["tenant.id"]        = "test_user";
     attributes["bool_value"]       = true;
@@ -197,7 +197,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
-  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>();
+  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>();
 }
 
 }  // namespace otlp
