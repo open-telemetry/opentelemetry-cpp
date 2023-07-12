@@ -5,6 +5,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <chrono>
@@ -50,8 +51,8 @@ struct OtlpHttpMetricExporterOptions
   OtlpHeaders http_headers = GetOtlpDefaultMetricsHeaders();
 
   // Preferred Aggregation Temporality
-  sdk::metrics::AggregationTemporality aggregation_temporality =
-      sdk::metrics::AggregationTemporality::kCumulative;
+  PreferredAggregationTemporality aggregation_temporality =
+      PreferredAggregationTemporality::kCumulative;
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests

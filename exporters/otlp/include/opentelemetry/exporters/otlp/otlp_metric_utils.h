@@ -18,6 +18,15 @@ namespace exporter
 {
 namespace otlp
 {
+
+enum class PreferredAggregationTemporality
+{
+  kUnspecified,
+  kDelta,
+  kCumulative,
+  kLowMemory,
+};
+
 /**
  * The OtlpMetricUtils contains utility functions for OTLP metrics
  */
@@ -52,10 +61,12 @@ public:
       proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
 
   static sdk::metrics::AggregationTemporalitySelector ChooseTemporalitySelector(
-      sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept;
+      PreferredAggregationTemporality preferred_aggregation_temporality) noexcept;
   static sdk::metrics::AggregationTemporality DeltaTemporalitySelector(
       sdk::metrics::InstrumentType instrument_type) noexcept;
   static sdk::metrics::AggregationTemporality CumulativeTemporalitySelector(
+      sdk::metrics::InstrumentType instrument_type) noexcept;
+  static sdk::metrics::AggregationTemporality LowMemoryTemporalitySelector(
       sdk::metrics::InstrumentType instrument_type) noexcept;
 };
 
