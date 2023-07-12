@@ -216,8 +216,8 @@ set(OTELCPP_PROTO_PATH
 if(WIN32)
   if(BUILD_TESTING)
     if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
+      # Warning as error: warning STL4036: <ciso646> is removed in C++20
+      add_compile_options(/wd4996)
     endif()
   endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
