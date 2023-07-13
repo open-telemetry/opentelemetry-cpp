@@ -64,7 +64,7 @@ public:
    * Create a LoggerProvider.
    */
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
-      std::shared_ptr<sdk::logs::LoggerContext> context);
+      std::unique_ptr<LoggerContext> context);
 };
 
 }  // namespace logs

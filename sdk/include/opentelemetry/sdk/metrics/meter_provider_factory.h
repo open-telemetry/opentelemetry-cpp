@@ -69,7 +69,7 @@ public:
       const opentelemetry::sdk::resource::Resource &resource);
 
   static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create(
-      std::shared_ptr<sdk::metrics::MeterContext> context);
+      std::unique_ptr<sdk::metrics::MeterContext> context);
 };
 
 }  // namespace metrics

@@ -202,6 +202,14 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+#
+# This option is experimental, subject to change in the spec:
+#
+# * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
+#
+option(WITH_REMOVE_METER_PREVIEW
+       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
+
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
@@ -211,12 +219,6 @@ set(OTELCPP_PROTO_PATH
     CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
-  if(BUILD_TESTING)
-    if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
-    endif()
-  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 endif(WIN32)
 

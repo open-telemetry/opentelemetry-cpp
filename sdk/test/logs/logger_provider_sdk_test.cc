@@ -170,7 +170,8 @@ TEST(LoggerProviderSDK, Shutdown)
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
-  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+  std::unique_ptr<LoggerContext> context(new LoggerContext(std::move(processors)));
+  LoggerProvider lp(std::move(context));
 
   EXPECT_TRUE(lp.Shutdown());
   EXPECT_TRUE(processor_ptr->IsShutdown());
@@ -185,7 +186,8 @@ TEST(LoggerProviderSDK, ForceFlush)
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
-  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+  std::unique_ptr<LoggerContext> context(new LoggerContext(std::move(processors)));
+  LoggerProvider lp(std::move(context));
 
   EXPECT_TRUE(lp.ForceFlush());
 }
