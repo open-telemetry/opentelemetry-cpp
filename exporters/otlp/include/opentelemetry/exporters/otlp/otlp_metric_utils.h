@@ -9,6 +9,7 @@
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -18,15 +19,6 @@ namespace exporter
 {
 namespace otlp
 {
-
-enum class PreferredAggregationTemporality
-{
-  kUnspecified,
-  kDelta,
-  kCumulative,
-  kLowMemory,
-};
-
 /**
  * The OtlpMetricUtils contains utility functions for OTLP metrics
  */

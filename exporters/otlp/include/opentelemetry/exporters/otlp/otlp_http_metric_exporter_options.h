@@ -5,8 +5,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
-#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 
 #include <chrono>
 #include <cstddef>

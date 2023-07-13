@@ -4,7 +4,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <memory>
