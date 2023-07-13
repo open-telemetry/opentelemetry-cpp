@@ -13,7 +13,6 @@ An exporter is responsible for sending the telemetry data to a particular backen
 OpenTelemetry offers six tracing exporters out of the box:
 
 - In-Memory Exporter: keeps the data in memory, useful for debugging.
-- Jaeger Exporter: prepares and sends the collected telemetry data to a Jaeger backend via UDP and HTTP.
 - Zipkin Exporter: prepares and sends the collected telemetry data to a Zipkin backend via the Zipkin APIs.
 - Logging Exporter: saves the telemetry data into log streams.
 - OpenTelemetry(otlp) Exporter: sends the data to the OpenTelemetry Collector using protobuf/gRPC or protobuf/HTTP.
@@ -38,23 +37,6 @@ OpenTelemetry offers six tracing exporters out of the box:
     opts.service_name = "default_service" ;
     auto zipkin_exporter =
         std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::zipkin::ZipkinExporter(opts));
-
-    // Jaeger UDP exporter
-    opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
-    opts.endpoint = "localhost";
-    opts.server_port =  6831;
-    auto jaeger_udp_exporter =
-        std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::jaeger::JaegerExporter(opts));
-
-    // Jaeger HTTP exporter
-    opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
-    opts.transport_format  = opentelemetry::exporter::jaeger::TransportFormat::kThriftHttp;
-    opts.endpoint = "localhost";
-    opts.server_port = 14268;
-    opts.headers = {{}}; // optional headers
-    auto jaeger_http_exporter =
-        std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::jaeger::JaegerExporter(opts));
-
 
     // otlp grpc exporter
     opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;

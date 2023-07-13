@@ -182,8 +182,6 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
 
-option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
-
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
@@ -199,6 +197,14 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+#
+# This option is experimental, subject to change in the spec:
+#
+# * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
+#
+option(WITH_REMOVE_METER_PREVIEW
+       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
+
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
@@ -208,12 +214,6 @@ set(OTELCPP_PROTO_PATH
     CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
-  if(BUILD_TESTING)
-    if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
-    endif()
-  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 endif(WIN32)
 
@@ -294,25 +294,6 @@ function(set_target_version target_name)
                                 SOVERSION ${OPENTELEMETRY_ABI_VERSION_NO})
   endif()
 endfunction()
-
-if(WITH_JAEGER)
-  if(WITH_NO_DEPRECATED_CODE)
-    message(FATAL_ERROR "Jaeger is DEPRECATED.")
-  else()
-    message(WARNING "Jaeger is DEPRECATED.")
-  endif()
-
-  find_package(Thrift QUIET)
-  if(Thrift_FOUND)
-    find_package(Boost REQUIRED)
-    include_directories(${Boost_INCLUDE_DIR})
-  else()
-    # Install Thrift and propagate via vcpkg toolchain file
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
-  endif()
-endif()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
@@ -405,7 +386,6 @@ endif()
 
 if(WITH_OTLP_HTTP
    OR WITH_ELASTICSEARCH
-   OR WITH_JAEGER
    OR WITH_ZIPKIN
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_EXAMPLES_HTTP)
@@ -627,6 +607,8 @@ if(NOT WITH_API_ONLY)
     add_subdirectory(functional)
   endif()
 endif()
+
+include(cmake/opentelemetry-build-external-component.cmake)
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)

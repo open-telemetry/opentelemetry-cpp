@@ -26,7 +26,6 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
   #
@@ -77,7 +76,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -88,7 +86,6 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
       env:
@@ -111,7 +108,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -122,7 +118,6 @@ jobs:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
       env:
@@ -145,7 +140,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -156,7 +150,6 @@ jobs:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
       env:
@@ -179,7 +172,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -190,7 +182,6 @@ jobs:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
       env:
@@ -235,7 +226,6 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.with_async_export.test
 
   cmake_absel_stl_test:
@@ -247,8 +237,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
         sudo ./ci/install_abseil.sh
@@ -263,8 +253,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
@@ -287,8 +277,9 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: "1.10.0"
-      run: sudo -E ./ci/setup_cmake.sh
+        GOOGLETEST_VERSION: 1.10.0
+      run: |
+        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-4.8
@@ -314,7 +305,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: "1.10.0"
+        GOOGLETEST_VERSION: 1.10.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_grpc.sh -v 4.8
@@ -333,7 +324,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CMAKE_VERSION: "3.20.6"
+        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -354,7 +345,7 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: "3.20.6"
+        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -380,8 +371,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -396,8 +387,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -412,8 +403,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh -T
@@ -455,7 +446,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -477,7 +467,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -499,7 +488,6 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -521,7 +509,6 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -543,7 +530,6 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -565,7 +551,6 @@ jobs:
         key: bazel_nortti
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -587,7 +572,6 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -609,7 +593,6 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
-        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -738,7 +721,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_thrift.ps1
         ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build

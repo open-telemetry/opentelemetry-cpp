@@ -93,9 +93,7 @@ but the C++11 build will no longer be tested for each new release.
 
 ## [Third party dependencies]
 
-### Jaeger
-
-See [Jaeger exporter](#jaeger-exporter)
+N/A
 
 ## [Build tools]
 
@@ -107,15 +105,7 @@ N/A
 
 ## [opentelemetry-cpp API]
 
-N/A
-
-## [opentelemetry-cpp SDK]
-
-N/A
-
-## [opentelemetry-cpp Exporter]
-
-### Jaeger exporter
+### Jaeger propagator
 
 #### Announcement (Jaeger)
 
@@ -124,24 +114,17 @@ N/A
 * PR: [DEPRECATION] Deprecate the Jaeger exporter
   [#1923](https://github.com/open-telemetry/opentelemetry-cpp/pull/1923)
 
+This PR also listed the Jaeger propagator as deprecated.
+
 #### Motivation (Jaeger)
 
-The Jaeger client libraries are deprecated, as announced
-[here](https://www.jaegertracing.io/docs/1.41/client-libraries/).
+The Jaeger Exporter is now (July 2023) removed from the OpenTelemetry specification.
 
-The initial Jaeger announcement in release 1.35 reads as:
+The Jaeger Propagator remains, because changing propagation is a longer
+process compared to changing an export format.
 
-"
-We plan to continue accepting pull requests and making new releases of
-Jaeger clients through the end of 2021. In January 2022 we will enter a code
-freeze period for 6 months, during which time we will no longer accept pull
-requests with new features, with the exception of security-related fixes.
-After that we will archive the client library repositories and will no
-longer accept new changes.
-"
-
-At time of writing, Jan 2023, the client libraries have been archived 6
-months ago already.
+New deployments however are encouraged to use a W3C compliant propagator,
+and avoid the Jaeger propagator, which is now deprecated.
 
 #### Scope (Jaeger)
 
@@ -149,25 +132,26 @@ The following are deprecated and planned for removal:
 
 * the API header `opentelemetry/trace/propagation/jaeger.h`, including:
   * the C++ class `JaegerPropagator`
-* all the code located under `exporters/jaeger/`, including:
-  * the jaeger exporter C++ class (`JaegerExporter`)
-  * the related factory (`JaegerExporterFactory`)
-  * the related options (`JaegerExporterOptions`)
-* the jaeger exporter library(`opentelemetry_exporter_jaeger_trace`)
-* the jaeger build options in CMake (`WITH_JAEGER`)
-* the dependency on thrift
 
 #### Mitigation (Jaeger)
 
-Jaeger supports natively the OTLP protocol, starting with jaeger 1.35.
+Use a W3C compliant propagator instead.
 
-An application instrumented with opentelemetry needs to change how the SDK
-and exporter are configured to replace the Jaeger exporter with the OTLP
-exporter (both OTLP HTTP and OTLP GRPC are supported).
+That is, use class HttpTraceContext and "traceparent" tags.
+
+Do not use class JaegerPropagator and "uber-trace-id" tags.
 
 #### Planned removal (Jaeger)
 
-* Date: July, 2023
+No date set yet for the Jaeger Propagator.
+
+## [opentelemetry-cpp SDK]
+
+N/A
+
+## [opentelemetry-cpp Exporter]
+
+N/A
 
 ## [Documentation]
 

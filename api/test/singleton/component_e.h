@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #if defined(_MSC_VER)
-// component_e is a DDL
+// component_e is a DLL
 
 #  ifdef BUILD_COMPONENT_E
 __declspec(dllexport)

@@ -98,6 +98,11 @@ if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
 endif()
 
+if(WITH_REMOVE_METER_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_REMOVE_METER_PREVIEW)
+endif()
+
 # A better place should be in sdk, not api
 if(WITH_OTLP_HTTP_SSL_PREVIEW)
   target_compile_definitions(opentelemetry_api
@@ -111,6 +116,11 @@ if(WITH_OTLP_HTTP_SSL_PREVIEW)
     target_compile_definitions(opentelemetry_api
                                INTERFACE ENABLE_HTTP_SSL_TLS_PREVIEW)
   endif()
+endif()
+
+if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW)
 endif()
 
 if(WITH_METRICS_EXEMPLAR_PREVIEW)

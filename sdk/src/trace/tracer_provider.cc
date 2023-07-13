@@ -16,8 +16,8 @@ namespace trace
 namespace resource  = opentelemetry::sdk::resource;
 namespace trace_api = opentelemetry::trace;
 
-TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
-    : context_{context}
+TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context) noexcept
+    : context_(std::move(context))
 {
   OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
 }
