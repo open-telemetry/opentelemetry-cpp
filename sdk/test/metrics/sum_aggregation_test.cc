@@ -140,7 +140,7 @@ TEST(UpDownCounterToSum, Double)
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
   mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 
-  auto h = m->CreateDoubleUpDownCounter(instrument_name, instrument_desc, instrument_desc);
+  auto h = m->CreateDoubleUpDownCounter(instrument_name, instrument_desc, instrument_unit);
 
   h->Add(5, {});
   h->Add(10, {});
