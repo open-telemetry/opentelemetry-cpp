@@ -77,7 +77,8 @@ if(BUILD_TESTING)
 endif()
 
 if(WITH_LOGS_PREVIEW)
-  add_library(opentelemetry_exporter_ostream_logs src/log_record_exporter.cc src/log_record_exporter_factory.cc)
+  add_library(opentelemetry_exporter_ostream_logs
+              src/log_record_exporter.cc src/log_record_exporter_factory.cc)
   set_target_properties(opentelemetry_exporter_ostream_logs
                         PROPERTIES EXPORT_NAME ostream_log_record_exporter)
   set_target_version(opentelemetry_exporter_ostream_logs)
@@ -96,8 +97,9 @@ if(WITH_LOGS_PREVIEW)
       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     install(
-      FILES "include/opentelemetry/exporters/ostream/log_record_exporter.h"
-      "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h"
+      FILES
+        "include/opentelemetry/exporters/ostream/log_record_exporter.h"
+        "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h"
       DESTINATION include/opentelemetry/exporters/ostream)
   endif()
 
