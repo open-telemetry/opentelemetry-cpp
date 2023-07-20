@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+Breaking changes:
+
+* [SDK] Add unit to Instrument selection criteria
+  [#2236](https://github.com/open-telemetry/opentelemetry-cpp/pull/2236)
+  * The `View` constructor and `ViewFactory::Create` method now takes a
+   `unit` criteria as optional third argument.
+  * Please adjust SDK configuration code accordingly.
+
 ## [1.10.0] 2023-07-11
 
 * [REMOVAL] Remove the jaeger exporter
