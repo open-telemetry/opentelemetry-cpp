@@ -24,7 +24,6 @@ public:
       : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kPattern)},
         unit_filter_{PredicateFactory::GetPredicate(units, PredicateType::kExact)},
         instrument_type_{instrument_type}
-
   {}
 
   // Returns name filter predicate. This shouldn't be deleted
