@@ -214,12 +214,6 @@ set(OTELCPP_PROTO_PATH
     CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
-  if(BUILD_TESTING)
-    if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
-    endif()
-  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 endif(WIN32)
 

@@ -33,7 +33,7 @@ class SimpleLogRecordProcessor : public LogRecordProcessor
 
 public:
   explicit SimpleLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter);
-  ~SimpleLogRecordProcessor() override = default;
+  ~SimpleLogRecordProcessor() override;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 

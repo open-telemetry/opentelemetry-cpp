@@ -78,7 +78,10 @@ TEST(Histogram, Double)
 TEST(Histogram, DoubleCustomBuckets)
 {
   MeterProvider mp;
-  auto m = mp.GetMeter("meter1", "version1", "schema1");
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
 
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
@@ -87,13 +90,13 @@ TEST(Histogram, DoubleCustomBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {10, 20, 30, 40};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", instrument_unit, AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kHistogram, "histogram1")};
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
   mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 
-  auto h = m->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
+  auto h = m->CreateDoubleHistogram(instrument_name, instrument_desc, instrument_unit);
 
   h->Record(5, {});
   h->Record(10, {});
@@ -190,7 +193,10 @@ TEST(Histogram, UInt64)
 TEST(Histogram, UInt64CustomBuckets)
 {
   MeterProvider mp;
-  auto m = mp.GetMeter("meter1", "version1", "schema1");
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
+  std::string instrument_unit = "ms";
 
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
@@ -199,13 +205,13 @@ TEST(Histogram, UInt64CustomBuckets)
   std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
   config->boundaries_ = {10, 20, 30, 40};
   std::unique_ptr<View> view{
-      new View("view1", "view1_description", AggregationType::kHistogram, config)};
+      new View("view1", "view1_description", "ms", AggregationType::kHistogram, config)};
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kHistogram, "histogram1")};
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
   mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 
-  auto h = m->CreateUInt64Histogram("histogram1", "histogram1_description", "histogram1_unit");
+  auto h = m->CreateUInt64Histogram(instrument_name, instrument_desc, instrument_unit);
 
   h->Record(5, {});
   h->Record(10, {});

@@ -23,6 +23,8 @@ SimpleLogRecordProcessor::SimpleLogRecordProcessor(std::unique_ptr<LogRecordExpo
     : exporter_(std::move(exporter)), is_shutdown_(false)
 {}
 
+SimpleLogRecordProcessor::~SimpleLogRecordProcessor() {}
+
 std::unique_ptr<Recordable> SimpleLogRecordProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();

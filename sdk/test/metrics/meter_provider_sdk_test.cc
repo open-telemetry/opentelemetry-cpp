@@ -49,7 +49,7 @@ TEST(MeterProvider, GetMeter)
 
   std::unique_ptr<View> view{std::unique_ptr<View>()};
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kCounter, "instru1")};
+      new InstrumentSelector(InstrumentType::kCounter, "instru1", "unit1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
 
   mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
