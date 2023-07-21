@@ -99,6 +99,7 @@ private:
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor)
   {
     return selector->GetNameFilter()->Match(instrument_descriptor.name_) &&
+           selector->GetUnitFilter()->Match(instrument_descriptor.unit_) &&
            (selector->GetInstrumentType() == instrument_descriptor.type_);
   }
 };

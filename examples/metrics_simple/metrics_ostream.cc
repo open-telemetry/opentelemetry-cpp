@@ -53,14 +53,15 @@ void InitMetrics(const std::string &name)
 
   // counter view
   std::string counter_name = name + "_counter";
+  std::string unit         = "counter-unit";
 
   auto instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
-      metrics_sdk::InstrumentType::kCounter, counter_name);
+      metrics_sdk::InstrumentType::kCounter, counter_name, unit);
 
   auto meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto sum_view =
-      metrics_sdk::ViewFactory::Create(name, "description", metrics_sdk::AggregationType::kSum);
+  auto sum_view = metrics_sdk::ViewFactory::Create(name, "description", unit,
+                                                   metrics_sdk::AggregationType::kSum);
 
   p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
@@ -68,11 +69,11 @@ void InitMetrics(const std::string &name)
   std::string observable_counter_name = name + "_observable_counter";
 
   auto observable_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
-      metrics_sdk::InstrumentType::kObservableCounter, observable_counter_name);
+      metrics_sdk::InstrumentType::kObservableCounter, observable_counter_name, unit);
 
   auto observable_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
-  auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description",
+  auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description", unit,
                                                               metrics_sdk::AggregationType::kSum);
 
   p->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
@@ -80,9 +81,10 @@ void InitMetrics(const std::string &name)
 
   // histogram view
   std::string histogram_name = name + "_histogram";
+  unit                       = "histogram-unit";
 
   auto histogram_instrument_selector = metrics_sdk::InstrumentSelectorFactory::Create(
-      metrics_sdk::InstrumentType::kHistogram, histogram_name);
+      metrics_sdk::InstrumentType::kHistogram, histogram_name, unit);
 
   auto histogram_meter_selector = metrics_sdk::MeterSelectorFactory::Create(name, version, schema);
 
@@ -96,7 +98,7 @@ void InitMetrics(const std::string &name)
       std::move(histogram_aggregation_config));
 
   auto histogram_view = metrics_sdk::ViewFactory::Create(
-      name, "description", metrics_sdk::AggregationType::kHistogram, aggregation_config);
+      name, "description", unit, metrics_sdk::AggregationType::kHistogram, aggregation_config);
 
   p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
              std::move(histogram_view));
