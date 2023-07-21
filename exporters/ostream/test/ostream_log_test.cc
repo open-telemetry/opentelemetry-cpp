@@ -4,6 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#  include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -505,6 +506,13 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
     }
     ASSERT_NE(result, std::string::npos);
   }
+}
+
+// Test using the factory to create the ostream exporter
+TEST(OStreamLogRecordExporter, Factory)
+{
+  auto exporter = OStreamLogRecordExporterFactory::Create();
+  ASSERT_NE(exporter, nullptr);
 }
 
 }  // namespace logs
