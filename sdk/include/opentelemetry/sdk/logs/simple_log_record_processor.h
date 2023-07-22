@@ -53,7 +53,7 @@ private:
   // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
   // The atomic boolean to ensure the ShutDown() function is only called once
-  std::atomic<bool> is_shutdown_;
+  std::atomic<bool> is_shutdown_{false};
 };
 }  // namespace logs
 }  // namespace sdk
