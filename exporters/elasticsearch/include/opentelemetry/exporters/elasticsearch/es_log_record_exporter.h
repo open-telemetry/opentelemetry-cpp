@@ -125,8 +125,8 @@ private:
 #  ifdef ENABLE_ASYNC_EXPORT
   struct SynchronizationData
   {
-    std::atomic<std::size_t> session_counter_;
-    std::atomic<std::size_t> finished_session_counter_;
+    std::atomic<std::size_t> session_counter_{0};
+    std::atomic<std::size_t> finished_session_counter_{0};
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
     std::recursive_mutex force_flush_m;
