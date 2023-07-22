@@ -30,12 +30,7 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
-{
-  synchronization_data_->is_force_wakeup_background_worker.store(false);
-  synchronization_data_->is_force_flush_pending.store(false);
-  synchronization_data_->is_force_flush_notified.store(false);
-  synchronization_data_->is_shutdown.store(false);
-}
+{}
 
 BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter,
                                                  const BatchLogRecordProcessorOptions &options)
@@ -46,13 +41,7 @@ BatchLogRecordProcessor::BatchLogRecordProcessor(std::unique_ptr<LogRecordExport
       buffer_(options.max_queue_size),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchLogRecordProcessor::DoBackgroundWork, this)
-{
-  synchronization_data_->is_force_wakeup_background_worker.store(false);
-  synchronization_data_->is_force_flush_pending.store(false);
-  synchronization_data_->is_force_flush_notified.store(false);
-  synchronization_data_->force_flush_timeout_us.store(0);
-  synchronization_data_->is_shutdown.store(false);
-}
+{}
 
 std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
 {
