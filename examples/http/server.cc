@@ -46,7 +46,7 @@ public:
                                  {SemanticConventions::kHttpScheme, "http"},
                                  {SemanticConventions::kHttpRequestContentLength,
                                   static_cast<uint64_t>(request.content.length())},
-                                 {SemanticConventions::kHttpClientIp, request.client}},
+                                 {SemanticConventions::kClientAddress, request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
