@@ -99,7 +99,7 @@ if(OPENTELEMETRY_INSTALL)
     FILES
       "include/opentelemetry/exporters/ostream/log_record_exporter.h"
       "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h"
-      DESTINATION include/opentelemetry/exporters/ostream)
+    DESTINATION include/opentelemetry/exporters/ostream)
 endif()
 
 if(BUILD_TESTING)
