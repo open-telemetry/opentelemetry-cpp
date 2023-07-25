@@ -99,8 +99,8 @@ class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRe
 protected:
   HTTP_SERVER_NS::HttpServer server_;
   std::string server_address_;
-  std::atomic<bool> is_setup_;
-  std::atomic<bool> is_running_;
+  std::atomic<bool> is_setup_{false};
+  std::atomic<bool> is_running_{false};
   std::vector<HTTP_SERVER_NS::HttpRequest> received_requests_;
   std::mutex mtx_requests;
   std::condition_variable cv_got_events;

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #include <memory>
@@ -21,8 +22,8 @@ struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
 {
 
   // Preferred Aggregation Temporality
-  sdk::metrics::AggregationTemporality aggregation_temporality =
-      sdk::metrics::AggregationTemporality::kCumulative;
+  PreferredAggregationTemporality aggregation_temporality =
+      PreferredAggregationTemporality::kCumulative;
 };
 
 }  // namespace otlp

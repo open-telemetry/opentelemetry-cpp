@@ -89,6 +89,7 @@ if [[ "$1" == "cmake.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
@@ -102,6 +103,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
@@ -125,6 +127,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
@@ -171,6 +174,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
@@ -185,6 +189,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -197,6 +202,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug \
+        -DCMAKE_CXX_STANDARD=14 \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
@@ -207,9 +213,9 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=20 \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DCMAKE_CXX_STANDARD=20 \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -219,6 +225,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=20 \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -234,8 +241,8 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   export BUILD_ROOT="${BUILD_DIR}"
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_CXX_STANDARD=11 \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make -j $(nproc)
   make test
@@ -261,6 +268,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
@@ -275,6 +283,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DBUILD_SHARED_LIBS=ON \
@@ -289,6 +298,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -303,6 +313,7 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -429,6 +440,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=14 \
         -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
         "${SRC_DIR}"
   make

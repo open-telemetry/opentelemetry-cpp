@@ -25,8 +25,8 @@ jobs:
           key: bazel_benchmark
       - name: setup
         run: |
-          sudo ./ci/setup_cmake.sh
-          sudo ./ci/setup_ci_environment.sh
+          sudo -E ./ci/setup_cmake.sh
+          sudo -E ./ci/setup_ci_environment.sh
       - name: Run benchmark
         id: run_benchmarks
         run: |

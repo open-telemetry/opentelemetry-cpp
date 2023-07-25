@@ -10,7 +10,15 @@
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/version/version.h"
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#  include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/read_write_log_record.h"
+#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#  include "opentelemetry/sdk/version/version.h"
 
 #include <array>
 #include <iostream>
@@ -503,6 +511,13 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
     }
     ASSERT_NE(result, std::string::npos);
   }
+}
+
+// Test using the factory to create the ostream exporter
+TEST(OStreamLogRecordExporter, Factory)
+{
+  auto exporter = OStreamLogRecordExporterFactory::Create();
+  ASSERT_NE(exporter, nullptr);
 }
 
 }  // namespace logs

@@ -76,7 +76,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -109,7 +108,6 @@ jobs:
       env:
         CC: /usr/bin/gcc-12
         CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -142,7 +140,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -175,7 +172,6 @@ jobs:
       env:
         CC: /usr/bin/clang-14
         CXX: /usr/bin/clang++-14
-        GOOGLETEST_VERSION: 1.12.1
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -241,8 +237,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
         sudo ./ci/install_abseil.sh
@@ -257,8 +253,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
 
@@ -281,8 +277,9 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: "1.10.0"
-      run: sudo -E ./ci/setup_cmake.sh
+        GOOGLETEST_VERSION: 1.10.0
+      run: |
+        sudo -E ./ci/setup_cmake.sh
     - name: run tests
       env:
         CC: /usr/bin/gcc-4.8
@@ -308,7 +305,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: "1.10.0"
+        GOOGLETEST_VERSION: 1.10.0
       run: |
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_grpc.sh -v 4.8
@@ -327,7 +324,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CMAKE_VERSION: "3.20.6"
+        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -348,7 +345,7 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: "3.20.6"
+        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -374,8 +371,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -390,8 +387,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
@@ -406,8 +403,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
-        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh -T

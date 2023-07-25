@@ -32,7 +32,7 @@ class SimpleLogRecordProcessor : public LogRecordProcessor
 
 public:
   explicit SimpleLogRecordProcessor(std::unique_ptr<LogRecordExporter> &&exporter);
-  ~SimpleLogRecordProcessor() override = default;
+  ~SimpleLogRecordProcessor() override;
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
@@ -52,7 +52,7 @@ private:
   // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
   // The atomic boolean to ensure the ShutDown() function is only called once
-  std::atomic<bool> is_shutdown_;
+  std::atomic<bool> is_shutdown_{false};
 };
 }  // namespace logs
 }  // namespace sdk

@@ -20,6 +20,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
+        "include/opentelemetry/exporters/otlp/otlp_preferred_temporality.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
