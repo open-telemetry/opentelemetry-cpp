@@ -134,10 +134,12 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
 
   for (int i = 0; i < kArraySize; i++)
   {
-    EXPECT_EQ(rec.log_record().attributes(0).value().array_value().values(i).bool_value(), bool_span[i]);
+    EXPECT_EQ(rec.log_record().attributes(0).value().array_value().values(i).bool_value(),
+              bool_span[i]);
     EXPECT_EQ(rec.log_record().attributes(1).value().array_value().values(i).double_value(),
               double_span[i]);
-    EXPECT_EQ(rec.log_record().attributes(2).value().array_value().values(i).string_value(), str_span[i]);
+    EXPECT_EQ(rec.log_record().attributes(2).value().array_value().values(i).string_value(),
+              str_span[i]);
   }
 }
 
