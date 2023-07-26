@@ -16,7 +16,7 @@ namespace sdk
 {
 
 // [[maybe_used]] is not supported before C++17
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
+#if defined(_MSVC_LANG) && _MSVC_LANG < 201703L
 
 #pragma warning(push)
 #pragma warning(disable: 4505) // warning C4505: 'function': unreferenced local function has been removed
@@ -40,7 +40,7 @@ OPENTELEMETRY_MAYBE_UNUSED static const opentelemetry::common::KeyValueIterableV
   return kEmptyAttributes;
 }
 
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
+#if defined(_MSVC_LANG) && _MSVC_LANG < 201703L
 
 #pragma warning(pop)
 
