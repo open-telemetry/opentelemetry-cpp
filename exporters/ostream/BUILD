@@ -7,10 +7,12 @@ cc_library(
     name = "ostream_log_record_exporter",
     srcs = [
         "src/log_record_exporter.cc",
+        "src/log_record_exporter_factory.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/ostream/common_utils.h",
         "include/opentelemetry/exporters/ostream/log_record_exporter.h",
+        "include/opentelemetry/exporters/ostream/log_record_exporter_factory.h",
     ],
     strip_include_prefix = "include",
     tags = ["ostream"],

@@ -66,7 +66,7 @@ namespace
 {
 
 /**
- * This class handles the response message from the Elasticsearch request
+ * This class handles the response message from the HTTP request
  */
 class ResponseHandler : public http_client::EventHandler
 {
@@ -77,9 +77,7 @@ public:
   ResponseHandler(std::function<bool(opentelemetry::sdk::common::ExportResult)> &&callback,
                   bool console_debug = false)
       : result_callback_{std::move(callback)}, console_debug_{console_debug}
-  {
-    stopping_.store(false);
-  }
+  {}
 
   std::string BuildResponseLogMessage(http_client::Response &response,
                                       const std::string &body) noexcept
@@ -358,7 +356,7 @@ private:
   const opentelemetry::ext::http::client::Session *session_ = nullptr;
 
   // Whether notify has been called
-  std::atomic<bool> stopping_;
+  std::atomic<bool> stopping_{false};
 
   // A string to store the response body
   std::string body_ = "";
