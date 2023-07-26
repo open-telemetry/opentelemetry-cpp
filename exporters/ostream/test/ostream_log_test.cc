@@ -23,6 +23,8 @@
 #include <array>
 #include <iostream>
 
+#include <gtest/gtest.h>
+
 namespace sdklogs      = opentelemetry::sdk::logs;
 namespace logs_api     = opentelemetry::logs;
 namespace nostd        = opentelemetry::nostd;

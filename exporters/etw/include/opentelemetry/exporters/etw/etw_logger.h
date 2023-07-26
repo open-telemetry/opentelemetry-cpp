@@ -26,6 +26,8 @@
 
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -84,6 +86,8 @@ public:
   {
     attributes_map_[static_cast<std::string>(key)] = value;
   }
+
+  void SetEventId(int64_t /* id */, nostd::string_view /* name */) noexcept override {}
 
   const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
       const noexcept
