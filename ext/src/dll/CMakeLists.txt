@@ -22,7 +22,9 @@ if(WITH_OTLP_HTTP)
                         PRIVATE opentelemetry_exporter_otlp_http)
 endif()
 
-target_link_libraries(opentelemetry_cpp PRIVATE opentelemetry_logs)
+target_link_libraries(
+  opentelemetry_cpp PRIVATE opentelemetry_logs
+                            opentelemetry_exporter_ostream_logs)
 
 if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp

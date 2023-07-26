@@ -7,6 +7,7 @@
 #include <opentelemetry/trace/provider.h>
 
 #include <opentelemetry/logs/logger_provider.h>
+#include <opentelemetry/logs/provider.h>
 
 extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
