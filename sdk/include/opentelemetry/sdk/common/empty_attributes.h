@@ -15,15 +15,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 
-// [[maybe_used]] is not supported before C++17
-#if defined(_MSVC_LANG) && _MSVC_LANG < 201703L
-
-#  pragma warning(push)
-#  pragma warning( \
-      disable : 4505)  // warning C4505: 'function': unreferenced local function has been removed
-
-#endif
-
 /**
  * Maintain a static empty array of pairs that represents empty (default) attributes.
  * This helps to avoid constructing a new empty container every time a call is made
@@ -40,12 +31,6 @@ OPENTELEMETRY_MAYBE_UNUSED static const opentelemetry::common::KeyValueIterableV
 
   return kEmptyAttributes;
 }
-
-#if defined(_MSVC_LANG) && _MSVC_LANG < 201703L
-
-#  pragma warning(pop)
-
-#endif
 
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

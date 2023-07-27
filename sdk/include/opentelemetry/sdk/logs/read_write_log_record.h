@@ -14,7 +14,6 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
