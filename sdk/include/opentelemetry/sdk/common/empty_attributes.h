@@ -20,7 +20,7 @@ namespace sdk
  * This helps to avoid constructing a new empty container every time a call is made
  * with default attributes.
  */
-OPENTELEMETRY_MAYBE_UNUSED static const opentelemetry::common::KeyValueIterableView<
+static const opentelemetry::common::KeyValueIterableView<
     std::array<std::pair<std::string, int>, 0>>
     &GetEmptyAttributes() noexcept
 {
