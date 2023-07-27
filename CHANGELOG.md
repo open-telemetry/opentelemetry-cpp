@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Mark logs signal as stable API/SDK
+  [#2229](https://github.com/open-telemetry/opentelemetry-cpp/pull/2229)
+
 Breaking changes:
 
 * [SDK] Add unit to Instrument selection criteria
