@@ -57,7 +57,7 @@ tags
 .cache/clangd/*
 
 # Temporary dir used when generating semconv
-./buildscripts/semantic-convention/opentelemetry-specification
+buildscripts/semantic-convention/tmp-semconv/
 
 # Generated cert keys in functional tests
 functional/cert/ca.csr
