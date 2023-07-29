@@ -14,4 +14,9 @@ foreach(testname atomic_unique_ptr_fuzz)
   link_fuzztest(${testname})
   target_link_libraries(${testname} PRIVATE opentelemetry_common
                                             opentelemetry_trace)
+  gtest_add_tests(
+    TARGET ${testname}
+    TEST_PREFIX trace.
+    TEST_LIST ${testname})
+
 endforeach()

@@ -199,9 +199,6 @@ option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
 
 option(WITH_FUZZ "Whether to build fuzz targets" OFF)
 
-if(WITH_FUZZ)
-  add_subdirectory(third_party/fuzztest)
-endif()
 #
 # This option is experimental, subject to change in the spec:
 #
@@ -550,6 +547,10 @@ if(BUILD_TESTING)
     # Benchmark respects the CMAKE_PREFIX_PATH
     find_package(benchmark CONFIG REQUIRED)
   endif()
+endif()
+
+if(WITH_FUZZ)
+  add_subdirectory(third_party/fuzztest)
 endif()
 
 include(CMakePackageConfigHelpers)

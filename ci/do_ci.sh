@@ -204,6 +204,31 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   make -j $(nproc)
   make test
   exit 0
+elif [[ "$1" == "cmake.fuzz.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=RelWithDebug \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DWITH_FUZZ=ON \
+        -DFUZZTEST_FUZZING_MODE=ON \
+        -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE \
+        -DWITH_PROMETHEUS=OFF \
+        -DWITH_EXAMPLES=OFF \
+        -DWITH_ZIPKIN=OFF \
+        -DBUILD_TESTING=ON \
+        -DWITH_BENCHMARK=OFF \
+        -DWITH_OTLP_HTTP=OFF \
+        -DWITH_OTLP_GRPC=OFF \
+        -DWITH_LOGS_PREVIEW=OFF \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  FUZZ_DURATION=3s
+  find "${BUILD_DIR}" -type f -name "*fuzz*" -executable |
+  while read -r test_executable; do
+      "$test_executable" --fuzz_for="$FUZZ_DURATION"
+  done
+  exit 0
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
