@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <memory>
+#include <chrono>
+#include <memory>
 
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -68,4 +67,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -14,9 +14,7 @@ set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
 target_link_libraries(
   opentelemetry_exporter_etw INTERFACE opentelemetry_api opentelemetry_trace
                                        nlohmann_json::nlohmann_json)
-if(WITH_LOGS_PREVIEW)
-  target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs)
-endif()
+target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs)
 if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()

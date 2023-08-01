@@ -1,22 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <array>
+#include <unordered_map>
 
-#  include <array>
-#  include <unordered_map>
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
-
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
@@ -191,5 +189,3 @@ TEST(LoggerProviderSDK, ForceFlush)
 
   EXPECT_TRUE(lp.ForceFlush());
 }
-
-#endif
