@@ -2,15 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/ostream/log_record_exporter.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
-#include "opentelemetry/sdk/logs/simple_log_record_processor.h"
-#include "opentelemetry/sdk/version/version.h"
-
-#include "opentelemetry/exporters/ostream/log_record_exporter.h"
 #include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/span.h"
