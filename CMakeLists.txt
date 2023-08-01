@@ -643,8 +643,6 @@ if(NOT WITH_API_ONLY)
   endif()
 endif()
 
-include("${PROJECT_SOURCE_DIR}/cmake/patch-imported-config.cmake")
-
 include(cmake/opentelemetry-build-external-component.cmake)
 
 if(OPENTELEMETRY_INSTALL)
