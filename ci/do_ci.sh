@@ -69,7 +69,7 @@ fi
 echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
-BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
 BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
@@ -94,7 +94,6 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make -j $(nproc)
@@ -115,7 +114,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
@@ -140,7 +138,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
@@ -165,7 +162,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DBUILD_W3CTRACECONTEXT_TEST=ON \
         -DWITH_ELASTICSEARCH=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
@@ -183,7 +179,6 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
@@ -196,7 +191,6 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=14 \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_ABSEIL=ON \
@@ -233,7 +227,6 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=20 \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=ON \

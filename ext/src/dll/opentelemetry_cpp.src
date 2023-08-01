@@ -22,7 +22,6 @@ EXPORTS
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanExporter,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpHttpExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpHttpExporterOptions const & __ptr64)
     ?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpExporterOptions@2345@@Z
 #endif  // defined(WITH_OTLP_HTTP)
-#if defined(ENABLE_LOGS_PREVIEW)
     // public: static class std::unique_ptr<class opentelemetry::v1::logs::LoggerProvider,class std::default_delete<class opentelemetry::v1::logs::LoggerProvider> > __cdecl opentelemetry::v1::sdk::logs::LoggerProviderFactory::Create(class std::unique_ptr<class opentelemetry::v1::sdk::logs::LogRecordProcessor,struct std::default_delete<class opentelemetry::v1::sdk::logs::LogRecordProcessor> > && __ptr64)
 #if defined(_WIN64)
     ?Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLoggerProvider@logs@v1@opentelemetry@@U?$default_delete@VLoggerProvider@logs@v1@opentelemetry@@@std@@@std@@$$QEAV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@7@@Z
@@ -45,15 +44,29 @@ EXPORTS
 #if defined(WIN32)
     ?Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$vector@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@V?$allocator@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@@2@@7@@Z
 #else
-    ?Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@$$QAV?$vector@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@V?$allocator@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@@2@@7@@Z
+    ?Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@$$QEAV?$vector@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@V?$allocator@V?$unique_ptr@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordProcessor@logs@sdk@v1@opentelemetry@@@std@@@std@@@2@@7@@Z
 #endif
+    ?ForceFlush@TracerProvider@trace@sdk@v1@opentelemetry@@QEAA_NV?$duration@_JU?$ratio@$00$0PECEA@@std@@@chrono@std@@@Z
+    ?ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry@@QEAA_NV?$duration@_JU?$ratio@$00$0PECEA@@std@@@chrono@std@@@Z
+    ??0OStreamLogRecordExporter@logs@exporter@v1@opentelemetry@@QEAA@AEAV?$basic_ostream@DU?$char_traits@D@std@@@std@@@Z
+#if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
+    ?GetOtlpDefaultTracesTimeout@otlp@exporter@v1@opentelemetry@@YA?AV?$duration@_JU?$ratio@$00$0JIJGIA@@std@@@chrono@std@@XZ
+    ?GetOtlpDefaultTracesHeaders@otlp@exporter@v1@opentelemetry@@YA?AV?$multimap@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@Ucmp_ic@otlp@exporter@v1@opentelemetry@@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@@std@@@2@@std@@XZ
+    ?GetOtlpDefaultLogsTimeout@otlp@exporter@v1@opentelemetry@@YA?AV?$duration@_JU?$ratio@$00$0JIJGIA@@std@@@chrono@std@@XZ
+    ?GetOtlpDefaultLogsHeaders@otlp@exporter@v1@opentelemetry@@YA?AV?$multimap@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@Ucmp_ic@otlp@exporter@v1@opentelemetry@@V?$allocator@U?$pair@$$CBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V12@@std@@@2@@std@@XZ
+#endif  // defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
 #if defined(WITH_OTLP_GRPC)
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::logs::LogRecordExporter,struct std::default_delete<class opentelemetry::v1::sdk::logs::LogRecordExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpGrpcLogRecordExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpGrpcExporterOptions const & __ptr64)
     ?Create@OtlpGrpcLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
+    ?GetOtlpDefaultGrpcTracesEndpoint@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
+    ?GetOtlpDefaultGrpcTracesIsInsecure@otlp@exporter@v1@opentelemetry@@YA_NXZ
+    ?GetOtlpDefaultTracesSslCertificatePath@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
+    ?GetOtlpDefaultTracesSslCertificateString@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
 #endif  // defined(WITH_OTLP_GRPC)
 #if defined(WITH_OTLP_HTTP)
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::logs::LogRecordExporter,struct std::default_delete<class opentelemetry::v1::sdk::logs::LogRecordExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpHttpLogRecordExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpHttpLogRecordExporterOptions const & __ptr64)
     ?Create@OtlpHttpLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpLogRecordExporterOptions@2345@@Z
-#endif  //  defined(WITH_OTLP_HTTP)
-#endif  //  defined(ENABLE_LOGS_PREVIEW)
+    ?GetOtlpDefaultHttpTracesEndpoint@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
+    ?GetOtlpDefaultHttpLogsEndpoint@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
+#endif  // defined(WITH_OTLP_HTTP)
 // clang-format on

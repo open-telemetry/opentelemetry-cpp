@@ -72,7 +72,6 @@ void OtlpRecordableUtils::PopulateRequest(
   }
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 void OtlpRecordableUtils::PopulateRequest(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
@@ -137,7 +136,6 @@ void OtlpRecordableUtils::PopulateRequest(
     }
   }
 }
-#endif
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

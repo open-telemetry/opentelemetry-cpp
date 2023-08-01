@@ -1,16 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
+#include <chrono>
 
-#  include <chrono>
-
-#  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -134,30 +132,14 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
   nostd::span<const nostd::string_view> str_span(str_arr);
   rec.SetAttribute("str_arr_attr", str_span);
 
-  const opentelemetry::proto::common::v1::ArrayValue *bool_values   = nullptr;
-  const opentelemetry::proto::common::v1::ArrayValue *double_values = nullptr;
-  const opentelemetry::proto::common::v1::ArrayValue *string_values = nullptr;
-  for (int i = 0; i < rec.log_record().attributes_size(); i++)
-  {
-    if (rec.log_record().attributes(i).value().array_value().values(0).has_bool_value())
-    {
-      bool_values = &rec.log_record().attributes(i).value().array_value();
-    }
-    else if (rec.log_record().attributes(i).value().array_value().values(0).has_double_value())
-    {
-      double_values = &rec.log_record().attributes(i).value().array_value();
-    }
-    else if (rec.log_record().attributes(i).value().array_value().values(0).has_string_value())
-    {
-      string_values = &rec.log_record().attributes(i).value().array_value();
-    }
-  }
-
   for (int i = 0; i < kArraySize; i++)
   {
-    EXPECT_EQ(bool_values->values(i).bool_value(), bool_span[i]);
-    EXPECT_EQ(double_values->values(i).double_value(), double_span[i]);
-    EXPECT_EQ(string_values->values(i).string_value(), str_span[i]);
+    EXPECT_EQ(rec.log_record().attributes(0).value().array_value().values(i).bool_value(),
+              bool_span[i]);
+    EXPECT_EQ(rec.log_record().attributes(1).value().array_value().values(i).double_value(),
+              double_span[i]);
+    EXPECT_EQ(rec.log_record().attributes(2).value().array_value().values(i).string_value(),
+              str_span[i]);
   }
 }
 
@@ -220,5 +202,3 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

@@ -2,16 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_http.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 
-#  include <chrono>
-#  include <cstddef>
-#  include <memory>
-#  include <string>
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -49,16 +48,16 @@ struct OtlpHttpLogRecordExporterOptions
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultLogsHeaders();
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
   std::size_t max_concurrent_requests = 64;
 
   // Requests per connections
   std::size_t max_requests_per_connection = 8;
-#  endif
+#endif
 
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   bool ssl_insecure_skip_verify{false};
 
   std::string ssl_ca_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
@@ -69,9 +68,9 @@ struct OtlpHttpLogRecordExporterOptions
 
   std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
   std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
-#  endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
-#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   /** Minimum TLS version. */
   std::string ssl_min_tls = GetOtlpDefaultLogsSslTlsMinVersion();
   /** Maximum TLS version. */
@@ -80,10 +79,9 @@ struct OtlpHttpLogRecordExporterOptions
   std::string ssl_cipher = GetOtlpDefaultLogsSslTlsCipher();
   /** TLS cipher suite. */
   std::string ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
-#  endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

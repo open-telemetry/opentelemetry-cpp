@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -91,4 +90,3 @@ public:
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif
