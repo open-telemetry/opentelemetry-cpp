@@ -385,8 +385,8 @@ jobs:
         sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
-  cmake_modern_protobuf_grpc_test:
-    name: CMake test (with modern protobuf and grpc)
+  cmake_modern_protobuf_grpc_with_abseil_test:
+    name: CMake test (with modern protobuf,grpc and abseil)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -405,6 +405,30 @@ jobs:
     - name: run otlp exporter tests
       env:
         WITH_ABSEIL: 'ON'
+        CXX_STANDARD: '14'
+      run: |
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_modern_protobuf_grpc_without_abseil_test:
+    name: CMake test (with modern protobuf and grpc, without abseil)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        PROTOBUF_VERSION: '23.3'
+        ABSEIL_CPP_VERSION: '20230125.3'
+        CXX_STANDARD: '14'
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run otlp exporter tests
+      env:
         CXX_STANDARD: '14'
       run: |
         sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
