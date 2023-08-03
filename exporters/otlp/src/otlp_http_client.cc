@@ -28,6 +28,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstring>
 #include <fstream>
 #include <mutex>
 #include <sstream>
@@ -58,14 +59,14 @@ static constexpr Base64EscapeChars kBase64CharsBasic = {
     'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
 static int Base64EscapeInternal(unsigned char *dest,
-                                size_t dlen,
-                                size_t *olen,
+                                std::size_t dlen,
+                                std::size_t *olen,
                                 const unsigned char *src,
-                                size_t slen,
+                                std::size_t slen,
                                 Base64EscapeChars &base64_enc_map,
                                 unsigned char padding_char)
 {
-  size_t i, n, nopadding;
+  std::size_t i, n, nopadding;
   int C1, C2, C3;
   unsigned char *p;
 
@@ -77,9 +78,9 @@ static int Base64EscapeInternal(unsigned char *dest,
 
   n = (slen + 2) / 3;
 
-  if (n > (BASE64_SIZE_T_MAX - 1) / 4)
+  if (n > (std::numeric_limits<std::size_t>::max() - 1) / 4)
   {
-    *olen = BASE64_SIZE_T_MAX;
+    *olen = std::numeric_limits<std::size_t>::max();
     return -1;
   }
 
@@ -138,7 +139,7 @@ static int Base64EscapeInternal(unsigned char *dest,
     }
   }
 
-  *olen = static_cast<size_t>(p - dest);
+  *olen = static_cast<std::size_t>(p - dest);
   *p    = 0;
 
   return (0);
@@ -146,11 +147,11 @@ static int Base64EscapeInternal(unsigned char *dest,
 
 static inline int Base64EscapeInternal(std::string &dest,
                                        const unsigned char *src,
-                                       size_t slen,
+                                       std::size_t slen,
                                        Base64EscapeChars &base64_enc_map,
                                        unsigned char padding_char)
 {
-  size_t olen = 0;
+  std::size_t olen = 0;
   Base64EscapeInternal(nullptr, 0, &olen, src, slen, base64_enc_map, padding_char);
   dest.resize(olen);
 
