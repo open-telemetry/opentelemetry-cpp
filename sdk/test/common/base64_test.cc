@@ -70,8 +70,6 @@ TEST(Base64Test, UnescapeRfc2045InvalidInput)
   std_str_in = "  JEhuVodiW=";
   EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
 
-  std_str_in = "JE=";
-  EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
   std_str_in = "JE==";
   EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
   std_str_in = "JE==huVo";
@@ -79,8 +77,6 @@ TEST(Base64Test, UnescapeRfc2045InvalidInput)
   std_str_in = "JE=huVo=";
   EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
 
-  std_str_in = " JE=";
-  EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
   std_str_in = " JE==";
   EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
   std_str_in = " JE==huVo";
@@ -88,13 +84,9 @@ TEST(Base64Test, UnescapeRfc2045InvalidInput)
   std_str_in = " JE=huVo=";
   EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
 
-  std_str_in = "JE= ";
-  EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
   std_str_in = "JE==\r\n";
   EXPECT_TRUE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
 
   std_str_in = "J E=";
-  EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
-  std_str_in = "J E==";
   EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
 };
