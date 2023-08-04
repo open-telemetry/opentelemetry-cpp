@@ -291,7 +291,7 @@ static int Base64UnescapeInternal(unsigned char *dst,
 // 2045.
 OPENTELEMETRY_EXPORT void Base64Escape(opentelemetry::nostd::string_view src, std::string *dest)
 {
-  if (nullptr == dest)
+  if (nullptr == dest || src.empty())
   {
     return;
   }
@@ -322,6 +322,11 @@ OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, 
 #if defined(HAVE_ABSEIL)
   return absl::Base64Unescape(absl::string_view{src.data(), src.size()}, dest);
 #else
+  if (src.empty())
+  {
+    return true;
+  }
+  
   std::size_t olen = 0;
 
   if (-2 == Base64UnescapeInternal(nullptr, 0, &olen,
@@ -329,11 +334,6 @@ OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, 
                                    kBase64UnescapeCharsBasic, '='))
   {
     return false;
-  }
-
-  if (src.empty())
-  {
-    return true;
   }
 
   dest->resize(olen);
