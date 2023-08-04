@@ -10,6 +10,7 @@
 #endif
 #include <cstring>
 #include <iostream>
+#include <limits>
 
 #if defined(HAVE_ABSEIL)
 #  include "absl/strings/escaping.h"
