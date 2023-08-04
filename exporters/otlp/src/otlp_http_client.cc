@@ -23,6 +23,7 @@
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
@@ -50,146 +51,6 @@ namespace otlp
 
 namespace
 {
-
-using Base64EscapeChars                              = const unsigned char[64];
-static constexpr Base64EscapeChars kBase64CharsBasic = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-    'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-    'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
-
-static int Base64EscapeInternal(unsigned char *dest,
-                                std::size_t dlen,
-                                std::size_t *olen,
-                                const unsigned char *src,
-                                std::size_t slen,
-                                Base64EscapeChars &base64_enc_map,
-                                unsigned char padding_char)
-{
-  std::size_t i, n, nopadding;
-  int C1, C2, C3;
-  unsigned char *p;
-
-  if (slen == 0)
-  {
-    *olen = 0;
-    return (0);
-  }
-
-  n = (slen + 2) / 3;
-
-  if (n > (std::numeric_limits<std::size_t>::max() - 1) / 4)
-  {
-    *olen = std::numeric_limits<std::size_t>::max();
-    return -1;
-  }
-
-  n *= 4;
-
-  // no padding
-  if (0 == padding_char)
-  {
-    nopadding = slen % 3;
-    if (0 != nopadding)
-    {
-      n -= 3 - nopadding;
-    }
-  }
-
-  if ((dlen < n + 1) || (nullptr == dest))
-  {
-    *olen = n + 1;
-    return -1;
-  }
-
-  n = (slen / 3) * 3;
-
-  for (i = 0, p = dest; i < n; i += 3)
-  {
-    C1 = *src++;
-    C2 = *src++;
-    C3 = *src++;
-
-    *p++ = base64_enc_map[(C1 >> 2) & 0x3F];
-    *p++ = base64_enc_map[(((C1 & 3) << 4) + (C2 >> 4)) & 0x3F];
-    *p++ = base64_enc_map[(((C2 & 15) << 2) + (C3 >> 6)) & 0x3F];
-    *p++ = base64_enc_map[C3 & 0x3F];
-  }
-
-  if (i < slen)
-  {
-    C1 = *src++;
-    C2 = ((i + 1) < slen) ? *src++ : 0;
-
-    *p++ = base64_enc_map[(C1 >> 2) & 0x3F];
-    *p++ = base64_enc_map[(((C1 & 3) << 4) + (C2 >> 4)) & 0x3F];
-
-    if ((i + 1) < slen)
-    {
-      *p++ = base64_enc_map[((C2 & 15) << 2) & 0x3F];
-    }
-    else if (padding_char)
-    {
-      *p++ = padding_char;
-    }
-
-    if (padding_char)
-    {
-      *p++ = padding_char;
-    }
-  }
-
-  *olen = static_cast<std::size_t>(p - dest);
-  *p    = 0;
-
-  return (0);
-}
-
-static inline int Base64EscapeInternal(std::string &dest,
-                                       const unsigned char *src,
-                                       std::size_t slen,
-                                       Base64EscapeChars &base64_enc_map,
-                                       unsigned char padding_char)
-{
-  std::size_t olen = 0;
-  Base64EscapeInternal(nullptr, 0, &olen, src, slen, base64_enc_map, padding_char);
-  dest.resize(olen);
-
-  if (nullptr == src || 0 == slen)
-  {
-    return 0;
-  }
-
-  int ret = Base64EscapeInternal(reinterpret_cast<unsigned char *>(&dest[0]), dest.size(), &olen,
-                                 src, slen, base64_enc_map, padding_char);
-#if defined(HAVE_GSL)
-  Expects(0 != ret || dest.size() == olen + 1);
-#else
-  assert(0 != ret || dest.size() == olen + 1);
-#endif
-  // pop back last zero
-  if (!dest.empty() && *dest.rbegin() == 0)
-  {
-    dest.resize(dest.size() - 1);
-  }
-  return ret;
-}
-
-// Base64Escape()
-//
-// Encodes a `src` string into a base64-encoded 'dest' string with padding
-// characters. This function conforms with RFC 4648 section 4 (base64) and RFC
-// 2045. See also CalculateBase64EscapedLen().
-static void Base64Escape(nostd::string_view src, std::string *dest)
-{
-  if (nullptr == dest)
-  {
-    return;
-  }
-
-  Base64EscapeInternal(*dest, reinterpret_cast<const unsigned char *>(src.data()), src.size(),
-                       kBase64CharsBasic, '=');
-}
 
 /**
  * This class handles the response message from the HTTP request
@@ -539,16 +400,12 @@ static std::string BytesMapping(const std::string &bytes,
       }
       else
       {
-        std::string base64_value;
-        Base64Escape(bytes, &base64_value);
-        return base64_value;
+        return opentelemetry::sdk::common::Base64Escape(bytes);
       }
     }
     case JsonBytesMappingKind::kBase64: {
       // Base64 is the default bytes mapping of protobuf
-      std::string base64_value;
-      Base64Escape(bytes, &base64_value);
-      return base64_value;
+      return opentelemetry::sdk::common::Base64Escape(bytes);
     }
     case JsonBytesMappingKind::kHex:
       return HexEncode(bytes);
