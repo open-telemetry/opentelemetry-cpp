@@ -8,6 +8,7 @@
 #else
 #  include <assert.h>
 #endif
+#include <cstring>
 #include <iostream>
 
 #if defined(HAVE_ABSEIL)
@@ -326,7 +327,7 @@ OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, 
   {
     return true;
   }
-  
+
   std::size_t olen = 0;
 
   if (-2 == Base64UnescapeInternal(nullptr, 0, &olen,
