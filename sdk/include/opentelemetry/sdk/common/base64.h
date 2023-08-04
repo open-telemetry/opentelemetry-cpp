@@ -28,7 +28,7 @@ OPENTELEMETRY_EXPORT std::string Base64Escape(opentelemetry::nostd::string_view 
 // `src` contains invalid characters, `dest` is cleared and returns `false`.
 // If padding is included (note that `Base64Escape()` does produce it), it must
 // be correct. In the padding, '=' are treated identically.
-OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, std::string* dest);
+OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, std::string *dest);
 
 }  // namespace common
 }  // namespace sdk
