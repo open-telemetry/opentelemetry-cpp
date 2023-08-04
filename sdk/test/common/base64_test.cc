@@ -25,7 +25,7 @@ TEST(Base64Test, EscapeRfc2045)
       reinterpret_cast<const char *>(base64_test_enc_rfc_2045), 88};
 
   EXPECT_EQ(encoded, expected);
-};
+}
 
 TEST(Base64Test, UnescapeRfc2045)
 {
@@ -38,7 +38,7 @@ TEST(Base64Test, UnescapeRfc2045)
                                              sizeof(base64_test_dec)};
 
   EXPECT_EQ(decoded, expected);
-};
+}
 
 TEST(Base64Test, UnescapeRfc2045InvalidInput)
 {
@@ -89,4 +89,4 @@ TEST(Base64Test, UnescapeRfc2045InvalidInput)
 
   std_str_in = "J E=";
   EXPECT_FALSE(opentelemetry::sdk::common::Base64Unescape(std_str_in, &std_str_out));
-};
+}

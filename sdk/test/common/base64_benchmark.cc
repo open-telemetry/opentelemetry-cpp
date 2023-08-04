@@ -1,12 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <string>
+
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/base64.h"
 
-#include <cstdint>
-#include <random>
-
-#include <benchmark/benchmark.h>
+#include "benchmark/benchmark.h"
 
 namespace
 {
