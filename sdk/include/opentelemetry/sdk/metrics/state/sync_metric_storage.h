@@ -40,9 +40,10 @@ public:
                     const AttributesProcessor *attributes_processor,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
                         OPENTELEMETRY_MAYBE_UNUSED,
-                    const AggregationConfig *aggregation_config)
+                    const AggregationConfig *aggregation_config,
+                    size_t attributes_limit = kAggregationCardinalityLimit)
       : instrument_descriptor_(instrument_descriptor),
-        attributes_hashmap_(new AttributesHashMap()),
+        attributes_hashmap_(new AttributesHashMap(attributes_limit)),
         attributes_processor_(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(exemplar_reservoir),
