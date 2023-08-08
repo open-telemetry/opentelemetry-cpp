@@ -60,21 +60,25 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
     proto::metrics::v1::NumberDataPoint *proto_sum_point_data = sum->add_data_points();
     proto_sum_point_data->set_start_time_unix_nano(start_ts);
     proto_sum_point_data->set_time_unix_nano(ts);
-    auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
+    if ((nostd::holds_alternative<sdk::metrics::SumPointData>(
+            point_data_with_attributes.point_data)))
+    {
+      auto sum_data = nostd::get<sdk::metrics::SumPointData>(point_data_with_attributes.point_data);
 
-    if ((nostd::holds_alternative<int64_t>(sum_data.value_)))
-    {
-      proto_sum_point_data->set_as_int(nostd::get<int64_t>(sum_data.value_));
-    }
-    else
-    {
-      proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
-    }
-    // set attributes
-    for (auto &kv_attr : point_data_with_attributes.attributes)
-    {
-      OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
-                                                    kv_attr.first, kv_attr.second);
+      if ((nostd::holds_alternative<int64_t>(sum_data.value_)))
+      {
+        proto_sum_point_data->set_as_int(nostd::get<int64_t>(sum_data.value_));
+      }
+      else
+      {
+        proto_sum_point_data->set_as_double(nostd::get<double>(sum_data.value_));
+      }
+      // set attributes
+      for (auto &kv_attr : point_data_with_attributes.attributes)
+      {
+        OtlpPopulateAttributeUtils::PopulateAttribute(proto_sum_point_data->add_attributes(),
+                                                      kv_attr.first, kv_attr.second);
+      }
     }
   }
 }
