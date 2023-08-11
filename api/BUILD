@@ -22,6 +22,7 @@ cc_library(
     deps = select({
         ":with_external_abseil": [
             "@com_google_absl//absl/base",
+            "@com_google_absl//absl/strings",
             "@com_google_absl//absl/types:variant",
         ],
         "//conditions:default": [],
