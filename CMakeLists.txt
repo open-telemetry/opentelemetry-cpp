@@ -647,6 +647,7 @@ if(NOT WITH_API_ONLY)
 endif()
 
 include(cmake/opentelemetry-build-external-component.cmake)
+include(cmake/patch-imported-config.cmake)
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)
