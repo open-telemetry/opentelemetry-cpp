@@ -143,16 +143,16 @@ public:
     int response_status = 404;
     if (request.uri == "/get/")
     {
-      std::unique_lock<std::mutex> lk(mtx_requests);
-      std::unique_lock<std::mutex> lk(cv_mtx_requests);
+      std::unique_lock<std::mutex> lk1(mtx_requests);
+      std::unique_lock<std::mutex> lk2(cv_mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
       response_status                  = 200;
     }
     else if (request.uri == "/post/")
     {
-      std::unique_lock<std::mutex> lk(mtx_requests);
-      std::unique_lock<std::mutex> lk(cv_mtx_requests);
+      std::unique_lock<std::mutex> lk1(mtx_requests);
+      std::unique_lock<std::mutex> lk2(cv_mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "application/json";
       response.body                    = "{'k1':'v1', 'k2':'v2', 'k3':'v3'}";
