@@ -166,7 +166,7 @@ public:
   {
     std::unique_lock<std::mutex> lk(cv_mtx_requests);
     if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec), [&] {
-          //
+          std::unique_lock<std::mutex> lk1(mtx_requests);
           return received_requests_.size() >= expected_count;
         }))
     {
