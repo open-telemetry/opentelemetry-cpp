@@ -5,8 +5,6 @@
 
 set -ex
 
-apt-get install pkg-config
-
 PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:${PKG_CONFIG_PATH:-}"
 
 for library in api common logs metrics resources trace version; do
