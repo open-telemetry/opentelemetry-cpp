@@ -284,6 +284,7 @@ jobs:
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
+        CXX_STANDARD: '11'
       run: ./ci/do_ci.sh cmake.legacy.test
 
   cmake_gcc_48_otlp_exporter_test:
@@ -329,8 +330,12 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
     - name: run tests
+      env:
+        CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_test_cxx20_clang:
@@ -354,12 +359,14 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.test
     - name: run tests (enable stl)
       env:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_otprotocol_test:
@@ -376,6 +383,31 @@ jobs:
     - name: run otlp exporter tests
       run: |
         sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_modern_protobuf_grpc_with_abseil_test:
+    name: CMake test (with modern protobuf,grpc and abseil)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        PROTOBUF_VERSION: '23.3'
+        ABSEIL_CPP_VERSION: '20230125.3'
+        CXX_STANDARD: '14'
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run otlp exporter tests
+      env:
+        WITH_ABSEIL: 'ON'
+        CXX_STANDARD: '14'
+      run: |
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   cmake_do_not_install_test:

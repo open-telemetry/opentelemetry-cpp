@@ -42,8 +42,6 @@ endif()
 
 if(WITH_ABSEIL)
 
-  find_package(absl CONFIG REQUIRED)
-
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
     opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
