@@ -459,7 +459,7 @@ jobs:
         ./ci/do_ci.sh cmake.install.test
     - name: verify packages
       run: |
-        ./ci/verify-packages.sh
+        ./ci/verify_packages.sh
 
   plugin_test:
     name: Plugin -> CMake
