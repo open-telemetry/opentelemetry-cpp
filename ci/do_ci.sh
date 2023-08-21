@@ -400,8 +400,8 @@ elif [[ "$1" == "bazel.asan" ]]; then
 elif [[ "$1" == "bazel.tsan" ]]; then
 # TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
 # https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-# zpages test failing with tsan. Removing for now, as zpages will be removed soon.
-  bazel $BAZEL_STARTUP_OPTIONS test ----test_arg=--gtest_filter=TracezDataAggregatorTest.* --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
+# zpages test failing with tsan. Ignoring the tests for now, as zpages will be removed soon.
+  bazel $BAZEL_STARTUP_OPTIONS test --test_arg=--gtest_filter=TracezDataAggregatorTest.* --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
