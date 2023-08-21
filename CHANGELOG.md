@@ -17,6 +17,11 @@ Increment the:
 
 ## [1.11.0] 2023-08-21
 
+* [BUILD] added public link of `opentelemetry_proto_grpc` against gRPC lib (only
+  if gRPC library is shared)
+  [#2268](https://github.com/open-telemetry/opentelemetry-cpp/pull/2268)
+* [CI] use ubuntu-latest for tsan CI
+  [#2267](https://github.com/open-telemetry/opentelemetry-cpp/pull/2267)
 * [SDK] Fixing an apparent logging macro bug
   [#2265](https://github.com/open-telemetry/opentelemetry-cpp/pull/2265)
 * [BUILD] Support protobuf 3.22 or upper
