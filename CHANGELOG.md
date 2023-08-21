@@ -41,7 +41,7 @@ Increment the:
   [#2232](https://github.com/open-telemetry/opentelemetry-cpp/pull/2232)
 * [CI] Upgrade GoogleTest version from 1.12.1 to 1.13.0
   [#2114](https://github.com/open-telemetry/opentelemetry-cpp/pull/2114)
-* [BUILD] include <cstdint>
+* [BUILD] include cstdint
   [#2230](https://github.com/open-telemetry/opentelemetry-cpp/pull/2230)
 * [EXPORTER] Support protobuf 3.22 or upper
   [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
