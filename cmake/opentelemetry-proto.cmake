@@ -272,8 +272,14 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
-  target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
+  target_link_libraries(opentelemetry_proto_grpc
+    PUBLIC opentelemetry_proto)
 
+  get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
+  if (grpc_lib_type STREQUAL "SHARED_LIBRARY")
+    target_link_libraries(opentelemetry_proto_grpc
+      PUBLIC gRPC::grpc++)
+  endif()
   set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
                                                             proto_grpc)
   patch_protobuf_targets(opentelemetry_proto_grpc)
