@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [1.11.0] 2023-08-21
 
 * [EXPORTER] Support protobuf 3.22 or upper
   [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
