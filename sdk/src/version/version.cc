@@ -18,7 +18,8 @@ const char *pre_release    = "NONE";
 const char *build_metadata = "NONE";
 const char *short_version  = "1.11.0";
 const char *full_version   = "1.11.0-NONE-NONE";
-const char *build_date     = "Mon 21 Aug 2023 20:54:39 PM UTC";
+const char *build_date     = "Mon Aug 21 22:31:07 UTC 2023";
+
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
