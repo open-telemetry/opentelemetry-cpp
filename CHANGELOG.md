@@ -17,6 +17,8 @@ Increment the:
 
 ## [1.11.0] 2023-08-21
 
+* [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build
+  [#2264](https://github.com/open-telemetry/opentelemetry-cpp/pull/2264)
 * [BUILD] added public link of `opentelemetry_proto_grpc` against gRPC lib (only
   if gRPC library is shared)
   [#2268](https://github.com/open-telemetry/opentelemetry-cpp/pull/2268)
