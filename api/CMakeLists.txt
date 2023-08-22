@@ -29,6 +29,8 @@ if(OPENTELEMETRY_INSTALL)
     DESTINATION include
     FILES_MATCHING
     PATTERN "*.h")
+
+  unset(TARGET_DEPS)
 endif()
 
 if(BUILD_TESTING)
@@ -41,12 +43,12 @@ if(WITH_NO_DEPRECATED_CODE)
 endif()
 
 if(WITH_ABSEIL)
-
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
     opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
                                 absl::bits absl::city)
-
+  list(APPEND TARGET_DEPS "absl_bad_variant_access" "absl_any absl_base"
+       "absl_bits" "absl_city")
 endif()
 
 if(WITH_STL)
@@ -64,6 +66,7 @@ if(WITH_GSL)
   find_package(Microsoft.GSL QUIET)
   if(TARGET Microsoft.GSL::GSL)
     target_link_libraries(opentelemetry_api INTERFACE Microsoft.GSL::GSL)
+    list(APPEND TARGET_DEPS "gsl")
   else()
     set(GSL_DIR third_party/ms-gsl)
     target_include_directories(
@@ -114,4 +117,13 @@ endif()
 if(WITH_METRICS_EXEMPLAR_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)
+endif()
+
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
+if(OPENTELEMETRY_INSTALL)
+  opentelemetry_add_pkgconfig(
+    api "OpenTelemetry API"
+    "A header-only library to support instrumentation with OpenTelemetry."
+    "${TARGET_DEPS}")
 endif()

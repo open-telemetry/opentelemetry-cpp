@@ -15,6 +15,41 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.11.0] 2023-08-21
+
+* [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build
+  [#2264](https://github.com/open-telemetry/opentelemetry-cpp/pull/2264)
+* [BUILD] added public link of `opentelemetry_proto_grpc` against gRPC lib (only
+  if gRPC library is shared)
+  [#2268](https://github.com/open-telemetry/opentelemetry-cpp/pull/2268)
+* [CI] use ubuntu-latest for tsan CI
+  [#2267](https://github.com/open-telemetry/opentelemetry-cpp/pull/2267)
+* [SDK] Fixing an apparent logging macro bug
+  [#2265](https://github.com/open-telemetry/opentelemetry-cpp/pull/2265)
+* [BUILD] Support protobuf 3.22 or upper
+  [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
+* [BUILD] Remove extra includes
+  [#2252](https://github.com/open-telemetry/opentelemetry-cpp/pull/2252)
+* [LOGS API SDK] Mark logs signal as stable API/SDK
+  [#2229](https://github.com/open-telemetry/opentelemetry-cpp/pull/2229)
+* [SEMANTIC CONVENTIONS] Upgrade to 1.21.0
+  [#2248](https://github.com/open-telemetry/opentelemetry-cpp/pull/2248)
+* [SDK] Valgrind errors on std::atomic variables
+  [#2244](https://github.com/open-telemetry/opentelemetry-cpp/pull/2244)
+* [BUILD] Fix compile with clang 16 and libc++
+  [#2242](https://github.com/open-telemetry/opentelemetry-cpp/pull/2242)
+* [Metrics SDK] Add unit to Instrument selection criteria
+  [#2236](https://github.com/open-telemetry/opentelemetry-cpp/pull/2236)
+* [SDK] Add OStreamLogRecordExporterFactory
+  [#2240](https://github.com/open-telemetry/opentelemetry-cpp/pull/2240)
+* [SDK] Add support for LowMemory metrics temporality
+  [#2234](https://github.com/open-telemetry/opentelemetry-cpp/pull/2234)
+* [CI] Misc build scripts cleanup
+  [#2232](https://github.com/open-telemetry/opentelemetry-cpp/pull/2232)
+* [CI] Upgrade GoogleTest version from 1.12.1 to 1.13.0
+  [#2114](https://github.com/open-telemetry/opentelemetry-cpp/pull/2114)
+* [BUILD] include cstdint
+  [#2230](https://github.com/open-telemetry/opentelemetry-cpp/pull/2230)
 * [EXPORTER] Support protobuf 3.22 or upper
   [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
 * [SDK] Mark logs signal as stable API/SDK

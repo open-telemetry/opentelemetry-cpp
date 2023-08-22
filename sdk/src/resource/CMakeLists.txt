@@ -19,4 +19,9 @@ if(OPENTELEMETRY_INSTALL)
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+  opentelemetry_add_pkgconfig(
+    resources "OpenTelemetry SDK - Resources"
+    "Components for resource detection in the OpenTelemetry SDK."
+    "opentelemetry_common")
 endif()

@@ -16,11 +16,19 @@ EXPORTS
     ?Create@TracerProviderFactory@trace@sdk@v1@opentelemetry@@SA?AV?$unique_ptr@VTracerProvider@trace@v1@opentelemetry@@U?$default_delete@VTracerProvider@trace@v1@opentelemetry@@@std@@@std@@V?$unique_ptr@VSpanProcessor@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanProcessor@trace@sdk@v1@opentelemetry@@@std@@@7@@Z
 #if defined(WITH_OTLP_GRPC)
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanExporter,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpGrpcExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpGrpcExporterOptions const & __ptr64)
+#if defined(_WIN64)
     ?Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
+#else
+    ?Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@ABUOtlpGrpcExporterOptions@2345@@Z
+#endif  // defined(_WIN64)
 #endif  // defined(WITH_OTLP_GRPC)
 #if defined(WITH_OTLP_HTTP)
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::trace::SpanExporter,struct std::default_delete<class opentelemetry::v1::sdk::trace::SpanExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpHttpExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpHttpExporterOptions const & __ptr64)
+#if defined(_WIN64)
     ?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpHttpExporterOptions@2345@@Z
+#else
+    ?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VSpanExporter@trace@sdk@v1@opentelemetry@@U?$default_delete@VSpanExporter@trace@sdk@v1@opentelemetry@@@std@@@std@@ABUOtlpHttpExporterOptions@2345@@Z
+#endif  // defined(_WIN64)
 #endif  // defined(WITH_OTLP_HTTP)
     // public: static class std::unique_ptr<class opentelemetry::v1::logs::LoggerProvider,class std::default_delete<class opentelemetry::v1::logs::LoggerProvider> > __cdecl opentelemetry::v1::sdk::logs::LoggerProviderFactory::Create(class std::unique_ptr<class opentelemetry::v1::sdk::logs::LogRecordProcessor,struct std::default_delete<class opentelemetry::v1::sdk::logs::LogRecordProcessor> > && __ptr64)
 #if defined(_WIN64)
