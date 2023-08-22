@@ -119,10 +119,59 @@ cc_library(
     ]),
 )
 
+# no cc_shared_library in bazel 4.2
+cc_binary(
+    name = "component_g",
+    srcs = [
+        "component_g.cc",
+    ],
+    copts = select({
+        "//bazel:windows": DEFAULT_WIN_COPTS,
+        "//conditions:default": DEFAULT_NOWIN_COPTS,
+    }),
+    linkshared = True,
+    deps = [
+        "//api",
+    ],
+)
+
+# no cc_shared_library in bazel 4.2
+cc_binary(
+    name = "component_h",
+    srcs = [
+        "component_h.cc",
+    ],
+    copts = select({
+        "//bazel:windows": HIDDEN_WIN_COPTS,
+        "//conditions:default": HIDDEN_NOWIN_COPTS,
+    }),
+    linkshared = True,
+    deps = [
+        "//api",
+    ],
+)
+
+#
+# To build this test alone:
+# - bazel build //api/test/singleton:singleton_test
+# - bazel build //api/test/singleton:component_g
+# - bazel build //api/test/singleton:component_h
+#
+# Note that singleton_test does not depend on
+# component_g and component_h, on purpose.
+#
+# To run this test:
+# bazel test //api/test/singleton:singleton_test
+#
+
 cc_test(
     name = "singleton_test",
     srcs = [
         "singleton_test.cc",
+    ],
+    defines = ["BAZEL_BUILD"],
+    linkopts = [
+        "-ldl",
     ],
     linkstatic = False,
     tags = [

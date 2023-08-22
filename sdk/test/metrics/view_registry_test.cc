@@ -55,9 +55,10 @@ TEST(ViewRegistry, FindNonExistingView)
   const std::string instrumentation_schema  = "schema1";
   const std::string instrument_name         = "testname";
   const InstrumentType instrument_type      = InstrumentType::kCounter;
+  const std::string instrument_unit         = "ms";
 
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(instrument_type, instrument_name)};
+      new InstrumentSelector(instrument_type, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{
       new MeterSelector(instrumentation_name, instrumentation_version, instrumentation_schema)};
   std::unique_ptr<View> view = std::unique_ptr<View>(new View(view_name, view_description));
@@ -66,7 +67,7 @@ TEST(ViewRegistry, FindNonExistingView)
   registry.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
   InstrumentDescriptor default_instrument_descriptor = {instrument_name,  // name
                                                         "test_descr",     // description
-                                                        "1",              // unit
+                                                        instrument_unit,  // unit
                                                         instrument_type,  // instrument type
                                                         InstrumentValueType::kLong};
 

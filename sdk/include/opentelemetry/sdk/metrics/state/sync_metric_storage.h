@@ -3,8 +3,18 @@
 
 #pragma once
 
+#include <functional>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <utility>
-#include "opentelemetry/common/key_value_iterable_view.h"
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
@@ -14,9 +24,7 @@
 
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-
-#include <list>
-#include <memory>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

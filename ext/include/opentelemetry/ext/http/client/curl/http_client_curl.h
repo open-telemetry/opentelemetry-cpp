@@ -159,7 +159,7 @@ public:
           std::string scheme      = "http",
           const std::string &host = "",
           uint16_t port           = 80)
-      : http_client_(http_client), is_session_active_(false)
+      : http_client_(http_client)
   {
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
@@ -218,7 +218,7 @@ private:
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
   HttpClient &http_client_;
-  std::atomic<bool> is_session_active_;
+  std::atomic<bool> is_session_active_{false};
 };
 
 class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
@@ -356,7 +356,7 @@ private:
 
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
-  std::atomic<uint64_t> next_session_id_;
+  std::atomic<uint64_t> next_session_id_{0};
   uint64_t max_sessions_per_connection_;
 
   std::mutex sessions_m_;

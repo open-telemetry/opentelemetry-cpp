@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/context/runtime_context.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -47,10 +48,10 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
             opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(context_value))
+    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
     {
-      nostd::shared_ptr<trace::Span> &data =
-          nostd::get<nostd::shared_ptr<trace::Span>>(context_value);
+      nostd::shared_ptr<opentelemetry::trace::Span> &data =
+          nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value);
       if (data)
       {
         recordable->SetTraceId(data->GetContext().trace_id());
@@ -103,4 +104,3 @@ Logger::GetInstrumentationScope() const noexcept
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

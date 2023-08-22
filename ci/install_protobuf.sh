@@ -31,12 +31,41 @@ set -e
 # when calling this script
 #
 
-export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
+CPP_PROTOBUF_BUILD_OPTIONS=(
+  "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+  "-Dprotobuf_BUILD_TESTS=OFF"
+  "-Dprotobuf_BUILD_EXAMPLES=OFF"
+)
 
-cd /
-wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz
-tar zxf protobuf-cpp-${CPP_PROTOBUF_VERSION}.tar.gz --no-same-owner
-cd protobuf-${CPP_PROTOBUF_VERSION}
-./configure
-make -j $(nproc) && make install
+if [ ! -z "${CXX_STANDARD}" ]; then
+    CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+fi
+
+# After protobuf 22/4.22, protobuf depends on absl and we can use
+# "-Dprotobuf_ABSL_PROVIDER=package" to tell protobuf to find absl from the
+# system. Otherwise, it will build absl from source.
+# 4.XX.YY and 3.XX.YY are alias of XX.YY, and source pacakges are moved into the
+# tag of XX.YY and without -cpp suffix from protobuf v22.
+if [[ ${PROTOBUF_VERSION/.*/} -ge 22 ]]; then
+  export CPP_PROTOBUF_VERSION="${PROTOBUF_VERSION}"
+  CPP_PROTOBUF_PACKAGE_NAME="protobuf-${CPP_PROTOBUF_VERSION}"
+  CPP_PROTOBUF_BUILD_OPTIONS=(${CPP_PROTOBUF_BUILD_OPTIONS[@]} "-Dprotobuf_ABSL_PROVIDER=package")
+else
+  export CPP_PROTOBUF_VERSION="3.${PROTOBUF_VERSION}"
+  CPP_PROTOBUF_PACKAGE_NAME="protobuf-cpp-${CPP_PROTOBUF_VERSION}"
+fi
+
+cd /tmp
+wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz
+tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
+
+mkdir protobuf-${CPP_PROTOBUF_VERSION}/build && pushd protobuf-${CPP_PROTOBUF_VERSION}/build
+if [ -e "../CMakeLists.txt" ]; then
+  cmake .. ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+else
+  cmake ../cmake ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+fi
+cmake --build . -j $(nproc)
+cmake --install .
+popd
 ldconfig

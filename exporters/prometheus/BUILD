@@ -9,9 +9,13 @@ cc_library(
     name = "prometheus_exporter",
     srcs = [
         "src/exporter.cc",
+        "src/exporter_factory.cc",
+        "src/exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/prometheus/exporter.h",
+        "include/opentelemetry/exporters/prometheus/exporter_factory.h",
+        "include/opentelemetry/exporters/prometheus/exporter_options.h",
     ],
     strip_include_prefix = "include",
     tags = ["prometheus"],

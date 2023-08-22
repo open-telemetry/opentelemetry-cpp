@@ -17,6 +17,18 @@ cc_test(
 )
 
 cc_test(
+    name = "base64_test",
+    srcs = [
+        "base64_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//sdk/src/common:base64",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "fast_random_number_generator_test",
     srcs = [
         "fast_random_number_generator_test.cc",
@@ -26,6 +38,16 @@ cc_test(
         "//sdk/src/common:random",
         "@com_google_googletest//:gtest_main",
     ]),
+)
+
+otel_cc_benchmark(
+    name = "base64_benchmark",
+    srcs = ["base64_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "test",
+    ],
+    deps = ["//sdk/src/common:base64"],
 )
 
 otel_cc_benchmark(

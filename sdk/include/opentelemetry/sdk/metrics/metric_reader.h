@@ -3,21 +3,22 @@
 
 #pragma once
 
-#include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/version.h"
-
 #include <chrono>
 #include <memory>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+class MetricProducer;
+struct ResourceMetrics;
 
 /**
  * MetricReader defines the interface to collect metrics from SDK

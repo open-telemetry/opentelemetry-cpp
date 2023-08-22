@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/event_logger.h"
-#  include "opentelemetry/sdk_config.h"
-#  include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/logs/event_logger.h"
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -53,4 +52,3 @@ void EventLogger::EmitEvent(nostd::string_view event_name,
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

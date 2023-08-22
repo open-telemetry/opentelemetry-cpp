@@ -3,13 +3,25 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include <vector>
+
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace resource
+{
+class OPENTELEMETRY_SDK_METRICS_EXPORT Resource;
+}  // namespace resource
+
+namespace instrumentationscope
+{
+class OPENTELEMETRY_SDK_METRICS_EXPORT InstrumentationScope;
+}  // namespace instrumentationscope
+
 namespace metrics
 {
 
@@ -17,14 +29,24 @@ namespace metrics
  * Metric Data to be exported along with resources and
  * Instrumentation scope.
  */
-struct ScopeMetrics
+struct OPENTELEMETRY_SDK_METRICS_EXPORT ScopeMetrics
 {
+    ScopeMetrics(ScopeMetrics &&) = default;
+    ScopeMetrics &operator=(ScopeMetrics &&) = default;
+    ScopeMetrics(const ScopeMetrics &)       = default;
+    ScopeMetrics()                                 = default;
+
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_;
   std::vector<MetricData> metric_data_;
 };
 
-struct ResourceMetrics
+struct OPENTELEMETRY_SDK_METRICS_EXPORT ResourceMetrics
 {
+    ResourceMetrics(ResourceMetrics &&) = default;
+    ResourceMetrics &operator=(ResourceMetrics &&) = default;
+    ResourceMetrics(const ResourceMetrics &)       = default;
+    ResourceMetrics()                                 = default;
+
   const opentelemetry::sdk::resource::Resource *resource_;
   std::vector<ScopeMetrics> scope_metric_data_;
 };

@@ -2,40 +2,39 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef HAVE_CPP_STDLIB
-#  ifdef ENABLE_LOGS_PREVIEW
 
-#    include <chrono>
-#    include <thread>
+#  include <chrono>
+#  include <thread>
 
-#    include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 
-#    include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#    include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 
-#    include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#    include "opentelemetry/common/key_value_iterable_view.h"
-#    include "opentelemetry/ext/http/client/http_client_factory.h"
-#    include "opentelemetry/ext/http/server/http_server.h"
-#    include "opentelemetry/logs/provider.h"
-#    include "opentelemetry/sdk/logs/batch_log_record_processor.h"
-#    include "opentelemetry/sdk/logs/exporter.h"
-#    include "opentelemetry/sdk/logs/logger_provider.h"
-#    include "opentelemetry/sdk/resource/resource.h"
-#    include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/ext/http/client/http_client_factory.h"
+#  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
-#    include <google/protobuf/message_lite.h>
-#    include <gtest/gtest.h>
-#    include "gmock/gmock.h"
+#  include <google/protobuf/message_lite.h>
+#  include <gtest/gtest.h>
+#  include "gmock/gmock.h"
 
-#    include "nlohmann/json.hpp"
+#  include "nlohmann/json.hpp"
 
-#    if defined(_MSC_VER)
-#      include "opentelemetry/sdk/common/env_variables.h"
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#    endif
+#  endif
 
 using namespace testing;
 
@@ -61,19 +60,19 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url,
-#    ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
       false,                              /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#    endif                                /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#    ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
-      "",  /* ssl_min_tls */
-      "",  /* ssl_max_tls */
-      "",  /* ssl_cipher */
-      "",  /* ssl_cipher_suite */
-#    endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+      "", /* ssl_min_tls */
+      "", /* ssl_max_tls */
+      "", /* ssl_cipher */
+      "", /* ssl_cipher_suite */
+#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
@@ -222,7 +221,7 @@ public:
     provider->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -349,7 +348,7 @@ public:
 
     provider->ForceFlush();
   }
-#    endif
+#  endif
 
   void ExportBinaryIntegrationTest()
   {
@@ -462,7 +461,7 @@ public:
     provider->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -578,7 +577,7 @@ public:
 
     provider->ForceFlush();
   }
-#    endif
+#  endif
 };
 
 TEST(OtlpHttpLogRecordExporterTest, Shutdown)
@@ -599,13 +598,13 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
   google::protobuf::ShutdownProtobufLibrary();
 }
-#    endif
+#  endif
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -613,12 +612,12 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
-#    endif
+#  endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
@@ -647,7 +646,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
-#    ifndef NO_GETENV
+#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
 {
@@ -736,10 +735,9 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
 }
 
-#    endif
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#  endif
 #endif

@@ -2,11 +2,9 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
-
-load("@rules_pkg//pkg:mappings.bzl", "pkg_files", pkg_strip_prefix = "strip_prefix", "pkg_filegroup")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
-
 load("dll_deps.bzl", "force_compilation_mode")
 
 bool_flag(
@@ -30,12 +28,14 @@ config_setting(
     name = "debug",
     values = {"compilation_mode": "dbg"},
 )
+
 config_setting(
     name = "release",
     values = {"compilation_mode": "opt"},
 )
+
 config_setting(
-    name = "reldeb", # Uses MSVCRT like release, not MSVCRTD like dbg
+    name = "reldeb",  # Uses MSVCRT like release, not MSVCRTD like dbg
     values = {"compilation_mode": "fastbuild"},
 )
 
@@ -46,32 +46,24 @@ config_setting(
 # But it's impossible to know this in advance.
 cc_library(
     name = "otel_sdk_deps",
+    visibility = ["//visibility:private"],
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
-
         "//exporters/etw:etw_exporter",
-
-        "//exporters/memory:in_memory_span_exporter", # traces
-
-        "//exporters/ostream:ostream_span_exporter", # traces
+        "//exporters/memory:in_memory_span_exporter",  # traces
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
-
-        "//exporters/otlp:otlp_grpc_exporter", # traces
+        "//exporters/ostream:ostream_span_exporter",  # traces
+        "//exporters/otlp:otlp_grpc_exporter",  # traces
         "//exporters/otlp:otlp_grpc_log_record_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
-
-        "//exporters/otlp:otlp_http_exporter", # traces
+        "//exporters/otlp:otlp_http_exporter",  # traces
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//exporters/otlp:otlp_http_metric_exporter",
-
-        "//exporters/prometheus:prometheus_exporter", # metrics
-
-        "//exporters/zipkin:zipkin_exporter", # traces
-
-        "//ext/src/zpages", # traces
+        "//exporters/prometheus:prometheus_exporter",  # metrics
+        "//exporters/zipkin:zipkin_exporter",  # traces
+        "//ext/src/zpages",  # traces
     ],
-    visibility = ["//visibility:private"],
 )
 
 # Expands to all transitive project dependencies, excluding external projects (repos)
@@ -85,45 +77,56 @@ genquery(
 
 [cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
-    target_compatible_with = select({ # Makes the build target compatible only with specific compilation mode, for example:
-        otel_sdk_config_name: [],     # otel_sdk_r needs "-c opt", and otel_sdk_d "-c dbg" (otel_sdk_rd the default "-c fastbuild")
-        "//conditions:default": ["@platforms//:incompatible"], # This would error out if say "bazel build -c dbg otel_sdk_r" is used.
-    }),    
+    target_compatible_with = select({
+        # Makes the build target compatible only with specific compilation mode, for example:
+        otel_sdk_config_name: [],  # otel_sdk_r needs "-c opt", and otel_sdk_d "-c dbg" (otel_sdk_rd the default "-c fastbuild")
+        "//conditions:default": ["@platforms//:incompatible"],  # This would error out if say "bazel build -c dbg otel_sdk_r" is used.
+    }),
     visibility = ["//visibility:private"],
-) for (otel_sdk_binary, otel_sdk_config_name) in [("otel_sdk_r", ":release"), ("otel_sdk_d", ":debug"), ("otel_sdk_rd", ":reldeb")]]
+) for (otel_sdk_binary, otel_sdk_config_name) in [
+    ("otel_sdk_r", ":release"),
+    ("otel_sdk_d", ":debug"),
+    ("otel_sdk_rd", ":reldeb"),
+]]
 
 # Conveniently place all Open Telemetry C++ dependencies required to build otel_sdk
 [cc_binary(
     name = otel_sdk_binary,
-    deps = [
-        otel_sdk_binary + "_restrict_compilation_mode",
-        "otel_sdk_deps",
+
+    # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
+    srcs = [
+        "all_api_includes.cc",
+        "all_sdk_includes.cc",
     ],
 
     # Force generation of .pdb file for for opt builds
     features = [
-        "generate_pdb_file", 
+        "generate_pdb_file",
         # Below was an attempt to use the export all symbols feature, but it failed with:
         # LINK : fatal error LNK1189: library limit of 65535 objects exceeded
         # "windows_export_all_symbols"
     ],
 
-    # Make a .dll
-    linkshared = True,
-
     # https://learn.microsoft.com/en-us/cpp/build/reference/wholearchive-include-all-library-object-files?view=msvc-170
     linkopts = ["/WHOLEARCHIVE"],
 
-    # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
-    srcs = ["all_api_includes.cc", "all_sdk_includes.cc"],
-    visibility = ["//visibility:private"],
-
+    # Make a .dll
+    linkshared = True,
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
         "with_dll_enabled": [],
-        "//conditions:default": ["@platforms//:incompatible"]
-    }),    
-) for (otel_sdk_binary, otel_sdk_config_name) in [("otel_sdk_r", ":release"), ("otel_sdk_d", ":debug"), ("otel_sdk_rd", ":reldeb")]]
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+    visibility = ["//visibility:private"],
+    deps = [
+        otel_sdk_binary + "_restrict_compilation_mode",
+        "otel_sdk_deps",
+    ],
+) for (otel_sdk_binary, otel_sdk_config_name) in [
+    ("otel_sdk_r", ":release"),
+    ("otel_sdk_d", ":debug"),
+    ("otel_sdk_rd", ":reldeb"),
+]]
 
 # Convenient alias that selects the appropriate otel_sdk from above
 alias(
@@ -132,7 +135,7 @@ alias(
         ":release": "otel_sdk_r",
         ":reldeb": "otel_sdk_rd",
         ":debug": "otel_sdk_d",
-    })
+    }),
 )
 
 # Expose the import .lib file
@@ -141,7 +144,11 @@ alias(
     srcs = [otel_sdk_binary],
     output_group = "interface_library",
     visibility = ["//visibility:private"],
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 # Expose the debug .pdb file
 [filegroup(
@@ -149,29 +156,40 @@ alias(
     srcs = [otel_sdk_binary],
     output_group = "pdb_file",
     visibility = ["//visibility:private"],
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
 [cc_import(
     name = otel_sdk_binary + "_import",
+    data = [otel_sdk_binary + "_pdb_file"],
     interface_library = otel_sdk_binary + "_lib_file",
     shared_library = otel_sdk_binary,
-    data = [otel_sdk_binary + "_pdb_file"],
     visibility = ["//visibility:private"],
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 # Present the import library above as cc_library so we can add headers to it, force defines, and make it public.
 [cc_library(
     name = otel_sdk_binary + "_dll",
     # These have to be propagate to users of the dll library
-    defines = ["ENABLE_LOGS_PREVIEW=1", "ENABLE_TEST=1", "OPENTELEMETRY_DLL=1", "HAVE_CPP_STDLIB=1"], 
-    implementation_deps = [
-        otel_sdk_binary + "_import", # The otel_sdk.dll, .lib and .pdb files
+    defines = [
+        "ENABLE_TEST=1",
+        "OPENTELEMETRY_DLL=1",
+        "HAVE_CPP_STDLIB=1",
     ],
+    implementation_deps = [
+        otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files
+    ],
+    visibility = ["//visibility:public"],
     deps = [
         "//api:headers",
-        "//sdk:headers",
-        "//ext:headers",
         "//exporters/elasticsearch:headers",
         "//exporters/etw:headers",
         "//exporters/memory:headers",
@@ -179,18 +197,23 @@ alias(
         "//exporters/otlp:headers",
         "//exporters/prometheus:headers",
         "//exporters/zipkin:headers",
+        "//ext:headers",
+        "//sdk:headers",
     ],
-    visibility = ["//visibility:public"],
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 alias(
     name = "dll",
-    visibility = ["//visibility:public"],
     actual = select({
         ":release": "otel_sdk_r_dll",
         ":reldeb": "otel_sdk_rd_dll",
         ":debug": "otel_sdk_d_dll",
-    })
+    }),
+    visibility = ["//visibility:public"],
 )
 
 cc_test(
@@ -203,8 +226,6 @@ pkg_files(
     name = "otel_sdk_header_files",
     srcs = [
         "//api:header_files",
-        "//sdk:header_files",
-        "//ext:header_files",
         "//exporters/elasticsearch:header_files",
         "//exporters/etw:header_files",
         "//exporters/memory:header_files",
@@ -212,8 +233,10 @@ pkg_files(
         "//exporters/otlp:header_files",
         "//exporters/prometheus:header_files",
         "//exporters/zipkin:header_files",
+        "//ext:header_files",
+        "//sdk:header_files",
     ],
-    prefix = otel_sdk_prefix, # + "include",
+    prefix = otel_sdk_prefix,  # + "include",
     strip_prefix = pkg_strip_prefix.from_pkg(),
 )
 
@@ -222,103 +245,134 @@ pkg_files(
 #
 # For more info, check https://bazel.build/rules/lib/transition and otel_sdk.bzl
 [force_compilation_mode(
-    compilation_mode = compilation_mode,
     name = otel_sdk_binary + "_lib_file" + "_force",
-    data = [otel_sdk_binary + "_lib_file"]
-) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
+    compilation_mode = compilation_mode,
+    data = [otel_sdk_binary + "_lib_file"],
+) for (otel_sdk_binary, compilation_mode) in [
+    ("otel_sdk_r", "opt"),
+    ("otel_sdk_d", "dbg"),
+    ("otel_sdk_rd", "fastbuild"),
+]]
 
 # Same as above, but for the binaries
 [force_compilation_mode(
-    compilation_mode = compilation_mode,
     name = otel_sdk_binary + "_bin_file" + "_force",
+    compilation_mode = compilation_mode,
     data = [
-        otel_sdk_binary, 
-        otel_sdk_binary + "_pdb_file", 
-    ]
-) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
+        otel_sdk_binary,
+        otel_sdk_binary + "_pdb_file",
+    ],
+) for (otel_sdk_binary, compilation_mode) in [
+    ("otel_sdk_r", "opt"),
+    ("otel_sdk_d", "dbg"),
+    ("otel_sdk_rd", "fastbuild"),
+]]
 
 # Same as above, but for the binaries
 [force_compilation_mode(
-    compilation_mode = compilation_mode,
     name = otel_sdk_binary + "_src_bundle" + "_force",
+    compilation_mode = compilation_mode,
     data = [
-        otel_sdk_binary + "_make_src_bundle", 
-    ]
-) for (otel_sdk_binary, compilation_mode) in [("otel_sdk_r", "opt"), ("otel_sdk_d", "dbg"), ("otel_sdk_rd", "fastbuild")]]
+        otel_sdk_binary + "_make_src_bundle",
+    ],
+) for (otel_sdk_binary, compilation_mode) in [
+    ("otel_sdk_r", "opt"),
+    ("otel_sdk_d", "dbg"),
+    ("otel_sdk_rd", "fastbuild"),
+]]
 
 # Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
 [run_binary(
     name = otel_sdk_binary + "_make_src_bundle",
-    srcs = [otel_sdk_binary + "_pdb_file", ".sentryclirc"],
+    srcs = [
+        otel_sdk_binary + "_pdb_file",
+        ".sentryclirc",
+    ],
     outs = [otel_sdk_binary + ".src.zip"],
-    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
     args = [
-        "debug-files", # Called `difutil` in the online docs, but the tool lists it as `debug-files`
+        "debug-files",  # Called `difutil` in the online docs, but the tool lists it as `debug-files`
         "bundle-sources",
         "$(location " + otel_sdk_binary + "_pdb_file" + ")",
-    ]
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+    ],
+    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 [pkg_files(
     name = otel_sdk_binary + "_src_bundle",
     srcs = [otel_sdk_binary + "_src_bundle_force"],
     prefix = otel_sdk_prefix,
-    strip_prefix = pkg_strip_prefix.from_pkg()
-) for otel_sdk_binary in ["otel_sdk_r", "otel_sdk_d", "otel_sdk_rd"]]
+    strip_prefix = pkg_strip_prefix.from_pkg(),
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
 
 # Package `lib` files under `otel_sdk/<version>/(debug/|reldeb/|/)lib`
 [pkg_files(
     name = otel_sdk_binary + "_lib_files",
     srcs = [otel_sdk_binary + "_lib_file_force"],
     prefix = otel_sdk_prefix + prefix + "lib",
-    strip_prefix = pkg_strip_prefix.from_pkg()
-) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug/"), ("otel_sdk_rd", "reldeb/")]]
+    strip_prefix = pkg_strip_prefix.from_pkg(),
+) for (otel_sdk_binary, prefix) in [
+    ("otel_sdk_r", ""),
+    ("otel_sdk_d", "debug/"),
+    ("otel_sdk_rd", "reldeb/"),
+]]
 
 # Package `bin` files under `otel_sdk/<version>/(debug/|reldeb/|/)bin`
 [pkg_files(
     name = otel_sdk_binary + "_bin_files",
     srcs = [otel_sdk_binary + "_bin_file_force"],
     prefix = otel_sdk_prefix + prefix + "bin",
-    strip_prefix = pkg_strip_prefix.from_pkg()
-) for (otel_sdk_binary, prefix) in [("otel_sdk_r", ""), ("otel_sdk_d", "debug/"), ("otel_sdk_rd", "reldeb/")]]
+    strip_prefix = pkg_strip_prefix.from_pkg(),
+) for (otel_sdk_binary, prefix) in [
+    ("otel_sdk_r", ""),
+    ("otel_sdk_d", "debug/"),
+    ("otel_sdk_rd", "reldeb/"),
+]]
 
 # Group all files into one group
 pkg_filegroup(
     name = "otel_sdk_files",
     srcs = [
+        "otel_sdk_d_bin_files",
+        "otel_sdk_d_lib_files",
+        "otel_sdk_d_src_bundle",
         "otel_sdk_header_files",
-        "otel_sdk_r_bin_files", 
-        "otel_sdk_r_lib_files", 
-        "otel_sdk_r_src_bundle", 
-        "otel_sdk_d_bin_files", 
-        "otel_sdk_d_lib_files", 
-        "otel_sdk_d_src_bundle", 
-        "otel_sdk_rd_bin_files", 
-        "otel_sdk_rd_lib_files", 
-        "otel_sdk_rd_src_bundle", 
-    ]
+        "otel_sdk_r_bin_files",
+        "otel_sdk_r_lib_files",
+        "otel_sdk_r_src_bundle",
+        "otel_sdk_rd_bin_files",
+        "otel_sdk_rd_lib_files",
+        "otel_sdk_rd_src_bundle",
+    ],
 )
 
 pkg_zip(
     name = "otel_sdk_zip",
-    out = "otel_sdk.zip",
     srcs = ["otel_sdk_files"],
+    out = "otel_sdk.zip",
 )
 
 cc_binary(
     name = "dll_deps_update_binary",
     srcs = ["dll_deps_update.cpp"],
-    local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
     data = ["otel_sdk_all_project_deps"],
-    deps = ["@bazel_tools//tools/cpp/runfiles"]
+    local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
+    deps = ["@bazel_tools//tools/cpp/runfiles"],
 )
 
 run_binary(
     name = "dll_deps_update_run",
-    tool = "dll_deps_update_binary",
     srcs = [":otel_sdk_all_project_deps"],
+    outs = ["dll_deps_generated_internally.bzl"],
     args = ["$(location dll_deps_generated_internally.bzl)"],
-    outs = ["dll_deps_generated_internally.bzl"]
+    tool = "dll_deps_update_binary",
 )
 
 # To update the dll_deps_generated.bzl files, do this:

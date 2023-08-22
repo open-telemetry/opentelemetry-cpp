@@ -3,18 +3,17 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <memory>
+#include <vector>
 
-#  include <memory>
-#  include <vector>
-
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class LogRecordProcessor;
 
 /**
  * Factory class for MultiLogRecordProcessor.
@@ -30,4 +29,3 @@ public:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

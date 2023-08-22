@@ -55,7 +55,7 @@ struct AdaptingIntegerArrayClear
   template <typename T>
   void operator()(std::vector<T> &backing)
   {
-    std::fill(backing.begin(), backing.end(), static_cast<T>(0));
+    backing.assign(backing.size(), static_cast<T>(0));
   }
 };
 

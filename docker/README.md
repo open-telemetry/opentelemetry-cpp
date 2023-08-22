@@ -17,8 +17,4 @@ docker rm -f otel
 docker create -ti --name grpc grpc-<base_image> bash
 docker cp grpc:/ ./
 docker rm -f grpc
-
-docker create -ti --name thrift thrift-<base_image> bash
-docker cp thrift:/ ./
-docker rm -f thrift
 ```

@@ -155,7 +155,7 @@ private:
 
   /** A boolean that is set to true in the constructor and false in the
    * destructor to start and end execution of aggregate spans **/
-  std::atomic<bool> execute_;
+  std::atomic<bool> execute_{false};
 
   /** Thread that executes aggregate spans at regurlar intervals during this
   object's lifetime**/

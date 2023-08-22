@@ -2,18 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <map>
-#  include <sstream>
-#  include <type_traits>
-#  include <unordered_map>
+#include <map>
+#include <sstream>
+#include <type_traits>
+#include <unordered_map>
 
-#  include "nlohmann/json.hpp"
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/version.h"
+#include "nlohmann/json.hpp"
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -128,4 +127,3 @@ private:
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

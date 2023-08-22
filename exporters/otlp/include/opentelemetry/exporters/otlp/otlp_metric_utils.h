@@ -9,6 +9,7 @@
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -52,10 +53,12 @@ public:
       proto::collector::metrics::v1::ExportMetricsServiceRequest *request) noexcept;
 
   static sdk::metrics::AggregationTemporalitySelector ChooseTemporalitySelector(
-      sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept;
+      PreferredAggregationTemporality preferred_aggregation_temporality) noexcept;
   static sdk::metrics::AggregationTemporality DeltaTemporalitySelector(
       sdk::metrics::InstrumentType instrument_type) noexcept;
   static sdk::metrics::AggregationTemporality CumulativeTemporalitySelector(
+      sdk::metrics::InstrumentType instrument_type) noexcept;
+  static sdk::metrics::AggregationTemporality LowMemoryTemporalitySelector(
       sdk::metrics::InstrumentType instrument_type) noexcept;
 };
 

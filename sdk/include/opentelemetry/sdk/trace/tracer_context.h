@@ -3,7 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include <chrono>
+#include <memory>
+#include <vector>
+
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"

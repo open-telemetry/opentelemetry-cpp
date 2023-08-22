@@ -10,6 +10,7 @@
 #include <prometheus/exposer.h>
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/prometheus/collector.h"
+#include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -27,27 +28,6 @@ namespace exporter
 {
 namespace metrics
 {
-
-inline const std::string GetPrometheusDefaultHttpEndpoint()
-{
-  constexpr char kPrometheusEndpointEnv[]     = "PROMETHEUS_EXPORTER_ENDPOINT";
-  constexpr char kPrometheusEndpointDefault[] = "localhost:9464";
-
-  std::string endpoint;
-
-  auto exists =
-      opentelemetry::sdk::common::GetStringEnvironmentVariable(kPrometheusEndpointEnv, endpoint);
-  return exists ? endpoint : kPrometheusEndpointDefault;
-}
-
-/**
- * Struct to hold Prometheus exporter options.
- */
-struct PrometheusExporterOptions
-{
-  // The endpoint the Prometheus backend can collect metrics from
-  std::string url = GetPrometheusDefaultHttpEndpoint();
-};
 
 class OPENTELEMETRY_EXPORTERS_PROMETHEUS_EXPORT PrometheusExporter : public sdk::metrics::MetricReader
 {

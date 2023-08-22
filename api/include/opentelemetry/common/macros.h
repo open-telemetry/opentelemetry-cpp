@@ -232,9 +232,6 @@ point.
 // When compiling with --//:with_dll=true OPENTELEMETRY_DLL is set to 1
 #  if defined(OPENTELEMETRY_DLL) && OPENTELEMETRY_DLL
 #    undef OPENTELEMETRY_EXPORT
-#    if !defined(ENABLE_LOGS_PREVIEW) || ENABLE_LOGS_PREVIEW==0
-#      error OPENTELEMETRY_DLL: ENABLE_LOGS_PREVIEW must be 1
-#    endif
 #    if !defined(HAVE_CPP_STDLIB) || HAVE_CPP_STDLIB==0
 #      error OPENTELEMETRY_DLL: HAVE_CPP_STDLIB must be 1
 #    endif

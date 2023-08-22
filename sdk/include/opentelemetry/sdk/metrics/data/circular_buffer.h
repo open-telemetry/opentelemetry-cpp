@@ -5,6 +5,7 @@
 
 #include "opentelemetry/nostd/variant.h"
 
+#include <cstdint>
 #include <limits>
 #include <vector>
 

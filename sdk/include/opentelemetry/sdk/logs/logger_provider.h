@@ -2,24 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0/
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <memory>
-#  include <mutex>
-#  include <string>
-#  include <vector>
+#include <memory>
+#include <mutex>
+#include <vector>
 
-#  include "opentelemetry/logs/logger_provider.h"
-#  include "opentelemetry/logs/noop.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/atomic_shared_ptr.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it
-#  define MAX_LOGGER_COUNT 100
+#define MAX_LOGGER_COUNT 100
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -27,6 +23,8 @@ namespace sdk
 namespace logs
 {
 class OPENTELEMETRY_SDK_LOGS_EXPORT Logger;
+class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerContext;
+class OPENTELEMETRY_SDK_LOGS_EXPORT LogRecordProcessor;
 
 class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
@@ -57,9 +55,9 @@ public:
 
   /**
    * Initialize a new logger provider with a specified context
-   * @param context The shared logger configuration/pipeline for this provider.
+   * @param context The owned logger configuration/pipeline for this provider.
    */
-  explicit LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept;
+  explicit LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept;
 
   ~LoggerProvider() override;
 
@@ -107,10 +105,9 @@ public:
 private:
   // order of declaration is important here - loggers should destroy only after context.
   std::vector<std::shared_ptr<opentelemetry::sdk::logs::Logger>> loggers_;
-  std::shared_ptr<sdk::logs::LoggerContext> context_;
+  std::shared_ptr<LoggerContext> context_;
   std::mutex lock_;
 };
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

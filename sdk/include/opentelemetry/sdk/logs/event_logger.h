@@ -2,21 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <memory>
-#  include <vector>
+#include <string>
 
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/logs/event_logger.h"
-#  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Logger;
+class LogRecord;
 
 class OPENTELEMETRY_SDK_LOGS_EXPORT EventLogger final : public opentelemetry::logs::EventLogger
 {
@@ -49,4 +50,3 @@ private:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -3,11 +3,16 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -96,6 +101,7 @@ private:
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor)
   {
     return selector->GetNameFilter()->Match(instrument_descriptor.name_) &&
+           selector->GetUnitFilter()->Match(instrument_descriptor.unit_) &&
            (selector->GetInstrumentType() == instrument_descriptor.type_);
   }
 };

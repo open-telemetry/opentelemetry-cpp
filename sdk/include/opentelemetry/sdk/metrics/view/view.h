@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
+#include <memory>
+#include <string>
+
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -25,6 +26,7 @@ class OPENTELEMETRY_SDK_METRICS_EXPORT View
 public:
   View(const std::string &name,
        const std::string &description                        = "",
+       const std::string &unit                               = "",
        AggregationType aggregation_type                      = AggregationType::kDefault,
        std::shared_ptr<AggregationConfig> aggregation_config = nullptr,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
@@ -32,6 +34,7 @@ public:
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
       : name_(name),
         description_(description),
+        unit_(unit),
         aggregation_type_{aggregation_type},
         aggregation_config_{aggregation_config},
         attributes_processor_{std::move(attributes_processor)}
@@ -59,6 +62,7 @@ public:
 private:
   std::string name_;
   std::string description_;
+  std::string unit_;
   AggregationType aggregation_type_;
   std::shared_ptr<AggregationConfig> aggregation_config_;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor_;

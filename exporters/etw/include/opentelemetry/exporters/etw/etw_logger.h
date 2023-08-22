@@ -2,43 +2,40 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <algorithm>
+#include <algorithm>
 
-#  include <chrono>
-#  include <cstdint>
-#  include <cstdio>
-#  include <cstdlib>
-#  include <sstream>
-#  include <type_traits>
+#include <chrono>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
+#include <type_traits>
 
-#  include <fstream>
+#include <fstream>
 
-#  include <map>
-#  include <unordered_map>
+#include <map>
+#include <unordered_map>
 
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 
-#  include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 
-#  include "opentelemetry/logs/log_record.h"
-#  include "opentelemetry/logs/logger_provider.h"
-#  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/logs/logger.h"
-
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_id.h"
-
-#  include "opentelemetry/exporters/etw/etw_config.h"
-#  include "opentelemetry/exporters/etw/etw_fields.h"
-#  include "opentelemetry/exporters/etw/etw_properties.h"
-#  include "opentelemetry/exporters/etw/etw_provider.h"
-#  include "opentelemetry/exporters/etw/utils.h"
+#include "opentelemetry/exporters/etw/etw_config.h"
+#include "opentelemetry/exporters/etw/etw_fields.h"
+#include "opentelemetry/exporters/etw/etw_properties.h"
+#include "opentelemetry/exporters/etw/etw_provider.h"
+#include "opentelemetry/exporters/etw/utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -243,7 +240,7 @@ public:
   {
     UNREFERENCED_PARAMETER(trace_flags);
 
-#  if defined(ENABLE_ENV_PROPERTIES)
+#if defined(ENABLE_ENV_PROPERTIES)
 
     Properties env_properties_env = {};
     bool has_customer_attribute   = false;
@@ -274,22 +271,22 @@ public:
 
     Properties &evt = has_customer_attribute ? env_properties_env : input_evt;
 
-#  else
+#else
 
     Properties &evt = input_evt;
 
-#  endif  // defined(ENABLE_ENV_PROPERTIES)
+#endif  // defined(ENABLE_ENV_PROPERTIES)
 
     // Populate Etw.EventName attribute at envelope level
     evt[ETW_FIELD_NAME] = ETW_VALUE_LOG;
 
-#  ifdef HAVE_FIELD_TIME
+#ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
       auto nanos          = std::chrono::duration_cast<std::chrono::nanoseconds>(timeNow).count();
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampNsAsISO8601(nanos);
     }
-#  endif
+#endif
     const auto &cfg = GetConfiguration(loggerProvider_);
     if (cfg.enableSpanId)
     {
@@ -387,4 +384,3 @@ public:
 }  // namespace etw
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif  // ENABLE_LOGS_PREVIEW

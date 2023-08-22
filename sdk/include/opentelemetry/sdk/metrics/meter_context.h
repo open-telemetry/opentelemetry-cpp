@@ -3,17 +3,18 @@
 
 #pragma once
 
-#include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#include "opentelemetry/sdk/metrics/view/meter_selector.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
-
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <vector>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -22,8 +23,11 @@ namespace metrics
 {
 
 // forward declaration
+class OPENTELEMETRY_SDK_METRICS_EXPORT CollectorHandle;
+class OPENTELEMETRY_SDK_METRICS_EXPORT InstrumentSelector;
 class OPENTELEMETRY_SDK_METRICS_EXPORT Meter;
 class OPENTELEMETRY_SDK_METRICS_EXPORT MetricReader;
+class OPENTELEMETRY_SDK_METRICS_EXPORT MeterSelector;
 
 /**
  * A class which stores the MeterProvider context.
@@ -110,6 +114,10 @@ public:
    * @param meter
    */
   void AddMeter(std::shared_ptr<Meter> meter);
+
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url);
 
   /**
    * Force all active Collectors to flush any buffered meter data

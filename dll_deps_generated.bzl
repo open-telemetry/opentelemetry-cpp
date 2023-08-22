@@ -26,6 +26,7 @@ DLL_DEPS = {
   Label("@//ext/src/http/client/curl:http_client_curl"): None,
   Label("@//ext/src/zpages:zpages"): None,
   Label("@//sdk:headers"): None,
+  Label("@//sdk/src/common:base64"): None,
   Label("@//sdk/src/common:env_variables"): None,
   Label("@//sdk/src/common:global_log_handler"): None,
   Label("@//sdk/src/logs:logs"): None,

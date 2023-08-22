@@ -24,31 +24,6 @@ RUN apt-get update && apt-get install -y build-essential autoconf libtool pkg-co
     make -j${nproc} install && make clean && ldconfig && \
     cd ../..
 
-#install thrift
-ARG THRIFT_VERSION=0.14.1
-RUN apt-get install -y --no-install-recommends \
-        libboost-all-dev \
-        libevent-dev \
-        wget && \
-    wget https://github.com/apache/thrift/archive/refs/tags/v$THRIFT_VERSION.tar.gz && \
-    tar -xvf v$THRIFT_VERSION.tar.gz && \
-    mkdir -p thrift-$THRIFT_VERSION/build && cd thrift-$THRIFT_VERSION/build && \
-    cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_COMPILER=OFF \
-        -DBUILD_CPP=ON \
-        -DBUILD_LIBRARIES=ON \
-        -DBUILD_NODEJS=OFF \
-        -DBUILD_PYTHON=OFF \
-        -DBUILD_JAVASCRIPT=OFF \
-        -DBUILD_C_GLIB=OFF \
-        -DBUILD_JAVA=OFF \
-        -DBUILD_TESTING=OFF \
-        -DBUILD_TUTORIALS=OFF \
-        .. && \
-    make -j${nproc} install && make clean && ldconfig && \
-    cd ../..
-
 #install opentelemetry-cpp
 RUN apt-get install -y --no-install-recommends libcurl4-openssl-dev && git clone --depth=1 https://github.com/open-telemetry/opentelemetry-cpp.git && \
     cd opentelemetry-cpp && git submodule update --init && \
@@ -57,7 +32,6 @@ RUN apt-get install -y --no-install-recommends libcurl4-openssl-dev && git clone
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE  \
         -DWITH_ZIPKIN=ON \
-        -DWITH_JAEGER=ON \
         -DBUILD_TESTING=OFF \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \

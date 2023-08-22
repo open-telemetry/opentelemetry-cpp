@@ -11,14 +11,17 @@
 
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
@@ -973,6 +976,78 @@ TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
                 opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter));
 }
 #endif
+
+// Test Preferred aggregtion temporality selection
+TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
+{
+  // Cummulative aggregation selector : use cummulative aggregation for all instruments.
+  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  EXPECT_EQ(GetOptions(exporter).aggregation_temporality,
+            PreferredAggregationTemporality::kCumulative);
+  auto cumm_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter).aggregation_temporality);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+
+  // LowMemory aggregation selector use:
+  //   - cummulative aggregtion for Counter and Histogram
+  //   - delta aggregation for up-down counter, observable counter, observable gauge, observable
+  //   up-down counter
+  OtlpHttpMetricExporterOptions opts2;
+  opts2.aggregation_temporality = PreferredAggregationTemporality::kLowMemory;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter2(new OtlpHttpMetricExporter(opts2));
+  EXPECT_EQ(GetOptions(exporter2).aggregation_temporality,
+            PreferredAggregationTemporality::kLowMemory);
+  auto lowmemory_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter2).aggregation_temporality);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(
+      lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+
+  // Delta aggregation selector use:
+  //   - delta aggregtion for Counter, Histogram, Observable Counter, Observable Gauge
+  //   - cummulative aggregation for up-down counter, observable up-down counter
+  OtlpHttpMetricExporterOptions opts3;
+  opts3.aggregation_temporality = PreferredAggregationTemporality::kDelta;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter3(new OtlpHttpMetricExporter(opts3));
+  EXPECT_EQ(GetOptions(exporter3).aggregation_temporality, PreferredAggregationTemporality::kDelta);
+  auto delta_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter3).aggregation_temporality);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+}
 
 }  // namespace otlp
 }  // namespace exporter

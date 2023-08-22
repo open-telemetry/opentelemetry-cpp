@@ -3,27 +3,33 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/version.h"
-
-#include <map>
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
 namespace sdk
 {
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
 namespace trace
 {
 

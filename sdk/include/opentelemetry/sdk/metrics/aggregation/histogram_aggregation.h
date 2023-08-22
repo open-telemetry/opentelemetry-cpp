@@ -3,18 +3,20 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
+
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-
-#include <mutex>
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+class AggregationConfig;
 
 class OPENTELEMETRY_SDK_METRICS_EXPORT LongHistogramAggregation : public Aggregation
 {

@@ -2,22 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "nlohmann/json.hpp"
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/type_traits.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
+#include "nlohmann/json.hpp"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 
-#  include <time.h>
-#  include <atomic>
-#  include <condition_variable>
-#  include <cstddef>
-#  include <iostream>
-#  include <mutex>
+#include <time.h>
+#include <atomic>
+#include <condition_variable>
+#include <cstddef>
+#include <iostream>
+#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -122,19 +121,18 @@ private:
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   struct SynchronizationData
   {
-    std::atomic<std::size_t> session_counter_;
-    std::atomic<std::size_t> finished_session_counter_;
+    std::atomic<std::size_t> session_counter_{0};
+    std::atomic<std::size_t> finished_session_counter_{0};
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
     std::recursive_mutex force_flush_m;
   };
   nostd::shared_ptr<SynchronizationData> synchronization_data_;
-#  endif
+#endif
 };
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

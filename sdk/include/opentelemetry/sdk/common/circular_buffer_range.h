@@ -4,8 +4,6 @@
 #pragma once
 
 #include <cassert>
-#include <iterator>
-#include <type_traits>
 #include <utility>
 
 #include "opentelemetry/nostd/span.h"

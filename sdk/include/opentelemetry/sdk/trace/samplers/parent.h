@@ -3,10 +3,25 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include <memory>
+
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
+namespace trace
+{
+class SpanContext;
+class SpanContextKeyValueIterable;
+class TraceState;
+}  // namespace trace
+
 namespace sdk
 {
 namespace trace

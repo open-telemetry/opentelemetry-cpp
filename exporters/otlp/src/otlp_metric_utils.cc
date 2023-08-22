@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -246,13 +247,17 @@ void OtlpMetricUtils::PopulateRequest(
 }
 
 sdk::metrics::AggregationTemporalitySelector OtlpMetricUtils::ChooseTemporalitySelector(
-    sdk::metrics::AggregationTemporality preferred_aggregation_temporality) noexcept
+    PreferredAggregationTemporality preferred_aggregation_temporality) noexcept
 {
-  if (preferred_aggregation_temporality == sdk::metrics::AggregationTemporality::kDelta)
+  if (preferred_aggregation_temporality == PreferredAggregationTemporality::kDelta)
   {
     return DeltaTemporalitySelector;
   }
-  return CumulativeTemporalitySelector;
+  else if (preferred_aggregation_temporality == PreferredAggregationTemporality::kCumulative)
+  {
+    return CumulativeTemporalitySelector;
+  }
+  return LowMemoryTemporalitySelector;
 }
 
 sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
@@ -278,6 +283,22 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::CumulativeTemporalitySelec
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
+sdk::metrics::AggregationTemporality OtlpMetricUtils::LowMemoryTemporalitySelector(
+    sdk::metrics::InstrumentType instrument_type) noexcept
+{
+  switch (instrument_type)
+  {
+    case sdk::metrics::InstrumentType::kCounter:
+    case sdk::metrics::InstrumentType::kHistogram:
+      return sdk::metrics::AggregationTemporality::kDelta;
+    case sdk::metrics::InstrumentType::kObservableCounter:
+    case sdk::metrics::InstrumentType::kObservableGauge:
+    case sdk::metrics::InstrumentType::kUpDownCounter:
+    case sdk::metrics::InstrumentType::kObservableUpDownCounter:
+      return sdk::metrics::AggregationTemporality::kCumulative;
+  }
+  return sdk::metrics::AggregationTemporality::kUnspecified;
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

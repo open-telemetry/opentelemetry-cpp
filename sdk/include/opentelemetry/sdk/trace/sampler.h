@@ -3,19 +3,30 @@
 
 #pragma once
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/trace_state.h"
-#include "opentelemetry/version.h"
-
 #include <map>
 #include <memory>
 #include <string>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
+namespace trace
+{
+class SpanContext;
+class SpanContextKeyValueIterable;
+class TraceState;
+}  // namespace trace
+
 namespace sdk
 {
 namespace trace

@@ -4,14 +4,18 @@
 #pragma once
 
 #include <cstddef>
-#include <memory>
 #include <vector>
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
+
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+class Context;
+}  // namespace context
+
 namespace sdk
 {
 namespace metrics

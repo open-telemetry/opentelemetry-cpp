@@ -1,13 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
 // MUST be first (absl)
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -33,5 +31,3 @@ OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcExporterOptions &options)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

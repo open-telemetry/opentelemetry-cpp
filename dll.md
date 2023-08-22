@@ -24,14 +24,12 @@ To tackle the above issues, this branch creates a dynamic `otel_sdk.dll` library
 In order to use the library, the users would need to define these 3 items, before including opentelemetry headers:
     - `OPENTELEMETRY_DLL=1` - This enables the `dll` path.
     - `HAVE_CPP_STDLIB=1` - The `dll` library was compiled with C++17 and standard STL support (no abseil)
-    - `ENABLE_LOGS_PREVIEW=1` - It was also compiled with logs enabled, which is still experimental.
 
     _(In the future these defines may become part of `version.h` and/or `config.h`)_
 
 ```C++
 #define OPENTELEMETRY_DLL 1
 #define HAVE_CPP_STDLIB 1
-#define ENABLE_LOGS_PREVIEW 1
 #include <opentelemetry/... some header file>
 ```
 

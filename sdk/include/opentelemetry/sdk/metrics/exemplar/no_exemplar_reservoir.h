@@ -3,17 +3,31 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
+
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class SystemTimestamp;
+}  // namespace common
+
+namespace context
+{
+class Context;
+}  // namespace context
+
 namespace sdk
 {
 namespace metrics
 {
+
+class OPENTELEMETRY_SDK_METRICS_EXPORT ExemplarData;
+
 class OPENTELEMETRY_SDK_METRICS_EXPORT NoExemplarReservoir final : public ExemplarReservoir
 {
 

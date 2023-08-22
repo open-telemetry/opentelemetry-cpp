@@ -3,12 +3,11 @@
 
 #pragma once
 
+#include <vector>
+
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
-
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -55,7 +54,7 @@ public:
   HistogramPointData &operator=(HistogramPointData &&) = default;
   HistogramPointData(const HistogramPointData &)       = default;
   HistogramPointData()                                 = default;
-  HistogramPointData(std::vector<double> &boundaries) : boundaries_(boundaries) {}
+  HistogramPointData(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
   std::vector<double> boundaries_ = {};
   ValueType sum_                  = {};
   ValueType min_                  = {};

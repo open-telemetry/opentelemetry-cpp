@@ -16,11 +16,10 @@ cc_library(
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
         "//:with_dll_enabled": [
-        	"ENABLE_LOGS_PREVIEW=1", 
-        	"ENABLE_TEST=1", 
-        	"OPENTELEMETRY_DLL=1", 
-        	"HAVE_CPP_STDLIB=1", 
-        	"OPENTELEMETRY_DLL_EXPORT=__declspec(dllexport)"
+            "ENABLE_TEST=1",
+            "OPENTELEMETRY_DLL=1",
+            "HAVE_CPP_STDLIB=1",
+            "OPENTELEMETRY_DLL_EXPORT=__declspec(dllexport)",
         ],
         "//conditions:default": [],
     }),
@@ -29,6 +28,7 @@ cc_library(
     deps = select({
         ":with_external_abseil": [
             "@com_google_absl//absl/base",
+            "@com_google_absl//absl/strings",
             "@com_google_absl//absl/types:variant",
         ],
         "//conditions:default": [],
@@ -48,7 +48,6 @@ cc_library(
 
 # This is used for otel_sdk.zip packaging
 filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )
-

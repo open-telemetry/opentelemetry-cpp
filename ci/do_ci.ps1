@@ -10,7 +10,7 @@ $nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
-$BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
@@ -85,7 +85,6 @@ switch ($action) {
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_JAEGER=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

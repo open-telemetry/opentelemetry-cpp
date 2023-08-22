@@ -1,16 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-
-#  include <memory>
-#  include <mutex>
-#  include <string>
-#  include <unordered_map>
-#  include <vector>
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,29 +22,27 @@ LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
-  context_ = std::make_shared<sdk::logs::LoggerContext>(std::move(processors), std::move(resource));
+  context_ = std::make_shared<LoggerContext>(std::move(processors), std::move(resource));
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
                                opentelemetry::sdk::resource::Resource resource) noexcept
-    : context_{
-          std::make_shared<sdk::logs::LoggerContext>(std::move(processors), std::move(resource))}
+    : context_{std::make_shared<LoggerContext>(std::move(processors), std::move(resource))}
 {}
 
 LoggerProvider::LoggerProvider() noexcept
-    : context_{std::make_shared<sdk::logs::LoggerContext>(
-          std::vector<std::unique_ptr<LogRecordProcessor>>{})}
+    : context_{std::make_shared<LoggerContext>(std::vector<std::unique_ptr<LogRecordProcessor>>{})}
 {}
 
-LoggerProvider::LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context) noexcept
-    : context_{context}
+LoggerProvider::LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept
+    : context_(std::move(context))
 {}
 
 LoggerProvider::~LoggerProvider()
 {
   // Logger hold the shared pointer to the context. So we can not use destructor of LoggerContext to
-  // Shutdown and flush all pending recordables when we hasve more than one loggers.These
+  // Shutdown and flush all pending recordables when we have more than one loggers. These
   // recordables may use the raw pointer of instrumentation_scope_ in Logger
   if (context_)
   {
@@ -131,4 +125,3 @@ bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif
