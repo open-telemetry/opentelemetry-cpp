@@ -29,4 +29,10 @@ if(OPENTELEMETRY_INSTALL)
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+  opentelemetry_add_pkgconfig(
+    common
+    "OpenTelemetry SDK - Common"
+    "Common components for the OpenTelemetry SDK, a library for exporting telemetry."
+    "opentelemetry_api")
 endif()
