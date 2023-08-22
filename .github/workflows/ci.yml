@@ -228,7 +228,7 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.with_async_export.test
 
-  cmake_absel_stl_test:
+  cmake_abseil_stl_test:
     name: CMake test (with abseil)
     runs-on: ubuntu-20.04
     steps:
@@ -442,6 +442,25 @@ jobs:
         sudo ./ci/setup_grpc.sh -T
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
+  cmake_install_test:
+    name: CMake install test (with abseil)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake install (with abseil)
+      run: |
+        sudo ./ci/install_abseil.sh
+        ./ci/do_ci.sh cmake.install.test
+    - name: verify packages
+      run: |
+        ./ci/verify_packages.sh
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
@@ -611,7 +630,7 @@ jobs:
 
   bazel_tsan:
     name: Bazel tsan config
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
