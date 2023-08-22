@@ -361,7 +361,7 @@ pkg_zip(
 
 cc_binary(
     name = "dll_deps_update_binary",
-    srcs = ["dll_deps_update.cpp"],
+    srcs = ["dll_deps_update.cc"],
     data = ["otel_sdk_all_project_deps"],
     local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
     deps = ["@bazel_tools//tools/cpp/runfiles"],

@@ -130,9 +130,9 @@ cc_binary(
         "//conditions:default": DEFAULT_NOWIN_COPTS,
     }),
     linkshared = True,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 # no cc_shared_library in bazel 4.2
@@ -146,9 +146,9 @@ cc_binary(
         "//conditions:default": HIDDEN_NOWIN_COPTS,
     }),
     linkshared = True,
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 #

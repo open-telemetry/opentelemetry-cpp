@@ -17,7 +17,6 @@ rem Note that `otel_sdk.zip` is built here for the default fastdbg (e.g. when no
 "%__BAZEL__%" build --//:with_dll=true ... || goto:error
 
 rem We can't test dbg, fastbuild and opt at the same time, as done above ^^^ (no config "transition" possible when doing testing (AFAIK))
-rem TODO: Fix failing tests in debug only (e.g. add back the || goto:error)
 "%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c dbg ... || goto:error
 "%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c fastbuild ... || goto:error
 "%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c opt ... || goto:error

@@ -22,10 +22,10 @@ cc_test(
         "base64_test.cc",
     ],
     tags = ["test"],
-    deps = [
+    deps = dll_deps([
         "//sdk/src/common:base64",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -47,7 +47,7 @@ otel_cc_benchmark(
         "benchmark",
         "test",
     ],
-    deps = ["//sdk/src/common:base64"],
+    deps = dll_deps(["//sdk/src/common:base64"]),
 )
 
 otel_cc_benchmark(
