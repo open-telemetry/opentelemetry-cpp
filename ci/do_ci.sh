@@ -322,6 +322,18 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "cmake.install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_ABSEIL=ON \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  sudo make install
+  exit 0
 elif [[ "$1" == "bazel.with_abseil" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...
