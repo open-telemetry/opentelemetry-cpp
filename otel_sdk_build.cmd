@@ -9,7 +9,7 @@ for /F "usebackq" %%i in (`where bazel`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
 rem Python311 is something we need to solve better here!
-set PATH=c:\windows\system32;c:\python311;
+set PATH=c:\windows\system32;c:\python311;c:\program files\python312;
 pushd "%~dp0"
 
 rem Note that this builds (through the magic of force_debug/release/reldeb) all configurations (unlike tests).
