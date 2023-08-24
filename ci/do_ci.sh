@@ -25,7 +25,7 @@ function run_benchmarks
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   mkdir -p $BENCHMARK_DIR
-  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
