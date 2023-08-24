@@ -9,6 +9,8 @@
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 #include <functional>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 using namespace opentelemetry::sdk::metrics;
@@ -32,8 +34,10 @@ void BM_AttributseHashMap(benchmark::State &state)
       return std::unique_ptr<Aggregation>(new DropAggregation);
     };
     m.lock();
-    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate((int64_t)1);
-    benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
+    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes[i % 2]);
+    hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation, hash)
+        ->Aggregate((int64_t)1);
+    benchmark::DoNotOptimize(hash_map.Has(hash));
     m.unlock();
   };
   while (state.KeepRunning())

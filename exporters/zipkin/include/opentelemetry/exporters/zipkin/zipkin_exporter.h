@@ -50,6 +50,14 @@ public:
       override;
 
   /**
+   * Force flush the exporter.
+   * @param timeout an option timeout, default to max.
+   * @return return true when all data are exported, and false when timeout
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+
+  /**
    * Shut down the exporter.
    * @param timeout an optional timeout, default to max.
    */
@@ -70,7 +78,7 @@ private:
   // For testing
   friend class ZipkinExporterTestPeer;
   /**
-   * Create an ZipkinExporter using the specified thrift sender.
+   * Create an ZipkinExporter using the specified http client.
    * Only tests can call this constructor directly.
    * @param http_client the http client to be used for exporting
    */

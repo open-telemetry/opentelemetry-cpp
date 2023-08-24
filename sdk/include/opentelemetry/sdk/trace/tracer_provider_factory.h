@@ -4,22 +4,35 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
 namespace trace
 {
+class TracerProvider;
+}  // namespace trace
+
+namespace sdk
+{
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
+namespace trace
+{
+class IdGenerator;
+class Sampler;
+class SpanProcessor;
+class TracerContext;
 
 /**
  * Factory class for TracerProvider.
  * See @ref TracerProvider.
  */
-class TracerProviderFactory
+class OPENTELEMETRY_EXPORT TracerProviderFactory
 {
 public:
   /* Serie of builders with a single processor. */
@@ -65,7 +78,7 @@ public:
   /* Create with a tracer context. */
 
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
-      std::shared_ptr<sdk::trace::TracerContext> context);
+      std::unique_ptr<TracerContext> context);
 };
 
 }  // namespace trace

@@ -27,6 +27,13 @@
 #  include <codecvt>
 #endif
 
+#if defined(ENABLE_ENV_PROPERTIES)
+
+#  include <nlohmann/json.hpp>
+#  include "etw_properties.h"
+
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace utils
@@ -269,6 +276,112 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
 #endif
   return buf;
 }
+
+#if defined(ENABLE_ENV_PROPERTIES)
+
+static inline void PopulateAttribute(nlohmann::json &attribute,
+                                     nostd::string_view key,
+                                     const exporter::etw::PropertyValue &value)
+{
+  if (nostd::holds_alternative<bool>(value))
+  {
+    attribute[key.data()] = nostd::get<bool>(value);
+  }
+  else if (nostd::holds_alternative<int>(value))
+  {
+    attribute[key.data()] = nostd::get<int>(value);
+  }
+  else if (nostd::holds_alternative<int64_t>(value))
+  {
+    attribute[key.data()] = nostd::get<int64_t>(value);
+  }
+  else if (nostd::holds_alternative<unsigned int>(value))
+  {
+    attribute[key.data()] = nostd::get<unsigned int>(value);
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    attribute[key.data()] = nostd::get<uint64_t>(value);
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    attribute[key.data()] = nostd::get<double>(value);
+  }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    attribute[key.data()] = std::string(nostd::get<const char *>(value));
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    attribute[key.data()] = nostd::get<std::string>(value);
+  }
+  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<uint8_t>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<bool>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<bool>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<int>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<int>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<int64_t>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<unsigned int>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<unsigned int>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<double>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<double>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<std::vector<std::string>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+}
+
+#endif  // defined(ENABLE_ENV_PROPERTIES)
 
 };  // namespace utils
 

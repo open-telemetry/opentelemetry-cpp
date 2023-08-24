@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <sstream>
 #include <utility>
 
@@ -134,7 +133,7 @@ private:
 OPENTELEMETRY_END_NAMESPACE
 
 /**
- * GlobalLogHandler and TracerProvider/MeterProvider/LoggerProvider are lazy sigletons.
+ * GlobalLogHandler and TracerProvider/MeterProvider/LoggerProvider are lazy singletons.
  * To ensure that GlobalLogHandler is the first one to be initialized (and so last to be
  * destroyed), it is first used inside the constructors of TraceProvider, MeterProvider
  * and LoggerProvider for debug logging. */
@@ -187,7 +186,7 @@ OPENTELEMETRY_END_NAMESPACE
                                   OTEL_INTERNAL_LOG_WARN_1_ARGS)
 #  define OTEL_INTERNAL_LOG_WARN(...) OTEL_INTERNAL_LOG_WARN_MACRO(__VA_ARGS__)(__VA_ARGS__)
 #else
-#  define OTEL_INTERNAL_LOG_ERROR(...)
+#  define OTEL_INTERNAL_LOG_WARN(...)
 #endif
 
 #if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_DEBUG

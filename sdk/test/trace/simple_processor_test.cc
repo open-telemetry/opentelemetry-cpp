@@ -17,9 +17,9 @@ using opentelemetry::trace::SpanContext;
 
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
-  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
-  SimpleSpanProcessor processor(std::move(exporter));
+  SimpleSpanProcessor processor(std::unique_ptr<SpanExporter>{exporter});
 
   auto recordable = processor.MakeRecordable();
 
@@ -38,7 +38,9 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 class RecordShutdownExporter final : public SpanExporter
 {
 public:
-  RecordShutdownExporter(int *shutdown_counter) : shutdown_counter_(shutdown_counter) {}
+  RecordShutdownExporter(int *force_flush_counter, int *shutdown_counter)
+      : force_flush_counter_(force_flush_counter), shutdown_counter_(shutdown_counter)
+  {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
@@ -51,6 +53,12 @@ public:
     return ExportResult::kSuccess;
   }
 
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override
+  {
+    *force_flush_counter_ += 1;
+    return true;
+  }
+
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
     *shutdown_counter_ += 1;
@@ -58,17 +66,70 @@ public:
   }
 
 private:
+  int *force_flush_counter_;
   int *shutdown_counter_;
 };
 
 TEST(SimpleSpanProcessor, ShutdownCalledOnce)
 {
-  int shutdowns = 0;
-  std::unique_ptr<RecordShutdownExporter> exporter(new RecordShutdownExporter(&shutdowns));
-  SimpleSpanProcessor processor(std::move(exporter));
+  int force_flush                  = 0;
+  int shutdowns                    = 0;
+  RecordShutdownExporter *exporter = new RecordShutdownExporter(&force_flush, &shutdowns);
+  SimpleSpanProcessor processor(std::unique_ptr<SpanExporter>{exporter});
   EXPECT_EQ(0, shutdowns);
   processor.Shutdown();
   EXPECT_EQ(1, shutdowns);
   processor.Shutdown();
   EXPECT_EQ(1, shutdowns);
+
+  EXPECT_EQ(0, force_flush);
+}
+
+TEST(SimpleSpanProcessor, ForceFlush)
+{
+  int force_flush                  = 0;
+  int shutdowns                    = 0;
+  RecordShutdownExporter *exporter = new RecordShutdownExporter(&force_flush, &shutdowns);
+  SimpleSpanProcessor processor(std::unique_ptr<SpanExporter>{exporter});
+  processor.ForceFlush();
+  EXPECT_EQ(0, shutdowns);
+  EXPECT_EQ(1, force_flush);
+  processor.ForceFlush();
+  EXPECT_EQ(2, force_flush);
+}
+
+// An exporter that does nothing but record (and give back ) the # of times Shutdown was called.
+class FailShutDownForceFlushExporter final : public SpanExporter
+{
+public:
+  FailShutDownForceFlushExporter() {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new SpanData());
+  }
+
+  ExportResult Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>>
+                          & /* recordables */) noexcept override
+  {
+    return ExportResult::kSuccess;
+  }
+
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return false; }
+
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return false; }
+};
+
+TEST(SimpleSpanProcessor, ShutdownFail)
+{
+  SimpleSpanProcessor processor(
+      std::unique_ptr<SpanExporter>{new FailShutDownForceFlushExporter()});
+  EXPECT_EQ(false, processor.Shutdown());
+}
+
+TEST(SimpleSpanProcessor, ForceFlushFail)
+{
+  SimpleSpanProcessor processor(
+      std::unique_ptr<SpanExporter>{new FailShutDownForceFlushExporter()});
+  EXPECT_EQ(false, processor.ForceFlush());
 }

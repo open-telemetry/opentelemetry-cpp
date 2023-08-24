@@ -4,6 +4,7 @@
 #pragma once
 
 #include <atomic>
+#include <cassert>
 #include <cstdint>
 #include <memory>
 
@@ -113,6 +114,14 @@ public:
       }
     }
     return true;
+  }
+
+  bool Add(std::unique_ptr<T> &&ptr) noexcept
+  {
+    // rvalue to lvalue reference
+    bool result = Add(std::ref(ptr));
+    ptr.reset();
+    return result;
   }
 
   /**

@@ -3,6 +3,8 @@
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -17,7 +19,7 @@ namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-void initTracer()
+void InitTracer()
 {
   auto exporter  = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
@@ -26,6 +28,12 @@ void initTracer()
                                                opentelemetry::sdk::resource::Resource::Create({}));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
+}
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace_api::Provider::SetTracerProvider(none);
 }
 
 nostd::shared_ptr<trace_api::Tracer> get_tracer()
@@ -56,10 +64,14 @@ void run_threads()
 
 int main()
 {
-  initTracer();
+  InitTracer();
 
-  auto root_span = get_tracer()->StartSpan(__func__);
-  trace_api::Scope scope(root_span);
+  {
+    auto root_span = get_tracer()->StartSpan(__func__);
+    trace_api::Scope scope(root_span);
 
-  run_threads();
+    run_threads();
+  }
+
+  CleanupTracer();
 }

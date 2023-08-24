@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "common.h"
+
 #include <memory>
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -16,23 +18,6 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 using M         = std::map<std::string, std::string>;
 namespace nostd = opentelemetry::nostd;
-
-class MockCollectorHandle : public CollectorHandle
-{
-public:
-  MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
-
-  ~MockCollectorHandle() override = default;
-
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) noexcept override
-  {
-    return temporality;
-  }
-
-private:
-  AggregationTemporality temporality;
-};
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
@@ -110,6 +95,10 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        if (temporality == AggregationTemporality::kCumulative)
+        {
+          EXPECT_EQ(metric_data.start_ts, sdk_start_ts);
+        }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -249,6 +238,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        if (temporality == AggregationTemporality::kCumulative)
+        {
+          EXPECT_EQ(metric_data.start_ts, sdk_start_ts);
+        }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);

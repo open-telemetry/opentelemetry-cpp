@@ -1,7 +1,10 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 $ErrorActionPreference = "Stop"
 trap { $host.SetShouldExit(1) }
 
-$CMAKE_VERSION="3.15.2"
+$CMAKE_VERSION="3.16.3"
 $CWD=(Get-Item -Path ".\").FullName
 (new-object System.Net.WebClient). `
    DownloadFile("https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-win64-x64.zip", `

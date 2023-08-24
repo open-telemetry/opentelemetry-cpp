@@ -1,16 +1,5 @@
-# Copyright 2020, OpenTelemetry Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,6 +8,7 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_library(
     name = "otlp_recordable",
     srcs = [
+        "src/otlp_environment.cc",
         "src/otlp_log_recordable.cc",
         "src/otlp_metric_utils.cc",
         "src/otlp_populate_attribute_utils.cc",
@@ -26,9 +16,11 @@ cc_library(
         "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
+        "include/opentelemetry/exporters/otlp/otlp_preferred_temporality.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
@@ -70,6 +62,9 @@ cc_library(
         "//sdk/src/common:global_log_handler",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
     ],
 )
 
@@ -136,7 +131,9 @@ cc_library(
         "//api",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk:headers",
+        "//sdk/src/common:base64",
         "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_google_absl//absl/strings",
         "@github_nlohmann_json//:json",
     ],
 )
@@ -277,7 +274,6 @@ cc_library(
         ":otlp_grpc_client",
         "//ext:headers",
         "//sdk/src/logs",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         # For gRPC
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
     ],
@@ -416,6 +412,7 @@ cc_test(
         "test",
     ],
     deps = [
+        ":otlp_grpc_exporter",
         ":otlp_grpc_log_record_exporter",
         "//api",
         "//sdk/src/logs",

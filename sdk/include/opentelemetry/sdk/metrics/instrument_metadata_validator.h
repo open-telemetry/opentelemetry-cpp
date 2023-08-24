@@ -4,11 +4,12 @@
 #pragma once
 
 #include <string>
+
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #endif
 
@@ -26,7 +27,7 @@ public:
   bool ValidateDescription(nostd::string_view description) const;
 
 private:
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   const std::regex name_reg_key_;
   const std::regex unit_reg_key_;
 #endif

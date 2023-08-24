@@ -2,18 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <memory>
-#include <vector>
+
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
 
 #include <iostream>
-#include "opentelemetry/exporters/ostream/metric_exporter.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/resource/resource.h"
+#include <memory>
+#include <vector>
 
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace nostd           = opentelemetry::nostd;
@@ -97,14 +99,14 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
       std::unique_ptr<metric_sdk::PushMetricExporter>(new exportermetrics::OStreamMetricExporter);
 
   metric_sdk::HistogramPointData histogram_point_data{};
-  histogram_point_data.boundaries_ = std::list<double>{10.1, 20.2, 30.2};
+  histogram_point_data.boundaries_ = std::vector<double>{10.1, 20.2, 30.2};
   histogram_point_data.count_      = 3;
   histogram_point_data.counts_     = {200, 300, 400, 500};
   histogram_point_data.sum_        = 900.5;
   histogram_point_data.min_        = 1.8;
   histogram_point_data.max_        = 12.0;
   metric_sdk::HistogramPointData histogram_point_data2{};
-  histogram_point_data2.boundaries_ = std::list<double>{10.0, 20.0, 30.0};
+  histogram_point_data2.boundaries_ = std::vector<double>{10.0, 20.0, 30.0};
   histogram_point_data2.count_      = 3;
   histogram_point_data2.counts_     = {200, 300, 400, 500};
   histogram_point_data2.sum_        = (int64_t)900;

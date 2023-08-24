@@ -26,7 +26,7 @@ namespace otlp
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpHttpExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_EXPORT OtlpHttpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
@@ -52,6 +52,14 @@ public:
   opentelemetry::sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
       override;
+
+  /**
+   * Force flush the exporter.
+   * @param timeout an option timeout, default to max.
+   * @return return true when all data are exported, and false when timeout
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
    * Shut down the exporter.

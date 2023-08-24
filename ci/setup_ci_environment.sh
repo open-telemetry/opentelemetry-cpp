@@ -11,4 +11,6 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 wget \
                 git \
                 valgrind \
-                lcov
+                lcov \
+                iwyu \
+                pkg-config

@@ -6,6 +6,7 @@
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
@@ -54,9 +55,10 @@ void initTracer()
       new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<trace_sdk::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  auto context = std::make_shared<trace_sdk::TracerContext>(std::move(processors));
-  auto provider =
-      nostd::shared_ptr<trace_api::TracerProvider>(new trace_sdk::TracerProvider(context));
+  auto context = std::unique_ptr<trace_sdk::TracerContext>(
+      new trace_sdk::TracerContext(std::move(processors)));
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
+      new trace_sdk::TracerProvider(std::move(context)));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }
@@ -89,11 +91,11 @@ struct Uri
 class NoopEventHandler : public http_client::EventHandler
 {
 public:
-  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override {}
+  void OnEvent(http_client::SessionState /* state */,
+               nostd::string_view /* reason */) noexcept override
+  {}
 
-  void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
-
-  void OnResponse(http_client::Response &response) noexcept override {}
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
 };
 }  // namespace
 
@@ -165,7 +167,9 @@ int main(int argc, char *argv[])
 
         for (auto &part : body)
         {
-          const TextMapCarrierTest carrier((std::map<std::string, std::string> &)req.headers);
+          auto headers_2 = const_cast<std::map<std::string, std::string> &>(req.headers);
+
+          const TextMapCarrierTest carrier(headers_2);
           auto current_ctx = context::RuntimeContext::GetCurrent();
           auto ctx         = propagator_format.Extract(carrier, current_ctx);
           auto token       = context::RuntimeContext::Attach(ctx);

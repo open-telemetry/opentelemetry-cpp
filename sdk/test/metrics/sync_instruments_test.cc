@@ -98,15 +98,15 @@ TEST(SyncInstruments, LongHistogram)
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongHistogram<int64_t> counter(instrument_descriptor, std::move(metric_storage));
-  counter.Record(10, opentelemetry::context::Context{});
-  counter.Record(-10, opentelemetry::context::Context{});  // This is ignored
+  LongHistogram<int64_t> histogram(instrument_descriptor, std::move(metric_storage));
+  histogram.Record(10, opentelemetry::context::Context{});
+  histogram.Record(-10, opentelemetry::context::Context{});  // This is ignored
 
-  counter.Record(10,
-                 opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
-                 opentelemetry::context::Context{});
-  counter.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
-                 opentelemetry::context::Context{});
+  histogram.Record(10,
+                   opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+                   opentelemetry::context::Context{});
+  histogram.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
+                   opentelemetry::context::Context{});
 }
 
 TEST(SyncInstruments, DoubleHistogram)
@@ -115,17 +115,17 @@ TEST(SyncInstruments, DoubleHistogram)
                                                 InstrumentType::kHistogram,
                                                 InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  DoubleHistogram counter(instrument_descriptor, std::move(metric_storage));
-  counter.Record(10.10, opentelemetry::context::Context{});
-  counter.Record(-10.10, opentelemetry::context::Context{});  // This is ignored.
-  counter.Record(std::numeric_limits<double>::quiet_NaN(),
-                 opentelemetry::context::Context{});  // This is ignored too
-  counter.Record(std::numeric_limits<double>::infinity(),
-                 opentelemetry::context::Context{});  // This is ignored too
+  DoubleHistogram histogram(instrument_descriptor, std::move(metric_storage));
+  histogram.Record(10.10, opentelemetry::context::Context{});
+  histogram.Record(-10.10, opentelemetry::context::Context{});  // This is ignored.
+  histogram.Record(std::numeric_limits<double>::quiet_NaN(),
+                   opentelemetry::context::Context{});  // This is ignored too
+  histogram.Record(std::numeric_limits<double>::infinity(),
+                   opentelemetry::context::Context{});  // This is ignored too
 
-  counter.Record(10.10,
-                 opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
-                 opentelemetry::context::Context{});
-  counter.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
-                 opentelemetry::context::Context{});
+  histogram.Record(10.10,
+                   opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+                   opentelemetry::context::Context{});
+  histogram.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
+                   opentelemetry::context::Context{});
 }

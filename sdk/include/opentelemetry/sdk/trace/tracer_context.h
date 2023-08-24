@@ -3,7 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include <chrono>
+#include <memory>
+#include <vector>
+
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
@@ -39,6 +42,8 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
+
+  virtual ~TracerContext() = default;
 
   /**
    * Attaches a span processor to list of configured processors to this tracer context.
@@ -85,7 +90,7 @@ public:
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
   //  order of declaration is important here - resource object should be destroyed after processor.

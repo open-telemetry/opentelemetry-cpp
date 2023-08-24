@@ -40,10 +40,14 @@ bool MetricCollector::Collect(
   ResourceMetrics resource_metrics;
   meter_context_->ForEachMeter([&](std::shared_ptr<Meter> meter) noexcept {
     auto collection_ts = std::chrono::system_clock::now();
-    ScopeMetrics scope_metrics;
-    scope_metrics.metric_data_ = meter->Collect(this, collection_ts);
-    scope_metrics.scope_       = meter->GetInstrumentationScope();
-    resource_metrics.scope_metric_data_.push_back(scope_metrics);
+    auto metric_data   = meter->Collect(this, collection_ts);
+    if (!metric_data.empty())
+    {
+      ScopeMetrics scope_metrics;
+      scope_metrics.metric_data_ = std::move(metric_data);
+      scope_metrics.scope_       = meter->GetInstrumentationScope();
+      resource_metrics.scope_metric_data_.emplace_back(std::move(scope_metrics));
+    }
     return true;
   });
   resource_metrics.resource_ = &meter_context_->GetResource();

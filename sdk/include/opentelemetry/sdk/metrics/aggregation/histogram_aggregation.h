@@ -3,18 +3,20 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
+
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-
-#include <mutex>
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+class AggregationConfig;
 
 class LongHistogramAggregation : public Aggregation
 {
@@ -106,6 +108,13 @@ void HistogramDiff(HistogramPointData &current, HistogramPointData &next, Histog
   diff.boundaries_     = current.boundaries_;
   diff.count_          = next.count_ - current.count_;
   diff.record_min_max_ = false;
+}
+
+template <class T>
+size_t BucketBinarySearch(T value, const std::vector<double> &boundaries)
+{
+  auto low = std::lower_bound(boundaries.begin(), boundaries.end(), value);
+  return low - boundaries.begin();
 }
 
 }  // namespace metrics

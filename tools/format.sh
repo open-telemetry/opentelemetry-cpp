@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 if [[ ! -e tools/format.sh ]]; then
   echo "This tool must be run from the topmost directory." >&2
   exit 1
@@ -6,7 +10,7 @@ fi
 
 set -e
 
-FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o -name opentelemetry_logo.png -prune -o -name TraceLoggingDynamic.h -prune -o -name thrift-gen -prune -o"
+FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o -name opentelemetry_logo.png -prune -o -name TraceLoggingDynamic.h -prune -o"
 
 # GNU syntax.
 SED=(sed -i)

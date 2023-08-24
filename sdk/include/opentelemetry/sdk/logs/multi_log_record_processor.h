@@ -3,21 +3,19 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <memory>
+#include <vector>
 
-#  include <memory>
-#  include <vector>
-
-#  include "opentelemetry/sdk/logs/multi_recordable.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
 
 /**
  * Log processor allow hooks for receive method invocations.
@@ -66,4 +64,3 @@ private:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

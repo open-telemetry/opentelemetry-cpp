@@ -14,12 +14,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | ------- | ----------------------- | ------------------------------------------------------------------------ |
 | Traces  | Public Release          | N/A                                                                      |
 | Metrics | Public Release          | N/A                                                                      |
-| Logs    | Experimental [1]        | [Release Milestone](https://github.com/open-telemetry/opentelemetry-cpp/milestone/18)|
-
-* [1]: The current Log Signal Implementation is Experimental, and will change as
-      the current OpenTelemetry Log specification matures. The current
-      implementation can be included in build by setting `ENABLE_LOGS_PREVIEW`
-      preprocessor macro.
+| Logs    | Public Release          | N/A                                                                      |
 
 ## Supported C++ Versions
 
@@ -43,14 +38,16 @@ of the current project.
 
 | Platform                                                            |   Build type  |
 |---------------------------------------------------------------------|---------------|
-| ubuntu-20.04 (Default GCC Compiler - 9.3.0)                         | CMake, Bazel  |
-| ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
-| ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)   | CMake, Bazel  |
-| macOS 10.15 (Xcode 12.2)                                            | Bazel         |
+| ubuntu-22.04 (GCC - 10, 12)                                         | CMake, Bazel  |
+| ubuntu-20.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
+| ubuntu-20.04 (GCC 9.4.0)                                            | CMake, Bazel  |
+| ubuntu-20.04 (Default GCC Compiler - 9.4.0 with -std=c++20 flags)   | CMake, Bazel  |
+| macOS 12.0 (Xcode 14.2)                                             | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
+| Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
 
 [1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
-  (required by OTLP expoter) don't build with this compiler. See gRPC [official
+  (required by OTLP exporter) don't build with this compiler. See gRPC [official
   support](https://grpc.io/docs/#official-support) document. CMake build doesn't
   build OTLP exporter with GCC 4.8.
 
@@ -96,14 +93,13 @@ For edit access, get in touch on
 
 * [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
+* [Marc Alff](https://github.com/marcalff), Oracle
 * [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 [Approvers](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 * [Josh Suereth](https://github.com/jsuereth), Google
-* [Marc Alff](https://github.com/marcalff), Oracle
-* [Reiley Yang](https://github.com/reyang), Microsoft
 * [WenTao Ou](https://github.com/owent), Tencent
 
 [Emeritus
@@ -114,6 +110,7 @@ Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/ma
 * [Jodee Varney](https://github.com/jodeev)
 * [Johannes Tax](https://github.com/pyohannes)
 * [Max Golovanov](https://github.com/maxgolov)
+* [Reiley Yang](https://github.com/reyang)
 * [Ryan Burn](https://github.com/rnburn)
 
 ### Thanks to all the people who have contributed

@@ -1,9 +1,13 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "es_log_record_exporter",
     srcs = [
         "src/es_log_record_exporter.cc",
+        "src/es_log_recordable.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/elasticsearch/es_log_record_exporter.h",

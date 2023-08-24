@@ -10,6 +10,7 @@
 #  include <memory>
 #  include <utility>
 
+#  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -96,6 +97,18 @@ public:
   }
 
   shared_ptr(const shared_ptr &other) noexcept { other.wrapper().CopyTo(buffer_); }
+
+  shared_ptr(unique_ptr<T> &&other) noexcept
+  {
+    std::shared_ptr<T> ptr_(other.release());
+    new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
+  }
+
+  shared_ptr(std::unique_ptr<T> &&other) noexcept
+  {
+    std::shared_ptr<T> ptr_(other.release());
+    new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
+  }
 
   ~shared_ptr() { wrapper().~shared_ptr_wrapper(); }
 

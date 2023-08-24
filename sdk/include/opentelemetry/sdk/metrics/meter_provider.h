@@ -3,24 +3,30 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <mutex>
-#include <vector>
-#include "opentelemetry/metrics/meter.h"
+
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace metrics
+{
+class Meter;
+}  // namespace metrics
+
 namespace sdk
 {
 namespace metrics
 {
 
 // forward declaration
+class MeterContext;
 class MetricCollector;
 class MetricReader;
 
@@ -38,14 +44,20 @@ public:
 
   /**
    * Initialize a new meter provider with a specified context
-   * @param context The shared meter configuration/pipeline for this provider.
+   * @param context The owned meter configuration/pipeline for this provider.
    */
-  explicit MeterProvider(std::shared_ptr<sdk::metrics::MeterContext> context) noexcept;
+  explicit MeterProvider(std::unique_ptr<MeterContext> context) noexcept;
 
   nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") noexcept override;
+
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+  void RemoveMeter(nostd::string_view name,
+                   nostd::string_view version,
+                   nostd::string_view schema_url) noexcept override;
+#endif
 
   /**
    * Obtain the resource associated with this meter provider.
@@ -88,7 +100,7 @@ public:
   ~MeterProvider() override;
 
 private:
-  std::shared_ptr<sdk::metrics::MeterContext> context_;
+  std::shared_ptr<MeterContext> context_;
   std::mutex lock_;
 };
 }  // namespace metrics

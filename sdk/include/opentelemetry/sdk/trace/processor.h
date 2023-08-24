@@ -5,20 +5,28 @@
 
 #include <chrono>
 #include <memory>
-#include "opentelemetry/sdk/trace/recordable.h"
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+class SpanContext;
+}  // namespace trace
+
 namespace sdk
 {
 namespace trace
 {
+class Recordable;
+
 /**
  * Span processor allow hooks for span start and end method invocations.
  *
  * Built-in span processors are responsible for batching and conversion of
  * spans to exportable representation and passing batches to exporters.
  */
-class SpanProcessor
+class OPENTELEMETRY_EXPORT SpanProcessor
 {
 public:
   virtual ~SpanProcessor() = default;

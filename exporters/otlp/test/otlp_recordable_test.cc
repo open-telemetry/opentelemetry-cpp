@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 #if defined(__GNUC__)
 // GCC raises -Wsuggest-override warnings on GTest,
@@ -282,6 +283,29 @@ TEST(OtlpRecordable, SetArrayAttribute)
               double_span[i]);
     EXPECT_EQ(rec.span().attributes(2).value().array_value().values(i).string_value(), str_span[i]);
   }
+}
+
+template <typename T>
+struct EmptyArrayAttributeTest : public testing::Test
+{
+  using ElementType = T;
+};
+
+using ArrayElementTypes =
+    testing::Types<bool, double, nostd::string_view, uint8_t, int, int64_t, unsigned int, uint64_t>;
+TYPED_TEST_SUITE(EmptyArrayAttributeTest, ArrayElementTypes);
+
+// Test empty arrays.
+TYPED_TEST(EmptyArrayAttributeTest, SetEmptyArrayAttribute)
+{
+  using ArrayElementType = typename TestFixture::ElementType;
+  OtlpRecordable rec;
+
+  nostd::span<const ArrayElementType> span = {};
+  rec.SetAttribute("empty_arr_attr", span);
+
+  EXPECT_TRUE(rec.span().attributes(0).value().has_array_value());
+  EXPECT_TRUE(rec.span().attributes(0).value().array_value().values().empty());
 }
 
 /**

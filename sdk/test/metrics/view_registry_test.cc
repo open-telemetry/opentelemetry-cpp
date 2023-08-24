@@ -8,6 +8,10 @@
 
 #include <gtest/gtest.h>
 
+#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#  include <regex>
+#endif
+
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 
@@ -28,14 +32,14 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_scope.get(),
                          [&count](const View &view) {
                            count++;
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), "");
                            EXPECT_EQ(view.GetDescription(), "");
 #endif
                            EXPECT_EQ(view.GetAggregationType(), AggregationType::kDefault);
                            return true;
                          });
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
 #endif
@@ -51,9 +55,10 @@ TEST(ViewRegistry, FindNonExistingView)
   const std::string instrumentation_schema  = "schema1";
   const std::string instrument_name         = "testname";
   const InstrumentType instrument_type      = InstrumentType::kCounter;
+  const std::string instrument_unit         = "ms";
 
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(instrument_type, instrument_name)};
+      new InstrumentSelector(instrument_type, instrument_name, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{
       new MeterSelector(instrumentation_name, instrumentation_version, instrumentation_schema)};
   std::unique_ptr<View> view = std::unique_ptr<View>(new View(view_name, view_description));
@@ -62,7 +67,7 @@ TEST(ViewRegistry, FindNonExistingView)
   registry.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
   InstrumentDescriptor default_instrument_descriptor = {instrument_name,  // name
                                                         "test_descr",     // description
-                                                        "1",              // unit
+                                                        instrument_unit,  // unit
                                                         instrument_type,  // instrument type
                                                         InstrumentValueType::kLong};
 
@@ -73,13 +78,13 @@ TEST(ViewRegistry, FindNonExistingView)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_scope.get(),
                          [&count, &view_name, &view_description](const View &view) {
                            count++;
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), view_name);
                            EXPECT_EQ(view.GetDescription(), view_description);
 #endif
                            return true;
                          });
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   EXPECT_EQ(count, 1);
   EXPECT_EQ(status, true);
 #endif

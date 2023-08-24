@@ -23,7 +23,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.15.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.21.0";
 
 /**
  * Array of brand name and version separated by a space
@@ -63,16 +63,6 @@ static constexpr const char *kBrowserPlatform = "browser.platform";
 static constexpr const char *kBrowserMobile = "browser.mobile";
 
 /**
- * Full user-agent string provided by the browser
- *
- * <p>Notes:
-  <ul> <li>The user-agent value SHOULD be provided only from browsers that do not have a mechanism
- to retrieve brands and platform individually from the User-Agent Client Hints API. To retrieve the
- value, the legacy {@code navigator.userAgent} API can be used.</li> </ul>
- */
-static constexpr const char *kBrowserUserAgent = "browser.user_agent";
-
-/**
  * Preferred language of the user using the browser
  *
  * <p>Notes:
@@ -100,10 +90,40 @@ static constexpr const char *kCloudAccountId = "cloud.account.id";
  href="https://aws.amazon.com/about-aws/global-infrastructure/regions_az/">AWS regions</a>, <a
  href="https://azure.microsoft.com/en-us/global-infrastructure/geographies/">Azure regions</a>, <a
  href="https://cloud.google.com/about/locations">Google Cloud regions</a>, or <a
- href="https://intl.cloud.tencent.com/document/product/213/6091">Tencent Cloud regions</a>.</li>
- </ul>
+ href="https://www.tencentcloud.com/document/product/213/6091">Tencent Cloud regions</a>.</li> </ul>
  */
 static constexpr const char *kCloudRegion = "cloud.region";
+
+/**
+ * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an <a
+href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a> on AWS, a
+<a href="https://learn.microsoft.com/en-us/rest/api/resources/resources/get-by-id">fully qualified
+resource ID</a> on Azure, a <a
+href="https://cloud.google.com/apis/design/resource_names#full_resource_name">full resource name</a>
+on GCP)
+ *
+ * <p>Notes:
+  <ul> <li>On some cloud providers, it may not be possible to determine the full ID at startup,
+so it may be necessary to set {@code cloud.resource_id} as a span attribute instead.</li><li>The
+exact value to use for {@code cloud.resource_id} depends on the cloud provider. The following
+well-known definitions MUST be used if you set this attribute and they apply:</li><li><strong>AWS
+Lambda:</strong> The function <a
+href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a>. Take care
+not to use the &quot;invoked ARN&quot; directly but replace any <a
+href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias suffix</a> with
+the resolved function version, as the same runtime instance may be invokable with multiple different
+aliases.</li> <li><strong>GCP:</strong> The <a
+href="https://cloud.google.com/iam/docs/full-resource-names">URI of the resource</a></li>
+<li><strong>Azure:</strong> The <a
+href="https://docs.microsoft.com/en-us/rest/api/resources/resources/get-by-id">Fully Qualified
+Resource ID</a> of the invoked function, <em>not</em> the function app, having the form
+{@code
+/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>}.
+This means that a span attribute MUST be used, as an Azure function app can host multiple functions
+that would usually share a TracerProvider.</li>
+ </ul>
+ */
+static constexpr const char *kCloudResourceId = "cloud.resource_id";
 
 /**
  * Cloud regions often have multiple, isolated locations known as zones to increase availability.
@@ -202,6 +222,52 @@ static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
 static constexpr const char *kAwsLogStreamArns = "aws.log.stream.arns";
 
 /**
+ * The name of the Cloud Run <a
+ * href="https://cloud.google.com/run/docs/managing/job-executions">execution</a> being run for the
+ * Job, as set by the <a
+ * href="https://cloud.google.com/run/docs/container-contract#jobs-env-vars">{@code
+ * CLOUD_RUN_EXECUTION}</a> environment variable.
+ */
+static constexpr const char *kGcpCloudRunJobExecution = "gcp.cloud_run.job.execution";
+
+/**
+ * The index for a task within an execution as provided by the <a
+ * href="https://cloud.google.com/run/docs/container-contract#jobs-env-vars">{@code
+ * CLOUD_RUN_TASK_INDEX}</a> environment variable.
+ */
+static constexpr const char *kGcpCloudRunJobTaskIndex = "gcp.cloud_run.job.task_index";
+
+/**
+ * The instance name of a GCE instance. This is the value provided by {@code host.name}, the visible
+ * name of the instance in the Cloud Console UI, and the prefix for the default hostname of the
+ * instance as defined by the <a
+ * href="https://cloud.google.com/compute/docs/internal-dns#instance-fully-qualified-domain-names">default
+ * internal DNS name</a>.
+ */
+static constexpr const char *kGcpGceInstanceName = "gcp.gce.instance.name";
+
+/**
+ * The hostname of a GCE instance. This is the full value of the default or <a
+ * href="https://cloud.google.com/compute/docs/instances/custom-hostname-vm">custom hostname</a>.
+ */
+static constexpr const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
+
+/**
+ * Time and date the release was created
+ */
+static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
+
+/**
+ * Commit hash for the current release
+ */
+static constexpr const char *kHerokuReleaseCommit = "heroku.release.commit";
+
+/**
+ * Unique identifier for the application
+ */
+static constexpr const char *kHerokuAppId = "heroku.app.id";
+
+/**
  * Container name used by container runtime.
  */
 static constexpr const char *kContainerName = "container.name";
@@ -227,6 +293,39 @@ static constexpr const char *kContainerImageName = "container.image.name";
  * Container image tag.
  */
 static constexpr const char *kContainerImageTag = "container.image.tag";
+
+/**
+ * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
+ *
+ * <p>Notes:
+  <ul> <li>Docker defines a sha256 of the image id; {@code container.image.id} corresponds to the
+{@code Image} field from the Docker container inspect <a
+href="https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect">API</a>
+endpoint. K8s defines a link to the container registry repository with digest {@code "imageID":
+"registry.azurecr.io
+/namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"}.
+OCI defines a digest of manifest.</li> </ul>
+ */
+static constexpr const char *kContainerImageId = "container.image.id";
+
+/**
+ * The command used to run the container (i.e. the command name).
+ *
+ * <p>Notes:
+  <ul> <li>If using embedded credentials or sensitive data, it is recommended to remove them to
+ prevent potential leakage.</li> </ul>
+ */
+static constexpr const char *kContainerCommand = "container.command";
+
+/**
+ * The full command run by the container as a single string representing the full command. [2]
+ */
+static constexpr const char *kContainerCommandLine = "container.command_line";
+
+/**
+ * All the command arguments (including the command/executable itself) run by the container. [2]
+ */
+static constexpr const char *kContainerCommandArgs = "container.command_args";
 
 /**
  * Name of the <a href="https://en.wikipedia.org/wiki/Deployment_environment">deployment
@@ -287,42 +386,17 @@ static constexpr const char *kDeviceManufacturer = "device.manufacturer";
   <ul> <li>This is the name of the function as configured/deployed on the FaaS
 platform and is usually different from the name of the callback
 function (which may be stored in the
-<a href="../../trace/semantic_conventions/span-general.md#source-code-attributes">{@code
-code.namespace}/{@code code.function}</a> span attributes).</li><li>For some cloud providers, the
-above definition is ambiguous. The following definition of function name MUST be used for this
-attribute (and consequently the span name) for the listed cloud
-providers/products:</li><li><strong>Azure:</strong>  The full name {@code <FUNCAPP>/<FUNC>}, i.e.,
-function app name followed by a forward slash followed by the function name (this form can also be
-seen in the resource JSON for the function). This means that a span attribute MUST be used, as an
-Azure function app can host multiple functions that would usually share a TracerProvider (see also
-the {@code faas.id} attribute).</li>
+<a href="/docs/general/general-attributes.md#source-code-attributes">{@code code.namespace}/{@code
+code.function}</a> span attributes).</li><li>For some cloud providers, the above definition is
+ambiguous. The following definition of function name MUST be used for this attribute (and
+consequently the span name) for the listed cloud providers/products:</li><li><strong>Azure:</strong>
+The full name {@code <FUNCAPP>/<FUNC>}, i.e., function app name followed by a forward slash followed
+by the function name (this form can also be seen in the resource JSON for the function). This means
+that a span attribute MUST be used, as an Azure function app can host multiple functions that would
+usually share a TracerProvider (see also the {@code cloud.resource_id} attribute).</li>
  </ul>
  */
 static constexpr const char *kFaasName = "faas.name";
-
-/**
- * The unique ID of the single function that this runtime instance executes.
- *
- * <p>Notes:
-  <ul> <li>On some cloud providers, it may not be possible to determine the full ID at startup,
-so consider setting {@code faas.id} as a span attribute instead.</li><li>The exact value to use for
-{@code faas.id} depends on the cloud provider:</li><li><strong>AWS Lambda:</strong> The function <a
-href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">ARN</a>. Take care
-not to use the &quot;invoked ARN&quot; directly but replace any <a
-href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html">alias suffix</a> with
-the resolved function version, as the same runtime instance may be invokable with multiple different
-aliases.</li> <li><strong>GCP:</strong> The <a
-href="https://cloud.google.com/iam/docs/full-resource-names">URI of the resource</a></li>
-<li><strong>Azure:</strong> The <a
-href="https://docs.microsoft.com/en-us/rest/api/resources/resources/get-by-id">Fully Qualified
-Resource ID</a> of the invoked function, <em>not</em> the function app, having the form
-{@code
-/subscriptions/<SUBSCIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>}.
-This means that a span attribute MUST be used, as an Azure function app can host multiple functions
-that would usually share a TracerProvider.</li>
- </ul>
- */
-static constexpr const char *kFaasId = "faas.id";
 
 /**
  * The immutable version of the function being executed.
@@ -330,10 +404,11 @@ static constexpr const char *kFaasId = "faas.id";
  * <p>Notes:
   <ul> <li>Depending on the cloud provider and platform, use:</li><li><strong>AWS Lambda:</strong>
 The <a href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html">function
-version</a> (an integer represented as a decimal string).</li> <li><strong>Google Cloud
-Run:</strong> The <a href="https://cloud.google.com/run/docs/managing/revisions">revision</a> (i.e.,
-the function name plus the revision suffix).</li> <li><strong>Google Cloud Functions:</strong> The
-value of the <a
+version</a> (an integer represented as a decimal string).</li> <li><strong>Google Cloud Run
+(Services):</strong> The <a href="https://cloud.google.com/run/docs/managing/revisions">revision</a>
+(i.e., the function name plus the revision suffix).</li>
+<li><strong>Google Cloud Functions:</strong> The value of the
+<a
 href="https://cloud.google.com/functions/docs/env-var#runtime_environment_variables_set_automatically">{@code
 K_REVISION} environment variable</a>.</li> <li><strong>Azure Functions:</strong> Not applicable. Do
 not set this attribute.</li>
@@ -352,17 +427,20 @@ static constexpr const char *kFaasVersion = "faas.version";
 static constexpr const char *kFaasInstance = "faas.instance";
 
 /**
- * The amount of memory available to the serverless function in MiB.
+ * The amount of memory available to the serverless function converted to Bytes.
  *
  * <p>Notes:
   <ul> <li>It's recommended to set this attribute since e.g. too little memory can easily stop a
  Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable {@code
- AWS_LAMBDA_FUNCTION_MEMORY_SIZE} provides this information.</li> </ul>
+ AWS_LAMBDA_FUNCTION_MEMORY_SIZE} provides this information (which must be multiplied by
+ 1,048,576).</li> </ul>
  */
 static constexpr const char *kFaasMaxMemory = "faas.max_memory";
 
 /**
- * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider.
+ * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
+ * non-containerized systems, this should be the {@code machine-id}. See the table below for the
+ * sources to use to determine the {@code machine-id} based on operating system.
  */
 static constexpr const char *kHostId = "host.id";
 
@@ -388,13 +466,13 @@ static constexpr const char *kHostArch = "host.arch";
 static constexpr const char *kHostImageName = "host.image.name";
 
 /**
- * VM image ID. For Cloud, this value is from the provider.
+ * VM image ID or host OS image ID. For Cloud, this value is from the provider.
  */
 static constexpr const char *kHostImageId = "host.image.id";
 
 /**
- * The version string of the VM image as defined in <a href="README.md#version-attributes">Version
- * Attributes</a>.
+ * The version string of the VM image or host OS as defined in <a
+ * href="README.md#version-attributes">Version Attributes</a>.
  */
 static constexpr const char *kHostImageVersion = "host.image.version";
 
@@ -402,6 +480,30 @@ static constexpr const char *kHostImageVersion = "host.image.version";
  * The name of the cluster.
  */
 static constexpr const char *kK8sClusterName = "k8s.cluster.name";
+
+/**
+ * A pseudo-ID for the cluster, set to the UID of the {@code kube-system} namespace.
+ *
+ * <p>Notes:
+  <ul> <li>K8s does not have support for obtaining a cluster ID. If this is ever
+added, we will recommend collecting the {@code k8s.cluster.uid} through the
+official APIs. In the meantime, we are able to use the {@code uid} of the
+{@code kube-system} namespace as a proxy for cluster ID. Read on for the
+rationale.</li><li>Every object created in a K8s cluster is assigned a distinct UID. The
+{@code kube-system} namespace is used by Kubernetes itself and will exist
+for the lifetime of the cluster. Using the {@code uid} of the {@code kube-system}
+namespace is a reasonable proxy for the K8s ClusterID as it will only
+change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+UUIDs as standardized by
+<a href="https://www.itu.int/ITU-T/studygroups/com17/oid.html">ISO/IEC 9834-8 and ITU-T X.667</a>.
+Which states:</li><blockquote>
+<li>If generated according to one of the mechanisms defined in Rec.</li></blockquote>
+<li>ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+  different from all other UUIDs generated before 3603 A.D., or is
+  extremely likely to be different (depending on the mechanism chosen).</li><li>Therefore, UIDs
+between clusters should be extremely unlikely to conflict.</li> </ul>
+ */
+static constexpr const char *kK8sClusterUid = "k8s.cluster.uid";
 
 /**
  * The name of the Node.
@@ -518,7 +620,7 @@ static constexpr const char *kOsName = "os.name";
 
 /**
  * The version string of the operating system as defined in <a
- * href="../../resource/semantic_conventions/README.md#version-attributes">Version Attributes</a>.
+ * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
  */
 static constexpr const char *kOsVersion = "os.version";
 
@@ -602,6 +704,12 @@ static constexpr const char *kProcessRuntimeDescription = "process.runtime.descr
 static constexpr const char *kServiceName = "service.name";
 
 /**
+ * The version string of the service API or implementation. The format is not defined by these
+ * conventions.
+ */
+static constexpr const char *kServiceVersion = "service.version";
+
+/**
  * A namespace for {@code service.name}.
  *
  * <p>Notes:
@@ -631,12 +739,16 @@ static constexpr const char *kServiceNamespace = "service.namespace";
 static constexpr const char *kServiceInstanceId = "service.instance.id";
 
 /**
- * The version string of the service API or implementation.
- */
-static constexpr const char *kServiceVersion = "service.version";
-
-/**
  * The name of the telemetry SDK as defined above.
+ *
+ * <p>Notes:
+  <ul> <li>The OpenTelemetry SDK MUST set the {@code telemetry.sdk.name} attribute to {@code
+opentelemetry}. If another SDK, like a fork or a vendor-provided implementation, is used, this SDK
+MUST set the
+{@code telemetry.sdk.name} attribute to the fully-qualified class or module name of this SDK's main
+entry point or another suitable identifier depending on the language. The identifier {@code
+opentelemetry} is reserved and MUST NOT be used in this case. All custom identifiers SHOULD be
+stable across different versions of an implementation.</li> </ul>
  */
 static constexpr const char *kTelemetrySdkName = "telemetry.sdk.name";
 
@@ -701,6 +813,10 @@ static constexpr const char *kAws = "aws";
 static constexpr const char *kAzure = "azure";
 /** Google Cloud Platform. */
 static constexpr const char *kGcp = "gcp";
+/** Heroku Platform as a Service. */
+static constexpr const char *kHeroku = "heroku";
+/** IBM Cloud. */
+static constexpr const char *kIbmCloud = "ibm_cloud";
 /** Tencent Cloud. */
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace CloudProviderValues
@@ -711,6 +827,8 @@ namespace CloudPlatformValues
 static constexpr const char *kAlibabaCloudEcs = "alibaba_cloud_ecs";
 /** Alibaba Cloud Function Compute. */
 static constexpr const char *kAlibabaCloudFc = "alibaba_cloud_fc";
+/** Red Hat OpenShift on Alibaba Cloud. */
+static constexpr const char *kAlibabaCloudOpenshift = "alibaba_cloud_openshift";
 /** AWS Elastic Compute Cloud. */
 static constexpr const char *kAwsEc2 = "aws_ec2";
 /** AWS Elastic Container Service. */
@@ -723,6 +841,8 @@ static constexpr const char *kAwsLambda = "aws_lambda";
 static constexpr const char *kAwsElasticBeanstalk = "aws_elastic_beanstalk";
 /** AWS App Runner. */
 static constexpr const char *kAwsAppRunner = "aws_app_runner";
+/** Red Hat OpenShift on AWS (ROSA). */
+static constexpr const char *kAwsOpenshift = "aws_openshift";
 /** Azure Virtual Machines. */
 static constexpr const char *kAzureVm = "azure_vm";
 /** Azure Container Instances. */
@@ -733,6 +853,10 @@ static constexpr const char *kAzureAks = "azure_aks";
 static constexpr const char *kAzureFunctions = "azure_functions";
 /** Azure App Service. */
 static constexpr const char *kAzureAppService = "azure_app_service";
+/** Azure Red Hat OpenShift. */
+static constexpr const char *kAzureOpenshift = "azure_openshift";
+/** Google Bare Metal Solution (BMS). */
+static constexpr const char *kGcpBareMetalSolution = "gcp_bare_metal_solution";
 /** Google Cloud Compute Engine (GCE). */
 static constexpr const char *kGcpComputeEngine = "gcp_compute_engine";
 /** Google Cloud Run. */
@@ -743,6 +867,10 @@ static constexpr const char *kGcpKubernetesEngine = "gcp_kubernetes_engine";
 static constexpr const char *kGcpCloudFunctions = "gcp_cloud_functions";
 /** Google Cloud App Engine (GAE). */
 static constexpr const char *kGcpAppEngine = "gcp_app_engine";
+/** Red Hat OpenShift on Google Cloud. */
+static constexpr const char *kGcpOpenshift = "gcp_openshift";
+/** Red Hat OpenShift on IBM Cloud. */
+static constexpr const char *kIbmCloudOpenshift = "ibm_cloud_openshift";
 /** Tencent Cloud Cloud Virtual Machine (CVM). */
 static constexpr const char *kTencentCloudCvm = "tencent_cloud_cvm";
 /** Tencent Cloud Elastic Kubernetes Service (EKS). */
@@ -825,10 +953,12 @@ static constexpr const char *kPhp = "php";
 static constexpr const char *kPython = "python";
 /** ruby. */
 static constexpr const char *kRuby = "ruby";
-/** webjs. */
-static constexpr const char *kWebjs = "webjs";
+/** rust. */
+static constexpr const char *kRust = "rust";
 /** swift. */
 static constexpr const char *kSwift = "swift";
+/** webjs. */
+static constexpr const char *kWebjs = "webjs";
 }  // namespace TelemetrySdkLanguageValues
 
 }  // namespace SemanticConventions

@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // Make sure to include GRPC headers first because otherwise Abseil may create
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
@@ -50,8 +53,8 @@ public:
         {{SemanticConventions::kRpcSystem, "grpc"},
          {SemanticConventions::kRpcService, "grpc-example.GreetService"},
          {SemanticConventions::kRpcMethod, "Greet"},
-         {SemanticConventions::kNetSockPeerAddr, ip},
-         {SemanticConventions::kNetPeerPort, port}},
+         {SemanticConventions::kServerSocketAddress, ip},
+         {SemanticConventions::kServerPort, port}},
         options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
@@ -98,7 +101,7 @@ void RunClient(uint16_t port)
 
 int main(int argc, char **argv)
 {
-  initTracer();
+  InitTracer();
   // set global propagator
   context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       opentelemetry::nostd::shared_ptr<context::propagation::TextMapPropagator>(
@@ -114,5 +117,6 @@ int main(int argc, char **argv)
     port = default_port;
   }
   RunClient(port);
+  CleanupTracer();
   return 0;
 }

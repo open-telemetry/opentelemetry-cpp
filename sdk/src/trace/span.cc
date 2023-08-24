@@ -5,6 +5,8 @@
 #include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
@@ -48,10 +50,10 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            nostd::string_view name,
            const common::KeyValueIterable &attributes,
-           const trace_api::SpanContextKeyValueIterable &links,
-           const trace_api::StartSpanOptions &options,
-           const trace_api::SpanContext &parent_span_context,
-           std::unique_ptr<trace_api::SpanContext> span_context) noexcept
+           const opentelemetry::trace::SpanContextKeyValueIterable &links,
+           const opentelemetry::trace::StartSpanOptions &options,
+           const opentelemetry::trace::SpanContext &parent_span_context,
+           std::unique_ptr<opentelemetry::trace::SpanContext> span_context) noexcept
     : tracer_{std::move(tracer)},
       recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
@@ -66,7 +68,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetInstrumentationScope(tracer_->GetInstrumentationScope());
   recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
                                                ? parent_span_context.span_id()
-                                               : trace_api::SpanId());
+                                               : opentelemetry::trace::SpanId());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable_->SetAttribute(key, value);
@@ -164,7 +166,7 @@ void Span::UpdateName(nostd::string_view name) noexcept
   recordable_->SetName(name);
 }
 
-void Span::End(const trace_api::EndSpanOptions &options) noexcept
+void Span::End(const opentelemetry::trace::EndSpanOptions &options) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 

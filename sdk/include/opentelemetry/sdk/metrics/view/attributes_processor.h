@@ -3,7 +3,15 @@
 
 #pragma once
 
+#include <string>
+#include <unordered_map>
+
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -20,10 +28,14 @@ class AttributesProcessor
 {
 public:
   // Process the metric instrument attributes.
-  // @returns The processed attributes
+  // @returns integer with individual bits set if they are to be filtered.
+
   virtual MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept = 0;
-  virtual ~AttributesProcessor()                                                = default;
+
+  virtual bool isPresent(nostd::string_view key) const noexcept = 0;
+
+  virtual ~AttributesProcessor() = default;
 };
 
 /**
@@ -33,12 +45,15 @@ public:
 
 class DefaultAttributesProcessor : public AttributesProcessor
 {
+public:
   MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
   {
     MetricAttributes result(attributes);
     return result;
   }
+
+  bool isPresent(nostd::string_view /*key*/) const noexcept override { return true; }
 };
 
 /**
@@ -68,6 +83,11 @@ public:
           return true;
         });
     return result;
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override
+  {
+    return (allowed_attribute_keys_.find(key.data()) != allowed_attribute_keys_.end());
   }
 
 private:

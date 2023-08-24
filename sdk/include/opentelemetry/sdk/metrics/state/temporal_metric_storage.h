@@ -3,18 +3,26 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#include "opentelemetry/sdk/metrics/state/metric_collector.h"
-
+#include <list>
 #include <memory>
+#include <unordered_map>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+class AggregationConfig;
+class AttributesHashMap;
+class CollectorHandle;
+class MetricData;
 
 struct LastReportedMetrics
 {
@@ -26,6 +34,7 @@ class TemporalMetricStorage
 {
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
+                        AggregationType aggregation_type,
                         const AggregationConfig *aggregation_config);
 
   bool buildMetrics(CollectorHandle *collector,
@@ -37,6 +46,7 @@ public:
 
 private:
   InstrumentDescriptor instrument_descriptor_;
+  AggregationType aggregation_type_;
 
   // unreported metrics stash for all the collectors
   std::unordered_map<CollectorHandle *, std::list<std::shared_ptr<AttributesHashMap>>>

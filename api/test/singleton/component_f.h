@@ -4,7 +4,7 @@
 // Make the entry point visible, loaded dynamically
 
 #if defined(_MSC_VER)
-// component_f is a DDL
+// component_f is a DLL
 
 #  ifdef BUILD_COMPONENT_F
 __declspec(dllexport)

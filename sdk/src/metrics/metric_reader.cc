@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 
 #include <mutex>
@@ -28,10 +29,12 @@ bool MetricReader::Collect(
     OTEL_INTERNAL_LOG_WARN(
         "MetricReader::Collect Cannot invoke Collect(). No MetricProducer registered for "
         "collection!")
+    return false;
   }
   if (IsShutdown())
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Collect Cannot invoke Collect(). Shutdown in progress!");
+    // Continue with warning, and let pull and push MetricReader state machine handle this.
+    OTEL_INTERNAL_LOG_WARN("MetricReader::Collect invoked while Shutdown in progress!");
   }
 
   return metric_producer_->Collect(callback);

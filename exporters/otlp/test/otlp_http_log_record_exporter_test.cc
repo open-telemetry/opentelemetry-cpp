@@ -2,41 +2,39 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef HAVE_CPP_STDLIB
-#  ifdef ENABLE_LOGS_PREVIEW
 
-#    include <chrono>
-#    include <thread>
+#  include <chrono>
+#  include <thread>
 
-#    include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
 
-#    include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#    include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 
-#    include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#    include "opentelemetry/common/key_value_iterable_view.h"
-#    include "opentelemetry/ext/http/client/http_client_factory.h"
-#    include "opentelemetry/ext/http/server/http_server.h"
-#    include "opentelemetry/logs/provider.h"
-#    include "opentelemetry/sdk/logs/batch_log_record_processor.h"
-#    include "opentelemetry/sdk/logs/exporter.h"
-#    include "opentelemetry/sdk/logs/log_record.h"
-#    include "opentelemetry/sdk/logs/logger_provider.h"
-#    include "opentelemetry/sdk/resource/resource.h"
-#    include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/ext/http/client/http_client_factory.h"
+#  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
-#    include <google/protobuf/message_lite.h>
-#    include <gtest/gtest.h>
-#    include "gmock/gmock.h"
+#  include <google/protobuf/message_lite.h>
+#  include <gtest/gtest.h>
+#  include "gmock/gmock.h"
 
-#    include "nlohmann/json.hpp"
+#  include "nlohmann/json.hpp"
 
-#    if defined(_MSC_VER)
-#      include "opentelemetry/sdk/common/env_variables.h"
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#    endif
+#  endif
 
 using namespace testing;
 
@@ -61,7 +59,21 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
+      options.url,
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+      false,                              /* ssl_insecure_skip_verify */
+      "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
+      "",                                 /* ssl_client_key_path */
+      "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
+      "",                                 /* ssl_client_cert_string */
+#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+      "", /* ssl_min_tls */
+      "", /* ssl_max_tls */
+      "", /* ssl_cipher */
+      "", /* ssl_cipher_suite */
+#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+      options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
   {
@@ -130,7 +142,8 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -146,14 +159,15 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resource_logs"].begin();
-          auto scope_logs        = *resource_logs["scope_logs"].begin();
-          auto log               = *scope_logs["log_records"].begin();
-          auto received_trace_id = log["trace_id"].get<std::string>();
-          auto received_span_id  = log["span_id"].get<std::string>();
+          auto resource_logs     = *check_json["resourceLogs"].begin();
+          auto scope_logs        = *resource_logs["scopeLogs"].begin();
+          auto scope             = scope_logs["scope"];
+          auto log               = *scope_logs["logRecords"].begin();
+          auto received_trace_id = log["traceId"].get<std::string>();
+          auto received_span_id  = log["spanId"].get<std::string>();
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
+          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -162,34 +176,52 @@ public:
             EXPECT_EQ("Custom-Header-Value", custom_header->second);
           }
 
+          bool check_scope_attribute = false;
+          auto scope_attributes      = scope["attributes"];
+          for (auto &attribute : scope_attributes)
+          {
+            if (!attribute.is_object())
+            {
+              continue;
+            }
+            if ("scope_key1" == attribute["key"])
+            {
+              check_scope_attribute = true;
+              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
+            }
+          }
+          ASSERT_TRUE(check_scope_attribute);
+
           http_client::nosend::Response response;
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::common::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -227,7 +259,8 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -243,14 +276,21 @@ public:
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resource_logs"].begin();
-          auto scope_logs        = *resource_logs["scope_logs"].begin();
-          auto log               = *scope_logs["log_records"].begin();
-          auto received_trace_id = log["trace_id"].get<std::string>();
-          auto received_span_id  = log["span_id"].get<std::string>();
+          auto resource_logs     = *check_json["resourceLogs"].begin();
+          auto scope_logs        = *resource_logs["scopeLogs"].begin();
+          auto schema_url        = scope_logs["schemaUrl"].get<std::string>();
+          auto scope             = scope_logs["scope"];
+          auto scope_name        = scope["name"];
+          auto scope_version     = scope["version"];
+          auto log               = *scope_logs["logRecords"].begin();
+          auto received_trace_id = log["traceId"].get<std::string>();
+          auto received_span_id  = log["spanId"].get<std::string>();
+          EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
+          EXPECT_EQ(scope_name, "opentelelemtry_library");
+          EXPECT_EQ(scope_version, "1.2.0");
           EXPECT_EQ(received_trace_id, report_trace_id);
           EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
+          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
           EXPECT_LE(15, log["attributes"].size());
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -258,6 +298,22 @@ public:
           {
             EXPECT_EQ("Custom-Header-Value", custom_header->second);
           }
+
+          bool check_scope_attribute = false;
+          auto scope_attributes      = scope["attributes"];
+          for (auto &attribute : scope_attributes)
+          {
+            if (!attribute.is_object())
+            {
+              continue;
+            }
+            if ("scope_key1" == attribute["key"])
+            {
+              check_scope_attribute = true;
+              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
+            }
+          }
+          ASSERT_TRUE(check_scope_attribute);
 
           // let the otlp_http_client to continue
           std::thread async_finish{[callback]() {
@@ -268,29 +324,31 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::common::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
-#    endif
+#  endif
 
   void ExportBinaryIntegrationTest()
   {
@@ -326,7 +384,8 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "1.2.0", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
@@ -340,7 +399,11 @@ public:
           opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_log = request_body.resource_logs(0).scope_logs(0).log_records(0);
+          auto scope_log = request_body.resource_logs(0).scope_logs(0);
+          EXPECT_EQ(scope_log.schema_url(), "https://opentelemetry.io/schemas/1.2.0");
+          EXPECT_EQ(scope_log.scope().name(), "opentelelemtry_library");
+          EXPECT_EQ(scope_log.scope().version(), "1.2.0");
+          auto received_log = scope_log.log_records(0);
           EXPECT_EQ(received_log.trace_id(), report_trace_id);
           EXPECT_EQ(received_log.span_id(), report_span_id);
           EXPECT_EQ("Log message", received_log.body().string_value());
@@ -356,36 +419,49 @@ public:
           }
           ASSERT_TRUE(check_service_name);
 
+          bool check_scope_attribute = false;
+          for (auto &attribute : scope_log.scope().attributes())
+          {
+            if ("scope_key1" == attribute.key())
+            {
+              check_scope_attribute = true;
+              EXPECT_EQ("scope_value", attribute.value().string_value());
+            }
+          }
+          ASSERT_TRUE(check_scope_attribute);
+
           // let the otlp_http_client to continue
 
           http_client::nosend::Response response;
           response.Finish(*callback.get());
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::common::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -421,7 +497,8 @@ public:
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
     const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
+                                      {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
     report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
@@ -430,12 +507,13 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id, report_span_id](
+        .WillOnce([&mock_session, report_trace_id, report_span_id, schema_url](
                       std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
           opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto received_log = request_body.resource_logs(0).scope_logs(0).log_records(0);
+          auto &scope_log   = request_body.resource_logs(0).scope_logs(0);
+          auto received_log = scope_log.log_records(0);
           EXPECT_EQ(received_log.trace_id(), report_trace_id);
           EXPECT_EQ(received_log.span_id(), report_span_id);
           EXPECT_EQ("Log message", received_log.body().string_value());
@@ -451,6 +529,20 @@ public:
           }
           ASSERT_TRUE(check_service_name);
 
+          auto &scope = scope_log.scope();
+          EXPECT_EQ(scope.name(), "opentelelemtry_library");
+          EXPECT_EQ(scope_log.schema_url(), schema_url);
+          bool check_scope_attribute = false;
+          for (auto &attribute : scope.attributes())
+          {
+            if ("scope_key1" == attribute.key())
+            {
+              check_scope_attribute = true;
+              EXPECT_EQ("scope_value", attribute.value().string_value());
+            }
+          }
+          ASSERT_TRUE(check_scope_attribute);
+
           // let the otlp_http_client to continue
 
           std::thread async_finish{[callback]() {
@@ -461,29 +553,31 @@ public:
           async_finish.detach();
         });
 
-    logger->Log(opentelemetry::logs::Severity::kInfo, "Log message",
-                {{"service.name", "unit_test_service"},
-                 {"tenant.id", "test_user"},
-                 {"bool_value", true},
-                 {"int32_value", static_cast<int32_t>(1)},
-                 {"uint32_value", static_cast<uint32_t>(2)},
-                 {"int64_value", static_cast<int64_t>(0x1100000000LL)},
-                 {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
-                 {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", attribute_storage_bool_value},
-                 {"vec_int32_value", attribute_storage_int32_value},
-                 {"vec_uint32_value", attribute_storage_uint32_value},
-                 {"vec_int64_value", attribute_storage_int64_value},
-                 {"vec_uint64_value", attribute_storage_uint64_value},
-                 {"vec_double_value", attribute_storage_double_value},
-                 {"vec_string_value", attribute_storage_string_value}},
-                trace_id, span_id,
-                opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
-                std::chrono::system_clock::now());
+    logger->EmitLogRecord(
+        opentelemetry::logs::Severity::kInfo, "Log message",
+        opentelemetry::common::MakeAttributes(
+            {{"service.name", "unit_test_service"},
+             {"tenant.id", "test_user"},
+             {"bool_value", true},
+             {"int32_value", static_cast<int32_t>(1)},
+             {"uint32_value", static_cast<uint32_t>(2)},
+             {"int64_value", static_cast<int64_t>(0x1100000000LL)},
+             {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
+             {"double_value", static_cast<double>(3.1)},
+             {"vec_bool_value", attribute_storage_bool_value},
+             {"vec_int32_value", attribute_storage_int32_value},
+             {"vec_uint32_value", attribute_storage_uint32_value},
+             {"vec_int64_value", attribute_storage_int64_value},
+             {"vec_uint64_value", attribute_storage_uint64_value},
+             {"vec_double_value", attribute_storage_double_value},
+             {"vec_string_value", attribute_storage_string_value}}),
+        trace_id, span_id,
+        opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
+        std::chrono::system_clock::now());
 
     provider->ForceFlush();
   }
-#    endif
+#  endif
 };
 
 TEST(OtlpHttpLogRecordExporterTest, Shutdown)
@@ -504,13 +598,13 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
   google::protobuf::ShutdownProtobufLibrary();
 }
-#    endif
+#  endif
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -518,12 +612,12 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
-#    endif
+#  endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
@@ -552,7 +646,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
-#    ifndef NO_GETENV
+#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
 {
@@ -598,7 +692,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
 {
   const std::string url = "http://localhost:9999/v1/logs";
   setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", url.c_str(), 1);
-  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_TIMEOUT", "20s", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
 
@@ -629,22 +723,21 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
   }
 
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT");
-  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
 }
 
 TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
 {
-  EXPECT_EQ("http://localhost:4318/v1/logs", GetOtlpDefaultHttpLogEndpoint());
+  EXPECT_EQ("http://localhost:4318/v1/logs", GetOtlpDefaultHttpLogsEndpoint());
   EXPECT_EQ("http://localhost:4318/v1/traces", GetOtlpDefaultHttpEndpoint());
   EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
 }
 
-#    endif
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#  endif
 #endif

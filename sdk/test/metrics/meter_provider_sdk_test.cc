@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "common.h"
+
 #include <gtest/gtest.h>
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/meter.h"
@@ -12,54 +14,8 @@
 
 using namespace opentelemetry::sdk::metrics;
 
-class MockMetricExporter : public PushMetricExporter
-{
-
-public:
-  MockMetricExporter() = default;
-  opentelemetry::sdk::common::ExportResult Export(
-      const ResourceMetrics & /* records */) noexcept override
-  {
-    return opentelemetry::sdk::common::ExportResult::kSuccess;
-  }
-
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) const noexcept override
-  {
-    return AggregationTemporality::kCumulative;
-  }
-
-  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
-
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
-};
-
-class MockMetricReader : public MetricReader
-{
-public:
-  MockMetricReader(std::unique_ptr<PushMetricExporter> exporter) : exporter_(std::move(exporter)) {}
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept override
-  {
-    return exporter_->GetAggregationTemporality(instrument_type);
-  }
-  virtual bool OnForceFlush(std::chrono::microseconds /* timeout */) noexcept override
-  {
-    return true;
-  }
-  virtual bool OnShutDown(std::chrono::microseconds /* timeout */) noexcept override
-  {
-    return true;
-  }
-  virtual void OnInitialized() noexcept override {}
-
-private:
-  std::unique_ptr<PushMetricExporter> exporter_;
-};
-
 TEST(MeterProvider, GetMeter)
 {
-
   MeterProvider mp1;
   //   std::unique_ptr<View> view{std::unique_ptr<View>()};
   // MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views);
@@ -93,7 +49,7 @@ TEST(MeterProvider, GetMeter)
 
   std::unique_ptr<View> view{std::unique_ptr<View>()};
   std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kCounter, "instru1")};
+      new InstrumentSelector(InstrumentType::kCounter, "instru1", "unit1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
 
   mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
@@ -102,3 +58,39 @@ TEST(MeterProvider, GetMeter)
   mp1.ForceFlush();
   mp1.Shutdown();
 }
+
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+TEST(MeterProvider, RemoveMeter)
+{
+  MeterProvider mp;
+
+  auto m1 = mp.GetMeter("test", "1", "URL");
+  ASSERT_NE(nullptr, m1);
+
+  // Will return the same meter
+  auto m2 = mp.GetMeter("test", "1", "URL");
+  ASSERT_NE(nullptr, m2);
+  ASSERT_EQ(m1, m2);
+
+  mp.RemoveMeter("unknown", "0", "");
+
+  // Will decrease use_count() on m1 and m2
+  mp.RemoveMeter("test", "1", "URL");
+
+  // Will create a different meter
+  auto m3 = mp.GetMeter("test", "1", "URL");
+  ASSERT_NE(nullptr, m3);
+  ASSERT_NE(m1, m3);
+  ASSERT_NE(m2, m3);
+
+  // Will decrease use_count() on m3
+  mp.RemoveMeter("test", "1", "URL");
+
+  // Will do nothing
+  mp.RemoveMeter("test", "1", "URL");
+
+  // cleanup properly without crash
+  mp.ForceFlush();
+  mp.Shutdown();
+}
+#endif

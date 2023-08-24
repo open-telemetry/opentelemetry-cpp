@@ -21,7 +21,159 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.15.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.21.0";
+
+/**
+ * Client address - unix domain socket name, IPv4 or IPv6 address.
+ *
+ * <p>Notes:
+  <ul> <li>When observed from the server side, and when communicating through an intermediary,
+ {@code client.address} SHOULD represent client address behind any intermediaries (e.g. proxies) if
+ it's available.</li> </ul>
+ */
+static constexpr const char *kClientAddress = "client.address";
+
+/**
+ * Client port number
+ *
+ * <p>Notes:
+  <ul> <li>When observed from the server side, and when communicating through an intermediary,
+ {@code client.port} SHOULD represent client port behind any intermediaries (e.g. proxies) if it's
+ available.</li> </ul>
+ */
+static constexpr const char *kClientPort = "client.port";
+
+/**
+ * Immediate client peer address - unix domain socket name, IPv4 or IPv6 address.
+ */
+static constexpr const char *kClientSocketAddress = "client.socket.address";
+
+/**
+ * Immediate client peer port number
+ */
+static constexpr const char *kClientSocketPort = "client.socket.port";
+
+/**
+ * Deprecated, use {@code http.request.method} instead.
+ */
+static constexpr const char *kHttpMethod = "http.method";
+
+/**
+ * Deprecated, use {@code http.response.status_code} instead.
+ */
+static constexpr const char *kHttpStatusCode = "http.status_code";
+
+/**
+ * Deprecated, use {@code url.scheme} instead.
+ */
+static constexpr const char *kHttpScheme = "http.scheme";
+
+/**
+ * Deprecated, use {@code url.full} instead.
+ */
+static constexpr const char *kHttpUrl = "http.url";
+
+/**
+ * Deprecated, use {@code url.path} and {@code url.query} instead.
+ */
+static constexpr const char *kHttpTarget = "http.target";
+
+/**
+ * Deprecated, use {@code http.request.body.size} instead.
+ */
+static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
+
+/**
+ * Deprecated, use {@code http.response.body.size} instead.
+ */
+static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
+
+/**
+ * Deprecated, use {@code server.socket.domain} on client spans.
+ */
+static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
+
+/**
+ * Deprecated, use {@code server.socket.address} on client spans and {@code client.socket.address}
+ * on server spans.
+ */
+static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
+
+/**
+ * Deprecated, use {@code server.socket.port} on client spans and {@code client.socket.port} on
+ * server spans.
+ */
+static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
+
+/**
+ * Deprecated, use {@code server.address} on client spans and {@code client.address} on server
+ * spans.
+ */
+static constexpr const char *kNetPeerName = "net.peer.name";
+
+/**
+ * Deprecated, use {@code server.port} on client spans and {@code client.port} on server spans.
+ */
+static constexpr const char *kNetPeerPort = "net.peer.port";
+
+/**
+ * Deprecated, use {@code server.address}.
+ */
+static constexpr const char *kNetHostName = "net.host.name";
+
+/**
+ * Deprecated, use {@code server.port}.
+ */
+static constexpr const char *kNetHostPort = "net.host.port";
+
+/**
+ * Deprecated, use {@code server.socket.address}.
+ */
+static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
+
+/**
+ * Deprecated, use {@code server.socket.port}.
+ */
+static constexpr const char *kNetSockHostPort = "net.sock.host.port";
+
+/**
+ * Deprecated, use {@code network.transport}.
+ */
+static constexpr const char *kNetTransport = "net.transport";
+
+/**
+ * Deprecated, use {@code network.protocol.name}.
+ */
+static constexpr const char *kNetProtocolName = "net.protocol.name";
+
+/**
+ * Deprecated, use {@code network.protocol.version}.
+ */
+static constexpr const char *kNetProtocolVersion = "net.protocol.version";
+
+/**
+ * Deprecated, use {@code network.transport} and {@code network.type}.
+ */
+static constexpr const char *kNetSockFamily = "net.sock.family";
+
+/**
+ * The domain name of the destination system.
+ *
+ * <p>Notes:
+  <ul> <li>This value may be a host name, a fully qualified domain name, or another host naming
+ format.</li> </ul>
+ */
+static constexpr const char *kDestinationDomain = "destination.domain";
+
+/**
+ * Peer address, for example IP address or UNIX socket name.
+ */
+static constexpr const char *kDestinationAddress = "destination.address";
+
+/**
+ * Peer port number
+ */
+static constexpr const char *kDestinationPort = "destination.port";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -41,27 +193,168 @@ static constexpr const char *kExceptionMessage = "exception.message";
 static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 
 /**
+ * HTTP request method.
+ *
+ * <p>Notes:
+  <ul> <li>HTTP request method value SHOULD be &quot;known&quot; to the instrumentation.
+By default, this convention defines &quot;known&quot; methods as the ones listed in <a
+href="https://www.rfc-editor.org/rfc/rfc9110.html#name-methods">RFC9110</a> and the PATCH method
+defined in <a href="https://www.rfc-editor.org/rfc/rfc5789.html">RFC5789</a>.</li><li>If the HTTP
+request method is not known to instrumentation, it MUST set the {@code http.request.method}
+attribute to {@code _OTHER} and, except if reporting a metric, MUST set the exact method received in
+the request line as value of the {@code http.request.method_original} attribute.</li><li>If the HTTP
+instrumentation could end up converting valid HTTP request methods to {@code _OTHER}, then it MUST
+provide a way to override the list of known HTTP methods. If this override is done via environment
+variable, then the environment variable MUST be named OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and
+support a comma-separated list of case-sensitive known HTTP methods (this list MUST be a full
+override of the default known method, it is not a list of known methods in addition to the
+defaults).</li><li>HTTP method names are case-sensitive and {@code http.request.method} attribute
+value MUST match a known HTTP method name exactly. Instrumentations for specific web frameworks that
+consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent. Tracing
+instrumentations that do so, MUST also set {@code http.request.method_original} to the original
+value.</li> </ul>
+ */
+static constexpr const char *kHttpRequestMethod = "http.request.method";
+
+/**
+ * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
+ */
+static constexpr const char *kHttpResponseStatusCode = "http.response.status_code";
+
+/**
+ * The matched route (path template in the format used by the respective server framework). See note
+below
+ *
+ * <p>Notes:
+  <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
+route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
+the <a href="/docs/http/http-spans.md#http-server-definitions">application root</a> if there is
+one.</li> </ul>
+ */
+static constexpr const char *kHttpRoute = "http.route";
+
+/**
  * The name identifies the event.
  */
 static constexpr const char *kEventName = "event.name";
 
 /**
- * The domain identifies the context in which an event happened. An event name is unique only within
-a domain.
+ * The domain identifies the business context for the events.
  *
  * <p>Notes:
-  <ul> <li>An {@code event.name} is supposed to be unique only in the context of an
-{@code event.domain}, so this allows for two events in different domains to
-have same {@code event.name}, yet be unrelated events.</li> </ul>
+  <ul> <li>Events across different domains may have same {@code event.name}, yet be
+unrelated events.</li> </ul>
  */
 static constexpr const char *kEventDomain = "event.domain";
+
+/**
+ * A unique identifier for the Log Record.
+ *
+ * <p>Notes:
+  <ul> <li>If an id is provided, other log records with the same id will be considered duplicates
+and can be removed safely. This means, that two distinguishable log records MUST have different
+values. The id MAY be an <a href="https://github.com/ulid/spec">Universally Unique Lexicographically
+Sortable Identifier (ULID)</a>, but other identifiers (e.g. UUID) may be used as needed.</li> </ul>
+ */
+static constexpr const char *kLogRecordUid = "log.record.uid";
+
+/**
+ * The stream associated with the log. See below for a list of well-known values.
+ */
+static constexpr const char *kLogIostream = "log.iostream";
+
+/**
+ * The basename of the file.
+ */
+static constexpr const char *kLogFileName = "log.file.name";
+
+/**
+ * The full path to the file.
+ */
+static constexpr const char *kLogFilePath = "log.file.path";
+
+/**
+ * The basename of the file, with symlinks resolved.
+ */
+static constexpr const char *kLogFileNameResolved = "log.file.name_resolved";
+
+/**
+ * The full path to the file, with symlinks resolved.
+ */
+static constexpr const char *kLogFilePathResolved = "log.file.path_resolved";
+
+/**
+ * The type of memory.
+ */
+static constexpr const char *kType = "type";
+
+/**
+ * Name of the memory pool.
+ *
+ * <p>Notes:
+  <ul> <li>Pool names are generally obtained via <a
+ href="https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()">MemoryPoolMXBean#getName()</a>.</li>
+ </ul>
+ */
+static constexpr const char *kPool = "pool";
+
+/**
+ * Logical server hostname, matches server FQDN if available, and IP or socket address if FQDN is
+ * not known.
+ */
+static constexpr const char *kServerAddress = "server.address";
+
+/**
+ * Logical server port number
+ */
+static constexpr const char *kServerPort = "server.port";
+
+/**
+ * The domain name of an immediate peer.
+ *
+ * <p>Notes:
+  <ul> <li>Typically observed from the client side, and represents a proxy or other intermediary
+ domain name.</li> </ul>
+ */
+static constexpr const char *kServerSocketDomain = "server.socket.domain";
+
+/**
+ * Physical server IP address or Unix socket address. If set from the client, should simply use the
+ * socket's peer address, and not attempt to find any actual server IP (i.e., if set from client,
+ * this may represent some proxy server instead of the logical server).
+ */
+static constexpr const char *kServerSocketAddress = "server.socket.address";
+
+/**
+ * Physical server port.
+ */
+static constexpr const char *kServerSocketPort = "server.socket.port";
+
+/**
+ * The domain name of the source system.
+ *
+ * <p>Notes:
+  <ul> <li>This value may be a host name, a fully qualified domain name, or another host naming
+ format.</li> </ul>
+ */
+static constexpr const char *kSourceDomain = "source.domain";
+
+/**
+ * Source address, for example IP address or Unix socket name.
+ */
+static constexpr const char *kSourceAddress = "source.address";
+
+/**
+ * Source port number
+ */
+static constexpr const char *kSourcePort = "source.port";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
  Lambda-Runtime-Invoked-Function-Arn} header on the {@code /runtime/invocation/next} applicable).
  *
  * <p>Notes:
-  <ul> <li>This may be different from {@code faas.id} if an alias is involved.</li> </ul>
+  <ul> <li>This may be different from {@code cloud.resource_id} if an alias is involved.</li> </ul>
  */
 static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
 
@@ -145,9 +438,6 @@ static constexpr const char *kDbName = "db.name";
 
 /**
  * The database statement being executed.
- *
- * <p>Notes:
-  <ul> <li>The value may be sanitized to exclude sensitive information.</li> </ul>
  */
 static constexpr const char *kDbStatement = "db.statement";
 
@@ -170,7 +460,7 @@ static constexpr const char *kDbOperation = "db.operation";
  name</a> connecting to. This name is used to determine the port of a named instance.
  *
  * <p>Notes:
-  <ul> <li>If setting a {@code db.mssql.instance_name}, {@code net.peer.port} is no longer required
+  <ul> <li>If setting a {@code db.mssql.instance_name}, {@code server.port} is no longer required
  (but still recommended if non-standard).</li> </ul>
  */
 static constexpr const char *kDbMssqlInstanceName = "db.mssql.instance_name";
@@ -246,6 +536,46 @@ static constexpr const char *kDbMongodbCollection = "db.mongodb.collection";
 static constexpr const char *kDbSqlTable = "db.sql.table";
 
 /**
+ * Unique Cosmos client instance id.
+ */
+static constexpr const char *kDbCosmosdbClientId = "db.cosmosdb.client_id";
+
+/**
+ * CosmosDB Operation Type.
+ */
+static constexpr const char *kDbCosmosdbOperationType = "db.cosmosdb.operation_type";
+
+/**
+ * Cosmos client connection mode.
+ */
+static constexpr const char *kDbCosmosdbConnectionMode = "db.cosmosdb.connection_mode";
+
+/**
+ * Cosmos DB container name.
+ */
+static constexpr const char *kDbCosmosdbContainer = "db.cosmosdb.container";
+
+/**
+ * Request payload size in bytes
+ */
+static constexpr const char *kDbCosmosdbRequestContentLength = "db.cosmosdb.request_content_length";
+
+/**
+ * Cosmos DB status code.
+ */
+static constexpr const char *kDbCosmosdbStatusCode = "db.cosmosdb.status_code";
+
+/**
+ * Cosmos DB sub status code.
+ */
+static constexpr const char *kDbCosmosdbSubStatusCode = "db.cosmosdb.sub_status_code";
+
+/**
+ * RU consumed for that operation
+ */
+static constexpr const char *kDbCosmosdbRequestCharge = "db.cosmosdb.request_charge";
+
+/**
  * Name of the code, either &quot;OK&quot; or &quot;ERROR&quot;. MUST NOT be set if the status code
  * is UNSET.
  */
@@ -257,7 +587,7 @@ static constexpr const char *kOtelStatusCode = "otel.status_code";
 static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
 /**
- * Type of the trigger which caused this function execution.
+ * Type of the trigger which caused this function invocation.
  *
  * <p>Notes:
   <ul> <li>For the server/consumer span on the incoming side,
@@ -270,9 +600,9 @@ lambda, which is often HTTP).</li> </ul>
 static constexpr const char *kFaasTrigger = "faas.trigger";
 
 /**
- * The execution ID of the current function execution.
+ * The invocation ID of the current function invocation.
  */
-static constexpr const char *kFaasExecution = "faas.execution";
+static constexpr const char *kFaasInvocationId = "faas.invocation_id";
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud
@@ -346,117 +676,94 @@ static constexpr const char *kFaasInvokedProvider = "faas.invoked_provider";
 static constexpr const char *kFaasInvokedRegion = "faas.invoked_region";
 
 /**
- * Transport protocol used. See note below.
+ * The unique identifier of the feature flag.
  */
-static constexpr const char *kNetTransport = "net.transport";
+static constexpr const char *kFeatureFlagKey = "feature_flag.key";
 
 /**
- * Application layer protocol used. The value SHOULD be normalized to lowercase.
+ * The name of the service provider that performs the flag evaluation.
  */
-static constexpr const char *kNetAppProtocolName = "net.app.protocol.name";
+static constexpr const char *kFeatureFlagProviderName = "feature_flag.provider_name";
+
+/**
+ * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the
+value can be used.
+ *
+ * <p>Notes:
+  <ul> <li>A semantic identifier, commonly referred to as a variant, provides a means
+for referring to a value without including the value itself. This can
+provide additional context for understanding the meaning behind a value.
+For example, the variant {@code red} maybe be used for the value {@code #c05543}.</li><li>A
+stringified version of the value can be used in situations where a semantic identifier is
+unavailable. String representation of the value should be determined by the implementer.</li> </ul>
+ */
+static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
+
+/**
+ * <a href="https://osi-model.com/transport-layer/">OSI Transport Layer</a> or <a
+ * href="https://en.wikipedia.org/wiki/Inter-process_communication">Inter-process Communication
+ * method</a>. The value SHOULD be normalized to lowercase.
+ */
+static constexpr const char *kNetworkTransport = "network.transport";
+
+/**
+ * <a href="https://osi-model.com/network-layer/">OSI Network Layer</a> or non-OSI equivalent. The
+ * value SHOULD be normalized to lowercase.
+ */
+static constexpr const char *kNetworkType = "network.type";
+
+/**
+ * <a href="https://osi-model.com/application-layer/">OSI Application Layer</a> or non-OSI
+ * equivalent. The value SHOULD be normalized to lowercase.
+ */
+static constexpr const char *kNetworkProtocolName = "network.protocol.name";
 
 /**
  * Version of the application layer protocol used. See note below.
  *
  * <p>Notes:
-  <ul> <li>{@code net.app.protocol.version} refers to the version of the protocol used and might be
+  <ul> <li>{@code network.protocol.version} refers to the version of the protocol used and might be
  different from the protocol client's version. If the HTTP client used has a version of {@code
  0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
  </ul>
  */
-static constexpr const char *kNetAppProtocolVersion = "net.app.protocol.version";
+static constexpr const char *kNetworkProtocolVersion = "network.protocol.version";
 
 /**
- * Remote socket peer name.
+ * The internet connection type.
  */
-static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
-
-/**
- * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, <a
- * href="https://man7.org/linux/man-pages/man7/address_families.7.html">etc</a>.
- */
-static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
-
-/**
- * Remote socket peer port.
- */
-static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
-
-/**
- * Protocol <a href="https://man7.org/linux/man-pages/man7/address_families.7.html">address
- * family</a> which is used for communication.
- */
-static constexpr const char *kNetSockFamily = "net.sock.family";
-
-/**
- * Logical remote hostname, see note below.
- *
- * <p>Notes:
-  <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
- lookup.</li> </ul>
- */
-static constexpr const char *kNetPeerName = "net.peer.name";
-
-/**
- * Logical remote port number
- */
-static constexpr const char *kNetPeerPort = "net.peer.port";
-
-/**
- * Logical local hostname or similar, see note below.
- */
-static constexpr const char *kNetHostName = "net.host.name";
-
-/**
- * Logical local port number, preferably the one that the peer used to connect
- */
-static constexpr const char *kNetHostPort = "net.host.port";
-
-/**
- * Local socket address. Useful in case of a multi-IP host.
- */
-static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
-
-/**
- * Local socket port number.
- */
-static constexpr const char *kNetSockHostPort = "net.sock.host.port";
-
-/**
- * The internet connection type currently being used by the host.
- */
-static constexpr const char *kNetHostConnectionType = "net.host.connection.type";
+static constexpr const char *kNetworkConnectionType = "network.connection.type";
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology
  * connection, but it could be used for describing details about a wifi connection.
  */
-static constexpr const char *kNetHostConnectionSubtype = "net.host.connection.subtype";
+static constexpr const char *kNetworkConnectionSubtype = "network.connection.subtype";
 
 /**
  * The name of the mobile carrier.
  */
-static constexpr const char *kNetHostCarrierName = "net.host.carrier.name";
+static constexpr const char *kNetworkCarrierName = "network.carrier.name";
 
 /**
  * The mobile carrier country code.
  */
-static constexpr const char *kNetHostCarrierMcc = "net.host.carrier.mcc";
+static constexpr const char *kNetworkCarrierMcc = "network.carrier.mcc";
 
 /**
  * The mobile carrier network code.
  */
-static constexpr const char *kNetHostCarrierMnc = "net.host.carrier.mnc";
+static constexpr const char *kNetworkCarrierMnc = "network.carrier.mnc";
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  */
-static constexpr const char *kNetHostCarrierIcc = "net.host.carrier.icc";
+static constexpr const char *kNetworkCarrierIcc = "network.carrier.icc";
 
 /**
- * The <a href="../../resource/semantic_conventions/README.md#service">{@code service.name}</a> of
- * the remote service. SHOULD be equal to the actual {@code service.name} resource attribute of the
- * remote service if any.
+ * The <a href="/docs/resource/README.md#service">{@code service.name}</a> of the remote service.
+ * SHOULD be equal to the actual {@code service.name} resource attribute of the remote service if
+ * any.
  */
 static constexpr const char *kPeerService = "peer.service";
 
@@ -518,29 +825,15 @@ static constexpr const char *kCodeFilepath = "code.filepath";
 static constexpr const char *kCodeLineno = "code.lineno";
 
 /**
- * HTTP request method.
+ * The column number in {@code code.filepath} best representing the operation. It SHOULD point
+ * within the code unit named in {@code code.function}.
  */
-static constexpr const char *kHttpMethod = "http.method";
+static constexpr const char *kCodeColumn = "code.column";
 
 /**
- * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
+ * Original HTTP method sent by the client in the request line.
  */
-static constexpr const char *kHttpStatusCode = "http.status_code";
-
-/**
- * Kind of HTTP protocol used.
- *
- * <p>Notes:
-  <ul> <li>If {@code net.transport} is not specified, it can be assumed to be {@code IP.TCP} except
- if {@code http.flavor} is {@code QUIC}, in which case {@code IP.UDP} is assumed.</li> </ul>
- */
-static constexpr const char *kHttpFlavor = "http.flavor";
-
-/**
- * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
- * User-Agent</a> header sent by the client.
- */
-static constexpr const char *kHttpUserAgent = "http.user_agent";
+static constexpr const char *kHttpRequestMethodOriginal = "http.request.method_original";
 
 /**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
@@ -548,7 +841,7 @@ static constexpr const char *kHttpUserAgent = "http.user_agent";
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
+static constexpr const char *kHttpRequestBodySize = "http.request.body.size";
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding
@@ -556,18 +849,7 @@ static constexpr const char *kHttpRequestContentLength = "http.request_content_l
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
-
-/**
- * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
- fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
- *
- * <p>Notes:
-  <ul> <li>{@code http.url} MUST NOT contain credentials passed via URL in form of {@code
- https://username:password@www.example.com/}. In such case the attribute's value should be {@code
- https://www.example.com/}.</li> </ul>
- */
-static constexpr const char *kHttpUrl = "http.url";
+static constexpr const char *kHttpResponseBodySize = "http.response.body.size";
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
@@ -580,42 +862,10 @@ static constexpr const char *kHttpUrl = "http.url";
 static constexpr const char *kHttpResendCount = "http.resend_count";
 
 /**
- * The URI scheme identifying the used protocol.
+ * The AWS request ID as returned in the response headers {@code x-amz-request-id} or {@code
+ * x-amz-requestid}.
  */
-static constexpr const char *kHttpScheme = "http.scheme";
-
-/**
- * The full request target as passed in a HTTP request line or equivalent.
- */
-static constexpr const char *kHttpTarget = "http.target";
-
-/**
- * The matched route (path template in the format used by the respective server framework). See note
- below
- *
- * <p>Notes:
-  <ul> <li>'http.route' MUST NOT be populated when this is not supported by the HTTP server
- framework as the route attribute should have low-cardinality and the URI path can NOT substitute
- it.</li> </ul>
- */
-static constexpr const char *kHttpRoute = "http.route";
-
-/**
- * The IP address of the original client behind all proxies, if known (e.g. from <a
-href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For">X-Forwarded-For</a>).
- *
- * <p>Notes:
-  <ul> <li>This is not necessarily the same as {@code net.sock.peer.addr}, which would
-identify the network-level peer, which may be a proxy.</li><li>This attribute should be set when a
-source of information different from the one used for {@code net.sock.peer.addr}, is available even
-if that other source just confirms the same value as {@code net.sock.peer.addr}. Rationale: For
-{@code net.sock.peer.addr}, one typically does not know if it comes from a proxy, reverse proxy, or
-the actual client. Setting
-{@code http.client_ip} when it's the same as {@code net.sock.peer.addr} means that
-one is at least somewhat confident that the address is not that of
-the closest proxy.</li> </ul>
- */
-static constexpr const char *kHttpClientIp = "http.client_ip";
+static constexpr const char *kAwsRequestId = "aws.request_id";
 
 /**
  * The keys in the {@code RequestItems} object field.
@@ -736,6 +986,117 @@ static constexpr const char *kAwsDynamodbGlobalSecondaryIndexUpdates =
     "aws.dynamodb.global_secondary_index_updates";
 
 /**
+ * The S3 bucket name the request refers to. Corresponds to the {@code --bucket} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> operations.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code bucket} attribute is applicable to all S3 operations that reference a bucket,
+i.e. that require the bucket name as a mandatory parameter. This applies to almost all S3 operations
+except {@code list-buckets}.</li> </ul>
+ */
+static constexpr const char *kAwsS3Bucket = "aws.s3.bucket";
+
+/**
+ * The S3 object key the request refers to. Corresponds to the {@code --key} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> operations.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code key} attribute is applicable to all object-related S3 operations, i.e. that
+require the object key as a mandatory parameter. This applies in particular to the following
+operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html">get-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/head-object.html">head-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/put-object.html">put-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/restore-object.html">restore-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/select-object-content.html">select-object-content</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html">complete-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/create-multipart-upload.html">create-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html">list-parts</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3Key = "aws.s3.key";
+
+/**
+ * The source object (in the form {@code bucket}/{@code key}) for the copy operation.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code copy_source} attribute applies to S3 copy operations and corresponds to the
+{@code --copy-source} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object operation
+within the S3 API</a>. This applies in particular to the following operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3CopySource = "aws.s3.copy_source";
+
+/**
+ * Upload ID that identifies the multipart upload.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code upload_id} attribute applies to S3 multipart-upload operations and corresponds
+to the {@code --upload-id} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> multipart
+operations. This applies in particular to the following operations:</li><li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/complete-multipart-upload.html">complete-multipart-upload</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/list-parts.html">list-parts</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
+<li><a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
+ </ul>
+ */
+static constexpr const char *kAwsS3UploadId = "aws.s3.upload_id";
+
+/**
+ * The delete request container that specifies the objects to be deleted.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code delete} attribute is only applicable to the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a>
+operation. The {@code delete} attribute corresponds to the {@code --delete} parameter of the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html">delete-objects
+operation within the S3 API</a>.</li> </ul>
+ */
+static constexpr const char *kAwsS3Delete = "aws.s3.delete";
+
+/**
+ * The part number of the part being uploaded in a multipart-upload operation. This is a positive
+integer between 1 and 10,000.
+ *
+ * <p>Notes:
+  <ul> <li>The {@code part_number} attribute is only applicable to the <a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a> and
+<a
+href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>
+operations. The {@code part_number} attribute corresponds to the {@code --part-number} parameter of
+the <a href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part
+operation within the S3 API</a>.</li> </ul>
+ */
+static constexpr const char *kAwsS3PartNumber = "aws.s3.part_number";
+
+/**
  * The name of the operation being executed.
  */
 static constexpr const char *kGraphqlOperationName = "graphql.operation.name";
@@ -754,88 +1115,102 @@ static constexpr const char *kGraphqlOperationType = "graphql.operation.type";
 static constexpr const char *kGraphqlDocument = "graphql.document";
 
 /**
- * A string identifying the messaging system.
- */
-static constexpr const char *kMessagingSystem = "messaging.system";
-
-/**
- * The message destination name. This might be equal to the span name but is required nevertheless.
- */
-static constexpr const char *kMessagingDestination = "messaging.destination";
-
-/**
- * The kind of message destination
- */
-static constexpr const char *kMessagingDestinationKind = "messaging.destination_kind";
-
-/**
- * A boolean that is true if the message destination is temporary.
- */
-static constexpr const char *kMessagingTempDestination = "messaging.temp_destination";
-
-/**
- * The name of the transport protocol.
- */
-static constexpr const char *kMessagingProtocol = "messaging.protocol";
-
-/**
- * The version of the transport protocol.
- */
-static constexpr const char *kMessagingProtocolVersion = "messaging.protocol_version";
-
-/**
- * Connection string.
- */
-static constexpr const char *kMessagingUrl = "messaging.url";
-
-/**
  * A value used by the messaging system as an identifier for the message, represented as a string.
  */
-static constexpr const char *kMessagingMessageId = "messaging.message_id";
+static constexpr const char *kMessagingMessageId = "messaging.message.id";
 
 /**
  * The <a href="#conversations">conversation ID</a> identifying the conversation to which the
  * message belongs, represented as a string. Sometimes called &quot;Correlation ID&quot;.
  */
-static constexpr const char *kMessagingConversationId = "messaging.conversation_id";
+static constexpr const char *kMessagingMessageConversationId = "messaging.message.conversation_id";
 
 /**
  * The (uncompressed) size of the message payload in bytes. Also use this attribute if it is unknown
  * whether the compressed or uncompressed payload size is reported.
  */
 static constexpr const char *kMessagingMessagePayloadSizeBytes =
-    "messaging.message_payload_size_bytes";
+    "messaging.message.payload_size_bytes";
 
 /**
  * The compressed size of the message payload in bytes.
  */
 static constexpr const char *kMessagingMessagePayloadCompressedSizeBytes =
-    "messaging.message_payload_compressed_size_bytes";
+    "messaging.message.payload_compressed_size_bytes";
 
 /**
- * A string identifying the kind of message consumption as defined in the <a
- * href="#operation-names">Operation names</a> section above. If the operation is &quot;send&quot;,
- * this attribute MUST NOT be set, since the operation can be inferred from the span kind in that
- * case.
+ * The message destination name
+ *
+ * <p>Notes:
+  <ul> <li>Destination name SHOULD uniquely identify a specific queue, topic or other entity within
+the broker. If the broker does not have such notion, the destination name SHOULD uniquely identify
+the broker.</li> </ul>
+ */
+static constexpr const char *kMessagingDestinationName = "messaging.destination.name";
+
+/**
+ * Low cardinality representation of the messaging destination name
+ *
+ * <p>Notes:
+  <ul> <li>Destination names could be constructed from templates. An example would be a destination
+ name involving a user name or product id. Although the destination name in this case is of high
+ cardinality, the underlying template is of low cardinality and can be effectively used for grouping
+ and aggregation.</li> </ul>
+ */
+static constexpr const char *kMessagingDestinationTemplate = "messaging.destination.template";
+
+/**
+ * A boolean that is true if the message destination is temporary and might not exist anymore after
+ * messages are processed.
+ */
+static constexpr const char *kMessagingDestinationTemporary = "messaging.destination.temporary";
+
+/**
+ * A boolean that is true if the message destination is anonymous (could be unnamed or have
+ * auto-generated name).
+ */
+static constexpr const char *kMessagingDestinationAnonymous = "messaging.destination.anonymous";
+
+/**
+ * A string identifying the messaging system.
+ */
+static constexpr const char *kMessagingSystem = "messaging.system";
+
+/**
+ * A string identifying the kind of messaging operation as defined in the <a
+ href="#operation-names">Operation names</a> section above.
+ *
+ * <p>Notes:
+  <ul> <li>If a custom value is used, it MUST be of low cardinality.</li> </ul>
  */
 static constexpr const char *kMessagingOperation = "messaging.operation";
 
 /**
- * The identifier for the consumer receiving a message. For Kafka, set it to {@code
- * {messaging.kafka.consumer_group} - {messaging.kafka.client_id}}, if both are present, or only
- * {@code messaging.kafka.consumer_group}. For brokers, such as RabbitMQ and Artemis, set it to the
- * {@code client_id} of the client consuming the message.
+ * The number of messages sent, received, or processed in the scope of the batching operation.
+ *
+ * <p>Notes:
+  <ul> <li>Instrumentations SHOULD NOT set {@code messaging.batch.message_count} on spans that
+ operate with a single message. When a messaging client library supports both batch and
+ single-message API for the same operation, instrumentations SHOULD use {@code
+ messaging.batch.message_count} for batching APIs and SHOULD NOT use it for single-message
+ APIs.</li> </ul>
  */
-static constexpr const char *kMessagingConsumerId = "messaging.consumer_id";
+static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.message_count";
+
+/**
+ * A unique identifier for the client that consumes or produces a message.
+ */
+static constexpr const char *kMessagingClientId = "messaging.client_id";
 
 /**
  * RabbitMQ message routing key.
  */
-static constexpr const char *kMessagingRabbitmqRoutingKey = "messaging.rabbitmq.routing_key";
+static constexpr const char *kMessagingRabbitmqDestinationRoutingKey =
+    "messaging.rabbitmq.destination.routing_key";
 
 /**
  * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the
- same partition. They differ from {@code messaging.message_id} in that they're not unique. If the
+ same partition. They differ from {@code messaging.message.id} in that they're not unique. If the
  key is {@code null}, the attribute MUST NOT be set.
  *
  * <p>Notes:
@@ -843,28 +1218,29 @@ static constexpr const char *kMessagingRabbitmqRoutingKey = "messaging.rabbitmq.
  attribute. If the key has no unambiguous, canonical string form, don't include its value.</li>
  </ul>
  */
-static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message_key";
+static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.message.key";
 
 /**
  * Name of the Kafka Consumer Group that is handling the message. Only applies to consumers, not
  * producers.
  */
-static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer_group";
-
-/**
- * Client Id for the Consumer or Producer that is handling the message.
- */
-static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_id";
+static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer.group";
 
 /**
  * Partition the message is sent to.
  */
-static constexpr const char *kMessagingKafkaPartition = "messaging.kafka.partition";
+static constexpr const char *kMessagingKafkaDestinationPartition =
+    "messaging.kafka.destination.partition";
+
+/**
+ * The offset of a record in the corresponding Kafka partition.
+ */
+static constexpr const char *kMessagingKafkaMessageOffset = "messaging.kafka.message.offset";
 
 /**
  * A boolean that is true if the message is a tombstone.
  */
-static constexpr const char *kMessagingKafkaTombstone = "messaging.kafka.tombstone";
+static constexpr const char *kMessagingKafkaMessageTombstone = "messaging.kafka.message.tombstone";
 
 /**
  * Namespace of RocketMQ resources, resources in different namespaces are individual.
@@ -878,42 +1254,37 @@ static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.n
 static constexpr const char *kMessagingRocketmqClientGroup = "messaging.rocketmq.client_group";
 
 /**
- * The unique identifier for each client.
- */
-static constexpr const char *kMessagingRocketmqClientId = "messaging.rocketmq.client_id";
-
-/**
  * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
  */
-static constexpr const char *kMessagingRocketmqDeliveryTimestamp =
-    "messaging.rocketmq.delivery_timestamp";
+static constexpr const char *kMessagingRocketmqMessageDeliveryTimestamp =
+    "messaging.rocketmq.message.delivery_timestamp";
 
 /**
  * The delay time level for delay message, which determines the message delay time.
  */
-static constexpr const char *kMessagingRocketmqDelayTimeLevel =
-    "messaging.rocketmq.delay_time_level";
+static constexpr const char *kMessagingRocketmqMessageDelayTimeLevel =
+    "messaging.rocketmq.message.delay_time_level";
 
 /**
  * It is essential for FIFO message. Messages that belong to the same message group are always
  * processed one by one within the same consumer group.
  */
-static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message_group";
+static constexpr const char *kMessagingRocketmqMessageGroup = "messaging.rocketmq.message.group";
 
 /**
  * Type of message.
  */
-static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message_type";
+static constexpr const char *kMessagingRocketmqMessageType = "messaging.rocketmq.message.type";
 
 /**
  * The secondary classifier of message besides topic.
  */
-static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message_tag";
+static constexpr const char *kMessagingRocketmqMessageTag = "messaging.rocketmq.message.tag";
 
 /**
  * Key(s) of message, another way to mark message besides message id.
  */
-static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message_keys";
+static constexpr const char *kMessagingRocketmqMessageKeys = "messaging.rocketmq.message.keys";
 
 /**
  * Model of message consumption. This only applies to consumer spans.
@@ -979,7 +1350,155 @@ static constexpr const char *kRpcJsonrpcErrorCode = "rpc.jsonrpc.error_code";
  */
 static constexpr const char *kRpcJsonrpcErrorMessage = "rpc.jsonrpc.error_message";
 
+/**
+ * Whether this is a received or sent message.
+ */
+static constexpr const char *kMessageType = "message.type";
+
+/**
+ * MUST be calculated as two different counters starting from {@code 1} one for sent messages and
+ one for received message.
+ *
+ * <p>Notes:
+  <ul> <li>This way we guarantee that the values will be consistent between different
+ implementations.</li> </ul>
+ */
+static constexpr const char *kMessageId = "message.id";
+
+/**
+ * Compressed size of the message in bytes.
+ */
+static constexpr const char *kMessageCompressedSize = "message.compressed_size";
+
+/**
+ * Uncompressed size of the message in bytes.
+ */
+static constexpr const char *kMessageUncompressedSize = "message.uncompressed_size";
+
+/**
+ * The <a href="https://connect.build/docs/protocol/#error-codes">error codes</a> of the Connect
+ * request. Error codes are always string values.
+ */
+static constexpr const char *kRpcConnectRpcErrorCode = "rpc.connect_rpc.error_code";
+
+/**
+ * SHOULD be set to true if the exception event is recorded at a point where it is known that the
+exception is escaping the scope of the span.
+ *
+ * <p>Notes:
+  <ul> <li>An exception is considered to have escaped (or left) the scope of a span,
+if that span is ended while the exception is still logically &quot;in flight&quot;.
+This may be actually &quot;in flight&quot; in some languages (e.g. if the exception
+is passed to a Context manager's {@code __exit__} method in Python) but will
+usually be caught at the point of recording the exception in most languages.</li><li>It is usually
+not possible to determine at the point where an exception is thrown whether it will escape the scope
+of a span. However, it is trivial to know that an exception will escape, if one checks for an active
+exception just before ending the span, as done in the <a href="#recording-an-exception">example
+above</a>.</li><li>It follows that an exception may still escape the scope of the span even if the
+{@code exception.escaped} attribute was not set or set to false, since the event might have been
+recorded at a time where it was not clear whether the exception will escape.</li> </ul>
+ */
+static constexpr const char *kExceptionEscaped = "exception.escaped";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.1">URI scheme</a> component
+ * identifying the used protocol.
+ */
+static constexpr const char *kUrlScheme = "url.scheme";
+
+/**
+ * Absolute URL describing a network resource according to <a
+href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a>
+ *
+ * <p>Notes:
+  <ul> <li>For network calls, URL usually has {@code scheme://host[:port][path][?query][#fragment]}
+format, where the fragment is not transmitted over HTTP, but if it is known, it should be included
+nevertheless.
+{@code url.full} MUST NOT contain credentials passed via URL in form of {@code
+https://username:password@www.example.com/}. In such case username and password should be redacted
+and attribute's value should be {@code https://REDACTED:REDACTED@www.example.com/}.
+{@code url.full} SHOULD capture the absolute URL when it is available (or can be reconstructed) and
+SHOULD NOT be validated or modified except for sanitizing purposes.</li> </ul>
+ */
+static constexpr const char *kUrlFull = "url.full";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.3">URI path</a> component
+ *
+ * <p>Notes:
+  <ul> <li>When missing, the value is assumed to be {@code /}</li> </ul>
+ */
+static constexpr const char *kUrlPath = "url.path";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.4">URI query</a> component
+ *
+ * <p>Notes:
+  <ul> <li>Sensitive content provided in query string SHOULD be scrubbed when instrumentations can
+ identify it.</li> </ul>
+ */
+static constexpr const char *kUrlQuery = "url.query";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.5">URI fragment</a> component
+ */
+static constexpr const char *kUrlFragment = "url.fragment";
+
+/**
+ * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
+ * User-Agent</a> header sent by the client.
+ */
+static constexpr const char *kUserAgentOriginal = "user_agent.original";
+
 // Enum definitions
+namespace NetTransportValues
+{
+/** ip_tcp. */
+static constexpr const char *kIpTcp = "ip_tcp";
+/** ip_udp. */
+static constexpr const char *kIpUdp = "ip_udp";
+/** Named or anonymous pipe. */
+static constexpr const char *kPipe = "pipe";
+/** In-process communication. */
+static constexpr const char *kInproc = "inproc";
+/** Something else (non IP-based). */
+static constexpr const char *kOther = "other";
+}  // namespace NetTransportValues
+
+namespace NetSockFamilyValues
+{
+/** IPv4 address. */
+static constexpr const char *kInet = "inet";
+/** IPv6 address. */
+static constexpr const char *kInet6 = "inet6";
+/** Unix domain socket path. */
+static constexpr const char *kUnix = "unix";
+}  // namespace NetSockFamilyValues
+
+namespace HttpRequestMethodValues
+{
+/** CONNECT method. */
+static constexpr const char *kConnect = "CONNECT";
+/** DELETE method. */
+static constexpr const char *kDelete = "DELETE";
+/** GET method. */
+static constexpr const char *kGet = "GET";
+/** HEAD method. */
+static constexpr const char *kHead = "HEAD";
+/** OPTIONS method. */
+static constexpr const char *kOptions = "OPTIONS";
+/** PATCH method. */
+static constexpr const char *kPatch = "PATCH";
+/** POST method. */
+static constexpr const char *kPost = "POST";
+/** PUT method. */
+static constexpr const char *kPut = "PUT";
+/** TRACE method. */
+static constexpr const char *kTrace = "TRACE";
+/** Any HTTP method that the instrumentation has no prior knowledge of. */
+static constexpr const char *kOther = "_OTHER";
+}  // namespace HttpRequestMethodValues
+
 namespace EventDomainValues
 {
 /** Events from browser apps. */
@@ -989,6 +1508,22 @@ static constexpr const char *kDevice = "device";
 /** Events from Kubernetes. */
 static constexpr const char *kK8s = "k8s";
 }  // namespace EventDomainValues
+
+namespace LogIostreamValues
+{
+/** Logs from stdout stream. */
+static constexpr const char *kStdout = "stdout";
+/** Events from stderr stream. */
+static constexpr const char *kStderr = "stderr";
+}  // namespace LogIostreamValues
+
+namespace TypeValues
+{
+/** Heap memory. */
+static constexpr const char *kHeap = "heap";
+/** Non-heap memory. */
+static constexpr const char *kNonHeap = "non_heap";
+}  // namespace TypeValues
 
 namespace OpentracingRefTypeValues
 {
@@ -1004,6 +1539,8 @@ namespace DbSystemValues
 static constexpr const char *kOtherSql = "other_sql";
 /** Microsoft SQL Server. */
 static constexpr const char *kMssql = "mssql";
+/** Microsoft SQL Server Compact. */
+static constexpr const char *kMssqlcompact = "mssqlcompact";
 /** MySQL. */
 static constexpr const char *kMysql = "mysql";
 /** Oracle Database. */
@@ -1096,6 +1633,12 @@ static constexpr const char *kMemcached = "memcached";
 static constexpr const char *kCockroachdb = "cockroachdb";
 /** OpenSearch. */
 static constexpr const char *kOpensearch = "opensearch";
+/** ClickHouse. */
+static constexpr const char *kClickhouse = "clickhouse";
+/** Cloud Spanner. */
+static constexpr const char *kSpanner = "spanner";
+/** Trino. */
+static constexpr const char *kTrino = "trino";
 }  // namespace DbSystemValues
 
 namespace DbCassandraConsistencyLevelValues
@@ -1123,6 +1666,48 @@ static constexpr const char *kSerial = "serial";
 /** local_serial. */
 static constexpr const char *kLocalSerial = "local_serial";
 }  // namespace DbCassandraConsistencyLevelValues
+
+namespace DbCosmosdbOperationTypeValues
+{
+/** invalid. */
+static constexpr const char *kInvalid = "Invalid";
+/** create. */
+static constexpr const char *kCreate = "Create";
+/** patch. */
+static constexpr const char *kPatch = "Patch";
+/** read. */
+static constexpr const char *kRead = "Read";
+/** read_feed. */
+static constexpr const char *kReadFeed = "ReadFeed";
+/** delete. */
+static constexpr const char *kDelete = "Delete";
+/** replace. */
+static constexpr const char *kReplace = "Replace";
+/** execute. */
+static constexpr const char *kExecute = "Execute";
+/** query. */
+static constexpr const char *kQuery = "Query";
+/** head. */
+static constexpr const char *kHead = "Head";
+/** head_feed. */
+static constexpr const char *kHeadFeed = "HeadFeed";
+/** upsert. */
+static constexpr const char *kUpsert = "Upsert";
+/** batch. */
+static constexpr const char *kBatch = "Batch";
+/** query_plan. */
+static constexpr const char *kQueryPlan = "QueryPlan";
+/** execute_javascript. */
+static constexpr const char *kExecuteJavascript = "ExecuteJavaScript";
+}  // namespace DbCosmosdbOperationTypeValues
+
+namespace DbCosmosdbConnectionModeValues
+{
+/** Gateway (HTTP) connections mode. */
+static constexpr const char *kGateway = "gateway";
+/** Direct connection. */
+static constexpr const char *kDirect = "direct";
+}  // namespace DbCosmosdbConnectionModeValues
 
 namespace OtelStatusCodeValues
 {
@@ -1171,31 +1756,27 @@ static constexpr const char *kGcp = "gcp";
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace FaasInvokedProviderValues
 
-namespace NetTransportValues
+namespace NetworkTransportValues
 {
-/** ip_tcp. */
-static constexpr const char *kIpTcp = "ip_tcp";
-/** ip_udp. */
-static constexpr const char *kIpUdp = "ip_udp";
+/** TCP. */
+static constexpr const char *kTcp = "tcp";
+/** UDP. */
+static constexpr const char *kUdp = "udp";
 /** Named or anonymous pipe. See note below. */
 static constexpr const char *kPipe = "pipe";
-/** In-process communication. */
-static constexpr const char *kInproc = "inproc";
-/** Something else (non IP-based). */
-static constexpr const char *kOther = "other";
-}  // namespace NetTransportValues
-
-namespace NetSockFamilyValues
-{
-/** IPv4 address. */
-static constexpr const char *kInet = "inet";
-/** IPv6 address. */
-static constexpr const char *kInet6 = "inet6";
-/** Unix domain socket path. */
+/** Unix domain socket. */
 static constexpr const char *kUnix = "unix";
-}  // namespace NetSockFamilyValues
+}  // namespace NetworkTransportValues
 
-namespace NetHostConnectionTypeValues
+namespace NetworkTypeValues
+{
+/** IPv4. */
+static constexpr const char *kIpv4 = "ipv4";
+/** IPv6. */
+static constexpr const char *kIpv6 = "ipv6";
+}  // namespace NetworkTypeValues
+
+namespace NetworkConnectionTypeValues
 {
 /** wifi. */
 static constexpr const char *kWifi = "wifi";
@@ -1207,9 +1788,9 @@ static constexpr const char *kCell = "cell";
 static constexpr const char *kUnavailable = "unavailable";
 /** unknown. */
 static constexpr const char *kUnknown = "unknown";
-}  // namespace NetHostConnectionTypeValues
+}  // namespace NetworkConnectionTypeValues
 
-namespace NetHostConnectionSubtypeValues
+namespace NetworkConnectionSubtypeValues
 {
 /** GPRS. */
 static constexpr const char *kGprs = "gprs";
@@ -1253,23 +1834,7 @@ static constexpr const char *kNr = "nr";
 static constexpr const char *kNrnsa = "nrnsa";
 /** LTE CA. */
 static constexpr const char *kLteCa = "lte_ca";
-}  // namespace NetHostConnectionSubtypeValues
-
-namespace HttpFlavorValues
-{
-/** HTTP/1.0. */
-static constexpr const char *kHttp10 = "1.0";
-/** HTTP/1.1. */
-static constexpr const char *kHttp11 = "1.1";
-/** HTTP/2. */
-static constexpr const char *kHttp20 = "2.0";
-/** HTTP/3. */
-static constexpr const char *kHttp30 = "3.0";
-/** SPDY protocol. */
-static constexpr const char *kSpdy = "SPDY";
-/** QUIC protocol. */
-static constexpr const char *kQuic = "QUIC";
-}  // namespace HttpFlavorValues
+}  // namespace NetworkConnectionSubtypeValues
 
 namespace GraphqlOperationTypeValues
 {
@@ -1281,16 +1846,10 @@ static constexpr const char *kMutation = "mutation";
 static constexpr const char *kSubscription = "subscription";
 }  // namespace GraphqlOperationTypeValues
 
-namespace MessagingDestinationKindValues
-{
-/** A message sent to a queue. */
-static constexpr const char *kQueue = "queue";
-/** A message sent to a topic. */
-static constexpr const char *kTopic = "topic";
-}  // namespace MessagingDestinationKindValues
-
 namespace MessagingOperationValues
 {
+/** publish. */
+static constexpr const char *kPublish = "publish";
 /** receive. */
 static constexpr const char *kReceive = "receive";
 /** process. */
@@ -1327,6 +1886,8 @@ static constexpr const char *kJavaRmi = "java_rmi";
 static constexpr const char *kDotnetWcf = "dotnet_wcf";
 /** Apache Dubbo. */
 static constexpr const char *kApacheDubbo = "apache_dubbo";
+/** Connect RPC. */
+static constexpr const char *kConnectRpc = "connect_rpc";
 }  // namespace RpcSystemValues
 
 namespace RpcGrpcStatusCodeValues
@@ -1366,6 +1927,50 @@ static constexpr const int kDataLoss = 15;
 /** UNAUTHENTICATED. */
 static constexpr const int kUnauthenticated = 16;
 }  // namespace RpcGrpcStatusCodeValues
+
+namespace MessageTypeValues
+{
+/** sent. */
+static constexpr const char *kSent = "SENT";
+/** received. */
+static constexpr const char *kReceived = "RECEIVED";
+}  // namespace MessageTypeValues
+
+namespace RpcConnectRpcErrorCodeValues
+{
+/** cancelled. */
+static constexpr const char *kCancelled = "cancelled";
+/** unknown. */
+static constexpr const char *kUnknown = "unknown";
+/** invalid_argument. */
+static constexpr const char *kInvalidArgument = "invalid_argument";
+/** deadline_exceeded. */
+static constexpr const char *kDeadlineExceeded = "deadline_exceeded";
+/** not_found. */
+static constexpr const char *kNotFound = "not_found";
+/** already_exists. */
+static constexpr const char *kAlreadyExists = "already_exists";
+/** permission_denied. */
+static constexpr const char *kPermissionDenied = "permission_denied";
+/** resource_exhausted. */
+static constexpr const char *kResourceExhausted = "resource_exhausted";
+/** failed_precondition. */
+static constexpr const char *kFailedPrecondition = "failed_precondition";
+/** aborted. */
+static constexpr const char *kAborted = "aborted";
+/** out_of_range. */
+static constexpr const char *kOutOfRange = "out_of_range";
+/** unimplemented. */
+static constexpr const char *kUnimplemented = "unimplemented";
+/** internal. */
+static constexpr const char *kInternal = "internal";
+/** unavailable. */
+static constexpr const char *kUnavailable = "unavailable";
+/** data_loss. */
+static constexpr const char *kDataLoss = "data_loss";
+/** unauthenticated. */
+static constexpr const char *kUnauthenticated = "unauthenticated";
+}  // namespace RpcConnectRpcErrorCodeValues
 
 }  // namespace SemanticConventions
 }  // namespace trace

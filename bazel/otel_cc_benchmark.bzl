@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 def otel_cc_benchmark(name, srcs, deps, tags = [""]):
     """
     Creates targets for the benchmark and related targets.

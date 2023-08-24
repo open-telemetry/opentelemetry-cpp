@@ -3,8 +3,7 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
-#include <cstring>
-#include <random>
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,7 +25,7 @@ void DefaultLogHandler::Handle(LogLevel level,
   output_s << "[" << LevelToString(level) << "] ";
   if (file != nullptr)
   {
-    output_s << "File: " << file << ":" << line;
+    output_s << "File: " << file << ":" << line << " ";
   }
   if (msg != nullptr)
   {

@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -21,7 +24,7 @@ copyright = '2021, OpenTelemetry authors'
 author = 'OpenTelemetry authors'
 
 # The full version, including alpha/beta/rc tags
-release = "1.8.1"
+release = "1.11.0"
 
 # Run sphinx on subprojects and copy output
 # -----------------------------------------

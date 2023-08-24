@@ -3,13 +3,16 @@
 
 #pragma once
 
-#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
+
+class Meter;
+
 /**
  * Creates new Meter instances.
  */
@@ -26,6 +29,11 @@ public:
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
+#ifdef ENABLE_REMOVE_METER_PREVIEW
+  virtual void RemoveMeter(nostd::string_view library_name,
+                           nostd::string_view library_version = "",
+                           nostd::string_view schema_url      = "") noexcept = 0;
+#endif
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

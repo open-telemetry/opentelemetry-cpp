@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 licenses(["notice"])  # 3-Clause BSD
 
 exports_files(["LICENSE.MIT"])

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/prometheus/exporter.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -14,22 +15,24 @@ namespace metrics
  * @param address: an address for an exposer that exposes
  *  an HTTP endpoint for the exporter to connect to
  */
-PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
-    : options_(options), is_shutdown_(false)
+PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options) : options_(options)
 {
-  exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
-  collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector);
+  try
+  {
+    exposer_ = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{options_.url});
+  }
+  catch (const std::exception &ex)
+  {
+    exposer_.reset(nullptr);
+    OTEL_INTERNAL_LOG_ERROR("[Prometheus Exporter] "
+                            << "Can't initialize prometheus exposer with endpoint: " << options_.url
+                            << "\nError: " << ex.what());
+    Shutdown();  // set MetricReader in shutdown state.
+    return;
+  }
+  collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector(this));
 
   exposer_->RegisterCollectable(collector_);
-}
-
-/**
- * PrometheusExporter constructor with no parameters
- * Used for testing only
- */
-PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
-{
-  collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector(3));
 }
 
 sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporality(
@@ -39,71 +42,19 @@ sdk::metrics::AggregationTemporality PrometheusExporter::GetAggregationTemporali
   return sdk::metrics::AggregationTemporality::kCumulative;
 }
 
-/**
- * Exports a batch of Metric Records.
- * @param records: a collection of records to export
- * @return: returns a ReturnCode detailing a success, or type of failure
- */
-sdk::common::ExportResult PrometheusExporter::Export(
-    const sdk::metrics::ResourceMetrics &data) noexcept
-{
-  if (is_shutdown_)
-  {
-    return sdk::common::ExportResult::kFailure;
-  }
-  else if (collector_->GetCollection().size() + data.scope_metric_data_.size() >
-           (size_t)collector_->GetMaxCollectionSize())
-  {
-    return sdk::common::ExportResult::kFailureFull;
-  }
-  else if (data.scope_metric_data_.empty())
-  {
-    return sdk::common::ExportResult::kFailureInvalidArgument;
-  }
-  else
-  {
-    collector_->AddMetricData(data);
-    return sdk::common::ExportResult::kSuccess;
-  }
-  return sdk::common::ExportResult::kSuccess;
-}
-
-bool PrometheusExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+bool PrometheusExporter::OnForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
 }
 
-/**
- * Shuts down the exporter and does cleanup.
- * Since Prometheus is a pull based interface,
- * we cannot serve data remaining in the intermediate
- * collection to to client an HTTP request being sent,
- * so we flush the data.
- */
-bool PrometheusExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool PrometheusExporter::OnShutDown(std::chrono::microseconds /* timeout */) noexcept
 {
-  is_shutdown_ = true;
+  if (exposer_ != nullptr)
+    exposer_->RemoveCollectable(collector_);
   return true;
-
-  collector_->GetCollection().clear();
 }
 
-/**
- * @return: returns a shared_ptr to
- * the PrometheusCollector instance
- */
-std::shared_ptr<PrometheusCollector> &PrometheusExporter::GetCollector()
-{
-  return collector_;
-}
-
-/**
- * @return: Gets the shutdown status of the exporter
- */
-bool PrometheusExporter::IsShutdown() const
-{
-  return is_shutdown_;
-}
+void PrometheusExporter::OnInitialized() noexcept {}
 
 }  // namespace metrics
 }  // namespace exporter

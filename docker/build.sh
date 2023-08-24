@@ -18,7 +18,6 @@ Help()
    echo "o     OpenTelemetry-cpp git tag"
    echo "h     Print Help."
    echo "g     gRPC git tag"
-   echo "t     thrift version"
    echo "j     Parallel jobs"
    echo
    echo "how to use:"
@@ -34,11 +33,10 @@ Help()
 
 base_image=${base_image:="alpine"}
 grpc_git_tag=${grpc_git_tag:="v1.43.2"}
-thrift_version=${thrift_version:="0.14.1"}
 otel_git_tag=${otel_git_tag:="v1.3.0"}
 cores=${cores:=1}
 
-while getopts ":h:b:o:g:j:t:" option; do
+while getopts ":h:b:o:g:j:" option; do
    case $option in
     h) # display Help
          Help
@@ -51,9 +49,6 @@ while getopts ":h:b:o:g:j:t:" option; do
         ;;
     g) # gRPC git tag
         grpc_git_tag=$OPTARG
-        ;;
-    t) # thrfit version
-        thrift_version=$OPTARG
         ;;
     j) # number of cores
         cores=$OPTARG
@@ -71,13 +66,6 @@ docker build --build-arg BASE_IMAGE=base-${base_image}-dev \
     --build-arg GRPC_GIT_TAG=${grpc_git_tag} \
     --build-arg CORES=${cores} \
     -t grpc-${base_image} -f Dockerfile .
-popd
-
-pushd thrift/
-docker build --build-arg BASE_IMAGE=base-${base_image}-dev \
-    --build-arg THRIFT_VERSION=${thrift_version} \
-    --build-arg CORES=${cores} \
-    -t thrift-${base_image} -f Dockerfile .
 popd
 
 docker build --build-arg BASE_IMAGE=${base_image} \

@@ -117,22 +117,25 @@ TEST(ETWTracer, TracerCheck)
   auto tracer = tp.GetTracer(providerName);
 
   // Span attributes
-  Properties attribs =
+  Properties outer_attribs =
   {
     {"attrib1", 1},
     {"attrib2", 2}
   };
+  // copy the outer attributes
+  Properties inner_attribs = outer_attribs;
+
   {
     auto topSpan = tracer->StartSpan("MySpanTop");
     auto topScope = tracer->WithActiveSpan(topSpan);
     {
-      auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
+      auto outerSpan = tracer->StartSpan("MySpanL2", outer_attribs);
       auto outerScope = tracer->WithActiveSpan(outerSpan);
 
       // Create nested span. Note how we share the attributes here.
       // It is Okay to either reuse/share or have your own attributes.
       {
-        auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
+        auto innerSpan = tracer->StartSpan("MySpanL3", inner_attribs);
         auto innerScope = tracer->WithActiveSpan(innerSpan);
 
         // Add span attribute
@@ -535,6 +538,20 @@ TEST(ETWTracer, CustomSampler)
       EXPECT_EQ(child_span->GetContext().trace_id(), trace_id);
     }
   }
+}
+
+TEST(ETWTracer, EndWithCustomTime)
+{
+  // Obtain a global tracer using C++11 magic static.
+  auto& globalTracer = GetGlobalTracer();
+  auto s1 = globalTracer.StartSpan("Span1");
+  auto traceId1 = s1->GetContext().trace_id();
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time =  opentelemetry::common::SteadyTimestamp(std::chrono::nanoseconds(40));
+  s1->End(end);
+  auto end_time = static_cast<opentelemetry::exporter::etw::Span *>(s1.get())->GetEndTime();
+  EXPECT_EQ(end.end_steady_time.time_since_epoch(), end_time.time_since_epoch());
+
 }
 
 /* clang-format on */

@@ -6,7 +6,14 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
 
-#include <future>
+#if defined(_MSC_VER)
+#  pragma warning(suppress : 5204)
+#  include <future>
+#else
+#  include <future>
+#endif
+
+#include <functional>
 #include <map>
 #include <regex>
 #include <sstream>
@@ -132,6 +139,9 @@ public:
    */
   HttpOperation(opentelemetry::ext::http::client::Method method,
                 std::string url,
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+                const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
                 opentelemetry::ext::http::client::EventHandler *event_handle,
                 // Default empty headers and empty request body
                 const opentelemetry::ext::http::client::Headers &request_headers =
@@ -239,13 +249,38 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
-  std::atomic<bool> is_aborted_;   // Set to 'true' when async callback is aborted
-  std::atomic<bool> is_finished_;  // Set to 'true' when async callback is finished.
-  std::atomic<bool> is_cleaned_;   // Set to 'true' when async callback is cleaned.
-  const bool is_raw_response_;     // Do not split response headers from response body
-  const bool reuse_connection_;    // Reuse connection
+  CURLcode SetCurlPtrOption(CURLoption option, void *value);
+
+  CURLcode SetCurlStrOption(CURLoption option, const char *str)
+  {
+    void *ptr = const_cast<char *>(str);
+    return SetCurlPtrOption(option, ptr);
+  }
+
+  CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *blob)
+  {
+    return SetCurlPtrOption(option, blob);
+  }
+
+  CURLcode SetCurlListOption(CURLoption option, struct curl_slist *list)
+  {
+    return SetCurlPtrOption(option, list);
+  }
+
+  CURLcode SetCurlLongOption(CURLoption option, long value);
+
+  CURLcode SetCurlOffOption(CURLoption option, curl_off_t value);
+
+  const char *GetCurlErrorMessage(CURLcode code);
+
+  std::atomic<bool> is_aborted_{false};   // Set to 'true' when async callback is aborted
+  std::atomic<bool> is_finished_{false};  // Set to 'true' when async callback is finished.
+  std::atomic<bool> is_cleaned_{false};   // Set to 'true' when async callback is cleaned.
+  const bool is_raw_response_;            // Do not split response headers from response body
+  const bool reuse_connection_;           // Reuse connection
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
+  char curl_error_message_[CURL_ERROR_SIZE];
   HttpCurlEasyResource curl_resource_;
   CURLcode last_curl_result_;  // Curl result OR HTTP status code if successful
 
@@ -254,6 +289,11 @@ private:
   // Request values
   opentelemetry::ext::http::client::Method method_;
   std::string url_;
+
+#ifdef ENABLE_HTTP_SSL_PREVIEW
+  const opentelemetry::ext::http::client::HttpSslOptions &ssl_options_;
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
+
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
   size_t request_nwrite_;
@@ -271,7 +311,7 @@ private:
 
     std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;
-    std::atomic<bool> is_promise_running;
+    std::atomic<bool> is_promise_running{false};
     std::promise<CURLcode> result_promise;
     std::future<CURLcode> result_future;
   };

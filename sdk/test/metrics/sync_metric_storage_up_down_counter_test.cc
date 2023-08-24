@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "common.h"
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
@@ -16,23 +18,6 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 using M         = std::map<std::string, std::string>;
 namespace nostd = opentelemetry::nostd;
-
-class MockCollectorHandle : public CollectorHandle
-{
-public:
-  MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
-
-  ~MockCollectorHandle() override = default;
-
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) noexcept override
-  {
-    return temporality;
-  }
-
-private:
-  AggregationTemporality temporality;
-};
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
@@ -114,6 +99,10 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {
+                    if (temporality == AggregationTemporality::kCumulative)
+                    {
+                      EXPECT_EQ(data.start_ts, sdk_start_ts);
+                    }
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -261,6 +250,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
                   [&](const MetricData data) {
+                    if (temporality == AggregationTemporality::kCumulative)
+                    {
+                      EXPECT_EQ(data.start_ts, sdk_start_ts);
+                    }
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);

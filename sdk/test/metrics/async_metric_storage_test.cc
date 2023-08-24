@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
-#include <cstdint>
+#include "common.h"
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -10,38 +10,22 @@
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <memory>
 #include <vector>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::resource;
-
-using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-using M         = std::map<std::string, std::string>;
 namespace nostd = opentelemetry::nostd;
 
-class MockCollectorHandle : public CollectorHandle
-{
-public:
-  MockCollectorHandle(AggregationTemporality temp) : temporality(temp) {}
-
-  ~MockCollectorHandle() override = default;
-
-  AggregationTemporality GetAggregationTemporality(
-      InstrumentType /* instrument_type */) noexcept override
-  {
-    return temporality;
-  }
-
-private:
-  AggregationTemporality temporality;
-};
+using M = std::map<std::string, std::string>;
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
@@ -65,10 +49,8 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  std::unique_ptr<AttributesProcessor> default_attributes_processor{
-      new DefaultAttributesProcessor{}};
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, default_attributes_processor.get(), nullptr);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kSum,
+                                                          nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -157,10 +139,8 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  std::unique_ptr<AttributesProcessor> default_attributes_processor{
-      new DefaultAttributesProcessor{}};
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, default_attributes_processor.get(), nullptr);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kLastValue,
+                                                          nullptr);
   int64_t freq_cpu0                                                                   = 3;
   int64_t freq_cpu1                                                                   = 5;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {

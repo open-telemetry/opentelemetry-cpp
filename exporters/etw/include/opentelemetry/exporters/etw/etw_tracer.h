@@ -32,6 +32,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
+#include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 
@@ -250,8 +251,41 @@ class Tracer : public opentelemetry::trace::Tracer,
     auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
-    Span &currentSpan   = const_cast<Span &>(span);
-    Properties evt      = GetSpanAttributes(currentSpan);
+    Span &currentSpan = const_cast<Span &>(span);
+    Properties evt    = GetSpanAttributes(currentSpan);
+
+#if defined(ENABLE_ENV_PROPERTIES)
+
+    Properties env_properties_env = {};
+    if (evt.size() > 0)
+    {
+      bool has_customer_attribute        = false;
+      nlohmann::json env_properties_json = nlohmann::json::object();
+      for (auto &kv : evt)
+      {
+        nostd::string_view key = kv.first.data();
+
+        // don't serialize fields propagated from span data.
+        if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+            key == ETW_FIELD_SPAN_PARENTID)
+        {
+          env_properties_env[key.data()] = kv.second;
+        }
+        else
+        {
+          utils::PopulateAttribute(env_properties_json, key, kv.second);
+          has_customer_attribute = true;
+        }
+      }
+      if (has_customer_attribute)
+      {
+        env_properties_env[ETW_FIELD_ENV_PROPERTIES] = env_properties_json.dump();
+        evt                                          = std::move(env_properties_env);
+      }
+    }
+
+#endif  // defined(ENABLE_ENV_PROPERTIES)
+
     evt[ETW_FIELD_NAME] = GetName(span);
 
     if (cfg.enableSpanId)
@@ -870,7 +904,8 @@ public:
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
     // don't override fields propagated from span data.
-    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID)
+    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||
+        key == ETW_FIELD_SPAN_PARENTID)
     {
       return;
     }
@@ -899,7 +934,17 @@ public:
    */
   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override
   {
-    end_time_ = std::chrono::system_clock::now();
+    // TODO - explicitly setting end_time as 0 is not supported, and would be changed to
+    // current_time.
+    if (options.end_steady_time.time_since_epoch().count() == 0)
+    {
+      end_time_ = std::chrono::system_clock::now();
+    }
+    else
+    {
+      end_time_ =
+          opentelemetry::common::SystemTimestamp(options.end_steady_time.time_since_epoch());
+    }
 
     if (!has_ended_.exchange(true))
     {

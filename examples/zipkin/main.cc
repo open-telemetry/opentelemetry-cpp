@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -13,7 +15,6 @@
 #endif
 
 namespace trace     = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace zipkin    = opentelemetry::exporter::zipkin;
 namespace resource  = opentelemetry::sdk::resource;
@@ -33,6 +34,12 @@ void InitTracer()
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace::Provider::SetTracerProvider(none);
+}
 }  // namespace
 
 int main(int argc, char *argv[])
@@ -45,4 +52,6 @@ int main(int argc, char *argv[])
   InitTracer();
 
   foo_library();
+
+  CleanupTracer();
 }

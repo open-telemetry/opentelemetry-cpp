@@ -2,32 +2,34 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <memory>
-#  include <vector>
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
+#include <chrono>
+#include <memory>
+
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
+
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class LogRecordExporter
+class OPENTELEMETRY_EXPORT LogRecordExporter
 {
 public:
-  virtual ~LogRecordExporter() = default;
+  LogRecordExporter();
+  virtual ~LogRecordExporter();
 
   /**
    * Create a log recordable. This object will be used to record log data and
    * will subsequently be passed to LogRecordExporter::Export. Vendors can implement
-   * custom recordables or use the default LogRecord recordable provided by the
+   * custom recordables or use the default ReadWriteLogRecord recordable provided by the
    * SDK.
    * @return a newly initialized Recordable object
    *
@@ -47,6 +49,12 @@ public:
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
   /**
+   * Force flush the log records pushed into this log exporter.
+   */
+  virtual bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
+  /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
    * Shutdown should be called only once for each Exporter instance.
    * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
@@ -59,4 +67,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

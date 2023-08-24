@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <iostream>
 
+#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#  include <regex>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -20,7 +24,7 @@ const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 // instrument-unit = It can have a maximum length of 63 ASCII chars
 
 InstrumentMetaDataValidator::InstrumentMetaDataValidator()
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
     // clang-format off
     : name_reg_key_{kInstrumentNamePattern},
       unit_reg_key_{kInstrumentUnitPattern}
@@ -31,7 +35,7 @@ InstrumentMetaDataValidator::InstrumentMetaDataValidator()
 bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 {
 
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   return std::regex_match(name.data(), name_reg_key_);
 #else
   const size_t kMaxSize = 63;
@@ -53,7 +57,7 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 
 bool InstrumentMetaDataValidator::ValidateUnit(nostd::string_view unit) const
 {
-#if HAVE_WORKING_REGEX
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   return std::regex_match(unit.data(), unit_reg_key_);
 #else
   const size_t kMaxSize = 63;

@@ -17,30 +17,19 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/stringpiece.h"
 #include "nlohmann/json.hpp"
-
-#if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
-#  include "google/protobuf/stubs/strutil.h"
-#else
-#  include "google/protobuf/stubs/port.h"
-namespace google
-{
-namespace protobuf
-{
-LIBPROTOBUF_EXPORT void Base64Escape(StringPiece src, std::string *dest);
-}  // namespace protobuf
-}  // namespace google
-#endif
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <atomic>
 #include <condition_variable>
+#include <cstring>
 #include <fstream>
 #include <mutex>
 #include <sstream>
@@ -64,7 +53,7 @@ namespace
 {
 
 /**
- * This class handles the response message from the Elasticsearch request
+ * This class handles the response message from the HTTP request
  */
 class ResponseHandler : public http_client::EventHandler
 {
@@ -75,9 +64,7 @@ public:
   ResponseHandler(std::function<bool(opentelemetry::sdk::common::ExportResult)> &&callback,
                   bool console_debug = false)
       : result_callback_{std::move(callback)}, console_debug_{console_debug}
-  {
-    stopping_.store(false);
-  }
+  {}
 
   std::string BuildResponseLogMessage(http_client::Response &response,
                                       const std::string &body) noexcept
@@ -113,7 +100,7 @@ public:
       {
         log_message = BuildResponseLogMessage(response, body_);
 
-        OTEL_INTERNAL_LOG_ERROR("OTLP HTTP Client] Export failed, " << log_message);
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Export failed, " << log_message);
         result = sdk::common::ExportResult::kFailure;
       }
       else if (console_debug_)
@@ -289,7 +276,7 @@ public:
       case http_client::SessionState::WriteError:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG:Session state: error writing request");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Session state: error writing request");
         }
         break;
 
@@ -356,7 +343,7 @@ private:
   const opentelemetry::ext::http::client::Session *session_ = nullptr;
 
   // Whether notify has been called
-  std::atomic<bool> stopping_;
+  std::atomic<bool> stopping_{false};
 
   // A string to store the response body
   std::string body_ = "";
@@ -413,16 +400,12 @@ static std::string BytesMapping(const std::string &bytes,
       }
       else
       {
-        std::string base64_value;
-        google::protobuf::Base64Escape(bytes, &base64_value);
-        return base64_value;
+        return opentelemetry::sdk::common::Base64Escape(bytes);
       }
     }
     case JsonBytesMappingKind::kBase64: {
       // Base64 is the default bytes mapping of protobuf
-      std::string base64_value;
-      google::protobuf::Base64Escape(bytes, &base64_value);
-      return base64_value;
+      return opentelemetry::sdk::common::Base64Escape(bytes);
     }
     case JsonBytesMappingKind::kHex:
       return HexEncode(bytes);
@@ -451,7 +434,7 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   {
     const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
     nlohmann::json &child_value = options.use_json_name ? value[field_descriptor->json_name()]
-                                                        : value[field_descriptor->name()];
+                                                        : value[field_descriptor->camelcase_name()];
     if (field_descriptor->is_repeated())
     {
       ConvertListFieldToJson(child_value, message, field_descriptor, options);
@@ -712,12 +695,13 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
-  opentelemetry::sdk::common::ExportResult session_result =
-      opentelemetry::sdk::common::ExportResult::kSuccess;
+  std::shared_ptr<opentelemetry::sdk::common::ExportResult> session_result =
+      std::make_shared<opentelemetry::sdk::common::ExportResult>(
+          opentelemetry::sdk::common::ExportResult::kSuccess);
   opentelemetry::sdk::common::ExportResult export_result = Export(
       message,
-      [&session_result](opentelemetry::sdk::common::ExportResult result) {
-        session_result = result;
+      [session_result](opentelemetry::sdk::common::ExportResult result) {
+        *session_result = result;
         return result == opentelemetry::sdk::common::ExportResult::kSuccess;
       },
       0);
@@ -727,7 +711,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     return export_result;
   }
 
-  return session_result;
+  return *session_result;
 }
 
 sdk::common::ExportResult OtlpHttpClient::Export(
@@ -760,7 +744,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(
   if (options_.console_debug)
   {
     OTEL_INTERNAL_LOG_DEBUG(
-        "[OTLP HTTP Client] DEBUG: Waiting for response from "
+        "[OTLP HTTP Client] Waiting for response from "
         << options_.url << " (timeout = "
         << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
         << " milliseconds)");
@@ -793,34 +777,40 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   // Wait for all the sessions to finish
   std::unique_lock<std::mutex> lock(session_waker_lock_);
-  if (timeout <= std::chrono::microseconds::zero())
+
+  std::chrono::steady_clock::duration timeout_steady =
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    while (true)
+    timeout_steady = std::chrono::steady_clock::duration::max();
+  }
+
+  while (timeout_steady > std::chrono::steady_clock::duration::zero())
+  {
     {
+      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
+      if (running_sessions_.empty())
       {
-        std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-        if (running_sessions_.empty())
-        {
-          break;
-        }
-      }
-      // When changes of running_sessions_ and notify_one/notify_all happen between predicate
-      // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
-      // as possible to call FinishSession() and cleanup resources.
-      if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
-      {
-        cleanupGCSessions();
+        break;
       }
     }
-    return true;
+    // When changes of running_sessions_ and notify_one/notify_all happen between predicate
+    // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
+    // as possible to call FinishSession() and cleanup resources.
+    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
+    if (std::cv_status::timeout == session_waker_.wait_for(lock, options_.timeout))
+    {
+      cleanupGCSessions();
+    }
+    else
+    {
+      break;
+    }
+
+    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
-  else
-  {
-    return session_waker_.wait_for(lock, timeout, [this] {
-      std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-      return running_sessions_.empty();
-    });
-  }
+
+  return timeout_steady > std::chrono::steady_clock::duration::zero();
 }
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
@@ -961,6 +951,9 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+  request->SetSslOptions(options_.ssl_options);
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);

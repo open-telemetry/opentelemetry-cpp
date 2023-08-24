@@ -2,19 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 
-#  include <chrono>
-#  include <cstddef>
-#  include <memory>
-#  include <string>
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -54,6 +53,14 @@ public:
       override;
 
   /**
+   * Force flush the exporter.
+   * @param timeout an option timeout, default to max.
+   * @return return true when all data are exported, and false when timeout
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+
+  /**
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return
    */
@@ -78,4 +85,3 @@ private:
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -3,21 +3,22 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <memory>
 
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class LogRecordExporter;
+class LogRecordProcessor;
 
 /**
  * Factory class for SimpleLogRecordProcessor.
  */
-class SimpleLogRecordProcessorFactory
+class OPENTELEMETRY_EXPORT SimpleLogRecordProcessorFactory
 {
 public:
   /**
@@ -29,4 +30,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif /* ENABLE_LOGS_PREVIEW */

@@ -2,30 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <map>
-#  include <vector>
-
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/type_traits.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_flags.h"
-#  include "opentelemetry/trace/trace_id.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/logs/logger_type_traits.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace common
+{
+class KeyValueIterable;
+}  // namespace common
+
 namespace logs
 {
+
+class EventId;
+class LogRecord;
+
 /**
  * Handles log record creation.
  **/
@@ -38,604 +33,444 @@ public:
   virtual const nostd::string_view GetName() noexcept = 0;
 
   /**
-   * Each of the following overloaded Log(...) methods
-   * creates a log message with the specific parameters passed.
+   * Create a Log Record object
    *
-   * @param severity the severity level of the log event.
-   * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
-   * with the log event.
-   * @param trace_id the trace id associated with the log event.
-   * @param span_id the span id associate with the log event.
-   * @param trace_flags the trace flags associated with the log event.
-   * @param timestamp the timestamp the log record was created.
-   * @throws No exceptions under any circumstances.
+   * @return nostd::unique_ptr<LogRecord>
    */
+  virtual nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept = 0;
 
   /**
-   * The base Log(...) method that all other Log(...) overloaded methods will eventually call,
-   * in order to create a log record.
+   * Emit a Log Record object
+   *
+   * @param log_record
+   */
+  virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
+
+  /**
+   * Emit a Log Record object with arguments
+   *
+   * @param log_record Log record
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  Severity                                -> severity, severity_text
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&... args)
+  {
+    if (!log_record)
+    {
+      return;
+    }
+
+    IgnoreTraitResult(
+        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
+            log_record.get(), std::forward<ArgumentType>(args))...);
+
+    EmitLogRecord(std::move(log_record));
+  }
+
+  /**
+   * Emit a Log Record object with arguments
+   *
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  Severity                                -> severity, severity_text
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void EmitLogRecord(ArgumentType &&... args)
+  {
+    nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
+    if (!log_record)
+    {
+      return;
+    }
+
+    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of trace.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Trace(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kTrace, std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of debug.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Debug(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kDebug, std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of info.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Info(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kInfo, std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of warn.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Warn(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kWarn, std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of error.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Error(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kError, std::forward<ArgumentType>(args)...);
+  }
+
+  /**
+   * Writes a log with a severity of fatal.
+   * @tparam args Arguments which can be used to set data of log record by type.
+   *  string_view                             -> body
+   *  AttributeValue                          -> body
+   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanId                                  -> span_id
+   *  TraceId                                 -> tace_id
+   *  TraceFlags                              -> trace_flags
+   *  SystemTimestamp                         -> timestamp
+   *  system_clock::time_point                -> timestamp
+   *  KeyValueIterable                        -> attributes
+   *  Key value iterable container            -> attributes
+   *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
+   */
+  template <class... ArgumentType>
+  void Fatal(ArgumentType &&... args) noexcept
+  {
+    static_assert(
+        !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
+        "Severity is already set.");
+    this->EmitLogRecord(Severity::kFatal, std::forward<ArgumentType>(args)...);
+  }
+
+  //
+  // OpenTelemetry C++ user-facing Logs API
+  //
+
+  inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
+  {
+    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    return EnabledImplementation(severity, event_id);
+  }
+
+  inline bool Enabled(Severity severity, int64_t event_id) const noexcept
+  {
+    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    return EnabledImplementation(severity, event_id);
+  }
+
+  inline bool Enabled(Severity severity) const noexcept
+  {
+    return static_cast<uint8_t>(severity) >= OPENTELEMETRY_ATOMIC_READ_8(&minimum_severity_);
+  }
+
+  /**
+   * Log an event
+   *
+   * @severity severity of the log
+   * @event_id event identifier of the log
+   * @format an utf-8 string following https://messagetemplates.org/
+   * @attributes key value pairs of the log
    */
   virtual void Log(Severity severity,
-                   nostd::string_view body,
-                   const common::KeyValueIterable &attributes,
-                   trace::TraceId trace_id,
-                   trace::SpanId span_id,
-                   trace::TraceFlags trace_flags,
-                   common::SystemTimestamp timestamp) noexcept = 0;
+                   const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
+  {
+    this->EmitLogRecord(severity, event_id, format, attributes);
+  }
 
-  /**
-   * Each of the following overloaded Log(...) methods
-   * creates a log message with the specific parameters passed.
-   *
-   * @param severity the severity level of the log event.
-   * @param name the name of the log event.
-   * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
-   * with the log event.
-   * @param trace_id the trace id associated with the log event.
-   * @param span_id the span id associate with the log event.
-   * @param trace_flags the trace flags associated with the log event.
-   * @param timestamp the timestamp the log record was created.
-   * @throws No exceptions under any circumstances.
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
   virtual void Log(Severity severity,
-                   OPENTELEMETRY_MAYBE_UNUSED nostd::string_view name,
-                   nostd::string_view body,
-                   const common::KeyValueIterable &attributes,
-                   trace::TraceId trace_id,
-                   trace::SpanId span_id,
-                   trace::TraceFlags trace_flags,
-                   common::SystemTimestamp timestamp) noexcept
+                   int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    Log(severity, body, attributes, trace_id, span_id, trace_flags, timestamp);
+    this->EmitLogRecord(severity, EventId{event_id}, format, attributes);
   }
 
-  /*** Overloaded methods for KeyValueIterables ***/
-  /**
-   * The secondary base Log(...) method that all other Log(...) overloaded methods except the one
-   * above will eventually call,  in order to create a log record.
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Log(Severity severity,
-           nostd::string_view body,
-           const T &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
+  virtual void Log(Severity severity,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    Log(severity, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id, trace_flags,
-        timestamp);
+    this->EmitLogRecord(severity, format, attributes);
   }
 
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           const T &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
+  virtual void Log(Severity severity, nostd::string_view message) noexcept
   {
-    Log(severity, name, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id,
-        trace_flags, timestamp);
+    this->EmitLogRecord(severity, message);
   }
 
-  void Log(Severity severity,
-           nostd::string_view body,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
+  // Convenient wrappers based on virtual methods Log().
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber
+
+  inline void Trace(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    return this->Log(severity, body,
-                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()},
-                     trace_id, span_id, trace_flags, timestamp);
+    this->Log(Severity::kTrace, event_id, format, attributes);
   }
 
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
+  inline void Trace(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    return this->Log(severity, name, body,
-                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()},
-                     trace_id, span_id, trace_flags, timestamp);
+    this->Log(Severity::kTrace, EventId{event_id}, format, attributes);
   }
 
-  /** Wrapper methods that the user could call for convenience when logging **/
-
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param message The message to log
-   */
-  void Log(Severity severity, nostd::string_view message) noexcept
+  inline void Trace(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, message, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kTrace, format, attributes);
   }
 
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Log(Severity severity, nostd::string_view name, nostd::string_view message) noexcept
+  inline void Trace(nostd::string_view message) noexcept { this->Log(Severity::kTrace, message); }
+
+  inline void Debug(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, name, message, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kDebug, event_id, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Log(Severity severity, const T &attributes) noexcept
+  inline void Debug(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kDebug, EventId{event_id}, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param message The message to log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Log(Severity severity, nostd::string_view message, const T &attributes) noexcept
+  inline void Debug(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kDebug, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Log(Severity severity,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-               attributes) noexcept
+  inline void Debug(nostd::string_view message) noexcept { this->Log(Severity::kDebug, message); }
+
+  inline void Info(const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kInfo, event_id, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param message The message to log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Log(Severity severity,
-           nostd::string_view message,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-               attributes) noexcept
+  inline void Info(int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kInfo, EventId{event_id}, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param attributes The attributes, stored as a 2D list of key/value pairs, that are associated
-   * with the log event
-   */
-  void Log(Severity severity, const common::KeyValueIterable &attributes) noexcept
+  inline void Info(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kInfo, format, attributes);
   }
 
-  /**
-   * Writes a log.
-   * @param severity The severity of the log
-   * @param message The message to log
-   * @param attributes The attributes, stored as a 2D list of key/value pairs, that are associated
-   * with the log event
-   */
-  void Log(Severity severity,
-           nostd::string_view message,
-           const common::KeyValueIterable &attributes) noexcept
+  inline void Info(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
+
+  inline void Warn(const EventId &event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, message, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(Severity::kWarn, event_id, format, attributes);
   }
 
-  /** Trace severity overloads **/
-
-  /**
-   * Writes a log with a severity of trace.
-   * @param message The message to log
-   */
-  void Trace(nostd::string_view message) noexcept { this->Log(Severity::kTrace, message); }
-
-  /**
-   * Writes a log with a severity of trace.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Trace(nostd::string_view name, nostd::string_view message) noexcept
+  inline void Warn(int64_t event_id,
+                   nostd::string_view format,
+                   const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, name, message);
+    this->Log(Severity::kWarn, EventId{event_id}, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of trace.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Trace(const T &attributes) noexcept
+  inline void Warn(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, attributes);
+    this->Log(Severity::kWarn, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of trace.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Trace(nostd::string_view message, const T &attributes) noexcept
+  inline void Warn(nostd::string_view message) noexcept { this->Log(Severity::kWarn, message); }
+
+  inline void Error(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, message, attributes);
+    this->Log(Severity::kError, event_id, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of trace.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Trace(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
+  inline void Error(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, attributes);
+    this->Log(Severity::kError, EventId{event_id}, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of trace.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Trace(nostd::string_view message,
-             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
+  inline void Error(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kTrace, message, attributes);
+    this->Log(Severity::kError, format, attributes);
   }
 
-  /** Debug severity overloads **/
+  inline void Error(nostd::string_view message) noexcept { this->Log(Severity::kError, message); }
 
-  /**
-   * Writes a log with a severity of debug.
-   * @param message The message to log
-   */
-  void Debug(nostd::string_view message) noexcept { this->Log(Severity::kDebug, message); }
-
-  /**
-   * Writes a log with a severity of debug.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Debug(nostd::string_view name, nostd::string_view message) noexcept
+  inline void Fatal(const EventId &event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kDebug, name, message);
+    this->Log(Severity::kFatal, event_id, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of debug.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Debug(const T &attributes) noexcept
+  inline void Fatal(int64_t event_id,
+                    nostd::string_view format,
+                    const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kDebug, attributes);
+    this->Log(Severity::kFatal, EventId{event_id}, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of debug.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Debug(nostd::string_view message, const T &attributes) noexcept
+  inline void Fatal(nostd::string_view format, const common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(Severity::kDebug, message, attributes);
+    this->Log(Severity::kFatal, format, attributes);
   }
 
-  /**
-   * Writes a log with a severity of debug.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Debug(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
+  inline void Fatal(nostd::string_view message) noexcept { this->Log(Severity::kFatal, message); }
+
+  //
+  // End of OpenTelemetry C++ user-facing Log API.
+  //
+
+protected:
+  // TODO: discuss with community about naming for internal methods.
+  virtual bool EnabledImplementation(Severity /*severity*/,
+                                     const EventId & /*event_id*/) const noexcept
   {
-    this->Log(Severity::kDebug, attributes);
+    return false;
   }
 
-  /**
-   * Writes a log with a severity of debug.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Debug(nostd::string_view message,
-             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
+  virtual bool EnabledImplementation(Severity /*severity*/, int64_t /*event_id*/) const noexcept
   {
-    this->Log(Severity::kDebug, message, attributes);
+    return false;
   }
 
-  /** Info severity overloads **/
-
-  /**
-   * Writes a log with a severity of info.
-   * @param message The message to log
-   */
-  void Info(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
-
-  /**
-   * Writes a log with a severity of info.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Info(nostd::string_view name, nostd::string_view message) noexcept
+  void SetMinimumSeverity(uint8_t severity_or_max) noexcept
   {
-    this->Log(Severity::kInfo, name, message);
+    OPENTELEMETRY_ATOMIC_WRITE_8(&minimum_severity_, severity_or_max);
   }
 
-  /**
-   * Writes a log with a severity of info.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Info(const T &attributes) noexcept
-  {
-    this->Log(Severity::kInfo, attributes);
-  }
+private:
+  template <class... ValueType>
+  void IgnoreTraitResult(ValueType &&...)
+  {}
 
-  /**
-   * Writes a log with a severity of info.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Info(nostd::string_view message, const T &attributes) noexcept
-  {
-    this->Log(Severity::kInfo, message, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of info.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Info(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                attributes) noexcept
-  {
-    this->Log(Severity::kInfo, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of info.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Info(nostd::string_view message,
-            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                attributes) noexcept
-  {
-    this->Log(Severity::kInfo, message, attributes);
-  }
-
-  /** Warn severity overloads **/
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param message The message to log
-   */
-  void Warn(nostd::string_view message) noexcept { this->Log(Severity::kWarn, message); }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Warn(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kWarn, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Warn(const T &attributes) noexcept
-  {
-    this->Log(Severity::kWarn, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Warn(nostd::string_view message, const T &attributes) noexcept
-  {
-    this->Log(Severity::kWarn, message, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Warn(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                attributes) noexcept
-  {
-    this->Log(Severity::kWarn, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of warn.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Warn(nostd::string_view message,
-            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                attributes) noexcept
-  {
-    this->Log(Severity::kWarn, message, attributes);
-  }
-
-  /** Error severity overloads **/
-
-  /**
-   * Writes a log with a severity of error.
-   * @param message The message to log
-   */
-  void Error(nostd::string_view message) noexcept { this->Log(Severity::kError, message); }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Error(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kError, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Error(const T &attributes) noexcept
-  {
-    this->Log(Severity::kError, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Error(nostd::string_view message, const T &attributes) noexcept
-  {
-    this->Log(Severity::kError, message, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Error(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
-  {
-    this->Log(Severity::kError, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of error.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Error(nostd::string_view message,
-             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
-  {
-    this->Log(Severity::kError, message, attributes);
-  }
-
-  /** Fatal severity overloads **/
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param message The message to log
-   */
-  void Fatal(nostd::string_view message) noexcept { this->Log(Severity::kFatal, message); }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param name The name of the log
-   * @param message The message to log
-   */
-  OPENTELEMETRY_DEPRECATED_MESSAGE("name will be removed in the future")
-  void Fatal(nostd::string_view name, nostd::string_view message) noexcept
-  {
-    this->Log(Severity::kFatal, name, message);
-  }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Fatal(const T &attributes) noexcept
-  {
-    this->Log(Severity::kFatal, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as a key/value object
-   */
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void Fatal(nostd::string_view message, const T &attributes) noexcept
-  {
-    this->Log(Severity::kFatal, message, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Fatal(std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
-  {
-    this->Log(Severity::kFatal, attributes);
-  }
-
-  /**
-   * Writes a log with a severity of fatal.
-   * @param message The message of the log
-   * @param attributes The attributes of the log as an initializer list
-   */
-  void Fatal(nostd::string_view message,
-             std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                 attributes) noexcept
-  {
-    this->Log(Severity::kFatal, message, attributes);
-  }
+  //
+  // minimum_severity_ can be updated concurrently by multiple threads/cores, so race condition on
+  // read/write should be handled. And std::atomic can not be used here because it is not ABI
+  // compatible for OpenTelemetry C++ API.
+  //
+  mutable uint8_t minimum_severity_{kMaxSeverity};
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

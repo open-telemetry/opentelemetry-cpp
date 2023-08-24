@@ -1,3 +1,5 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 #
 # MAINTAINER
 #
@@ -11,13 +13,13 @@
 #   git submodule status
 #
 
-gRPC=v1.48.1
-thrift=0.14.1
+gRPC=v1.49.2
 abseil=20220623.1
-benchmark=v1.5.3
-googletest=release-1.10.0-459-ga6dfd3ac
+benchmark=v1.7.1
+googletest=release-1.13.0
 ms-gsl=v3.1.0-67-g6f45293
-nlohmann-json=v3.10.5
-opentelemetry-proto=v0.19.0
-prometheus-cpp=v1.0.0
+nlohmann-json=v3.11.2
+opentelemetry-proto=v1.0.0
+opentracing-cpp=v1.6.0
+prometheus-cpp=v1.1.0
 vcpkg=2022.08.15

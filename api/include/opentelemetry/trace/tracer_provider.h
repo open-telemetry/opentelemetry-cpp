@@ -5,15 +5,18 @@
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+class Tracer;
+
 /**
  * Creates new Tracer instances.
  */
-class TracerProvider
+class OPENTELEMETRY_EXPORT TracerProvider
 {
 public:
   virtual ~TracerProvider() = default;

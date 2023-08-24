@@ -18,11 +18,10 @@
 using opentelemetry::exporter::memory::InMemorySpanData;
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
-namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-std::shared_ptr<InMemorySpanData> initTracer()
+std::shared_ptr<InMemorySpanData> InitTracer()
 {
   std::shared_ptr<InMemorySpanData> data;
 
@@ -42,6 +41,12 @@ std::shared_ptr<InMemorySpanData> initTracer()
   trace_api::Provider::SetTracerProvider(std::move(provider));
 
   return data;
+}
+
+void CleanupTracer()
+{
+  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+  trace_api::Provider::SetTracerProvider(none);
 }
 
 void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
@@ -79,9 +84,11 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  std::shared_ptr<InMemorySpanData> data = initTracer();
+  std::shared_ptr<InMemorySpanData> data = InitTracer();
 
   foo_library();
   auto memory_spans = data->GetSpans();
   dumpSpans(memory_spans);
+
+  CleanupTracer();
 }

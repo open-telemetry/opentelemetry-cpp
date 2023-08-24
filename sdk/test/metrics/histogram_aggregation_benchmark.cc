@@ -1,0 +1,78 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#include "common.h"
+
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+
+#include <benchmark/benchmark.h>
+#include <random>
+
+using namespace opentelemetry;
+using namespace opentelemetry::sdk::instrumentationscope;
+using namespace opentelemetry::sdk::metrics;
+
+namespace
+{
+void BM_HistogramAggregation(benchmark::State &state)
+{
+  MeterProvider mp;
+  auto m = mp.GetMeter("meter1", "version1", "schema1");
+
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+  auto h = m->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
+  std::default_random_engine generator;
+  std::uniform_int_distribution<int> distribution(0, 1000000);
+  // Generate 100000 measurements
+  constexpr size_t TOTAL_MEASUREMENTS = 100000;
+  double measurements[TOTAL_MEASUREMENTS];
+  for (size_t i = 0; i < TOTAL_MEASUREMENTS; i++)
+  {
+    measurements[i] = (double)distribution(generator);
+  }
+  std::vector<HistogramPointData> actuals;
+  std::vector<std::thread> collectionThreads;
+  std::function<void()> collectMetrics = [&reader, &actuals]() {
+    reader->Collect([&](ResourceMetrics &rm) {
+      for (const ScopeMetrics &smd : rm.scope_metric_data_)
+      {
+        for (const MetricData &md : smd.metric_data_)
+        {
+          for (const PointDataAttributes &dp : md.point_data_attr_)
+          {
+            actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+          }
+        }
+      }
+      return true;
+    });
+  };
+
+  while (state.KeepRunning())
+  {
+    for (size_t i = 0; i < TOTAL_MEASUREMENTS; i++)
+    {
+      h->Record(measurements[i], {});
+      if (i % 1000 == 0 || i == TOTAL_MEASUREMENTS - 1)
+      {
+        collectMetrics();
+      }
+      if (i == 100)
+      {
+        std::this_thread::sleep_for(std::chrono::nanoseconds(4));
+      }
+    }
+  }
+}
+
+BENCHMARK(BM_HistogramAggregation);
+
+}  // namespace
+BENCHMARK_MAIN();

@@ -29,7 +29,7 @@ public:
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
-      const std::vector<std::unique_ptr<sdk::metrics::ResourceMetrics>> &data);
+      const sdk::metrics::ResourceMetrics &data);
 
 private:
   /**
@@ -67,7 +67,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
-                      const std::list<double> &boundaries,
+                      const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       std::chrono::nanoseconds time,
@@ -104,9 +104,12 @@ private:
    */
   template <typename T>
   static void SetValue(std::vector<T> values,
-                       const std::list<double> &boundaries,
+                       const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
+
+  // For testing
+  friend class SanitizeNameTester;
 };
 }  // namespace metrics
 }  // namespace exporter

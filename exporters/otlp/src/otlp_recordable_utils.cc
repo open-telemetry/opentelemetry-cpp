@@ -11,6 +11,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <list>
@@ -71,7 +72,6 @@ void OtlpRecordableUtils::PopulateRequest(
   }
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 void OtlpRecordableUtils::PopulateRequest(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
@@ -109,14 +109,25 @@ void OtlpRecordableUtils::PopulateRequest(
       {
         if (!output_resource_log->has_resource())
         {
-          *output_resource_log->mutable_resource() = input_log_record->ProtoResource();
+          OtlpPopulateAttributeUtils::PopulateAttribute(output_resource_log->mutable_resource(),
+                                                        *input_resource_log.first);
           output_resource_log->set_schema_url(input_resource_log.first->GetSchemaURL());
         }
 
         if (!output_scope_log->has_scope())
         {
-          output_scope_log->mutable_scope()->set_name(input_scope_log.first->GetName());
-          output_scope_log->mutable_scope()->set_version(input_scope_log.first->GetVersion());
+          auto proto_scope = output_scope_log->mutable_scope();
+          if (proto_scope != nullptr)
+          {
+            proto_scope->set_name(input_scope_log.first->GetName());
+            proto_scope->set_version(input_scope_log.first->GetVersion());
+
+            for (auto &scope_attribute : input_scope_log.first->GetAttributes())
+            {
+              OtlpPopulateAttributeUtils::PopulateAttribute(
+                  proto_scope->add_attributes(), scope_attribute.first, scope_attribute.second);
+            }
+          }
           output_scope_log->set_schema_url(input_scope_log.first->GetSchemaURL());
         }
 
@@ -125,7 +136,6 @@ void OtlpRecordableUtils::PopulateRequest(
     }
   }
 }
-#endif
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

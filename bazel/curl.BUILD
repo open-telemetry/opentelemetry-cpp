@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # Builds CURL from a distribution.
 
 load("@io_opentelemetry_cpp//bazel:curl.bzl", "CURL_COPTS")
@@ -7,7 +10,7 @@ package(features = ["no_copts_tokenization"])
 config_setting(
     name = "windows",
     constraint_values = [
-        "@bazel_tools//platforms:windows",
+        "@platforms//os:windows",
     ],
     visibility = ["//visibility:private"],
 )
@@ -15,7 +18,7 @@ config_setting(
 config_setting(
     name = "osx",
     constraint_values = [
-        "@bazel_tools//platforms:osx",
+        "@platforms//os:osx",
     ],
     visibility = ["//visibility:private"],
 )

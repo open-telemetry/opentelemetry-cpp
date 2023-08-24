@@ -1,13 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 
-#  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/multi_log_record_processor.h"
-
-#  include <memory>
-#  include <vector>
+#include <memory>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -52,4 +50,3 @@ bool LoggerContext::Shutdown(std::chrono::microseconds timeout) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

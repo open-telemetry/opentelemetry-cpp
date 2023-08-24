@@ -26,6 +26,21 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+                                                            options.ssl_insecure_skip_verify,
+                                                            options.ssl_ca_cert_path,
+                                                            options.ssl_ca_cert_string,
+                                                            options.ssl_client_key_path,
+                                                            options.ssl_client_key_string,
+                                                            options.ssl_client_cert_path,
+                                                            options.ssl_client_cert_string,
+#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+                                                            options.ssl_min_tls,
+                                                            options.ssl_max_tls,
+                                                            options.ssl_cipher,
+                                                            options.ssl_cipher_suite,
+#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
                                                             options.content_type,
                                                             options.json_bytes_mapping,
                                                             options.use_json_name,
@@ -94,8 +109,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
         }
         else
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
-                                                                      << " trace span(s) success");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << span_count
+                                                               << " trace span(s) success");
         }
         return true;
       });
@@ -109,11 +124,15 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] DEBUG: Export " << span_count
-                                                                << " trace span(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << span_count << " trace span(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
+}
+
+bool OtlpHttpExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return http_client_->ForceFlush(timeout);
 }
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept

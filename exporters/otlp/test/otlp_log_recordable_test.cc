@@ -1,13 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
+#include <chrono>
 
-#  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -17,7 +18,7 @@ namespace otlp
 namespace resource = opentelemetry::sdk::resource;
 namespace proto    = opentelemetry::proto;
 
-TEST(OtlpLogRecordable, SetTimestamp)
+TEST(OtlpLogRecordable, Basic)
 {
   OtlpLogRecordable rec;
   std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -27,53 +28,34 @@ TEST(OtlpLogRecordable, SetTimestamp)
       std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
 
   rec.SetTimestamp(start_timestamp);
-  EXPECT_EQ(rec.log_record().time_unix_nano(), unix_start);
-}
-
-TEST(OtlpLogRecordable, SetSeverity)
-{
-  OtlpLogRecordable rec;
   rec.SetSeverity(opentelemetry::logs::Severity::kError);
-
-  EXPECT_EQ(rec.log_record().severity_number(), proto::logs::v1::SEVERITY_NUMBER_ERROR);
-  EXPECT_EQ(rec.log_record().severity_text(), "ERROR");
-}
-
-TEST(OtlpLogRecordable, SetBody)
-{
-  OtlpLogRecordable rec;
   nostd::string_view name = "Test Log Message";
   rec.SetBody(name);
-  EXPECT_EQ(rec.log_record().body().string_value(), name);
-}
 
-TEST(OtlpLogRecordable, SetTraceId)
-{
-  OtlpLogRecordable rec;
   uint8_t trace_id_bin[opentelemetry::trace::TraceId::kSize] = {
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  std::string expected_bytes;
-  expected_bytes.assign(
+  std::string expected_trace_id_bytes;
+  expected_trace_id_bytes.assign(
       reinterpret_cast<char *>(trace_id_bin),
       reinterpret_cast<char *>(trace_id_bin) + opentelemetry::trace::TraceId::kSize);
   rec.SetTraceId(opentelemetry::trace::TraceId{trace_id_bin});
-  EXPECT_EQ(rec.log_record().trace_id(), expected_bytes);
-}
-
-TEST(OtlpLogRecordable, SetSpanId)
-{
-  OtlpLogRecordable rec;
   uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize] = {'7', '6', '5', '4',
                                                               '3', '2', '1', '0'};
-  std::string expected_bytes;
-  expected_bytes.assign(
+  std::string expected_span_id_bytes;
+  expected_span_id_bytes.assign(
       reinterpret_cast<char *>(span_id_bin),
       reinterpret_cast<char *>(span_id_bin) + opentelemetry::trace::SpanId::kSize);
   rec.SetSpanId(opentelemetry::trace::SpanId{span_id_bin});
-  EXPECT_EQ(rec.log_record().span_id(), expected_bytes);
+
+  EXPECT_EQ(rec.log_record().time_unix_nano(), unix_start);
+  EXPECT_EQ(rec.log_record().severity_number(), proto::logs::v1::SEVERITY_NUMBER_ERROR);
+  EXPECT_EQ(rec.log_record().severity_text(), "ERROR");
+  EXPECT_EQ(rec.log_record().body().string_value(), name);
+  EXPECT_EQ(rec.log_record().trace_id(), expected_trace_id_bytes);
+  EXPECT_EQ(rec.log_record().span_id(), expected_span_id_bytes);
 }
 
-TEST(OtlpLogRecordable, SetResource)
+TEST(OtlpLogRecordable, GetResource)
 {
   OtlpLogRecordable rec;
   const std::string service_name_key = "service.name";
@@ -82,51 +64,21 @@ TEST(OtlpLogRecordable, SetResource)
       opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}});
   rec.SetResource(resource);
 
-  auto proto_resource     = rec.ProtoResource();
-  bool found_service_name = false;
-  for (int i = 0; i < proto_resource.attributes_size(); i++)
-  {
-    auto attr = proto_resource.attributes(static_cast<int>(i));
-    if (attr.key() == service_name_key && attr.value().string_value() == service_name)
-    {
-      found_service_name = true;
-    }
-  }
-  EXPECT_TRUE(found_service_name);
+  EXPECT_EQ(&rec.GetResource(), &resource);
 }
 
 TEST(OtlpLogRecordable, DefaultResource)
 {
   OtlpLogRecordable rec;
 
-  auto proto_resource      = rec.ProtoResource();
-  int found_resource_count = 0;
-  for (int i = 0; i < proto_resource.attributes_size(); i++)
-  {
-    auto attr = proto_resource.attributes(static_cast<int>(i));
-    if (attr.key() == resource::SemanticConventions::kTelemetrySdkLanguage)
-    {
-      EXPECT_EQ(attr.value().string_value(), "cpp");
-      ++found_resource_count;
-    }
-    else if (attr.key() == resource::SemanticConventions::kTelemetrySdkName)
-    {
-      EXPECT_EQ(attr.value().string_value(), "opentelemetry");
-      ++found_resource_count;
-    }
-    else if (attr.key() == resource::SemanticConventions::kTelemetrySdkVersion)
-    {
-      EXPECT_EQ(attr.value().string_value(), OPENTELEMETRY_SDK_VERSION);
-      ++found_resource_count;
-    }
-  }
-  EXPECT_EQ(3, found_resource_count);
+  EXPECT_EQ(&rec.GetResource(), &opentelemetry::sdk::logs::ReadableLogRecord::GetDefaultResource());
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
 TEST(OtlpLogRecordable, SetSingleAttribute)
 {
   OtlpLogRecordable rec;
+
   nostd::string_view bool_key = "bool_attr";
   common::AttributeValue bool_val(true);
   rec.SetAttribute(bool_key, bool_val);
@@ -139,21 +91,33 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
   common::AttributeValue str_val(nostd::string_view("Test"));
   rec.SetAttribute(str_key, str_val);
 
-  EXPECT_EQ(rec.log_record().attributes(0).key(), bool_key);
-  EXPECT_EQ(rec.log_record().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
-
-  EXPECT_EQ(rec.log_record().attributes(1).key(), double_key);
-  EXPECT_EQ(rec.log_record().attributes(1).value().double_value(), nostd::get<double>(double_val));
-
-  EXPECT_EQ(rec.log_record().attributes(2).key(), str_key);
-  EXPECT_EQ(rec.log_record().attributes(2).value().string_value(),
-            nostd::get<nostd::string_view>(str_val).data());
+  int checked_attributes = 0;
+  for (auto &attribute : rec.log_record().attributes())
+  {
+    if (attribute.key() == bool_key)
+    {
+      ++checked_attributes;
+      EXPECT_EQ(attribute.value().bool_value(), nostd::get<bool>(bool_val));
+    }
+    else if (attribute.key() == double_key)
+    {
+      ++checked_attributes;
+      EXPECT_EQ(attribute.value().double_value(), nostd::get<double>(double_val));
+    }
+    else if (attribute.key() == str_key)
+    {
+      ++checked_attributes;
+      EXPECT_EQ(attribute.value().string_value(), nostd::get<nostd::string_view>(str_val).data());
+    }
+  }
+  EXPECT_EQ(3, checked_attributes);
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
 TEST(OtlpLogRecordable, SetArrayAttribute)
 {
   OtlpLogRecordable rec;
+
   const int kArraySize = 3;
 
   bool bool_arr[kArraySize] = {true, false, true};
@@ -182,10 +146,12 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
 TEST(OtlpLogRecordable, SetInstrumentationScope)
 {
   OtlpLogRecordable rec;
+
   auto inst_lib =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("test", "v1");
   rec.SetInstrumentationScope(*inst_lib);
-  EXPECT_EQ(rec.GetInstrumentationScope(), *inst_lib);
+
+  EXPECT_EQ(&rec.GetInstrumentationScope(), inst_lib.get());
 }
 
 /**
@@ -209,7 +175,9 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntSingleAttribute)
   common::AttributeValue int_val(i);
 
   OtlpLogRecordable rec;
+
   rec.SetAttribute("int_attr", int_val);
+
   EXPECT_EQ(rec.log_record().attributes(0).value().int_value(), nostd::get<IntType>(int_val));
 }
 
@@ -222,6 +190,7 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
   nostd::span<const IntType> int_span(int_arr);
 
   OtlpLogRecordable rec;
+
   rec.SetAttribute("int_arr_attr", int_span);
 
   for (int i = 0; i < kArraySize; i++)
@@ -233,5 +202,3 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

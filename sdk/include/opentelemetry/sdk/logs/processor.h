@@ -2,17 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <memory>
-#  include "opentelemetry/sdk/logs/recordable.h"
+#include <chrono>
+#include <memory>
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
+
 /**
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
@@ -25,6 +27,7 @@ public:
   /**
    * Create a log recordable. This requests a new log recordable from the
    * associated exporter.
+   *
    * @return a newly initialized recordable
    *
    * Note: This method must be callable from multiple threads.
@@ -33,7 +36,7 @@ public:
 
   /**
    * OnEmit is called by the SDK once a log record has been successfully created.
-   * @param record the log record
+   * @param record the log recordable object
    */
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
@@ -58,4 +61,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

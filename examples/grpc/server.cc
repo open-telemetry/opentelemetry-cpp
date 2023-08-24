@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #ifdef BAZEL_BUILD
 #  include "examples/grpc/protos/messages.grpc.pb.h"
 #else
@@ -107,7 +110,7 @@ void RunServer(uint16_t port)
 
 int main(int argc, char **argv)
 {
-  initTracer();
+  InitTracer();
   constexpr uint16_t default_port = 8800;
   uint16_t port;
   if (argc > 1)
@@ -120,5 +123,6 @@ int main(int argc, char **argv)
   }
 
   RunServer(port);
+  CleanupTracer();
   return 0;
 }

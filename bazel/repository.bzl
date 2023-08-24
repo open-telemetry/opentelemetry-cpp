@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
@@ -31,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "1f71c72ce08d2c1310011ea6436b31e39ccab8c2db94186d26657d41747c85d6",
-        strip_prefix = "benchmark-1.6.0",
+        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
+        strip_prefix = "benchmark-1.7.1",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.6.0.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
         ],
     )
 
@@ -43,10 +46,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "a03a7b24b3a0766dc823c9008dd32c56a1183889c04f084653266af22289ab0c",
-        strip_prefix = "googletest-a6dfd3aca7f2f91f95fc7ab650c95a48420d513d",
+        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
+        strip_prefix = "googletest-1.13.0",
         urls = [
-            "https://github.com/google/googletest/archive/a6dfd3aca7f2f91f95fc7ab650c95a48420d513d.tar.gz",
+            "https://github.com/google/googletest/archive/v1.13.0.tar.gz",
         ],
     )
 
@@ -85,10 +88,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "320366665d19027cda87b2368c03939006a37e0388bfd1091c8d2a96fbc93bd8",
-        strip_prefix = "grpc-1.48.1",
+        sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
+        strip_prefix = "grpc-1.49.2",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.48.1.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
         ],
     )
 
@@ -97,10 +100,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "464bc2b348e674a1a03142e403cbccb01be8655b6de0f8bfe733ea31fcd421be",
-        strip_prefix = "opentelemetry-proto-0.19.0",
+        sha256 = "a13a1a7b76a1f22a0ca2e6c293e176ffef031413ab8ba653a82a1dbc286a3a33",
+        strip_prefix = "opentelemetry-proto-1.0.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.19.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.0.0.tar.gz",
         ],
     )
 
@@ -109,9 +112,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "b94997df68856753b72f0d7a3703b7d484d4745c567f3584ef97c96c25a5798e",
+        sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.10.5/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip",
         ],
     )
 
@@ -119,10 +122,21 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        sha256 = "07018db604ea3e61f5078583e87c80932ea10c300d979061490ee1b7dc8e3a41",
-        strip_prefix = "prometheus-cpp-1.0.0",
+        sha256 = "397544fe91e183029120b4eebcfab24ed9ec833d15850aae78fd5db19062d13a",
+        strip_prefix = "prometheus-cpp-1.1.0",
         urls = [
-            "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.0.0.tar.gz",
+            "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.1.0.tar.gz",
+        ],
+    )
+
+    # bazel platforms
+    maybe(
+        http_archive,
+        name = "platforms",
+        sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+            "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
         ],
     )
 
@@ -133,18 +147,9 @@ def opentelemetry_cpp_deps():
         build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
         sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
         strip_prefix = "curl-7.73.0",
-        urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
-    )
-
-    # libthrift (optional)
-    maybe(
-        http_archive,
-        name = "com_github_thrift",
-        build_file_content = _ALL_CONTENT,
-        sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
-        strip_prefix = "thrift-0.14.1",
         urls = [
-            "https://github.com/apache/thrift/archive/refs/tags/v0.14.1.tar.gz",
+            "https://curl.haxx.se/download/curl-7.73.0.tar.gz",
+            "https://github.com/curl/curl/releases/download/curl-7_73_0/curl-7.73.0.tar.gz",
         ],
     )
 
@@ -168,24 +173,13 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # boost headers from vcpkg
+    # Opentracing
     maybe(
-        native.new_local_repository,
-        name = "boost_all_hdrs",
-        build_file_content = """
-package(default_visibility = ["//visibility:public"])
-cc_library(
-  name = "boost_all_hdrs",
-  hdrs = glob(
-      ["include/**/*.h*"],
-  ),
-  strip_include_prefix = "include",
-  copts = [
-      "-isystem include",
-      "-fexceptions",
-    ],
-    visibility = ["//visibility:public"],
-)
-        """,
-        path = "tools/vcpkg/installed/x64-windows/",
+        http_archive,
+        name = "com_github_opentracing",
+        sha256 = "5b170042da4d1c4c231df6594da120875429d5231e9baa5179822ee8d1054ac3",
+        strip_prefix = "opentracing-cpp-1.6.0",
+        urls = [
+            "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
+        ],
     )

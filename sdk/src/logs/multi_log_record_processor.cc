@@ -1,13 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
-#  include "opentelemetry/sdk/logs/multi_log_record_processor.h"
-
-#  include <chrono>
-#  include <memory>
-#  include <vector>
+#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
+#include "opentelemetry/sdk/logs/multi_recordable.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -40,7 +36,7 @@ void MultiLogRecordProcessor::AddProcessor(std::unique_ptr<LogRecordProcessor> &
 
 std::unique_ptr<Recordable> MultiLogRecordProcessor::MakeRecordable() noexcept
 {
-  auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
+  auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable());
   auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
   for (auto &processor : processors_)
   {
@@ -149,4 +145,3 @@ bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

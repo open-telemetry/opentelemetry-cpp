@@ -87,7 +87,7 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 #if defined(_MSC_VER)
           YieldProcessor();
 #elif defined(__i386__) || defined(__x86_64__)
-#  if defined(__clang__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
           _mm_pause();
 #  else
           __builtin_ia32_pause();
@@ -103,7 +103,12 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 // SpinLock thrashing with thread::yield().
 static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
 {
+#if defined(__cpp_lib_atomic_value_initialization) && \
+    __cpp_lib_atomic_value_initialization >= 201911L
+  std::atomic_flag mutex{};
+#else
   std::atomic_flag mutex = ATOMIC_FLAG_INIT;
+#endif
   SpinThrash<std::atomic_flag>(
       s, mutex,
       [](std::atomic_flag &l) {

@@ -3,9 +3,12 @@
 
 #pragma once
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -33,7 +36,7 @@ struct StartSpanOptions
   //
   // This defaults to an invalid span context. In this case, the Span is
   // automatically parented to the currently active span.
-  nostd::variant<SpanContext, opentelemetry::context::Context> parent = SpanContext::GetInvalid();
+  nostd::variant<SpanContext, context::Context> parent = SpanContext::GetInvalid();
 
   // TODO:
   // SpanContext remote_parent;

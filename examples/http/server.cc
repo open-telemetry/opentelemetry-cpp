@@ -40,13 +40,13 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{SemanticConventions::kNetHostName, server_name},
-                                 {SemanticConventions::kNetHostPort, server_port},
-                                 {SemanticConventions::kHttpMethod, request.method},
-                                 {SemanticConventions::kHttpScheme, "http"},
-                                 {SemanticConventions::kHttpRequestContentLength,
+                                {{SemanticConventions::kServerAddress, server_name},
+                                 {SemanticConventions::kServerPort, server_port},
+                                 {SemanticConventions::kHttpRequestMethod, request.method},
+                                 {SemanticConventions::kUrlScheme, "http"},
+                                 {SemanticConventions::kHttpRequestBodySize,
                                   static_cast<uint64_t>(request.content.length())},
-                                 {SemanticConventions::kHttpClientIp, request.client}},
+                                 {SemanticConventions::kClientAddress, request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
@@ -70,12 +70,12 @@ public:
 
 int main(int argc, char *argv[])
 {
-  initTracer();
+  InitTracer();
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    server_port = atoi(argv[1]);
+    server_port = (uint16_t)atoi(argv[1]);
   }
 
   HttpServer http_server(server_name, server_port);
@@ -91,5 +91,6 @@ int main(int argc, char *argv[])
   }
   http_server.Stop();
   root_span->End();
+  CleanupTracer();
   return 0;
 }

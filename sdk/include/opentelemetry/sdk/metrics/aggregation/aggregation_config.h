@@ -3,8 +3,10 @@
 
 #pragma once
 
-#include <list>
+#include <vector>
+
 #include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -19,7 +21,7 @@ public:
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:
-  std::list<double> boundaries_;
+  std::vector<double> boundaries_;
   bool record_min_max_ = true;
 };
 }  // namespace metrics

@@ -2,18 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/sdk/common/circular_buffer.h"
-#  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
-#  include <atomic>
-#  include <condition_variable>
-#  include <cstdint>
-#  include <memory>
-#  include <thread>
+#include <atomic>
+#include <condition_variable>
+#include <cstdint>
+#include <memory>
+#include <thread>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -114,10 +114,11 @@ protected:
     std::mutex cv_m, force_flush_cv_m, shutdown_m;
 
     /* Important boolean flags to handle the workflow of the processor */
-    std::atomic<bool> is_force_wakeup_background_worker;
-    std::atomic<bool> is_force_flush_pending;
-    std::atomic<bool> is_force_flush_notified;
-    std::atomic<bool> is_shutdown;
+    std::atomic<bool> is_force_wakeup_background_worker{false};
+    std::atomic<bool> is_force_flush_pending{false};
+    std::atomic<bool> is_force_flush_notified{false};
+    std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
+    std::atomic<bool> is_shutdown{false};
   };
 
   /**
@@ -128,6 +129,7 @@ protected:
    * @param synchronization_data Synchronization data to be notified.
    */
   static void NotifyCompletion(bool notify_force_flush,
+                               const std::unique_ptr<LogRecordExporter> &exporter,
                                const std::shared_ptr<SynchronizationData> &synchronization_data);
 
   void GetWaitAdjustedTime(std::chrono::microseconds &timeout,
@@ -152,4 +154,3 @@ protected:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

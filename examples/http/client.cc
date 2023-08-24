@@ -26,9 +26,9 @@ void sendRequest(const std::string &url)
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")
                   ->StartSpan(span_name,
-                              {{SemanticConventions::kHttpUrl, url_parser.url_},
-                               {SemanticConventions::kHttpScheme, url_parser.scheme_},
-                               {SemanticConventions::kHttpMethod, "GET"}},
+                              {{SemanticConventions::kUrlFull, url_parser.url_},
+                               {SemanticConventions::kUrlScheme, url_parser.scheme_},
+                               {SemanticConventions::kHttpRequestMethod, "GET"}},
                               options);
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
@@ -39,12 +39,12 @@ void sendRequest(const std::string &url)
   prop->Inject(carrier, current_ctx);
 
   // send http request
-  http_client::Result result = http_client->Get(url, carrier.headers_);
+  http_client::Result result = http_client->GetNoSsl(url, carrier.headers_);
   if (result)
   {
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
-    span->SetAttribute(SemanticConventions::kHttpStatusCode, status_code);
+    span->SetAttribute(SemanticConventions::kHttpResponseStatusCode, status_code);
     result.GetResponse().ForEachHeader(
         [&span](nostd::string_view header_name, nostd::string_view header_value) {
           span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
@@ -73,7 +73,7 @@ void sendRequest(const std::string &url)
 
 int main(int argc, char *argv[])
 {
-  initTracer();
+  InitTracer();
   constexpr char default_host[]   = "localhost";
   constexpr char default_path[]   = "/helloworld";
   constexpr uint16_t default_port = 8800;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = atoi(argv[1]);
+    port = (uint16_t)(atoi(argv[1]));
   }
   else
   {
@@ -92,4 +92,5 @@ int main(int argc, char *argv[])
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +
                     std::string(default_path);
   sendRequest(url);
+  CleanupTracer();
 }
