@@ -15,9 +15,9 @@ target_include_directories(
 
 if(OPENTRACING_DIR)
   include_directories(
-    "${CMAKE_BINARY_DIR}/${OPENTRACING_DIR}/include"
-    "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/include"
-    "${CMAKE_SOURCE_DIR}/${OPENTRACING_DIR}/3rd_party/include")
+    "${CMAKE_CURRENT_BINARY_DIR}/../${OPENTRACING_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/3rd_party/include")
   target_link_libraries(${this_target} opentelemetry_api opentracing)
 else()
   target_link_libraries(${this_target} opentelemetry_api
