@@ -18,7 +18,7 @@ if(OPENTRACING_DIR)
     "${CMAKE_CURRENT_BINARY_DIR}/../${OPENTRACING_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/3rd_party/include")
-  target_link_libraries(${this_target} opentelemetry_api opentracing)
+  target_link_libraries(${this_target} opentelemetry_api opentracing-static)
 else()
   target_link_libraries(${this_target} opentelemetry_api
                         OpenTracing::opentracing)
