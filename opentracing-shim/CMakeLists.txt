@@ -14,7 +14,7 @@ target_include_directories(
                         "$<INSTALL_INTERFACE:include>")
 
 if(OPENTRACING_DIR)
-  include_directories(
+  target_include_directories(${this_target} PUBLIC
     "${CMAKE_CURRENT_BINARY_DIR}/../${OPENTRACING_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/3rd_party/include")
