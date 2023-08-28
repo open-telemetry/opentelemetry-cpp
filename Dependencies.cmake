@@ -92,6 +92,20 @@ if(WITH_OPENTRACING)
         OPTIONS
         "BUILD_TESTING OFF"
     )
+
+    message("source dir -> ${opentracing-cpp_SOURCE_DIR}/include")
+
+    target_include_directories(opentracing-static PUBLIC 
+    $<BUILD_INTERFACE:${opentracing-cpp_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${opentracing-cpp_SOURCE_DIR}/3rd_party/include>
+    $<BUILD_INTERFACE:${opentracing-cpp_BINARY_DIR}/include>
+    )
+
+    target_include_directories(opentracing PUBLIC 
+    $<BUILD_INTERFACE:${opentracing-cpp_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${opentracing-cpp_SOURCE_DIR}/3rd_party/include>
+    $<BUILD_INTERFACE:${opentracing-cpp_BINARY_DIR}/include>
+    )
 endif()
 
 endfunction()
