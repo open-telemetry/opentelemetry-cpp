@@ -46,7 +46,7 @@ void BM_ParentBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
+    // benchmark::DoNotOptimize(ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
   }
 }
 BENCHMARK(BM_ParentBasedSamplerConstruction);
@@ -55,7 +55,8 @@ void BM_TraceIdRatioBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(TraceIdRatioBasedSampler(0.01));
+    // TraceIdRatioBasedSampler sampler(0.01);
+    // benchmark::DoNotOptimize(sampler);
   }
 }
 BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);

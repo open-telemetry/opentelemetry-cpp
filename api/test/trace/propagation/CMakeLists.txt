@@ -4,7 +4,7 @@
 foreach(testname http_text_format_test b3_propagation_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api project_options)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX trace.
@@ -16,7 +16,7 @@ if(NOT WITH_NO_DEPRECATED_CODE)
 
     add_executable(${testname} "${testname}.cc")
     target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                          ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+                          ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api project_options)
     gtest_add_tests(
       TARGET ${testname}
       TEST_PREFIX trace.

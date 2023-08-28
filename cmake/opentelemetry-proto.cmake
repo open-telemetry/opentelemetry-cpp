@@ -23,47 +23,14 @@
 # provided in variable ${opentelemetry-proto}
 #
 
-if(OTELCPP_PROTO_PATH)
-  if(NOT EXISTS
-     "${OTELCPP_PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
-    message(
-      FATAL_ERROR
-        "OTELCPP_PROTO_PATH does not point to a opentelemetry-proto repository")
-  endif()
-  message(STATUS "opentelemetry-proto dependency satisfied by: external path")
-  set(PROTO_PATH ${OTELCPP_PROTO_PATH})
-  set(needs_proto_download FALSE)
-else()
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
-    message(STATUS "opentelemetry-proto dependency satisfied by: git submodule")
-    set(PROTO_PATH
-        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
-    set(needs_proto_download FALSE)
-  else()
-    message(
-      STATUS "opentelemetry-proto dependency satisfied by: github download")
-    if("${opentelemetry-proto}" STREQUAL "")
-      set(opentelemetry-proto "v1.0.0")
-    endif()
-    include(ExternalProject)
-    ExternalProject_Add(
-      opentelemetry-proto
-      GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-proto.git
-      GIT_TAG "${opentelemetry-proto}"
-      UPDATE_COMMAND ""
-      BUILD_COMMAND ""
-      INSTALL_COMMAND ""
-      CONFIGURE_COMMAND ""
-      TEST_AFTER_INSTALL 0
-      DOWNLOAD_NO_PROGRESS 1
-      LOG_CONFIGURE 1
-      LOG_BUILD 1
-      LOG_INSTALL 1)
-    ExternalProject_Get_Property(opentelemetry-proto INSTALL_DIR)
-    set(PROTO_PATH "${INSTALL_DIR}/src/opentelemetry-proto")
-    set(needs_proto_download TRUE)
-  endif()
-endif()
+CPMFindPackage(
+  NAME opentelemetry-proto
+  DOWNLOAD_ONLY TRUE
+  GITHUB_REPOSITORY open-telemetry/opentelemetry-proto
+  GIT_TAG main
+)
+
+set(PROTO_PATH "${opentelemetry-proto_SOURCE_DIR}")
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO
@@ -81,7 +48,7 @@ set(METRICS_SERVICE_PROTO
 )
 
 set(GENERATED_PROTOBUF_PATH
-    "${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto")
+    "${CMAKE_CURRENT_BINARY_DIR}/../generated/third_party/opentelemetry-proto")
 
 file(MAKE_DIRECTORY "${GENERATED_PROTOBUF_PATH}")
 
@@ -237,8 +204,6 @@ add_custom_command(
     ${METRICS_SERVICE_PROTO}
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}")
 
-include_directories("${GENERATED_PROTOBUF_PATH}")
-
 unset(OTELCPP_PROTO_TARGET_OPTIONS)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows|MinGW|WindowsStore")
   list(APPEND OTELCPP_PROTO_TARGET_OPTIONS STATIC)
@@ -260,6 +225,9 @@ add_library(
   ${TRACE_SERVICE_PB_CPP_FILE}
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
+
+target_include_directories(opentelemetry_proto PUBLIC "${GENERATED_PROTOBUF_PATH}")
+
 
 if(WITH_ABSEIL)
   target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)

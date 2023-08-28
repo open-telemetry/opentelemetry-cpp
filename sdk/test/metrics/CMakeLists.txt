@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_library(metrics_common_test_utils common.cc)
-target_link_libraries(metrics_common_test_utils opentelemetry_metrics)
+target_link_libraries(metrics_common_test_utils opentelemetry_metrics project_options)
 
 foreach(
   testname
@@ -32,7 +32,7 @@ foreach(
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils opentelemetry_resources)
+    metrics_common_test_utils opentelemetry_resources project_options)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX metrics.
@@ -43,33 +43,33 @@ if(WITH_BENCHMARK)
   add_executable(attributes_processor_benchmark
                  attributes_processor_benchmark.cc)
   target_link_libraries(attributes_processor_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common project_options)
 
   add_executable(attributes_hashmap_benchmark attributes_hashmap_benchmark.cc)
   target_link_libraries(attributes_hashmap_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common project_options)
 
   add_executable(base2_exponential_histogram_indexer_benchmark
                  base2_exponential_histogram_indexer_benchmark.cc)
   target_link_libraries(
     base2_exponential_histogram_indexer_benchmark benchmark::benchmark
-    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common project_options)
 
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)
   target_link_libraries(
     histogram_aggregation_benchmark benchmark::benchmark
     ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_common
-    opentelemetry_resources)
+    opentelemetry_resources project_options)
 
   add_executable(measurements_benchmark measurements_benchmark.cc)
   target_link_libraries(
     measurements_benchmark benchmark::benchmark opentelemetry_metrics
-    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common project_options)
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
     sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
-    metrics_common_test_utils opentelemetry_common opentelemetry_resources)
+    metrics_common_test_utils opentelemetry_common opentelemetry_resources project_options)
 endif()
 
 add_subdirectory(exemplar)

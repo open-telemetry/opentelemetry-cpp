@@ -13,16 +13,8 @@ target_include_directories(
   ${this_target} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
                         "$<INSTALL_INTERFACE:include>")
 
-if(OPENTRACING_DIR)
-  target_include_directories(${this_target} PUBLIC
-    "${CMAKE_CURRENT_BINARY_DIR}/../${OPENTRACING_DIR}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../${OPENTRACING_DIR}/3rd_party/include")
-  target_link_libraries(${this_target} opentelemetry_api opentracing-static)
-else()
-  target_link_libraries(${this_target} opentelemetry_api
-                        OpenTracing::opentracing)
-endif()
+
+target_link_libraries(${this_target} opentelemetry_api opentracing-static project_options)
 
 if(OPENTELEMETRY_INSTALL)
   install(
@@ -48,12 +40,12 @@ if(BUILD_TESTING)
     if(OPENTRACING_DIR)
       target_link_libraries(
         ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-        opentelemetry_api opentelemetry_opentracing_shim opentracing)
+        opentelemetry_api opentelemetry_opentracing_shim opentracing project_options)
     else()
       target_link_libraries(
         ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
         opentelemetry_api opentelemetry_opentracing_shim
-        OpenTracing::opentracing)
+        OpenTracing::opentracing project_options)
     endif()
 
     gtest_add_tests(

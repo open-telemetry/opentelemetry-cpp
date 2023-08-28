@@ -14,7 +14,7 @@ set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
 target_link_libraries(
   opentelemetry_exporter_etw INTERFACE opentelemetry_api opentelemetry_trace
                                        nlohmann_json::nlohmann_json)
-target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs)
+target_link_libraries(opentelemetry_exporter_etw INTERFACE opentelemetry_logs project_options)
 if(nlohmann_json_clone)
   add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
 endif()
@@ -42,23 +42,23 @@ if(BUILD_TESTING)
   add_executable(etw_logger_test_enable_env_properties test/etw_logger_test.cc)
 
   target_link_libraries(etw_provider_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
 
   target_link_libraries(etw_tracer_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
 
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
 
   target_link_libraries(
     etw_tracer_test_enable_env_properties ${GTEST_BOTH_LIBRARIES}
-    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
   target_compile_definitions(etw_tracer_test_enable_env_properties
                              PRIVATE ENABLE_ENV_PROPERTIES)
 
   target_link_libraries(
     etw_logger_test_enable_env_properties ${GTEST_BOTH_LIBRARIES}
-    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+    opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
   target_compile_definitions(etw_logger_test_enable_env_properties
                              PRIVATE ENABLE_ENV_PROPERTIES)
 
@@ -66,7 +66,7 @@ if(BUILD_TESTING)
     add_executable(etw_perf_test test/etw_perf_test.cc)
     target_link_libraries(
       etw_perf_test benchmark::benchmark ${GTEST_BOTH_LIBRARIES}
-      opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+      opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT} project_options)
   endif()
 
   gtest_add_tests(

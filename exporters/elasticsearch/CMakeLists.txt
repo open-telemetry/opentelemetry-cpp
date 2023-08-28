@@ -16,7 +16,7 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_exporter_elasticsearch_logs
   PUBLIC opentelemetry_trace opentelemetry_logs opentelemetry_http_client_curl
-         nlohmann_json::nlohmann_json)
+         nlohmann_json::nlohmann_json project_options)
 
 if(OPENTELEMETRY_INSTALL)
   install(
@@ -40,7 +40,7 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     es_log_record_exporter_test ${GTEST_BOTH_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_elasticsearch_logs)
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_elasticsearch_logs project_options)
 
   gtest_add_tests(
     TARGET es_log_record_exporter_test

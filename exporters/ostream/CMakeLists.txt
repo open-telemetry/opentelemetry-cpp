@@ -13,7 +13,7 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
 target_link_libraries(opentelemetry_exporter_ostream_span
-                      PUBLIC opentelemetry_trace)
+                      PUBLIC opentelemetry_trace) 
 
 if(OPENTELEMETRY_INSTALL)
   install(
@@ -33,7 +33,7 @@ endif()
 if(BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
   target_link_libraries(ostream_span_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_ostream_span)
+                        opentelemetry_exporter_ostream_span project_options)
   gtest_add_tests(
     TARGET ostream_span_test
     TEST_PREFIX exporter.
@@ -69,7 +69,7 @@ if(BUILD_TESTING)
   add_executable(ostream_metric_test test/ostream_metric_test.cc)
   target_link_libraries(
     ostream_metric_test ${GTEST_BOTH_LIBRARIES}
-    opentelemetry_exporter_ostream_metrics opentelemetry_resources)
+    opentelemetry_exporter_ostream_metrics opentelemetry_resources project_options)
   gtest_add_tests(
     TARGET ostream_metric_test
     TEST_PREFIX exporter.
@@ -105,7 +105,7 @@ endif()
 if(BUILD_TESTING)
   add_executable(ostream_log_test test/ostream_log_test.cc)
   target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
-                        opentelemetry_exporter_ostream_logs)
+                        opentelemetry_exporter_ostream_logs project_options)
   gtest_add_tests(
     TARGET ostream_log_test
     TEST_PREFIX exporter.

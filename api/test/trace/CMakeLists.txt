@@ -17,7 +17,7 @@ foreach(
   tracer_test)
   add_executable(api_${testname} "${testname}.cc")
   target_link_libraries(api_${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api project_options)
   gtest_add_tests(
     TARGET api_${testname}
     TEST_PREFIX trace.
@@ -27,8 +27,8 @@ endforeach()
 if(WITH_BENCHMARK)
   add_executable(span_id_benchmark span_id_benchmark.cc)
   target_link_libraries(span_id_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api project_options)
   add_executable(span_benchmark span_benchmark.cc)
   target_link_libraries(span_benchmark benchmark::benchmark
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api project_options)
 endif()

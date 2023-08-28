@@ -4,7 +4,7 @@
 foreach(testname resource_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_resources)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_resources project_options)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX resources.

@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.20)
 
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
@@ -13,7 +13,10 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
-project(opentelemetry-cpp)
+project(opentelemetry-cpp CXX C)
+
+include(Dependencies.cmake)
+
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
@@ -141,7 +144,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
       set(CMAKE_CXX_STANDARD 17)
     endif()
   else()
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 14)
   endif()
 endif()
 
@@ -273,6 +276,13 @@ if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
   )
 endif()
 
+# include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
+# opentelemetry-proto installs targets to the location variables defined in
+# GNUInstallDirs.
+include(GNUInstallDirs)
+
+add_external_dependencies()
+
 find_package(Threads)
 
 function(install_windows_deps)
@@ -319,35 +329,6 @@ if(MSVC)
   endif()
 endif()
 
-# include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
-# opentelemetry-proto installs targets to the location variables defined in
-# GNUInstallDirs.
-include(GNUInstallDirs)
-
-if(WITH_PROMETHEUS)
-  find_package(prometheus-cpp CONFIG QUIET)
-  if(NOT prometheus-cpp_FOUND)
-    message("Trying to use local prometheus-cpp from submodule")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
-      set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
-      set(ENABLE_TESTING OFF)
-      add_subdirectory(third_party/prometheus-cpp)
-      set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
-    else()
-      message(
-        FATAL_ERROR
-          "\nprometheus-cpp package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
-    endif()
-  else()
-    message("Using external prometheus-cpp")
-  endif()
-endif()
-
-if(WITH_ABSEIL)
-  find_package(absl CONFIG REQUIRED)
-endif()
 
 if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   find_package(Protobuf)
@@ -404,56 +385,13 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   include(cmake/opentelemetry-proto.cmake)
 endif()
 
-#
-# Do we need HTTP CLIENT CURL ?
-#
-
-if(WITH_OTLP_HTTP
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
-  set(WITH_HTTP_CLIENT_CURL OFF)
-endif()
-
-#
-# Do we need CURL ?
-#
-
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
-  # No specific version required.
-  find_package(CURL REQUIRED)
-  message(STATUS "Found CURL: ${CURL_LIBRARIES}, version ${CURL_VERSION}")
-endif()
-
-#
-# Do we need NLOHMANN_JSON ?
-#
-
-if(WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR WITH_OTLP_HTTP
-   OR WITH_ZPAGES
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_ETW)
-  set(USE_NLOHMANN_JSON ON)
-else()
-  set(USE_NLOHMANN_JSON OFF)
-endif()
-
-if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
-  include(cmake/nlohmann-json.cmake)
-endif()
+add_library(project_options INTERFACE)
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message("Building with gcc in maintainer mode.")
 
-    add_compile_options(-Wall)
-    add_compile_options(-Werror)
-    add_compile_options(-Wextra)
+    target_compile_options(project_options INTERFACE -Wall -Werror -Wextra)
 
     # Tested with GCC 9.4 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
@@ -464,69 +402,69 @@ if(OTELCPP_MAINTAINER_MODE)
       # Enforced warnings
 
       # C++ options only
-      add_compile_options($<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wextra-semi>)
-      add_compile_options(
+      target_compile_options(project_options INTERFACE $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wextra-semi>)
+      target_compile_options(project_options INTERFACE 
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
-      add_compile_options(
+        target_compile_options(project_options INTERFACE 
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
 
       # C and C++
-      add_compile_options(-Wcast-qual)
-      add_compile_options(-Wformat-security)
-      add_compile_options(-Wlogical-op)
-      add_compile_options(-Wmissing-include-dirs)
-      add_compile_options(-Wstringop-truncation)
-      add_compile_options(-Wundef)
-      add_compile_options(-Wvla)
+      target_compile_options(project_options INTERFACE -Wcast-qual)
+      target_compile_options(project_options INTERFACE -Wformat-security)
+      target_compile_options(project_options INTERFACE -Wlogical-op)
+      target_compile_options(project_options INTERFACE -Wmissing-include-dirs)
+      target_compile_options(project_options INTERFACE -Wstringop-truncation)
+      target_compile_options(project_options INTERFACE -Wundef)
+      target_compile_options(project_options INTERFACE -Wvla)
     endif()
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message("Building with clang in maintainer mode.")
 
-    add_compile_options(-Wall)
-    add_compile_options(-Werror)
-    add_compile_options(-Wextra)
+    target_compile_options(project_options INTERFACE -Wall)
+    target_compile_options(project_options INTERFACE -Werror)
+    target_compile_options(project_options INTERFACE -Wextra)
 
     # Tested with Clang 11.0 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
       message("Building with additional warnings for clang.")
 
       # Relaxed warnings
-      add_compile_options(-Wno-error=unused-private-field)
+      target_compile_options(project_options INTERFACE -Wno-error=unused-private-field)
 
       # Enforced warnings
-      add_compile_options(-Wcast-qual)
-      add_compile_options(-Wconditional-uninitialized)
-      add_compile_options(-Wextra-semi)
-      add_compile_options(-Wformat-security)
-      add_compile_options(-Wheader-hygiene)
-      add_compile_options(-Winconsistent-missing-destructor-override)
-      add_compile_options(-Winconsistent-missing-override)
-      add_compile_options(-Wnewline-eof)
-      add_compile_options(-Wnon-virtual-dtor)
-      add_compile_options(-Woverloaded-virtual)
-      add_compile_options(-Wrange-loop-analysis)
-      add_compile_options(-Wundef)
-      add_compile_options(-Wundefined-reinterpret-cast)
-      add_compile_options(-Wvla)
+      target_compile_options(project_options INTERFACE -Wcast-qual)
+      target_compile_options(project_options INTERFACE -Wconditional-uninitialized)
+      target_compile_options(project_options INTERFACE -Wextra-semi)
+      target_compile_options(project_options INTERFACE -Wformat-security)
+      target_compile_options(project_options INTERFACE -Wheader-hygiene)
+      target_compile_options(project_options INTERFACE -Winconsistent-missing-destructor-override)
+      target_compile_options(project_options INTERFACE -Winconsistent-missing-override)
+      target_compile_options(project_options INTERFACE -Wnewline-eof)
+      target_compile_options(project_options INTERFACE -Wnon-virtual-dtor)
+      target_compile_options(project_options INTERFACE -Woverloaded-virtual)
+      target_compile_options(project_options INTERFACE -Wrange-loop-analysis)
+      target_compile_options(project_options INTERFACE -Wundef)
+      target_compile_options(project_options INTERFACE -Wundefined-reinterpret-cast)
+      target_compile_options(project_options INTERFACE -Wvla)
     endif()
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message("Building with msvc in maintainer mode.")
 
-    add_compile_options(/WX)
-    add_compile_options(/W4)
+    target_compile_options(project_options INTERFACE /WX)
+    target_compile_options(project_options INTERFACE /W4)
 
     # Relaxed warnings
-    add_compile_options(/wd4100)
-    add_compile_options(/wd4125)
-    add_compile_options(/wd4566)
-    add_compile_options(/wd4127)
-    add_compile_options(/wd4512)
-    add_compile_options(/wd4267)
+    target_compile_options(project_options INTERFACE /wd4100)
+    target_compile_options(project_options INTERFACE /wd4125)
+    target_compile_options(project_options INTERFACE /wd4566)
+    target_compile_options(project_options INTERFACE /wd4127)
+    target_compile_options(project_options INTERFACE /wd4512)
+    target_compile_options(project_options INTERFACE /wd4267)
 
     # Enforced warnings
-    add_compile_options(/we4265) # 'class': class has virtual functions, but
+    target_compile_options(project_options INTERFACE /we4265) # 'class': class has virtual functions, but
                                  # destructor is not virtual
-    add_compile_options(/we5204) # A class with virtual functions has
+    target_compile_options(project_options INTERFACE /we5204) # A class with virtual functions has
                                  # non-virtual trivial destructor.
 
   elseif()
@@ -538,51 +476,9 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
-  add_definitions(-DENABLE_TEST)
-  if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
-    # Prefer GTest from build tree. GTest is not always working with
-    # CMAKE_PREFIX_PATH
-    set(GTEST_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    if(TARGET gtest)
-      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
-    else()
-      set(GTEST_BOTH_LIBRARIES
-          ${CMAKE_BINARY_DIR}/lib/libgtest.a
-          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
-    endif()
-  elseif(WIN32)
-    # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest)
-    if(NOT (GTEST_FOUND OR GTest_FOUND))
-      install_windows_deps()
-      include(${CMAKE_TOOLCHAIN_FILE})
-      find_package(GTest REQUIRED)
-    endif()
-  else()
-    # Prefer GTest installed by OS distro, brew or vcpkg package manager
-    find_package(GTest REQUIRED)
-  endif()
-  if(NOT GTEST_BOTH_LIBRARIES)
-    # New GTest package names
-    if(TARGET GTest::gtest)
-      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
-    elseif(TARGET GTest::GTest)
-      set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
-    endif()
-  endif()
-  if(GTEST_INCLUDE_DIRS)
-    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
-  endif()
-  message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
-  message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+  target_compile_definitions(project_options INTERFACE -DENABLE_TEST)
+  target_link_libraries(project_options INTERFACE gtest_main)  
   enable_testing()
-  if(WITH_BENCHMARK)
-    # Benchmark respects the CMAKE_PREFIX_PATH
-    find_package(benchmark CONFIG REQUIRED)
-  endif()
 endif()
 
 include(CMakePackageConfigHelpers)
@@ -595,33 +491,14 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
     message(
       WARNING "Build DLL with C++ STL could cause binary incompatibility!")
   endif()
-  add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
+  target_compile_definitions(project_options INTERFACE -DOPENTELEMETRY_BUILD_EXPORT_DLL)
 endif()
 
-include_directories(api/include)
+target_include_directories(project_options INTERFACE api/include)
 
 add_subdirectory(api)
 
 if(WITH_OPENTRACING)
-  find_package(OpenTracing CONFIG QUIET)
-  if(NOT OpenTracing_FOUND)
-    set(OPENTRACING_DIR "third_party/opentracing-cpp")
-    message("Trying to use local ${OPENTRACING_DIR} from submodule")
-    if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
-      set(SAVED_BUILD_TESTING ${BUILD_TESTING})
-      set(BUILD_TESTING OFF)
-      add_subdirectory(${OPENTRACING_DIR})
-      set(BUILD_TESTING ${SAVED_BUILD_TESTING})
-    else()
-      message(
-        FATAL_ERROR
-          "\nopentracing-cpp package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
-    endif()
-  else()
-    message("Using external opentracing-cpp")
-  endif()
   add_subdirectory(opentracing-shim)
 endif()
 

@@ -17,9 +17,10 @@ target_include_directories(
 
 set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
 
-target_link_libraries(opentelemetry_otlp_recordable PUBLIC opentelemetry_logs)
+target_link_libraries(opentelemetry_otlp_recordable PUBLIC opentelemetry_logs project_options)
 target_link_libraries(opentelemetry_otlp_recordable
                       PUBLIC opentelemetry_metrics)
+
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
@@ -39,7 +40,7 @@ if(WITH_OTLP_GRPC)
     PUBLIC opentelemetry_sdk opentelemetry_common opentelemetry_ext
            # gRPC::grpc++ must be linked before opentelemetry_proto_grpc.
            opentelemetry_proto_grpc
-    PRIVATE gRPC::grpc++)
+    PRIVATE gRPC::grpc++ project_options)
 
   get_target_property(GRPC_INCLUDE_DIRECTORY gRPC::grpc++
                       INTERFACE_INCLUDE_DIRECTORIES)
@@ -66,7 +67,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_grpc_client)
+           opentelemetry_exporter_otlp_grpc_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc)
 
@@ -82,7 +83,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_log
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_grpc_client)
+           opentelemetry_exporter_otlp_grpc_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
 
@@ -97,7 +98,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc_metrics
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_grpc_client)
+           opentelemetry_exporter_otlp_grpc_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_grpc_metrics)
@@ -113,7 +114,7 @@ if(WITH_OTLP_HTTP)
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_sdk opentelemetry_ext
     PRIVATE opentelemetry_proto opentelemetry_http_client_curl
-            nlohmann_json::nlohmann_json)
+            nlohmann_json::nlohmann_json project_options)
   if(TARGET absl::strings)
     target_link_libraries(opentelemetry_exporter_otlp_http_client
                           PUBLIC absl::strings)
@@ -140,7 +141,7 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(
     opentelemetry_exporter_otlp_http
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_http_client)
+           opentelemetry_exporter_otlp_http_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
 
@@ -156,7 +157,7 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_log
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_http_client)
+           opentelemetry_exporter_otlp_http_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
 
@@ -171,7 +172,7 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_metric
     PUBLIC opentelemetry_otlp_recordable
-           opentelemetry_exporter_otlp_http_client)
+           opentelemetry_exporter_otlp_http_client project_options)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_metric)
@@ -179,7 +180,7 @@ endif()
 
 target_link_libraries(
   opentelemetry_otlp_recordable
-  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
+  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto project_options)
 
 if(OPENTELEMETRY_INSTALL)
   install(
@@ -200,7 +201,7 @@ if(BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
   target_link_libraries(
     otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_otlp_recordable protobuf::libprotobuf)
+    opentelemetry_otlp_recordable protobuf::libprotobuf project_options)
   gtest_add_tests(
     TARGET otlp_recordable_test
     TEST_PREFIX exporter.otlp.
@@ -208,7 +209,7 @@ if(BUILD_TESTING)
 
   add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
   target_link_libraries(otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable project_options)
   gtest_add_tests(
     TARGET otlp_log_recordable_test
     TEST_PREFIX exporter.otlp.
@@ -219,7 +220,7 @@ if(BUILD_TESTING)
   target_link_libraries(
     otlp_metrics_serialization_test ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable
-    protobuf::libprotobuf)
+    protobuf::libprotobuf project_options)
   gtest_add_tests(
     TARGET otlp_metrics_serialization_test
     TEST_PREFIX exporter.otlp.
@@ -252,7 +253,7 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc project_options)
     gtest_add_tests(
       TARGET otlp_grpc_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -262,7 +263,7 @@ if(BUILD_TESTING)
                    test/otlp_grpc_exporter_factory_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc project_options)
     gtest_add_tests(
       TARGET otlp_grpc_exporter_factory_test
       TEST_PREFIX exporter.otlp.
@@ -278,7 +279,7 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_grpc
       opentelemetry_exporter_otlp_grpc_log
       opentelemetry_trace
-      opentelemetry_logs)
+      opentelemetry_logs project_options)
     gtest_add_tests(
       TARGET otlp_grpc_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -289,7 +290,7 @@ if(BUILD_TESTING)
     target_link_libraries(
       otlp_grpc_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_grpc_log opentelemetry_logs)
+      opentelemetry_exporter_otlp_grpc_log opentelemetry_logs project_options)
     gtest_add_tests(
       TARGET otlp_grpc_log_record_exporter_factory_test
       TEST_PREFIX exporter.otlp.
@@ -300,7 +301,7 @@ if(BUILD_TESTING)
     target_link_libraries(
       otlp_grpc_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_grpc_metrics opentelemetry_metrics)
+      opentelemetry_exporter_otlp_grpc_metrics opentelemetry_metrics project_options)
     gtest_add_tests(
       TARGET otlp_grpc_metric_exporter_factory_test
       TEST_PREFIX exporter.otlp.
@@ -327,7 +328,7 @@ if(BUILD_TESTING)
                    test/otlp_http_exporter_factory_test.cc)
     target_link_libraries(
       otlp_http_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http)
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http project_options)
     gtest_add_tests(
       TARGET otlp_http_exporter_factory_test
       TEST_PREFIX exporter.otlp.
@@ -342,7 +343,7 @@ if(BUILD_TESTING)
       ${GMOCK_LIB}
       opentelemetry_exporter_otlp_http_log
       opentelemetry_logs
-      opentelemetry_http_client_nosend)
+      opentelemetry_http_client_nosend project_options)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -353,7 +354,7 @@ if(BUILD_TESTING)
     target_link_libraries(
       otlp_http_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_http_log opentelemetry_logs)
+      opentelemetry_exporter_otlp_http_log opentelemetry_logs project_options)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_factory_test
       TEST_PREFIX exporter.otlp.
@@ -370,7 +371,7 @@ if(BUILD_TESTING)
       opentelemetry_metrics
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
+      protobuf::libprotobuf project_options)
     gtest_add_tests(
       TARGET otlp_http_metric_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -381,7 +382,7 @@ if(BUILD_TESTING)
     target_link_libraries(
       otlp_http_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_http_metric opentelemetry_metrics)
+      opentelemetry_exporter_otlp_http_metric opentelemetry_metrics project_options)
     gtest_add_tests(
       TARGET otlp_http_metric_exporter_factory_test
       TEST_PREFIX exporter.otlp.

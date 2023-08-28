@@ -10,11 +10,11 @@ if(WITH_HTTP_CLIENT_CURL)
 
   if(TARGET CURL::libcurl)
     target_link_libraries(${FILENAME} opentelemetry_http_client_curl
-                          opentelemetry_common CURL::libcurl)
+                          opentelemetry_common CURL::libcurl project_options)
   else()
     include_directories(${CURL_INCLUDE_DIRS})
     target_link_libraries(${FILENAME} ${CURL_LIBRARIES}
-                          opentelemetry_http_client_curl opentelemetry_common)
+                          opentelemetry_http_client_curl opentelemetry_common project_options)
   endif()
   gtest_add_tests(
     TARGET ${FILENAME}
@@ -25,7 +25,7 @@ endif()
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
 target_link_libraries(${URL_PARSER_FILENAME} ${GTEST_BOTH_LIBRARIES}
-                      ${CMAKE_THREAD_LIBS_INIT})
+                      ${CMAKE_THREAD_LIBS_INIT} project_options)
 gtest_add_tests(
   TARGET ${URL_PARSER_FILENAME}
   TEST_PREFIX ext.http.urlparser.

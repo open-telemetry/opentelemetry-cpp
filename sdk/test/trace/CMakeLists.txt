@@ -20,7 +20,8 @@ foreach(
     opentelemetry_common
     opentelemetry_trace
     opentelemetry_resources
-    opentelemetry_exporter_in_memory)
+    opentelemetry_exporter_in_memory
+    project_options)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX trace.
@@ -32,5 +33,6 @@ if(WITH_BENCHMARK)
   target_link_libraries(
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_trace opentelemetry_resources
-    opentelemetry_exporter_in_memory)
+    opentelemetry_exporter_in_memory
+    project_options)
 endif()

@@ -38,12 +38,12 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     in_memory_span_data_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_in_memory opentelemetry_resources)
+    opentelemetry_exporter_in_memory opentelemetry_resources project_options)
 
   target_link_libraries(
     in_memory_span_exporter_test ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_in_memory
-    opentelemetry_resources)
+    opentelemetry_resources project_options)
 
   gtest_add_tests(
     TARGET in_memory_span_data_test

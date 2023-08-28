@@ -17,7 +17,7 @@ set_target_version(opentelemetry_exporter_zipkin_trace)
 target_link_libraries(
   opentelemetry_exporter_zipkin_trace
   PUBLIC opentelemetry_trace opentelemetry_http_client_curl
-         nlohmann_json::nlohmann_json)
+         nlohmann_json::nlohmann_json project_options)
 
 if(OPENTELEMETRY_INSTALL)
   install(
@@ -42,7 +42,7 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     zipkin_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+    opentelemetry_exporter_zipkin_trace opentelemetry_resources project_options)
 
   gtest_add_tests(
     TARGET zipkin_recordable_test
@@ -64,7 +64,7 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     zipkin_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+    ${GMOCK_LIB} opentelemetry_exporter_zipkin_trace opentelemetry_resources project_options)
 
   gtest_add_tests(
     TARGET zipkin_exporter_test
