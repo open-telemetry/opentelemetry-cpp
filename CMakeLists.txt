@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.14)
 
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
@@ -144,7 +144,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
       set(CMAKE_CXX_STANDARD 17)
     endif()
   else()
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 11)
   endif()
 endif()
 
