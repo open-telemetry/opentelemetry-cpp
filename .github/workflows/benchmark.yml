@@ -25,12 +25,12 @@ jobs:
           key: bazel_benchmark
       - name: setup
         run: |
-          sudo -E ./ci/setup_cmake.sh
-          sudo -E ./ci/setup_ci_environment.sh
+          sudo ./ci/setup_ci_environment.sh
+          sudo ./ci/install_bazelisk.sh
       - name: Run benchmark
         id: run_benchmarks
         run: |
-          CC=/usr/bin/gcc-10 CXX=/usr/bin/g++-10 ci/do_ci.sh bazel.benchmark
+          ./ci/do_ci.sh bazel.benchmark
           mkdir -p benchmarks
           mv api-benchmark_result.json benchmarks
           mv sdk-benchmark_result.json benchmarks

@@ -25,7 +25,7 @@ function run_benchmarks
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   mkdir -p $BENCHMARK_DIR
-  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -321,6 +321,18 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
+  exit 0
+elif [[ "$1" == "cmake.install.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_ABSEIL=ON \
+        "${SRC_DIR}"
+  make -j $(nproc)
+  sudo make install
   exit 0
 elif [[ "$1" == "bazel.with_abseil" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
