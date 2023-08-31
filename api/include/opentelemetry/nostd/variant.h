@@ -5,7 +5,7 @@
 
 #include "opentelemetry/version.h"
 
-#ifdef HAVE_CPP_STDLIB
+#if OPENTELEMETRY_STL_VERSION >= 2017
 #  include "opentelemetry/std/variant.h"
 #else
 

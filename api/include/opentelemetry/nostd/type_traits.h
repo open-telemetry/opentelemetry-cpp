@@ -3,7 +3,7 @@
 
 #pragma once
 
-#ifdef HAVE_CPP_STDLIB
+#if OPENTELEMETRY_STL_VERSION >= 2011
 #  include "opentelemetry/std/type_traits.h"
 #else
 #  include <array>
@@ -154,4 +154,4 @@ struct is_trivially_move_assignable
 #  endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_STL_VERSION >= 2011 */

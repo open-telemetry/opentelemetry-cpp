@@ -122,42 +122,6 @@ option(WITH_GSL
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
-if(WITH_STL STREQUAL "OFF")
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=0)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 11)
-  endif()
-  # STL not used.
-elseif(WITH_STL STREQUAL "CXX11")
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=2011)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 11)
-  endif()
-elseif(WITH_STL STREQUAL "CXX14")
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=2014)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 14)
-  endif()
-elseif(WITH_STL STREQUAL "CXX17")
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=2017)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
-elseif(WITH_STL STREQUAL "CXX20")
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=2020)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 20)
-  endif()
-elseif(WITH_STL STREQUAL "ON")
-  # "ON" corresponds to "CXX20" at this time.
-  add_definitions(-DOPENTELEMETRY_STL_VERSION=2020)
-  if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 20)
-  endif()
-else()
-  message(FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17 or CXX20")
-endif()
-
 set(OPENTELEMETRY_INSTALL_default ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   set(OPENTELEMETRY_INSTALL_default OFF)
@@ -166,21 +130,6 @@ option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
        ${OPENTELEMETRY_INSTALL_default})
 
 include("${PROJECT_SOURCE_DIR}/cmake/tools.cmake")
-
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-  if(NOT WITH_STL STREQUAL "OFF")
-    # Require at least C++17. C++20 is needed to avoid gsl::span
-    if(CMAKE_VERSION VERSION_GREATER 3.11.999)
-      # Ask for 20, may get anything below
-      set(CMAKE_CXX_STANDARD 20)
-    else()
-      # Ask for 17, may get anything below
-      set(CMAKE_CXX_STANDARD 17)
-    endif()
-  else()
-    set(CMAKE_CXX_STANDARD 11)
-  endif()
-endif()
 
 if(NOT WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
