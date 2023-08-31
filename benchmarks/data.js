@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693496459167,
+  "lastUpdate": 1693496461038,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -100564,6 +100564,54 @@ window.BENCHMARK_DATA = {
             "value": 1825251.5373341849,
             "unit": "ns/iter",
             "extra": "iterations: 341\ncpu: 378931.96480938414 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "marc.alff@oracle.com",
+            "name": "Marc Alff",
+            "username": "marcalff"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f52ec6caded074437658643566bed0d83152a78a",
+          "message": "[SDK] Increase metric name maximum length from 63 to 255 characters (#2284)",
+          "timestamp": "2023-08-31T17:17:26+02:00",
+          "tree_id": "8e21b6d9727443e6e0995bd5cc66eacc8e9e5444",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/f52ec6caded074437658643566bed0d83152a78a"
+        },
+        "date": 1693496455419,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 188.30790962140586,
+            "unit": "ns/iter",
+            "extra": "iterations: 970000\ncpu: 142.70742268041238 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 217.77565733542582,
+            "unit": "ns/iter",
+            "extra": "iterations: 647000\ncpu: 216.75780525502324 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 910.0451702024878,
+            "unit": "ns/iter",
+            "extra": "iterations: 164000\ncpu: 872.5457317073173 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2651610.5136732114,
+            "unit": "ns/iter",
+            "extra": "iterations: 274\ncpu: 505738.68613138667 ns\nthreads: 1"
           }
         ]
       }
