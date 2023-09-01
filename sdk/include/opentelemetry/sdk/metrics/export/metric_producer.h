@@ -31,7 +31,7 @@ namespace metrics
  */
 struct ScopeMetrics
 {
-  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_ = nullptr;
   std::vector<MetricData> metric_data_;
 };
 

@@ -27,6 +27,9 @@ Increment the:
   [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
 * [REMOVAL] Drop C++11 support
   [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
+* [EXPORTER] Add otel_scope_name and otel_scope_version labels to the prometheus
+  exporter.
+  [#2293](https://github.com/open-telemetry/opentelemetry-cpp/pull/2293)
 
 Important changes:
 
