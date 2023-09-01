@@ -44,6 +44,8 @@ private:
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 
+  static inline bool endsWith(std::string const &value, std::string const &ending);
+
   /**
    * Translate the OTel metric type to Prometheus metric type
    */

@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add _total suffixes to Prometheus counters
+  [#2288](https://github.com/open-telemetry/opentelemetry-cpp/pull/2288)
+
 ## [1.11.0] 2023-08-21
 
 * [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build

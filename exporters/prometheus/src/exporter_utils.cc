@@ -38,24 +38,37 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      auto origin_name = metric_data.instrument_descriptor.name_;
-      auto unit        = metric_data.instrument_descriptor.unit_;
-      auto sanitized   = SanitizeNames(origin_name);
+      if (metric_data.point_data_attr_.empty())
+      {
+        continue;
+      }
       prometheus_client::MetricFamily metric_family;
+      auto front        = metric_data.point_data_attr_.front();
+      auto kind         = getAggregationType(front.point_data);
+      bool is_monotonic = true;
+      if (kind == sdk::metrics::AggregationType::kSum)
+      {
+        is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
+      }
+      auto type          = TranslateType(kind, is_monotonic);
+      metric_family.type = type;
+      auto origin_name   = metric_data.instrument_descriptor.name_;
+      auto unit          = metric_data.instrument_descriptor.unit_;
+      auto sanitized     = SanitizeNames(origin_name);
+      if (type == prometheus_client::MetricType::Counter && endsWith(sanitized, "_total"))
+      {
+        // trim _total from counters, since it will be appended after the unit.
+        sanitized = sanitized.substr(0, sanitized.length() - sizeof("_total"));
+      }
       metric_family.name = sanitized + "_" + unit;
+      if (type == prometheus_client::MetricType::Counter)
+      {
+        metric_family.name += "_total";
+      }
       metric_family.help = metric_data.instrument_descriptor.description_;
       auto time          = metric_data.end_ts.time_since_epoch();
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
-        auto kind         = getAggregationType(point_data_attr.point_data);
-        bool is_monotonic = true;
-        if (kind == sdk::metrics::AggregationType::kSum)
-        {
-          is_monotonic =
-              nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
-        }
-        const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-        metric_family.type                       = type;
         if (type == prometheus_client::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
@@ -119,6 +132,13 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     }
   }
   return output;
+}
+
+inline bool PrometheusExporterUtils::endsWith(std::string const &value, std::string const &ending)
+{
+  if (ending.size() > value.size())
+    return false;
+  return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 /**

@@ -38,9 +38,9 @@ void assert_basic(prometheus_client::MetricFamily &metric,
                   int label_num,
                   std::vector<T> vals)
 {
-  ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
-  ASSERT_EQ(metric.help, description);               // description not changed
-  ASSERT_EQ(metric.type, type);                      // type translated
+  ASSERT_EQ(metric.name, sanitized_name);  // name sanitized
+  ASSERT_EQ(metric.help, description);     // description not changed
+  ASSERT_EQ(metric.type, type);            // type translated
 
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
@@ -114,8 +114,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 1,
-               vals);
+  assert_basic(metric1, "library_name_unit_total", "description",
+               prometheus_client::MetricType::Counter, 1, vals);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
@@ -127,7 +127,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
+  assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 1,
                vals);
 }
 
@@ -140,8 +140,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 1,
-               vals);
+  assert_basic(metric, "library_name_unit", "description", prometheus_client::MetricType::Histogram,
+               1, vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
 
