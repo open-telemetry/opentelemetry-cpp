@@ -185,7 +185,8 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
-option(WITH_ZPAGES "DEPRECATED - Whether to include the Zpages Server in the SDK" OFF)
+option(WITH_ZPAGES
+       "DEPRECATED - Whether to include the Zpages Server in the SDK" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 

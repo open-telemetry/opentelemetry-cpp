@@ -157,8 +157,8 @@ N/A
 
 * Version: 1.11.0
 * Date: 2023-09-01
-* PR: [DEPRECATION] Deprecate the ZPages exporter
-  [#xxxx](https://github.com/open-telemetry/opentelemetry-cpp/pull/xxxx)
+* PR: [DEPRECATION] Deprecate ZPAGES
+  [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
 
 #### Motivation (ZPages)
 
