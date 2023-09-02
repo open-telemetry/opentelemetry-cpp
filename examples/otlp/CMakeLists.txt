@@ -35,18 +35,16 @@ if(WITH_OTLP_GRPC)
 
   # LOG
 
-  if(WITH_LOGS_PREVIEW)
-    add_executable(example_otlp_grpc_log grpc_log_main.cc)
+  add_executable(example_otlp_grpc_log grpc_log_main.cc)
 
-    target_link_libraries(example_otlp_grpc_log ${CMAKE_THREAD_LIBS_INIT}
-                          common_logs_foo_library)
-    if(DEFINED OPENTELEMETRY_BUILD_DLL)
-      target_link_libraries(example_otlp_grpc_log opentelemetry_cpp)
-    else()
-      target_link_libraries(
-        example_otlp_grpc_log opentelemetry_trace opentelemetry_logs
-        opentelemetry_exporter_otlp_grpc opentelemetry_exporter_otlp_grpc_log)
-    endif()
+  target_link_libraries(example_otlp_grpc_log ${CMAKE_THREAD_LIBS_INIT}
+                        common_logs_foo_library)
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_grpc_log opentelemetry_cpp)
+  else()
+    target_link_libraries(
+      example_otlp_grpc_log opentelemetry_trace opentelemetry_logs
+      opentelemetry_exporter_otlp_grpc opentelemetry_exporter_otlp_grpc_log)
   endif()
 endif()
 
@@ -75,20 +73,18 @@ if(WITH_OTLP_HTTP)
 
   # LOG
 
-  if(WITH_LOGS_PREVIEW)
-    add_executable(example_otlp_http_log http_log_main.cc)
-    target_link_libraries(example_otlp_http_log ${CMAKE_THREAD_LIBS_INIT}
-                          common_logs_foo_library)
+  add_executable(example_otlp_http_log http_log_main.cc)
+  target_link_libraries(example_otlp_http_log ${CMAKE_THREAD_LIBS_INIT}
+                        common_logs_foo_library)
 
-    if(DEFINED OPENTELEMETRY_BUILD_DLL)
-      target_link_libraries(example_otlp_http_log opentelemetry_cpp
-                            opentelemetry_common)
-    else()
-      target_link_libraries(
-        example_otlp_http_log common_logs_foo_library opentelemetry_trace
-        opentelemetry_logs opentelemetry_exporter_otlp_http
-        opentelemetry_exporter_otlp_http_log)
-    endif()
-
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_http_log opentelemetry_cpp
+                          opentelemetry_common)
+  else()
+    target_link_libraries(
+      example_otlp_http_log common_logs_foo_library opentelemetry_trace
+      opentelemetry_logs opentelemetry_exporter_otlp_http
+      opentelemetry_exporter_otlp_http_log)
   endif()
+
 endif()

@@ -1,28 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <memory>
 
-#  include <chrono>
-#  include <memory>
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
 // clang-format off
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -106,5 +104,3 @@ bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

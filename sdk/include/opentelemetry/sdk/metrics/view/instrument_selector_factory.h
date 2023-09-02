@@ -19,7 +19,8 @@ class InstrumentSelectorFactory
 public:
   static std::unique_ptr<InstrumentSelector> Create(
       opentelemetry::sdk::metrics::InstrumentType instrument_type,
-      opentelemetry::nostd::string_view name);
+      opentelemetry::nostd::string_view name,
+      opentelemetry::nostd::string_view unit);
 };
 
 }  // namespace metrics

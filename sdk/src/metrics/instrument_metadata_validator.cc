@@ -17,8 +17,8 @@ namespace sdk
 {
 namespace metrics
 {
-// instrument-name = ALPHA 0*62 ("_" / "." / "-" / ALPHA / DIGIT)
-const std::string kInstrumentNamePattern = "[a-zA-Z][-_.a-zA-Z0-9]{0,62}";
+// instrument-name = ALPHA 0*254 ("_" / "." / "-" / ALPHA / DIGIT)
+const std::string kInstrumentNamePattern = "[a-zA-Z][-_.a-zA-Z0-9]{0,254}";
 //
 const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 // instrument-unit = It can have a maximum length of 63 ASCII chars
@@ -38,8 +38,8 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
   return std::regex_match(name.data(), name_reg_key_);
 #else
-  const size_t kMaxSize = 63;
-  // size atmost 63 chars
+  const size_t kMaxSize = 255;
+  // size atmost 255 chars
   if (name.size() > kMaxSize)
   {
     return false;

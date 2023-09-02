@@ -18,6 +18,9 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+# Prefer cmake CONFIG to auto resolve dependencies.
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -125,6 +128,8 @@ endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
        ${OPENTELEMETRY_INSTALL_default})
 
+include("${PROJECT_SOURCE_DIR}/cmake/tools.cmake")
+
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   if(WITH_STL)
     # Require at least C++17. C++20 is needed to avoid gsl::span
@@ -214,12 +219,6 @@ set(OTELCPP_PROTO_PATH
     CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
-  if(BUILD_TESTING)
-    if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
-    endif()
-  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 endif(WIN32)
 
@@ -242,7 +241,10 @@ option(
 
 option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
 
-option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+if(DEFINED WITH_LOGS_PREVIEW)
+  message(WARNING "WITH_LOGS_PREVIEW is removed because logs signal is stable")
+endif()
+
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
 # EXPERIMENTAL
@@ -343,9 +345,21 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
+if(WITH_ABSEIL)
+  find_package(absl CONFIG REQUIRED)
+endif()
+
 if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
-  set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
+  if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
+    if(NOT WITH_ABSEIL)
+      message(
+        FATAL_ERROR
+          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
+      )
+    endif()
+  endif()
+
   if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
@@ -375,10 +389,14 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
         )
       endif()
     endif()
-    # Latest Protobuf uses mixed case instead of uppercase
-    if(Protobuf_PROTOC_EXECUTABLE)
-      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
-    endif()
+  endif()
+  # Latest Protobuf imported targets and without legacy module support
+  if(TARGET protobuf::protoc)
+    project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
+                                              protobuf::protoc)
+  elseif(Protobuf_PROTOC_EXECUTABLE)
+    # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
+    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   include(CMakeDependentOption)
 
@@ -527,10 +545,14 @@ if(BUILD_TESTING)
     set(GTEST_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    set(GTEST_BOTH_LIBRARIES
-        ${CMAKE_BINARY_DIR}/lib/libgtest.a
-        ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-        ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    if(TARGET gtest)
+      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
+    else()
+      set(GTEST_BOTH_LIBRARIES
+          ${CMAKE_BINARY_DIR}/lib/libgtest.a
+          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
+          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
@@ -543,7 +565,17 @@ if(BUILD_TESTING)
     # Prefer GTest installed by OS distro, brew or vcpkg package manager
     find_package(GTest REQUIRED)
   endif()
-  include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  if(NOT GTEST_BOTH_LIBRARIES)
+    # New GTest package names
+    if(TARGET GTest::gtest)
+      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+    elseif(TARGET GTest::GTest)
+      set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
+    endif()
+  endif()
+  if(GTEST_INCLUDE_DIRS)
+    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  endif()
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()

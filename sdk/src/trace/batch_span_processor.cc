@@ -31,13 +31,7 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
-{
-  synchronization_data_->is_force_wakeup_background_worker.store(false);
-  synchronization_data_->is_force_flush_pending.store(false);
-  synchronization_data_->is_force_flush_notified.store(false);
-  synchronization_data_->force_flush_timeout_us.store(0);
-  synchronization_data_->is_shutdown.store(false);
-}
+{}
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
 {
