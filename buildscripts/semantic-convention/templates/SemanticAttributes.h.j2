@@ -39,6 +39,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -59,13 +60,13 @@ static constexpr const char *kSchemaUrl = "{{schemaUrl}}";
  * <p>Notes:
   <ul> {{attribute.note | render_markdown(code="{{@code {0}}}", paragraph="<li>{0}</li>", list="{0}")}} </ul>
   {%- endif %}
-{%- if attribute.deprecated %}
+{%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
  *
- * @deprecated {{attribute.deprecated | to_doc_brief}}.
+ * @deprecated {{attribute.brief | to_doc_brief}}.
   {%- endif %}
  */
-  {%- if attribute.deprecated %}
-@Deprecated
+  {%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
+OPENTELEMETRY_DEPRECATED
   {%- endif %}
 static constexpr const char *k{{attribute.fqn | to_camelcase(True)}} = "{{attribute.fqn}}";
 {%- endfor %}
