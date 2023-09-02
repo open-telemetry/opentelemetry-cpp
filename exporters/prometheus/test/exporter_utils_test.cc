@@ -140,9 +140,9 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
   metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
+  ASSERT_EQ(translated.size(), 1);
 
-  auto metric1          = translated[0];
+  auto metric1          = translated.begin()->second;
   std::vector<int> vals = {10};
   assert_basic(metric1, "library_name_unit_total", "description",
                prometheus_client::MetricType::Counter, 1, vals);
@@ -153,9 +153,9 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
   metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
+  ASSERT_EQ(translated.size(), 1);
 
-  auto metric1          = translated[0];
+  auto metric1          = translated.begin()->second;
   std::vector<int> vals = {10};
   assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 1,
                vals);
@@ -166,9 +166,9 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   metric_sdk::ResourceMetrics metrics_data = CreateHistogramPointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 2);
+  ASSERT_EQ(translated.size(), 1);
 
-  auto metric              = translated[0];
+  auto metric              = translated.begin()->second;
   std::vector<double> vals = {3, 900.5, 4};
   assert_basic(metric, "library_name_unit", "description", prometheus_client::MetricType::Histogram,
                1, vals);
@@ -204,11 +204,11 @@ TEST(PrometheusExporterUtils, PrometheusUnit)
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MBy"), "megabytes");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GBy"), "gigabytes");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TBy"), "terabytes");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("B"), "bytes");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("KB"), "kilobytes");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MB"), "megabytes");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GB"), "gigabytes");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TB"), "terabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("By"), "bytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("KBy"), "kilobytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MBy"), "megabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GBy"), "gigabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TBy"), "terabytes");
 
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("m"), "meters");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("V"), "volts");
@@ -221,7 +221,6 @@ TEST(PrometheusExporterUtils, PrometheusUnit)
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("Hz"), "hertz");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("1"), "");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("%"), "percent");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("$"), "dollars");
 }
 
 TEST(PrometheusExporterUtils, PrometheusPerUnit)
@@ -289,6 +288,9 @@ TEST(PrometheusExporterUtils, MapToPrometheusName)
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
                 "name", "unit", prometheus_client::MetricType::Counter),
             "name_unit_total");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
+                "name", "total_unit", prometheus_client::MetricType::Counter),
+            "name_total_unit_total");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
                 "name", "unit", prometheus_client::MetricType::Gauge),
             "name_unit");

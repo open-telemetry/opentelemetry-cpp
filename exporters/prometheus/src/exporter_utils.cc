@@ -29,33 +29,43 @@ namespace metrics
  * @param records a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
-std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
-    const sdk::metrics::ResourceMetrics &data)
+std::map<std::string, prometheus_client::MetricFamily>
+PrometheusExporterUtils::TranslateToPrometheus(const sdk::metrics::ResourceMetrics &data)
 {
 
   // initialize output vector
-  std::vector<prometheus_client::MetricFamily> output;
+  std::map<std::string, prometheus_client::MetricFamily> output;
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      auto time = metric_data.end_ts.time_since_epoch();
+      if (metric_data.point_data_attr_.empty())
+      {
+        continue;
+      }
+      auto time         = metric_data.end_ts.time_since_epoch();
+      auto front        = metric_data.point_data_attr_.front();
+      auto kind         = getAggregationType(front.point_data);
+      bool is_monotonic = true;
+      if (kind == sdk::metrics::AggregationType::kSum)
+      {
+        is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
+      }
+      const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
+      auto mf_name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
+                                         metric_data.instrument_descriptor.unit_, type);
+      auto [mf, is_new_family] =
+          output.emplace(std::make_pair(mf_name, prometheus_client::MetricFamily{}));
+      auto *metric_family = &mf->second;
+      if (is_new_family)
+      {
+        metric_family->name = mf_name;
+        metric_family->type = type;
+        metric_family->help = metric_data.instrument_descriptor.description_;
+      }
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
-        auto kind         = getAggregationType(point_data_attr.point_data);
-        bool is_monotonic = true;
-        if (kind == sdk::metrics::AggregationType::kSum)
-        {
-          is_monotonic =
-              nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
-        }
-        const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-        prometheus_client::MetricFamily metric_family;
-        metric_family.type = type;
-        metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
-                                                 metric_data.instrument_descriptor.unit_, type);
-        metric_family.help = metric_data.instrument_descriptor.description_;
         if (type == prometheus_client::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
@@ -72,7 +82,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, time, &metric_family);
+                  point_data_attr.attributes, time, metric_family);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -82,14 +92,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, metric_family);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, metric_family);
           }
           else
           {
@@ -105,7 +115,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, metric_family);
           }
           else
           {
@@ -114,7 +124,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 "invalid SumPointData type");
           }
         }
-        output.emplace_back(metric_family);
       }
     }
   }
@@ -207,11 +216,11 @@ std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_a
                                                   {"MBy", "megabytes"},
                                                   {"GBy", "gigabytes"},
                                                   {"TBy", "terabytes"},
-                                                  {"B", "bytes"},
-                                                  {"KB", "kilobytes"},
-                                                  {"MB", "megabytes"},
-                                                  {"GB", "gigabytes"},
-                                                  {"TB", "terabytes"},
+                                                  {"By", "bytes"},
+                                                  {"KBy", "kilobytes"},
+                                                  {"MBy", "megabytes"},
+                                                  {"GBy", "gigabytes"},
+                                                  {"TBy", "terabytes"},
                                                   // SI
                                                   {"m", "meters"},
                                                   {"V", "volts"},
@@ -223,8 +232,7 @@ std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_a
                                                   {"Cel", "celsius"},
                                                   {"Hz", "hertz"},
                                                   {"1", ""},
-                                                  {"%", "percent"},
-                                                  {"$", "dollars"}};
+                                                  {"%", "percent"}};
   auto res_it = units.find(unit_abbreviation);
   if (res_it == units.end())
   {
@@ -254,13 +262,13 @@ std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string
 std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
     const std::string &rate_expressed_unit)
 {
-  if (rate_expressed_unit.find("/") == std::string::npos)
+  size_t pos = rate_expressed_unit.find("/");
+  if (pos == std::string::npos)
   {
     return rate_expressed_unit;
   }
 
   std::vector<std::string> rate_entities;
-  size_t pos = rate_expressed_unit.find("/");
   rate_entities.push_back(rate_expressed_unit.substr(0, pos));
   rate_entities.push_back(rate_expressed_unit.substr(pos + 1));
 
@@ -301,10 +309,14 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
   }
 
   // Special case - counter
-  if (prometheus_type == prometheus_client::MetricType::Counter &&
-      sanitized_name.find("total") == std::string::npos)
+  if (prometheus_type == prometheus_client::MetricType::Counter)
   {
-    sanitized_name += "_total";
+    auto t_pos           = sanitized_name.rfind("_total");
+    bool ends_with_total = t_pos == sanitized_name.size() - 6;
+    if (!ends_with_total)
+    {
+      sanitized_name += "_total";
+    }
   }
 
   // Special case - gauge

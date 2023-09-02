@@ -28,7 +28,7 @@ public:
    * @param records a collection of metrics in OpenTelemetry
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
-  static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
+  static std::map<std::string, ::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data);
 
 private:
