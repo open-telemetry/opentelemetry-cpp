@@ -130,7 +130,6 @@ private:
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   opentelemetry::common::SpinLockMutex storage_lock_;
-  const InstrumentMetaDataValidator instrument_metadata_validator;
 
   static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
   GetNoopObservableInsrument()
