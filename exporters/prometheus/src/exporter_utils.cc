@@ -55,10 +55,9 @@ PrometheusExporterUtils::TranslateToPrometheus(const sdk::metrics::ResourceMetri
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
       auto mf_name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
                                          metric_data.instrument_descriptor.unit_, type);
-      auto [mf, is_new_family] =
-          output.emplace(std::make_pair(mf_name, prometheus_client::MetricFamily{}));
-      auto *metric_family = &mf->second;
-      if (is_new_family)
+      auto emp_res = output.emplace(std::make_pair(mf_name, prometheus_client::MetricFamily{}));
+      auto *metric_family = &emp_res.first->second;
+      if (emp_res.second)
       {
         metric_family->name = mf_name;
         metric_family->type = type;
