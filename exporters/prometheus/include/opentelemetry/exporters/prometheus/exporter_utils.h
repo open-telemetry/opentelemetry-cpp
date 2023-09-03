@@ -5,8 +5,10 @@
 
 #include <prometheus/metric_family.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/version.h"
 
@@ -28,7 +30,7 @@ public:
    * @param records a collection of metrics in OpenTelemetry
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
-  static std::map<std::string, ::prometheus::MetricFamily> TranslateToPrometheus(
+  static std::unordered_map<nostd::string_view, ::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data);
 
 private:

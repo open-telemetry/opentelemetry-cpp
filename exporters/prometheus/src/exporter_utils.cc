@@ -29,12 +29,12 @@ namespace metrics
  * @param records a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
-std::map<std::string, prometheus_client::MetricFamily>
+std::unordered_map<nostd::string_view, prometheus_client::MetricFamily>
 PrometheusExporterUtils::TranslateToPrometheus(const sdk::metrics::ResourceMetrics &data)
 {
 
   // initialize output vector
-  std::map<std::string, prometheus_client::MetricFamily> output;
+  std::unordered_map<nostd::string_view, prometheus_client::MetricFamily> output;
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
