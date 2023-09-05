@@ -177,7 +177,8 @@ code in opentelemetry-cpp.
 
 The following are deprecated and planned for removal:
 
-* all the API headers located under `ext/include/opentelemetry/ext/zpages/`, including:
+* all the API headers located under
+  `ext/include/opentelemetry/ext/zpages/`, including:
   * the C++ class `ThreadsafeSpanData`
   * the C++ class `TracezDataAggregator`
   * the C++ class `TracezHttpServer`
@@ -191,9 +192,11 @@ The following are deprecated and planned for removal:
 * the zpages build options in CMake (`WITH_ZPAGES`)
 
 The following code is no longer considered public, will no longer be
-installed, and will no longer be useable outside of the opentelemetry-cpp implementation:
+installed, and will no longer be useable outside of
+the opentelemetry-cpp implementation:
 
-* all the API headers located under `ext/include/opentelemetry/ext/http/server`, including:
+* all the API headers located under
+  `ext/include/opentelemetry/ext/http/server`, including:
   * the C++ class `FileHttpServer`
   * the C++ class `HttpRequestCallback`
   * the C++ class `HttpServer`
