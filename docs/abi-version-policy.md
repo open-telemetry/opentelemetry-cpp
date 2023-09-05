@@ -306,7 +306,7 @@ opentelemetry-cpp produces a library for ABI v1 by default.
 
 Fixes introducing breaking changes can __not__ be delivered.
 
-This is the current status as of opentelemetry-cpp version 1.9.1
+This is the current status as of opentelemetry-cpp version 1.11.0
 
 ### STABLE V1, EXPERIMENTAL V2
 
