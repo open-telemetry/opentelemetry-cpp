@@ -13,7 +13,7 @@ jobs:
     name: Run OpenTelemetry-cpp benchmarks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Mount Bazel Cache
@@ -47,7 +47,7 @@ jobs:
     name: Store benchmark result
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@master
         with:
           name: benchmark_results
