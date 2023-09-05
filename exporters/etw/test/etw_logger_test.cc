@@ -1,15 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  ifdef _WIN32
+#ifdef _WIN32
 
-#    include <gtest/gtest.h>
-#    include <map>
-#    include <string>
+#  include <gtest/gtest.h>
+#  include <map>
+#  include <string>
 
-#    include "opentelemetry/exporters/etw/etw_logger_exporter.h"
-#    include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/exporters/etw/etw_logger_exporter.h"
+#  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -99,5 +98,4 @@ TEST(ETWLogger, LoggerCheckWithAttributes)
                                         opentelemetry::common::MakeAttributes(attribs)));
 }
 
-#  endif  // _WIN32
-#endif    // ENABLE_LOGS_PREVIEW
+#endif  // _WIN32

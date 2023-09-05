@@ -3,11 +3,10 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include <iostream>
-#  include <memory>
+#include <iostream>
+#include <memory>
 
-#  include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/sdk/version/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -43,4 +42,3 @@ public:
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

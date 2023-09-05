@@ -3,13 +3,11 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <algorithm>
 
-#  include <algorithm>
-
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -37,4 +35,3 @@ public:
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif

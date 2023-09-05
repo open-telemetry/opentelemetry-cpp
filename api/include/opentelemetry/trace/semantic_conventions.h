@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -21,7 +22,222 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.20.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.21.0";
+
+/**
+ * Client address - unix domain socket name, IPv4 or IPv6 address.
+ *
+ * <p>Notes:
+  <ul> <li>When observed from the server side, and when communicating through an intermediary,
+ {@code client.address} SHOULD represent client address behind any intermediaries (e.g. proxies) if
+ it's available.</li> </ul>
+ */
+static constexpr const char *kClientAddress = "client.address";
+
+/**
+ * Client port number
+ *
+ * <p>Notes:
+  <ul> <li>When observed from the server side, and when communicating through an intermediary,
+ {@code client.port} SHOULD represent client port behind any intermediaries (e.g. proxies) if it's
+ available.</li> </ul>
+ */
+static constexpr const char *kClientPort = "client.port";
+
+/**
+ * Immediate client peer address - unix domain socket name, IPv4 or IPv6 address.
+ */
+static constexpr const char *kClientSocketAddress = "client.socket.address";
+
+/**
+ * Immediate client peer port number
+ */
+static constexpr const char *kClientSocketPort = "client.socket.port";
+
+/**
+ * Deprecated, use {@code http.request.method} instead.
+ *
+ * @deprecated Deprecated, use `http.request.method` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpMethod = "http.method";
+
+/**
+ * Deprecated, use {@code http.response.status_code} instead.
+ *
+ * @deprecated Deprecated, use `http.response.status_code` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpStatusCode = "http.status_code";
+
+/**
+ * Deprecated, use {@code url.scheme} instead.
+ *
+ * @deprecated Deprecated, use `url.scheme` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpScheme = "http.scheme";
+
+/**
+ * Deprecated, use {@code url.full} instead.
+ *
+ * @deprecated Deprecated, use `url.full` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpUrl = "http.url";
+
+/**
+ * Deprecated, use {@code url.path} and {@code url.query} instead.
+ *
+ * @deprecated Deprecated, use `url.path` and `url.query` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpTarget = "http.target";
+
+/**
+ * Deprecated, use {@code http.request.body.size} instead.
+ *
+ * @deprecated Deprecated, use `http.request.body.size` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
+
+/**
+ * Deprecated, use {@code http.response.body.size} instead.
+ *
+ * @deprecated Deprecated, use `http.response.body.size` instead.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
+
+/**
+ * Deprecated, use {@code server.socket.domain} on client spans.
+ *
+ * @deprecated Deprecated, use `server.socket.domain` on client spans.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
+
+/**
+ * Deprecated, use {@code server.socket.address} on client spans and {@code client.socket.address}
+ * on server spans.
+ *
+ * @deprecated Deprecated, use `server.socket.address` on client spans and `client.socket.address`
+ * on server spans.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
+
+/**
+ * Deprecated, use {@code server.socket.port} on client spans and {@code client.socket.port} on
+ * server spans.
+ *
+ * @deprecated Deprecated, use `server.socket.port` on client spans and `client.socket.port` on
+ * server spans.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
+
+/**
+ * Deprecated, use {@code server.address} on client spans and {@code client.address} on server
+ * spans.
+ *
+ * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server
+ * spans.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetPeerName = "net.peer.name";
+
+/**
+ * Deprecated, use {@code server.port} on client spans and {@code client.port} on server spans.
+ *
+ * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetPeerPort = "net.peer.port";
+
+/**
+ * Deprecated, use {@code server.address}.
+ *
+ * @deprecated Deprecated, use `server.address`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetHostName = "net.host.name";
+
+/**
+ * Deprecated, use {@code server.port}.
+ *
+ * @deprecated Deprecated, use `server.port`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetHostPort = "net.host.port";
+
+/**
+ * Deprecated, use {@code server.socket.address}.
+ *
+ * @deprecated Deprecated, use `server.socket.address`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
+
+/**
+ * Deprecated, use {@code server.socket.port}.
+ *
+ * @deprecated Deprecated, use `server.socket.port`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockHostPort = "net.sock.host.port";
+
+/**
+ * Deprecated, use {@code network.transport}.
+ *
+ * @deprecated Deprecated, use `network.transport`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetTransport = "net.transport";
+
+/**
+ * Deprecated, use {@code network.protocol.name}.
+ *
+ * @deprecated Deprecated, use `network.protocol.name`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetProtocolName = "net.protocol.name";
+
+/**
+ * Deprecated, use {@code network.protocol.version}.
+ *
+ * @deprecated Deprecated, use `network.protocol.version`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetProtocolVersion = "net.protocol.version";
+
+/**
+ * Deprecated, use {@code network.transport} and {@code network.type}.
+ *
+ * @deprecated Deprecated, use `network.transport` and `network.type`.
+ */
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kNetSockFamily = "net.sock.family";
+
+/**
+ * The domain name of the destination system.
+ *
+ * <p>Notes:
+  <ul> <li>This value may be a host name, a fully qualified domain name, or another host naming
+ format.</li> </ul>
+ */
+static constexpr const char *kDestinationDomain = "destination.domain";
+
+/**
+ * Peer address, for example IP address or UNIX socket name.
+ */
+static constexpr const char *kDestinationAddress = "destination.address";
+
+/**
+ * Peer port number
+ */
+static constexpr const char *kDestinationPort = "destination.port";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
@@ -42,18 +258,32 @@ static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 
 /**
  * HTTP request method.
+ *
+ * <p>Notes:
+  <ul> <li>HTTP request method value SHOULD be &quot;known&quot; to the instrumentation.
+By default, this convention defines &quot;known&quot; methods as the ones listed in <a
+href="https://www.rfc-editor.org/rfc/rfc9110.html#name-methods">RFC9110</a> and the PATCH method
+defined in <a href="https://www.rfc-editor.org/rfc/rfc5789.html">RFC5789</a>.</li><li>If the HTTP
+request method is not known to instrumentation, it MUST set the {@code http.request.method}
+attribute to {@code _OTHER} and, except if reporting a metric, MUST set the exact method received in
+the request line as value of the {@code http.request.method_original} attribute.</li><li>If the HTTP
+instrumentation could end up converting valid HTTP request methods to {@code _OTHER}, then it MUST
+provide a way to override the list of known HTTP methods. If this override is done via environment
+variable, then the environment variable MUST be named OTEL_INSTRUMENTATION_HTTP_KNOWN_METHODS and
+support a comma-separated list of case-sensitive known HTTP methods (this list MUST be a full
+override of the default known method, it is not a list of known methods in addition to the
+defaults).</li><li>HTTP method names are case-sensitive and {@code http.request.method} attribute
+value MUST match a known HTTP method name exactly. Instrumentations for specific web frameworks that
+consider HTTP methods to be case insensitive, SHOULD populate a canonical equivalent. Tracing
+instrumentations that do so, MUST also set {@code http.request.method_original} to the original
+value.</li> </ul>
  */
-static constexpr const char *kHttpMethod = "http.method";
+static constexpr const char *kHttpRequestMethod = "http.request.method";
 
 /**
  * <a href="https://tools.ietf.org/html/rfc7231#section-6">HTTP response status code</a>.
  */
-static constexpr const char *kHttpStatusCode = "http.status_code";
-
-/**
- * The URI scheme identifying the used protocol.
- */
-static constexpr const char *kHttpScheme = "http.scheme";
+static constexpr const char *kHttpResponseStatusCode = "http.response.status_code";
 
 /**
  * The matched route (path template in the format used by the respective server framework). See note
@@ -62,8 +292,8 @@ below
  * <p>Notes:
   <ul> <li>MUST NOT be populated when this is not supported by the HTTP server framework as the
 route attribute should have low-cardinality and the URI path can NOT substitute it. SHOULD include
-the <a href="/specification/trace/semantic_conventions/http.md#http-server-definitions">application
-root</a> if there is one.</li> </ul>
+the <a href="/docs/http/http-spans.md#http-server-definitions">application root</a> if there is
+one.</li> </ul>
  */
 static constexpr const char *kHttpRoute = "http.route";
 
@@ -91,6 +321,97 @@ values. The id MAY be an <a href="https://github.com/ulid/spec">Universally Uniq
 Sortable Identifier (ULID)</a>, but other identifiers (e.g. UUID) may be used as needed.</li> </ul>
  */
 static constexpr const char *kLogRecordUid = "log.record.uid";
+
+/**
+ * The stream associated with the log. See below for a list of well-known values.
+ */
+static constexpr const char *kLogIostream = "log.iostream";
+
+/**
+ * The basename of the file.
+ */
+static constexpr const char *kLogFileName = "log.file.name";
+
+/**
+ * The full path to the file.
+ */
+static constexpr const char *kLogFilePath = "log.file.path";
+
+/**
+ * The basename of the file, with symlinks resolved.
+ */
+static constexpr const char *kLogFileNameResolved = "log.file.name_resolved";
+
+/**
+ * The full path to the file, with symlinks resolved.
+ */
+static constexpr const char *kLogFilePathResolved = "log.file.path_resolved";
+
+/**
+ * The type of memory.
+ */
+static constexpr const char *kType = "type";
+
+/**
+ * Name of the memory pool.
+ *
+ * <p>Notes:
+  <ul> <li>Pool names are generally obtained via <a
+ href="https://docs.oracle.com/en/java/javase/11/docs/api/java.management/java/lang/management/MemoryPoolMXBean.html#getName()">MemoryPoolMXBean#getName()</a>.</li>
+ </ul>
+ */
+static constexpr const char *kPool = "pool";
+
+/**
+ * Logical server hostname, matches server FQDN if available, and IP or socket address if FQDN is
+ * not known.
+ */
+static constexpr const char *kServerAddress = "server.address";
+
+/**
+ * Logical server port number
+ */
+static constexpr const char *kServerPort = "server.port";
+
+/**
+ * The domain name of an immediate peer.
+ *
+ * <p>Notes:
+  <ul> <li>Typically observed from the client side, and represents a proxy or other intermediary
+ domain name.</li> </ul>
+ */
+static constexpr const char *kServerSocketDomain = "server.socket.domain";
+
+/**
+ * Physical server IP address or Unix socket address. If set from the client, should simply use the
+ * socket's peer address, and not attempt to find any actual server IP (i.e., if set from client,
+ * this may represent some proxy server instead of the logical server).
+ */
+static constexpr const char *kServerSocketAddress = "server.socket.address";
+
+/**
+ * Physical server port.
+ */
+static constexpr const char *kServerSocketPort = "server.socket.port";
+
+/**
+ * The domain name of the source system.
+ *
+ * <p>Notes:
+  <ul> <li>This value may be a host name, a fully qualified domain name, or another host naming
+ format.</li> </ul>
+ */
+static constexpr const char *kSourceDomain = "source.domain";
+
+/**
+ * Source address, for example IP address or Unix socket name.
+ */
+static constexpr const char *kSourceAddress = "source.address";
+
+/**
+ * Source port number
+ */
+static constexpr const char *kSourcePort = "source.port";
 
 /**
  * The full invoked ARN as provided on the {@code Context} passed to the function ({@code
@@ -203,7 +524,7 @@ static constexpr const char *kDbOperation = "db.operation";
  name</a> connecting to. This name is used to determine the port of a named instance.
  *
  * <p>Notes:
-  <ul> <li>If setting a {@code db.mssql.instance_name}, {@code net.peer.port} is no longer required
+  <ul> <li>If setting a {@code db.mssql.instance_name}, {@code server.port} is no longer required
  (but still recommended if non-standard).</li> </ul>
  */
 static constexpr const char *kDbMssqlInstanceName = "db.mssql.instance_name";
@@ -443,117 +764,70 @@ unavailable. String representation of the value should be determined by the impl
 static constexpr const char *kFeatureFlagVariant = "feature_flag.variant";
 
 /**
- * Transport protocol used. See note below.
+ * <a href="https://osi-model.com/transport-layer/">OSI Transport Layer</a> or <a
+ * href="https://en.wikipedia.org/wiki/Inter-process_communication">Inter-process Communication
+ * method</a>. The value SHOULD be normalized to lowercase.
  */
-static constexpr const char *kNetTransport = "net.transport";
+static constexpr const char *kNetworkTransport = "network.transport";
 
 /**
- * Application layer protocol used. The value SHOULD be normalized to lowercase.
+ * <a href="https://osi-model.com/network-layer/">OSI Network Layer</a> or non-OSI equivalent. The
+ * value SHOULD be normalized to lowercase.
  */
-static constexpr const char *kNetProtocolName = "net.protocol.name";
+static constexpr const char *kNetworkType = "network.type";
+
+/**
+ * <a href="https://osi-model.com/application-layer/">OSI Application Layer</a> or non-OSI
+ * equivalent. The value SHOULD be normalized to lowercase.
+ */
+static constexpr const char *kNetworkProtocolName = "network.protocol.name";
 
 /**
  * Version of the application layer protocol used. See note below.
  *
  * <p>Notes:
-  <ul> <li>{@code net.protocol.version} refers to the version of the protocol used and might be
+  <ul> <li>{@code network.protocol.version} refers to the version of the protocol used and might be
  different from the protocol client's version. If the HTTP client used has a version of {@code
  0.27.2}, but sends HTTP version {@code 1.1}, this attribute should be set to {@code 1.1}.</li>
  </ul>
  */
-static constexpr const char *kNetProtocolVersion = "net.protocol.version";
+static constexpr const char *kNetworkProtocolVersion = "network.protocol.version";
 
 /**
- * Remote socket peer name.
+ * The internet connection type.
  */
-static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
-
-/**
- * Remote socket peer address: IPv4 or IPv6 for internet protocols, path for local communication, <a
- * href="https://man7.org/linux/man-pages/man7/address_families.7.html">etc</a>.
- */
-static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
-
-/**
- * Remote socket peer port.
- */
-static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
-
-/**
- * Protocol <a href="https://man7.org/linux/man-pages/man7/address_families.7.html">address
- * family</a> which is used for communication.
- */
-static constexpr const char *kNetSockFamily = "net.sock.family";
-
-/**
- * Logical remote hostname, see note below.
- *
- * <p>Notes:
-  <ul> <li>{@code net.peer.name} SHOULD NOT be set if capturing it would require an extra DNS
- lookup.</li> </ul>
- */
-static constexpr const char *kNetPeerName = "net.peer.name";
-
-/**
- * Logical remote port number
- */
-static constexpr const char *kNetPeerPort = "net.peer.port";
-
-/**
- * Logical local hostname or similar, see note below.
- */
-static constexpr const char *kNetHostName = "net.host.name";
-
-/**
- * Logical local port number, preferably the one that the peer used to connect
- */
-static constexpr const char *kNetHostPort = "net.host.port";
-
-/**
- * Local socket address. Useful in case of a multi-IP host.
- */
-static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
-
-/**
- * Local socket port number.
- */
-static constexpr const char *kNetSockHostPort = "net.sock.host.port";
-
-/**
- * The internet connection type currently being used by the host.
- */
-static constexpr const char *kNetHostConnectionType = "net.host.connection.type";
+static constexpr const char *kNetworkConnectionType = "network.connection.type";
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology
  * connection, but it could be used for describing details about a wifi connection.
  */
-static constexpr const char *kNetHostConnectionSubtype = "net.host.connection.subtype";
+static constexpr const char *kNetworkConnectionSubtype = "network.connection.subtype";
 
 /**
  * The name of the mobile carrier.
  */
-static constexpr const char *kNetHostCarrierName = "net.host.carrier.name";
+static constexpr const char *kNetworkCarrierName = "network.carrier.name";
 
 /**
  * The mobile carrier country code.
  */
-static constexpr const char *kNetHostCarrierMcc = "net.host.carrier.mcc";
+static constexpr const char *kNetworkCarrierMcc = "network.carrier.mcc";
 
 /**
  * The mobile carrier network code.
  */
-static constexpr const char *kNetHostCarrierMnc = "net.host.carrier.mnc";
+static constexpr const char *kNetworkCarrierMnc = "network.carrier.mnc";
 
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  */
-static constexpr const char *kNetHostCarrierIcc = "net.host.carrier.icc";
+static constexpr const char *kNetworkCarrierIcc = "network.carrier.icc";
 
 /**
- * The <a href="../../resource/semantic_conventions/README.md#service">{@code service.name}</a> of
- * the remote service. SHOULD be equal to the actual {@code service.name} resource attribute of the
- * remote service if any.
+ * The <a href="/docs/resource/README.md#service">{@code service.name}</a> of the remote service.
+ * SHOULD be equal to the actual {@code service.name} resource attribute of the remote service if
+ * any.
  */
 static constexpr const char *kPeerService = "peer.service";
 
@@ -621,12 +895,17 @@ static constexpr const char *kCodeLineno = "code.lineno";
 static constexpr const char *kCodeColumn = "code.column";
 
 /**
+ * Original HTTP method sent by the client in the request line.
+ */
+static constexpr const char *kHttpRequestMethodOriginal = "http.request.method_original";
+
+/**
  * The size of the request payload body in bytes. This is the number of bytes transferred excluding
  * headers and is often, but not always, present as the <a
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
+static constexpr const char *kHttpRequestBodySize = "http.request.body.size";
 
 /**
  * The size of the response payload body in bytes. This is the number of bytes transferred excluding
@@ -634,18 +913,7 @@ static constexpr const char *kHttpRequestContentLength = "http.request_content_l
  * href="https://www.rfc-editor.org/rfc/rfc9110.html#field.content-length">Content-Length</a>
  * header. For requests using transport encoding, this should be the compressed size.
  */
-static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
-
-/**
- * Full HTTP request URL in the form {@code scheme://host[:port]/path?query[#fragment]}. Usually the
- fragment is not transmitted over HTTP, but if it is known, it should be included nevertheless.
- *
- * <p>Notes:
-  <ul> <li>{@code http.url} MUST NOT contain credentials passed via URL in form of {@code
- https://username:password@www.example.com/}. In such case the attribute's value should be {@code
- https://www.example.com/}.</li> </ul>
- */
-static constexpr const char *kHttpUrl = "http.url";
+static constexpr const char *kHttpResponseBodySize = "http.response.body.size";
 
 /**
  * The ordinal number of request resending attempt (for any reason, including redirects).
@@ -656,28 +924,6 @@ static constexpr const char *kHttpUrl = "http.url";
  Server Unavailable, network issues, or any other).</li> </ul>
  */
 static constexpr const char *kHttpResendCount = "http.resend_count";
-
-/**
- * The full request target as passed in a HTTP request line or equivalent.
- */
-static constexpr const char *kHttpTarget = "http.target";
-
-/**
- * The IP address of the original client behind all proxies, if known (e.g. from <a
-href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For">X-Forwarded-For</a>).
- *
- * <p>Notes:
-  <ul> <li>This is not necessarily the same as {@code net.sock.peer.addr}, which would
-identify the network-level peer, which may be a proxy.</li><li>This attribute should be set when a
-source of information different from the one used for {@code net.sock.peer.addr}, is available even
-if that other source just confirms the same value as {@code net.sock.peer.addr}. Rationale: For
-{@code net.sock.peer.addr}, one typically does not know if it comes from a proxy, reverse proxy, or
-the actual client. Setting
-{@code http.client_ip} when it's the same as {@code net.sock.peer.addr} means that
-one is at least somewhat confident that the address is not that of
-the closest proxy.</li> </ul>
- */
-static constexpr const char *kHttpClientIp = "http.client_ip";
 
 /**
  * The AWS request ID as returned in the response headers {@code x-amz-request-id} or {@code
@@ -990,39 +1236,6 @@ static constexpr const char *kMessagingDestinationTemporary = "messaging.destina
 static constexpr const char *kMessagingDestinationAnonymous = "messaging.destination.anonymous";
 
 /**
- * The message source name
- *
- * <p>Notes:
-  <ul> <li>Source name SHOULD uniquely identify a specific queue, topic, or other entity within the
-broker. If the broker does not have such notion, the source name SHOULD uniquely identify the
-broker.</li> </ul>
- */
-static constexpr const char *kMessagingSourceName = "messaging.source.name";
-
-/**
- * Low cardinality representation of the messaging source name
- *
- * <p>Notes:
-  <ul> <li>Source names could be constructed from templates. An example would be a source name
- involving a user name or product id. Although the source name in this case is of high cardinality,
- the underlying template is of low cardinality and can be effectively used for grouping and
- aggregation.</li> </ul>
- */
-static constexpr const char *kMessagingSourceTemplate = "messaging.source.template";
-
-/**
- * A boolean that is true if the message source is temporary and might not exist anymore after
- * messages are processed.
- */
-static constexpr const char *kMessagingSourceTemporary = "messaging.source.temporary";
-
-/**
- * A boolean that is true if the message source is anonymous (could be unnamed or have
- * auto-generated name).
- */
-static constexpr const char *kMessagingSourceAnonymous = "messaging.source.anonymous";
-
-/**
  * A string identifying the messaging system.
  */
 static constexpr const char *kMessagingSystem = "messaging.system";
@@ -1049,12 +1262,9 @@ static constexpr const char *kMessagingOperation = "messaging.operation";
 static constexpr const char *kMessagingBatchMessageCount = "messaging.batch.message_count";
 
 /**
- * The identifier for the consumer receiving a message. For Kafka, set it to {@code
- * {messaging.kafka.consumer.group} - {messaging.kafka.client_id}}, if both are present, or only
- * {@code messaging.kafka.consumer.group}. For brokers, such as RabbitMQ and Artemis, set it to the
- * {@code client_id} of the client consuming the message.
+ * A unique identifier for the client that consumes or produces a message.
  */
-static constexpr const char *kMessagingConsumerId = "messaging.consumer.id";
+static constexpr const char *kMessagingClientId = "messaging.client_id";
 
 /**
  * RabbitMQ message routing key.
@@ -1081,20 +1291,10 @@ static constexpr const char *kMessagingKafkaMessageKey = "messaging.kafka.messag
 static constexpr const char *kMessagingKafkaConsumerGroup = "messaging.kafka.consumer.group";
 
 /**
- * Client Id for the Consumer or Producer that is handling the message.
- */
-static constexpr const char *kMessagingKafkaClientId = "messaging.kafka.client_id";
-
-/**
  * Partition the message is sent to.
  */
 static constexpr const char *kMessagingKafkaDestinationPartition =
     "messaging.kafka.destination.partition";
-
-/**
- * Partition the message is received from.
- */
-static constexpr const char *kMessagingKafkaSourcePartition = "messaging.kafka.source.partition";
 
 /**
  * The offset of a record in the corresponding Kafka partition.
@@ -1116,11 +1316,6 @@ static constexpr const char *kMessagingRocketmqNamespace = "messaging.rocketmq.n
  * identified by the SpanKind.
  */
 static constexpr const char *kMessagingRocketmqClientGroup = "messaging.rocketmq.client_group";
-
-/**
- * The unique identifier for each client.
- */
-static constexpr const char *kMessagingRocketmqClientId = "messaging.rocketmq.client_id";
 
 /**
  * The timestamp in milliseconds that the delay message is expected to be delivered to consumer.
@@ -1270,12 +1465,104 @@ recorded at a time where it was not clear whether the exception will escape.</li
 static constexpr const char *kExceptionEscaped = "exception.escaped";
 
 /**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.1">URI scheme</a> component
+ * identifying the used protocol.
+ */
+static constexpr const char *kUrlScheme = "url.scheme";
+
+/**
+ * Absolute URL describing a network resource according to <a
+href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a>
+ *
+ * <p>Notes:
+  <ul> <li>For network calls, URL usually has {@code scheme://host[:port][path][?query][#fragment]}
+format, where the fragment is not transmitted over HTTP, but if it is known, it should be included
+nevertheless.
+{@code url.full} MUST NOT contain credentials passed via URL in form of {@code
+https://username:password@www.example.com/}. In such case username and password should be redacted
+and attribute's value should be {@code https://REDACTED:REDACTED@www.example.com/}.
+{@code url.full} SHOULD capture the absolute URL when it is available (or can be reconstructed) and
+SHOULD NOT be validated or modified except for sanitizing purposes.</li> </ul>
+ */
+static constexpr const char *kUrlFull = "url.full";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.3">URI path</a> component
+ *
+ * <p>Notes:
+  <ul> <li>When missing, the value is assumed to be {@code /}</li> </ul>
+ */
+static constexpr const char *kUrlPath = "url.path";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.4">URI query</a> component
+ *
+ * <p>Notes:
+  <ul> <li>Sensitive content provided in query string SHOULD be scrubbed when instrumentations can
+ identify it.</li> </ul>
+ */
+static constexpr const char *kUrlQuery = "url.query";
+
+/**
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.5">URI fragment</a> component
+ */
+static constexpr const char *kUrlFragment = "url.fragment";
+
+/**
  * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
  * User-Agent</a> header sent by the client.
  */
 static constexpr const char *kUserAgentOriginal = "user_agent.original";
 
 // Enum definitions
+namespace NetTransportValues
+{
+/** ip_tcp. */
+static constexpr const char *kIpTcp = "ip_tcp";
+/** ip_udp. */
+static constexpr const char *kIpUdp = "ip_udp";
+/** Named or anonymous pipe. */
+static constexpr const char *kPipe = "pipe";
+/** In-process communication. */
+static constexpr const char *kInproc = "inproc";
+/** Something else (non IP-based). */
+static constexpr const char *kOther = "other";
+}  // namespace NetTransportValues
+
+namespace NetSockFamilyValues
+{
+/** IPv4 address. */
+static constexpr const char *kInet = "inet";
+/** IPv6 address. */
+static constexpr const char *kInet6 = "inet6";
+/** Unix domain socket path. */
+static constexpr const char *kUnix = "unix";
+}  // namespace NetSockFamilyValues
+
+namespace HttpRequestMethodValues
+{
+/** CONNECT method. */
+static constexpr const char *kConnect = "CONNECT";
+/** DELETE method. */
+static constexpr const char *kDelete = "DELETE";
+/** GET method. */
+static constexpr const char *kGet = "GET";
+/** HEAD method. */
+static constexpr const char *kHead = "HEAD";
+/** OPTIONS method. */
+static constexpr const char *kOptions = "OPTIONS";
+/** PATCH method. */
+static constexpr const char *kPatch = "PATCH";
+/** POST method. */
+static constexpr const char *kPost = "POST";
+/** PUT method. */
+static constexpr const char *kPut = "PUT";
+/** TRACE method. */
+static constexpr const char *kTrace = "TRACE";
+/** Any HTTP method that the instrumentation has no prior knowledge of. */
+static constexpr const char *kOther = "_OTHER";
+}  // namespace HttpRequestMethodValues
+
 namespace EventDomainValues
 {
 /** Events from browser apps. */
@@ -1285,6 +1572,22 @@ static constexpr const char *kDevice = "device";
 /** Events from Kubernetes. */
 static constexpr const char *kK8s = "k8s";
 }  // namespace EventDomainValues
+
+namespace LogIostreamValues
+{
+/** Logs from stdout stream. */
+static constexpr const char *kStdout = "stdout";
+/** Events from stderr stream. */
+static constexpr const char *kStderr = "stderr";
+}  // namespace LogIostreamValues
+
+namespace TypeValues
+{
+/** Heap memory. */
+static constexpr const char *kHeap = "heap";
+/** Non-heap memory. */
+static constexpr const char *kNonHeap = "non_heap";
+}  // namespace TypeValues
 
 namespace OpentracingRefTypeValues
 {
@@ -1517,31 +1820,27 @@ static constexpr const char *kGcp = "gcp";
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace FaasInvokedProviderValues
 
-namespace NetTransportValues
+namespace NetworkTransportValues
 {
-/** ip_tcp. */
-static constexpr const char *kIpTcp = "ip_tcp";
-/** ip_udp. */
-static constexpr const char *kIpUdp = "ip_udp";
+/** TCP. */
+static constexpr const char *kTcp = "tcp";
+/** UDP. */
+static constexpr const char *kUdp = "udp";
 /** Named or anonymous pipe. See note below. */
 static constexpr const char *kPipe = "pipe";
-/** In-process communication. */
-static constexpr const char *kInproc = "inproc";
-/** Something else (non IP-based). */
-static constexpr const char *kOther = "other";
-}  // namespace NetTransportValues
-
-namespace NetSockFamilyValues
-{
-/** IPv4 address. */
-static constexpr const char *kInet = "inet";
-/** IPv6 address. */
-static constexpr const char *kInet6 = "inet6";
-/** Unix domain socket path. */
+/** Unix domain socket. */
 static constexpr const char *kUnix = "unix";
-}  // namespace NetSockFamilyValues
+}  // namespace NetworkTransportValues
 
-namespace NetHostConnectionTypeValues
+namespace NetworkTypeValues
+{
+/** IPv4. */
+static constexpr const char *kIpv4 = "ipv4";
+/** IPv6. */
+static constexpr const char *kIpv6 = "ipv6";
+}  // namespace NetworkTypeValues
+
+namespace NetworkConnectionTypeValues
 {
 /** wifi. */
 static constexpr const char *kWifi = "wifi";
@@ -1553,9 +1852,9 @@ static constexpr const char *kCell = "cell";
 static constexpr const char *kUnavailable = "unavailable";
 /** unknown. */
 static constexpr const char *kUnknown = "unknown";
-}  // namespace NetHostConnectionTypeValues
+}  // namespace NetworkConnectionTypeValues
 
-namespace NetHostConnectionSubtypeValues
+namespace NetworkConnectionSubtypeValues
 {
 /** GPRS. */
 static constexpr const char *kGprs = "gprs";
@@ -1599,7 +1898,7 @@ static constexpr const char *kNr = "nr";
 static constexpr const char *kNrnsa = "nrnsa";
 /** LTE CA. */
 static constexpr const char *kLteCa = "lte_ca";
-}  // namespace NetHostConnectionSubtypeValues
+}  // namespace NetworkConnectionSubtypeValues
 
 namespace GraphqlOperationTypeValues
 {

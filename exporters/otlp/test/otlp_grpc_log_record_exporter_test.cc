@@ -1,39 +1,37 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <unordered_map>
 
-#  include <unordered_map>
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
-#  include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
-#  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
 
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/trace/exporter.h"
-#  include "opentelemetry/sdk/trace/processor.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/provider.h"
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -203,5 +201,3 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif  // ENABLE_LOGS_PREVIEW

@@ -1,25 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-#  include "opentelemetry/sdk/trace/exporter.h"
-#  include "opentelemetry/sdk/trace/processor.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/provider.h"
+#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
 
-#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 
-#  ifdef BAZEL_BUILD
-#    include "examples/common/logs_foo_library/foo_library.h"
-#  else
-#    include "logs_foo_library/foo_library.h"
-#  endif
+#ifdef BAZEL_BUILD
+#  include "examples/common/logs_foo_library/foo_library.h"
+#else
+#  include "logs_foo_library/foo_library.h"
+#endif
 
 namespace logs_api      = opentelemetry::logs;
 namespace logs_sdk      = opentelemetry::sdk::logs;
@@ -78,9 +77,3 @@ int main()
   CleanupTracer();
   CleanupLogger();
 }
-#else
-int main()
-{
-  return 0;
-}
-#endif  // ENABLE_LOGS_PREVIEW

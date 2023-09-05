@@ -132,13 +132,11 @@ OtlpGrpcClient::MakeMetricsServiceStub(const OtlpGrpcExporterOptions &options)
   return proto::collector::metrics::v1::MetricsService::NewStub(MakeChannel(options));
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
 OtlpGrpcClient::MakeLogsServiceStub(const OtlpGrpcExporterOptions &options)
 {
   return proto::collector::logs::v1::LogsService::NewStub(MakeChannel(options));
 }
-#endif
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::trace::v1::TraceService::StubInterface *stub,
@@ -158,7 +156,6 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   return stub->Export(context, request, response);
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::logs::v1::LogsService::StubInterface *stub,
     grpc::ClientContext *context,
@@ -167,7 +164,6 @@ grpc::Status OtlpGrpcClient::DelegateExport(
 {
   return stub->Export(context, request, response);
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

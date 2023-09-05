@@ -1,14 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -127,4 +125,3 @@ bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

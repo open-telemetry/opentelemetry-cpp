@@ -2,16 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0/
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/logs/event_logger_provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it
-#  define MAX_LOGGER_COUNT 100
+#define MAX_LOGGER_COUNT 100
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -35,4 +34,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif
