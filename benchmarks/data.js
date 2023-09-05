@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693897533135,
+  "lastUpdate": 1693897537509,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -101896,6 +101896,54 @@ window.BENCHMARK_DATA = {
             "value": 2180462.1631237115,
             "unit": "ns/iter",
             "extra": "iterations: 307\ncpu: 449333.8762214986 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6eb09faa7c8e8628b295d4bbaa2d78a13532c01f",
+          "message": "Bump actions/checkout from 3 to 4 (#2295)\n\nBumps [actions/checkout](https://github.com/actions/checkout) from 3 to 4.\r\n- [Release notes](https://github.com/actions/checkout/releases)\r\n- [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/actions/checkout/compare/v3...v4)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: actions/checkout\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-major\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-09-05T08:47:56+02:00",
+          "tree_id": "ff3ef4e0933183f62aa516c9d875d57ddfaef99c",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/6eb09faa7c8e8628b295d4bbaa2d78a13532c01f"
+        },
+        "date": 1693897530092,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 289.7501715032348,
+            "unit": "ns/iter",
+            "extra": "iterations: 989000\ncpu: 142.86703741152684 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 301.6467433964874,
+            "unit": "ns/iter",
+            "extra": "iterations: 646000\ncpu: 218.24473684210525 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 956.0512333381466,
+            "unit": "ns/iter",
+            "extra": "iterations: 164000\ncpu: 870.5646341463416 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2187726.1413924997,
+            "unit": "ns/iter",
+            "extra": "iterations: 261\ncpu: 478670.8812260537 ns\nthreads: 1"
           }
         ]
       }
