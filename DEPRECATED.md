@@ -214,7 +214,7 @@ Note that this changes the access pattern:
 * with zpages, data is only available locally (in process)
 * with other exporters, data is available externally (not in process)
 
-Our assessment is that the zpages implementation, is no longer in use,
+Our assessment is that the zpages implementation is no longer in use,
 and can be removed.
 
 If that assessment is incorrect (i.e., if you own a project that depends
