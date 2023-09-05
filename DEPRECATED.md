@@ -189,12 +189,19 @@ The following are deprecated and planned for removal:
 * all the tests located under `ext/test/zpages/`
 * the zpages exporter library(`opentelemetry_zpages`)
 * the zpages build options in CMake (`WITH_ZPAGES`)
+
+The following code is no longer considered public, will no longer be
+installed, and will no longer be useable outside of the opentelemetry-cpp implementation:
+
 * all the API headers located under `ext/include/opentelemetry/ext/http/server`, including:
   * the C++ class `FileHttpServer`
   * the C++ class `HttpRequestCallback`
   * the C++ class `HttpServer`
   * the C++ class `HttpRequestHandler`
   * the C++ class `SocketCallback`
+
+This implementation of an HTTP server is meant to be used for testing only,
+it is not production ready.
 
 #### Mitigation (ZPages)
 
