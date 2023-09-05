@@ -189,6 +189,12 @@ The following are deprecated and planned for removal:
 * all the tests located under `ext/test/zpages/`
 * the zpages exporter library(`opentelemetry_zpages`)
 * the zpages build options in CMake (`WITH_ZPAGES`)
+* all the API headers located under `ext/include/opentelemetry/ext/http/server`, including:
+  * the C++ class `FileHttpServer`
+  * the C++ class `HttpRequestCallback`
+  * the C++ class `HttpServer`
+  * the C++ class `HttpRequestHandler`
+  * the C++ class `SocketCallback`
 
 #### Mitigation (ZPages)
 
@@ -200,6 +206,20 @@ Note that this changes the access pattern:
 
 * with zpages, data is only available locally (in process)
 * with other exporters, data is available externally (not in process)
+
+Our assessment is that the zpages implementation, is no longer in use,
+and can be removed.
+
+If that assessment is incorrect (i.e., if you own a project that depends
+on the zpage exporter from opentelemetry-cpp), please comment on the
+removal issue
+[#2292](https://github.com/open-telemetry/opentelemetry-cpp/issues/2292).
+
+An alternative to zpage removal is to move the code to the
+opentelemetry-cpp-contrib github
+[repository](https://github.com/open-telemetry/opentelemetry-cpp-contrib).
+
+Contributions to migrate the code, and maintain zpages, are welcome.
 
 #### Planned removal (ZPages)
 
