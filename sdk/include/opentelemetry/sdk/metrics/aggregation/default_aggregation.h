@@ -28,20 +28,16 @@ public:
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
       const AggregationConfig *aggregation_config)
   {
-    switch (instrument_descriptor.type_)
+    bool is_monotonic = true;
+    auto aggr_type    = GetDefaultAggregationType(instrument_descriptor.type_, is_monotonic);
+    switch (aggr_type)
     {
-      case InstrumentType::kCounter:
-      case InstrumentType::kObservableCounter:
+      case AggregationType::kSum:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)))
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic)))
                    : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
-      case InstrumentType::kUpDownCounter:
-      case InstrumentType::kObservableUpDownCounter:
-        return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(false)))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(false)));
         break;
-      case InstrumentType::kHistogram: {
+      case AggregationType::kHistogram: {
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
           return (std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config)));
@@ -53,7 +49,7 @@ public:
 
         break;
       }
-      case InstrumentType::kObservableGauge:
+      case AggregationType::kLastValue:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongLastValueAggregation()))
                    : std::move(std::unique_ptr<Aggregation>(new DoubleLastValueAggregation()));
@@ -121,6 +117,11 @@ public:
                                                        const Aggregation &to_copy)
   {
     const PointType point_data = to_copy.ToPoint();
+    bool is_monotonic          = true;
+    if (aggregation_type == AggregationType::kDefault)
+    {
+      aggregation_type = GetDefaultAggregationType(instrument_descriptor.type_, is_monotonic);
+    }
     switch (aggregation_type)
     {
       case AggregationType::kDrop:
@@ -159,7 +160,29 @@ public:
               new DoubleSumAggregation(nostd::get<SumPointData>(point_data)));
         }
       default:
-        return DefaultAggregation::CreateAggregation(instrument_descriptor, nullptr);
+        return nullptr;  // won't reach here
+    }
+  }
+
+  static AggregationType GetDefaultAggregationType(InstrumentType instrument_type,
+                                                   bool &is_monotonic)
+  {
+    is_monotonic = true;
+    switch (instrument_type)
+    {
+      case InstrumentType::kCounter:
+      case InstrumentType::kObservableCounter:
+        is_monotonic = false;
+        return AggregationType::kSum;
+      case InstrumentType::kUpDownCounter:
+      case InstrumentType::kObservableUpDownCounter:
+        return AggregationType::kSum;
+      case InstrumentType::kHistogram:
+        return AggregationType::kHistogram;
+      case InstrumentType::kObservableGauge:
+        return AggregationType::kLastValue;
+      default:
+        return AggregationType::kDrop;
     }
   }
 };
