@@ -14,12 +14,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | ------- | ----------------------- | ------------------------------------------------------------------------ |
 | Traces  | Public Release          | N/A                                                                      |
 | Metrics | Public Release          | N/A                                                                      |
-| Logs    | Experimental [1]        | [Release Milestone](https://github.com/open-telemetry/opentelemetry-cpp/milestone/18)|
-
-* [1]: The current Log Signal Implementation is Experimental, and will change as
-      the current OpenTelemetry Log specification matures. The current
-      implementation can be included in build by setting `ENABLE_LOGS_PREVIEW`
-      preprocessor macro.
+| Logs    | Public Release          | N/A                                                                      |
 
 ## Supported C++ Versions
 

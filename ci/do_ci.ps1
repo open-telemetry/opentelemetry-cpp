@@ -10,7 +10,7 @@ $nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
-$BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {

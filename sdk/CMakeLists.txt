@@ -23,17 +23,11 @@ if(OPENTELEMETRY_INSTALL)
     FILES_MATCHING
     PATTERN "*config.h")
 
-  set(LOGS_EXCLUDE_PATTERN "")
-  if(NOT WITH_LOGS_PREVIEW)
-    set(LOGS_EXCLUDE_PATTERN "logs")
-  endif()
-
   install(
     DIRECTORY include/opentelemetry/sdk
     DESTINATION include/opentelemetry
     FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
+    PATTERN "*.h")
 endif()
 
 add_subdirectory(src)

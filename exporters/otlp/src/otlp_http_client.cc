@@ -17,30 +17,19 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
-#include "google/protobuf/stubs/stringpiece.h"
 #include "nlohmann/json.hpp"
-
-#if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
-#  include "google/protobuf/stubs/strutil.h"
-#else
-#  include "google/protobuf/stubs/port.h"
-namespace google
-{
-namespace protobuf
-{
-LIBPROTOBUF_EXPORT void Base64Escape(StringPiece src, std::string *dest);
-}  // namespace protobuf
-}  // namespace google
-#endif
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <atomic>
 #include <condition_variable>
+#include <cstring>
 #include <fstream>
 #include <mutex>
 #include <sstream>
@@ -411,16 +400,12 @@ static std::string BytesMapping(const std::string &bytes,
       }
       else
       {
-        std::string base64_value;
-        google::protobuf::Base64Escape(bytes, &base64_value);
-        return base64_value;
+        return opentelemetry::sdk::common::Base64Escape(bytes);
       }
     }
     case JsonBytesMappingKind::kBase64: {
       // Base64 is the default bytes mapping of protobuf
-      std::string base64_value;
-      google::protobuf::Base64Escape(bytes, &base64_value);
-      return base64_value;
+      return opentelemetry::sdk::common::Base64Escape(bytes);
     }
     case JsonBytesMappingKind::kHex:
       return HexEncode(bytes);

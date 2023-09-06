@@ -2,21 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
 // Please refer to provider.h for documentation on how to obtain a Logger object.
 //
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to logger.h for documentation on these interfaces.
 
-#  include "opentelemetry/logs/event_logger.h"
-#  include "opentelemetry/logs/event_logger_provider.h"
-#  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/logs/logger_provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -100,4 +99,3 @@ private:
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -3,12 +3,10 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <cstddef>
 
-#  include <chrono>
-#  include <cstddef>
-
-#  include "opentelemetry/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -41,4 +39,3 @@ struct BatchLogRecordProcessorOptions
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

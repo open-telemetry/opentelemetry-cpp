@@ -22,6 +22,19 @@ cc_library(
 )
 
 cc_library(
+    name = "base64",
+    srcs = [
+        "base64.cc",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common/platform:fork",
+    ],
+)
+
+cc_library(
     name = "env_variables",
     srcs = [
         "env_variables.cc",

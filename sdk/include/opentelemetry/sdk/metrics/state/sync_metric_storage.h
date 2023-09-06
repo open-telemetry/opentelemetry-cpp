@@ -161,11 +161,6 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
-  // unreported metrics stash for all the collectors
-  std::unordered_map<CollectorHandle *, std::list<std::shared_ptr<AttributesHashMap>>>
-      unreported_metrics_;
-  // last reported metrics stash for all the collectors.
-  std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   const AttributesProcessor *attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

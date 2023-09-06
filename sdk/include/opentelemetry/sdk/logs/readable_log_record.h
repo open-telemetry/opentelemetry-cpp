@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <string>
-#  include <unordered_map>
+#include <string>
+#include <unordered_map>
 
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/logs/severity.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -140,4 +139,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

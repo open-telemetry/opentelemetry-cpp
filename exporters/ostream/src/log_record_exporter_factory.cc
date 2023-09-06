@@ -1,9 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
-#  include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter_factory.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter.h"
 
 namespace logs_sdk = opentelemetry::sdk::logs;
 
@@ -28,4 +27,3 @@ std::unique_ptr<logs_sdk::LogRecordExporter> OStreamLogRecordExporterFactory::Cr
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif
