@@ -167,12 +167,12 @@ public:
   static AggregationType GetDefaultAggregationType(InstrumentType instrument_type,
                                                    bool &is_monotonic)
   {
-    is_monotonic = true;
+    is_monotonic = false;
     switch (instrument_type)
     {
       case InstrumentType::kCounter:
       case InstrumentType::kObservableCounter:
-        is_monotonic = false;
+        is_monotonic = true;
         return AggregationType::kSum;
       case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableUpDownCounter:
