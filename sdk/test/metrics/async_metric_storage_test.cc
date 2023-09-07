@@ -123,6 +123,11 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
       });
 }
 
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
+                         WritableMetricStorageTestFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+
 TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
 {
   AggregationTemporality temporality = GetParam();
