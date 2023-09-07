@@ -16,9 +16,7 @@
 
 #include "opentelemetry/sdk/trace/recordable.h"
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/sdk/logs/recordable.h"
-#endif
+#include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -35,11 +33,9 @@ public:
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
       proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept;
 
-#ifdef ENABLE_LOGS_PREVIEW
   static void PopulateRequest(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
       proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept;
-#endif
 };
 }  // namespace otlp
 }  // namespace exporter

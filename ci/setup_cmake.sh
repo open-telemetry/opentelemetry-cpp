@@ -10,7 +10,7 @@ apt-get update
 
 if [ "x$CMAKE_VERSION" = "x" ]; then
   # By default, CMake version set the following version.
-  export CMAKE_VERSION=3.15.2
+  export CMAKE_VERSION=3.16.3
 fi
 
 if [ -z "${GOOGLETEST_VERSION}" ]; then

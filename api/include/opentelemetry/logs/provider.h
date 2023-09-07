@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <mutex>
+#include <mutex>
 
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/logs/noop.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/logs/noop.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -90,4 +89,3 @@ private:
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif
