@@ -173,8 +173,8 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
       });
   // subsequent recording after collection shouldn't fail
   // monotonic increasing values;
-  int64_t get_count2 = 50;
-  int64_t put_count2 = 70;
+  int64_t get_count2 = -50;
+  int64_t put_count2 = -70;
 
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
