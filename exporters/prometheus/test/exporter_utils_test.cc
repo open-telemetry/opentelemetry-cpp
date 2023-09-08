@@ -6,6 +6,7 @@
 #include "prometheus/metric_type.h"
 
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "prometheus_test_helper.h"
 
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
@@ -35,7 +36,7 @@ void assert_basic(prometheus_client::MetricFamily &metric,
                   const std::string &sanitized_name,
                   const std::string &description,
                   prometheus_client::MetricType type,
-                  int label_num,
+                  size_t label_num,
                   std::vector<T> vals)
 {
   ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
@@ -107,28 +108,82 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollect
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
 
+  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.name", "test_service"},
+       {"service.namespace", "test_namespace"},
+       {"service.instance.id", "localhost:8000"},
+       {"custom_resource_attr", "custom_resource_value"}});
   metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
+  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 1,
-               vals);
+
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter,
+               resource.GetAttributes().size(), vals);
+
+  int checked_label_num = 0;
+  for (auto &label : metric1.metric[0].label)
+  {
+    if (label.name == "job")
+    {
+      ASSERT_EQ(label.value, "test_namespace/test_service");
+      checked_label_num++;
+    }
+    else if (label.name == "instance")
+    {
+      ASSERT_EQ(label.value, "localhost:8000");
+      checked_label_num++;
+    }
+    else if (label.name == "custom_resource_attr")
+    {
+      ASSERT_EQ(label.value, "custom_resource_value");
+      checked_label_num++;
+    }
+  }
+  ASSERT_EQ(checked_label_num, 3);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 {
+  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.name", "test_service"},
+       {"service.instance.id", "localhost:8000"},
+       {"custom_resource_attr", "custom_resource_value"}});
   metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
+  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
-               vals);
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge,
+               resource.GetAttributes().size() + 1, vals);
+
+  int checked_label_num = 0;
+  for (auto &label : metric1.metric[0].label)
+  {
+    if (label.name == "job")
+    {
+      ASSERT_EQ(label.value, "test_service");
+      checked_label_num++;
+    }
+    else if (label.name == "instance")
+    {
+      ASSERT_EQ(label.value, "localhost:8000");
+      checked_label_num++;
+    }
+    else if (label.name == "custom_resource_attr")
+    {
+      ASSERT_EQ(label.value, "custom_resource_value");
+      checked_label_num++;
+    }
+  }
+  ASSERT_EQ(checked_label_num, 3);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)

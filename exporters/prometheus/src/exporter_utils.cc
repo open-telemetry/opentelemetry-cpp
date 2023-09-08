@@ -2,13 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <sstream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
+#include "opentelemetry/sdk/resource/resource.h"
 #include "prometheus/metric_family.h"
 
 #include <prometheus/metric_type.h>
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
@@ -20,6 +26,7 @@ namespace exporter
 {
 namespace metrics
 {
+
 /**
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
@@ -72,7 +79,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, time, &metric_family);
+                  point_data_attr.attributes, time, &metric_family, data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -82,14 +89,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
           }
           else
           {
@@ -105,7 +112,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family);
+            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
           }
           else
           {
@@ -165,6 +172,30 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
     return std::string{name.begin(), end};
   }
   return name;
+}
+
+bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &name)
+{
+  static std::unordered_set<std::string> ignores{
+      opentelemetry::sdk::resource::SemanticConventions::kServiceName,
+      opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace,
+      opentelemetry::trace::SemanticConventions::kServerAddress,
+      opentelemetry::trace::SemanticConventions::kServerPort,
+      opentelemetry::trace::SemanticConventions::kUrlScheme};
+  return ignores.end() == ignores.find(name);
+}
+
+const std::string &PrometheusExporterUtils::GetPrometheusAttributeName(const std::string &name)
+{
+  static std::unordered_map<std::string, std::string> name_mappings{
+      {opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, "instance"}};
+  std::unordered_map<std::string, std::string>::const_iterator it = name_mappings.find(name);
+  if (it == name_mappings.end())
+  {
+    return name;
+  }
+
+  return it->second;
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
@@ -229,11 +260,12 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const metric_sdk::PointAttributes &labels,
                                       prometheus_client::MetricType type,
                                       std::chrono::nanoseconds time,
-                                      prometheus_client::MetricFamily *metric_family)
+                                      prometheus_client::MetricFamily *metric_family,
+                                      const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, time, labels);
+  SetMetricBasic(metric, time, labels, resource);
   SetValue(values, type, &metric);
 }
 
@@ -247,11 +279,12 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const std::vector<uint64_t> &counts,
                                       const metric_sdk::PointAttributes &labels,
                                       std::chrono::nanoseconds time,
-                                      prometheus_client::MetricFamily *metric_family)
+                                      prometheus_client::MetricFamily *metric_family,
+                                      const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, time, labels);
+  SetMetricBasic(metric, time, labels, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
@@ -260,20 +293,79 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
  */
 void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
                                              std::chrono::nanoseconds time,
-                                             const metric_sdk::PointAttributes &labels)
+                                             const metric_sdk::PointAttributes &labels,
+                                             const opentelemetry::sdk::resource::Resource *resource)
 {
   metric.timestamp_ms = time.count() / 1000000;
+
+  std::size_t label_size = 0;
+  if (nullptr != resource)
+  {
+    label_size += resource->GetAttributes().size();
+  }
+  if (!labels.empty())
+  {
+    label_size += labels.size();
+  }
+  metric.label.resize(label_size);
+
+  // Convert resource to prometheus labels
+  if (nullptr != resource)
+  {
+    opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
+        resource->GetAttributes().find(
+            opentelemetry::sdk::resource::SemanticConventions::kServiceName);
+    opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_namespace_it =
+        resource->GetAttributes().find(
+            opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace);
+
+    if (service_namespace_it != resource->GetAttributes().end() &&
+        service_name_it != resource->GetAttributes().end())
+    {
+      prometheus_client::ClientMetric::Label prometheus_label;
+      prometheus_label.name  = "job";
+      prometheus_label.value = AttributeValueToString(service_namespace_it->second) + "/" +
+                               AttributeValueToString(service_name_it->second);
+      metric.label.emplace_back(std::move(prometheus_label));
+    }
+    else if (service_name_it != resource->GetAttributes().end())
+    {
+      prometheus_client::ClientMetric::Label prometheus_label;
+      prometheus_label.name  = "job";
+      prometheus_label.value = AttributeValueToString(service_name_it->second);
+      metric.label.emplace_back(std::move(prometheus_label));
+    }
+    else if (service_namespace_it != resource->GetAttributes().end())
+    {
+      prometheus_client::ClientMetric::Label prometheus_label;
+      prometheus_label.name  = "job";
+      prometheus_label.value = AttributeValueToString(service_namespace_it->second);
+      metric.label.emplace_back(std::move(prometheus_label));
+    }
+
+    for (auto &label : resource->GetAttributes())
+    {
+      if (ShouldIgnoreResourceAttribute(label.first))
+      {
+        continue;
+      }
+
+      prometheus_client::ClientMetric::Label prometheus_label;
+      prometheus_label.name  = SanitizeNames(GetPrometheusAttributeName(label.first));
+      prometheus_label.value = AttributeValueToString(label.second);
+      metric.label.emplace_back(std::move(prometheus_label));
+    }
+  }
 
   // auto label_pairs = ParseLabel(labels);
   if (!labels.empty())
   {
-    metric.label.resize(labels.size());
-    size_t i = 0;
-    for (auto const &label : labels)
+    for (auto &label : labels)
     {
-      auto sanitized          = SanitizeNames(label.first);
-      metric.label[i].name    = sanitized;
-      metric.label[i++].value = AttributeValueToString(label.second);
+      prometheus_client::ClientMetric::Label prometheus_label;
+      prometheus_label.name  = SanitizeNames(label.first);
+      prometheus_label.value = AttributeValueToString(label.second);
+      metric.label.emplace_back(std::move(prometheus_label));
     }
   }
 }

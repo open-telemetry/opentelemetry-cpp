@@ -41,6 +41,24 @@ private:
    */
   static std::string SanitizeNames(std::string name);
 
+  /**
+   * Some attributes should be ignored when converting resource attributes to
+   * prometheus labels.
+   *
+   * @param name resource attribnuet name
+   * @return true if the attribute should be ignored, false otherwise.
+   */
+  static bool ShouldIgnoreResourceAttribute(const std::string &name);
+
+  /**
+   * Some attributes should be renamed when converting resource attributes to
+   * prometheus labels.
+   *
+   * @param name resource attribnuet name
+   * @return const std::string&
+   */
+  static const std::string &GetPrometheusAttributeName(const std::string &name);
+
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 
@@ -59,7 +77,8 @@ private:
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       ::prometheus::MetricType type,
                       std::chrono::nanoseconds time,
-                      ::prometheus::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family,
+                      const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Set metric data for:
@@ -71,14 +90,16 @@ private:
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       std::chrono::nanoseconds time,
-                      ::prometheus::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family,
+                      const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Set time and labels to metric data
    */
   static void SetMetricBasic(::prometheus::ClientMetric &metric,
                              std::chrono::nanoseconds time,
-                             const opentelemetry::sdk::metrics::PointAttributes &labels);
+                             const opentelemetry::sdk::metrics::PointAttributes &labels,
+                             const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Convert attribute value to string
