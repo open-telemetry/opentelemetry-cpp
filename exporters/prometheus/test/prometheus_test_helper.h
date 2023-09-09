@@ -11,6 +11,14 @@ namespace exportermetrics = opentelemetry::exporter::metrics;
 
 namespace
 {
+
+inline opentelemetry::sdk::resource::Resource &GetEmptyResource()
+{
+  static auto resource = opentelemetry::sdk::resource::Resource::Create(
+      opentelemetry::sdk::resource::ResourceAttributes{});
+  return resource;
+}
+
 /**
  * Helper function to create ResourceMetrics
  */
@@ -21,9 +29,7 @@ inline metric_sdk::ResourceMetrics CreateSumPointData()
   metric_sdk::SumPointData sum_point_data2{};
   sum_point_data2.value_ = 20.0;
   metric_sdk::ResourceMetrics data;
-  auto resource = opentelemetry::sdk::resource::Resource::Create(
-      opentelemetry::sdk::resource::ResourceAttributes{});
-  data.resource_ = &resource;
+  data.resource_ = &GetEmptyResource();
   auto instrumentation_scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
                                                                              "1.2.0");
@@ -54,9 +60,7 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
   histogram_point_data2.counts_     = {200, 300, 400, 500};
   histogram_point_data2.sum_        = (int64_t)900;
   metric_sdk::ResourceMetrics data;
-  static auto resource = opentelemetry::sdk::resource::Resource::Create(
-      opentelemetry::sdk::resource::ResourceAttributes{});
-  data.resource_ = &resource;
+  data.resource_ = &GetEmptyResource();
   auto instrumentation_scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
                                                                              "1.2.0");
@@ -77,9 +81,7 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
 inline metric_sdk::ResourceMetrics CreateLastValuePointData()
 {
   metric_sdk::ResourceMetrics data;
-  static auto resource = opentelemetry::sdk::resource::Resource::Create(
-      opentelemetry::sdk::resource::ResourceAttributes{});
-  data.resource_ = &resource;
+  data.resource_ = &GetEmptyResource();
   auto instrumentation_scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
                                                                              "1.2.0");
@@ -108,9 +110,7 @@ inline metric_sdk::ResourceMetrics CreateLastValuePointData()
 inline metric_sdk::ResourceMetrics CreateDropPointData()
 {
   metric_sdk::ResourceMetrics data;
-  static auto resource = opentelemetry::sdk::resource::Resource::Create(
-      opentelemetry::sdk::resource::ResourceAttributes{});
-  data.resource_ = &resource;
+  data.resource_ = &GetEmptyResource();
   auto instrumentation_scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name",
                                                                              "1.2.0");

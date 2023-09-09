@@ -45,7 +45,8 @@ struct ScopeMetrics
   inline ScopeMetrics(ScopeMetrics &&)      = default;
 
   inline ScopeMetrics &operator=(const ScopeMetrics &) = default;
-  inline ScopeMetrics &operator=(ScopeMetrics &&)      = default;
+
+  inline ScopeMetrics &operator=(ScopeMetrics &&) = default;
 };
 
 struct ResourceMetrics
@@ -63,7 +64,8 @@ struct ResourceMetrics
   inline ResourceMetrics(ResourceMetrics &&)      = default;
 
   inline ResourceMetrics &operator=(const ResourceMetrics &) = default;
-  inline ResourceMetrics &operator=(ResourceMetrics &&)      = default;
+
+  inline ResourceMetrics &operator=(ResourceMetrics &&) = default;
 };
 
 /**
