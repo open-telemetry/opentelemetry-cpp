@@ -7,12 +7,13 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include "opentelemetry/sdk/resource/resource.h"
-#include "prometheus/metric_family.h"
 
-#include <prometheus/metric_type.h>
+#include "prometheus/metric_family.h"
+#include "prometheus/metric_type.h"
+
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/trace/semantic_conventions.h"
 
