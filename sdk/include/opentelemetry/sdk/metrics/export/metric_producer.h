@@ -34,7 +34,11 @@ struct ScopeMetrics
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_ = nullptr;
   std::vector<MetricData> metric_data_;
 
-  ScopeMetrics() = default;
+  ScopeMetrics()                                = default;
+  ScopeMetrics(const ScopeMetrics &)            = default;
+  ScopeMetrics(ScopeMetrics &&)                 = default;
+  ScopeMetrics &operator=(const ScopeMetrics &) = default;
+  ScopeMetrics &operator=(ScopeMetrics &&)      = default;
 };
 
 struct ResourceMetrics
@@ -42,7 +46,11 @@ struct ResourceMetrics
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   std::vector<ScopeMetrics> scope_metric_data_;
 
-  ResourceMetrics() = default;
+  ResourceMetrics()                                   = default;
+  ResourceMetrics(const ResourceMetrics &)            = default;
+  ResourceMetrics(ResourceMetrics &&)                 = default;
+  ResourceMetrics &operator=(const ResourceMetrics &) = default;
+  ResourceMetrics &operator=(ResourceMetrics &&)      = default;
 };
 
 /**
