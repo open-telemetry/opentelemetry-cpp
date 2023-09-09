@@ -17,6 +17,8 @@ Increment the:
 
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+* [EXPORTER] Prometheus exporter emit resource attributes
+  [#2301](https://github.com/open-telemetry/opentelemetry-cpp/pull/2301)
 
 ## [1.11.0] 2023-08-21
 

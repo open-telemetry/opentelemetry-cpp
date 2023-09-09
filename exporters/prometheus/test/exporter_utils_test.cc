@@ -195,8 +195,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 1,
-               vals);
+  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram,
+               metrics_data.resource_->GetAttributes().size() + 1, vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
 

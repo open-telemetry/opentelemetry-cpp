@@ -31,14 +31,18 @@ namespace metrics
  */
 struct ScopeMetrics
 {
-  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_ = nullptr;
   std::vector<MetricData> metric_data_;
+
+  ScopeMetrics() = default;
 };
 
 struct ResourceMetrics
 {
-  const opentelemetry::sdk::resource::Resource *resource_;
+  const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   std::vector<ScopeMetrics> scope_metric_data_;
+
+  ResourceMetrics() = default;
 };
 
 /**

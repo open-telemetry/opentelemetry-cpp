@@ -182,7 +182,7 @@ bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &n
       opentelemetry::trace::SemanticConventions::kServerAddress,
       opentelemetry::trace::SemanticConventions::kServerPort,
       opentelemetry::trace::SemanticConventions::kUrlScheme};
-  return ignores.end() == ignores.find(name);
+  return ignores.end() != ignores.find(name);
 }
 
 const std::string &PrometheusExporterUtils::GetPrometheusAttributeName(const std::string &name)
@@ -307,7 +307,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   {
     label_size += labels.size();
   }
-  metric.label.resize(label_size);
+  metric.label.reserve(label_size);
 
   // Convert resource to prometheus labels
   if (nullptr != resource)

@@ -54,7 +54,7 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
   histogram_point_data2.counts_     = {200, 300, 400, 500};
   histogram_point_data2.sum_        = (int64_t)900;
   metric_sdk::ResourceMetrics data;
-  auto resource = opentelemetry::sdk::resource::Resource::Create(
+  static auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
   auto instrumentation_scope =
@@ -77,7 +77,7 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
 inline metric_sdk::ResourceMetrics CreateLastValuePointData()
 {
   metric_sdk::ResourceMetrics data;
-  auto resource = opentelemetry::sdk::resource::Resource::Create(
+  static auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
   auto instrumentation_scope =
@@ -108,7 +108,7 @@ inline metric_sdk::ResourceMetrics CreateLastValuePointData()
 inline metric_sdk::ResourceMetrics CreateDropPointData()
 {
   metric_sdk::ResourceMetrics data;
-  auto resource = opentelemetry::sdk::resource::Resource::Create(
+  static auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
   data.resource_ = &resource;
   auto instrumentation_scope =
