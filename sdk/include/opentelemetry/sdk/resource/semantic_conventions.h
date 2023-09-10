@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -794,12 +795,18 @@ static constexpr const char *kOtelScopeVersion = "otel.scope.version";
 
 /**
  * Deprecated, use the {@code otel.scope.name} attribute.
+ *
+ * @deprecated Deprecated, use the `otel.scope.name` attribute.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
  * Deprecated, use the {@code otel.scope.version} attribute.
+ *
+ * @deprecated Deprecated, use the `otel.scope.version` attribute.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 // Enum definitions
