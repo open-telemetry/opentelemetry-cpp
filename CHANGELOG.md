@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [DEPRECATION] Deprecate ZPAGES
+  [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+
 ## [1.11.0] 2023-08-21
 
 * [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build

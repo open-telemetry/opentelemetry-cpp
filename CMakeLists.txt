@@ -171,7 +171,8 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
-option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
+option(WITH_ZPAGES
+       "DEPRECATED - Whether to include the Zpages Server in the SDK" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
@@ -243,6 +244,14 @@ option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
+
+if(WITH_ZPAGES)
+  if(WITH_NO_DEPRECATED_CODE)
+    message(FATAL_ERROR "WITH_ZPAGES is DEPRECATED.")
+  else()
+    message(WARNING "WITH_ZPAGES is DEPRECATED.")
+  endif()
+endif()
 
 #
 # Verify options dependencies
