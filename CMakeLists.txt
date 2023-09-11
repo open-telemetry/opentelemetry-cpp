@@ -115,7 +115,9 @@ endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-set(WITH_STL "OFF" CACHE STRING "Which version of the Standard Library for C++ to use")
+set(WITH_STL
+    "OFF"
+    CACHE STRING "Which version of the Standard Library for C++ to use")
 
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
