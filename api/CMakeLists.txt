@@ -79,7 +79,8 @@ elseif(WITH_STL STREQUAL "ON")
   target_compile_definitions(opentelemetry_api
                              INTERFACE OPENTELEMETRY_STL_VERSION=2023)
 else()
-  message(FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20 or CXX23")
+  message(
+    FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20 or CXX23")
 endif()
 
 if(WITH_GSL)
