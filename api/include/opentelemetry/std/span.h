@@ -12,18 +12,18 @@
 #  if __has_include(<version>)  // Check for __cpp_{feature}
 #    include <version>
 #    if defined(__cpp_lib_span) && __cplusplus > 201703L
-#      define HAVE_SPAN
+#      define OPENTELEMETRY_HAVE_SPAN
 #    endif
 #  endif
-#  if !defined(HAVE_SPAN)
+#  if !defined(OPENTELEMETRY_HAVE_SPAN)
 #    // Check for Visual Studio span
 #    if defined(_MSVC_LANG) && _HAS_CXX20
-#      define HAVE_SPAN
+#      define OPENTELEMETRY_HAVE_SPAN
 #    endif
 #    // Check for other compiler span implementation
 #    if !defined(_MSVC_LANG) && __has_include(<span>) && __cplusplus > 201703L
 // This works as long as compiler standard is set to C++20
-#      define HAVE_SPAN
+#      define OPENTELEMETRY_HAVE_SPAN
 #    endif
 #  endif
 #  if !__has_include(<gsl/gsl>)
@@ -31,7 +31,7 @@
 #  endif
 #endif
 
-#if !defined(HAVE_SPAN)
+#if !defined(OPENTELEMETRY_HAVE_SPAN)
 #  if defined(HAVE_GSL)
 #    include <type_traits>
 // Guidelines Support Library provides an implementation of std::span
@@ -44,12 +44,12 @@ template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#    define HAVE_SPAN
+#    define OPENTELEMETRY_HAVE_SPAN
 #  else
 // No `gsl::span`, no `std::span`, fallback to `nostd::span`
 #  endif
 
-#else  // HAVE_SPAN
+#else  // OPENTELEMETRY_HAVE_SPAN
 // Using std::span (https://wg21.link/P0122R7) from Standard Library available in C++20 :
 // - GCC libstdc++ 10+
 // - Clang libc++ 7
@@ -66,4 +66,4 @@ template <class ElementType, std::size_t Extent = nostd::dynamic_extent>
 using span = std::span<ElementType, Extent>;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif  // of HAVE_SPAN
+#endif  // if OPENTELEMETRY_HAVE_SPAN

@@ -53,8 +53,6 @@ endif()
 
 if(WITH_STL STREQUAL "OFF")
   message(STATUS "Building WITH_STL=OFF")
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_STL_VERSION=0)
 elseif(WITH_STL STREQUAL "CXX11")
   message(STATUS "Building WITH_STL=CXX1")
   target_compile_definitions(opentelemetry_api

@@ -3,9 +3,14 @@
 
 #pragma once
 
-#if OPENTELEMETRY_STL_VERSION >= 2011
-#  include "opentelemetry/std/unique_ptr.h"
-#else
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2011
+#    include "opentelemetry/std/unique_ptr.h"
+#    define OPENTELEMETRY_HAVE_STD_UNIQUE_PTR
+#  endif
+#endif
+
+#if !defined(OPENTELEMETRY_HAVE_STD_UNIQUE_PTR)
 #  include <cstddef>
 #  include <memory>
 #  include <type_traits>
@@ -172,4 +177,4 @@ bool operator!=(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_HAVE_STD_UNIQUE_PTR */
