@@ -40,7 +40,7 @@ struct ScopeMetrics
       : scope_{std::move(scope)}, metric_data_{std::move(metric)}
   {}
 
-  inline ScopeMetrics()                     = default;
+  inline ScopeMetrics() {}
   inline ScopeMetrics(const ScopeMetrics &) = default;
   inline ScopeMetrics(ScopeMetrics &&)      = default;
 
@@ -59,7 +59,7 @@ struct ResourceMetrics
       : resource_{std::move(resource)}, scope_metric_data_{std::move(scope_metric_data)}
   {}
 
-  inline ResourceMetrics()                        = default;
+  inline ResourceMetrics() {}
   inline ResourceMetrics(const ResourceMetrics &) = default;
   inline ResourceMetrics(ResourceMetrics &&)      = default;
 
