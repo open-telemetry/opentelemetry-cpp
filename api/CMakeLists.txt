@@ -69,13 +69,17 @@ elseif(WITH_STL STREQUAL "CXX20")
   message(STATUS "Building WITH_STL=CXX20")
   target_compile_definitions(opentelemetry_api
                              INTERFACE OPENTELEMETRY_STL_VERSION=2020)
+elseif(WITH_STL STREQUAL "CXX23")
+  message(STATUS "Building WITH_STL=CXX23")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2023)
 elseif(WITH_STL STREQUAL "ON")
   message(STATUS "Building WITH_STL=ON")
-  # "ON" corresponds to "CXX20" at this time.
+  # "ON" corresponds to "CXX23" at this time.
   target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_STL_VERSION=2020)
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2023)
 else()
-  message(FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17 or CXX20")
+  message(FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20 or CXX23")
 endif()
 
 if(WITH_GSL)

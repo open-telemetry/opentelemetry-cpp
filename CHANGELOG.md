@@ -18,6 +18,23 @@ Increment the:
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
 
+Breaking changes:
+
+* [BUILD] Need fine-grained HAVE_CPP_STDLIB
+  [#2304](https://github.com/open-telemetry/opentelemetry-cpp/pull/2304)
+  * In `CMAKE`, the boolean option `WITH_STL` as changed to an option
+    that accepts the values `OFF`, `ON`, `CXX11`, `CXX14`, `CXX17`,
+    `CXX20` and `CXX23`.
+  * Applications makefiles that did not set WITH_STL need to use
+    `WITH_STL=OFF` instead (this is the default).
+  * Applications makefiles that did set WITH_STL need to use
+    `WITH_STL=ON` instead, or may choose to pick a specific value.
+  * In the `API` header files, the preprocessor symbol `HAVE_CPP_STDLIB`
+    is no longer used.
+  * Applications that did set `HAVE_CPP_STDLIB` before, need to set
+    `OPENTELEMETRY_STL_VERSION=<version>` instead, to build with a
+    specific STL version (2011, 2014, 2017, 2020, 2023).
+
 ## [1.11.0] 2023-08-21
 
 * [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build
