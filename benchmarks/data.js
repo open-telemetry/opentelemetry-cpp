@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1693904910606,
+  "lastUpdate": 1694572258947,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -102550,6 +102550,54 @@ window.BENCHMARK_DATA = {
             "value": 2598796.3038166678,
             "unit": "ns/iter",
             "extra": "iterations: 254\ncpu: 535755.5118110235 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e706b205032456ac45318e82ef89eee6723dafaa",
+          "message": "Bump docker/setup-qemu-action from 2 to 3 (#2306)",
+          "timestamp": "2023-09-12T19:17:21-07:00",
+          "tree_id": "693e0ce2aed6f5f8d3ef38e8f0b3e4120783407c",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/e706b205032456ac45318e82ef89eee6723dafaa"
+        },
+        "date": 1694572253657,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 173.59462123685114,
+            "unit": "ns/iter",
+            "extra": "iterations: 1335000\ncpu: 106.51895131086144 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 158.12847801442845,
+            "unit": "ns/iter",
+            "extra": "iterations: 879000\ncpu: 157.89522184300347 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 922.6740142445506,
+            "unit": "ns/iter",
+            "extra": "iterations: 162000\ncpu: 918.577777777778 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1862492.3981641182,
+            "unit": "ns/iter",
+            "extra": "iterations: 263\ncpu: 449824.3346007603 ns\nthreads: 1"
           }
         ]
       }
