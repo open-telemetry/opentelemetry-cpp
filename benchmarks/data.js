@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1694588973571,
+  "lastUpdate": 1694591239392,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -103414,6 +103414,54 @@ window.BENCHMARK_DATA = {
             "value": 3074245.5897719096,
             "unit": "ns/iter",
             "extra": "iterations: 209\ncpu: 655986.6028708136 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f5f39343ac498fd8e4a461019ee91d0f0ca6b8d6",
+          "message": "Bump docker/setup-buildx-action from 2 to 3 (#2307)\n\nBumps [docker/setup-buildx-action](https://github.com/docker/setup-buildx-action) from 2 to 3.\r\n- [Release notes](https://github.com/docker/setup-buildx-action/releases)\r\n- [Commits](https://github.com/docker/setup-buildx-action/compare/v2...v3)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: docker/setup-buildx-action\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-major\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-09-13T09:34:13+02:00",
+          "tree_id": "10fe16a3c0d99b2ebb657099be3066bb54284ee3",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/f5f39343ac498fd8e4a461019ee91d0f0ca6b8d6"
+        },
+        "date": 1694591234500,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 139.2813313758759,
+            "unit": "ns/iter",
+            "extra": "iterations: 1174000\ncpu: 118.50971039182282 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 232.20829877434466,
+            "unit": "ns/iter",
+            "extra": "iterations: 774000\ncpu: 180.37248062015505 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 715.0028691147313,
+            "unit": "ns/iter",
+            "extra": "iterations: 198000\ncpu: 714.1505050505049 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2087197.047752022,
+            "unit": "ns/iter",
+            "extra": "iterations: 298\ncpu: 421188.2550335573 ns\nthreads: 1"
           }
         ]
       }
