@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1694588965862,
+  "lastUpdate": 1694588972098,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -103156,6 +103156,54 @@ window.BENCHMARK_DATA = {
             "value": 1862492.3981641182,
             "unit": "ns/iter",
             "extra": "iterations: 263\ncpu: 449824.3346007603 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7aee911985dc36a1eb7adac65cd8e977c6dfcb30",
+          "message": "Bump docker/build-push-action from 4 to 5 (#2308)\n\nBumps [docker/build-push-action](https://github.com/docker/build-push-action) from 4 to 5.\r\n- [Release notes](https://github.com/docker/build-push-action/releases)\r\n- [Commits](https://github.com/docker/build-push-action/compare/v4...v5)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: docker/build-push-action\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-major\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-09-13T08:50:55+02:00",
+          "tree_id": "fca25d695a6c0d9e8464fb45a4406ca7d4829afa",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/7aee911985dc36a1eb7adac65cd8e977c6dfcb30"
+        },
+        "date": 1694588967566,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 283.27547036497907,
+            "unit": "ns/iter",
+            "extra": "iterations: 983000\ncpu: 143.58677517802647 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 232.95825872665796,
+            "unit": "ns/iter",
+            "extra": "iterations: 624000\ncpu: 226.14599358974363 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1144.8955535888672,
+            "unit": "ns/iter",
+            "extra": "iterations: 100000\ncpu: 1142.6259999999997 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 3074245.5897719096,
+            "unit": "ns/iter",
+            "extra": "iterations: 209\ncpu: 655986.6028708136 ns\nthreads: 1"
           }
         ]
       }
