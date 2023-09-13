@@ -94,13 +94,8 @@ if(WITH_REMOVE_METER_PREVIEW)
                              INTERFACE ENABLE_REMOVE_METER_PREVIEW)
 endif()
 
-if(WITH_ABI_VERSION_2)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=2)
-elseif(WITH_ABI_VERSION_1)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_ABI_VERSION_NO=1)
-endif()
+target_compile_definitions(opentelemetry_api
+                           INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})
 
 # A better place should be in sdk, not api
 if(WITH_OTLP_HTTP_SSL_PREVIEW)
