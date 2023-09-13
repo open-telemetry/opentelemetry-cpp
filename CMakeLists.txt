@@ -99,21 +99,20 @@ file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 
 #
-# We do not want to have WITH_ABI_VERSION = "1" or "2",
-# and instead prefer two distinct flags,
-# WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
+# We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
+# distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
 #
 # This allows:
 #
-# - to have a specific option description for each ABI
-# - to mark experimental/stable/deprecated on flags, for clarity
-# - to search for exact abi usage move easily, discouraging:
-#     cmake -DWITH_ABI_VERSION=${ARG}
+# * to have a specific option description for each ABI
+# * to mark experimental/stable/deprecated on flags, for clarity
+# * to search for exact abi usage move easily, discouraging:
 #
-# While not supported,
-# having distinct WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2 flags
-# also opens the possibility to support multiple ABI concurrently,
-# should that become necessary.
+#   * cmake -DWITH_ABI_VERSION=${ARG}
+#
+# While not supported, having distinct WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2
+# flags also opens the possibility to support multiple ABI concurrently, should
+# that become necessary.
 #
 if(WITH_ABI_VERSION_1 AND WITH_ABI_VERSION_2)
   #
