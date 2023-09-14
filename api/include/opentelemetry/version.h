@@ -6,8 +6,10 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/detail/preprocessor.h"
 
-// For proof of concept only, testing version 2 build.
-#define OPENTELEMETRY_ABI_VERSION_NO 2
+#ifndef OPENTELEMETRY_ABI_VERSION_NO
+#  define OPENTELEMETRY_ABI_VERSION_NO 1
+#endif
+
 #define OPENTELEMETRY_VERSION "1.11.0"
 #define OPENTELEMETRY_VERSION_MAJOR 1
 #define OPENTELEMETRY_VERSION_MINOR 11
