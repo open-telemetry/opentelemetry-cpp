@@ -28,6 +28,8 @@ namespace exporter
 namespace metrics
 {
 
+static constexpr const char *kPrometheusInstance = "instance";
+
 /**
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
@@ -40,7 +42,17 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
 {
 
   // initialize output vector
+  std::size_t reserve_size = 1;
+  for (const auto &instrumentation_info : data.scope_metric_data_)
+  {
+    reserve_size += instrumentation_info.metric_data_.size();
+  }
+
   std::vector<prometheus_client::MetricFamily> output;
+  output.reserve(reserve_size);
+
+  // Append target_info as the first metric
+  SetTarget(data, &output);
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
@@ -175,6 +187,17 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   return name;
 }
 
+void PrometheusExporterUtils::AddPrometheusLabel(
+    std::string name,
+    std::string value,
+    std::vector<::prometheus::ClientMetric::Label> *labels)
+{
+  prometheus_client::ClientMetric::Label prometheus_label;
+  prometheus_label.name  = std::move(name);
+  prometheus_label.value = std::move(value);
+  labels->emplace_back(std::move(prometheus_label));
+}
+
 bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &name)
 {
   static std::unordered_set<std::string> ignores{
@@ -189,7 +212,7 @@ bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &n
 const std::string &PrometheusExporterUtils::GetPrometheusAttributeName(const std::string &name)
 {
   static std::unordered_map<std::string, std::string> name_mappings{
-      {opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, "instance"}};
+      {opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, kPrometheusInstance}};
   std::unordered_map<std::string, std::string>::const_iterator it = name_mappings.find(name);
   if (it == name_mappings.end())
   {
@@ -252,6 +275,57 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
   }
 }
 
+void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &data,
+                                        std::vector<::prometheus::MetricFamily> *output)
+{
+  if (output == nullptr || data.resource_ == nullptr)
+  {
+    return;
+  }
+  if (data.scope_metric_data_.empty())
+  {
+    return;
+  }
+  if ((*data.scope_metric_data_.begin()).metric_data_.empty())
+  {
+    return;
+  }
+
+  prometheus_client::MetricFamily metric_family;
+  metric_family.name = "target_info";
+  metric_family.help = "Target metadata";
+  metric_family.type = prometheus_client::MetricType::Info;
+  metric_family.metric.emplace_back();
+
+  prometheus_client::ClientMetric &metric = metric_family.metric.back();
+  metric.info.value                       = 1.0;
+
+  std::chrono::nanoseconds time;
+  for (const auto &instrumentation_info : data.scope_metric_data_)
+  {
+    for (const auto &metric_data : instrumentation_info.metric_data_)
+    {
+      time = metric_data.end_ts.time_since_epoch();
+      break;
+    }
+    break;
+  }
+
+  metric_sdk::PointAttributes empty_attributes;
+  SetMetricBasic(metric, time, empty_attributes, data.resource_);
+
+  for (auto &label : data.resource_->GetAttributes())
+  {
+    if (ShouldIgnoreResourceAttribute(label.first))
+    {
+      continue;
+    }
+
+    AddPrometheusLabel(SanitizeNames(GetPrometheusAttributeName(label.first)),
+                       AttributeValueToString(label.second), &metric.label);
+  }
+}
+
 /**
  * Set metric data for:
  * sum => Prometheus Counter
@@ -311,6 +385,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   metric.label.reserve(label_size);
 
   // Convert resource to prometheus labels
+  bool has_instance_label = false;
   if (nullptr != resource)
   {
     opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
@@ -323,38 +398,19 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     if (service_namespace_it != resource->GetAttributes().end() &&
         service_name_it != resource->GetAttributes().end())
     {
-      prometheus_client::ClientMetric::Label prometheus_label;
-      prometheus_label.name  = "job";
-      prometheus_label.value = AttributeValueToString(service_namespace_it->second) + "/" +
-                               AttributeValueToString(service_name_it->second);
-      metric.label.emplace_back(std::move(prometheus_label));
+      AddPrometheusLabel("job",
+                         AttributeValueToString(service_namespace_it->second) + "/" +
+                             AttributeValueToString(service_name_it->second),
+                         &metric.label);
     }
     else if (service_name_it != resource->GetAttributes().end())
     {
-      prometheus_client::ClientMetric::Label prometheus_label;
-      prometheus_label.name  = "job";
-      prometheus_label.value = AttributeValueToString(service_name_it->second);
-      metric.label.emplace_back(std::move(prometheus_label));
+      AddPrometheusLabel("job", AttributeValueToString(service_name_it->second), &metric.label);
     }
     else if (service_namespace_it != resource->GetAttributes().end())
     {
-      prometheus_client::ClientMetric::Label prometheus_label;
-      prometheus_label.name  = "job";
-      prometheus_label.value = AttributeValueToString(service_namespace_it->second);
-      metric.label.emplace_back(std::move(prometheus_label));
-    }
-
-    for (auto &label : resource->GetAttributes())
-    {
-      if (ShouldIgnoreResourceAttribute(label.first))
-      {
-        continue;
-      }
-
-      prometheus_client::ClientMetric::Label prometheus_label;
-      prometheus_label.name  = SanitizeNames(GetPrometheusAttributeName(label.first));
-      prometheus_label.value = AttributeValueToString(label.second);
-      metric.label.emplace_back(std::move(prometheus_label));
+      AddPrometheusLabel("job", AttributeValueToString(service_namespace_it->second),
+                         &metric.label);
     }
   }
 
@@ -363,11 +419,24 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   {
     for (auto &label : labels)
     {
-      prometheus_client::ClientMetric::Label prometheus_label;
-      prometheus_label.name  = SanitizeNames(label.first);
-      prometheus_label.value = AttributeValueToString(label.second);
-      metric.label.emplace_back(std::move(prometheus_label));
+      if (ShouldIgnoreResourceAttribute(label.first))
+      {
+        continue;
+      }
+
+      std::string label_name = SanitizeNames(GetPrometheusAttributeName(label.first));
+      if (label_name == kPrometheusInstance)
+      {
+        has_instance_label = true;
+      }
+      AddPrometheusLabel(std::move(label_name), AttributeValueToString(label.second),
+                         &metric.label);
     }
+  }
+
+  if (!has_instance_label)
+  {
+    AddPrometheusLabel(kPrometheusInstance, "", &metric.label);
   }
 }
 

@@ -42,10 +42,23 @@ private:
   static std::string SanitizeNames(std::string name);
 
   /**
+   * Append key-value pair to prometheus labels.
+   *
+   * @param name label name
+   * @param value label value
+   * @param labels target labels
+   *
+   * @return true if the attribute should be ignored, false otherwise.
+   */
+  static void AddPrometheusLabel(std::string name,
+                                 std::string value,
+                                 std::vector<::prometheus::ClientMetric::Label> *labels);
+
+  /**
    * Some attributes should be ignored when converting resource attributes to
    * prometheus labels.
    *
-   * @param name resource attribnuet name
+   * @param name resource attribute name
    * @return true if the attribute should be ignored, false otherwise.
    */
   static bool ShouldIgnoreResourceAttribute(const std::string &name);
@@ -54,7 +67,7 @@ private:
    * Some attributes should be renamed when converting resource attributes to
    * prometheus labels.
    *
-   * @param name resource attribnuet name
+   * @param name resource attribute name
    * @return const std::string&
    */
   static const std::string &GetPrometheusAttributeName(const std::string &name);
@@ -67,6 +80,12 @@ private:
    */
   static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregationType kind,
                                                 bool is_monotonic = true);
+
+  /**
+   * Add a target_info metric to collect resource attributes
+   */
+  static void SetTarget(const sdk::metrics::ResourceMetrics &data,
+                        std::vector<::prometheus::MetricFamily> *output);
 
   /**
    * Set metric data for:
