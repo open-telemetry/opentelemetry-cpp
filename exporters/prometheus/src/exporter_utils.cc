@@ -29,6 +29,7 @@ namespace metrics
 {
 
 static constexpr const char *kPrometheusInstance = "instance";
+static constexpr const char *kPrometheusJob      = "job";
 
 /**
  * Helper function to convert OpenTelemetry metrics data collection
@@ -205,21 +206,11 @@ bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &n
       opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace,
       opentelemetry::trace::SemanticConventions::kServerAddress,
       opentelemetry::trace::SemanticConventions::kServerPort,
-      opentelemetry::trace::SemanticConventions::kUrlScheme};
+      opentelemetry::trace::SemanticConventions::kUrlScheme,
+      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId,
+      kPrometheusJob,
+      kPrometheusInstance};
   return ignores.end() != ignores.find(name);
-}
-
-const std::string &PrometheusExporterUtils::GetPrometheusAttributeName(const std::string &name)
-{
-  static std::unordered_map<std::string, std::string> name_mappings{
-      {opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, kPrometheusInstance}};
-  std::unordered_map<std::string, std::string>::const_iterator it = name_mappings.find(name);
-  if (it == name_mappings.end())
-  {
-    return name;
-  }
-
-  return it->second;
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
@@ -321,9 +312,11 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
       continue;
     }
 
-    AddPrometheusLabel(SanitizeNames(GetPrometheusAttributeName(label.first)),
-                       AttributeValueToString(label.second), &metric.label);
+    AddPrometheusLabel(SanitizeNames(label.first), AttributeValueToString(label.second),
+                       &metric.label);
   }
+
+  output->emplace_back(std::move(metric_family));
 }
 
 /**
@@ -384,37 +377,9 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   }
   metric.label.reserve(label_size);
 
-  // Convert resource to prometheus labels
-  bool has_instance_label = false;
-  if (nullptr != resource)
-  {
-    opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
-        resource->GetAttributes().find(
-            opentelemetry::sdk::resource::SemanticConventions::kServiceName);
-    opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_namespace_it =
-        resource->GetAttributes().find(
-            opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace);
-
-    if (service_namespace_it != resource->GetAttributes().end() &&
-        service_name_it != resource->GetAttributes().end())
-    {
-      AddPrometheusLabel("job",
-                         AttributeValueToString(service_namespace_it->second) + "/" +
-                             AttributeValueToString(service_name_it->second),
-                         &metric.label);
-    }
-    else if (service_name_it != resource->GetAttributes().end())
-    {
-      AddPrometheusLabel("job", AttributeValueToString(service_name_it->second), &metric.label);
-    }
-    else if (service_namespace_it != resource->GetAttributes().end())
-    {
-      AddPrometheusLabel("job", AttributeValueToString(service_namespace_it->second),
-                         &metric.label);
-    }
-  }
-
   // auto label_pairs = ParseLabel(labels);
+  bool has_instance_label = false;
+  bool has_job_label      = false;
   if (!labels.empty())
   {
     for (auto &label : labels)
@@ -424,16 +389,86 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
         continue;
       }
 
-      std::string label_name = SanitizeNames(GetPrometheusAttributeName(label.first));
+      std::string label_name = SanitizeNames(label.first);
       if (label_name == kPrometheusInstance)
       {
         has_instance_label = true;
+      }
+      else if (label_name == kPrometheusJob)
+      {
+        has_job_label = true;
       }
       AddPrometheusLabel(std::move(label_name), AttributeValueToString(label.second),
                          &metric.label);
     }
   }
 
+  // Convert resource to prometheus labels
+  if (nullptr != resource)
+  {
+    do
+    {
+      if (has_job_label)
+      {
+        break;
+      }
+
+      opentelemetry::sdk::resource::ResourceAttributes::const_iterator prometheus_job_it =
+          resource->GetAttributes().find(kPrometheusJob);
+      if (prometheus_job_it != resource->GetAttributes().end())
+      {
+        AddPrometheusLabel(kPrometheusJob, AttributeValueToString(prometheus_job_it->second),
+                           &metric.label);
+        break;
+      }
+
+      opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
+          resource->GetAttributes().find(
+              opentelemetry::sdk::resource::SemanticConventions::kServiceName);
+      opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_namespace_it =
+          resource->GetAttributes().find(
+              opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace);
+
+      if (service_namespace_it != resource->GetAttributes().end() &&
+          service_name_it != resource->GetAttributes().end())
+      {
+        AddPrometheusLabel(kPrometheusJob,
+                           AttributeValueToString(service_namespace_it->second) + "/" +
+                               AttributeValueToString(service_name_it->second),
+                           &metric.label);
+      }
+      else if (service_name_it != resource->GetAttributes().end())
+      {
+        AddPrometheusLabel(kPrometheusJob, AttributeValueToString(service_name_it->second),
+                           &metric.label);
+      }
+      else if (service_namespace_it != resource->GetAttributes().end())
+      {
+        AddPrometheusLabel(kPrometheusJob,
+                           AttributeValueToString(service_namespace_it->second) + "/",
+                           &metric.label);
+      }
+    } while (false);
+
+    if (!has_instance_label)
+    {
+      opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_instance_id_it =
+          resource->GetAttributes().find(
+              opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
+      if (service_instance_id_it == resource->GetAttributes().end())
+      {
+        service_instance_id_it = resource->GetAttributes().find(kPrometheusInstance);
+      }
+      if (service_instance_id_it != resource->GetAttributes().end())
+      {
+        has_instance_label = true;
+        AddPrometheusLabel(kPrometheusInstance,
+                           AttributeValueToString(service_instance_id_it->second), &metric.label);
+      }
+    }
+  }
+
+  // Add a empty instance label if it's not exist
   if (!has_instance_label)
   {
     AddPrometheusLabel(kPrometheusInstance, "", &metric.label);

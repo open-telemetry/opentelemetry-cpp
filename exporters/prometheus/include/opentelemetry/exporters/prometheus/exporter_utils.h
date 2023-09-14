@@ -63,15 +63,6 @@ private:
    */
   static bool ShouldIgnoreResourceAttribute(const std::string &name);
 
-  /**
-   * Some attributes should be renamed when converting resource attributes to
-   * prometheus labels.
-   *
-   * @param name resource attribute name
-   * @return const std::string&
-   */
-  static const std::string &GetPrometheusAttributeName(const std::string &name);
-
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 
