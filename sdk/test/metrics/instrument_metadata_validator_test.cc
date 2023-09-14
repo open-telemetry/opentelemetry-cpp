@@ -24,6 +24,7 @@ TEST(InstrumentMetadataValidator, TestName)
       "123€AAA€BBB",                    // unicode characters
       "/\\sdsd",                        // string starting with special character
       "***sSSs",                        // string starting with special character
+      "a\\broken\\path",                // contains backward slash
       CreateVeryLargeString(25) + "X",  // total 256 characters
       CreateVeryLargeString(26),        // string much bigger than 255 characters
   };
@@ -37,6 +38,7 @@ TEST(InstrumentMetadataValidator, TestName)
       "s123",                                   // starting with char, followed by numbers
       "dsdsdsd_-.",                             // string , and valid nonalphanumeric
       "d1234_-sDSDs.sdsd344",                   // combination of all valid characters
+      "a/path/to/some/metric",                  // contains forward slash
       CreateVeryLargeString(5) + "ABCERTYG",    // total 63 characters
       CreateVeryLargeString(5) + "ABCERTYGJ",   // total 64 characters
       CreateVeryLargeString(24) + "ABCDEFGHI",  // total 254 characters
