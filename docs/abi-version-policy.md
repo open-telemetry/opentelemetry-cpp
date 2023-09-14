@@ -333,7 +333,7 @@ ABI v2.
 In this state, two stable ABI versions are available,
 the ABI offered by default is the conservative ABI v1.
 
-Fixes introducing breaking changes can no longer be delivered ABI v2,
+Fixes introducing breaking changes can no longer be delivered in ABI v2,
 because it is declared stable.
 An experimental ABI v3 is created.
 
@@ -424,7 +424,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
     {
       virtual void DoSomething() = 0;
       virtual void DoSomethingMore() = 0;
-
     };
   }
 }
