@@ -52,7 +52,7 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
   // subsequent chars should be either of alphabets, digits, underscore,
   // minus, dot, slash
   return !std::any_of(std::next(name.begin()), name.end(), [](char c) {
-    return !isalnum(c) && (c != '-') && (c != '_') && (c != '.') && (c != "/");
+    return !isalnum(c) && (c != '-') && (c != '_') && (c != '.') && (c != '/');
   });
 #endif
 }
