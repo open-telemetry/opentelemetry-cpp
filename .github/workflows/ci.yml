@@ -810,7 +810,7 @@ jobs:
         CXX: /usr/bin/g++-10
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: /home/runner/build/coverage.info
 
