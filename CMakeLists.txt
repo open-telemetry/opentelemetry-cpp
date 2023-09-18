@@ -92,17 +92,54 @@ if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
+option(WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
-if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-   "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-  math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
-else()
+
+#
+# We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
+# distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
+#
+# This allows:
+#
+# * to have a specific option description for each ABI
+# * to mark experimental/stable/deprecated on flags, for clarity
+# * to search for exact abi usage move easily, discouraging:
+#
+#   * cmake -DWITH_ABI_VERSION=${ARG}
+#
+# While not supported, having distinct WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2
+# flags also opens the possibility to support multiple ABI concurrently, should
+# that become necessary.
+#
+if(WITH_ABI_VERSION_1 AND WITH_ABI_VERSION_2)
+  #
+  # Only one ABI is supported in a build.
+  #
   message(
-    FATAL_ERROR
-      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-  )
+    FATAL_ERROR "Set either WITH_ABI_VERSION_1 or WITH_ABI_VERSION_2, not both")
 endif()
+
+if(WITH_ABI_VERSION_2)
+  set(OPENTELEMETRY_ABI_VERSION_NO "2")
+elseif(WITH_ABI_VERSION_1)
+  set(OPENTELEMETRY_ABI_VERSION_NO "1")
+else()
+  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
+    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
+  else()
+    message(
+      FATAL_ERROR
+        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+    )
+  endif()
+endif()
+
+message(STATUS "OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO}")
+
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
    "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
   set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
@@ -112,6 +149,8 @@ else()
       "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
   )
 endif()
+
+message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
