@@ -30,6 +30,10 @@ using M = std::map<std::string, std::string>;
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};
 
+class WritableMetricStorageTestUpDownFixture
+    : public ::testing::TestWithParam<AggregationTemporality>
+{};
+
 class WritableMetricStorageTestObservableGaugeFixture
     : public ::testing::TestWithParam<AggregationTemporality>
 {};
@@ -121,6 +125,97 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+
+TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
+{
+  AggregationTemporality temporality = GetParam();
+
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit",
+                                     InstrumentType::kObservableUpDownCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  // Some computation here
+  auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kDefault,
+                                                          nullptr);
+  int64_t get_count1                                                                  = 20;
+  int64_t put_count1                                                                  = 10;
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"RequestType", "GET"}}, get_count1}, {{{"RequestType", "PUT"}}, put_count1}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count1);
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count1);
+          }
+        }
+        return true;
+      });
+  // subsequent recording after collection shouldn't fail
+  // monotonic increasing values;
+  int64_t get_count2 = -50;
+  int64_t put_count2 = -70;
+
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
+      {{{"RequestType", "GET"}}, get_count2}, {{{"RequestType", "PUT"}}, put_count2}};
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count2 - get_count1);
+            }
+          }
+          else if (opentelemetry::nostd::get<std::string>(
+                       data_attr.attributes.find("RequestType")->second) == "PUT")
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count2 - put_count1);
+            }
+          }
+        }
+        return true;
+      });
+}
+
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestUpDownLong,
+                         WritableMetricStorageTestUpDownFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
 
