@@ -17,8 +17,8 @@ namespace sdk
 {
 namespace metrics
 {
-// instrument-name = ALPHA 0*254 ("_" / "." / "-" / ALPHA / DIGIT)
-const std::string kInstrumentNamePattern = "[a-zA-Z][-_.a-zA-Z0-9]{0,254}";
+// instrument-name = ALPHA 0*254 ("_" / "." / "-" / "/" / ALPHA / DIGIT)
+const std::string kInstrumentNamePattern = "[a-zA-Z][-_./a-zA-Z0-9]{0,254}";
 //
 const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 // instrument-unit = It can have a maximum length of 63 ASCII chars
@@ -49,9 +49,11 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
   {
     return false;
   }
-  // subsequent chars should be either of alphabets, digits, underscore, minus, dot
-  return !std::any_of(std::next(name.begin()), name.end(),
-                      [](char c) { return !isalnum(c) && c != '-' && c != '_' && c != '.'; });
+  // subsequent chars should be either of alphabets, digits, underscore,
+  // minus, dot, slash
+  return !std::any_of(std::next(name.begin()), name.end(), [](char c) {
+    return !isalnum(c) && (c != '-') && (c != '_') && (c != '.') && (c != '/');
+  });
 #endif
 }
 
