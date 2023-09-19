@@ -26,10 +26,12 @@ public:
    * to Prometheus metrics data collection
    *
    * @param records a collection of metrics in OpenTelemetry
+   * @param populate_target_info whether to populate target_info
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
-      const sdk::metrics::ResourceMetrics &data);
+      const sdk::metrics::ResourceMetrics &data,
+      bool populate_target_info = true);
 
 private:
   /**
@@ -47,8 +49,6 @@ private:
    * @param name label name
    * @param value label value
    * @param labels target labels
-   *
-   * @return true if the attribute should be ignored, false otherwise.
    */
   static void AddPrometheusLabel(std::string name,
                                  std::string value,

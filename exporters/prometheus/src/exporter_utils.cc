@@ -39,7 +39,8 @@ static constexpr const char *kPrometheusJob      = "job";
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
-    const sdk::metrics::ResourceMetrics &data)
+    const sdk::metrics::ResourceMetrics &data,
+    bool populate_target_info)
 {
 
   // initialize output vector
@@ -53,7 +54,10 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   output.reserve(reserve_size);
 
   // Append target_info as the first metric
-  SetTarget(data, &output);
+  if (populate_target_info)
+  {
+    SetTarget(data, &output);
+  }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
@@ -291,16 +295,8 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
   prometheus_client::ClientMetric &metric = metric_family.metric.back();
   metric.info.value                       = 1.0;
 
-  std::chrono::nanoseconds time;
-  for (const auto &instrumentation_info : data.scope_metric_data_)
-  {
-    for (const auto &metric_data : instrumentation_info.metric_data_)
-    {
-      time = metric_data.end_ts.time_since_epoch();
-      break;
-    }
-    break;
-  }
+  std::chrono::nanoseconds time =
+      (*data.scope_metric_data_.begin()).metric_data_.begin()->end_ts.time_since_epoch();
 
   metric_sdk::PointAttributes empty_attributes;
   SetMetricBasic(metric, time, empty_attributes, data.resource_);
@@ -442,22 +438,16 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
         AddPrometheusLabel(kPrometheusJob, AttributeValueToString(service_name_it->second),
                            &metric.label);
       }
-      else if (service_namespace_it != resource->GetAttributes().end())
-      {
-        AddPrometheusLabel(kPrometheusJob,
-                           AttributeValueToString(service_namespace_it->second) + "/",
-                           &metric.label);
-      }
     } while (false);
 
     if (!has_instance_label)
     {
       opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_instance_id_it =
-          resource->GetAttributes().find(
-              opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
+          resource->GetAttributes().find(kPrometheusInstance);
       if (service_instance_id_it == resource->GetAttributes().end())
       {
-        service_instance_id_it = resource->GetAttributes().find(kPrometheusInstance);
+        service_instance_id_it = resource->GetAttributes().find(
+            opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
       }
       if (service_instance_id_it != resource->GetAttributes().end())
       {
