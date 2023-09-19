@@ -19,13 +19,14 @@ TEST(InstrumentMetadataValidator, TestName)
 {
   opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
   std::vector<std::string> invalid_names = {
-      "",                                      // empty string
-      "1sdf",                                  // string starting with number
-      "123€AAA€BBB",                           // unicode characters
-      "/\\sdsd",                               // string starting with special character
-      "***sSSs",                               // string starting with special character
-      CreateVeryLargeString(5) + "ABCERTYGJ",  // total 64 charactes
-      CreateVeryLargeString(7),                // string much bigger than 63 chars
+      "",                               // empty string
+      "1sdf",                           // string starting with number
+      "123€AAA€BBB",                    // unicode characters
+      "/\\sdsd",                        // string starting with special character
+      "***sSSs",                        // string starting with special character
+      "a\\broken\\path",                // contains backward slash
+      CreateVeryLargeString(25) + "X",  // total 256 characters
+      CreateVeryLargeString(26),        // string much bigger than 255 characters
   };
   for (auto const &str : invalid_names)
   {
@@ -33,11 +34,15 @@ TEST(InstrumentMetadataValidator, TestName)
   }
 
   std::vector<std::string> valid_names = {
-      "T",                                    // single char string
-      "s123",                                 // starting with char, followed by numbers
-      "dsdsdsd_-.",                           // string , and valid nonalphanumeric
-      "d1234_-sDSDs.sdsd344",                 // combination of all valid characters
-      CreateVeryLargeString(5) + "ABCERTYG",  // total 63 charactes
+      "T",                                      // single char string
+      "s123",                                   // starting with char, followed by numbers
+      "dsdsdsd_-.",                             // string , and valid nonalphanumeric
+      "d1234_-sDSDs.sdsd344",                   // combination of all valid characters
+      "a/path/to/some/metric",                  // contains forward slash
+      CreateVeryLargeString(5) + "ABCERTYG",    // total 63 characters
+      CreateVeryLargeString(5) + "ABCERTYGJ",   // total 64 characters
+      CreateVeryLargeString(24) + "ABCDEFGHI",  // total 254 characters
+      CreateVeryLargeString(25),                // total 255 characters
   };
   for (auto const &str : valid_names)
   {
