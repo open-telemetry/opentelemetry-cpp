@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <limits>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -94,7 +95,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           }
           else
           {
-            sum = nostd::get<int64_t>(histogram_point_data.sum_);
+            sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
                   point_data_attr.attributes, time, &metric_family, data.resource_);
@@ -518,7 +519,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
   const auto &value_var = values[0];
   if (nostd::holds_alternative<int64_t>(value_var))
   {
-    value = nostd::get<int64_t>(value_var);
+    value = static_cast<double>(nostd::get<int64_t>(value_var));
   }
   else
   {
@@ -553,9 +554,9 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)
 {
-  metric->histogram.sample_sum   = values[0];
-  metric->histogram.sample_count = values[1];
-  int cumulative                 = 0;
+  metric->histogram.sample_sum   = static_cast<double>(values[0]);
+  metric->histogram.sample_count = static_cast<std::uint64_t>(values[1]);
+  std::uint64_t cumulative       = 0;
   std::vector<prometheus_client::ClientMetric::Bucket> buckets;
   uint32_t idx = 0;
   for (const auto &boundary : boundaries)
