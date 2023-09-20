@@ -30,14 +30,14 @@ public:
    *
    * @since ABI_VERSION 2
    *
-   * @param[in] library_name Meter instrumentation scope
-   * @param[in] library_version Version, optional
-   * @param[in] schema_url Schema URL, optional
+   * @param[in] name Meter instrumentation scope
+   * @param[in] version Instrumentation scope version, optional
+   * @param[in] schema_url Instrumentation scope schema URL, optional
    * @param[in] attributes Instrumentation scope attributes, optional
    */
   virtual nostd::shared_ptr<Meter> GetMeter(
-      nostd::string_view library_name,
-      nostd::string_view library_version         = "",
+      nostd::string_view name,
+      nostd::string_view version                 = "",
       nostd::string_view schema_url              = "",
       const common::KeyValueIterable *attributes = nullptr) noexcept = 0;
 #else
@@ -46,30 +46,30 @@ public:
    *
    * @since ABI_VERSION 1
    *
-   * @param[in] library_name Meter instrumentation scope
-   * @param[in] library_version Version, optional
-   * @param[in] schema_url Schema URL, optional
+   * @param[in] name Meter instrumentation scope
+   * @param[in] version Instrumentation scope version, optional
+   * @param[in] schema_url Instrumentation scope schema URL, optional
    */
-  virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
-                                            nostd::string_view library_version = "",
-                                            nostd::string_view schema_url      = "") noexcept = 0;
+  virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view name,
+                                            nostd::string_view version    = "",
+                                            nostd::string_view schema_url = "") noexcept = 0;
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::shared_ptr<Meter> GetMeter(
-      nostd::string_view library_name,
-      nostd::string_view library_version,
+      nostd::string_view name,
+      nostd::string_view version,
       nostd::string_view schema_url,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes)
   {
-    nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> atributes_span{
+    nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> attributes_span{
         attributes.begin(), attributes.end()};
 
     common::KeyValueIterableView<
         nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>>
-        iterable_attributes{atributes_span};
+        iterable_attributes{attributes_span};
 
-    return GetMeter(library_name, library_version, schema_url, &iterable_attributes);
+    return GetMeter(name, version, schema_url, &iterable_attributes);
   }
 #endif
 

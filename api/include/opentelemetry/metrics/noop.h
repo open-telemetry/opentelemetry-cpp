@@ -198,16 +198,16 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::shared_ptr<Meter> GetMeter(
-      nostd::string_view /* library_name */,
-      nostd::string_view /* library_version */,
+      nostd::string_view /* name */,
+      nostd::string_view /* version */,
       nostd::string_view /* schema_url */,
       const common::KeyValueIterable * /* attributes */) noexcept override
   {
     return meter_;
   }
 #else
-  nostd::shared_ptr<Meter> GetMeter(nostd::string_view /* library_name */,
-                                    nostd::string_view /* library_version */,
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view /* name */,
+                                    nostd::string_view /* version */,
                                     nostd::string_view /* schema_url */) noexcept override
   {
     return meter_;
