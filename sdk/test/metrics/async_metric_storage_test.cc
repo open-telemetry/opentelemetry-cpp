@@ -145,8 +145,8 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
   collectors.push_back(collector);
 
-  opentelemetry::sdk::metrics::AsyncMetricStorage storage(instr_desc, AggregationType::kDefault,
-                                                          nullptr);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kDefault, ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
