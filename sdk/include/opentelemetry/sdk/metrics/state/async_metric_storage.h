@@ -10,6 +10,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
@@ -29,11 +30,16 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
+                         OPENTELEMETRY_MAYBE_UNUSED,
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         cumulative_hash_map_(new AttributesHashMap()),
         delta_hash_map_(new AttributesHashMap()),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+        exemplar_reservoir_(exemplar_reservoir),
+#endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {}
 
@@ -47,6 +53,11 @@ public:
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
     for (auto &measurement : measurements)
     {
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
+                                            std::chrono::system_clock::now());
+#endif
+
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       aggr->Aggregate(measurement.second);
       auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(measurement.first);
@@ -119,6 +130,9 @@ private:
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+#endif
   TemporalMetricStorage temporal_metric_storage_;
 };
 
