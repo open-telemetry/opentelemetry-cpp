@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695329714305,
+  "lastUpdate": 1695329716293,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -106390,6 +106390,54 @@ window.BENCHMARK_DATA = {
             "value": 2840052.4304463314,
             "unit": "ns/iter",
             "extra": "iterations: 208\ncpu: 659851.4423076923 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "Tom.Tan@microsoft.com",
+            "name": "Tom Tan",
+            "username": "ThomsonTan"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "13f01cae932b2f73eb9eba7631ca257d729bb66f",
+          "message": "Add exemplar reservoir to async metric storage (#2319)",
+          "timestamp": "2023-09-21T22:41:18+02:00",
+          "tree_id": "ecf87c1bb43999912fb6293865a47c5cd3e8b317",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/13f01cae932b2f73eb9eba7631ca257d729bb66f"
+        },
+        "date": 1695329709230,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 179.92218096299305,
+            "unit": "ns/iter",
+            "extra": "iterations: 1163000\ncpu: 119.26646603611353 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 181.64014939497915,
+            "unit": "ns/iter",
+            "extra": "iterations: 774000\ncpu: 181.10232558139538 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1049.541579890372,
+            "unit": "ns/iter",
+            "extra": "iterations: 197000\ncpu: 730.3162436548223 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2048546.5138103254,
+            "unit": "ns/iter",
+            "extra": "iterations: 313\ncpu: 438844.0894568693 ns\nthreads: 1"
           }
         ]
       }
