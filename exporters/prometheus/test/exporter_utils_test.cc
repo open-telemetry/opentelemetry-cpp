@@ -241,7 +241,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   {
     if (label.name == "job")
     {
-      ASSERT_EQ(label.value, "test_service2");
+      // job label should be ignored when service.name exist
+      ASSERT_EQ(label.value, "unknown_service");
       checked_label_num++;
     }
     else if (label.name == "instance")
