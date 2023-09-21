@@ -209,10 +209,19 @@ bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &n
   static std::unordered_set<std::string> ignores{
       opentelemetry::sdk::resource::SemanticConventions::kServiceName,
       opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace,
+      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, kPrometheusJob,
+      kPrometheusInstance};
+  return ignores.end() != ignores.find(name);
+}
+
+bool PrometheusExporterUtils::ShouldIgnoreMetricAttribute(const std::string &name)
+{
+  static std::unordered_set<std::string> ignores{
+      opentelemetry::sdk::resource::SemanticConventions::kServiceName,
+      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId,
       opentelemetry::trace::SemanticConventions::kServerAddress,
       opentelemetry::trace::SemanticConventions::kServerPort,
       opentelemetry::trace::SemanticConventions::kUrlScheme,
-      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId,
       kPrometheusJob,
       kPrometheusInstance};
   return ignores.end() != ignores.find(name);
@@ -381,7 +390,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   {
     for (auto &label : labels)
     {
-      if (ShouldIgnoreResourceAttribute(label.first))
+      if (ShouldIgnoreMetricAttribute(label.first))
       {
         continue;
       }
