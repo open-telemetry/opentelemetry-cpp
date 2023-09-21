@@ -214,19 +214,6 @@ bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &n
   return ignores.end() != ignores.find(name);
 }
 
-bool PrometheusExporterUtils::ShouldIgnoreMetricAttribute(const std::string &name)
-{
-  static std::unordered_set<std::string> ignores{
-      opentelemetry::sdk::resource::SemanticConventions::kServiceName,
-      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId,
-      opentelemetry::trace::SemanticConventions::kServerAddress,
-      opentelemetry::trace::SemanticConventions::kServerPort,
-      opentelemetry::trace::SemanticConventions::kUrlScheme,
-      kPrometheusJob,
-      kPrometheusInstance};
-  return ignores.end() != ignores.find(name);
-}
-
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
     const metric_sdk::PointType &point_type)
 {
@@ -390,11 +377,6 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   {
     for (auto &label : labels)
     {
-      if (ShouldIgnoreMetricAttribute(label.first))
-      {
-        continue;
-      }
-
       std::string label_name = SanitizeNames(label.first);
       if (label_name == kPrometheusInstance)
       {

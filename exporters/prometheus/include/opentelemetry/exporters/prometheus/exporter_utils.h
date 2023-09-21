@@ -63,15 +63,6 @@ private:
    */
   static bool ShouldIgnoreResourceAttribute(const std::string &name);
 
-  /**
-   * Some attributes should be ignored when converting metric attributes to
-   * prometheus labels.
-   *
-   * @param name attribute name
-   * @return true if the attribute should be ignored, false otherwise.
-   */
-  static bool ShouldIgnoreMetricAttribute(const std::string &name);
-
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 
