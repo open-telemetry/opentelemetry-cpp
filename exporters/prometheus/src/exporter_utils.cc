@@ -410,15 +410,6 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
         break;
       }
 
-      opentelemetry::sdk::resource::ResourceAttributes::const_iterator prometheus_job_it =
-          resource->GetAttributes().find(kPrometheusJob);
-      if (prometheus_job_it != resource->GetAttributes().end())
-      {
-        AddPrometheusLabel(kPrometheusJob, AttributeValueToString(prometheus_job_it->second),
-                           &metric.label);
-        break;
-      }
-
       opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
           resource->GetAttributes().find(
               opentelemetry::sdk::resource::SemanticConventions::kServiceName);
@@ -433,10 +424,20 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
                            AttributeValueToString(service_namespace_it->second) + "/" +
                                AttributeValueToString(service_name_it->second),
                            &metric.label);
+        break;
       }
       else if (service_name_it != resource->GetAttributes().end())
       {
         AddPrometheusLabel(kPrometheusJob, AttributeValueToString(service_name_it->second),
+                           &metric.label);
+        break;
+      }
+
+      opentelemetry::sdk::resource::ResourceAttributes::const_iterator prometheus_job_it =
+          resource->GetAttributes().find(kPrometheusJob);
+      if (prometheus_job_it != resource->GetAttributes().end())
+      {
+        AddPrometheusLabel(kPrometheusJob, AttributeValueToString(prometheus_job_it->second),
                            &metric.label);
       }
     } while (false);
@@ -444,11 +445,11 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     if (!has_instance_label)
     {
       opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_instance_id_it =
-          resource->GetAttributes().find(kPrometheusInstance);
+          resource->GetAttributes().find(
+              opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
       if (service_instance_id_it == resource->GetAttributes().end())
       {
-        service_instance_id_it = resource->GetAttributes().find(
-            opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
+        service_instance_id_it = resource->GetAttributes().find(kPrometheusInstance);
       }
       if (service_instance_id_it != resource->GetAttributes().end())
       {
