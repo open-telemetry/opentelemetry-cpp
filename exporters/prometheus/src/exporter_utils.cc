@@ -297,7 +297,7 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
   }
 
   prometheus_client::MetricFamily metric_family;
-  metric_family.name = "target_info";
+  metric_family.name = "target";
   metric_family.help = "Target metadata";
   metric_family.type = prometheus_client::MetricType::Info;
   metric_family.metric.emplace_back();
