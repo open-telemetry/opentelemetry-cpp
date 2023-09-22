@@ -42,7 +42,11 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       auto unit        = metric_data.instrument_descriptor.unit_;
       auto sanitized   = SanitizeNames(origin_name);
       prometheus_client::MetricFamily metric_family;
-      metric_family.name = sanitized + "_" + unit;
+      metric_family.name = sanitized;
+      if (!unit.empty())
+      {
+        metric_family.name += "_" + unit;
+      };
       metric_family.help = metric_data.instrument_descriptor.description_;
       auto time          = metric_data.end_ts.time_since_epoch();
       for (const auto &point_data_attr : metric_data.point_data_attr_)

@@ -25,7 +25,7 @@ struct TestDataPoints
   /**
    * Helper function to create ResourceMetrics
    */
-  inline metric_sdk::ResourceMetrics CreateSumPointData()
+  inline metric_sdk::ResourceMetrics CreateSumPointData(std::string unit = "unit")
   {
     metric_sdk::SumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
@@ -34,7 +34,7 @@ struct TestDataPoints
     metric_sdk::ResourceMetrics data;
     data.resource_ = &resource;
     metric_sdk::MetricData metric_data{
-        metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
+        metric_sdk::InstrumentDescriptor{"library_name", "description", unit,
                                          metric_sdk::InstrumentType::kCounter,
                                          metric_sdk::InstrumentValueType::kDouble},
         metric_sdk::AggregationTemporality::kDelta, opentelemetry::common::SystemTimestamp{},

@@ -17,6 +17,8 @@ Increment the:
 
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+* [EXPORTER] Omit underscore suffix for unitless metrics
+  [#2323](https://github.com/open-telemetry/opentelemetry-cpp/pull/2323)
 
 ## [1.11.0] 2023-08-21
 

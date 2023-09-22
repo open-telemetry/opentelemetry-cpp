@@ -157,4 +157,13 @@ TEST(PrometheusExporterUtils, SanitizeName)
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name:"), "name_name:");
 }
 
+TEST(PrometheusExporterUtils, HandleMissingUnit)
+{
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics data = dp.CreateSumPointData("");
+  std::vector<prometheus::MetricFamily> family =
+      PrometheusExporterUtils::TranslateToPrometheus(data);
+  ASSERT_EQ(family.begin()->name, "library_name");
+}
+
 OPENTELEMETRY_END_NAMESPACE
