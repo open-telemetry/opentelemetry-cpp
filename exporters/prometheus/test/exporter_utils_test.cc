@@ -42,6 +42,12 @@ void assert_basic(prometheus_client::MetricFamily &metric,
   ASSERT_EQ(metric.help, description);               // description not changed
   ASSERT_EQ(metric.type, type);                      // type translated
 
+  // Prometheus metric data points should not have explicit timestamps
+  for (const prometheus::ClientMetric &cm : metric.metric)
+  {
+    ASSERT_EQ(cm.timestamp_ms, 0);
+  }
+
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
 

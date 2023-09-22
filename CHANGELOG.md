@@ -17,6 +17,8 @@ Increment the:
 
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
 
 ## [1.11.0] 2023-08-21
 
