@@ -106,8 +106,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollect
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
-
-  metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
@@ -120,7 +120,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 {
-  metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateLastValuePointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
@@ -133,7 +134,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 {
-  metric_sdk::ResourceMetrics metrics_data = CreateHistogramPointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
