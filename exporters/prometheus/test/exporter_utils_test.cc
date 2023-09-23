@@ -11,7 +11,6 @@
 
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
-namespace metric_api        = opentelemetry::metrics;
 namespace prometheus_client = ::prometheus;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -42,6 +41,12 @@ void assert_basic(prometheus_client::MetricFamily &metric,
   ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
   ASSERT_EQ(metric.help, description);               // description not changed
   ASSERT_EQ(metric.type, type);                      // type translated
+
+  // Prometheus metric data points should not have explicit timestamps
+  for (const prometheus::ClientMetric &cm : metric.metric)
+  {
+    ASSERT_EQ(cm.timestamp_ms, 0);
+  }
 
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
@@ -113,7 +118,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
        {"service.namespace", "test_namespace"},
        {"service.instance.id", "localhost:8000"},
        {"custom_resource_attr", "custom_resource_value"}});
-  metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
@@ -169,7 +175,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
       {{"service.name", "test_service"},
        {"service.instance.id", "localhost:8000"},
        {"custom_resource_attr", "custom_resource_value"}});
-  metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateLastValuePointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
@@ -224,7 +231,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
       {{"job", "test_service2"},
        {"instance", "localhost:8001"},
        {"custom_resource_attr", "custom_resource_value"}});
-  metric_sdk::ResourceMetrics metrics_data = CreateHistogramPointData();
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();
   metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);

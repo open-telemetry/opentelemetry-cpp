@@ -70,7 +70,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       prometheus_client::MetricFamily metric_family;
       metric_family.name = sanitized + "_" + unit;
       metric_family.help = metric_data.instrument_descriptor.description_;
-      auto time          = metric_data.end_ts.time_since_epoch();
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
         auto kind         = getAggregationType(point_data_attr.point_data);
@@ -98,7 +97,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, time, &metric_family, data.resource_);
+                  point_data_attr.attributes, &metric_family, data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -108,14 +107,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
           }
           else
           {
@@ -131,7 +130,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, time, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
           }
           else
           {
@@ -292,11 +291,8 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
   prometheus_client::ClientMetric &metric = metric_family.metric.back();
   metric.info.value                       = 1.0;
 
-  std::chrono::nanoseconds time =
-      (*data.scope_metric_data_.begin()).metric_data_.begin()->end_ts.time_since_epoch();
-
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, time, empty_attributes, data.resource_);
+  SetMetricBasic(metric, empty_attributes, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
@@ -320,13 +316,12 @@ template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const metric_sdk::PointAttributes &labels,
                                       prometheus_client::MetricType type,
-                                      std::chrono::nanoseconds time,
                                       prometheus_client::MetricFamily *metric_family,
                                       const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, time, labels, resource);
+  SetMetricBasic(metric, labels, resource);
   SetValue(values, type, &metric);
 }
 
@@ -339,26 +334,22 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const std::vector<double> &boundaries,
                                       const std::vector<uint64_t> &counts,
                                       const metric_sdk::PointAttributes &labels,
-                                      std::chrono::nanoseconds time,
                                       prometheus_client::MetricFamily *metric_family,
                                       const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, time, labels, resource);
+  SetMetricBasic(metric, labels, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
 /**
- * Set time and labels to metric data
+ * Set labels to metric data
  */
 void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
-                                             std::chrono::nanoseconds time,
                                              const metric_sdk::PointAttributes &labels,
                                              const opentelemetry::sdk::resource::Resource *resource)
 {
-  metric.timestamp_ms = time.count() / 1000000;
-
   std::size_t label_size = 0;
   if (nullptr != resource)
   {

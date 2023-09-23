@@ -86,7 +86,6 @@ private:
   static void SetData(std::vector<T> values,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
                       ::prometheus::MetricType type,
-                      std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -99,7 +98,6 @@ private:
                       const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
-                      std::chrono::nanoseconds time,
                       ::prometheus::MetricFamily *metric_family,
                       const opentelemetry::sdk::resource::Resource *resource);
 
@@ -107,7 +105,6 @@ private:
    * Set time and labels to metric data
    */
   static void SetMetricBasic(::prometheus::ClientMetric &metric,
-                             std::chrono::nanoseconds time,
                              const opentelemetry::sdk::metrics::PointAttributes &labels,
                              const opentelemetry::sdk::resource::Resource *resource);
 
