@@ -112,7 +112,14 @@ std::string AttributeValueToString(const opentelemetry::sdk::common::OwnedAttrib
   return result;
 }
 
-std::string SanitizeNamesLocal(std::string name)
+/**
+ * Sanitize the given metric name or label according to Prometheus rule.
+ *
+ * This function is needed because names in OpenTelemetry can contain
+ * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
+ * name should only contain alphanumeric characters and '_'.
+ */
+std::string SanitizeNames(std::string name)
 {
   constexpr const auto replacement     = '_';
   constexpr const auto replacement_dup = '=';
@@ -166,7 +173,7 @@ struct ClientMetricWrapper
       size_t i = 0;
       for (auto const &label : labels)
       {
-        auto sanitized          = SanitizeNamesLocal(label.first);
+        auto sanitized          = SanitizeNames(label.first);
         metric.label[i].name    = sanitized;
         metric.label[i++].value = AttributeValueToString(label.second);
       }
@@ -354,18 +361,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     }
   }
   return output;
-}
-
-/**
- * Sanitize the given metric name or label according to Prometheus rule.
- *
- * This function is needed because names in OpenTelemetry can contain
- * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
- * name should only contain alphanumeric characters and '_'.
- */
-std::string PrometheusExporterUtils::SanitizeNames(std::string name)
-{
-  return SanitizeNamesLocal(name);
 }
 
 }  // namespace metrics
