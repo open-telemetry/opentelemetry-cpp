@@ -5,16 +5,18 @@
 
 #include "opentelemetry/version.h"
 
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace nostd           = opentelemetry::nostd;
-namespace exportermetrics = opentelemetry::exporter::metrics;
+OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace metric_sdk      = sdk::metrics;
+namespace nostd           = nostd;
+namespace exportermetrics = exporter::metrics;
 
 namespace
 {
 
-using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
-using opentelemetry::sdk::resource::Resource;
-using opentelemetry::sdk::resource::ResourceAttributes;
+using sdk::instrumentationscope::InstrumentationScope;
+using sdk::resource::Resource;
+using sdk::resource::ResourceAttributes;
 
 struct TestDataPoints
 {
@@ -123,7 +125,6 @@ struct TestDataPoints
 };
 }  // namespace
 
-OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics

@@ -12,8 +12,6 @@
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
-namespace prometheus_client = ::prometheus;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -22,7 +20,7 @@ namespace metrics
 /**
  * The Prometheus Collector maintains the intermediate collection in Prometheus Exporter
  */
-class PrometheusCollector : public prometheus_client::Collectable
+class PrometheusCollector : public ::prometheus::Collectable
 {
 public:
   /**
@@ -38,7 +36,7 @@ public:
    *
    * @return all metrics in the metricsToCollect snapshot
    */
-  std::vector<prometheus_client::MetricFamily> Collect() const override;
+  std::vector<::prometheus::MetricFamily> Collect() const override;
 
 private:
   sdk::metrics::MetricReader *reader_;

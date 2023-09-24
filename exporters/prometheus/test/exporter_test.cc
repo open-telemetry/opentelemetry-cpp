@@ -9,6 +9,8 @@
 #include "opentelemetry/version.h"
 #include "prometheus_test_helper.h"
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+
 /**
  * PrometheusExporterTest is a friend class of PrometheusExporter.
  * It has access to a private constructor that does not take in
@@ -16,11 +18,12 @@
  * private constructor is only to be used here for testing
  */
 
-using opentelemetry::exporter::metrics::PrometheusCollector;
-using opentelemetry::exporter::metrics::PrometheusExporter;
-using opentelemetry::exporter::metrics::PrometheusExporterOptions;
-using opentelemetry::sdk::metrics::AggregationTemporality;
-using opentelemetry::sdk::metrics::InstrumentType;
+using exporter::metrics::PrometheusCollector;
+using exporter::metrics::PrometheusExporter;
+using exporter::metrics::PrometheusExporterOptions;
+using sdk::metrics::AggregationTemporality;
+using sdk::metrics::InstrumentType;
+
 /**
  * When a PrometheusExporter is initialized,
  * isShutdown should be false.
@@ -77,3 +80,5 @@ TEST(PrometheusExporter, CheckAggregationTemporality)
   ASSERT_EQ(exporter.GetAggregationTemporality(InstrumentType::kUpDownCounter),
             AggregationTemporality::kCumulative);
 }
+
+OPENTELEMETRY_END_NAMESPACE

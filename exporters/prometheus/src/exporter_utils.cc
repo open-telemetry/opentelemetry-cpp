@@ -12,10 +12,10 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
-namespace prometheus_client = ::prometheus;
-namespace metric_sdk        = opentelemetry::sdk::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace metric_sdk = sdk::metrics;
+
 namespace exporter
 {
 namespace metrics
@@ -47,28 +47,28 @@ metric_sdk::AggregationType getAggregationType(const metric_sdk::PointType &poin
 /**
  * Translate the OTel metric type to Prometheus metric type
  */
-prometheus_client::MetricType TranslateType(metric_sdk::AggregationType kind, bool is_monotonic)
+::prometheus::MetricType TranslateType(metric_sdk::AggregationType kind, bool is_monotonic)
 {
   switch (kind)
   {
     case metric_sdk::AggregationType::kSum:
       if (!is_monotonic)
       {
-        return prometheus_client::MetricType::Gauge;
+        return ::prometheus::MetricType::Gauge;
       }
       else
       {
-        return prometheus_client::MetricType::Counter;
+        return ::prometheus::MetricType::Counter;
       }
       break;
     case metric_sdk::AggregationType::kHistogram:
-      return prometheus_client::MetricType::Histogram;
+      return ::prometheus::MetricType::Histogram;
       break;
     case metric_sdk::AggregationType::kLastValue:
-      return prometheus_client::MetricType::Gauge;
+      return ::prometheus::MetricType::Gauge;
       break;
     default:
-      return prometheus_client::MetricType::Untyped;
+      return ::prometheus::MetricType::Untyped;
   }
 }
 
@@ -184,7 +184,7 @@ struct ClientMetricWrapper
    * Handle Counter.
    */
   template <typename T>
-  void SetValue(const std::vector<T> &values, prometheus_client::MetricType type)
+  void SetValue(const std::vector<T> &values, ::prometheus::MetricType type)
   {
     double value          = 0.0;
     const auto &value_var = values[0];
@@ -199,15 +199,15 @@ struct ClientMetricWrapper
 
     switch (type)
     {
-      case prometheus_client::MetricType::Counter: {
+      case ::prometheus::MetricType::Counter: {
         metric.counter.value = value;
         break;
       }
-      case prometheus_client::MetricType::Gauge: {
+      case ::prometheus::MetricType::Gauge: {
         metric.gauge.value = value;
         break;
       }
-      case prometheus_client::MetricType::Untyped: {
+      case ::prometheus::MetricType::Untyped: {
         metric.untyped.value = value;
         break;
       }
@@ -226,18 +226,18 @@ struct ClientMetricWrapper
     metric.histogram.sample_sum   = values[0];
     metric.histogram.sample_count = values[1];
     int cumulative                = 0;
-    std::vector<prometheus_client::ClientMetric::Bucket> buckets;
+    std::vector<::prometheus::ClientMetric::Bucket> buckets;
     uint32_t idx = 0;
     for (const auto &boundary : boundaries)
     {
-      prometheus_client::ClientMetric::Bucket bucket;
+      ::prometheus::ClientMetric::Bucket bucket;
       cumulative += counts[idx];
       bucket.cumulative_count = cumulative;
       bucket.upper_bound      = boundary;
       buckets.emplace_back(bucket);
       ++idx;
     }
-    prometheus_client::ClientMetric::Bucket bucket;
+    ::prometheus::ClientMetric::Bucket bucket;
     cumulative += counts[idx];
     bucket.cumulative_count = cumulative;
     bucket.upper_bound      = std::numeric_limits<double>::infinity();
@@ -268,12 +268,12 @@ struct MetricFamilyWrapper
  * @param records a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
-std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
+std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data)
 {
 
   // initialize output vector
-  std::vector<prometheus_client::MetricFamily> output;
+  std::vector<::prometheus::MetricFamily> output;
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
@@ -282,7 +282,7 @@ std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
       auto origin_name = metric_data.instrument_descriptor.name_;
       auto unit        = metric_data.instrument_descriptor.unit_;
       auto sanitized   = SanitizeNames(origin_name);
-      prometheus_client::MetricFamily metric_family;
+      ::prometheus::MetricFamily metric_family;
       metric_family.name = sanitized + "_" + unit;
       metric_family.help = metric_data.instrument_descriptor.description_;
       for (const auto &point_data_attr : metric_data.point_data_attr_)
@@ -294,10 +294,10 @@ std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
           is_monotonic =
               nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
         }
-        const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-        metric_family.type                       = type;
+        const ::prometheus::MetricType type = TranslateType(kind, is_monotonic);
+        metric_family.type                  = type;
         MetricFamilyWrapper wrapper{metric_family};
-        if (type == prometheus_client::MetricType::Histogram)  // Histogram
+        if (type == ::prometheus::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
               nostd::get<sdk::metrics::HistogramPointData>(point_data_attr.point_data);
@@ -316,7 +316,7 @@ std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
               .SetValue(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
                         counts);
         }
-        else if (type == prometheus_client::MetricType::Gauge)
+        else if (type == ::prometheus::MetricType::Gauge)
         {
           if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
                   point_data_attr.point_data))

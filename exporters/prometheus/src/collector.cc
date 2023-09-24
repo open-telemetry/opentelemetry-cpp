@@ -4,9 +4,11 @@
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
-namespace metric_sdk = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace metric_sdk = sdk::metrics;
+
 namespace exporter
 {
 namespace metrics
@@ -24,7 +26,7 @@ PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader) : r
  *
  * @return all metrics in the metricsToCollect snapshot
  */
-std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() const
+std::vector<::prometheus::MetricFamily> PrometheusCollector::Collect() const
 {
   if (reader_->IsShutdown())
   {
@@ -35,7 +37,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
   }
   collection_lock_.lock();
 
-  std::vector<prometheus_client::MetricFamily> result;
+  std::vector<::prometheus::MetricFamily> result;
   reader_->Collect([&result](sdk::metrics::ResourceMetrics &metric_data) {
     auto prometheus_metric_data = TranslateToPrometheus(metric_data);
     for (auto &data : prometheus_metric_data)

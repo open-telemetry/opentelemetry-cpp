@@ -11,11 +11,13 @@
 #include <map>
 #include <thread>
 
-using opentelemetry::exporter::metrics::PrometheusCollector;
-using opentelemetry::sdk::metrics::ResourceMetrics;
-namespace metric_api      = opentelemetry::metrics;
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace metric_exporter = opentelemetry::exporter::metrics;
+OPENTELEMETRY_BEGIN_NAMESPACE
+
+using exporter::metrics::PrometheusCollector;
+using sdk::metrics::ResourceMetrics;
+namespace metric_api      = metrics;
+namespace metric_sdk      = sdk::metrics;
+namespace metric_exporter = exporter::metrics;
 
 class MockMetricProducer : public opentelemetry::sdk::metrics::MetricProducer
 {
@@ -82,3 +84,5 @@ TEST(PrometheusCollector, BasicTests)
   delete reader;
   delete producer;
 }
+
+OPENTELEMETRY_END_NAMESPACE
