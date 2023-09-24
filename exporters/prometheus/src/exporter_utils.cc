@@ -20,6 +20,46 @@ namespace exporter
 {
 namespace metrics
 {
+namespace
+{
+struct MetricFamilyWrapper
+{
+  ::prometheus::MetricFamily &metric_family;
+
+  /**
+   * Set metric data for:
+   * sum => Prometheus Counter
+   */
+  template <typename T>
+  void SetData(std::vector<T> values,
+               const metric_sdk::PointAttributes &labels,
+               prometheus_client::MetricType type)
+  {
+    metric_family.metric.emplace_back();
+    prometheus_client::ClientMetric &metric = metric_family.metric.back();
+    PrometheusExporterUtils::SetMetricBasic(metric, labels);
+    PrometheusExporterUtils::SetValue(values, type, &metric);
+  }
+
+  /**
+   * Set metric data for:
+   * Histogram => Prometheus Histogram
+   */
+  template <typename T>
+  void SetData(std::vector<T> values,
+               const std::vector<double> &boundaries,
+               const std::vector<uint64_t> &counts,
+               const metric_sdk::PointAttributes &labels)
+  {
+    metric_family.metric.emplace_back();
+    prometheus_client::ClientMetric &metric = metric_family.metric.back();
+    PrometheusExporterUtils::SetMetricBasic(metric, labels);
+    PrometheusExporterUtils::SetValue(values, boundaries, counts, &metric);
+  }
+};
+
+}  // namespace
+
 /**
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
@@ -55,6 +95,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         }
         const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
         metric_family.type                       = type;
+        MetricFamilyWrapper wrapper{metric_family};
         if (type == prometheus_client::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
@@ -70,8 +111,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           {
             sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
-          SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, &metric_family);
+          wrapper.SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
+                          counts, point_data_attr.attributes);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -81,14 +122,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family);
+            wrapper.SetData(values, point_data_attr.attributes, type);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family);
+            wrapper.SetData(values, point_data_attr.attributes, type);
           }
           else
           {
@@ -104,7 +145,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family);
+            wrapper.SetData(values, point_data_attr.attributes, type);
           }
           else
           {
@@ -217,39 +258,6 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
     default:
       return prometheus_client::MetricType::Untyped;
   }
-}
-
-/**
- * Set metric data for:
- * sum => Prometheus Counter
- */
-template <typename T>
-void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const metric_sdk::PointAttributes &labels,
-                                      prometheus_client::MetricType type,
-                                      prometheus_client::MetricFamily *metric_family)
-{
-  metric_family->metric.emplace_back();
-  prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels);
-  SetValue(values, type, &metric);
-}
-
-/**
- * Set metric data for:
- * Histogram => Prometheus Histogram
- */
-template <typename T>
-void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const std::vector<double> &boundaries,
-                                      const std::vector<uint64_t> &counts,
-                                      const metric_sdk::PointAttributes &labels,
-                                      prometheus_client::MetricFamily *metric_family)
-{
-  metric_family->metric.emplace_back();
-  prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels);
-  SetValue(values, boundaries, counts, &metric);
 }
 
 /**

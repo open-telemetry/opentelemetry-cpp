@@ -31,7 +31,6 @@ public:
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data);
 
-private:
   /**
    * Sanitize the given metric name or label according to Prometheus rule.
    *
@@ -49,27 +48,6 @@ private:
    */
   static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregationType kind,
                                                 bool is_monotonic = true);
-
-  /**
-   * Set metric data for:
-   * Counter => Prometheus Counter
-   */
-  template <typename T>
-  static void SetData(std::vector<T> values,
-                      const opentelemetry::sdk::metrics::PointAttributes &labels,
-                      ::prometheus::MetricType type,
-                      ::prometheus::MetricFamily *metric_family);
-
-  /**
-   * Set metric data for:
-   * Histogram => Prometheus Histogram
-   */
-  template <typename T>
-  static void SetData(std::vector<T> values,
-                      const std::vector<double> &boundaries,
-                      const std::vector<uint64_t> &counts,
-                      const opentelemetry::sdk::metrics::PointAttributes &labels,
-                      ::prometheus::MetricFamily *metric_family);
 
   /**
    * Set time and labels to metric data
