@@ -16,21 +16,13 @@ namespace exporter
 namespace metrics
 {
 /**
- * The Prometheus Utils contains utility functions for Prometheus Exporter
+ * Convert OpenTelemetry metrics data collection to Prometheus metrics data collection
+ *
+ * @param data a collection of metrics in OpenTelemetry
+ * @return a collection of translated metrics that is acceptable by Prometheus
  */
-class PrometheusExporterUtils
-{
-public:
-  /**
-   * Helper function to convert OpenTelemetry metrics data collection
-   * to Prometheus metrics data collection
-   *
-   * @param data a collection of metrics in OpenTelemetry
-   * @return a collection of translated metrics that is acceptable by Prometheus
-   */
-  static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
-      const sdk::metrics::ResourceMetrics &data);
-};
+std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
+    const sdk::metrics::ResourceMetrics &data);
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

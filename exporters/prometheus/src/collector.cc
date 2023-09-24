@@ -37,7 +37,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
 
   std::vector<prometheus_client::MetricFamily> result;
   reader_->Collect([&result](sdk::metrics::ResourceMetrics &metric_data) {
-    auto prometheus_metric_data = PrometheusExporterUtils::TranslateToPrometheus(metric_data);
+    auto prometheus_metric_data = TranslateToPrometheus(metric_data);
     for (auto &data : prometheus_metric_data)
       result.emplace_back(data);
     return true;

@@ -268,7 +268,7 @@ struct MetricFamilyWrapper
  * @param records a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
-std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
+std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data)
 {
 
@@ -362,7 +362,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   }
   return output;
 }
-
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

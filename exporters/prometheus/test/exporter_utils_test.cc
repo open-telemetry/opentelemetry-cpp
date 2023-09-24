@@ -8,12 +8,12 @@
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "prometheus_test_helper.h"
 
-using opentelemetry::exporter::metrics::PrometheusExporterUtils;
-namespace metric_sdk        = opentelemetry::sdk::metrics;
-namespace metric_api        = opentelemetry::metrics;
-namespace prometheus_client = ::prometheus;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+using exporter::metrics::TranslateToPrometheus;
+namespace metric_sdk        = sdk::metrics;
+namespace metric_api        = metrics;
+namespace prometheus_client = ::prometheus;
 
 template <typename T>
 void assert_basic(prometheus_client::MetricFamily &metric,
@@ -91,7 +91,7 @@ void assert_histogram(prometheus_client::MetricFamily &metric,
 TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollection)
 {
   metric_sdk::ResourceMetrics metrics_data = {};
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  auto translated                          = TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 0);
 }
 
@@ -100,7 +100,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
 
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  auto translated = TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
@@ -114,7 +114,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateLastValuePointData();
 
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  auto translated = TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
 
   auto metric1          = translated[0];
@@ -128,7 +128,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();
 
-  auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
+  auto translated = TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 1);
 
   auto metric              = translated[0];
@@ -150,7 +150,7 @@ protected:
     metric_sdk::InstrumentDescriptor instrument_descriptor{
         original, "description", "unit", metric_sdk::InstrumentType::kCounter,
         metric_sdk::InstrumentValueType::kDouble};
-    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+    std::vector<prometheus::MetricFamily> result = TranslateToPrometheus(
         {&resource_,
          {{instrumentation_scope_.get(), {{instrument_descriptor, {}, {}, {}, {{}}}}}}});
     EXPECT_EQ(result.begin()->name, sanitized + "_unit");
