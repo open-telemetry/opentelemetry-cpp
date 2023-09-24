@@ -42,6 +42,12 @@ void assert_basic(prometheus_client::MetricFamily &metric,
   ASSERT_EQ(metric.help, description);               // description not changed
   ASSERT_EQ(metric.type, type);                      // type translated
 
+  // Prometheus metric data points should not have explicit timestamps
+  for (const prometheus::ClientMetric &cm : metric.metric)
+  {
+    ASSERT_EQ(cm.timestamp_ms, 0);
+  }
+
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
 
@@ -155,6 +161,44 @@ TEST(PrometheusExporterUtils, SanitizeName)
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__"), "name_");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name"), "name_name");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name:"), "name_name:");
+}
+
+class AttributeCollisionTest : public ::testing::Test
+{
+  Resource resource_ = Resource::Create(ResourceAttributes{});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+  metric_sdk::InstrumentDescriptor instrument_descriptor_{"library_name", "description", "unit",
+                                                          metric_sdk::InstrumentType::kCounter,
+                                                          metric_sdk::InstrumentValueType::kDouble};
+
+protected:
+  void CheckTranslation(const metric_sdk::PointAttributes &attrs,
+                        const std::vector<prometheus::ClientMetric::Label> &expected)
+  {
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         {{instrumentation_scope_.get(), {{instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}});
+    EXPECT_EQ(result.begin()->metric.begin()->label, expected);
+  }
+};
+
+TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}},
+                   {{"foo_a", "value1"}, {"foo_b", "value2"}});
+}
+
+TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}},  //
+                   {{"foo_a", "value1;value2"}});
+}
+
+TEST_F(AttributeCollisionTest, DropsInvertedKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
+                   {{"foo_a", "value1"}, {"foo_b", "value2"}});
 }
 
 OPENTELEMETRY_END_NAMESPACE
