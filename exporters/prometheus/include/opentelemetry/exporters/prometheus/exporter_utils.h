@@ -31,6 +31,7 @@ public:
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data);
 
+private:
   /**
    * Sanitize the given metric name or label according to Prometheus rule.
    *
@@ -39,49 +40,6 @@ public:
    * name should only contain alphanumeric characters and '_'.
    */
   static std::string SanitizeNames(std::string name);
-
-  static opentelemetry::sdk::metrics::AggregationType getAggregationType(
-      const opentelemetry::sdk::metrics::PointType &point_type);
-
-  /**
-   * Translate the OTel metric type to Prometheus metric type
-   */
-  static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregationType kind,
-                                                bool is_monotonic = true);
-
-  /**
-   * Set time and labels to metric data
-   */
-  static void SetMetricBasic(::prometheus::ClientMetric &metric,
-                             const opentelemetry::sdk::metrics::PointAttributes &labels);
-
-  /**
-   * Convert attribute value to string
-   */
-  static std::string AttributeValueToString(
-      const opentelemetry::sdk::common::OwnedAttributeValue &value);
-
-  /**
-   * Handle Counter and Gauge.
-   */
-  template <typename T>
-  static void SetValue(std::vector<T> values,
-                       ::prometheus::MetricType type,
-                       ::prometheus::ClientMetric *metric);
-
-  /**
-   * Handle Gauge from MinMaxSumCount
-   */
-  static void SetValue(double value, ::prometheus::ClientMetric *metric);
-
-  /**
-   * Handle Histogram
-   */
-  template <typename T>
-  static void SetValue(std::vector<T> values,
-                       const std::vector<double> &boundaries,
-                       const std::vector<uint64_t> &counts,
-                       ::prometheus::ClientMetric *metric);
 
   // For testing
   friend class SanitizeNameTester;

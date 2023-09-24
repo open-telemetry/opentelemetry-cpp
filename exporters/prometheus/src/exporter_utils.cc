@@ -22,39 +22,233 @@ namespace metrics
 {
 namespace
 {
+
+metric_sdk::AggregationType getAggregationType(const metric_sdk::PointType &point_type)
+{
+  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kSum;
+  }
+  else if (nostd::holds_alternative<sdk::metrics::DropPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kDrop;
+  }
+  else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kHistogram;
+  }
+  else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kLastValue;
+  }
+  return metric_sdk::AggregationType::kDefault;
+}
+
+/**
+ * Translate the OTel metric type to Prometheus metric type
+ */
+prometheus_client::MetricType TranslateType(metric_sdk::AggregationType kind, bool is_monotonic)
+{
+  switch (kind)
+  {
+    case metric_sdk::AggregationType::kSum:
+      if (!is_monotonic)
+      {
+        return prometheus_client::MetricType::Gauge;
+      }
+      else
+      {
+        return prometheus_client::MetricType::Counter;
+      }
+      break;
+    case metric_sdk::AggregationType::kHistogram:
+      return prometheus_client::MetricType::Histogram;
+      break;
+    case metric_sdk::AggregationType::kLastValue:
+      return prometheus_client::MetricType::Gauge;
+      break;
+    default:
+      return prometheus_client::MetricType::Untyped;
+  }
+}
+
+std::string AttributeValueToString(const opentelemetry::sdk::common::OwnedAttributeValue &value)
+{
+  std::string result;
+  if (nostd::holds_alternative<bool>(value))
+  {
+    result = nostd::get<bool>(value) ? "true" : "false";
+  }
+  else if (nostd::holds_alternative<int>(value))
+  {
+    result = std::to_string(nostd::get<int>(value));
+  }
+  else if (nostd::holds_alternative<int64_t>(value))
+  {
+    result = std::to_string(nostd::get<int64_t>(value));
+  }
+  else if (nostd::holds_alternative<unsigned int>(value))
+  {
+    result = std::to_string(nostd::get<unsigned int>(value));
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    result = std::to_string(nostd::get<uint64_t>(value));
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    result = std::to_string(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    result = nostd::get<std::string>(value);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Prometheus Exporter] AttributeValueToString - "
+        " Nested attributes not supported - ignored");
+  }
+  return result;
+}
+
+std::string SanitizeNamesLocal(std::string name)
+{
+  constexpr const auto replacement     = '_';
+  constexpr const auto replacement_dup = '=';
+
+  auto valid = [](int i, char c) {
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
+        (c >= '0' && c <= '9' && i > 0))
+    {
+      return true;
+    }
+    return false;
+  };
+
+  bool has_dup = false;
+  for (int i = 0; i < (int)name.size(); ++i)
+  {
+    if (valid(i, name[i]))
+    {
+      continue;
+    }
+    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
+    {
+      has_dup = true;
+      name[i] = replacement_dup;
+    }
+    else
+    {
+      name[i] = replacement;
+    }
+  }
+  if (has_dup)
+  {
+    auto end = std::remove(name.begin(), name.end(), replacement_dup);
+    return std::string{name.begin(), end};
+  }
+  return name;
+}
+
+struct ClientMetricWrapper
+{
+  ::prometheus::ClientMetric &metric;
+
+  /**
+   * Set labels to metric data
+   */
+  void SetLabels(const metric_sdk::PointAttributes &labels)
+  {
+    if (!labels.empty())
+    {
+      metric.label.resize(labels.size());
+      size_t i = 0;
+      for (auto const &label : labels)
+      {
+        auto sanitized          = SanitizeNamesLocal(label.first);
+        metric.label[i].name    = sanitized;
+        metric.label[i++].value = AttributeValueToString(label.second);
+      }
+    }
+  }
+
+  /**
+   * Handle Counter.
+   */
+  template <typename T>
+  void SetValue(const std::vector<T> &values, prometheus_client::MetricType type)
+  {
+    double value          = 0.0;
+    const auto &value_var = values[0];
+    if (nostd::holds_alternative<int64_t>(value_var))
+    {
+      value = nostd::get<int64_t>(value_var);
+    }
+    else
+    {
+      value = nostd::get<double>(value_var);
+    }
+
+    switch (type)
+    {
+      case prometheus_client::MetricType::Counter: {
+        metric.counter.value = value;
+        break;
+      }
+      case prometheus_client::MetricType::Gauge: {
+        metric.gauge.value = value;
+        break;
+      }
+      case prometheus_client::MetricType::Untyped: {
+        metric.untyped.value = value;
+        break;
+      }
+      default:
+        return;
+    }
+  }
+
+  /**
+   * Handle Histogram
+   */
+  void SetValue(const std::vector<double> &values,
+                const std::vector<double> &boundaries,
+                const std::vector<uint64_t> &counts)
+  {
+    metric.histogram.sample_sum   = values[0];
+    metric.histogram.sample_count = values[1];
+    int cumulative                = 0;
+    std::vector<prometheus_client::ClientMetric::Bucket> buckets;
+    uint32_t idx = 0;
+    for (const auto &boundary : boundaries)
+    {
+      prometheus_client::ClientMetric::Bucket bucket;
+      cumulative += counts[idx];
+      bucket.cumulative_count = cumulative;
+      bucket.upper_bound      = boundary;
+      buckets.emplace_back(bucket);
+      ++idx;
+    }
+    prometheus_client::ClientMetric::Bucket bucket;
+    cumulative += counts[idx];
+    bucket.cumulative_count = cumulative;
+    bucket.upper_bound      = std::numeric_limits<double>::infinity();
+    buckets.emplace_back(bucket);
+    metric.histogram.bucket = buckets;
+  }
+};
+
 struct MetricFamilyWrapper
 {
   ::prometheus::MetricFamily &metric_family;
 
-  /**
-   * Set metric data for:
-   * sum => Prometheus Counter
-   */
-  template <typename T>
-  void SetData(std::vector<T> values,
-               const metric_sdk::PointAttributes &labels,
-               prometheus_client::MetricType type)
+  ClientMetricWrapper Add(const metric_sdk::PointAttributes &labels)
   {
     metric_family.metric.emplace_back();
-    prometheus_client::ClientMetric &metric = metric_family.metric.back();
-    PrometheusExporterUtils::SetMetricBasic(metric, labels);
-    PrometheusExporterUtils::SetValue(values, type, &metric);
-  }
-
-  /**
-   * Set metric data for:
-   * Histogram => Prometheus Histogram
-   */
-  template <typename T>
-  void SetData(std::vector<T> values,
-               const std::vector<double> &boundaries,
-               const std::vector<uint64_t> &counts,
-               const metric_sdk::PointAttributes &labels)
-  {
-    metric_family.metric.emplace_back();
-    prometheus_client::ClientMetric &metric = metric_family.metric.back();
-    PrometheusExporterUtils::SetMetricBasic(metric, labels);
-    PrometheusExporterUtils::SetValue(values, boundaries, counts, &metric);
+    ClientMetricWrapper wrapper{metric_family.metric.back()};
+    wrapper.SetLabels(labels);
+    return wrapper;
   }
 };
 
@@ -111,8 +305,9 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           {
             sum = nostd::get<int64_t>(histogram_point_data.sum_);
           }
-          wrapper.SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
-                          counts, point_data_attr.attributes);
+          wrapper.Add(point_data_attr.attributes)
+              .SetValue(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries,
+                        counts);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -122,14 +317,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            wrapper.SetData(values, point_data_attr.attributes, type);
+            wrapper.Add(point_data_attr.attributes).SetValue(values, type);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            wrapper.SetData(values, point_data_attr.attributes, type);
+            wrapper.Add(point_data_attr.attributes).SetValue(values, type);
           }
           else
           {
@@ -145,7 +340,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            wrapper.SetData(values, point_data_attr.attributes, type);
+            wrapper.Add(point_data_attr.attributes).SetValue(values, type);
           }
           else
           {
@@ -170,224 +365,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
  */
 std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 {
-  constexpr const auto replacement     = '_';
-  constexpr const auto replacement_dup = '=';
-
-  auto valid = [](int i, char c) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
-        (c >= '0' && c <= '9' && i > 0))
-    {
-      return true;
-    }
-    return false;
-  };
-
-  bool has_dup = false;
-  for (int i = 0; i < (int)name.size(); ++i)
-  {
-    if (valid(i, name[i]))
-    {
-      continue;
-    }
-    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
-    {
-      has_dup = true;
-      name[i] = replacement_dup;
-    }
-    else
-    {
-      name[i] = replacement;
-    }
-  }
-  if (has_dup)
-  {
-    auto end = std::remove(name.begin(), name.end(), replacement_dup);
-    return std::string{name.begin(), end};
-  }
-  return name;
-}
-
-metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
-    const metric_sdk::PointType &point_type)
-{
-
-  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_type))
-  {
-    return metric_sdk::AggregationType::kSum;
-  }
-  else if (nostd::holds_alternative<sdk::metrics::DropPointData>(point_type))
-  {
-    return metric_sdk::AggregationType::kDrop;
-  }
-  else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(point_type))
-  {
-    return metric_sdk::AggregationType::kHistogram;
-  }
-  else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(point_type))
-  {
-    return metric_sdk::AggregationType::kLastValue;
-  }
-  return metric_sdk::AggregationType::kDefault;
-}
-
-/**
- * Translate the OTel metric type to Prometheus metric type
- */
-prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
-    metric_sdk::AggregationType kind,
-    bool is_monotonic)
-{
-  switch (kind)
-  {
-    case metric_sdk::AggregationType::kSum:
-      if (!is_monotonic)
-      {
-        return prometheus_client::MetricType::Gauge;
-      }
-      else
-      {
-        return prometheus_client::MetricType::Counter;
-      }
-      break;
-    case metric_sdk::AggregationType::kHistogram:
-      return prometheus_client::MetricType::Histogram;
-      break;
-    case metric_sdk::AggregationType::kLastValue:
-      return prometheus_client::MetricType::Gauge;
-      break;
-    default:
-      return prometheus_client::MetricType::Untyped;
-  }
-}
-
-/**
- * Set labels to metric data
- */
-void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
-                                             const metric_sdk::PointAttributes &labels)
-{
-  // auto label_pairs = ParseLabel(labels);
-  if (!labels.empty())
-  {
-    metric.label.resize(labels.size());
-    size_t i = 0;
-    for (auto const &label : labels)
-    {
-      auto sanitized          = SanitizeNames(label.first);
-      metric.label[i].name    = sanitized;
-      metric.label[i++].value = AttributeValueToString(label.second);
-    }
-  }
-}
-
-std::string PrometheusExporterUtils::AttributeValueToString(
-    const opentelemetry::sdk::common::OwnedAttributeValue &value)
-{
-  std::string result;
-  if (nostd::holds_alternative<bool>(value))
-  {
-    result = nostd::get<bool>(value) ? "true" : "false";
-  }
-  else if (nostd::holds_alternative<int>(value))
-  {
-    result = std::to_string(nostd::get<int>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    result = std::to_string(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<unsigned int>(value))
-  {
-    result = std::to_string(nostd::get<unsigned int>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    result = std::to_string(nostd::get<uint64_t>(value));
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    result = std::to_string(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<std::string>(value))
-  {
-    result = nostd::get<std::string>(value);
-  }
-  else
-  {
-    OTEL_INTERNAL_LOG_WARN(
-        "[Prometheus Exporter] AttributeValueToString - "
-        " Nested attributes not supported - ignored");
-  }
-  return result;
-}
-
-/**
- * Handle Counter.
- */
-template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
-                                       prometheus_client::MetricType type,
-                                       prometheus_client::ClientMetric *metric)
-{
-  double value          = 0.0;
-  const auto &value_var = values[0];
-  if (nostd::holds_alternative<int64_t>(value_var))
-  {
-    value = nostd::get<int64_t>(value_var);
-  }
-  else
-  {
-    value = nostd::get<double>(value_var);
-  }
-
-  switch (type)
-  {
-    case prometheus_client::MetricType::Counter: {
-      metric->counter.value = value;
-      break;
-    }
-    case prometheus_client::MetricType::Gauge: {
-      metric->gauge.value = value;
-      break;
-    }
-    case prometheus_client::MetricType::Untyped: {
-      metric->untyped.value = value;
-      break;
-    }
-    default:
-      return;
-  }
-}
-
-/**
- * Handle Histogram
- */
-template <typename T>
-void PrometheusExporterUtils::SetValue(std::vector<T> values,
-                                       const std::vector<double> &boundaries,
-                                       const std::vector<uint64_t> &counts,
-                                       prometheus_client::ClientMetric *metric)
-{
-  metric->histogram.sample_sum   = values[0];
-  metric->histogram.sample_count = values[1];
-  int cumulative                 = 0;
-  std::vector<prometheus_client::ClientMetric::Bucket> buckets;
-  uint32_t idx = 0;
-  for (const auto &boundary : boundaries)
-  {
-    prometheus_client::ClientMetric::Bucket bucket;
-    cumulative += counts[idx];
-    bucket.cumulative_count = cumulative;
-    bucket.upper_bound      = boundary;
-    buckets.emplace_back(bucket);
-    ++idx;
-  }
-  prometheus_client::ClientMetric::Bucket bucket;
-  cumulative += counts[idx];
-  bucket.cumulative_count = cumulative;
-  bucket.upper_bound      = std::numeric_limits<double>::infinity();
-  buckets.emplace_back(bucket);
-  metric->histogram.bucket = buckets;
+  return SanitizeNamesLocal(name);
 }
 
 }  // namespace metrics
