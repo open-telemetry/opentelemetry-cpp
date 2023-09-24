@@ -4,7 +4,6 @@
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace metric_sdk = sdk::metrics;

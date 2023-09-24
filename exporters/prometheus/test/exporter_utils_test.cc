@@ -11,8 +11,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 using exporter::metrics::TranslateToPrometheus;
-namespace metric_sdk        = sdk::metrics;
-namespace metric_api        = metrics;
+namespace metric_sdk = sdk::metrics;
+namespace metric_api = metrics;
 
 template <typename T>
 void assert_basic(::prometheus::MetricFamily &metric,
@@ -104,8 +104,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", ::prometheus::MetricType::Counter, 1,
-               vals);
+  assert_basic(metric1, "library_name", "description", ::prometheus::MetricType::Counter, 1, vals);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
@@ -118,8 +117,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", ::prometheus::MetricType::Gauge, 1,
-               vals);
+  assert_basic(metric1, "library_name", "description", ::prometheus::MetricType::Gauge, 1, vals);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
@@ -132,8 +130,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", ::prometheus::MetricType::Histogram, 1,
-               vals);
+  assert_basic(metric, "library_name", "description", ::prometheus::MetricType::Histogram, 1, vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
 
