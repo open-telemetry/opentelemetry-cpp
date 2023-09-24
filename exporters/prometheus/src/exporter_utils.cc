@@ -258,16 +258,37 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
 void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
                                              const metric_sdk::PointAttributes &labels)
 {
-  // auto label_pairs = ParseLabel(labels);
-  if (!labels.empty())
+  if (labels.empty())
   {
-    metric.label.resize(labels.size());
-    size_t i = 0;
-    for (auto const &label : labels)
+    return;
+  }
+
+  // Concatenate values for keys that collide after sanitation.
+  // Note that attribute keys are sorted, but sanitized keys can be out-of-order.
+  // We could sort the sanitized keys again, but this seems too expensive to do
+  // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
+  metric.label.reserve(labels.size());
+  std::string previous_key;
+  for (auto const &label : labels)
+  {
+    auto sanitized = SanitizeNames(label.first);
+    int comparison = previous_key.compare(sanitized);
+    if (metric.label.empty() || comparison < 0)  // new key
     {
-      auto sanitized          = SanitizeNames(label.first);
-      metric.label[i].name    = sanitized;
-      metric.label[i++].value = AttributeValueToString(label.second);
+      previous_key = sanitized;
+      metric.label.push_back({sanitized, AttributeValueToString(label.second)});
+    }
+    else if (comparison == 0)  // key collision after sanitation
+    {
+      metric.label.back().value += ";" + AttributeValueToString(label.second);
+    }
+    else  // order inversion introduced by sanitation
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[Prometheus Exporter] SetMetricBase - "
+          "the sort order of labels has changed because of sanitization: '"
+          << label.first << "' became '" << sanitized << "' which is less than '" << previous_key
+          << "'. Ignoring this label.");
     }
   }
 }
