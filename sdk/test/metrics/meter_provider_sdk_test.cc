@@ -59,6 +59,70 @@ TEST(MeterProvider, GetMeter)
   mp1.Shutdown();
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(MeterProvider, GetMeterAbiv2)
+{
+  MeterProvider mp;
+
+  auto m1 = mp.GetMeter("name1", "version1", "url1");
+
+  auto m2 = mp.GetMeter("name2", "version2", "url2", nullptr);
+
+  auto m3 = mp.GetMeter("name3", "version3", "url3", {{"accept_single_attr", true}});
+
+  std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attr4 = {
+      "accept_single_attr", true};
+
+  auto m4 = mp.GetMeter("name4", "version4", "url4", {attr4});
+
+  auto m5 = mp.GetMeter("name5", "version5", "url5", {{"foo", "1"}, {"bar", "2"}});
+
+  std::initializer_list<
+      std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>>
+      attrs6 = {{"foo", "1"}, {"bar", "2"}};
+
+  auto m6 = mp.GetMeter("name6", "version6", "url6", attrs6);
+
+  typedef std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> KV;
+
+  std::initializer_list<KV> attrs7 = {{"foo", "1"}, {"bar", "2"}};
+  auto m7                          = mp.GetMeter("name7", "version7", "url7", attrs6);
+
+  auto m8 = mp.GetMeter("name8", "version8", "url8",
+                        {{"a", "string"},
+                         {"b", false},
+                         {"c", 314159},
+                         {"d", (unsigned int)314159},
+                         {"e", (int32_t)-20},
+                         {"f", (uint32_t)20},
+                         {"g", (int64_t)-20},
+                         {"h", (uint64_t)20},
+                         {"i", 3.1},
+                         {"j", "string"}});
+
+  std::map<std::string, opentelemetry::common::AttributeValue> attr9{
+      {"a", "string"},     {"b", false},        {"c", 314159},       {"d", (unsigned int)314159},
+      {"e", (int32_t)-20}, {"f", (uint32_t)20}, {"g", (int64_t)-20}, {"h", (uint64_t)20},
+      {"i", 3.1},          {"j", "string"}};
+
+  auto m9 = mp.GetMeter("name9", "version9", "url9", attr9);
+
+  ASSERT_NE(nullptr, m1);
+  ASSERT_NE(nullptr, m2);
+  ASSERT_NE(nullptr, m3);
+  ASSERT_NE(nullptr, m4);
+  ASSERT_NE(nullptr, m5);
+  ASSERT_NE(nullptr, m6);
+  ASSERT_NE(nullptr, m7);
+  ASSERT_NE(nullptr, m8);
+  ASSERT_NE(nullptr, m9);
+
+  // cleanup properly without crash
+  mp.ForceFlush();
+  mp.Shutdown();
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
 #ifdef ENABLE_REMOVE_METER_PREVIEW
 TEST(MeterProvider, RemoveMeter)
 {

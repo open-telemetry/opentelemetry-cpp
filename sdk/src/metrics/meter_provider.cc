@@ -32,15 +32,18 @@ MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+nostd::shared_ptr<metrics_api::Meter> MeterProvider::DoGetMeter(
+    nostd::string_view name,
+    nostd::string_view version,
+    nostd::string_view schema_url,
+    const opentelemetry::common::KeyValueIterable *attributes) noexcept
+#else
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,
-    nostd::string_view schema_url
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    ,
-    const opentelemetry::common::KeyValueIterable *attributes
+    nostd::string_view schema_url) noexcept
 #endif
-    ) noexcept
 {
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
   const opentelemetry::common::KeyValueIterable *attributes = nullptr;
