@@ -86,7 +86,7 @@ TEST(MeterProvider, GetMeterAbiv2)
   typedef std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> KV;
 
   std::initializer_list<KV> attrs7 = {{"foo", "1"}, {"bar", "2"}};
-  auto m7                          = mp.GetMeter("name7", "version7", "url7", attrs6);
+  auto m7                          = mp.GetMeter("name7", "version7", "url7", attrs7);
 
   auto m8 = mp.GetMeter("name8", "version8", "url8",
                         {{"a", "string"},
