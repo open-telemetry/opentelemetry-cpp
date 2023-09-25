@@ -10,11 +10,12 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 ## Project Status
 
-| Signal  | Status                  | Project                                                                  |
-| ------- | ----------------------- | ------------------------------------------------------------------------ |
-| Traces  | Public Release          | N/A                                                                      |
-| Metrics | Public Release          | N/A                                                                      |
-| Logs    | Public Release          | N/A                                                                      |
+**Stable** across all 3 signals i.e. `Logs`, `Metrics`, and `Traces`.
+
+See [Spec Compliance
+Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)
+to understand which portions of the specification has been implemented in this
+repo.
 
 ## Supported C++ Versions
 
