@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1695570023429,
+  "lastUpdate": 1695656765909,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -107734,6 +107734,54 @@ window.BENCHMARK_DATA = {
             "value": 2110294.8763471474,
             "unit": "ns/iter",
             "extra": "iterations: 307\ncpu: 439881.4332247555 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "punya@google.com",
+            "name": "Punya Biswal",
+            "username": "punya"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d49ba52591b675dd7747e2a017793559c5196654",
+          "message": "[exporters/prometheus] Get rid of friend test (#2329)\n\nInstead, test using the TranslateToPrometheus public API.",
+          "timestamp": "2023-09-25T08:30:48-07:00",
+          "tree_id": "71110f0bdf9e9dd72c96751881e09cc5488eb3ee",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/d49ba52591b675dd7747e2a017793559c5196654"
+        },
+        "date": 1695656760597,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 180.52630195110092,
+            "unit": "ns/iter",
+            "extra": "iterations: 977000\ncpu: 143.5675537359263 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 332.75137111801126,
+            "unit": "ns/iter",
+            "extra": "iterations: 639000\ncpu: 227.4948356807512 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 1252.5401500441274,
+            "unit": "ns/iter",
+            "extra": "iterations: 161000\ncpu: 894.6565217391308 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2364363.760318396,
+            "unit": "ns/iter",
+            "extra": "iterations: 265\ncpu: 519314.71698113217 ns\nthreads: 1"
           }
         ]
       }
