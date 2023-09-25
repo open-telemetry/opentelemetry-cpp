@@ -304,8 +304,9 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   auto ctx = meter_context_.lock();
   if (!ctx)
   {
-    OTEL_INTERNAL_LOG_ERROR("[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
-                            << "The metric context is invalid");
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
+        << "The metric context is invalid");
     return nullptr;
   }
   auto view_registry = ctx->GetViewRegistry();
