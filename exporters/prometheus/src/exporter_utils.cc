@@ -20,6 +20,85 @@ namespace exporter
 {
 namespace metrics
 {
+namespace
+{
+/**
+ * Sanitize the given metric name by replacing invalid characters with _,
+ * ensuring that multiple consecutive _ characters are collapsed to a single _.
+ *
+ * @param valid a callable with the signature `(int pos, char ch) -> bool` that
+ *        returns whether `ch` is valid at position `pos` in the string
+ * @param name the string to sanitize
+ */
+template <typename T>
+inline std::string Sanitize(std::string name, const T &valid)
+{
+  static_assert(std::is_convertible<T, std::function<bool(int, char)>>::value,
+                "valid should be a callable with the signature "
+                "(int, char) -> bool");
+
+  constexpr const auto replacement     = '_';
+  constexpr const auto replacement_dup = '=';
+
+  bool has_dup = false;
+  for (int i = 0; i < (int)name.size(); ++i)
+  {
+    if (valid(i, name[i]) && name[i] != replacement)
+    {
+      continue;
+    }
+    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
+    {
+      has_dup = true;
+      name[i] = replacement_dup;
+    }
+    else
+    {
+      name[i] = replacement;
+    }
+  }
+  if (has_dup)
+  {
+    auto end = std::remove(name.begin(), name.end(), replacement_dup);
+    return std::string{name.begin(), end};
+  }
+  return name;
+}
+
+/**
+ * Sanitize the given metric label key according to Prometheus rule.
+ * Prometheus metric label keys are required to match the following regex:
+ *   [a-zA-Z_]([a-zA-Z0-9_])*
+ * and multiple consecutive _ characters must be collapsed to a single _.
+ */
+std::string SanitizeLabel(std::string label_key)
+{
+  return Sanitize(label_key, [](int i, char c) {
+    return (c >= 'a' && c <= 'z') ||  //
+           (c >= 'A' && c <= 'Z') ||  //
+           c == '_' ||                //
+           (c >= '0' && c <= '9' && i > 0);
+  });
+}
+
+/**
+ * Sanitize the given metric name according to Prometheus rule.
+ * Prometheus metric names are required to match the following regex:
+ *   [a-zA-Z_:]([a-zA-Z0-9_:])*
+ * and multiple consecutive _ characters must be collapsed to a single _.
+ */
+std::string SanitizeName(std::string name)
+{
+  return Sanitize(name, [](int i, char c) {
+    return (c >= 'a' && c <= 'z') ||  //
+           (c >= 'A' && c <= 'Z') ||  //
+           c == '_' ||                //
+           c == ':' ||                //
+           (c >= '0' && c <= '9' && i > 0);
+  });
+}
+}  // namespace
+
 /**
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
@@ -40,7 +119,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     {
       auto origin_name = metric_data.instrument_descriptor.name_;
       auto unit        = metric_data.instrument_descriptor.unit_;
-      auto sanitized   = SanitizeNames(origin_name);
+      auto sanitized   = SanitizeName(origin_name);
       prometheus_client::MetricFamily metric_family;
       metric_family.name = sanitized + "_" + unit;
       metric_family.help = metric_data.instrument_descriptor.description_;
@@ -118,52 +197,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     }
   }
   return output;
-}
-
-/**
- * Sanitize the given metric name or label according to Prometheus rule.
- *
- * This function is needed because names in OpenTelemetry can contain
- * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
- * name should only contain alphanumeric characters and '_'.
- */
-std::string PrometheusExporterUtils::SanitizeNames(std::string name)
-{
-  constexpr const auto replacement     = '_';
-  constexpr const auto replacement_dup = '=';
-
-  auto valid = [](int i, char c) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
-        (c >= '0' && c <= '9' && i > 0))
-    {
-      return true;
-    }
-    return false;
-  };
-
-  bool has_dup = false;
-  for (int i = 0; i < (int)name.size(); ++i)
-  {
-    if (valid(i, name[i]))
-    {
-      continue;
-    }
-    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
-    {
-      has_dup = true;
-      name[i] = replacement_dup;
-    }
-    else
-    {
-      name[i] = replacement;
-    }
-  }
-  if (has_dup)
-  {
-    auto end = std::remove(name.begin(), name.end(), replacement_dup);
-    return std::string{name.begin(), end};
-  }
-  return name;
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
@@ -271,7 +304,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   std::string previous_key;
   for (auto const &label : labels)
   {
-    auto sanitized = SanitizeNames(label.first);
+    auto sanitized = SanitizeLabel(label.first);
     int comparison = previous_key.compare(sanitized);
     if (metric.label.empty() || comparison < 0)  // new key
     {
