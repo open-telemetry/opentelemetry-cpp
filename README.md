@@ -120,8 +120,6 @@ Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/ma
 
 ## Release Schedule
 
-Refer to [project status](#project-status) for current status of the project.
-
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases) for
 existing releases.
