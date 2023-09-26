@@ -67,7 +67,8 @@ private:
   /**
    * Set time and labels to metric data
    */
-  static void SetMetricBasic(::prometheus::ClientMetric &metric,
+  static void SetMetricBasic(
+      ::prometheus::ClientMetric &metric,
       const opentelemetry::sdk::metrics::PointAttributes &labels,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope);
 

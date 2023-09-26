@@ -211,20 +211,26 @@ protected:
 
 TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}},
-                   {{"foo_a", "value1"}, {"foo_b", "value2"}, {"otel_scope_name", "library_name"}, {"otel_scope_version", "1.2.0"}});
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}}, {{"foo_a", "value1"},
+                                                                {"foo_b", "value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
 TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}},  //
-                   {{"foo_a", "value1;value2"}, {"otel_scope_name", "library_name"}, {"otel_scope_version", "1.2.0"}});
+  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}}, {{"foo_a", "value1;value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
 TEST_F(AttributeCollisionTest, DropsInvertedKeys)
 {
   CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
-                   {{"foo_a", "value1"}, {"foo_b", "value2"}, {"otel_scope_name", "library_name"}, {"otel_scope_version", "1.2.0"}});
+                   {{"foo_a", "value1"},
+                    {"foo_b", "value2"},
+                    {"otel_scope_name", "library_name"},
+                    {"otel_scope_version", "1.2.0"}});
 }
 
 OPENTELEMETRY_END_NAMESPACE

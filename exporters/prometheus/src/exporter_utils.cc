@@ -164,14 +164,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type, &metric_family);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type, &metric_family);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family);
           }
           else
           {
@@ -187,7 +189,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type, &metric_family);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family);
           }
           else
           {
@@ -296,7 +299,8 @@ void PrometheusExporterUtils::SetData(
 /**
  * Set labels to metric data
  */
-void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
+void PrometheusExporterUtils::SetMetricBasic(
+    prometheus_client::ClientMetric &metric,
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
 {
