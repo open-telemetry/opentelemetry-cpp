@@ -56,19 +56,49 @@ void OtlpRecordableUtils::PopulateRequest(
     return;
   }
 
+  using spans_by_scope =
+      std::unordered_map<const opentelemetry::sdk::instrumentationscope::InstrumentationScope *,
+                         std::list<std::unique_ptr<OtlpRecordable>>,
+                         InstrumentationScopePointerHasher, InstrumentationScopePointerEqual>;
+  std::unordered_map<const opentelemetry::sdk::resource::Resource *, spans_by_scope> spans_index;
+
+  // Collect spans per resource and instrumentation scope
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
-    auto resource_span = request->add_resource_spans();
-    auto scope_spans   = resource_span->add_scope_spans();
+    auto resource        = rec->GetResource();
+    auto instrumentation = rec->GetInstrumentationScope();
 
-    *scope_spans->add_spans()     = std::move(rec->span());
-    *scope_spans->mutable_scope() = rec->GetProtoInstrumentationScope();
+    spans_index[resource][instrumentation].emplace_back(std::move(rec));
+  }
 
-    scope_spans->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
+  // Add all resource spans
+  for (auto &input_resource_spans : spans_index)
+  {
+    // Add the resource
+    auto resource_spans = request->add_resource_spans();
+    proto::resource::v1::Resource resource_proto;
+    OtlpPopulateAttributeUtils::PopulateAttribute(&resource_proto, *input_resource_spans.first);
+    *resource_spans->mutable_resource() = resource_proto;
+    resource_spans->set_schema_url(input_resource_spans.first->GetSchemaURL());
 
-    *resource_span->mutable_resource() = rec->ProtoResource();
-    resource_span->set_schema_url(rec->GetResourceSchemaURL());
+    // Add all scope spans
+    for (auto &input_scope_spans : input_resource_spans.second)
+    {
+      // Add the instrumentation scope
+      auto scope_spans = resource_spans->add_scope_spans();
+      proto::common::v1::InstrumentationScope instrumentation_scope_proto;
+      instrumentation_scope_proto.set_name(input_scope_spans.first->GetName());
+      instrumentation_scope_proto.set_version(input_scope_spans.first->GetVersion());
+      *scope_spans->mutable_scope() = instrumentation_scope_proto;
+      scope_spans->set_schema_url(input_scope_spans.first->GetSchemaURL());
+
+      // Add all spans to this scope spans
+      for (auto &input_scope_spans : input_scope_spans.second)
+      {
+        *scope_spans->add_spans() = std::move(input_scope_spans->span());
+      }
+    }
   }
 }
 
