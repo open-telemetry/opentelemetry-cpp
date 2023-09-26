@@ -33,7 +33,7 @@ MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-nostd::shared_ptr<metrics_api::Meter> MeterProvider::DoGetMeter(
+nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url,

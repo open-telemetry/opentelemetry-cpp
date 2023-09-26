@@ -197,7 +197,7 @@ public:
   NoopMeterProvider() : meter_{nostd::shared_ptr<Meter>(new NoopMeter)} {}
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  nostd::shared_ptr<Meter> DoGetMeter(
+  nostd::shared_ptr<Meter> GetMeter(
       nostd::string_view /* name */,
       nostd::string_view /* version */,
       nostd::string_view /* schema_url */,

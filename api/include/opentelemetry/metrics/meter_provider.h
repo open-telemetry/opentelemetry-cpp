@@ -36,7 +36,7 @@ public:
    * @param[in] schema_url Instrumentation scope schema URL, optional
    * @param[in] attributes Instrumentation scope attributes, optional
    */
-  virtual nostd::shared_ptr<Meter> DoGetMeter(
+  virtual nostd::shared_ptr<Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
@@ -53,11 +53,10 @@ public:
    * @param[in] attributes Instrumentation scope attributes
    */
   nostd::shared_ptr<Meter> GetMeter(nostd::string_view name,
-                                    nostd::string_view version                 = "",
-                                    nostd::string_view schema_url              = "",
-                                    const common::KeyValueIterable *attributes = nullptr)
+                                    nostd::string_view version    = "",
+                                    nostd::string_view schema_url = "")
   {
-    return DoGetMeter(name, version, schema_url, attributes);
+    return GetMeter(name, version, schema_url, nullptr);
   }
 
   /**
@@ -86,7 +85,7 @@ public:
         iterable_attributes{attributes_span};
 
     /* Add attributes using the view. */
-    return DoGetMeter(name, version, schema_url, &iterable_attributes);
+    return GetMeter(name, version, schema_url, &iterable_attributes);
   }
 
   /**
@@ -110,7 +109,7 @@ public:
     common::KeyValueIterableView<T> iterable_attributes(attributes);
 
     /* Add attributes using the view. */
-    return DoGetMeter(name, version, schema_url, &iterable_attributes);
+    return GetMeter(name, version, schema_url, &iterable_attributes);
   }
 
 #else
@@ -129,9 +128,9 @@ public:
 #endif
 
 #ifdef ENABLE_REMOVE_METER_PREVIEW
-  virtual void RemoveMeter(nostd::string_view library_name,
-                           nostd::string_view library_version = "",
-                           nostd::string_view schema_url      = "") noexcept = 0;
+  virtual void RemoveMeter(nostd::string_view name,
+                           nostd::string_view version    = "",
+                           nostd::string_view schema_url = "") noexcept = 0;
 #endif
 };
 }  // namespace metrics

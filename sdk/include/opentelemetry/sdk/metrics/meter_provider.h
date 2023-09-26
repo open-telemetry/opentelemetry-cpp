@@ -48,8 +48,13 @@ public:
    */
   explicit MeterProvider(std::unique_ptr<MeterContext> context) noexcept;
 
+  /*
+    Make sure GetMeter() helpers from the API are seen in overload resolution.
+  */
+  using opentelemetry::metrics::MeterProvider::GetMeter;
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  nostd::shared_ptr<opentelemetry::metrics::Meter> DoGetMeter(
+  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
