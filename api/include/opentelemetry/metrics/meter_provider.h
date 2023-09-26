@@ -32,9 +32,9 @@ public:
    * @since ABI_VERSION 2
    *
    * @param[in] name Meter instrumentation scope
-   * @param[in] version Instrumentation scope version, optional
-   * @param[in] schema_url Instrumentation scope schema URL, optional
-   * @param[in] attributes Instrumentation scope attributes, optional
+   * @param[in] version Instrumentation scope version
+   * @param[in] schema_url Instrumentation scope schema URL
+   * @param[in] attributes Instrumentation scope attributes (optional, may be nullptr)
    */
   virtual nostd::shared_ptr<Meter> GetMeter(
       nostd::string_view name,
@@ -48,9 +48,8 @@ public:
    * @since ABI_VERSION 2
    *
    * @param[in] name Meter instrumentation scope
-   * @param[in] version Instrumentation scope version
-   * @param[in] schema_url Instrumentation scope schema URL
-   * @param[in] attributes Instrumentation scope attributes
+   * @param[in] version Instrumentation scope version, optional
+   * @param[in] schema_url Instrumentation scope schema URL, optional
    */
   nostd::shared_ptr<Meter> GetMeter(nostd::string_view name,
                                     nostd::string_view version    = "",
@@ -96,7 +95,7 @@ public:
    * @param[in] name Meter instrumentation scope
    * @param[in] version Instrumentation scope version
    * @param[in] schema_url Instrumentation scope schema URL
-   * @param[in] attributes Instrumentation scope attributes
+   * @param[in] attributes Instrumentation scope attributes container
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
