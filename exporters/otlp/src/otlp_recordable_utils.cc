@@ -58,8 +58,7 @@ void OtlpRecordableUtils::PopulateRequest(
 
   using spans_by_scope =
       std::unordered_map<const opentelemetry::sdk::instrumentationscope::InstrumentationScope *,
-                         std::vector<std::unique_ptr<OtlpRecordable>>,
-                         InstrumentationScopePointerHasher, InstrumentationScopePointerEqual>;
+                         std::vector<std::unique_ptr<OtlpRecordable>>>;
   std::unordered_map<const opentelemetry::sdk::resource::Resource *, spans_by_scope> spans_index;
 
   // Collect spans per resource and instrumentation scope

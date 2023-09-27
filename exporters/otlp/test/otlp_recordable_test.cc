@@ -289,17 +289,14 @@ TEST(OtlpRecordable, SetArrayAttribute)
 // Test otlp resource populate request util
 TEST(OtlpRecordable, PopulateRequest)
 {
-  auto rec1                          = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
-  const std::string service_name_key = "service.name";
-  std::string service_name1          = "one";
-  auto resource1 = resource::Resource::Create({{service_name_key, service_name1}});
+  auto rec1      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
   auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1");
   rec1->SetInstrumentationScope(*inst_lib1);
 
-  auto rec2                 = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
-  std::string service_name2 = "two";
-  auto resource2            = resource::Resource::Create({{service_name_key, service_name2}});
+  auto rec2      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+  auto resource2 = resource::Resource::Create({{"service.name", "two"}});
   rec2->SetResource(resource2);
   auto inst_lib2 = trace_sdk::InstrumentationScope::Create("two", "2");
   rec2->SetInstrumentationScope(*inst_lib2);
@@ -331,6 +328,50 @@ TEST(OtlpRecordable, PopulateRequest)
     if (service_name == "two")
     {
       EXPECT_EQ(scope_spans_size, 2);
+    }
+  }
+}
+
+// Test otlp resource populate request util with missing data
+TEST(OtlpRecordable, PopulateRequestMissing)
+{
+  // Missing scope
+  auto rec1      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  rec1->SetResource(resource1);
+
+  // Missing resource
+  auto rec2      = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+  auto inst_lib2 = trace_sdk::InstrumentationScope::Create("two", "2");
+  rec2->SetInstrumentationScope(*inst_lib2);
+
+  proto::collector::trace::v1::ExportTraceServiceRequest req;
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(std::move(rec1));
+  spans.push_back(std::move(rec2));
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>, 2> spans_span(spans.data(), 2);
+  OtlpRecordableUtils::PopulateRequest(spans_span, &req);
+
+  EXPECT_EQ(req.resource_spans().size(), 2);
+  for (auto resource_spans : req.resource_spans())
+  {
+    // Select the one with missing scope
+    if (resource_spans.resource().attributes().size() != 0)
+    {
+      // It has a service name
+      EXPECT_EQ(resource_spans.resource().attributes(0).value().string_value(), "one");
+      // And scope spans
+      EXPECT_EQ(resource_spans.scope_spans().size(), 1);
+      // But the scope data is missing
+      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "");
+    }
+    else
+    {
+      // It has no resource attributes
+      EXPECT_EQ(resource_spans.resource().attributes().size(), 0);
+      // It has a scope
+      EXPECT_EQ(resource_spans.scope_spans().size(), 1);
+      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "two");
     }
   }
 }
