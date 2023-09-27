@@ -15,21 +15,6 @@ namespace prometheus_client = ::prometheus;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-namespace exporter
-{
-namespace metrics
-{
-class SanitizeNameTester
-{
-public:
-  static std::string sanitize(std::string name)
-  {
-    return PrometheusExporterUtils::SanitizeNames(name);
-  }
-};
-}  // namespace metrics
-}  // namespace exporter
-
 template <typename T>
 void assert_basic(prometheus_client::MetricFamily &metric,
                   const std::string &sanitized_name,
@@ -153,14 +138,55 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
 
-TEST(PrometheusExporterUtils, SanitizeName)
+class SanitizeTest : public ::testing::Test
 {
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name"), "name");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name???"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name"), "name_name");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name:"), "name_name:");
+  Resource resource_ = Resource::Create({});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+
+protected:
+  void CheckSanitizeName(const std::string &original, const std::string &sanitized)
+  {
+    metric_sdk::InstrumentDescriptor instrument_descriptor{
+        original, "description", "unit", metric_sdk::InstrumentType::kCounter,
+        metric_sdk::InstrumentValueType::kDouble};
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         {{instrumentation_scope_.get(), {{instrument_descriptor, {}, {}, {}, {{{}, {}}}}}}}});
+    EXPECT_EQ(result.begin()->name, sanitized + "_unit");
+  }
+
+  void CheckSanitizeLabel(const std::string &original, const std::string &sanitized)
+  {
+    metric_sdk::InstrumentDescriptor instrument_descriptor{
+        "name", "description", "unit", metric_sdk::InstrumentType::kCounter,
+        metric_sdk::InstrumentValueType::kDouble};
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         {{instrumentation_scope_.get(),
+           {{instrument_descriptor, {}, {}, {}, {{{{original, "value"}}, {}}}}}}}});
+    EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
+  }
+};
+
+TEST_F(SanitizeTest, Name)
+{
+  CheckSanitizeName("name", "name");
+  CheckSanitizeName("name?", "name_");
+  CheckSanitizeName("name???", "name_");
+  CheckSanitizeName("name?__", "name_");
+  CheckSanitizeName("name?__name", "name_name");
+  CheckSanitizeName("name?__name:", "name_name:");
+}
+
+TEST_F(SanitizeTest, Label)
+{
+  CheckSanitizeLabel("name", "name");
+  CheckSanitizeLabel("name?", "name_");
+  CheckSanitizeLabel("name???", "name_");
+  CheckSanitizeLabel("name?__", "name_");
+  CheckSanitizeLabel("name?__name", "name_name");
+  CheckSanitizeLabel("name?__name:", "name_name_");
 }
 
 class AttributeCollisionTest : public ::testing::Test

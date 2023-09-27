@@ -32,15 +32,6 @@ public:
       const sdk::metrics::ResourceMetrics &data);
 
 private:
-  /**
-   * Sanitize the given metric name or label according to Prometheus rule.
-   *
-   * This function is needed because names in OpenTelemetry can contain
-   * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
-   * name should only contain alphanumeric characters and '_'.
-   */
-  static std::string SanitizeNames(std::string name);
-
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 
@@ -104,9 +95,6 @@ private:
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
-
-  // For testing
-  friend class SanitizeNameTester;
 };
 }  // namespace metrics
 }  // namespace exporter
