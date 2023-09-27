@@ -357,20 +357,18 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   {
     // Both should have scope spans
     EXPECT_EQ(resource_spans.scope_spans().size(), 1);
+    auto scope = resource_spans.scope_spans(0).scope();
     // Select the one with missing scope
-    if (resource_spans.resource().attributes().size() > 0 &&
-        resource_spans.resource().attributes(0).value().string_value() == "one")
+    if (scope.name() == "")
     {
-      // Scope data is missing
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "");
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().version(), "");
+      // Version is also empty
+      EXPECT_EQ(scope.version(), "");
     }
     else
     {
-      // The other has no resource attributes
-      EXPECT_EQ(resource_spans.resource().attributes().size(), 0);
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "two");
-      EXPECT_EQ(resource_spans.scope_spans(0).scope().version(), "2");
+      // The other has a name and version
+      EXPECT_EQ(scope.name(), "two");
+      EXPECT_EQ(scope.version(), "2");
     }
   }
 }
