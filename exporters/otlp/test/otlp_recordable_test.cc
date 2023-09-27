@@ -289,23 +289,20 @@ TEST(OtlpRecordable, SetArrayAttribute)
 // Test otlp resource populate request util
 TEST(OtlpRecordable, PopulateRequest)
 {
-  auto rec1                          = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
-  const std::string service_name_key = "service.name";
-  std::string service_name1          = "one";
-  auto resource1 = resource::Resource::Create({{service_name_key, service_name1}});
+  std::unique_ptr<sdk::trace::Recordable> rec1 = std::make_unique<OtlpRecordable>();
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
   auto inst_lib1 = trace_sdk::InstrumentationScope::Create("one", "1");
   rec1->SetInstrumentationScope(*inst_lib1);
 
-  auto rec2                 = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
-  std::string service_name2 = "two";
-  auto resource2            = resource::Resource::Create({{service_name_key, service_name2}});
+  std::unique_ptr<sdk::trace::Recordable> rec2 = std::make_unique<OtlpRecordable>();
+  auto resource2 = resource::Resource::Create({{"service.name", "two"}});
   rec2->SetResource(resource2);
   auto inst_lib2 = trace_sdk::InstrumentationScope::Create("two", "2");
   rec2->SetInstrumentationScope(*inst_lib2);
 
   // This has the same resource as rec2, but a different scope
-  auto rec3 = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+  std::unique_ptr<sdk::trace::Recordable> rec3 = std::make_unique<OtlpRecordable>();
   rec3->SetResource(resource2);
   auto inst_lib3 = trace_sdk::InstrumentationScope::Create("three", "3");
   rec3->SetInstrumentationScope(*inst_lib3);
