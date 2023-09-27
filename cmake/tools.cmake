@@ -122,10 +122,10 @@ endfunction()
 If we build third party packages with a different CONFIG setting from building
 otel-cpp, cmake may not find a suitable file in imported targets (#705, #1359)
 when linking. But on some platforms, different CONFIG settings can be used when
-ABI these CONFIG settings have the same ABI. For example, on Linux, we can build
+these CONFIG settings have the same ABI. For example, on Linux, we can build
 gRPC and protobuf with -DCMAKE_BUILD_TYPE=Release, but build otel-cpp with
 -DCMAKE_BUILD_TYPE=Debug and links these libraries together.
-The properties of imported targets can be find here:
+The properties of imported targets can be found here:
 https://cmake.org/cmake/help/latest/manual/cmake-properties.7.html#properties-on-targets
 ]]
 function(project_build_tools_patch_default_imported_config)
