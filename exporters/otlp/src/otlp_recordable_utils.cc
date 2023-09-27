@@ -77,21 +77,27 @@ void OtlpRecordableUtils::PopulateRequest(
   {
     // Add the resource
     auto resource_spans = request->add_resource_spans();
-    proto::resource::v1::Resource resource_proto;
-    OtlpPopulateAttributeUtils::PopulateAttribute(&resource_proto, *input_resource_spans.first);
-    *resource_spans->mutable_resource() = resource_proto;
-    resource_spans->set_schema_url(input_resource_spans.first->GetSchemaURL());
+    if (input_resource_spans.first)
+    {
+      proto::resource::v1::Resource resource_proto;
+      OtlpPopulateAttributeUtils::PopulateAttribute(&resource_proto, *input_resource_spans.first);
+      *resource_spans->mutable_resource() = resource_proto;
+      resource_spans->set_schema_url(input_resource_spans.first->GetSchemaURL());
+    }
 
     // Add all scope spans
     for (auto &input_scope_spans : input_resource_spans.second)
     {
       // Add the instrumentation scope
       auto scope_spans = resource_spans->add_scope_spans();
-      proto::common::v1::InstrumentationScope instrumentation_scope_proto;
-      instrumentation_scope_proto.set_name(input_scope_spans.first->GetName());
-      instrumentation_scope_proto.set_version(input_scope_spans.first->GetVersion());
-      *scope_spans->mutable_scope() = instrumentation_scope_proto;
-      scope_spans->set_schema_url(input_scope_spans.first->GetSchemaURL());
+      if (input_scope_spans.first)
+      {
+        proto::common::v1::InstrumentationScope instrumentation_scope_proto;
+        instrumentation_scope_proto.set_name(input_scope_spans.first->GetName());
+        instrumentation_scope_proto.set_version(input_scope_spans.first->GetVersion());
+        *scope_spans->mutable_scope() = instrumentation_scope_proto;
+        scope_spans->set_schema_url(input_scope_spans.first->GetSchemaURL());
+      }
 
       // Add all spans to this scope spans
       for (auto &input_span : input_scope_spans.second)
