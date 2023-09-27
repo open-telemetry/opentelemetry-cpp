@@ -355,23 +355,22 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   EXPECT_EQ(req.resource_spans().size(), 2);
   for (auto resource_spans : req.resource_spans())
   {
+    // Both should have scope spans
+    EXPECT_EQ(resource_spans.scope_spans().size(), 1);
     // Select the one with missing scope
-    if (resource_spans.resource().attributes().size() != 0)
+    if (resource_spans.resource().attributes().size() > 0 &&
+        resource_spans.resource().attributes(0).value().string_value() == "one")
     {
-      // It has a service name
-      EXPECT_EQ(resource_spans.resource().attributes(0).value().string_value(), "one");
-      // And scope spans
-      EXPECT_EQ(resource_spans.scope_spans().size(), 1);
-      // But the scope data is missing
+      // Scope data is missing
       EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "");
+      EXPECT_EQ(resource_spans.scope_spans(0).scope().version(), "");
     }
     else
     {
-      // It has no resource attributes
+      // The other has no resource attributes
       EXPECT_EQ(resource_spans.resource().attributes().size(), 0);
-      // It has a scope
-      EXPECT_EQ(resource_spans.scope_spans().size(), 1);
       EXPECT_EQ(resource_spans.scope_spans(0).scope().name(), "two");
+      EXPECT_EQ(resource_spans.scope_spans(0).scope().version(), "2");
     }
   }
 }
