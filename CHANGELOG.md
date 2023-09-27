@@ -23,6 +23,8 @@ Increment the:
   [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
 * [EXPORTER] Handle attribute key collisions caused by sanitation
   [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
+* [EXPORTER] Replace colons with underscores when converting to Prometheus label
+  [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
 
 ## [1.11.0] 2023-08-21
 

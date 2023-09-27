@@ -35,15 +35,6 @@ public:
 
 private:
   /**
-   * Sanitize the given metric name or label according to Prometheus rule.
-   *
-   * This function is needed because names in OpenTelemetry can contain
-   * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
-   * name should only contain alphanumeric characters and '_'.
-   */
-  static std::string SanitizeNames(std::string name);
-
-  /**
    * Append key-value pair to prometheus labels.
    *
    * @param name label name
