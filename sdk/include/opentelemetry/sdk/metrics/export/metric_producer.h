@@ -37,7 +37,7 @@ struct ScopeMetrics
 
   template <class ScopePtr, class MetricDataType>
   inline ScopeMetrics(ScopePtr &&scope, MetricDataType &&metric)
-      : scope_{std::move(scope)}, metric_data_{std::move(metric)}
+      : scope_{std::forward<ScopePtr>(scope)}, metric_data_{std::forward<MetricDataType>(metric)}
   {}
 
   inline ScopeMetrics() {}
@@ -56,7 +56,8 @@ struct ResourceMetrics
 
   template <class ResourcePtr, class ScopeMetricsType>
   inline ResourceMetrics(ResourcePtr &&resource, ScopeMetricsType &&scope_metric_data)
-      : resource_{std::move(resource)}, scope_metric_data_{std::move(scope_metric_data)}
+      : resource_{std::forward<ResourcePtr>(resource)},
+        scope_metric_data_{std::forward<ScopeMetricsType>(scope_metric_data)}
   {}
 
   inline ResourceMetrics() {}

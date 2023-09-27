@@ -283,7 +283,11 @@ protected:
         metric_sdk::InstrumentValueType::kDouble};
     std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
         {&resource_,
-         {{instrumentation_scope_.get(), {{instrument_descriptor_, {}, {}, {}, {{{}, {}}}}}}}});
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor_, {}, {}, {}, {{{}, {}}}}}}}},
+        false);
     EXPECT_EQ(result.begin()->name, sanitized + "_unit");
   }
 };
@@ -313,8 +317,24 @@ protected:
   {
     std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
         {&resource_,
-         {{instrumentation_scope_.get(), {{instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}});
-    EXPECT_EQ(result.begin()->metric.begin()->label, expected);
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}},
+        false);
+    for (auto &expected_kv : expected)
+    {
+      bool found = false;
+      for (auto &found_kv : result.begin()->metric.begin()->label)
+      {
+        if (found_kv.name == expected_kv.name)
+        {
+          EXPECT_EQ(found_kv.value, expected_kv.value);
+          found = true;
+        }
+      }
+      EXPECT_TRUE(found);
+    }
   }
 };
 
