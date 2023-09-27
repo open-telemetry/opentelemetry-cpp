@@ -334,7 +334,7 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
       continue;
     }
 
-    AddPrometheusLabel(SanitizeNames(label.first), AttributeValueToString(label.second),
+    AddPrometheusLabel(SanitizeName(label.first), AttributeValueToString(label.second),
                        &metric.label);
   }
 
