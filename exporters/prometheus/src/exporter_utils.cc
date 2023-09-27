@@ -350,39 +350,51 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
                                              const metric_sdk::PointAttributes &labels,
                                              const opentelemetry::sdk::resource::Resource *resource)
 {
-  std::size_t label_size = 0;
-  if (nullptr != resource)
+  if (labels.empty() && nullptr == resource)
   {
-    label_size += resource->GetAttributes().size();
+    return;
   }
-  if (!labels.empty())
-  {
-    label_size += labels.size();
-  }
-  metric.label.reserve(label_size);
 
-  // auto label_pairs = ParseLabel(labels);
+  // Concatenate values for keys that collide after sanitation.
+  // Note that attribute keys are sorted, but sanitized keys can be out-of-order.
+  // We could sort the sanitized keys again, but this seems too expensive to do
+  // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
+  metric.label.reserve(labels.size() + 2);
+  std::string previous_key;
   bool has_instance_label = false;
   bool has_job_label      = false;
-  if (!labels.empty())
+  for (auto const &label : labels)
   {
-    for (auto &label : labels)
+    auto sanitized = SanitizeNames(label.first);
+    if (!has_instance_label && sanitized == kPrometheusInstance)
     {
-      std::string label_name = SanitizeNames(label.first);
-      if (label_name == kPrometheusInstance)
-      {
-        has_instance_label = true;
-      }
-      else if (label_name == kPrometheusJob)
-      {
-        has_job_label = true;
-      }
-      AddPrometheusLabel(std::move(label_name), AttributeValueToString(label.second),
-                         &metric.label);
+      has_instance_label = true;
+    }
+    else if (!has_job_label && sanitized == kPrometheusJob)
+    {
+      has_job_label = true;
+    }
+    int comparison = previous_key.compare(sanitized);
+    if (metric.label.empty() || comparison < 0)  // new key
+    {
+      previous_key = sanitized;
+      metric.label.push_back({sanitized, AttributeValueToString(label.second)});
+    }
+    else if (comparison == 0)  // key collision after sanitation
+    {
+      metric.label.back().value += ";" + AttributeValueToString(label.second);
+    }
+    else  // order inversion introduced by sanitation
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[Prometheus Exporter] SetMetricBase - "
+          "the sort order of labels has changed because of sanitization: '"
+          << label.first << "' became '" << sanitized << "' which is less than '" << previous_key
+          << "'. Ignoring this label.");
     }
   }
 
-  // Convert resource to prometheus labels
+  // Convert resource to job and instance labels
   if (nullptr != resource)
   {
     do

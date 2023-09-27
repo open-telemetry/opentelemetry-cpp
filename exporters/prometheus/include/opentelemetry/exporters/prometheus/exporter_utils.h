@@ -135,9 +135,6 @@ private:
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
-
-  // For testing
-  friend class SanitizeNameTester;
 };
 }  // namespace metrics
 }  // namespace exporter
