@@ -94,9 +94,9 @@ void OtlpRecordableUtils::PopulateRequest(
       scope_spans->set_schema_url(input_scope_spans.first->GetSchemaURL());
 
       // Add all spans to this scope spans
-      for (auto &input_scope_spans : input_scope_spans.second)
+      for (auto &input_span : input_scope_spans.second)
       {
-        *scope_spans->add_spans() = std::move(input_scope_spans->span());
+        *scope_spans->add_spans() = std::move(input_span->span());
       }
     }
   }
