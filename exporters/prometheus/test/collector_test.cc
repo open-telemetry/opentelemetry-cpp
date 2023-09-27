@@ -19,6 +19,8 @@ namespace metric_exporter = opentelemetry::exporter::metrics;
 
 class MockMetricProducer : public opentelemetry::sdk::metrics::MetricProducer
 {
+  TestDataPoints test_data_points_;
+
 public:
   MockMetricProducer(std::chrono::microseconds sleep_ms = std::chrono::microseconds::zero())
       : sleep_ms_{sleep_ms}, data_sent_size_(0)
@@ -28,7 +30,7 @@ public:
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
-    ResourceMetrics data = CreateSumPointData();
+    ResourceMetrics data = test_data_points_.CreateSumPointData();
     callback(data);
     return true;
   }
