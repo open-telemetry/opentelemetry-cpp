@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef HAVE_CPP_STDLIB
+#ifndef OPENTELEMETRY_STL_VERSION
 
 #  include <chrono>
 #  include <thread>
@@ -740,4 +740,4 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_STL_VERSION */
