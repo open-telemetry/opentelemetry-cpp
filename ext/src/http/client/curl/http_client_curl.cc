@@ -244,6 +244,7 @@ void HttpClient::CleanupSession(uint64_t session_id)
     }
   }
 
+  bool need_wakeup_background_thread = false;
   {
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.erase(session_id);
@@ -259,9 +260,14 @@ void HttpClient::CleanupSession(uint64_t session_id)
       {
         // If this session is already running, give it to the background thread for cleanup.
         pending_to_abort_sessions_[session_id] = std::move(session);
-        wakeupBackgroundThread();
+        need_wakeup_background_thread          = true;
       }
     }
+  }
+
+  if (need_wakeup_background_thread)
+  {
+    wakeupBackgroundThread();
   }
 }
 
@@ -519,7 +525,8 @@ bool HttpClient::doRemoveSessions()
       std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
       pending_to_remove_session_handles_.swap(pending_to_remove_session_handles);
       pending_to_remove_sessions_.swap(pending_to_remove_sessions);
-
+    }
+    {
       // If user callback do not call CancelSession or FinishSession, We still need to remove it
       // from sessions_
       std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
