@@ -24,8 +24,9 @@ Both these dependencies are listed here:
   [SDK](/sdk):
   - Uses Standard C++ library for latest features (std::string_view,
     std::variant, std::span, std::shared_ptr, std::unique_ptr) with  C++14/17/20
-    compiler if `WITH_STL` cmake option is enabled or `HAVE_CPP_STDLIB` macro is
-    defined. License: `GNU General Public License`
+    compiler if cmake option `WITH_STL` is enabled
+    or macro `OPENTELEMETRY_STL_VERSION` is defined.
+    License: `GNU General Public License`
     - For C++11/14/17 compilers, fallback to gsl::span if [GSL C++
       library](https://github.com/microsoft/GSL) is installed. License: `MIT
       License`
