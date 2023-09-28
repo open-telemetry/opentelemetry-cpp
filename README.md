@@ -39,9 +39,9 @@ of the current project.
 | Platform                                                            |   Build type  |
 |---------------------------------------------------------------------|---------------|
 | ubuntu-22.04 (GCC 10, GCC 12, Clang 14)                             | CMake, Bazel  |
-| ubuntu-20.04 (GCC 9.4.0)                                            | CMake, Bazel  |
-| ubuntu-20.04 (Default GCC Compiler - 9.4.0 with -std=c++20 flags)   | CMake, Bazel  |
-| macOS 12.0 (Xcode 14.2)                                             | Bazel         |
+| ubuntu-20.04 (GCC 9.4.0 - default compiler)                         | CMake, Bazel  |
+| ubuntu-20.04 (GCC 9.4.0 with -std=c++14/17/20 flags)                | CMake, Bazel  |
+| macOS 12.7 (Xcode 14.2)                                             | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
 | Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
 
