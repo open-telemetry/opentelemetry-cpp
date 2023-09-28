@@ -45,15 +45,6 @@ private:
                                  std::string value,
                                  std::vector<::prometheus::ClientMetric::Label> *labels);
 
-  /**
-   * Some attributes should be ignored when converting resource attributes to
-   * prometheus labels.
-   *
-   * @param name resource attribute name
-   * @return true if the attribute should be ignored, false otherwise.
-   */
-  static bool ShouldIgnoreResourceAttribute(const std::string &name);
-
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
 

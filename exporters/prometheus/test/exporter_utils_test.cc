@@ -213,8 +213,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 {
   opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
-      {{"job", "test_service2"},
-       {"instance", "localhost:8001"},
+      {{"service.instance.id", "localhost:8001"},
        {"custom_resource_attr", "custom_resource_value"}});
   TestDataPoints dp;
   metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();

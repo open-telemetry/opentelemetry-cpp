@@ -236,16 +236,6 @@ void PrometheusExporterUtils::AddPrometheusLabel(
   labels->emplace_back(std::move(prometheus_label));
 }
 
-bool PrometheusExporterUtils::ShouldIgnoreResourceAttribute(const std::string &name)
-{
-  static std::unordered_set<std::string> ignores{
-      opentelemetry::sdk::resource::SemanticConventions::kServiceName,
-      opentelemetry::sdk::resource::SemanticConventions::kServiceNamespace,
-      opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId, kPrometheusJob,
-      kPrometheusInstance};
-  return ignores.end() != ignores.find(name);
-}
-
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
     const metric_sdk::PointType &point_type)
 {
@@ -329,11 +319,6 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
 
   for (auto &label : data.resource_->GetAttributes())
   {
-    if (ShouldIgnoreResourceAttribute(label.first))
-    {
-      continue;
-    }
-
     AddPrometheusLabel(SanitizeName(label.first), AttributeValueToString(label.second),
                        &metric.label);
   }
@@ -394,20 +379,9 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
   metric.label.reserve(labels.size() + 2);
   std::string previous_key;
-  bool has_instance_label = false;
-  bool has_job_label      = false;
   for (auto const &label : labels)
   {
     auto sanitized = SanitizeLabel(label.first);
-    if (!has_instance_label && sanitized == kPrometheusInstance)
-    {
-      has_instance_label = true;
-    }
-    else if (!has_job_label && sanitized == kPrometheusJob)
-    {
-      has_job_label = true;
-    }
-
     int comparison = previous_key.compare(sanitized);
     if (metric.label.empty() || comparison < 0)  // new key
     {
@@ -433,11 +407,6 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   {
     do
     {
-      if (has_job_label)
-      {
-        break;
-      }
-
       opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_name_it =
           resource->GetAttributes().find(
               opentelemetry::sdk::resource::SemanticConventions::kServiceName);
@@ -460,38 +429,22 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
                            &metric.label);
         break;
       }
-
-      opentelemetry::sdk::resource::ResourceAttributes::const_iterator prometheus_job_it =
-          resource->GetAttributes().find(kPrometheusJob);
-      if (prometheus_job_it != resource->GetAttributes().end())
-      {
-        AddPrometheusLabel(kPrometheusJob, AttributeValueToString(prometheus_job_it->second),
-                           &metric.label);
-      }
     } while (false);
 
-    if (!has_instance_label)
-    {
-      opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_instance_id_it =
-          resource->GetAttributes().find(
-              opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
-      if (service_instance_id_it == resource->GetAttributes().end())
-      {
-        service_instance_id_it = resource->GetAttributes().find(kPrometheusInstance);
-      }
-      if (service_instance_id_it != resource->GetAttributes().end())
-      {
-        has_instance_label = true;
-        AddPrometheusLabel(kPrometheusInstance,
-                           AttributeValueToString(service_instance_id_it->second), &metric.label);
-      }
-    }
-  }
+    opentelemetry::sdk::resource::ResourceAttributes::const_iterator service_instance_id_it =
+        resource->GetAttributes().find(
+            opentelemetry::sdk::resource::SemanticConventions::kServiceInstanceId);
 
-  // Add a empty instance label if it's not exist
-  if (!has_instance_label)
-  {
-    AddPrometheusLabel(kPrometheusInstance, "", &metric.label);
+    if (service_instance_id_it != resource->GetAttributes().end())
+    {
+      AddPrometheusLabel(kPrometheusInstance,
+                         AttributeValueToString(service_instance_id_it->second), &metric.label);
+    }
+    else
+    {
+      // Add a empty instance label if it's not exist
+      AddPrometheusLabel(kPrometheusInstance, "", &metric.label);
+    }
   }
 }
 
