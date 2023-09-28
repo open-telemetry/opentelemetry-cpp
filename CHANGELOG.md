@@ -40,7 +40,7 @@ Breaking changes:
   * Applications that did set `HAVE_CPP_STDLIB` before, need to set
     `OPENTELEMETRY_STL_VERSION=<version>` instead, to build with a
     specific STL version (2011, 2014, 2017, 2020, 2023).
-  * The opentrelemetry-cpp makefile no longer sets
+  * The opentelemetry-cpp makefile no longer sets
     CMAKE_CXX_STANDARD by itself.
     Instead, the CMAKE_CXX_STANDARD and/or compiler options -stdc++ used
     by the caller are honored.
