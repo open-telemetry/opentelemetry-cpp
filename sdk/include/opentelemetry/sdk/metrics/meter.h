@@ -74,6 +74,16 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept override;
 
+  nostd::unique_ptr<opentelemetry::metrics::Gauge<uint64_t>> CreateInt64Gauge(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override;
+
+  nostd::unique_ptr<opentelemetry::metrics::Gauge<double>> CreateDoubleGauge(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override;
+
   nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,
       nostd::string_view description = "",

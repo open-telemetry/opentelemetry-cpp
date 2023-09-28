@@ -196,6 +196,37 @@ public:
   void Record(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
+class LongGauge : public Synchronous, public opentelemetry::metrics::Gauge<int64_t>
+{
+{
+public:
+  /**
+   * Records the current value.
+   *
+   * @param value The measurement value. MUST be non-negative.
+   */
+  virtual void Record(int64_t value, const context::Context &context) noexcept{
+
+  }
+
+};
+
+class DoubleGauge : public Synchronous, public opentelemetry::metrics::Gauge<double>
+{
+{
+public:
+  /**
+   * Records the current value.
+   *
+   * @param value The measurement value. MUST be non-negative.
+   */
+  virtual void Record(int64_t value, const context::Context &context) noexcept{
+
+  }
+
+};
+
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

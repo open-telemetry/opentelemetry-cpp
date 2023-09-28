@@ -21,6 +21,9 @@ class Histogram;
 template <typename T>
 class UpDownCounter;
 
+template <typename T>
+class Gauge;
+
 class ObservableInstrument;
 
 /**
@@ -87,6 +90,24 @@ public:
       nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::unique_ptr<Histogram<double>> CreateDoubleHistogram(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept = 0;
+
+  /**
+   * Creates a Gauge with the passed characteristics and returns a
+   * unique_ptr to that Gauge
+   *
+   * @param name the name of the new Gauge.
+   * @param description a brief description of what the Gauge is used for.
+   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
+   */
+  virtual nostd::unique_ptr<Gauge<uint64_t>> CreateInt64Gauge(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept = 0;
+
+  virtual nostd::unique_ptr<Gauge<double>> CreateDoubleGauge(
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
