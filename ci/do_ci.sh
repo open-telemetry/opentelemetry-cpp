@@ -246,6 +246,32 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   eval "$MAKE_COMMAND"
   make test
   exit 0
+elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX14 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX17 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *

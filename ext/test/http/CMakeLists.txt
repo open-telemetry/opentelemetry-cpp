@@ -25,7 +25,7 @@ endif()
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
 target_link_libraries(${URL_PARSER_FILENAME} ${GTEST_BOTH_LIBRARIES}
-                      ${CMAKE_THREAD_LIBS_INIT})
+                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
 gtest_add_tests(
   TARGET ${URL_PARSER_FILENAME}
   TEST_PREFIX ext.http.urlparser.

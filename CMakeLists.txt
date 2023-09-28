@@ -154,7 +154,10 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+set(WITH_STL
+    "OFF"
+    CACHE STRING "Which version of the Standard Library for C++ to use")
+
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
@@ -169,22 +172,7 @@ option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
 
 include("${PROJECT_SOURCE_DIR}/cmake/tools.cmake")
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-  if(WITH_STL)
-    # Require at least C++17. C++20 is needed to avoid gsl::span
-    if(CMAKE_VERSION VERSION_GREATER 3.11.999)
-      # Ask for 20, may get anything below
-      set(CMAKE_CXX_STANDARD 20)
-    else()
-      # Ask for 17, may get anything below
-      set(CMAKE_CXX_STANDARD 17)
-    endif()
-  else()
-    set(CMAKE_CXX_STANDARD 11)
-  endif()
-endif()
-
-if(WITH_STL)
+if(NOT WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
   # opentelemetry-api library directly. We ensure that variant implementation
   # (absl::variant or std::variant) in variant unit test code is consistent with

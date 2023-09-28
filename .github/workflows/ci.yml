@@ -348,6 +348,42 @@ jobs:
         CXX: /usr/bin/g++-4.8
       run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
 
+  cmake_test_cxx14_gcc:
+    name: CMake C++14 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '14'
+      run: ./ci/do_ci.sh cmake.c++14.stl.test
+
+  cmake_test_cxx17_gcc:
+    name: CMake C++17 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '17'
+      run: ./ci/do_ci.sh cmake.c++17.stl.test
+
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
     runs-on: ubuntu-20.04
