@@ -71,6 +71,17 @@ TEST(SyncInstruments, LongUpDownCounter)
   counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}));
   counter.Add(10, opentelemetry::common::KeyValueIterableView<M>({}),
               opentelemetry::context::Context{});
+  // negative values
+  counter.Add(-10);
+  counter.Add(-10, opentelemetry::context::Context{});
+
+  counter.Add(-10,
+              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
+  counter.Add(-10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+              opentelemetry::context::Context{});
+  counter.Add(-10, opentelemetry::common::KeyValueIterableView<M>({}));
+  counter.Add(-10, opentelemetry::common::KeyValueIterableView<M>({}),
+              opentelemetry::context::Context{});
 }
 
 TEST(SyncInstruments, DoubleUpDownCounter)
@@ -100,7 +111,6 @@ TEST(SyncInstruments, LongHistogram)
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongHistogram histogram(instrument_descriptor, std::move(metric_storage));
   histogram.Record(10, opentelemetry::context::Context{});
-  histogram.Record(-10, opentelemetry::context::Context{});  // This is ignored
 
   histogram.Record(10,
                    opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
