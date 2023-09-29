@@ -31,9 +31,6 @@ namespace metrics
 namespace
 {
 
-static constexpr const char *kPrometheusInstance = "instance";
-static constexpr const char *kPrometheusJob      = "job";
-
 /**
  * Sanitize the given metric name by replacing invalid characters with _,
  * ensuring that multiple consecutive _ characters are collapsed to a single _.
