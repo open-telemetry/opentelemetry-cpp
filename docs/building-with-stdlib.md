@@ -138,14 +138,22 @@ Visual Studio provides 1st class debug experience for the standard library.
 Supported build flavors:
 
 * `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
-* `stdlib`   - Standard Library. Full native experience with C++20 compiler.
-  C++17 works but with additional dependencies, e.g. either MS-GSL or Abseil for
+* `stdlib` - Standard Library.
+  Native experience with C++11/C++14/C++17/C++20/C++23 compiler.
+  Depending on the stdlib level in effect,
+  C++ features are used from the standard library,
+  completed with `nostd` replacement implementations.
+  C++17 and below works but with additional dependencies,
+  e.g. either MS-GSL or Abseil for
   `std::span` implementation (`gsl::span` or `absl::Span`).
 * `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
 
 Currently only `nostd` and `stdlib` configurations are implemented in CMake
 build. `absl` is reserved for future use. Build systems other than CMake need to
-`#define HAVE_CPP_STDLIB` to enable the Standard Library classes.
+`#define OPENTELEMETRY_STL_VERSION=<version>` to enable the Standard Library classes.
+
+Valid values for `OPENTELEMETRY_STL_VERSION` are `2011`, `2014`, `2017`, `2020` and
+`2023`.
 
 ### Build matrix
 

@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef HAVE_CPP_STDLIB
+#ifndef OPENTELEMETRY_STL_VERSION
 // Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
 // Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
 //
@@ -284,4 +284,4 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_STL_VERSION */
