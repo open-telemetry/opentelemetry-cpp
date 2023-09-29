@@ -259,30 +259,6 @@ class Gauge : public SynchronousInstrument
 {
 public:
   /**
-   * Record a value
-   *
-   * @param value The increment amount. MUST be non-negative.
-   */
-  virtual void Record(T value) noexcept = 0;
-
-  /**
-   * Record a value
-   *
-   * @param value The increment amount. MUST be non-negative.
-   * @param context The explicit context to associate with this measurement.
-   */
-  virtual void Record(T value, const context::Context &context) noexcept = 0;
-
-  /**
-   * Record a value with a set of attributes.
-   *
-   * @param value The increment amount. MUST be non-negative.
-   * @param attributes A set of attributes to associate with the value.
-   */
-
-  virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
-
-  /**
    * Record a value with a set of attributes.
    *
    * @param value The increment amount. MUST be non-negative.
@@ -290,8 +266,52 @@ public:
    * @param context The explicit context to associate with this measurement.
    */
   virtual void Record(T value,
-                      const common::KeyValueIterable &attributes,
-                      const context::Context &context) noexcept = 0;
+                      const common::KeyValueIterable *attributes,
+                      const context::Context *context) noexcept = 0;
+
+  /**
+   * Record a value with a set of attributes.
+   *
+   * @param value The increment amount. MUST be non-negative.
+   * @param attributes A set of attributes to associate with the value.
+   * @param context The explicit context to associate with this measurement.
+   */
+  void Record(T value,
+              const common::KeyValueIterable &attributes,
+              const context::Context &context) noexcept
+  {
+    this->Record(value, &attributes, &context);
+  }
+
+  /**
+   * Record a value
+   *
+   * @param value The increment amount. MUST be non-negative.
+   */
+  virtual void Record(T value) noexcept { this->Record(value, nullptr, nullptr); }
+
+  /**
+   * Record a value
+   *
+   * @param value The increment amount. MUST be non-negative.
+   * @param context The explicit context to associate with this measurement.
+   */
+  void Record(T value, const context::Context &context) noexcept
+  {
+    this->Record(value, nullptr, &context);
+  }
+
+  /**
+   * Record a value with a set of attributes.
+   *
+   * @param value The increment amount. MUST be non-negative.
+   * @param attributes A set of attributes to associate with the value.
+   */
+
+  void Record(T value, const common::KeyValueIterable &attributes) noexcept
+  {
+    this->Record(value, &attributes, nullptr);
+  }
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>

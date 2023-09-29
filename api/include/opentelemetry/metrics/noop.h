@@ -80,13 +80,9 @@ public:
             nostd::string_view /* description */,
             nostd::string_view /* unit */) noexcept
   {}
-  void Record(T /* value */, const context::Context & /* context */) noexcept override {}
   void Record(T /* value */,
-              const common::KeyValueIterable & /* attributes */,
-              const context::Context & /* context */) noexcept override
-  {}
-  void Record(T value) noexcept override {}
-  void Record(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+              const common::KeyValueIterable * /* attributes */,
+              const context::Context * /* context */) noexcept override
   {}
 };
 #endif

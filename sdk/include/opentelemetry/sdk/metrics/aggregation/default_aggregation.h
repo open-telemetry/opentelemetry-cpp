@@ -179,9 +179,7 @@ public:
         return AggregationType::kSum;
       case InstrumentType::kHistogram:
         return AggregationType::kHistogram;
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
       case InstrumentType::kGauge:
-#endif
       case InstrumentType::kObservableGauge:
         return AggregationType::kLastValue;
       default:

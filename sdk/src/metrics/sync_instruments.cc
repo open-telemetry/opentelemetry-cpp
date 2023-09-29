@@ -453,8 +453,8 @@ LongGauge::LongGauge(InstrumentDescriptor instrument_descriptor,
 }
 
 void LongGauge::Record(uint64_t value,
-                       const opentelemetry::common::KeyValueIterable &attributes,
-                       const opentelemetry::context::Context &context) noexcept
+                       const opentelemetry::common::KeyValueIterable *attributes,
+                       const opentelemetry::context::Context *context) noexcept
 {
   if (!storage_)
   {
@@ -462,43 +462,7 @@ void LongGauge::Record(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(value, attributes, context);
-}
-
-void LongGauge::Record(uint64_t value, const opentelemetry::context::Context &context) noexcept
-{
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[LongGauge::Record(V,C)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  return storage_->RecordLong(value, context);
-}
-
-void LongGauge::Record(uint64_t value,
-                       const opentelemetry::common::KeyValueIterable &attributes) noexcept
-{
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[LongGauge::Record(V,A)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(value, attributes, context);
-}
-
-void LongGauge::Record(uint64_t value) noexcept
-{
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[LongGauge::Record(V)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(value, context);
+  return storage_->RecordLong(value, *attributes, *context);
 }
 
 DoubleGauge::DoubleGauge(InstrumentDescriptor instrument_descriptor,
@@ -514,8 +478,8 @@ DoubleGauge::DoubleGauge(InstrumentDescriptor instrument_descriptor,
 }
 
 void DoubleGauge::Record(double value,
-                         const opentelemetry::common::KeyValueIterable &attributes,
-                         const opentelemetry::context::Context &context) noexcept
+                         const opentelemetry::common::KeyValueIterable *attributes,
+                         const opentelemetry::context::Context *context) noexcept
 {
   if (value < 0)
   {
@@ -529,62 +493,9 @@ void DoubleGauge::Record(double value,
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordDouble(value, attributes, context);
+  return storage_->RecordDouble(value, *attributes, *context);
 }
 
-void DoubleGauge::Record(double value, const opentelemetry::context::Context &context) noexcept
-{
-  if (value < 0)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,C)] Value not recorded - negative value for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,C)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  return storage_->RecordDouble(value, context);
-}
-
-void DoubleGauge::Record(double value,
-                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
-{
-  if (value < 0)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,A)] Value not recorded - negative value for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,A)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  auto context = opentelemetry::context::Context{};
-  return storage_->RecordDouble(value, attributes, context);
-}
-
-void DoubleGauge::Record(double value) noexcept
-{
-  if (value < 0)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V)] Value not recorded - negative value for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  if (!storage_)
-  {
-    OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V)] Value not recorded - invalid storage for: "
-                           << instrument_descriptor_.name_);
-    return;
-  }
-  auto context = opentelemetry::context::Context{};
-  return storage_->RecordDouble(value, context);
-}
 #endif
 
 }  // namespace metrics
