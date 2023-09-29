@@ -57,7 +57,7 @@ void LongCounter::Add(uint64_t value) noexcept
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordDouble(value, context);
+  return storage_->RecordLong(value, context);
 }
 
 void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &context) noexcept
