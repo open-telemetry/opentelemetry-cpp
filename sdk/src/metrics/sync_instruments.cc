@@ -85,7 +85,7 @@ DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
 void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  if (double < 0)
+  if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V,A)] Value not recorded - negative value for: "
                            << instrument_descriptor_.name_);
@@ -105,7 +105,7 @@ void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes,
                         const opentelemetry::context::Context &context) noexcept
 {
-  if (double < 0)
+  if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V,A,C)] Value not recorded - negative value for: "
                            << instrument_descriptor_.name_);
@@ -122,7 +122,7 @@ void DoubleCounter::Add(double value,
 
 void DoubleCounter::Add(double value) noexcept
 {
-  if (double < 0)
+  if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V)] Value not recorded - negative value for: "
                            << instrument_descriptor_.name_);
@@ -140,7 +140,7 @@ void DoubleCounter::Add(double value) noexcept
 
 void DoubleCounter::Add(double value, const opentelemetry::context::Context &context) noexcept
 {
-  if (double < 0)
+  if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V)] Value not recorded - negative value for: "
                            << instrument_descriptor_.name_);
