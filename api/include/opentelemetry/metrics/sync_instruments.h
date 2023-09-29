@@ -288,7 +288,7 @@ public:
    *
    * @param value The increment amount. MUST be non-negative.
    */
-  virtual void Record(T value) noexcept { this->Record(value, nullptr, nullptr); }
+  void Record(T value) noexcept { this->Record(value, nullptr, nullptr); }
 
   /**
    * Record a value
