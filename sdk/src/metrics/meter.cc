@@ -52,7 +52,7 @@ nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return nostd::unique_ptr<metrics::Counter<uint64_t>>(
-      new LongCounter<uint64_t>(instrument_descriptor, std::move(storage)));
+      new LongCounter(instrument_descriptor, std::move(storage)));
 }
 
 nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -138,7 +138,7 @@ nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return nostd::unique_ptr<metrics::Histogram<uint64_t>>{
-      new LongHistogram<uint64_t>(instrument_descriptor, std::move(storage))};
+      new LongHistogram(instrument_descriptor, std::move(storage))};
 }
 
 nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
@@ -162,6 +162,51 @@ nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
   return nostd::unique_ptr<metrics::Histogram<double>>{
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+nostd::unique_ptr<opentelemetry::metrics::Gauge<uint64_t>> Meter::CreateInt64Gauge(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit) noexcept
+{
+  if (!ValidateInstrument(name, description, unit))
+  {
+    OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64Gauge - failed. Invalid parameters."
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
+    return nostd::unique_ptr<metrics::Gauge<uint64_t>>(
+        new metrics::NoopGauge<uint64_t>(name, description, unit));
+  }
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
+  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  return nostd::unique_ptr<metrics::Gauge<uint64_t>>{
+      new LongGauge(instrument_descriptor, std::move(storage))};
+}
+
+nostd::unique_ptr<opentelemetry::metrics::Gauge<double>> Meter::CreateDoubleGauge(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit) noexcept
+{
+  if (!ValidateInstrument(name, description, unit))
+  {
+    OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleGauge - failed. Invalid parameters."
+                            << name << " " << description << " " << unit
+                            << ". Measurements won't be recorded.");
+    return nostd::unique_ptr<metrics::Gauge<double>>(
+        new metrics::NoopGauge<double>(name, description, unit));
+  }
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
+  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  return nostd::unique_ptr<metrics::Gauge<double>>{
+      new DoubleGauge(instrument_descriptor, std::move(storage))};
+}
+#endif
 
 nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt64ObservableGauge(
     nostd::string_view name,
