@@ -156,6 +156,38 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
 
+  cmake_clang_maintainer_abiv2_test:
+    name: CMake clang 14 (maintainer mode, abiv2)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake clang (maintainer mode, abiv2)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
     runs-on: windows-latest

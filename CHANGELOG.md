@@ -23,8 +23,20 @@ Increment the:
   [#2326](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
 * [EXPORTER] Replace colons with underscores when converting to Prometheus label
   [#2330](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
+* [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
+  [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
 * [REMOVAL] Drop C++11 support
   [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
+
+Important changes:
+
+* [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
+  [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
+  * MeterProvider::GetMeter() now accepts InstrumentationScope attributes.
+  * Because this is an `ABI` breaking change, the fix is only available
+    with the `CMake` option `WITH_ABI_VERSION_2=ON`.
+  * When building with `CMake` option `WITH_ABI_VERSION_1=ON` (by default)
+    the `ABI` is unchanged, and the fix is not available.
 
 Breaking changes:
 
