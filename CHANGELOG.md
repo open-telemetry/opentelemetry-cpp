@@ -20,11 +20,13 @@ Increment the:
 * [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
   [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
 * [EXPORTER] Handle attribute key collisions caused by sanitation
-  [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
+  [#2326](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
 * [EXPORTER] Replace colons with underscores when converting to Prometheus label
-  [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
+  [#2330](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
 * [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
   [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
+* [REMOVAL] Drop C++11 support
+  [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
 
 Important changes:
 
@@ -58,6 +60,10 @@ Breaking changes:
     by the caller are honored.
   * Applications that set neither CMAKE_CXX_STANDARD nor -stdc++
     options may need to provide a C++ standard in their makefiles.
+
+* [REMOVAL] Drop C++11 support
+  [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
+  * Building with C++11 is no longer supported.
 
 ## [1.11.0] 2023-08-21
 

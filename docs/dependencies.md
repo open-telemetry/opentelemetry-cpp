@@ -27,7 +27,7 @@ Both these dependencies are listed here:
     compiler if cmake option `WITH_STL` is enabled
     or macro `OPENTELEMETRY_STL_VERSION` is defined.
     License: `GNU General Public License`
-    - For C++11/14/17 compilers, fallback to gsl::span if [GSL C++
+    - For C++14/17 compilers, fallback to gsl::span if [GSL C++
       library](https://github.com/microsoft/GSL) is installed. License: `MIT
       License`
     - libc++ 14.0.0 do not support construct std::span from a range or container

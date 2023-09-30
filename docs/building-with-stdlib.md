@@ -19,7 +19,7 @@ API surface classes with [Abseil classes](https://abseil.io/) instead of
 
 * ABI stability: scenario where different modules are compiled with different
   compiler and incompatible standard library.
-* backport of C++17 and above features to C++11 compiler.
+* backport of C++17 and above features to C++14 compiler.
 
 The need for custom `nostd` classes is significantly diminished when the SDK is
 compiled with C++17 or above compiler. Only `std::span` needs to be backported.
@@ -137,9 +137,9 @@ Visual Studio provides 1st class debug experience for the standard library.
 
 Supported build flavors:
 
-* `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
+* `nostd` - OpenTelemetry backport of classes for C++14. Not using standard lib.
 * `stdlib` - Standard Library.
-  Native experience with C++11/C++14/C++17/C++20/C++23 compiler.
+  Native experience with C++14/C++17/C++20/C++23 compiler.
   Depending on the stdlib level in effect,
   C++ features are used from the standard library,
   completed with `nostd` replacement implementations.
