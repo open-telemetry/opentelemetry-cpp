@@ -93,7 +93,7 @@ this, Google Test also allows us to easily integrate code coverage tools such as
 ## Integration and Usage
 
 One of the base requirements to build and use Google Test from a source package
-are to use either Bazel or CMake; the other is a C++11-standard-compliant
+are to use either Bazel or CMake; the other is a C++14-standard-compliant
 compiler like GCC or Clang.
 
 ### Bazel
