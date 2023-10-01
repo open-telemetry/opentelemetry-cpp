@@ -39,16 +39,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
   collection_lock_.lock();
 
   std::vector<prometheus_client::MetricFamily> result;
-
-  // If populate_target_info_ is true, populate target_info once.
-  bool populate_target_info = false;
-  if (populate_target_info_)
-  {
-    populate_target_info = true;
-
-    const_cast<PrometheusCollector *>(this)->populate_target_info_ = false;
-  }
-
+  
+  bool populate_target_info = populate_target_info_;
   reader_->Collect([&result, populate_target_info](sdk::metrics::ResourceMetrics &metric_data) {
     auto prometheus_metric_data =
         PrometheusExporterUtils::TranslateToPrometheus(metric_data, populate_target_info);
