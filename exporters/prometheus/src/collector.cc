@@ -39,7 +39,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
   collection_lock_.lock();
 
   std::vector<prometheus_client::MetricFamily> result;
-  
+
   bool populate_target_info = populate_target_info_;
   reader_->Collect([&result, populate_target_info](sdk::metrics::ResourceMetrics &metric_data) {
     auto prometheus_metric_data =
