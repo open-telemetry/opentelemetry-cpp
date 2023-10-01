@@ -196,12 +196,23 @@ class NoopMeterProvider final : public MeterProvider
 public:
   NoopMeterProvider() : meter_{nostd::shared_ptr<Meter>(new NoopMeter)} {}
 
-  nostd::shared_ptr<Meter> GetMeter(nostd::string_view /* library_name */,
-                                    nostd::string_view /* library_version */,
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::shared_ptr<Meter> GetMeter(
+      nostd::string_view /* name */,
+      nostd::string_view /* version */,
+      nostd::string_view /* schema_url */,
+      const common::KeyValueIterable * /* attributes */) noexcept override
+  {
+    return meter_;
+  }
+#else
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view /* name */,
+                                    nostd::string_view /* version */,
                                     nostd::string_view /* schema_url */) noexcept override
   {
     return meter_;
   }
+#endif
 
 #ifdef ENABLE_REMOVE_METER_PREVIEW
   void RemoveMeter(nostd::string_view /* name */,

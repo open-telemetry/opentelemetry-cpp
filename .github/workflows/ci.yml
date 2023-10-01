@@ -28,43 +28,6 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.test
 
-  #
-  # This build uses the latest libraries compatible
-  # with C++11
-  #
-  cmake_gcc_maintainer_cpp11_async_test:
-    name: CMake gcc 12 (maintainer mode, C++11, async)
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: setup
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-        GOOGLETEST_VERSION: 1.12.1
-        PROTOBUF_VERSION: 21.12
-      run: |
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/install_protobuf.sh
-    - name: run cmake gcc (maintainer mode, C++11, async)
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-      run: |
-        ./ci/do_ci.sh cmake.maintainer.cpp11.async.test
-    - name: generate test cert
-      env:
-        CFSSL_VERSION: 1.6.3
-      run: |
-        sudo -E ./tools/setup-cfssl.sh
-        (cd ./functional/cert; ./generate_cert.sh)
-    - name: run func test
-      run: |
-        (cd ./functional/otlp; ./run_test.sh)
-
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 12 (maintainer mode, sync)
     runs-on: ubuntu-latest
@@ -193,6 +156,38 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
 
+  cmake_clang_maintainer_abiv2_test:
+    name: CMake clang 14 (maintainer mode, abiv2)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake clang (maintainer mode, abiv2)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
     runs-on: windows-latest
@@ -257,64 +252,6 @@ jobs:
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
-
-  cmake_gcc_48_test:
-    name: CMake gcc 4.8 (without otlp exporter)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Add Ubuntu Xenial package sources
-      run: |
-          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
-          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_gcc48.sh
-    - name: setup cmake
-      env:
-        CC: /usr/bin/gcc-4.8
-        CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: 1.10.0
-      run: |
-        sudo -E ./ci/setup_cmake.sh
-    - name: run tests
-      env:
-        CC: /usr/bin/gcc-4.8
-        CXX: /usr/bin/g++-4.8
-        CXX_STANDARD: '11'
-      run: ./ci/do_ci.sh cmake.legacy.test
-
-  cmake_gcc_48_otlp_exporter_test:
-    name: CMake gcc 4.8 (with otlp exporter)
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Add Ubuntu Xenial package sources
-      run: |
-          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial main'
-          sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu/ xenial universe'
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_gcc48.sh
-    - name: setup cmake and grpc
-      env:
-        CC: /usr/bin/gcc-4.8
-        CXX: /usr/bin/g++-4.8
-        GOOGLETEST_VERSION: 1.10.0
-      run: |
-        sudo -E ./ci/setup_cmake.sh
-        sudo -E ./ci/setup_grpc.sh -v 4.8
-    - name: run tests
-      env:
-        CC: /usr/bin/gcc-4.8
-        CXX: /usr/bin/g++-4.8
-      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
