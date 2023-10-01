@@ -40,7 +40,7 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
     return metric_sdk::AggregationType::kHistogram;
   }
   else if (instrument_type == metric_sdk::InstrumentType::kObservableGauge ||
-           instrument_type == metric_sdk::InstrumentTye::kGauge)
+           instrument_type == metric_sdk::InstrumentType::kGauge)
   {
     return metric_sdk::AggregationType::kLastValue;
   }
