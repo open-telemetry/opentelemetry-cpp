@@ -49,7 +49,7 @@ public:
               const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
-  void Record(T value) noexcept override {}
+  void Record(T /*value*/) noexcept override {}
 #endif
 };
 
