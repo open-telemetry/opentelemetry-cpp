@@ -105,7 +105,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 1,
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 3,
                vals);
 }
 
@@ -119,7 +119,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 
   auto metric1          = translated[0];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 1,
+  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 3,
                vals);
 }
 
@@ -133,7 +133,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[0];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 1,
+  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 3,
                vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 }
@@ -211,20 +211,26 @@ protected:
 
 TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}},
-                   {{"foo_a", "value1"}, {"foo_b", "value2"}});
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}}, {{"foo_a", "value1"},
+                                                                {"foo_b", "value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
 TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
 {
-  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}},  //
-                   {{"foo_a", "value1;value2"}});
+  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}}, {{"foo_a", "value1;value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
 TEST_F(AttributeCollisionTest, DropsInvertedKeys)
 {
   CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
-                   {{"foo_a", "value1"}, {"foo_b", "value2"}});
+                   {{"foo_a", "value1"},
+                    {"foo_b", "value2"},
+                    {"otel_scope_name", "library_name"},
+                    {"otel_scope_version", "1.2.0"}});
 }
 
 OPENTELEMETRY_END_NAMESPACE

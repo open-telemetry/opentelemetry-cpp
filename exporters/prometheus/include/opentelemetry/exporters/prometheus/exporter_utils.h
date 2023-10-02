@@ -48,6 +48,7 @@ private:
   template <typename T>
   static void SetData(std::vector<T> values,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricType type,
                       ::prometheus::MetricFamily *metric_family);
 
@@ -60,13 +61,16 @@ private:
                       const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricFamily *metric_family);
 
   /**
    * Set time and labels to metric data
    */
-  static void SetMetricBasic(::prometheus::ClientMetric &metric,
-                             const opentelemetry::sdk::metrics::PointAttributes &labels);
+  static void SetMetricBasic(
+      ::prometheus::ClientMetric &metric,
+      const opentelemetry::sdk::metrics::PointAttributes &labels,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope);
 
   /**
    * Convert attribute value to string
