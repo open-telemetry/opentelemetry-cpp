@@ -58,6 +58,7 @@ private:
    * Add a target_info metric to collect resource attributes
    */
   static void SetTarget(const sdk::metrics::ResourceMetrics &data,
+                        const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                         std::vector<::prometheus::MetricFamily> *output);
 
   /**

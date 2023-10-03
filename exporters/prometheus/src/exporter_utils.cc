@@ -134,9 +134,9 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   output.reserve(reserve_size);
 
   // Append target_info as the first metric
-  if (populate_target_info)
+  if (populate_target_info && !data.scope_metric_data_.empty())
   {
-    SetTarget(data, &output);
+    SetTarget(data, (*data.scope_metric_data_.begin()).scope_, &output);
   }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
@@ -293,8 +293,10 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
   }
 }
 
-void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &data,
-                                        std::vector<::prometheus::MetricFamily> *output)
+void PrometheusExporterUtils::SetTarget(
+    const sdk::metrics::ResourceMetrics &data,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    std::vector<::prometheus::MetricFamily> *output)
 {
   if (output == nullptr || data.resource_ == nullptr)
   {
@@ -311,7 +313,7 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
   metric.info.value                       = 1.0;
 
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, empty_attributes, data.resource_);
+  SetMetricBasic(metric, empty_attributes, scope, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
