@@ -73,12 +73,12 @@ TEST(PrometheusCollector, BasicTests)
   MockMetricReader *reader     = new MockMetricReader();
   MockMetricProducer *producer = new MockMetricProducer();
   reader->SetMetricProducer(producer);
-  PrometheusCollector collector(reader);
+  PrometheusCollector collector(reader, true);
   auto data = collector.Collect();
 
   // Collection size should be the same as the size
   // of the records collection produced by MetricProducer.
-  ASSERT_EQ(data.size(), 1);
+  ASSERT_EQ(data.size(), 2);
   delete reader;
   delete producer;
 }
