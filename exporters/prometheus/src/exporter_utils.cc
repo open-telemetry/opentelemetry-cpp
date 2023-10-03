@@ -31,6 +31,9 @@ namespace metrics
 namespace
 {
 
+static constexpr const char *kScopeNameKey    = "otel_scope_name";
+static constexpr const char *kScopeVersionKey = "otel_scope_version";
+
 /**
  * Sanitize the given metric name by replacing invalid characters with _,
  * ensuring that multiple consecutive _ characters are collapsed to a single _.
@@ -173,7 +176,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, &metric_family, data.resource_);
+                  point_data_attr.attributes, instrumentation_info.scope_, &metric_family,
+                  data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -183,14 +187,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family, data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -206,7 +212,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, type, &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -320,15 +327,17 @@ void PrometheusExporterUtils::SetTarget(const sdk::metrics::ResourceMetrics &dat
  * sum => Prometheus Counter
  */
 template <typename T>
-void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const metric_sdk::PointAttributes &labels,
-                                      prometheus_client::MetricType type,
-                                      prometheus_client::MetricFamily *metric_family,
-                                      const opentelemetry::sdk::resource::Resource *resource)
+void PrometheusExporterUtils::SetData(
+    std::vector<T> values,
+    const metric_sdk::PointAttributes &labels,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    prometheus_client::MetricType type,
+    prometheus_client::MetricFamily *metric_family,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, resource);
+  SetMetricBasic(metric, labels, scope, resource);
   SetValue(values, type, &metric);
 }
 
@@ -337,25 +346,29 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
  * Histogram => Prometheus Histogram
  */
 template <typename T>
-void PrometheusExporterUtils::SetData(std::vector<T> values,
-                                      const std::vector<double> &boundaries,
-                                      const std::vector<uint64_t> &counts,
-                                      const metric_sdk::PointAttributes &labels,
-                                      prometheus_client::MetricFamily *metric_family,
-                                      const opentelemetry::sdk::resource::Resource *resource)
+void PrometheusExporterUtils::SetData(
+    std::vector<T> values,
+    const std::vector<double> &boundaries,
+    const std::vector<uint64_t> &counts,
+    const metric_sdk::PointAttributes &labels,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    prometheus_client::MetricFamily *metric_family,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, resource);
+  SetMetricBasic(metric, labels, scope, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
 /**
  * Set labels to metric data
  */
-void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
-                                             const metric_sdk::PointAttributes &labels,
-                                             const opentelemetry::sdk::resource::Resource *resource)
+void PrometheusExporterUtils::SetMetricBasic(
+    prometheus_client::ClientMetric &metric,
+    const metric_sdk::PointAttributes &labels,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
   if (labels.empty() && nullptr == resource)
   {
@@ -389,6 +402,24 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
           << label.first << "' became '" << sanitized << "' which is less than '" << previous_key
           << "'. Ignoring this label.");
     }
+  }
+  if (!scope)
+  {
+    return;
+  }
+  auto scope_name = scope->GetName();
+  if (!scope_name.empty())
+  {
+    metric.label.emplace_back();
+    metric.label.back().name  = kScopeNameKey;
+    metric.label.back().value = std::move(scope_name);
+  }
+  auto scope_version = scope->GetVersion();
+  if (!scope_version.empty())
+  {
+    metric.label.emplace_back();
+    metric.label.back().name  = kScopeVersionKey;
+    metric.label.back().value = std::move(scope_version);
   }
 }
 
