@@ -379,7 +379,7 @@ void PrometheusExporterUtils::SetMetricBasic(
   // Note that attribute keys are sorted, but sanitized keys can be out-of-order.
   // We could sort the sanitized keys again, but this seems too expensive to do
   // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
-  metric.label.reserve(labels.size() + 2);
+  metric.label.reserve(labels.size());
   std::string previous_key;
   for (auto const &label : labels)
   {
