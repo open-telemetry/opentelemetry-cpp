@@ -1,14 +1,22 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <limits>
 #include <sstream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
-#include "prometheus/metric_family.h"
 
-#include <prometheus/metric_type.h>
+#include "prometheus/metric_family.h"
+#include "prometheus/metric_type.h"
+
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
@@ -111,11 +119,25 @@ std::string SanitizeName(std::string name)
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
-    const sdk::metrics::ResourceMetrics &data)
+    const sdk::metrics::ResourceMetrics &data,
+    bool populate_target_info)
 {
 
   // initialize output vector
+  std::size_t reserve_size = 1;
+  for (const auto &instrumentation_info : data.scope_metric_data_)
+  {
+    reserve_size += instrumentation_info.metric_data_.size();
+  }
+
   std::vector<prometheus_client::MetricFamily> output;
+  output.reserve(reserve_size);
+
+  // Append target_info as the first metric
+  if (populate_target_info && !data.scope_metric_data_.empty())
+  {
+    SetTarget(data, (*data.scope_metric_data_.begin()).scope_, &output);
+  }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
@@ -151,10 +173,11 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
           }
           else
           {
-            sum = nostd::get<int64_t>(histogram_point_data.sum_);
+            sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, instrumentation_info.scope_, &metric_family);
+                  point_data_attr.attributes, instrumentation_info.scope_, &metric_family,
+                  data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -165,7 +188,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
             SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family);
+                    &metric_family, data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
@@ -173,7 +196,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
             SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family);
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -190,7 +213,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
             SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family);
+                    &metric_family, data.resource_);
           }
           else
           {
@@ -204,6 +227,17 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     }
   }
   return output;
+}
+
+void PrometheusExporterUtils::AddPrometheusLabel(
+    std::string name,
+    std::string value,
+    std::vector<::prometheus::ClientMetric::Label> *labels)
+{
+  prometheus_client::ClientMetric::Label prometheus_label;
+  prometheus_label.name  = std::move(name);
+  prometheus_label.value = std::move(value);
+  labels->emplace_back(std::move(prometheus_label));
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
@@ -259,6 +293,37 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
   }
 }
 
+void PrometheusExporterUtils::SetTarget(
+    const sdk::metrics::ResourceMetrics &data,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    std::vector<::prometheus::MetricFamily> *output)
+{
+  if (output == nullptr || data.resource_ == nullptr)
+  {
+    return;
+  }
+
+  prometheus_client::MetricFamily metric_family;
+  metric_family.name = "target";
+  metric_family.help = "Target metadata";
+  metric_family.type = prometheus_client::MetricType::Info;
+  metric_family.metric.emplace_back();
+
+  prometheus_client::ClientMetric &metric = metric_family.metric.back();
+  metric.info.value                       = 1.0;
+
+  metric_sdk::PointAttributes empty_attributes;
+  SetMetricBasic(metric, empty_attributes, scope, data.resource_);
+
+  for (auto &label : data.resource_->GetAttributes())
+  {
+    AddPrometheusLabel(SanitizeName(label.first), AttributeValueToString(label.second),
+                       &metric.label);
+  }
+
+  output->emplace_back(std::move(metric_family));
+}
+
 /**
  * Set metric data for:
  * sum => Prometheus Counter
@@ -269,11 +334,12 @@ void PrometheusExporterUtils::SetData(
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     prometheus_client::MetricType type,
-    prometheus_client::MetricFamily *metric_family)
+    prometheus_client::MetricFamily *metric_family,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, scope);
+  SetMetricBasic(metric, labels, scope, resource);
   SetValue(values, type, &metric);
 }
 
@@ -288,11 +354,12 @@ void PrometheusExporterUtils::SetData(
     const std::vector<uint64_t> &counts,
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
-    prometheus_client::MetricFamily *metric_family)
+    prometheus_client::MetricFamily *metric_family,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, scope);
+  SetMetricBasic(metric, labels, scope, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
@@ -302,9 +369,10 @@ void PrometheusExporterUtils::SetData(
 void PrometheusExporterUtils::SetMetricBasic(
     prometheus_client::ClientMetric &metric,
     const metric_sdk::PointAttributes &labels,
-    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    const opentelemetry::sdk::resource::Resource *resource)
 {
-  if (labels.empty())
+  if (labels.empty() && nullptr == resource)
   {
     return;
   }
@@ -410,7 +478,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
   const auto &value_var = values[0];
   if (nostd::holds_alternative<int64_t>(value_var))
   {
-    value = nostd::get<int64_t>(value_var);
+    value = static_cast<double>(nostd::get<int64_t>(value_var));
   }
   else
   {
@@ -445,9 +513,9 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
                                        const std::vector<uint64_t> &counts,
                                        prometheus_client::ClientMetric *metric)
 {
-  metric->histogram.sample_sum   = values[0];
-  metric->histogram.sample_count = values[1];
-  int cumulative                 = 0;
+  metric->histogram.sample_sum   = static_cast<double>(values[0]);
+  metric->histogram.sample_count = static_cast<std::uint64_t>(values[1]);
+  std::uint64_t cumulative       = 0;
   std::vector<prometheus_client::ClientMetric::Bucket> buckets;
   uint32_t idx = 0;
   for (const auto &boundary : boundaries)

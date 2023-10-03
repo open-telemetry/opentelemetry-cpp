@@ -17,6 +17,8 @@ Increment the:
 
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+* [EXPORTER] Prometheus exporter emit resource attributes
+  [#2301](https://github.com/open-telemetry/opentelemetry-cpp/pull/2301)
 * [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
   [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
 * [EXPORTER] Handle attribute key collisions caused by sanitation
