@@ -21,7 +21,7 @@ class ViewRegistry;
 /**
  * Factory class for MeterContext.
  */
-class MeterContextFactory
+class OPENTELEMETRY_EXPORT MeterContextFactory
 {
 public:
   /**
