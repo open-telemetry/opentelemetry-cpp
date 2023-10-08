@@ -33,7 +33,7 @@ jobs:
         cmake --build .
         chmod +x bin/cppcheck
         cd ../../opentelemetry-cpp
-        ../cppcheck/build/bin/cppcheck .
+        ../cppcheck/build/bin/cppcheck -ithird_party/ .
   cmake_test:
     name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
