@@ -7,6 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
+  cppcheck_analyser:
+    name: static check with cppcheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo apt-get -y install cmake
+    - name: build and run cppcheck
+      run: |
+        cd ..
+        git clone https://github.com/danmar/cppcheck.git --branch 2.12.x
+        cd cppcheck
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+        chmod +x bin/cppcheck
+        cd ../../opentelemetry-cpp
+        ../cppcheck/build/bin/cppcheck .
   cmake_test:
     name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
