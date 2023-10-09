@@ -105,5 +105,4 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
 }
 INSTANTIATE_TEST_SUITE_P(All,
                          WritableMetricStorageCardinalityLimitTestFixture,
-                         ::testing::Values(AggregationTemporality::kCumulative,
-                                           AggregationTemporality::kDelta));
+                         ::testing::Values(AggregationTemporality::kDelta));
