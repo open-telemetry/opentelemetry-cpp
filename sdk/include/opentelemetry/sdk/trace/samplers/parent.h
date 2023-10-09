@@ -52,8 +52,8 @@ public:
   nostd::string_view GetDescription() const noexcept override;
 
 private:
-  std::shared_ptr<Sampler> delegate_sampler_;
-  std::string description_;
+  const std::shared_ptr<Sampler> delegate_sampler_;
+  const std::string description_;
 };
 }  // namespace trace
 }  // namespace sdk
