@@ -98,7 +98,7 @@ EXPORTS
     ?Create@OtlpGrpcLogRecordExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VLogRecordExporter@logs@sdk@v1@opentelemetry@@U?$default_delete@VLogRecordExporter@logs@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcExporterOptions@2345@@Z
     // public: static class std::unique_ptr<class opentelemetry::v1::sdk::metrics::PushMetricExporter,struct std::default_delete<class opentelemetry::v1::sdk::metrics::PushMetricExporter> > __cdecl opentelemetry::v1::exporter::otlp::OtlpGrpcMetricExporterFactory::Create(struct opentelemetry::v1::exporter::otlp::OtlpGrpcMetricExporterOptions const & __ptr64)
     ?Create@OtlpGrpcMetricExporterFactory@otlp@exporter@v1@opentelemetry@@SA?AV?$unique_ptr@VPushMetricExporter@metrics@sdk@v1@opentelemetry@@U?$default_delete@VPushMetricExporter@metrics@sdk@v1@opentelemetry@@@std@@@std@@AEBUOtlpGrpcMetricExporterOptions@2345@@Z
-    
+
     ?GetOtlpDefaultGrpcTracesEndpoint@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ
     ?GetOtlpDefaultGrpcTracesIsInsecure@otlp@exporter@v1@opentelemetry@@YA_NXZ
     ?GetOtlpDefaultTracesSslCertificatePath@otlp@exporter@v1@opentelemetry@@YA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ

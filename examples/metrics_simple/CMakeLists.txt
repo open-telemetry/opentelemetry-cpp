@@ -14,6 +14,7 @@ target_link_libraries(metrics_ostream_example ${CMAKE_THREAD_LIBS_INIT}
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   target_link_libraries(metrics_ostream_example opentelemetry_cpp)
 else()
-  target_link_libraries(metrics_ostream_example opentelemetry_metrics
-                        opentelemetry_exporter_ostream_metrics opentelemetry_resources)
+  target_link_libraries(
+    metrics_ostream_example opentelemetry_metrics
+    opentelemetry_exporter_ostream_metrics opentelemetry_resources)
 endif()
