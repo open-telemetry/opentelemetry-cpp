@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -55,105 +56,168 @@ static constexpr const char *kClientSocketPort = "client.socket.port";
 
 /**
  * Deprecated, use {@code http.request.method} instead.
+ *
+ * @deprecated Deprecated, use `http.request.method` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpMethod = "http.method";
 
 /**
  * Deprecated, use {@code http.response.status_code} instead.
+ *
+ * @deprecated Deprecated, use `http.response.status_code` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpStatusCode = "http.status_code";
 
 /**
  * Deprecated, use {@code url.scheme} instead.
+ *
+ * @deprecated Deprecated, use `url.scheme` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpScheme = "http.scheme";
 
 /**
  * Deprecated, use {@code url.full} instead.
+ *
+ * @deprecated Deprecated, use `url.full` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpUrl = "http.url";
 
 /**
  * Deprecated, use {@code url.path} and {@code url.query} instead.
+ *
+ * @deprecated Deprecated, use `url.path` and `url.query` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpTarget = "http.target";
 
 /**
  * Deprecated, use {@code http.request.body.size} instead.
+ *
+ * @deprecated Deprecated, use `http.request.body.size` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpRequestContentLength = "http.request_content_length";
 
 /**
  * Deprecated, use {@code http.response.body.size} instead.
+ *
+ * @deprecated Deprecated, use `http.response.body.size` instead.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kHttpResponseContentLength = "http.response_content_length";
 
 /**
  * Deprecated, use {@code server.socket.domain} on client spans.
+ *
+ * @deprecated Deprecated, use `server.socket.domain` on client spans.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockPeerName = "net.sock.peer.name";
 
 /**
  * Deprecated, use {@code server.socket.address} on client spans and {@code client.socket.address}
  * on server spans.
+ *
+ * @deprecated Deprecated, use `server.socket.address` on client spans and `client.socket.address`
+ * on server spans.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockPeerAddr = "net.sock.peer.addr";
 
 /**
  * Deprecated, use {@code server.socket.port} on client spans and {@code client.socket.port} on
  * server spans.
+ *
+ * @deprecated Deprecated, use `server.socket.port` on client spans and `client.socket.port` on
+ * server spans.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockPeerPort = "net.sock.peer.port";
 
 /**
  * Deprecated, use {@code server.address} on client spans and {@code client.address} on server
  * spans.
+ *
+ * @deprecated Deprecated, use `server.address` on client spans and `client.address` on server
+ * spans.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetPeerName = "net.peer.name";
 
 /**
  * Deprecated, use {@code server.port} on client spans and {@code client.port} on server spans.
+ *
+ * @deprecated Deprecated, use `server.port` on client spans and `client.port` on server spans.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetPeerPort = "net.peer.port";
 
 /**
  * Deprecated, use {@code server.address}.
+ *
+ * @deprecated Deprecated, use `server.address`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetHostName = "net.host.name";
 
 /**
  * Deprecated, use {@code server.port}.
+ *
+ * @deprecated Deprecated, use `server.port`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetHostPort = "net.host.port";
 
 /**
  * Deprecated, use {@code server.socket.address}.
+ *
+ * @deprecated Deprecated, use `server.socket.address`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockHostAddr = "net.sock.host.addr";
 
 /**
  * Deprecated, use {@code server.socket.port}.
+ *
+ * @deprecated Deprecated, use `server.socket.port`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockHostPort = "net.sock.host.port";
 
 /**
  * Deprecated, use {@code network.transport}.
+ *
+ * @deprecated Deprecated, use `network.transport`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetTransport = "net.transport";
 
 /**
  * Deprecated, use {@code network.protocol.name}.
+ *
+ * @deprecated Deprecated, use `network.protocol.name`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetProtocolName = "net.protocol.name";
 
 /**
  * Deprecated, use {@code network.protocol.version}.
+ *
+ * @deprecated Deprecated, use `network.protocol.version`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetProtocolVersion = "net.protocol.version";
 
 /**
  * Deprecated, use {@code network.transport} and {@code network.type}.
+ *
+ * @deprecated Deprecated, use `network.transport` and `network.type`.
  */
+OPENTELEMETRY_DEPRECATED
 static constexpr const char *kNetSockFamily = "net.sock.family";
 
 /**

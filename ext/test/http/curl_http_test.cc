@@ -102,6 +102,7 @@ protected:
   std::atomic<bool> is_setup_{false};
   std::atomic<bool> is_running_{false};
   std::vector<HTTP_SERVER_NS::HttpRequest> received_requests_;
+  std::mutex cv_mtx_requests;
   std::mutex mtx_requests;
   std::condition_variable cv_got_events;
   std::mutex cv_m;
@@ -142,15 +143,14 @@ public:
     int response_status = 404;
     if (request.uri == "/get/")
     {
-
-      std::unique_lock<std::mutex> lk(mtx_requests);
+      std::unique_lock<std::mutex> lk1(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
       response_status                  = 200;
     }
     else if (request.uri == "/post/")
     {
-      std::unique_lock<std::mutex> lk(mtx_requests);
+      std::unique_lock<std::mutex> lk1(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "application/json";
       response.body                    = "{'k1':'v1', 'k2':'v2', 'k3':'v3'}";
@@ -164,9 +164,9 @@ public:
 
   bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
   {
-    std::unique_lock<std::mutex> lk(mtx_requests);
+    std::unique_lock<std::mutex> lk(cv_mtx_requests);
     if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec), [&] {
-          //
+          std::unique_lock<std::mutex> lk1(mtx_requests);
           return received_requests_.size() >= expected_count;
         }))
     {

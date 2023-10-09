@@ -15,6 +15,98 @@ Increment the:
 
 ## [Unreleased]
 
+* [DEPRECATION] Deprecate ZPAGES
+  [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
+* [EXPORTER] Prometheus exporter emit resource attributes
+  [#2301](https://github.com/open-telemetry/opentelemetry-cpp/pull/2301)
+* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+  [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
+* [EXPORTER] Handle attribute key collisions caused by sanitation
+  [#2326](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
+* [EXPORTER] Replace colons with underscores when converting to Prometheus label
+  [#2330](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
+* [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
+  [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
+* [REMOVAL] Drop C++11 support
+  [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
+* [EXPORTER] Add otel_scope_name and otel_scope_version labels to the prometheus
+  exporter.
+  [#2293](https://github.com/open-telemetry/opentelemetry-cpp/pull/2293)
+
+Important changes:
+
+* [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
+  [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
+  * MeterProvider::GetMeter() now accepts InstrumentationScope attributes.
+  * Because this is an `ABI` breaking change, the fix is only available
+    with the `CMake` option `WITH_ABI_VERSION_2=ON`.
+  * When building with `CMake` option `WITH_ABI_VERSION_1=ON` (by default)
+    the `ABI` is unchanged, and the fix is not available.
+
+Breaking changes:
+
+* [BUILD] Need fine-grained HAVE_CPP_STDLIB
+  [#2304](https://github.com/open-telemetry/opentelemetry-cpp/pull/2304)
+  * In `CMAKE`, the boolean option `WITH_STL` as changed to an option
+    that accepts the values `OFF`, `ON`, `CXX11`, `CXX14`, `CXX17`,
+    `CXX20` and `CXX23`.
+  * Applications makefiles that did not set WITH_STL need to use
+    `WITH_STL=OFF` instead (this is the default).
+  * Applications makefiles that did set WITH_STL need to use
+    `WITH_STL=ON` instead, or may choose to pick a specific value.
+  * In the `API` header files, the preprocessor symbol `HAVE_CPP_STDLIB`
+    is no longer used.
+  * Applications that did set `HAVE_CPP_STDLIB` before, need to set
+    `OPENTELEMETRY_STL_VERSION=<version>` instead, to build with a
+    specific STL version (2011, 2014, 2017, 2020, 2023).
+  * The opentelemetry-cpp makefile no longer sets
+    CMAKE_CXX_STANDARD by itself.
+    Instead, the CMAKE_CXX_STANDARD and/or compiler options -stdc++ used
+    by the caller are honored.
+  * Applications that set neither CMAKE_CXX_STANDARD nor -stdc++
+    options may need to provide a C++ standard in their makefiles.
+
+* [REMOVAL] Drop C++11 support
+  [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
+  * Building with C++11 is no longer supported.
+
+## [1.11.0] 2023-08-21
+
+* [BUILD] Fix more cases for symbol name for 32-bit win32 DLL build
+  [#2264](https://github.com/open-telemetry/opentelemetry-cpp/pull/2264)
+* [BUILD] added public link of `opentelemetry_proto_grpc` against gRPC lib (only
+  if gRPC library is shared)
+  [#2268](https://github.com/open-telemetry/opentelemetry-cpp/pull/2268)
+* [CI] use ubuntu-latest for tsan CI
+  [#2267](https://github.com/open-telemetry/opentelemetry-cpp/pull/2267)
+* [SDK] Fixing an apparent logging macro bug
+  [#2265](https://github.com/open-telemetry/opentelemetry-cpp/pull/2265)
+* [BUILD] Support protobuf 3.22 or upper
+  [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
+* [BUILD] Remove extra includes
+  [#2252](https://github.com/open-telemetry/opentelemetry-cpp/pull/2252)
+* [LOGS API SDK] Mark logs signal as stable API/SDK
+  [#2229](https://github.com/open-telemetry/opentelemetry-cpp/pull/2229)
+* [SEMANTIC CONVENTIONS] Upgrade to 1.21.0
+  [#2248](https://github.com/open-telemetry/opentelemetry-cpp/pull/2248)
+* [SDK] Valgrind errors on std::atomic variables
+  [#2244](https://github.com/open-telemetry/opentelemetry-cpp/pull/2244)
+* [BUILD] Fix compile with clang 16 and libc++
+  [#2242](https://github.com/open-telemetry/opentelemetry-cpp/pull/2242)
+* [Metrics SDK] Add unit to Instrument selection criteria
+  [#2236](https://github.com/open-telemetry/opentelemetry-cpp/pull/2236)
+* [SDK] Add OStreamLogRecordExporterFactory
+  [#2240](https://github.com/open-telemetry/opentelemetry-cpp/pull/2240)
+* [SDK] Add support for LowMemory metrics temporality
+  [#2234](https://github.com/open-telemetry/opentelemetry-cpp/pull/2234)
+* [CI] Misc build scripts cleanup
+  [#2232](https://github.com/open-telemetry/opentelemetry-cpp/pull/2232)
+* [CI] Upgrade GoogleTest version from 1.12.1 to 1.13.0
+  [#2114](https://github.com/open-telemetry/opentelemetry-cpp/pull/2114)
+* [BUILD] include cstdint
+  [#2230](https://github.com/open-telemetry/opentelemetry-cpp/pull/2230)
+* [EXPORTER] Support protobuf 3.22 or upper
+  [#2163](https://github.com/open-telemetry/opentelemetry-cpp/pull/2163)
 * [SDK] Mark logs signal as stable API/SDK
   [#2229](https://github.com/open-telemetry/opentelemetry-cpp/pull/2229)
 
