@@ -64,7 +64,7 @@ public:
 
 private:
   std::string description_;
-  const uint64_t threshold_;
+  uint64_t threshold_;
 };
 }  // namespace trace
 }  // namespace sdk
