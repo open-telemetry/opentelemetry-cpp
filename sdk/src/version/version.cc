@@ -12,13 +12,13 @@ namespace sdk
 namespace version
 {
 const int major_version    = 1;
-const int minor_version    = 11;
+const int minor_version    = 12;
 const int patch_version    = 0;
 const char *pre_release    = "NONE";
 const char *build_metadata = "NONE";
-const char *short_version  = "1.11.0";
-const char *full_version   = "1.11.0-NONE-NONE";
-const char *build_date     = "Mon Aug 21 22:31:07 UTC 2023";
+const char *short_version  = "1.12.0";
+const char *full_version   = "1.12.0-NONE-NONE";
+const char *build_date     = "Wed 11 Oct 2023 06:36:17 PM UTC";
 
 }  // namespace version
 }  // namespace sdk
