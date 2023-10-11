@@ -145,11 +145,11 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "curl",
         build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
-        sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
-        strip_prefix = "curl-7.73.0",
+        sha256 = "816e41809c043ff285e8c0f06a75a1fa250211bbfb2dc0a037eeef39f1a9e427",
+        strip_prefix = "curl-8.4.0",
         urls = [
-            "https://curl.haxx.se/download/curl-7.73.0.tar.gz",
-            "https://github.com/curl/curl/releases/download/curl-7_73_0/curl-7.73.0.tar.gz",
+            "https://curl.haxx.se/download/curl-8.4.0.tar.gz",
+            "https://github.com/curl/curl/releases/download/curl-8_4_0/curl-8.4.0.tar.gz",
         ],
     )
 
