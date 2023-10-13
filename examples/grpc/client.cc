@@ -53,7 +53,7 @@ public:
         {{SemanticConventions::kRpcSystem, "grpc"},
          {SemanticConventions::kRpcService, "grpc-example.GreetService"},
          {SemanticConventions::kRpcMethod, "Greet"},
-         {SemanticConventions::kServerSocketAddress, ip},
+         {SemanticConventions::kNetworkPeerAddress, ip},
          {SemanticConventions::kServerPort, port}},
         options);
 
