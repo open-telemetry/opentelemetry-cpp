@@ -77,6 +77,8 @@ Increment the:
   [#2358](https://github.com/open-telemetry/opentelemetry-cpp/pull/2358)
 * [BUILD] Fix opentracing-shim when added in super project
   [#2356](https://github.com/open-telemetry/opentelemetry-cpp/pull/2356)
+* [BUILD] Fix protoc searching with non-imported protobuf::protoc target
+  [#2362](https://github.com/open-telemetry/opentelemetry-cpp/pull/2362)
 
 Important changes:
 
