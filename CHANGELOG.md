@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
+  [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+
+Breaking changes:
+
+* [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
+  [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+  * The experimental `CMake` option `WITH_REMOVE_METER_PREVIEW` is removed,
+    use option `WITH_ABI_VERSION_2` instead.
+
 ## [1.12.0] 2023-10-16
 
 * [BUILD] Support `pkg-config`
