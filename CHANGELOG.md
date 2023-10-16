@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.12.0] 2023-10-11
+## [1.12.0] 2023-10-16
 
 * [BUILD] Support `pkg-config`
   [#2269](https://github.com/open-telemetry/opentelemetry-cpp/pull/2269)
@@ -79,6 +79,10 @@ Increment the:
   [#2356](https://github.com/open-telemetry/opentelemetry-cpp/pull/2356)
 * [BUILD] Fix protoc searching with non-imported protobuf::protoc target
   [#2362](https://github.com/open-telemetry/opentelemetry-cpp/pull/2362)
+* [BUILD] Support to use different cmake package CONFIG of dependencies
+  [#2263](https://github.com/open-telemetry/opentelemetry-cpp/pull/2263)
+* [SEMANTIC CONVENTION] Upgrade to semconv 1.22.0
+  [#2368](https://github.com/open-telemetry/opentelemetry-cpp/pull/2368)
 
 Important changes:
 

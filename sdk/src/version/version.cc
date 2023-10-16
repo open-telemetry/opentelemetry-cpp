@@ -18,7 +18,7 @@ const char *pre_release    = "NONE";
 const char *build_metadata = "NONE";
 const char *short_version  = "1.12.0";
 const char *full_version   = "1.12.0-NONE-NONE";
-const char *build_date     = "Wed 11 Oct 2023 06:36:17 PM UTC";
+const char *build_date     = "Mon 16 Oct 2023 07:42:23 AM UTC";
 
 }  // namespace version
 }  // namespace sdk
