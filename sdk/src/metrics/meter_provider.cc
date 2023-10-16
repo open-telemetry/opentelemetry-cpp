@@ -110,6 +110,12 @@ void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selec
                            std::move(view));
 }
 
+void MeterProvider::SetExemplarFilter(
+    std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept
+{
+  return context_->SetExemplarFilter(std::move(exemplar_filter));
+}
+
 /**
  * Shutdown the meter provider.
  */

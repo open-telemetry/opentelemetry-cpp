@@ -12,6 +12,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -107,6 +108,9 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
+  void SetExemplarFilter(
+      std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept;
+
   /**
    * NOTE - INTERNAL method, can change in future.
    * Adds a meter to the list of configured meters in thread safe manner.
@@ -135,6 +139,7 @@ private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
+  std::unique_ptr<metrics::ExemplarFilter> exemplar_filter_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
   std::vector<std::shared_ptr<Meter>> meters_;
 
