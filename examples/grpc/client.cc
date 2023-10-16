@@ -53,8 +53,8 @@ public:
         {{SemanticConventions::kRpcSystem, "grpc"},
          {SemanticConventions::kRpcService, "grpc-example.GreetService"},
          {SemanticConventions::kRpcMethod, "Greet"},
-         {SemanticConventions::kServerSocketAddress, ip},
-         {SemanticConventions::kServerPort, port}},
+         {SemanticConventions::kNetworkPeerAddress, ip},
+         {SemanticConventions::kNetworkPeerPort, port}},
         options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
