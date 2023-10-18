@@ -41,11 +41,10 @@ void ObservableRegistry::RemoveCallback(opentelemetry::metrics::ObservableCallba
 void ObservableRegistry::CleanupCallback(opentelemetry::metrics::ObservableInstrument *instrument)
 {
   std::lock_guard<std::mutex> lock_guard{callbacks_m_};
-  auto iter = std::remove_if(
-      callbacks_.begin(), callbacks_.end(),
-      [instrument](const std::unique_ptr<ObservableCallbackRecord> &record) {
-        return record->instrument == instrument;
-      });
+  auto iter = std::remove_if(callbacks_.begin(), callbacks_.end(),
+                             [instrument](const std::unique_ptr<ObservableCallbackRecord> &record) {
+                               return record->instrument == instrument;
+                             });
   callbacks_.erase(iter, callbacks_.end());
 }
 
