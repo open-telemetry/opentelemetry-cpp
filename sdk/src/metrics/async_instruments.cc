@@ -21,6 +21,11 @@ ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descr
 
 {}
 
+ObservableInstrument::~ObservableInstrument()
+{
+  observable_registry_->CleanupCallback(this);
+}
+
 void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                                        void *state) noexcept
 {
