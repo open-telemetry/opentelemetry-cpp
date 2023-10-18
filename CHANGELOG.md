@@ -17,6 +17,18 @@ Increment the:
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
   [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+* [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
+  [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+
+Important changes:
+
+* [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
+  [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+  * TracerProvider::GetTracer() now accepts InstrumentationScope attributes.
+  * Because this is an `ABI` breaking change, the fix is only available
+    with the `CMake` option `WITH_ABI_VERSION_2=ON`.
+  * When building with `CMake` option `WITH_ABI_VERSION_1=ON` (by default)
+    the `ABI` is unchanged, and the fix is not available.
 
 Breaking changes:
 
