@@ -114,11 +114,6 @@ if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
 endif()
 
-if(WITH_REMOVE_METER_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_REMOVE_METER_PREVIEW)
-endif()
-
 target_compile_definitions(
   opentelemetry_api
   INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})

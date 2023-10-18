@@ -75,7 +75,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   return nostd::shared_ptr<metrics_api::Meter>{meter};
 }
 
-#ifdef ENABLE_REMOVE_METER_PREVIEW
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 void MeterProvider::RemoveMeter(nostd::string_view name,
                                 nostd::string_view version,
                                 nostd::string_view schema_url) noexcept
