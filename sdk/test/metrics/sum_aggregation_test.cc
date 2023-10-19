@@ -121,13 +121,18 @@ TEST(CounterToSum, Double)
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
 }
 
-TEST(UpDownCounterToSum, Double)
+class UpDownCounterToSumFixture : public ::testing::TestWithParam<bool>
+{};
+
+TEST_P(UpDownCounterToSumFixture, Double)
 {
+  bool is_matching_view = GetParam();
   MeterProvider mp;
-  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
-  std::string instrument_name = "updowncounter1";
-  std::string instrument_desc = "updowncounter desc";
-  std::string instrument_unit = "ms";
+  auto m                                  = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_name             = "updowncounter1";
+  std::string instrument_name_nonmatching = "updowncounter1_nonmatching";
+  std::string instrument_desc             = "updowncounter desc";
+  std::string instrument_unit             = "ms";
 
   std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
@@ -135,8 +140,9 @@ TEST(UpDownCounterToSum, Double)
 
   std::unique_ptr<View> view{
       new View("view1", "view1_description", instrument_unit, AggregationType::kSum)};
-  std::unique_ptr<InstrumentSelector> instrument_selector{
-      new InstrumentSelector(InstrumentType::kUpDownCounter, instrument_name, instrument_unit)};
+  std::unique_ptr<InstrumentSelector> instrument_selector{new InstrumentSelector(
+      InstrumentType::kUpDownCounter,
+      is_matching_view ? instrument_name : instrument_name_nonmatching, instrument_unit)};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
   mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 
@@ -168,4 +174,7 @@ TEST(UpDownCounterToSum, Double)
   const auto &actual = actuals.at(0);
   ASSERT_EQ(15.0, opentelemetry::nostd::get<double>(actual.value_));
 }
+INSTANTIATE_TEST_SUITE_P(UpDownCounterToSum,
+                         UpDownCounterToSumFixture,
+                         ::testing::Values(true, false));
 #endif
