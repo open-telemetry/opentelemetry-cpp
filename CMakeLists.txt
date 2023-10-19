@@ -275,12 +275,12 @@ endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
-# EXPERIMENTAL
-option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+# STABLE
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" ON)
 
-# EXPERIMENTAL
+# STABLE
 option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
-       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+       "Whether to enable otlp http ssl tls min/max/cipher options" ON)
 
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
