@@ -17,6 +17,19 @@ Increment the:
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
   [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+* [BUILD] Make WITH_OTLP_HTTP_SSL_PREVIEW mainstream
+  [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
+
+Important changes:
+
+* [BUILD] Make WITH_OTLP_HTTP_SSL_PREVIEW mainstream
+  [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
+  * The experimental `CMake` option `WITH_OTLP_HTTP_SSL_PREVIEW`
+    is now promoted to stable. The default is changed to `ON`.
+  * The experimental `CMake` option `WITH_OTLP_HTTP_SSL_TLS_PREVIEW`
+    is now promoted to stable. The default is changed to `ON`.
+  * These build options are scheduled to be removed by the next release,
+    building without SSL/TLS will no longer be possible.
 
 Breaking changes:
 
