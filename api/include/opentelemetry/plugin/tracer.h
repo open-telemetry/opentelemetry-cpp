@@ -7,6 +7,7 @@
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
@@ -48,6 +49,13 @@ public:
   {
     span_->AddEvent(name, timestamp, attributes);
   }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void AddLink(const trace::SpanContextKeyValueIterable *links) noexcept override
+  {
+    span_->AddLink(links);
+  }
+#endif
 
   void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {

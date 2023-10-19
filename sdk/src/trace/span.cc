@@ -146,6 +146,23 @@ void Span::AddEvent(nostd::string_view name,
   recordable_->AddEvent(name, timestamp, attributes);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Span::AddLink(const opentelemetry::trace::SpanContextKeyValueIterable *links) noexcept
+{
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+
+  links->ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+                             const common::KeyValueIterable &attributes) {
+    recordable_->AddLink(span_context, attributes);
+    return true;
+  });
+}
+#endif
+
 void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};

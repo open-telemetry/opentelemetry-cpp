@@ -12,6 +12,8 @@
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_metadata.h"
 
 #include "opentelemetry/version.h"
@@ -98,6 +100,53 @@ public:
                    nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                        attributes.begin(), attributes.end()});
   }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  /**
+   * Add links (ABI).
+   *
+   * @since ABI_VERSION 2
+   */
+  virtual void AddLink(const SpanContextKeyValueIterable *links) noexcept = 0;
+
+  /**
+   * Add links (API helper).
+   *
+   * @since ABI_VERSION 2
+   */
+  template <class U, nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
+  void AddLink(const U &links)
+  {
+    SpanContextKeyValueIterableView<U> view(links);
+    this->AddLink(&view);
+  }
+
+  /**
+   * Add links (API helper).
+   *
+   * @since ABI_VERSION 2
+   */
+  void AddLink(
+      std::initializer_list<
+          std::pair<SpanContext,
+                    std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
+          links)
+  {
+    /* Build a container from std::initializer_list. */
+    nostd::span<const std::pair<
+        SpanContext, std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
+        links_span{links.begin(), links.end()};
+
+    /* Build a view on the container. */
+    SpanContextKeyValueIterableView<nostd::span<const std::pair<
+        SpanContext, std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>>
+        view(links_span);
+
+    return this->AddLink(&view);
+  }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
   // Sets the status of the span. The default status is Unset. Only the value of
   // the last call will be

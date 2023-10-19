@@ -45,6 +45,10 @@ public:
   void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void AddLink(const opentelemetry::trace::SpanContextKeyValueIterable *links) noexcept override;
+#endif
+
   void UpdateName(nostd::string_view name) noexcept override;
 
   void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override;
