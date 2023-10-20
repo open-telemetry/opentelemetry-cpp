@@ -48,7 +48,7 @@ public:
   {}
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  void AddLink(const SpanContextKeyValueIterable *links) noexcept override {}
+  void AddLink(const SpanContextKeyValueIterable * /* links */) noexcept override {}
 #endif
 
   void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
