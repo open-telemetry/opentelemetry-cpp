@@ -30,7 +30,7 @@ public:
    * @param records a collection of metrics in OpenTelemetry
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
-  static std::unordered_map<nostd::string_view, ::prometheus::MetricFamily> TranslateToPrometheus(
+  static std::unordered_map<std::string, ::prometheus::MetricFamily> TranslateToPrometheus(
       const sdk::metrics::ResourceMetrics &data);
 
 private:

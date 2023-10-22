@@ -292,6 +292,9 @@ TEST(PrometheusExporterUtils, MapToPrometheusName)
                 "name", "total_unit", prometheus_client::MetricType::Counter),
             "name_total_unit_total");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
+                "foo.bar.total", "s", prometheus_client::MetricType::Counter),
+            "foo_bar_total_seconds_total");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
                 "name", "unit", prometheus_client::MetricType::Gauge),
             "name_unit");
   ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(

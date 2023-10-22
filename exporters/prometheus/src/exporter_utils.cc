@@ -29,12 +29,12 @@ namespace metrics
  * @param records a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
-std::unordered_map<nostd::string_view, prometheus_client::MetricFamily>
+std::unordered_map<std::string, prometheus_client::MetricFamily>
 PrometheusExporterUtils::TranslateToPrometheus(const sdk::metrics::ResourceMetrics &data)
 {
 
   // initialize output vector
-  std::unordered_map<nostd::string_view, prometheus_client::MetricFamily> output;
+  std::unordered_map<std::string, prometheus_client::MetricFamily> output;
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
@@ -197,7 +197,7 @@ std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
 
 std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_abbreviation)
 {
-  static std::map<std::string, std::string> units{// Time
+  static std::unordered_map<std::string, std::string> units{// Time
                                                   {"d", "days"},
                                                   {"h", "hours"},
                                                   {"min", "minutes"},
@@ -242,7 +242,7 @@ std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_a
 
 std::string PrometheusExporterUtils::GetPrometheusPerUnit(const std::string &per_unit_abbreviation)
 {
-  static std::map<std::string, std::string> per_units{
+  static std::unordered_map<std::string, std::string> per_units{
       {"s", "second"}, {"m", "minute"}, {"h", "hour"}, {"d", "day"},
       {"w", "week"},   {"mo", "month"}, {"y", "year"}};
   auto res_it = per_units.find(per_unit_abbreviation);
