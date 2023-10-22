@@ -147,7 +147,8 @@ void Span::AddEvent(nostd::string_view name,
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-void Span::AddLink(const opentelemetry::trace::SpanContextKeyValueIterable *links) noexcept
+void Span::AddLink(const opentelemetry::trace::SpanContext &target,
+                   const opentelemetry::common::KeyValueIterable &attrs) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -155,8 +156,19 @@ void Span::AddLink(const opentelemetry::trace::SpanContextKeyValueIterable *link
     return;
   }
 
-  links->ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
-                             const common::KeyValueIterable &attributes) {
+  recordable_->AddLink(target, attrs);
+}
+
+void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
+{
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+                            const common::KeyValueIterable &attributes) {
     recordable_->AddLink(span_context, attributes);
     return true;
   });

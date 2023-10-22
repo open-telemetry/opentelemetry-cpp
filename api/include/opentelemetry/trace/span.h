@@ -104,22 +104,51 @@ public:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   /**
+   * Add link (ABI).
+   *
+   * @since ABI_VERSION 2
+   */
+  virtual void AddLink(const SpanContext &target,
+                       const common::KeyValueIterable &attrs) noexcept = 0;
+
+  /**
    * Add links (ABI).
    *
    * @since ABI_VERSION 2
    */
-  virtual void AddLink(const SpanContextKeyValueIterable *links) noexcept = 0;
+  virtual void AddLinks(const SpanContextKeyValueIterable &links) noexcept = 0;
 
   /**
-   * Add links (API helper).
+   * Add link (API helper).
    *
    * @since ABI_VERSION 2
    */
-  template <class U, nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
-  void AddLink(const U &links)
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void AddLink(const SpanContext &target, const U &attrs)
   {
-    SpanContextKeyValueIterableView<U> view(links);
-    this->AddLink(&view);
+    common::KeyValueIterableView<U> view(attrs);
+    this->AddLink(target, view);
+  }
+
+  /**
+   * Add link (API helper).
+   *
+   * @since ABI_VERSION 2
+   */
+  void AddLink(const SpanContext &target,
+               std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attrs)
+  {
+    /* Build a container from std::initializer_list. */
+    nostd::span<const std::pair<nostd::string_view, common::AttributeValue>> container{
+        attrs.begin(), attrs.end()};
+
+    /* Build a view on the container. */
+    common::KeyValueIterableView<
+        nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>>
+        view(container);
+
+    return this->AddLink(target, view);
   }
 
   /**
@@ -127,7 +156,19 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  void AddLink(
+  template <class U, nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
+  void AddLinks(const U &links)
+  {
+    SpanContextKeyValueIterableView<U> view(links);
+    this->AddLinks(view);
+  }
+
+  /**
+   * Add links (API helper).
+   *
+   * @since ABI_VERSION 2
+   */
+  void AddLinks(
       std::initializer_list<
           std::pair<SpanContext,
                     std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
@@ -136,14 +177,14 @@ public:
     /* Build a container from std::initializer_list. */
     nostd::span<const std::pair<
         SpanContext, std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
-        links_span{links.begin(), links.end()};
+        container{links.begin(), links.end()};
 
     /* Build a view on the container. */
     SpanContextKeyValueIterableView<nostd::span<const std::pair<
         SpanContext, std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>>
-        view(links_span);
+        view(container);
 
-    return this->AddLink(&view);
+    return this->AddLinks(view);
   }
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */

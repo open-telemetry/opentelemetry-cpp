@@ -50,7 +50,11 @@ public:
   {}
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  void AddLink(const trace::SpanContextKeyValueIterable * /* links */) noexcept override {}
+  void AddLink(const trace::SpanContext &target,
+               const common::KeyValueIterable &attrs) noexcept override
+  {}
+
+  void AddLinks(const trace::SpanContextKeyValueIterable & /* links */) noexcept override {}
 #endif
 
   void SetStatus(trace::StatusCode /*code*/, nostd::string_view /*description*/) noexcept override

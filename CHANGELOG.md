@@ -36,7 +36,8 @@ Important changes:
 
 * [API] Add a new AddLink() operation to Span
   [#2380](https://github.com/open-telemetry/opentelemetry-cpp/pull/2380)
-  * new `API` Span::AddLink() adds links to a span.
+  * New `API` Span::AddLink() adds a single link to a span.
+  * New `API` Span::AddLinks() adds multiple links to a span.
   * Because this is an `ABI` breaking change, the fix is only available
     with the `CMake` option `WITH_ABI_VERSION_2=ON`.
   * When building with `CMake` option `WITH_ABI_VERSION_1=ON` (by default)
