@@ -51,6 +51,7 @@ public:
   void AddLink(const SpanContext & /* target */,
                const common::KeyValueIterable & /* attrs */) noexcept override
   {}
+
   void AddLinks(const SpanContextKeyValueIterable & /* links */) noexcept override {}
 #endif
 
