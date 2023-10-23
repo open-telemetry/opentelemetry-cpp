@@ -16,7 +16,7 @@ namespace metrics
 
 class MeterSelector;
 
-class MeterSelectorFactory
+class OPENTELEMETRY_EXPORT MeterSelectorFactory
 {
 public:
   static std::unique_ptr<MeterSelector> Create(opentelemetry::nostd::string_view name,
