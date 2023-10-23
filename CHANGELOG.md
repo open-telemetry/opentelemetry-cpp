@@ -21,6 +21,8 @@ Increment the:
   [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
 * [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
   [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+* [BUILD] enum CanonicalCode names too generic... conflict with old C defines
+  [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
 
 Important changes:
 
@@ -47,6 +49,13 @@ Breaking changes:
   [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
   * The experimental `CMake` option `WITH_REMOVE_METER_PREVIEW` is removed,
     use option `WITH_ABI_VERSION_2` instead.
+
+* [BUILD] enum CanonicalCode names too generic... conflict with old C defines
+  [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
+  * Header file `opentelemetry/trace/canonical_code.h` is unused,
+    and is now removed.
+  * This header should not be included directly in an application.
+    If this is the case, please remove any remaining include directives.
 
 ## [1.12.0] 2023-10-16
 
