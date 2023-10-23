@@ -58,7 +58,7 @@ switch ($action) {
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -75,6 +75,16 @@ switch ($action) {
     }
     $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
     examples\simple\Debug\example_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    examples\metrics_simple\Debug\metrics_ostream_example.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    examples\logs_simple\Debug\example_logs_simple.exe
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
