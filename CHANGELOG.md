@@ -15,23 +15,107 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
+  [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+* [BUILD] Make WITH_OTLP_HTTP_SSL_PREVIEW mainstream
+  [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
+* [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
+  [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+
+Important changes:
+
+* [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
+  [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+  * TracerProvider::GetTracer() now accepts InstrumentationScope attributes.
+  * Because this is an `ABI` breaking change, the fix is only available
+    with the `CMake` option `WITH_ABI_VERSION_2=ON`.
+  * When building with `CMake` option `WITH_ABI_VERSION_1=ON` (by default)
+    the `ABI` is unchanged, and the fix is not available.
+
+* [BUILD] Make WITH_OTLP_HTTP_SSL_PREVIEW mainstream
+  [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
+  * The experimental `CMake` option `WITH_OTLP_HTTP_SSL_PREVIEW`
+    is now promoted to stable. The default is changed to `ON`.
+  * The experimental `CMake` option `WITH_OTLP_HTTP_SSL_TLS_PREVIEW`
+    is now promoted to stable. The default is changed to `ON`.
+  * These build options are scheduled to be removed by the next release,
+    building without SSL/TLS will no longer be possible.
+
+Breaking changes:
+
+* [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
+  [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+  * The experimental `CMake` option `WITH_REMOVE_METER_PREVIEW` is removed,
+    use option `WITH_ABI_VERSION_2` instead.
+
+## [1.12.0] 2023-10-16
+
+* [BUILD] Support `pkg-config`
+  [#2269](https://github.com/open-telemetry/opentelemetry-cpp/pull/2269)
+* [CI] Do not automatically close stale issues
+  [#2277](https://github.com/open-telemetry/opentelemetry-cpp/pull/2277)
+* [CI] Benchmark workflow fails, C++14 required to build grpc
+  [#2278](https://github.com/open-telemetry/opentelemetry-cpp/pull/2278)
+* [SDK] Increase metric name maximum length from 63 to 255 characters
+  [#2284](https://github.com/open-telemetry/opentelemetry-cpp/pull/2284)
+* [SEMANTIC CONVENTION] Deprecated semconv (in the spec)
+  not deprecated (in C++)
+  [#2285](https://github.com/open-telemetry/opentelemetry-cpp/pull/2285)
+* [SDK] Remove unused member variables from SyncMetricStorage
+  [#2294](https://github.com/open-telemetry/opentelemetry-cpp/pull/2294)
 * [DEPRECATION] Deprecate ZPAGES
   [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
-* [EXPORTER] Prometheus exporter emit resource attributes
-  [#2301](https://github.com/open-telemetry/opentelemetry-cpp/pull/2301)
-* [EXPORTER] Remove explicit timestamps from metric points exported by Prometheus
+* [API] Deliver ABI breaking changes
+  [#2222](https://github.com/open-telemetry/opentelemetry-cpp/pull/2222)
+* [SDK] Allow metric instrument names to contain / characters
+  [#2310](https://github.com/open-telemetry/opentelemetry-cpp/pull/2310)
+* [SDK] Fix Observable Counters/UpDownCounters
+  [#2298](https://github.com/open-telemetry/opentelemetry-cpp/pull/2298)
+* [SDK] Add exemplar reservoir to async metric storage
+  [#2319](https://github.com/open-telemetry/opentelemetry-cpp/pull/2319)
+* [TEST] Fix lifetime issues in prometheus test utils
+  [#2322](https://github.com/open-telemetry/opentelemetry-cpp/pull/2322)
+* [EXPORTER] Prometheus: Remove explicit timestamps from metric points
   [#2324](https://github.com/open-telemetry/opentelemetry-cpp/pull/2324)
-* [EXPORTER] Handle attribute key collisions caused by sanitation
+* [EXPORTER] Prometheus: Handle attribute key collisions from sanitation
   [#2326](https://github.com/open-telemetry/opentelemetry-cpp/pull/2326)
-* [EXPORTER] Replace colons with underscores when converting to Prometheus label
+* [EXPORTER] Prometheus cleanup, test with TranslateToPrometheus
+  [#2329](https://github.com/open-telemetry/opentelemetry-cpp/pull/2329)
+* [SDK] Fix log message in Meter::RegisterSyncMetricStorage
+  [#2325](https://github.com/open-telemetry/opentelemetry-cpp/pull/2325)
+* [DOC] Simplify the project status section
+  [#2332](https://github.com/open-telemetry/opentelemetry-cpp/pull/2332)
+* [EXPORTER] Prometheus: Sanitize labels according to spec
   [#2330](https://github.com/open-telemetry/opentelemetry-cpp/pull/2330)
+* [SDK] Fix deadlock when shuting down http client
+  [#2337](https://github.com/open-telemetry/opentelemetry-cpp/pull/2337)
+* [Exporter] Group spans by resource and instrumentation scope
+  in OTLP export requests
+  [#2335](https://github.com/open-telemetry/opentelemetry-cpp/pull/2335)
+* [BUILD] Need fine-grained HAVE_CPP_STDLIB
+  [#2304](https://github.com/open-telemetry/opentelemetry-cpp/pull/2304)
 * [API] Add InstrumentationScope attributes in MeterProvider::GetMeter()
   [#2224](https://github.com/open-telemetry/opentelemetry-cpp/pull/2224)
 * [REMOVAL] Drop C++11 support
   [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
-* [EXPORTER] Add otel_scope_name and otel_scope_version labels to the prometheus
-  exporter.
+* [EXPORTER] prometheus: add otel_scope_name and otel_scope_version labels
   [#2293](https://github.com/open-telemetry/opentelemetry-cpp/pull/2293)
+* [EXPORTER] Export resource for prometheus
+  [#2301](https://github.com/open-telemetry/opentelemetry-cpp/pull/2301)
+* [BUILD] error: read-only reference ‘value’ used as ‘asm’ output
+  [#2354](https://github.com/open-telemetry/opentelemetry-cpp/pull/2354)
+* [BUILD] Build break with external CMake nlohman_json package
+  [#2353](https://github.com/open-telemetry/opentelemetry-cpp/pull/2353)
+* [BUILD] Upgrade libcurl to version 8.4.0
+  [#2358](https://github.com/open-telemetry/opentelemetry-cpp/pull/2358)
+* [BUILD] Fix opentracing-shim when added in super project
+  [#2356](https://github.com/open-telemetry/opentelemetry-cpp/pull/2356)
+* [BUILD] Fix protoc searching with non-imported protobuf::protoc target
+  [#2362](https://github.com/open-telemetry/opentelemetry-cpp/pull/2362)
+* [BUILD] Support to use different cmake package CONFIG of dependencies
+  [#2263](https://github.com/open-telemetry/opentelemetry-cpp/pull/2263)
+* [SEMANTIC CONVENTION] Upgrade to semconv 1.22.0
+  [#2368](https://github.com/open-telemetry/opentelemetry-cpp/pull/2368)
 
 Important changes:
 
@@ -69,6 +153,11 @@ Breaking changes:
 * [REMOVAL] Drop C++11 support
   [#2342](https://github.com/open-telemetry/opentelemetry-cpp/pull/2342)
   * Building with C++11 is no longer supported.
+
+Deprecations:
+
+* [DEPRECATION] Deprecate ZPAGES
+  [#2291](https://github.com/open-telemetry/opentelemetry-cpp/pull/2291)
 
 ## [1.11.0] 2023-08-21
 

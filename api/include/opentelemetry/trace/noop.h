@@ -108,12 +108,23 @@ public:
       : tracer_{nostd::shared_ptr<trace::NoopTracer>(new trace::NoopTracer)}
   {}
 
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* library_name */,
-                                             nostd::string_view /* library_version */,
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::shared_ptr<trace::Tracer> GetTracer(
+      nostd::string_view /* name */,
+      nostd::string_view /* version */,
+      nostd::string_view /* schema_url */,
+      const common::KeyValueIterable * /* attributes */) noexcept override
+  {
+    return tracer_;
+  }
+#else
+  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* name */,
+                                             nostd::string_view /* version */,
                                              nostd::string_view /* schema_url */) noexcept override
   {
     return tracer_;
   }
+#endif
 
 private:
   nostd::shared_ptr<trace::Tracer> tracer_;

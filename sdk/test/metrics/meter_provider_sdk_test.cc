@@ -191,7 +191,7 @@ TEST(MeterProvider, GetMeterAbiv2)
 }
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
-#ifdef ENABLE_REMOVE_METER_PREVIEW
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(MeterProvider, RemoveMeter)
 {
   MeterProvider mp;
@@ -225,4 +225,4 @@ TEST(MeterProvider, RemoveMeter)
   mp.ForceFlush();
   mp.Shutdown();
 }
-#endif
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */

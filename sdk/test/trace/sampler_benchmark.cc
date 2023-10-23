@@ -42,6 +42,11 @@ void BM_AlwaysOnSamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerConstruction);
 
+/*
+  Fails to build with GCC.
+  See upstream bug: https://github.com/google/benchmark/issues/1675
+*/
+#if 0
 void BM_ParentBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
@@ -59,6 +64,7 @@ void BM_TraceIdRatioBasedSamplerConstruction(benchmark::State &state)
   }
 }
 BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);
+#endif
 
 // Sampler Helper Function
 void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
