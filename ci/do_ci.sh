@@ -506,6 +506,29 @@ elif [[ "$1" == "code.coverage" ]]; then
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
   exit 0
+elif [[ "$1" == "cppcheck" ]]; then
+  pwd
+  excluded_dirs=()
+  while read -r excluded_dir; do
+    excluded_dirs+=("$excluded_dir")
+  done < ./ci/exclude_cppcheck.txt
+  args=()
+  echo $excluded_dirs
+for excluded_dir in "${excluded_dirs[@]}"; do
+  args+=("$excluded_dir")
+done
+  string_args=$(join " -\\i" "${args[@]}")
+  cd ..
+  git clone https://github.com/danmar/cppcheck.git --branch 2.12.x
+  cd cppcheck
+  mkdir build
+  cd build
+  cmake ..
+  cmake --build .
+  chmod +x bin/cppcheck
+  cd ../../opentelemetry-cpp
+  echo "../cppcheck/build/bin/cppcheck -i$string_args --error-exitcode=1 ."
+  # ../cppcheck/build/bin/cppcheck -i$string_args --error-exitcode=1 .
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
   echo "abseil=20220623.1" >> third_party_release
