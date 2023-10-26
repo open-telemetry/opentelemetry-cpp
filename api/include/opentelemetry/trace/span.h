@@ -25,6 +25,31 @@ class Tracer;
 
 /**
  * A Span represents a single operation within a Trace.
+ *
+ * Span attributes can be provided:
+ * - at span creation time, using Tracer::StartSpan(),
+ * - during the span lifetime, using Span::SetAttribute()
+ *
+ * Please note that head samplers,
+ * in the SDK (@ref opentelemetry::sdk::trace::Sampler),
+ * can only make sampling decisions based on data known
+ * at span creation time.
+ *
+ * When attributes are known early, adding attributes
+ * with @ref opentelemetry::trace::Tracer::StartSpan() is preferable.
+ *
+ * Attributes added or changed with Span::SetAttribute()
+ * can not change a sampler decision.
+ *
+ * Likewise, links can be provided:
+ * - at span creation time, using Tracer::StartSpan(),
+ * - during the span lifetime, using Span::AddLink() or Span::AddLinks().
+ *
+ * When links are known early, adding links
+ * with @ref opentelemetry::trace::Tracer::StartSpan() is preferable.
+ *
+ * Links added with Span::AddLink() or Span::AddLinks()
+ * can not change a sampler decision.
  */
 class Span
 {
@@ -42,9 +67,14 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
-  // Sets an attribute on the Span. If the Span previously contained a mapping
-  // for
-  // the key, the old value is replaced.
+  /**
+   * Sets an attribute on the Span (ABI).
+   *
+   * If the Span previously contained a mapping for the key,
+   * the old value is replaced.
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   */
   virtual void SetAttribute(nostd::string_view key,
                             const common::AttributeValue &value) noexcept = 0;
 
@@ -105,6 +135,8 @@ public:
   /**
    * Add link (ABI).
    *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   *
    * @since ABI_VERSION 2
    */
   virtual void AddLink(const SpanContext &target,
@@ -113,12 +145,16 @@ public:
   /**
    * Add links (ABI).
    *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   *
    * @since ABI_VERSION 2
    */
   virtual void AddLinks(const SpanContextKeyValueIterable &links) noexcept = 0;
 
   /**
    * Add link (API helper).
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
    *
    * @since ABI_VERSION 2
    */
@@ -132,6 +168,8 @@ public:
 
   /**
    * Add link (API helper).
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
    *
    * @since ABI_VERSION 2
    */
@@ -153,6 +191,8 @@ public:
   /**
    * Add links (API helper).
    *
+   * See comments about sampling in @ref opentelemetry::trace::Span
+   *
    * @since ABI_VERSION 2
    */
   template <class U, nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
@@ -164,6 +204,8 @@ public:
 
   /**
    * Add links (API helper).
+   *
+   * See comments about sampling in @ref opentelemetry::trace::Span
    *
    * @since ABI_VERSION 2
    */
