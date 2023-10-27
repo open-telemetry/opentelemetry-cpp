@@ -624,9 +624,7 @@ TEST(Tracer, SpanAddLinkAbiv2)
     }
   }
 }
-#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Tracer, SpanAddLinksAbiv2)
 {
   InMemorySpanExporter *exporter              = new InMemorySpanExporter();
@@ -856,9 +854,7 @@ TEST(Tracer, SpanAddLinksAbiv2)
     }
   }
 }
-#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Tracer, SpanMixLinksAbiv2)
 {
   InMemorySpanExporter *exporter              = new InMemorySpanExporter();

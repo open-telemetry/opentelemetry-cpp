@@ -42,15 +42,15 @@ public:
                 opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
-  void SetStatus(opentelemetry::trace::StatusCode code,
-                 nostd::string_view description) noexcept override;
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   void AddLink(const opentelemetry::trace::SpanContext &target,
                const opentelemetry::common::KeyValueIterable &attrs) noexcept override;
 
   void AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept override;
 #endif
+
+  void SetStatus(opentelemetry::trace::StatusCode code,
+                 nostd::string_view description) noexcept override;
 
   void UpdateName(nostd::string_view name) noexcept override;
 
