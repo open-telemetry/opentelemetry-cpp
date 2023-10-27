@@ -47,6 +47,14 @@ public:
                 const common::KeyValueIterable & /* attributes */) noexcept override
   {}
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void AddLink(const SpanContext & /* target */,
+               const common::KeyValueIterable & /* attrs */) noexcept override
+  {}
+
+  void AddLinks(const SpanContextKeyValueIterable & /* links */) noexcept override {}
+#endif
+
   void SetStatus(StatusCode /* status */, nostd::string_view /* description */) noexcept override {}
 
   void UpdateName(nostd::string_view /* name */) noexcept override {}
