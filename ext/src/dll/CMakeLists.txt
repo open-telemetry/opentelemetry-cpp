@@ -6,8 +6,8 @@ set(OPENTELEMETRY_EXPORT_DEF
 
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
-if (WITH_STL)
-    add_compile_definitions(WITH_STL)
+if(WITH_STL)
+  add_compile_definitions(WITH_STL)
 endif()
 
 target_link_libraries(
