@@ -231,6 +231,7 @@ cc_library(
     srcs = [
         "src/otlp_http_log_record_exporter.cc",
         "src/otlp_http_log_record_exporter_factory.cc",
+        "src/otlp_http_log_record_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",

@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
-
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 
 #include <chrono>
