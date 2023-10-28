@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -13,7 +12,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP GRPC traces exporter options.
+ * Struct to hold OTLP GRPC log record exporter options.
  *
  * See
  * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlpgrpc
@@ -21,9 +20,9 @@ namespace otlp
  * See
  * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpGrpcExporterOptions : public OtlpGrpcClientOptions
+struct OtlpGrpcLogRecordExporterOptions : public OtlpGrpcClientOptions
 {
-  OtlpGrpcExporterOptions();
+  OtlpGrpcLogRecordExporterOptions();
 };
 
 }  // namespace otlp

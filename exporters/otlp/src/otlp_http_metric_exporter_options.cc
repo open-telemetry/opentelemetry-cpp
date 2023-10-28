@@ -46,7 +46,7 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
   ssl_cipher       = GetOtlpDefaultMetricsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultMetricsSslTlsCipherSuite();
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
-};
+}
 
 }  // namespace otlp
 }  // namespace exporter

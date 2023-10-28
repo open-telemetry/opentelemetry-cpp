@@ -57,7 +57,8 @@ if(WITH_OTLP_GRPC)
        opentelemetry_exporter_otlp_grpc_client)
 
   add_library(opentelemetry_exporter_otlp_grpc
-              src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc)
+              src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc
+              src/otlp_grpc_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
@@ -73,7 +74,8 @@ if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_exporter_otlp_grpc_log
     src/otlp_grpc_log_record_exporter.cc
-    src/otlp_grpc_log_record_exporter_factory.cc)
+    src/otlp_grpc_log_record_exporter_factory.cc
+    src/otlp_grpc_log_record_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_log
                         PROPERTIES EXPORT_NAME otlp_grpc_log_record_exporter)
@@ -88,7 +90,8 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_metrics
-    src/otlp_grpc_metric_exporter.cc src/otlp_grpc_metric_exporter_factory.cc)
+    src/otlp_grpc_metric_exporter.cc src/otlp_grpc_metric_exporter_factory.cc
+    src/otlp_grpc_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
                         PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter)

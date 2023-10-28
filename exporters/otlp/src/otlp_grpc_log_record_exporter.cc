@@ -30,16 +30,16 @@ namespace otlp
 // -------------------------------- Constructors --------------------------------
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
-    : OtlpGrpcLogRecordExporter(OtlpGrpcExporterOptions())
+    : OtlpGrpcLogRecordExporter(OtlpGrpcLogRecordExporterOptions())
 {}
 
-OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options)
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options)
     : options_(options), log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
 {}
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub)
-    : options_(OtlpGrpcExporterOptions()), log_service_stub_(std::move(stub))
+    : options_(OtlpGrpcLogRecordExporterOptions()), log_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------

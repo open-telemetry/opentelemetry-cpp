@@ -45,7 +45,8 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions()
   ssl_cipher       = GetOtlpDefaultTracesSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultTracesSslTlsCipherSuite();
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
-};
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

@@ -59,7 +59,7 @@ public:
   }
 
   // Get the options associated with the given exporter.
-  const OtlpGrpcExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcLogRecordExporter> &exporter)
+  const OtlpGrpcLogRecordExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcLogRecordExporter> &exporter)
   {
     return exporter->options_;
   }

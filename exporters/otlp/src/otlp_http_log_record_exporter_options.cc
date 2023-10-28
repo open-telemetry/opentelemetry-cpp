@@ -45,7 +45,7 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   ssl_cipher       = GetOtlpDefaultLogsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
-};
+}
 
 }  // namespace otlp
 }  // namespace exporter

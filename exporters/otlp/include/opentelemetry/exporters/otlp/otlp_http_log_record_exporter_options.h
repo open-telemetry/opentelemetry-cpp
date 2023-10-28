@@ -19,7 +19,7 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP HTTP logs exporter options.
+ * Struct to hold OTLP HTTP log record exporter options.
  *
  * See
  * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlphttp
