@@ -130,8 +130,11 @@ if(WITH_OTLP_HTTP)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_client)
 
-  add_library(opentelemetry_exporter_otlp_http
-              src/otlp_http_exporter.cc src/otlp_http_exporter_factory.cc)
+  add_library(
+    opentelemetry_exporter_otlp_http
+    src/otlp_http_exporter.cc
+    src/otlp_http_exporter_factory.cc
+    src/otlp_http_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)
@@ -147,7 +150,8 @@ if(WITH_OTLP_HTTP)
   add_library(
     opentelemetry_exporter_otlp_http_log
     src/otlp_http_log_record_exporter.cc
-    src/otlp_http_log_record_exporter_factory.cc)
+    src/otlp_http_log_record_exporter_factory.cc
+    src/otlp_http_log_record_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http_log
                         PROPERTIES EXPORT_NAME otlp_http_log_record_exporter)
@@ -162,7 +166,9 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_exporter_otlp_http_metric
-    src/otlp_http_metric_exporter.cc src/otlp_http_metric_exporter_factory.cc)
+    src/otlp_http_metric_exporter.cc
+    src/otlp_http_metric_exporter_factory.cc
+    src/otlp_http_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http_metric
                         PROPERTIES EXPORT_NAME otlp_http_metric_exporter)

@@ -143,6 +143,7 @@ cc_library(
     srcs = [
         "src/otlp_http_exporter.cc",
         "src/otlp_http_exporter_factory.cc",
+        "src/otlp_http_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
@@ -170,6 +171,7 @@ cc_library(
     srcs = [
         "src/otlp_grpc_metric_exporter.cc",
         "src/otlp_grpc_metric_exporter_factory.cc",
+        "src/otlp_grpc_metric_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
@@ -201,6 +203,7 @@ cc_library(
     srcs = [
         "src/otlp_http_metric_exporter.cc",
         "src/otlp_http_metric_exporter_factory.cc",
+        "src/otlp_http_metric_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
