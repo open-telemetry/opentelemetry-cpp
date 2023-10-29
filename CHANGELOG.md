@@ -25,6 +25,8 @@ Increment the:
   [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
 * [API] Add a new AddLink() operation to Span
   [#2380](https://github.com/open-telemetry/opentelemetry-cpp/pull/2380)
+* [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
+  [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
 
 Important changes:
 
@@ -54,6 +56,14 @@ Important changes:
   * These build options are scheduled to be removed by the next release,
     building without SSL/TLS will no longer be possible.
 
+* [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
+  [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
+  * `OtlpGrpcMetricExporterOptions` used to honor `_TRACES_`
+    environment variables, instead of `_METRICS_` environment variables.
+  * The implementation of `OtlpGrpcMetricExporterOptions` is now fixed.
+  * Please check configuration variables,
+    to make sure `_METRICS_` variables are set as expected.
+
 Breaking changes:
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
@@ -67,6 +77,20 @@ Breaking changes:
     and is now removed.
   * This header should not be included directly in an application.
     If this is the case, please remove any remaining include directives.
+
+* [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
+  [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
+  * `OtlpGrpcLogRecordExporter` incorrectly used `OtlpGrpcExporterOptions`,
+    which are options for traces and not logs.
+  * This created a bug: the `OtlpGrpcLogRecordExporter` honors `_TRACES_`
+    environment variables, instead of `_LOGS_` environment variables.
+  * `OtlpGrpcLogRecordExporter` is changed to use
+    `OtlpGrpcLogRecordExporterOptions` instead, fixing the bug.
+  * User code that initializes the SDK with a GRPC Log exporter,
+    and uses exporter options, should adjust to replace
+    `OtlpGrpcExporterOptions` with `OtlpGrpcLogRecordExporterOptions`.
+  * Please check configuration variables,
+    to make sure `_LOGS_` variables are set as expected.
 
 ## [1.12.0] 2023-10-16
 
