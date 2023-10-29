@@ -33,7 +33,8 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
     : OtlpGrpcLogRecordExporter(OtlpGrpcLogRecordExporterOptions())
 {}
 
-OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options)
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
+    const OtlpGrpcLogRecordExporterOptions &options)
     : options_(options), log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
 {}
 

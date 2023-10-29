@@ -12,9 +12,9 @@ namespace otlp
 
 OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
 {
-  endpoint                         = GetOtlpDefaultGrpcMetricsEndpoint();
-  use_ssl_credentials              = !GetOtlpDefaultGrpcMetricsIsInsecure(); /* negation intended. */
-  ssl_credentials_cacert_path      = GetOtlpDefaultMetricsSslCertificatePath();
+  endpoint                    = GetOtlpDefaultGrpcMetricsEndpoint();
+  use_ssl_credentials         = !GetOtlpDefaultGrpcMetricsIsInsecure(); /* negation intended. */
+  ssl_credentials_cacert_path = GetOtlpDefaultMetricsSslCertificatePath();
   ssl_credentials_cacert_as_string = GetOtlpDefaultMetricsSslCertificateString();
 
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW

@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
