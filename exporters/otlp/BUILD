@@ -445,6 +445,22 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_grpc_metric_exporter_test",
+    srcs = ["test/otlp_grpc_metric_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_metric_exporter",
+        "//api",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_grpc_metric_exporter_factory_test",
     srcs = ["test/otlp_grpc_metric_exporter_factory_test.cc"],
     tags = [
