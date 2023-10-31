@@ -4,8 +4,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,9 +19,9 @@ class MeterSelector;
 class OPENTELEMETRY_EXPORT MeterSelectorFactory
 {
 public:
-  static std::unique_ptr<MeterSelector> Create(opentelemetry::nostd::string_view name,
-                                               opentelemetry::nostd::string_view version,
-                                               opentelemetry::nostd::string_view schema);
+  static std::unique_ptr<MeterSelector> Create(const std::string& name,
+                                               const std::string& version,
+                                               const std::string& schema);
 };
 
 }  // namespace metrics

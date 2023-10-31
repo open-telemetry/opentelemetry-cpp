@@ -13,8 +13,8 @@ namespace metrics
 
 std::unique_ptr<InstrumentSelector> InstrumentSelectorFactory::Create(
     opentelemetry::sdk::metrics::InstrumentType instrument_type,
-    opentelemetry::nostd::string_view name,
-    opentelemetry::nostd::string_view unit)
+    const std::string& name,
+    const std::string& unit)
 {
   std::unique_ptr<InstrumentSelector> instrument_selector(
       new InstrumentSelector(instrument_type, name, unit));

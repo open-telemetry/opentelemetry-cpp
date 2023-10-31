@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,8 +18,8 @@ class OPENTELEMETRY_EXPORT InstrumentSelectorFactory
 public:
   static std::unique_ptr<InstrumentSelector> Create(
       opentelemetry::sdk::metrics::InstrumentType instrument_type,
-      opentelemetry::nostd::string_view name,
-      opentelemetry::nostd::string_view unit);
+      const std::string& name,
+      const std::string& unit);
 };
 
 }  // namespace metrics

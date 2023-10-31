@@ -5,7 +5,6 @@
 
 #include <memory>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #include "opentelemetry/version.h"
@@ -19,8 +18,8 @@ class InstrumentSelector
 {
 public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,
-                     opentelemetry::nostd::string_view name,
-                     opentelemetry::nostd::string_view units)
+                     const std::string& name,
+                     const std::string& units)
       : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kPattern)},
         unit_filter_{PredicateFactory::GetPredicate(units, PredicateType::kExact)},
         instrument_type_{instrument_type}
