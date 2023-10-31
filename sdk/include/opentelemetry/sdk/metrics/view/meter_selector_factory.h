@@ -19,9 +19,9 @@ class MeterSelector;
 class OPENTELEMETRY_EXPORT MeterSelectorFactory
 {
 public:
-  static std::unique_ptr<MeterSelector> Create(const std::string& name,
-                                               const std::string& version,
-                                               const std::string& schema);
+  static std::unique_ptr<MeterSelector> Create(const std::string &name,
+                                               const std::string &version,
+                                               const std::string &schema);
 };
 
 }  // namespace metrics

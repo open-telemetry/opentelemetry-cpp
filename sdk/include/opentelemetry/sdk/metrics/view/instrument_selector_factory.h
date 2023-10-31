@@ -18,8 +18,8 @@ class OPENTELEMETRY_EXPORT InstrumentSelectorFactory
 public:
   static std::unique_ptr<InstrumentSelector> Create(
       opentelemetry::sdk::metrics::InstrumentType instrument_type,
-      const std::string& name,
-      const std::string& unit);
+      const std::string &name,
+      const std::string &unit);
 };
 
 }  // namespace metrics

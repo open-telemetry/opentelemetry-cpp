@@ -18,8 +18,8 @@ class InstrumentSelector
 {
 public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,
-                     const std::string& name,
-                     const std::string& units)
+                     const std::string &name,
+                     const std::string &units)
       : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kPattern)},
         unit_filter_{PredicateFactory::GetPredicate(units, PredicateType::kExact)},
         instrument_type_{instrument_type}
