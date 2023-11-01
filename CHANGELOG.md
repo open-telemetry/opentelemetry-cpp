@@ -78,6 +78,13 @@ Breaking changes:
   * This header should not be included directly in an application.
     If this is the case, please remove any remaining include directives.
 
+* [BUILD] Fix exported definitions when building DLL with STL
+  [#2387](https://github.com/open-telemetry/opentelemetry-cpp/pull/2387)
+  * The MeterSelector, MeterSelectorFactory, InstrumentSelector,
+    and InstrumentSelectorFactory APIs now use const std::string&
+    instead of nostd::string_view for name, version and schema to
+    maintain a single export definition for DLL.
+
 * [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
   [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
   * `OtlpGrpcLogRecordExporter` incorrectly used `OtlpGrpcExporterOptions`,
