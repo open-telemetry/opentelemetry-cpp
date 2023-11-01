@@ -47,6 +47,8 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 }
 
+OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

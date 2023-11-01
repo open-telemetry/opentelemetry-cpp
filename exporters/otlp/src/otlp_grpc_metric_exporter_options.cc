@@ -31,6 +31,8 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   aggregation_temporality = PreferredAggregationTemporality::kCumulative;
 }
 
+OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

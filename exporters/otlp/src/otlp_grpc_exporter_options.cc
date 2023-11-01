@@ -31,6 +31,8 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
   user_agent = GetOtlpDefaultUserAgent();
 }
 
+OtlpGrpcExporterOptions::~OtlpGrpcExporterOptions() {}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

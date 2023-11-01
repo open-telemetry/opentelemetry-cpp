@@ -27,9 +27,10 @@ namespace otlp
  * See
  * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpHttpExporterOptions
+struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
 {
   OtlpHttpExporterOptions();
+  ~OtlpHttpExporterOptions();
 
   /** The endpoint to export to. */
   std::string url;

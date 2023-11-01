@@ -20,9 +20,10 @@ namespace otlp
  * See
  * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpGrpcLogRecordExporterOptions : public OtlpGrpcClientOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcLogRecordExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcLogRecordExporterOptions();
+  ~OtlpGrpcLogRecordExporterOptions();
 };
 
 }  // namespace otlp

@@ -22,9 +22,10 @@ namespace otlp
  * See
  * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
 {
   OtlpGrpcMetricExporterOptions();
+  ~OtlpGrpcMetricExporterOptions();
 
   /** Preferred Aggregation Temporality. */
   PreferredAggregationTemporality aggregation_temporality;
