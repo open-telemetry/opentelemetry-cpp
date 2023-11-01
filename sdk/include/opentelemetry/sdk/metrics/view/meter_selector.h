@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #include "opentelemetry/version.h"

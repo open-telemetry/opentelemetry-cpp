@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
