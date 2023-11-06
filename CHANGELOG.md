@@ -25,6 +25,8 @@ Increment the:
   [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
 * [API] Add a new AddLink() operation to Span
   [#2380](https://github.com/open-telemetry/opentelemetry-cpp/pull/2380)
+* [SDK] Fix core dump issue in OTEL_INTERNAL_LOG_DISPATCH macro
+  [#2394](https://github.com/open-telemetry/opentelemetry-cpp/pull/2394)
 
 Important changes:
 
