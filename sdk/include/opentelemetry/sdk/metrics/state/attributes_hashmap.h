@@ -23,12 +23,12 @@ namespace metrics
 
 using opentelemetry::sdk::common::OrderedAttributeMap;
 
-constexpr uint16_t kAggregationCardinalityLimit = 2000;
+constexpr size_t kAggregationCardinalityLimit = 2000;
 const std::string kAggregationCardinalityLimitOverflowError =
     "Maximum data points for metric stream exceeded. Entry added to overflow";
-const std::string kAttributesLimitOverflowKey   = "otel.metrics.overflow";
-const std::string kAttributesLimitOverflowValue = "true";
-const size_t kOverflowAttributesHash            = common::GetHashForAttributeMap(
+const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
+const bool kAttributesLimitOverflowValue      = true;
+const size_t kOverflowAttributesHash          = common::GetHashForAttributeMap(
     {{kAttributesLimitOverflowKey,
       kAttributesLimitOverflowValue}});  // precalculated for optimization
 
@@ -78,7 +78,7 @@ public:
       return it->second.second.get();
     }
 
-    if (hash_map_.size() >= attributes_limit_)
+    if (IsOverflowAttributes())
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -98,7 +98,7 @@ public:
       return it->second.second.get();
     }
 
-    if (hash_map_.size() >= attributes_limit_)
+    if (IsOverflowAttributes())
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -118,7 +118,7 @@ public:
       return it->second.second.get();
     }
 
-    if (hash_map_.size() >= attributes_limit_)
+    if (IsOverflowAttributes())
     {
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
@@ -141,7 +141,7 @@ public:
     {
       it->second.second = std::move(aggr);
     }
-    else if (hash_map_.size() >= attributes_limit_)
+    else if (IsOverflowAttributes())
     {
       hash_map_[kOverflowAttributesHash] = {
           MetricAttributes{{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}},
@@ -161,7 +161,7 @@ public:
     {
       it->second.second = std::move(aggr);
     }
-    else if (hash_map_.size() >= attributes_limit_)
+    else if (IsOverflowAttributes())
     {
       hash_map_[kOverflowAttributesHash] = {
           MetricAttributes{{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}},
@@ -218,6 +218,8 @@ private:
     hash_map_[kOverflowAttributesHash] = {attr, std::move(agg)};
     return hash_map_[kOverflowAttributesHash].second.get();
   }
+
+  bool IsOverflowAttributes() const { return (hash_map_.size() + 1 >= attributes_limit_); }
 };
 }  // namespace metrics
 

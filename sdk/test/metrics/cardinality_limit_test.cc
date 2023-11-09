@@ -22,7 +22,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
       []() -> std::unique_ptr<Aggregation> {
     return std::unique_ptr<Aggregation>(new LongSumAggregation(true));
   };
-  // add 10 unique metric points.
+  // add 10 unique metric points. 9 should be added to hashmap, 10th should be overflow.
   long record_value = 100;
   for (auto i = 0; i < 10; i++)
   {
@@ -33,7 +33,8 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
-  // add 5 unique metric points above limit, they should get consolidated as single metric point.
+  // add 5 unique metric points above limit, they all should get consolidated as single
+  // overflowmetric point.
   for (auto i = 10; i < 15; i++)
   {
     OrderedAttributeMap attributes = {{"key", std::to_string(i)}};
@@ -42,7 +43,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
         ->Aggregate(record_value);
   }
-  EXPECT_EQ(hash_map.Size(), 11);  // only one more metric point should be added as overflow.
+  EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
   // get the overflow metric point
   auto agg = hash_map.GetOrSetDefault(
       OrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
@@ -50,7 +51,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   EXPECT_NE(agg, nullptr);
   auto sum_agg = static_cast<LongSumAggregation *>(agg);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg->ToPoint()).value_),
-            record_value * 5);
+            record_value * 6);  // 1 from previous 10, 5 from current 5.
 }
 
 class WritableMetricStorageCardinalityLimitTestFixture
@@ -69,7 +70,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
                             ExemplarReservoir::GetNoExemplarReservoir(), nullptr, attributes_limit);
 
   long record_value = 100;
-  // add 10 unique metric points, and 5 more above limit.
+  // add 9 unique metric points, and 6 more above limit.
   for (auto i = 0; i < 15; i++)
   {
     std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
@@ -91,16 +92,15 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           count_attributes++;
-          if (opentelemetry::nostd::get<std::string>(data_attr.attributes.begin()->second) ==
-              kAttributesLimitOverflowValue)
+          if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
           {
-            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 5);
+            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 6);
             overflow_present = true;
           }
         }
         return true;
       });
-  EXPECT_EQ(count_attributes, attributes_limit + 1);  // +1 for overflow metric point.
+  EXPECT_EQ(count_attributes, attributes_limit);
   EXPECT_EQ(overflow_present, true);
 }
 INSTANTIATE_TEST_SUITE_P(All,
