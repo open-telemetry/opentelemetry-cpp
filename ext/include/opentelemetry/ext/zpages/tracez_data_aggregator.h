@@ -19,9 +19,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/canonical_code.h"
-
-using opentelemetry::trace::CanonicalCode;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

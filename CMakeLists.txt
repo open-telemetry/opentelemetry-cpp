@@ -275,12 +275,12 @@ endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
-# EXPERIMENTAL
-option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+# STABLE
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" ON)
 
-# EXPERIMENTAL
+# STABLE
 option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
-       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+       "Whether to enable otlp http ssl tls min/max/cipher options" ON)
 
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
@@ -430,6 +430,11 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   if(TARGET protobuf::protoc)
     project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
                                               protobuf::protoc)
+    # If protobuf::protoc is not a imported target, then we use the target
+    # directly for fallback
+    if(NOT PROTOBUF_PROTOC_EXECUTABLE)
+      set(PROTOBUF_PROTOC_EXECUTABLE protobuf::protoc)
+    endif()
   elseif(Protobuf_PROTOC_EXECUTABLE)
     # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
     set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
@@ -683,6 +688,7 @@ if(NOT WITH_API_ONLY)
 endif()
 
 include(cmake/opentelemetry-build-external-component.cmake)
+include(cmake/patch-imported-config.cmake)
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)

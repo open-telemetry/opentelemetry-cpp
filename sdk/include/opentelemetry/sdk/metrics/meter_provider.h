@@ -30,7 +30,7 @@ class MeterContext;
 class MetricCollector;
 class MetricReader;
 
-class MeterProvider final : public opentelemetry::metrics::MeterProvider
+class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**
@@ -66,7 +66,7 @@ public:
       nostd::string_view schema_url = "") noexcept override;
 #endif
 
-#ifdef ENABLE_REMOVE_METER_PREVIEW
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   void RemoveMeter(nostd::string_view name,
                    nostd::string_view version,
                    nostd::string_view schema_url) noexcept override;
