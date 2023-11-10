@@ -639,6 +639,27 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.macos.test
 
+  bazel_notest:
+    name: Bazel without test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.notest
+
   benchmark:
     name: Benchmark
     runs-on: ubuntu-latest
