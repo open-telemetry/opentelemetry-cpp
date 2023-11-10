@@ -248,6 +248,10 @@ set(OTELCPP_PROTO_PATH
 
 if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
+else()
+  if(DEFINED(WITH_ETW))
+    message(FATAL_ERROR "WITH_ETW is only supported on Windows")
+  endif()
 endif(WIN32)
 
 # Do not convert deprecated message to error
@@ -629,6 +633,9 @@ endif()
 include(CMakePackageConfigHelpers)
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(NOT WIN32)
+    message(FATAL_ERROR "Build DLL is only supported on Windows!")
+  endif()
   if(NOT MSVC)
     message(WARNING "Build DLL is supposed to work with MSVC!")
   endif()
