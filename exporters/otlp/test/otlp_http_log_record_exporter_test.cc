@@ -38,6 +38,8 @@ using opentelemetry::sdk::common::unsetenv;
 
 using namespace testing;
 
+#  ifdef ENABLE_TEST
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -60,19 +62,19 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url,
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#    ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
       false,                              /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
-      "", /* ssl_min_tls */
-      "", /* ssl_max_tls */
-      "", /* ssl_cipher */
-      "", /* ssl_cipher_suite */
-#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+#    endif                                /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#    ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+      "",  /* ssl_min_tls */
+      "",  /* ssl_max_tls */
+      "",  /* ssl_cipher */
+      "",  /* ssl_cipher_suite */
+#    endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
@@ -137,7 +139,7 @@ public:
     char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
     opentelemetry::trace::TraceId trace_id{trace_id_bin};
     uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize]  = {'7', '6', '5', '4',
-                                                                '3', '2', '1', '0'};
+                                                                 '3', '2', '1', '0'};
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
@@ -221,7 +223,7 @@ public:
     provider->ForceFlush();
   }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#    ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -254,7 +256,7 @@ public:
     char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
     opentelemetry::trace::TraceId trace_id{trace_id_bin};
     uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize]  = {'7', '6', '5', '4',
-                                                                '3', '2', '1', '0'};
+                                                                 '3', '2', '1', '0'};
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
@@ -348,7 +350,7 @@ public:
 
     provider->ForceFlush();
   }
-#  endif
+#    endif
 
   void ExportBinaryIntegrationTest()
   {
@@ -461,7 +463,7 @@ public:
     provider->ForceFlush();
   }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#    ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -577,7 +579,7 @@ public:
 
     provider->ForceFlush();
   }
-#  endif
+#    endif
 };
 
 TEST(OtlpHttpLogRecordExporterTest, Shutdown)
@@ -598,13 +600,13 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest();
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#    ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
   google::protobuf::ShutdownProtobufLibrary();
 }
-#  endif
+#    endif
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -612,12 +614,12 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest();
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#    ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
-#  endif
+#    endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
@@ -646,7 +648,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
-#  ifndef NO_GETENV
+#    ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
 {
@@ -735,9 +737,10 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
   EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
 }
 
-#  endif
+#    endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#  endif
 #endif /* OPENTELEMETRY_STL_VERSION */
