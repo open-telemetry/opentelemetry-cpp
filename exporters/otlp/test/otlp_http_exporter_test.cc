@@ -19,7 +19,7 @@
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
-#  include "opentelemetry/test_common/ext/http/client/http_client_factory.h"
+#  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/trace/provider.h"
 

@@ -22,7 +22,7 @@
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/test_common/ext/http/client/http_client_factory.h"
+#  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #  include <google/protobuf/message_lite.h>

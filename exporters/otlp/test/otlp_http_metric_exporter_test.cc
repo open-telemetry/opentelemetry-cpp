@@ -24,7 +24,7 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/test_common/ext/http/client/http_client_factory.h"
+#include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #include <google/protobuf/message_lite.h>
