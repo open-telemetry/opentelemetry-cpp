@@ -19,6 +19,7 @@
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/test_common/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #  include "opentelemetry/trace/provider.h"
 
@@ -34,8 +35,6 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #  endif
 using namespace testing;
-
-#  ifdef ENABLE_TEST
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -63,19 +62,19 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url,
-#    ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
       false,                              /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#    endif                                /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#    ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
-      "",  /* ssl_min_tls */
-      "",  /* ssl_max_tls */
-      "",  /* ssl_cipher */
-      "",  /* ssl_cipher_suite */
-#    endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+      "", /* ssl_min_tls */
+      "", /* ssl_max_tls */
+      "", /* ssl_cipher */
+      "", /* ssl_cipher_suite */
+#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
@@ -104,7 +103,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
-    auto http_client = http_client::HttpClientFactory::CreateNoSend();
+    auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
             http_client};
   }
@@ -199,7 +198,7 @@ public:
     static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client =
@@ -293,7 +292,7 @@ public:
 
     static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
   }
-#    endif
+#  endif
 
   void ExportBinaryIntegrationTest()
   {
@@ -375,7 +374,7 @@ public:
     static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
   }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client =
@@ -460,7 +459,7 @@ public:
 
     static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
   }
-#    endif
+#  endif
 };
 
 TEST(OtlpHttpExporterTest, Shutdown)
@@ -480,13 +479,13 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
   google::protobuf::ShutdownProtobufLibrary();
 }
-#    endif
+#  endif
 
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -494,12 +493,12 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest();
 }
 
-#    ifdef ENABLE_ASYNC_EXPORT
+#  ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
-#    endif
+#  endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
@@ -528,7 +527,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
-#    ifndef NO_GETENV
+#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 {
@@ -609,10 +608,9 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
 }
-#    endif
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#  endif
 #endif /* OPENTELEMETRY_STL_VERSION */

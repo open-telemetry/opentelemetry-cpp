@@ -191,9 +191,7 @@ public:
    */
   const std::string &GetBaseUri() const { return host_; }
 
-#ifdef ENABLE_TEST
   std::shared_ptr<Request> GetRequest() { return http_request_; }
-#endif
 
   inline HttpClient &GetHttpClient() noexcept { return http_client_; }
   inline const HttpClient &GetHttpClient() const noexcept { return http_client_; }

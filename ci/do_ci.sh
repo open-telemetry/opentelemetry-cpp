@@ -69,7 +69,7 @@ fi
 echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
-BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
 BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
@@ -433,9 +433,6 @@ elif [[ "$1" == "bazel.benchmark" ]]; then
 elif [[ "$1" == "bazel.macos.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_MACOS_OPTIONS -- //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_MACOS_TEST_OPTIONS -- //...
-  exit 0
-elif [[ "$1" == "bazel.notest" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build ${BAZEL_OPTIONS_ASYNC/--copt=-DENABLE_TEST /} //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then
   # we uses C++ future and async() function to test the Prometheus Exporter functionality,

@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/ext/http/client/http_client_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #include <google/protobuf/message_lite.h>
@@ -40,7 +41,6 @@ using opentelemetry::sdk::common::unsetenv;
 
 using namespace testing;
 
-#ifdef ENABLE_TEST
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -68,19 +68,19 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url,
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
+#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
       false,                              /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
+#endif                                    /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
+#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
       "", /* ssl_min_tls */
       "", /* ssl_max_tls */
       "", /* ssl_cipher */
       "", /* ssl_cipher_suite */
-#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+#endif    /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
@@ -110,23 +110,23 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
-    auto http_client = http_client::HttpClientFactory::CreateNoSend();
+    auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
             http_client};
   }
 
   void ExportJsonIntegrationTestExportSumPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -197,17 +197,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportSumPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -292,17 +292,17 @@ public:
   }
 
   void ExportJsonIntegrationTestExportLastValuePointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -378,17 +378,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportLastValuePointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -482,17 +482,17 @@ public:
   }
 
   void ExportJsonIntegrationTestExportHistogramPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -608,17 +608,17 @@ public:
   }
 
   void ExportBinaryIntegrationTestExportHistogramPointData(
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
       bool async_mode
-#  endif
+#endif
   )
   {
     auto mock_otlp_client =
         OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
-#  endif
+#endif
         );
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
@@ -758,7 +758,7 @@ TEST(OtlpHttpMetricExporterTest, Shutdown)
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonIntegrationTestSumPointDataAsync)
 {
   ExportJsonIntegrationTestExportSumPointData(true);
@@ -810,7 +810,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportBinaryIntegrationTestHistogramPoint
   ExportBinaryIntegrationTestExportHistogramPointData(false);
 }
 
-#  else
+#else
 TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonIntegrationTestSumPointData)
 {
   ExportJsonIntegrationTestExportSumPointData();
@@ -837,7 +837,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportBinaryIntegrationTestHistogramPoint
 {
   ExportBinaryIntegrationTestExportHistogramPointData();
 }
-#  endif
+#endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigTest)
@@ -867,7 +867,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigJsonBytesMappingTest)
   google::protobuf::ShutdownProtobufLibrary();
 }
 
-#  ifndef NO_GETENV
+#ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromEnv)
 {
@@ -976,7 +976,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
             exporter->GetAggregationTemporality(
                 opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter));
 }
-#  endif
+#endif
 
 // Test Preferred aggregtion temporality selection
 TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
@@ -1053,4 +1053,3 @@ TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif

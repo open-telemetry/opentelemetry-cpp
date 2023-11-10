@@ -11,11 +11,9 @@ namespace http
 {
 namespace client
 {
-class HttpClientFactory
+class HttpClientTestFactory
 {
 public:
-  static std::shared_ptr<HttpClientSync> CreateSync();
-
   static std::shared_ptr<HttpClient> Create();
 };
 }  // namespace client
