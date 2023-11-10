@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 namespace http_client = opentelemetry::ext::http::client;
