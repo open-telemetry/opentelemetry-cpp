@@ -25,6 +25,8 @@ Increment the:
   [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
 * [API] Add a new AddLink() operation to Span
   [#2380](https://github.com/open-telemetry/opentelemetry-cpp/pull/2380)
+* [SDK] Fix GetLogger with empty library name
+  [#2398](https://github.com/open-telemetry/opentelemetry-cpp/pull/2398)
 * [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
   [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
 

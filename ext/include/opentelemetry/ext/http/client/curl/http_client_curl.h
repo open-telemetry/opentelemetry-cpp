@@ -37,6 +37,7 @@ private:
   HttpCurlGlobalInitializer(HttpCurlGlobalInitializer &&)      = delete;
 
   HttpCurlGlobalInitializer &operator=(const HttpCurlGlobalInitializer &) = delete;
+
   HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&) = delete;
 
   HttpCurlGlobalInitializer();
@@ -190,9 +191,7 @@ public:
    */
   const std::string &GetBaseUri() const { return host_; }
 
-#ifdef ENABLE_TEST
   std::shared_ptr<Request> GetRequest() { return http_request_; }
-#endif
 
   inline HttpClient &GetHttpClient() noexcept { return http_client_; }
   inline const HttpClient &GetHttpClient() const noexcept { return http_client_; }
@@ -327,7 +326,6 @@ public:
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-#ifdef ENABLE_TEST
   void WaitBackgroundThreadExit()
   {
     std::unique_ptr<std::thread> background_thread;
@@ -341,7 +339,6 @@ public:
       background_thread->join();
     }
   }
-#endif
 
 private:
   void wakeupBackgroundThread();
