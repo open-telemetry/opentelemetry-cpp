@@ -249,7 +249,7 @@ set(OTELCPP_PROTO_PATH
 if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
 else()
-  if(DEFINED(WITH_ETW))
+  if(DEFINED (WITH_ETW))
     message(FATAL_ERROR "WITH_ETW is only supported on Windows")
   endif()
 endif(WIN32)
