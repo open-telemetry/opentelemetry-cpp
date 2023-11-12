@@ -111,6 +111,20 @@ TEST(LoggerProviderSDK, EventLoggerProviderFactory)
   auto event_logger = elp->CreateEventLogger(logger1, "otel-cpp.test");
 }
 
+TEST(LoggerPviderSDK, LoggerEquityCheck)
+{
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+
+  auto logger1 = lp->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
+  auto logger2 = lp->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
+  EXPECT_EQ(logger1, logger2);
+
+  auto logger3         = lp->GetLogger("logger3");
+  auto another_logger3 = lp->GetLogger("logger3");
+  EXPECT_EQ(logger3, another_logger3);
+}
+
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:

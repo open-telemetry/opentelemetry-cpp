@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #include <google/protobuf/message_lite.h>
@@ -109,7 +110,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
-    auto http_client = http_client::HttpClientFactory::CreateNoSend();
+    auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
             http_client};
   }
