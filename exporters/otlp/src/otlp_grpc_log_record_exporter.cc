@@ -65,14 +65,26 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
     return sdk::common::ExportResult::kSuccess;
   }
 
-  proto::collector::logs::v1::ExportLogsServiceRequest request;
-  OtlpRecordableUtils::PopulateRequest(logs, &request);
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
+
+  proto::collector::logs::v1::ExportLogsServiceRequest *request =
+      google::protobuf::Arena::CreateMessage<proto::collector::logs::v1::ExportLogsServiceRequest>(
+          &arena);
+  OtlpRecordableUtils::PopulateRequest(logs, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
-  proto::collector::logs::v1::ExportLogsServiceResponse response;
+  proto::collector::logs::v1::ExportLogsServiceResponse *response =
+      google::protobuf::Arena::CreateMessage<proto::collector::logs::v1::ExportLogsServiceResponse>(
+          &arena);
 
   grpc::Status status =
-      OtlpGrpcClient::DelegateExport(log_service_stub_.get(), context.get(), request, &response);
+      OtlpGrpcClient::DelegateExport(log_service_stub_.get(), context.get(), *request, response);
 
   if (!status.ok())
   {

@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -98,12 +99,23 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
-  proto::collector::logs::v1::ExportLogsServiceRequest service_request;
-  OtlpRecordableUtils::PopulateRequest(logs, &service_request);
+
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
+
+  proto::collector::logs::v1::ExportLogsServiceRequest *service_request =
+      google::protobuf::Arena::CreateMessage<proto::collector::logs::v1::ExportLogsServiceRequest>(
+          &arena);
+  OtlpRecordableUtils::PopulateRequest(logs, service_request);
   std::size_t log_count = logs.size();
 #ifdef ENABLE_ASYNC_EXPORT
   http_client_->Export(
-      service_request, [log_count](opentelemetry::sdk::common::ExportResult result) {
+      *service_request, [log_count](opentelemetry::sdk::common::ExportResult result) {
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
           OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "

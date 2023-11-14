@@ -52,14 +52,26 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
     return sdk::common::ExportResult::kSuccess;
   }
 
-  proto::collector::trace::v1::ExportTraceServiceRequest request;
-  OtlpRecordableUtils::PopulateRequest(spans, &request);
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
+
+  proto::collector::trace::v1::ExportTraceServiceRequest *request =
+      google::protobuf::Arena::CreateMessage<
+          proto::collector::trace::v1::ExportTraceServiceRequest>(&arena);
+  OtlpRecordableUtils::PopulateRequest(spans, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
-  proto::collector::trace::v1::ExportTraceServiceResponse response;
+  proto::collector::trace::v1::ExportTraceServiceResponse *response =
+      google::protobuf::Arena::CreateMessage<
+          proto::collector::trace::v1::ExportTraceServiceResponse>(&arena);
 
   grpc::Status status =
-      OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), context.get(), request, &response);
+      OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), context.get(), *request, response);
 
   if (!status.ok())
   {

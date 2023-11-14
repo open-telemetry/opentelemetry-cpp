@@ -60,14 +60,26 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     return sdk::common::ExportResult::kSuccess;
   }
 
-  proto::collector::metrics::v1::ExportMetricsServiceRequest request;
-  OtlpMetricUtils::PopulateRequest(data, &request);
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
+
+  proto::collector::metrics::v1::ExportMetricsServiceRequest *request =
+      google::protobuf::Arena::CreateMessage<
+          proto::collector::metrics::v1::ExportMetricsServiceRequest>(&arena);
+  OtlpMetricUtils::PopulateRequest(data, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
-  proto::collector::metrics::v1::ExportMetricsServiceResponse response;
+  proto::collector::metrics::v1::ExportMetricsServiceResponse *response =
+      google::protobuf::Arena::CreateMessage<
+          proto::collector::metrics::v1::ExportMetricsServiceResponse>(&arena);
 
   grpc::Status status = OtlpGrpcClient::DelegateExport(metrics_service_stub_.get(), context.get(),
-                                                       request, &response);
+                                                       *request, response);
 
   if (!status.ok())
   {
