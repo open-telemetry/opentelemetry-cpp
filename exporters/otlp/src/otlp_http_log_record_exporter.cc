@@ -128,7 +128,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
       });
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  opentelemetry::sdk::common::ExportResult result = http_client_->Export(service_request);
+  opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
   if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
