@@ -22,6 +22,8 @@ namespace exporter
 namespace otlp
 {
 
+class OtlpGrpcClient;
+
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
@@ -72,6 +74,10 @@ public:
 private:
   // Configuration options for the exporter
   const OtlpGrpcLogRecordExporterOptions options_;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  std::shared_ptr<OtlpGrpcClient> client_;
+#endif
 
   // For testing
   friend class OtlpGrpcLogRecordExporterTestPeer;

@@ -105,8 +105,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   google::protobuf::Arena arena{arena_options};
 
   proto::collector::trace::v1::ExportTraceServiceRequest *service_request =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::trace::v1::ExportTraceServiceRequest>(&arena);
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          &arena);
   OtlpRecordableUtils::PopulateRequest(spans, service_request);
   std::size_t span_count = spans.size();
 #ifdef ENABLE_ASYNC_EXPORT

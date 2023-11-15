@@ -112,8 +112,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   google::protobuf::Arena arena{arena_options};
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest *service_request =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::metrics::v1::ExportMetricsServiceRequest>(&arena);
+      google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceRequest>(
+          &arena);
   OtlpMetricUtils::PopulateRequest(data, service_request);
   std::size_t metric_count = data.scope_metric_data_.size();
 #ifdef ENABLE_ASYNC_EXPORT

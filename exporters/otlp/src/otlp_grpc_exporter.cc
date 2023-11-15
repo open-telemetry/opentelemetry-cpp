@@ -23,12 +23,20 @@ namespace otlp
 OtlpGrpcExporter::OtlpGrpcExporter() : OtlpGrpcExporter(OtlpGrpcExporterOptions()) {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options)
-    : options_(options), trace_service_stub_(OtlpGrpcClient::MakeTraceServiceStub(options))
+    : options_(options),
+#ifdef ENABLE_ASYNC_EXPORT
+      client_(std::make_shared<OtlpGrpcClient>()),
+#endif
+      trace_service_stub_(OtlpGrpcClient::MakeTraceServiceStub(options))
 {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub)
-    : options_(OtlpGrpcExporterOptions()), trace_service_stub_(std::move(stub))
+    : options_(OtlpGrpcExporterOptions()),
+#ifdef ENABLE_ASYNC_EXPORT
+      client_(std::make_shared<OtlpGrpcClient>()),
+#endif
+      trace_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
@@ -58,28 +66,58 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  google::protobuf::Arena arena{arena_options};
+  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
 
   proto::collector::trace::v1::ExportTraceServiceRequest *request =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::trace::v1::ExportTraceServiceRequest>(&arena);
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          arena.get());
   OtlpRecordableUtils::PopulateRequest(spans, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
   proto::collector::trace::v1::ExportTraceServiceResponse *response =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::trace::v1::ExportTraceServiceResponse>(&arena);
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+          arena.get());
 
-  grpc::Status status =
-      OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), context.get(), *request, response);
-
-  if (!status.ok())
+#ifdef ENABLE_ASYNC_EXPORT
+  if (options_.max_concurrent_requests > 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with status_code: \""
-                            << grpc_utils::grpc_status_code_to_string(status.error_code())
-                            << "\" error_message: \"" << status.error_message() << "\"");
-    return sdk::common::ExportResult::kFailure;
+    return client_->DelegateAsyncExport(
+        options_, trace_service_stub_.get(), std::move(context), std::move(arena),
+        std::move(*request),
+        [](opentelemetry::sdk::common::ExportResult result,
+           std::unique_ptr<google::protobuf::Arena> &&,
+           const proto::collector::trace::v1::ExportTraceServiceRequest &request,
+           proto::collector::trace::v1::ExportTraceServiceResponse *) {
+          if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+          {
+            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                                    << request.resource_spans_size()
+                                    << " trace span(s) error: " << static_cast<int>(result));
+          }
+          else
+          {
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << request.resource_spans_size()
+                                                                 << " trace span(s) success");
+          }
+          return true;
+        });
   }
+  else
+  {
+#endif
+    grpc::Status status =
+        OtlpGrpcClient::DelegateExport(trace_service_stub_.get(), std::move(context),
+                                       std::move(arena), std::move(*request), response);
+    if (!status.ok())
+    {
+      OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with status_code: \""
+                              << grpc_utils::grpc_status_code_to_string(status.error_code())
+                              << "\" error_message: \"" << status.error_message() << "\"");
+      return sdk::common::ExportResult::kFailure;
+    }
+#ifdef ENABLE_ASYNC_EXPORT
+  }
+#endif
   return sdk::common::ExportResult::kSuccess;
 }
 

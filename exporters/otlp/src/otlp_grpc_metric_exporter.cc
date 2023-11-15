@@ -23,6 +23,9 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter()
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options)
     : options_(options),
+#ifdef ENABLE_ASYNC_EXPORT
+      client_(std::make_shared<OtlpGrpcClient>()),
+#endif
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       metrics_service_stub_(OtlpGrpcClient::MakeMetricsServiceStub(options))
@@ -31,6 +34,9 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptio
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub)
     : options_(OtlpGrpcMetricExporterOptions()),
+#ifdef ENABLE_ASYNC_EXPORT
+      client_(std::make_shared<OtlpGrpcClient>()),
+#endif
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       metrics_service_stub_(std::move(stub))
@@ -66,27 +72,58 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  google::protobuf::Arena arena{arena_options};
+  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest *request =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::metrics::v1::ExportMetricsServiceRequest>(&arena);
+      google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceRequest>(
+          arena.get());
   OtlpMetricUtils::PopulateRequest(data, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
   proto::collector::metrics::v1::ExportMetricsServiceResponse *response =
-      google::protobuf::Arena::CreateMessage<
-          proto::collector::metrics::v1::ExportMetricsServiceResponse>(&arena);
+      google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceResponse>(
+          arena.get());
 
-  grpc::Status status = OtlpGrpcClient::DelegateExport(metrics_service_stub_.get(), context.get(),
-                                                       *request, response);
-
-  if (!status.ok())
+#ifdef ENABLE_ASYNC_EXPORT
+  if (options_.max_concurrent_requests > 1)
   {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[OTLP METRIC GRPC Exporter] Export() failed: " << status.error_message());
-    return sdk::common::ExportResult::kFailure;
+    return client_->DelegateAsyncExport(
+        options_, metrics_service_stub_.get(), std::move(context), std::move(arena),
+        std::move(*request),
+        [](opentelemetry::sdk::common::ExportResult result,
+           std::unique_ptr<google::protobuf::Arena> &&,
+           const proto::collector::metrics::v1::ExportMetricsServiceRequest &request,
+           proto::collector::metrics::v1::ExportMetricsServiceResponse *) {
+          if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+          {
+            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+                                    << request.resource_metrics_size()
+                                    << " metric(s) error: " << static_cast<int>(result));
+          }
+          else
+          {
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << request.resource_metrics_size()
+                                                                 << " metric(s) success");
+          }
+          return true;
+        });
   }
+  else
+  {
+#endif
+    grpc::Status status =
+        OtlpGrpcClient::DelegateExport(metrics_service_stub_.get(), std::move(context),
+                                       std::move(arena), std::move(*request), response);
+
+    if (!status.ok())
+    {
+      OTEL_INTERNAL_LOG_ERROR(
+          "[OTLP METRIC GRPC Exporter] Export() failed: " << status.error_message());
+      return sdk::common::ExportResult::kFailure;
+    }
+#ifdef ENABLE_ASYNC_EXPORT
+  }
+#endif
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 

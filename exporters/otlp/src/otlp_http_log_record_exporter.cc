@@ -109,8 +109,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   google::protobuf::Arena arena{arena_options};
 
   proto::collector::logs::v1::ExportLogsServiceRequest *service_request =
-      google::protobuf::Arena::CreateMessage<proto::collector::logs::v1::ExportLogsServiceRequest>(
-          &arena);
+      google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(&arena);
   OtlpRecordableUtils::PopulateRequest(logs, service_request);
   std::size_t log_count = logs.size();
 #ifdef ENABLE_ASYNC_EXPORT

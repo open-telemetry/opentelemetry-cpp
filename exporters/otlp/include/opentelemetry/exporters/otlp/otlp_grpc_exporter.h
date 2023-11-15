@@ -23,6 +23,8 @@ namespace exporter
 namespace otlp
 {
 
+class OtlpGrpcClient;
+
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
@@ -72,6 +74,10 @@ public:
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcExporterOptions options_;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  std::shared_ptr<OtlpGrpcClient> client_;
+#endif
 
   // For testing
   friend class OtlpGrpcExporterTestPeer;
