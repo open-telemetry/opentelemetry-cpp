@@ -95,11 +95,8 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
-  async_interface_base *async() override { return &async_interface_; }
-#else
-  async_interface_base *experimental_async() override { return &async_interface_; }
-#endif
+  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
 
@@ -159,11 +156,8 @@ public:
     OtlpMockLogsServiceStub *stub_;
   };
 
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
-  async_interface_base *async() override { return &async_interface_; }
-#else
-  async_interface_base *experimental_async() override { return &async_interface_; }
-#endif
+  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *experimental_async() { return &async_interface_; }
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
 
