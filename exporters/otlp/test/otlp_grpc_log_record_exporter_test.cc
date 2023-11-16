@@ -25,7 +25,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
-#include <grpcpp/version_info.h>
+#include <grpcpp/grpcpp.h>
 #include <gtest/gtest.h>
 
 #if defined(_MSC_VER)
