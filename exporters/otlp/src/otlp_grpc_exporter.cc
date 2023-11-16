@@ -121,18 +121,24 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
+bool OtlpGrpcExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  // TODO: When we implement async exporting in OTLP gRPC exporter in the future, we need wait the
-  //       running exporting finished here.
+#ifdef ENABLE_ASYNC_EXPORT
+  return client_->ForceFlush(timeout);
+#else
   return true;
+#endif
 }
 
-bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
+#ifdef ENABLE_ASYNC_EXPORT
+  return client_->Shutdown(timeout);
+#else
   return true;
+#endif
 }
 
 bool OtlpGrpcExporter::isShutdown() const noexcept

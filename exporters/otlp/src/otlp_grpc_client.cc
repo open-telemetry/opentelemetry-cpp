@@ -59,7 +59,6 @@ struct OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallData : public OtlpGrpcAsyncCa
 
   RequestType *request   = nullptr;
   ResponseType *response = nullptr;
-  std::unique_ptr<grpc::ClientAsyncResponseReaderInterface<ResponseType>> response_reader;
 
   std::function<bool(opentelemetry::sdk::common::ExportResult,
                      std::unique_ptr<google::protobuf::Arena> &&,
@@ -92,9 +91,6 @@ struct OtlpGrpcClientAsyncData
   std::mutex session_waker_lock;
   std::condition_variable session_waker;
 
-  std::mutex background_thread_m;
-  std::unique_ptr<std::thread> background_thread;
-
   // Do not use OtlpGrpcClientAsyncData() = default; here, some versions of GCC&Clang have BUGs
   // and may not initialize the member correctly. See also
   // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
@@ -126,77 +122,6 @@ static std::string GetFileContentsOrInMemoryContents(const std::string &file_pat
 }
 
 #ifdef ENABLE_ASYNC_EXPORT
-static void MaybeSpawnBackgroundThread(std::shared_ptr<OtlpGrpcClientAsyncData> async_data)
-{
-  std::lock_guard<std::mutex> lock_guard{async_data->background_thread_m};
-  if (async_data->background_thread)
-  {
-    return;
-  }
-
-  async_data->background_thread.reset(new std::thread([async_data]() {
-    bool running = true;
-    while (running)
-    {
-      void *tag = nullptr;
-      bool ok   = false;
-      // If there is no job in exporting_timeout+5 minutes, we can exit this thread and start
-      // another thread later when new datas arrived.
-      auto got_status = async_data->cq.AsyncNext(
-          &tag, &ok,
-          std::chrono::system_clock::now() + std::chrono::minutes{5} + async_data->export_timeout);
-      if (grpc::CompletionQueue::SHUTDOWN == got_status)
-      {
-        std::lock_guard<std::mutex> internal_lock_guard{async_data->background_thread_m};
-        if (async_data->background_thread)
-        {
-          async_data->background_thread->detach();
-          async_data->background_thread.reset();
-        }
-        break;
-      }
-      if (grpc::CompletionQueue::TIMEOUT == got_status)
-      {
-        std::lock_guard<std::mutex> internal_lock_guard{async_data->background_thread_m};
-        running = async_data->running_requests.load(std::memory_order_acquire) > 0;
-
-        if (!running)
-        {
-          if (async_data->background_thread)
-          {
-            async_data->background_thread->detach();
-            async_data->background_thread.reset();
-          }
-          break;
-        }
-      }
-
-      if (nullptr == tag)
-      {
-        continue;
-      }
-
-      auto callback_data = reinterpret_cast<OtlpGrpcAsyncCallDataBase *>(tag);
-      --async_data->running_requests;
-      ++async_data->finished_request_counter;
-
-      if (callback_data->grpc_status.ok())
-      {
-        callback_data->export_result = opentelemetry::sdk::common::ExportResult::kSuccess;
-      }
-
-      if (callback_data->grpc_async_callback)
-      {
-        callback_data->grpc_async_callback(callback_data);
-        delete callback_data;
-      }
-
-      // Maybe wake up blocking DelegateAsyncExport() call
-      async_data->session_waker.notify_all();
-    }
-  }));
-}
-
 template <class StubType, class RequestType, class ResponseType>
 static sdk::common::ExportResult InternalDelegateAsyncExport(
     std::shared_ptr<OtlpGrpcClientAsyncData> async_data,
@@ -225,8 +150,8 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     return opentelemetry::sdk::common::ExportResult::kFailureFull;
   }
 
-  OtlpGrpcAsyncCallData<RequestType, ResponseType> *call_data =
-      new OtlpGrpcAsyncCallData<RequestType, ResponseType>();
+  std::shared_ptr<OtlpGrpcAsyncCallData<RequestType, ResponseType>> call_data =
+      std::make_shared<OtlpGrpcAsyncCallData<RequestType, ResponseType>>();
   call_data->arena.swap(arena);
   call_data->result_callback.swap(result_callback);
 
@@ -247,7 +172,6 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
           nullptr == call_data->request ? request : *call_data->request, call_data->response);
     }
 
-    delete call_data;
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
   call_data->grpc_context.swap(context);
@@ -265,34 +189,32 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
     return true;
   };
 
-  call_data->response_reader =
-      stub->AsyncExport(call_data->grpc_context.get(), *call_data->request, &async_data->cq);
-  if (!call_data->response_reader)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
-                            << export_data_count << " " << export_data_name
-                            << " failed, call AsyncExport failed");
+  ++async_data->start_request_counter;
+  ++async_data->running_requests;
+#  if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+  stub->async()
+#  else
+  stub->experimental_async()
+#  endif
+      ->Export(call_data->grpc_context.get(), call_data->request, call_data->response,
+               [call_data, async_data](::grpc::Status grpc_status) {
+                 --async_data->running_requests;
+                 ++async_data->finished_request_counter;
 
-    if (call_data->result_callback)
-    {
-      call_data->result_callback(
-          opentelemetry::sdk::common::ExportResult::kFailure, std::move(call_data->arena),
-          nullptr == call_data->request ? request : *call_data->request, call_data->response);
-    }
-    delete call_data;
-    return opentelemetry::sdk::common::ExportResult::kFailure;
-  }
+                 call_data->grpc_status = grpc_status;
+                 if (call_data->grpc_status.ok())
+                 {
+                   call_data->export_result = opentelemetry::sdk::common::ExportResult::kSuccess;
+                 }
 
-  call_data->response_reader->Finish(call_data->response, &call_data->grpc_status,
-                                     reinterpret_cast<void *>(call_data));
+                 if (call_data->grpc_async_callback)
+                 {
+                   call_data->grpc_async_callback(call_data.get());
+                 }
 
-  {
-    ++async_data->start_request_counter;
-    ++async_data->running_requests;
-  }
-
-  // Maybe spawn background thread to handle the completion queue
-  MaybeSpawnBackgroundThread(async_data);
+                 // Maybe wake up blocking DelegateAsyncExport() call
+                 async_data->session_waker.notify_all();
+               });
 
   // Can not cancle when start the request
   {
@@ -599,7 +521,8 @@ bool OtlpGrpcClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     timeout_steady = std::chrono::steady_clock::duration::max();
   }
 
-  while (timeout_steady > std::chrono::steady_clock::duration::zero())
+  while (timeout_steady > std::chrono::steady_clock::duration::zero() &&
+         request_counter > async_data_->finished_request_counter.load(std::memory_order_acquire))
   {
     // When changes of running_sessions_ and notify_one/notify_all happen between predicate
     // checking and waiting, we should not wait forever.We should cleanup gc sessions here as soon
@@ -623,9 +546,14 @@ bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
   {
     return true;
   }
-  is_shutdown_ = true;
 
-  async_data_->cq.Shutdown();
+  if (!is_shutdown_)
+  {
+    is_shutdown_ = true;
+
+    async_data_->cq.Shutdown();
+  }
+
   return ForceFlush(timeout);
 }
 
