@@ -47,7 +47,8 @@ namespace
 class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceServiceStub
 {
 public:
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(GRPC_CPP_VERSION_MAJOR) && \
+    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   using async_interface_base =
       proto::collector::trace::v1::TraceService::StubInterface::async_interface;
 #else
@@ -74,7 +75,8 @@ public:
       callback(stub_->last_async_status_);
     }
 
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
     defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
     void Export(
         ::grpc::ClientContext * /*context*/,
@@ -108,7 +110,8 @@ private:
 class OtlpMockLogsServiceStub : public proto::collector::logs::v1::MockLogsServiceStub
 {
 public:
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(GRPC_CPP_VERSION_MAJOR) && \
+    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   using async_interface_base =
       proto::collector::logs::v1::LogsService::StubInterface::async_interface;
 #else
@@ -135,7 +138,8 @@ public:
       callback(stub_->last_async_status_);
     }
 
-#if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
     defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
     void Export(
         ::grpc::ClientContext * /*context*/,

@@ -191,7 +191,8 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
   ++async_data->start_request_counter;
   ++async_data->running_requests;
-#  if (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#  if defined(GRPC_CPP_VERSION_MAJOR) && \
+      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   stub->async()
 #  else
   stub->experimental_async()
@@ -289,6 +290,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
                                                                  options.ssl_client_key_string);
     ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
                                                                  options.ssl_client_cert_string);
+
 #endif
     channel =
         grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
