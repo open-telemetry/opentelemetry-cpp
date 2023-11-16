@@ -125,6 +125,7 @@ static std::string GetFileContentsOrInMemoryContents(const std::string &file_pat
   return contents;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
 static void MaybeSpawnBackgroundThread(std::shared_ptr<OtlpGrpcClientAsyncData> async_data)
 {
   std::lock_guard<std::mutex> lock_guard{async_data->background_thread_m};
@@ -304,7 +305,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
-
+#endif
 }  // namespace
 
 #ifdef ENABLE_ASYNC_EXPORT
@@ -622,6 +623,7 @@ bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
   {
     return true;
   }
+  is_shutdown_ = true;
 
   async_data_->cq.Shutdown();
   return ForceFlush(timeout);
