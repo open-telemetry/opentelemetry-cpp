@@ -1,6 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+build --subcommands
+
+
 # This auto-enables --config=windows if targeting Windows (and same for linux, osx, etc.)
 common --enable_platform_specific_config
 

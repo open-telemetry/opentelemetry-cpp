@@ -21,7 +21,7 @@ class OPENTELEMETRY_SDK_METRICS_EXPORT ViewRegistry;
 /**
  * Factory class for MeterContext.
  */
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterContextFactory
+class OPENTELEMETRY_EXPORT MeterContextFactory
 {
 public:
   /**

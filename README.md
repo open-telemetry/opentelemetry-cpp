@@ -12,20 +12,20 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 ## Project Status
 
-| Signal  | Status                  | Project                                                                  |
-| ------- | ----------------------- | ------------------------------------------------------------------------ |
-| Traces  | Public Release          | N/A                                                                      |
-| Metrics | Public Release          | N/A                                                                      |
-| Logs    | Public Release          | N/A                                                                      |
+**Stable** across all 3 signals i.e. `Logs`, `Metrics`, and `Traces`.
+
+See [Spec Compliance
+Matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)
+to understand which portions of the specification has been implemented in this
+repo.
 
 ## Supported C++ Versions
 
 Code shipped from this repository generally supports the following versions of
 C++ standards:
 
-* ISO/IEC 14882:2011 (C++11, C++0x)
-* ISO/IEC 14882:2014 (C++14, C++1y)
-* ISO/IEC 14882:2017 (C++17, C++1z)
+* ISO/IEC 14882:2014 (C++14)
+* ISO/IEC 14882:2017 (C++17)
 * ISO/IEC 14882:2020 (C++20)
 
 Any exceptions to this are noted in the individual `README.md` files.
@@ -40,18 +40,12 @@ of the current project.
 
 | Platform                                                            |   Build type  |
 |---------------------------------------------------------------------|---------------|
-| ubuntu-22.04 (GCC - 10, 12)                                         | CMake, Bazel  |
-| ubuntu-20.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
-| ubuntu-20.04 (GCC 9.4.0)                                            | CMake, Bazel  |
-| ubuntu-20.04 (Default GCC Compiler - 9.4.0 with -std=c++20 flags)   | CMake, Bazel  |
-| macOS 12.0 (Xcode 14.2)                                             | Bazel         |
+| ubuntu-22.04 (GCC 10, GCC 12, Clang 14)                             | CMake, Bazel  |
+| ubuntu-20.04 (GCC 9.4.0 - default compiler)                         | CMake, Bazel  |
+| ubuntu-20.04 (GCC 9.4.0 with -std=c++14/17/20 flags)                | CMake, Bazel  |
+| macOS 12.7 (Xcode 14.2)                                             | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
 | Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
-
-[1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
-  (required by OTLP exporter) don't build with this compiler. See gRPC [official
-  support](https://grpc.io/docs/#official-support) document. CMake build doesn't
-  build OTLP exporter with GCC 4.8.
 
 In general, the code shipped from this repository should build on all platforms
 having C++ compiler with [supported C++ standards](#supported-c-versions).
@@ -120,8 +114,6 @@ Maintainer/Approver/Triager](https://github.com/open-telemetry/community/blob/ma
 [![contributors](https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/graphs/contributors)
 
 ## Release Schedule
-
-Refer to [project status](#project-status) for current status of the project.
 
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases) for

@@ -1,6 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+set(CPACK_PACKAGE_VERSION "${OPENTELEMETRY_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION "OpenTelemetry C++ for Linux")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenTelemetry C++ for Linux - C++ Implementation of OpenTelemetry Specification")
 set(CPACK_PACKAGE_VENDOR "OpenTelemetry")

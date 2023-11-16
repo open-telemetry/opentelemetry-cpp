@@ -5,10 +5,14 @@
 
 #include "opentelemetry/version.h"
 
-#ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/utility.h"
-#else
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2014
+#    include "opentelemetry/std/utility.h"
+#    define OPENTELEMETRY_HAVE_STD_UTILITY
+#  endif
+#endif
 
+#if !defined(OPENTELEMETRY_HAVE_STD_UTILITY)
 #  include <cstddef>
 #  include <initializer_list>
 #  include <type_traits>
@@ -155,4 +159,4 @@ struct in_place_type_t
 };
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_HAVE_STD_UTILITY */

@@ -12,7 +12,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"

@@ -5,6 +5,7 @@
 #include "opentelemetry/context/context.h"
 
 #include <algorithm>
+#include <map>
 
 #include <gtest/gtest.h>
 

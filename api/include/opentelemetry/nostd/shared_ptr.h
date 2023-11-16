@@ -5,9 +5,14 @@
 
 #include "opentelemetry/version.h"
 
-#ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/shared_ptr.h"
-#else
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2011
+#    include "opentelemetry/std/shared_ptr.h"
+#    define OPENTELEMETRY_HAVE_STD_SHARED_PTR
+#  endif
+#endif
+
+#if !defined(OPENTELEMETRY_HAVE_STD_SHARED_PTR)
 #  include <cstdlib>
 #  include <memory>
 #  include <utility>
@@ -204,4 +209,4 @@ inline bool operator!=(std::nullptr_t, const shared_ptr<T> &rhs) noexcept
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_HAVE_STD_SHARED_PTR */

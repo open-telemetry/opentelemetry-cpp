@@ -13,7 +13,7 @@
 // clang-format on
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,7 +37,7 @@ public:
    * Create an OtlpGrpcLogRecordExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options);
+  OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options);
 
   /**
    * Creates a recordable that stores the data in protobuf.
@@ -71,7 +71,7 @@ public:
 
 private:
   // Configuration options for the exporter
-  const OtlpGrpcExporterOptions options_;
+  const OtlpGrpcLogRecordExporterOptions options_;
 
   // For testing
   friend class OtlpGrpcLogRecordExporterTestPeer;

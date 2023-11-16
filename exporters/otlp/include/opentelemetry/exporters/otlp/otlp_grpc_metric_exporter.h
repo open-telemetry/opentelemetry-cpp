@@ -63,7 +63,7 @@ private:
   const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // For testing
-  friend class OtlpGrpcExporterTestPeer;
+  friend class OtlpGrpcMetricExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>

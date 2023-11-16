@@ -27,7 +27,10 @@ public:
   /** Dynamically converts the resource of this span into a proto. */
   proto::resource::v1::Resource ProtoResource() const noexcept;
 
+  const opentelemetry::sdk::resource::Resource *GetResource() const noexcept;
   const std::string GetResourceSchemaURL() const noexcept;
+  const opentelemetry::sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope()
+      const noexcept;
   const std::string GetInstrumentationLibrarySchemaURL() const noexcept;
 
   proto::common::v1::InstrumentationScope GetProtoInstrumentationScope() const noexcept;

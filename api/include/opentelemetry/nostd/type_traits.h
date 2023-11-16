@@ -5,9 +5,14 @@
 
 #include "opentelemetry/version.h"
 
-#ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/type_traits.h"
-#else
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2011
+#    include "opentelemetry/std/type_traits.h"
+#    define OPENTELEMETRY_HAVE_STD_TYPE_TRAITS
+#  endif
+#endif
+
+#if !defined(OPENTELEMETRY_HAVE_STD_TYPE_TRAITS)
 #  include <array>
 #  include <type_traits>
 
@@ -156,4 +161,4 @@ struct is_trivially_move_assignable
 #  endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#endif
+#endif /* OPENTELEMETRY_HAVE_STD_TYPE_TRAITS */

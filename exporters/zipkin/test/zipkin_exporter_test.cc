@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef HAVE_CPP_STDLIB
+#ifndef OPENTELEMETRY_STL_VERSION
 
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
@@ -246,4 +246,4 @@ TEST_F(ZipkinExporterTestPeer, ConfigFromEnv)
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif  // HAVE_CPP_STDLIB
+#endif /* OPENTELEMETRY_STL_VERSION */

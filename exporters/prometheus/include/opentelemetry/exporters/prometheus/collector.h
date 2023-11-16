@@ -31,7 +31,7 @@ public:
    * This constructor initializes the collection for metrics to export
    * in this class with default capacity
    */
-  explicit PrometheusCollector(sdk::metrics::MetricReader *reader);
+  explicit PrometheusCollector(sdk::metrics::MetricReader *reader, bool populate_target_info);
 
   /**
    * Collects all metrics data from metricsToCollect collection.
@@ -42,6 +42,7 @@ public:
 
 private:
   sdk::metrics::MetricReader *reader_;
+  bool populate_target_info_;
 
   /*
    * Lock when operating the metricsToCollect collection

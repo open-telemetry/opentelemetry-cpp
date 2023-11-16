@@ -49,7 +49,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_client.h",
-        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_client_options.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
@@ -75,9 +75,11 @@ cc_library(
     srcs = [
         "src/otlp_grpc_exporter.cc",
         "src/otlp_grpc_exporter_factory.cc",
+        "src/otlp_grpc_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_client_options.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
@@ -145,6 +147,7 @@ cc_library(
     srcs = [
         "src/otlp_http_exporter.cc",
         "src/otlp_http_exporter_factory.cc",
+        "src/otlp_http_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
@@ -172,10 +175,11 @@ cc_library(
     srcs = [
         "src/otlp_grpc_metric_exporter.cc",
         "src/otlp_grpc_metric_exporter_factory.cc",
+        "src/otlp_grpc_metric_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
-        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_client_options.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h",
@@ -203,6 +207,7 @@ cc_library(
     srcs = [
         "src/otlp_http_metric_exporter.cc",
         "src/otlp_http_metric_exporter_factory.cc",
+        "src/otlp_http_metric_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
@@ -230,6 +235,7 @@ cc_library(
     srcs = [
         "src/otlp_http_log_record_exporter.cc",
         "src/otlp_http_log_record_exporter_factory.cc",
+        "src/otlp_http_log_record_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
@@ -257,12 +263,14 @@ cc_library(
     srcs = [
         "src/otlp_grpc_log_record_exporter.cc",
         "src/otlp_grpc_log_record_exporter_factory.cc",
+        "src/otlp_grpc_log_record_exporter_options.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
-        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_client_options.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -441,6 +449,22 @@ cc_test(
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
     ]),
+)
+
+cc_test(
+    name = "otlp_grpc_metric_exporter_test",
+    srcs = ["test/otlp_grpc_metric_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_metric_exporter",
+        "//api",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_test(

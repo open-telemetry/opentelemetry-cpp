@@ -51,11 +51,36 @@ if(WITH_ABSEIL)
        "absl_bits" "absl_city")
 endif()
 
-if(WITH_STL)
-  message("Building with standard library types...")
-  target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB)
+if(WITH_STL STREQUAL "OFF")
+  message(STATUS "Building WITH_STL=OFF")
+elseif(WITH_STL STREQUAL "CXX11")
+  message(STATUS "Building WITH_STL=CXX11")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2011)
+elseif(WITH_STL STREQUAL "CXX14")
+  message(STATUS "Building WITH_STL=CXX14")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2014)
+elseif(WITH_STL STREQUAL "CXX17")
+  message(STATUS "Building WITH_STL=CXX17")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2017)
+elseif(WITH_STL STREQUAL "CXX20")
+  message(STATUS "Building WITH_STL=CXX20")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2020)
+elseif(WITH_STL STREQUAL "CXX23")
+  message(STATUS "Building WITH_STL=CXX23")
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2023)
+elseif(WITH_STL STREQUAL "ON")
+  message(STATUS "Building WITH_STL=ON")
+  # "ON" corresponds to "CXX23" at this time.
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_STL_VERSION=2023)
 else()
-  message("Building with nostd types...")
+  message(
+    FATAL_ERROR "WITH_STL must be ON, OFF, CXX11, CXX14, CXX17, CXX20 or CXX23")
 endif()
 
 if(WITH_GSL)
@@ -87,11 +112,6 @@ endif()
 
 if(WITH_ASYNC_EXPORT_PREVIEW)
   target_compile_definitions(opentelemetry_api INTERFACE ENABLE_ASYNC_EXPORT)
-endif()
-
-if(WITH_REMOVE_METER_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_REMOVE_METER_PREVIEW)
 endif()
 
 target_compile_definitions(

@@ -304,8 +304,9 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   auto ctx = meter_context_.lock();
   if (!ctx)
   {
-    OTEL_INTERNAL_LOG_ERROR("[Meter::RegisterMetricStorage] - Error during finding matching views."
-                            << "The metric context is invalid");
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
+        << "The metric context is invalid");
     return nullptr;
   }
   auto view_registry = ctx->GetViewRegistry();
@@ -335,7 +336,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   if (!success)
   {
     OTEL_INTERNAL_LOG_ERROR(
-        "[Meter::RegisterMetricStorage] - Error during finding matching views."
+        "[Meter::RegisterSyncMetricStorage] - Error during finding matching views."
         << "Some of the matching view configurations mayn't be used for metric collection");
   }
   return storages;
@@ -368,7 +369,8 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
           view_instr_desc.description_ = view.GetDescription();
         }
         auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), view.GetAggregationConfig()));
+            view_instr_desc, view.GetAggregationType(), ExemplarReservoir::GetNoExemplarReservoir(),
+            view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
         return true;
