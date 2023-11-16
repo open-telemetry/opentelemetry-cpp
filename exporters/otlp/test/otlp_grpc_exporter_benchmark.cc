@@ -109,20 +109,18 @@ public:
     return grpc::Status::OK;
   }
 
-  grpc::ClientAsyncResponseReaderInterface<
-      proto::collector::trace::v1::ExportTraceServiceResponse> *
-  AsyncExportRaw(grpc::ClientContext *,
-                 const proto::collector::trace::v1::ExportTraceServiceRequest &,
-                 grpc::CompletionQueue *) override
+  grpc::ClientAsyncResponseReaderInterface<proto::collector::trace::v1::ExportTraceServiceResponse>
+      *AsyncExportRaw(grpc::ClientContext *,
+                      const proto::collector::trace::v1::ExportTraceServiceRequest &,
+                      grpc::CompletionQueue *) override
   {
     return nullptr;
   }
 
-  grpc::ClientAsyncResponseReaderInterface<
-      proto::collector::trace::v1::ExportTraceServiceResponse> *
-  PrepareAsyncExportRaw(grpc::ClientContext *,
-                        const proto::collector::trace::v1::ExportTraceServiceRequest &,
-                        grpc::CompletionQueue *) override
+  grpc::ClientAsyncResponseReaderInterface<proto::collector::trace::v1::ExportTraceServiceResponse>
+      *PrepareAsyncExportRaw(grpc::ClientContext *,
+                             const proto::collector::trace::v1::ExportTraceServiceRequest &,
+                             grpc::CompletionQueue *) override
   {
     return nullptr;
   }
