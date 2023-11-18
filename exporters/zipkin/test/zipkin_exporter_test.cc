@@ -176,10 +176,9 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 #  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
       .Times(Exactly(1))
-      .WillOnce(Return(ByMove(std::move( ext::http::client::Result{
+      .WillOnce(Return(ByMove(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
-          ext::http::client::SessionState::Response})) ));
-
+          ext::http::client::SessionState::Response})));
   child_span->End();
   parent_span->End();
 }

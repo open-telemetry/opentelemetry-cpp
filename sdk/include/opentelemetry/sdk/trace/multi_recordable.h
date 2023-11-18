@@ -24,12 +24,9 @@ std::size_t MakeKey(const SpanProcessor &processor)
 
 }  // namespace
 
-class OPENTELEMETRY_SDK_TRACE_EXPORT MultiRecordable : public Recordable
+class MultiRecordable : public Recordable
 {
 public:
-  MultiRecordable() = default;
-  MultiRecordable(MultiRecordable &&) = default;
-
   void AddRecordable(const SpanProcessor &processor,
                      std::unique_ptr<Recordable> recordable) noexcept
   {

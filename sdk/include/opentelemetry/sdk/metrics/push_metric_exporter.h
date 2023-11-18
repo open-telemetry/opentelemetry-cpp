@@ -14,15 +14,14 @@ namespace sdk
 {
 namespace metrics
 {
-
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricData;
-struct OPENTELEMETRY_SDK_METRICS_EXPORT ResourceMetrics;
+class MetricData;
+struct ResourceMetrics;
 
 /**
  * PushMetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.
  */
-class OPENTELEMETRY_SDK_METRICS_EXPORT PushMetricExporter
+class PushMetricExporter
 {
 public:
   virtual ~PushMetricExporter() = default;

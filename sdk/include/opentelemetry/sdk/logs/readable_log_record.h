@@ -40,7 +40,7 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT ReadableLogRecord : public Recordable
+class OPENTELEMETRY_EXPORT ReadableLogRecord : public Recordable
 {
 public:
   /**

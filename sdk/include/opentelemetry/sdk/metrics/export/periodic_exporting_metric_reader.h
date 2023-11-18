@@ -20,9 +20,9 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT PushMetricExporter;
+class PushMetricExporter;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT PeriodicExportingMetricReader : public MetricReader
+class OPENTELEMETRY_EXPORT PeriodicExportingMetricReader : public MetricReader
 {
 
 public:

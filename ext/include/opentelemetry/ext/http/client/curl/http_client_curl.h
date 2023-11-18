@@ -30,7 +30,7 @@ namespace curl
 
 const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
 
-class OPENTELEMETRY_EXT_HTTP_CLIENT_CURL_EXPORT HttpCurlGlobalInitializer
+class OPENTELEMETRY_EXPORT HttpCurlGlobalInitializer
 {
 private:
   HttpCurlGlobalInitializer(const HttpCurlGlobalInitializer &) = delete;
@@ -150,7 +150,7 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class OPENTELEMETRY_EXT_HTTP_CLIENT_CURL_EXPORT HttpClient;
+class OPENTELEMETRY_EXPORT HttpClient;
 
 class Session : public opentelemetry::ext::http::client::Session,
                 public std::enable_shared_from_this<Session>
@@ -164,8 +164,6 @@ public:
   {
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
-
-  Session(Session &&) = default;
 
   std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
@@ -225,8 +223,6 @@ class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 public:
   HttpClientSync() : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()) {}
 
-  HttpClientSync(HttpClientSync&&) = default;
-  
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
 #ifdef ENABLE_HTTP_SSL_PREVIEW
@@ -299,7 +295,7 @@ private:
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
-class OPENTELEMETRY_EXT_HTTP_CLIENT_CURL_EXPORT HttpClient : public opentelemetry::ext::http::client::HttpClient
+class OPENTELEMETRY_EXPORT HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.

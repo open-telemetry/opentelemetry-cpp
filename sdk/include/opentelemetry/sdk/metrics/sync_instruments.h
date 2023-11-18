@@ -18,9 +18,9 @@ namespace metrics
 {
 
 // forward declaration
-class OPENTELEMETRY_SDK_METRICS_EXPORT SyncWritableMetricStorage;
+class SyncWritableMetricStorage;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT Synchronous
+class Synchronous
 {
 public:
   Synchronous(InstrumentDescriptor instrument_descriptor,
@@ -34,7 +34,7 @@ protected:
 };
 
 template <typename T>
-class /* OPENTELEMETRY_SDK_METRICS_EXPORT */ LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
+class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<T>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
@@ -90,7 +90,7 @@ public:
   }
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
+class OPENTELEMETRY_EXPORT DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
 {
 
 public:
@@ -107,7 +107,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
+class OPENTELEMETRY_EXPORT LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
   LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -123,7 +123,7 @@ public:
   void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
+class OPENTELEMETRY_EXPORT DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
   DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -140,7 +140,7 @@ public:
 };
 
 template <typename T>
-class /* OPENTELEMETRY_SDK_METRICS_EXPORT */ LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
+class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<T>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,
@@ -183,7 +183,7 @@ public:
   }
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
+class OPENTELEMETRY_EXPORT DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
   DoubleHistogram(InstrumentDescriptor instrument_descriptor,

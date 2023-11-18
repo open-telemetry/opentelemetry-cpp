@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 // Try to use either `std::span` or `gsl::span`
 #if defined(OPENTELEMETRY_STL_VERSION)
 #  if OPENTELEMETRY_STL_VERSION >= 2020

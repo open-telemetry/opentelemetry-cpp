@@ -13,7 +13,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT WithTraceSampleFilter final : public ExemplarFilter
+class WithTraceSampleFilter final : public ExemplarFilter
 {
 public:
   bool ShouldSampleMeasurement(int64_t /* value */,

@@ -14,7 +14,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterSelector;
+class MeterSelector;
 
 class OPENTELEMETRY_EXPORT MeterSelectorFactory
 {

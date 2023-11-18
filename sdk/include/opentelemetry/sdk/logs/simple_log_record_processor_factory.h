@@ -18,7 +18,7 @@ class LogRecordProcessor;
 /**
  * Factory class for SimpleLogRecordProcessor.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT SimpleLogRecordProcessorFactory
+class OPENTELEMETRY_EXPORT SimpleLogRecordProcessorFactory
 {
 public:
   /**

@@ -43,9 +43,9 @@ namespace exporter
 namespace etw
 {
 
-class OPENTELEMETRY_EXPORTERS_ETW_EXPORT LoggerProvider;
+class LoggerProvider;
 
-class OPENTELEMETRY_EXPORTERS_ETW_EXPORT LogRecord : public opentelemetry::logs::LogRecord
+class LogRecord : public opentelemetry::logs::LogRecord
 {
 public:
   ~LogRecord() override = default;
@@ -87,18 +87,12 @@ public:
     attributes_map_[static_cast<std::string>(key)] = value;
   }
 
+  void SetEventId(int64_t /* id */, nostd::string_view /* name */) noexcept override {}
+
   const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
       const noexcept
   {
     return attributes_map_;
-  }
-
-  void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override {
-    id_ = id;
-  }
-
-  int64_t GetEventId(void) const noexcept {
-    return id_;
   }
 
   void SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept override
@@ -133,13 +127,12 @@ private:
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;
-  int64_t id_;
 };
 
 /**
  * @brief Logger  class that allows to send logs to ETW Provider.
  */
-class OPENTELEMETRY_EXPORTERS_ETW_EXPORT Logger : public opentelemetry::logs::Logger
+class Logger : public opentelemetry::logs::Logger
 {
 
   /**
@@ -166,7 +159,7 @@ class OPENTELEMETRY_EXPORTERS_ETW_EXPORT Logger : public opentelemetry::logs::Lo
    * @brief ETWProvider is a singleton that aggregates all ETW writes.
    * @return
    */
-  static ETWProvider &etwProvider()
+  static OPENTELEMETRY_EXPORT ETWProvider &etwProvider()
   {
     static ETWProvider instance;  // C++11 magic static
     return instance;
@@ -337,7 +330,7 @@ public:
 /**
  * @brief ETW LoggerProvider
  */
-class OPENTELEMETRY_EXPORTERS_ETW_EXPORT LoggerProvider : public opentelemetry::logs::LoggerProvider
+class LoggerProvider : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

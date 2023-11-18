@@ -29,7 +29,7 @@ class LogRecordProcessor;
 /**
  * Factory class for LoggerProvider.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerProviderFactory
+class OPENTELEMETRY_EXPORT LoggerProviderFactory
 {
 public:
   /**

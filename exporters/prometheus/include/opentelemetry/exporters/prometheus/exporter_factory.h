@@ -14,12 +14,12 @@ namespace exporter
 namespace metrics
 {
 
-struct OPENTELEMETRY_EXPORTERS_PROMETHEUS_EXPORT PrometheusExporterOptions;
+struct PrometheusExporterOptions;
 
 /**
  * Factory class for PrometheusExporter.
  */
-class OPENTELEMETRY_EXPORTERS_PROMETHEUS_EXPORT PrometheusExporterFactory
+class OPENTELEMETRY_EXPORT PrometheusExporterFactory
 {
 public:
   /**

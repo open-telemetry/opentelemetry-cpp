@@ -58,7 +58,7 @@ using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-class OPENTELEMETRY_EXPORTERS_ETW_EXPORT ETWProvider
+class ETWProvider
 {
 
 public:
@@ -605,7 +605,7 @@ public:
     return STATUS_ERROR;
   }
 
-  static const REGHANDLE INVALID_HANDLE = _UI64_MAX;
+  const REGHANDLE INVALID_HANDLE = _UI64_MAX;
 
 protected:
   const unsigned int LargeEventSizeKB = 62;
@@ -616,7 +616,7 @@ protected:
 
   using ProviderMap = std::map<std::string, Handle>;
 
-  ProviderMap &providers()
+  static OPENTELEMETRY_EXPORT ProviderMap &providers()
   {
     static std::map<std::string, Handle> providers;
     return providers;

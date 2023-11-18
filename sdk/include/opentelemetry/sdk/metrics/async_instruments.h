@@ -16,10 +16,10 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT AsyncWritableMetricStorage;
-class OPENTELEMETRY_SDK_METRICS_EXPORT ObservableRegistry;
+class AsyncWritableMetricStorage;
+class ObservableRegistry;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
+class OPENTELEMETRY_EXPORT ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,

@@ -9,7 +9,6 @@
 
 #include <gtest/gtest.h>
 
-
 using namespace opentelemetry;
 
 // Tests that GetCurrent returns the current context

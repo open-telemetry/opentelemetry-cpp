@@ -20,7 +20,7 @@ namespace logs
 /**
  * Factory class for EventLoggerProvider.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT EventLoggerProviderFactory
+class OPENTELEMETRY_EXPORT EventLoggerProviderFactory
 {
 public:
   /**

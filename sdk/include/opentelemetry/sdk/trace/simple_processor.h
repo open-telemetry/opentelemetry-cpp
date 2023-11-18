@@ -29,7 +29,7 @@ namespace trace
  * All calls to the configured SpanExporter are synchronized using a
  * spin-lock on an atomic_flag.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT SimpleSpanProcessor : public SpanProcessor
+class SimpleSpanProcessor : public SpanProcessor
 {
 public:
   /**

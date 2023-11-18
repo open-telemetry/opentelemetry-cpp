@@ -17,7 +17,7 @@ class IdGenerator;
 /**
  * Factory class for RandomIdGenerator.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT RandomIdGeneratorFactory
+class OPENTELEMETRY_EXPORT RandomIdGeneratorFactory
 {
 public:
   /**

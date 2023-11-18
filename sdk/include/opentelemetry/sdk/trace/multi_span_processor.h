@@ -28,7 +28,7 @@ struct MultiSpanProcessorOptions
  * Built-in span processors are responsible for batching and conversion of
  * spans to exportable representation and passing batches to exporters.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT MultiSpanProcessor : public SpanProcessor
+class MultiSpanProcessor : public SpanProcessor
 {
 public:
   MultiSpanProcessor(std::vector<std::unique_ptr<SpanProcessor>> &&processors)

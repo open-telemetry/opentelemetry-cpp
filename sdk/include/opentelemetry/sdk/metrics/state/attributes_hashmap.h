@@ -23,7 +23,7 @@ namespace metrics
 
 using opentelemetry::sdk::common::OrderedAttributeMap;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT AttributeHashGenerator
+class AttributeHashGenerator
 {
 public:
   size_t operator()(const MetricAttributes &attributes) const
@@ -32,7 +32,7 @@ public:
   }
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT AttributesHashMap
+class AttributesHashMap
 {
 public:
   Aggregation *Get(size_t hash) const
@@ -44,9 +44,6 @@ public:
     }
     return nullptr;
   }
-
-  AttributesHashMap() = default;
-  AttributesHashMap(AttributesHashMap &&) = default;
 
   /**
    * @return check if key is present in hash

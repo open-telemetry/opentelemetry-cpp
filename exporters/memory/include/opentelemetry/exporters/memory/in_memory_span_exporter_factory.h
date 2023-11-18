@@ -15,7 +15,7 @@ namespace memory
 /**
  * Factory class for InMemorySpanExporter.
  */
-class OPENTELEMETRY_EXPORTERS_MEMORY_EXPORT InMemorySpanExporterFactory
+class OPENTELEMETRY_EXPORT InMemorySpanExporterFactory
 {
 public:
   /**

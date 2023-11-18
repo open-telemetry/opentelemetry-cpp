@@ -32,7 +32,7 @@ class ExemplarData;
  *
  * <p>This represents a reservoir for a specific "point" of metric data.
  */
-class OPENTELEMETRY_SDK_METRICS_EXPORT ExemplarReservoir
+class OPENTELEMETRY_EXPORT ExemplarReservoir
 {
 public:
   virtual ~ExemplarReservoir() = default;

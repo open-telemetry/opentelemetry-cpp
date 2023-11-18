@@ -17,7 +17,7 @@ namespace sdk
 namespace metrics
 {
 template <class T>
-class OPENTELEMETRY_SDK_METRICS_EXPORT ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
+class ObserverResultT final : public opentelemetry::metrics::ObserverResultT<T>
 {
 public:
   explicit ObserverResultT(const AttributesProcessor *attributes_processor = nullptr)

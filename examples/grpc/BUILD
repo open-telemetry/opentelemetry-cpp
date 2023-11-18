@@ -1,11 +1,11 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+package(default_visibility = ["//visibility:public"])
+
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load ("//:dll_deps.bzl", "dll_deps")
-
-package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "messages_proto",

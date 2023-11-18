@@ -29,7 +29,7 @@ namespace exporter
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORTERS_PROMETHEUS_EXPORT PrometheusExporter : public sdk::metrics::MetricReader
+class OPENTELEMETRY_EXPORT PrometheusExporter : public sdk::metrics::MetricReader
 {
 public:
   /**

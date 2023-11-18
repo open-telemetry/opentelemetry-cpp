@@ -17,7 +17,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT NeverSampleFilter final : public ExemplarFilter
+class NeverSampleFilter final : public ExemplarFilter
 {
 public:
   bool ShouldSampleMeasurement(

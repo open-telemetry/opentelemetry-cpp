@@ -19,7 +19,7 @@ namespace logs
 class Logger;
 class LogRecord;
 
-class OPENTELEMETRY_SDK_LOGS_EXPORT EventLogger final : public opentelemetry::logs::EventLogger
+class OPENTELEMETRY_EXPORT EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:
   /**

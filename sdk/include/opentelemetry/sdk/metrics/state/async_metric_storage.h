@@ -25,7 +25,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
+class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,

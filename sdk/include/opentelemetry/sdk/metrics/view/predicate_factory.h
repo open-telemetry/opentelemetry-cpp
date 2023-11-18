@@ -21,7 +21,7 @@ enum class PredicateType : uint8_t
   kExact
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT PredicateFactory
+class PredicateFactory
 {
 public:
   static std::unique_ptr<Predicate> GetPredicate(opentelemetry::nostd::string_view pattern,

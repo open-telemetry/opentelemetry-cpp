@@ -27,8 +27,6 @@ public:
   SpanExporter();
   virtual ~SpanExporter();
 
-  SpanExporter(SpanExporter &&) = delete;
-
   /**
    * Create a span recordable. This object will be used to record span data and
    * will subsequently be passed to SpanExporter::Export. Vendors can implement

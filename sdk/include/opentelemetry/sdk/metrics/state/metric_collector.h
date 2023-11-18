@@ -16,10 +16,10 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricReader;
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterContext;
+class MetricReader;
+class MeterContext;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT CollectorHandle
+class CollectorHandle
 {
 public:
   CollectorHandle()          = default;
@@ -35,7 +35,7 @@ public:
  * state for each MetricReader.
  */
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricCollector : public MetricProducer, public CollectorHandle
+class OPENTELEMETRY_EXPORT MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
   MetricCollector(MeterContext *context, std::shared_ptr<MetricReader> metric_reader);

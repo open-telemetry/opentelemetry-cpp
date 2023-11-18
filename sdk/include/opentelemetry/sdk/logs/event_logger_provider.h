@@ -20,7 +20,7 @@ namespace logs
 class EventLogger;
 class Logger;
 
-class OPENTELEMETRY_SDK_LOGS_EXPORT EventLoggerProvider final : public opentelemetry::logs::EventLoggerProvider
+class OPENTELEMETRY_EXPORT EventLoggerProvider final : public opentelemetry::logs::EventLoggerProvider
 {
 public:
   EventLoggerProvider() noexcept;

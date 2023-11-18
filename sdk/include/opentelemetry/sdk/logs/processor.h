@@ -19,7 +19,7 @@ class Recordable;
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT LogRecordProcessor
+class LogRecordProcessor
 {
 public:
   virtual ~LogRecordProcessor() = default;

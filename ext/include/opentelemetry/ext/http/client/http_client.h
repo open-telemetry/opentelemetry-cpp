@@ -306,7 +306,6 @@ public:
   Result(std::unique_ptr<Response> res, SessionState session_state)
       : response_(std::move(res)), session_state_(session_state)
   {}
-  Result(Result&& other) = default;
 
   operator bool() const { return session_state_ == SessionState::Response; }
   Response &GetResponse()

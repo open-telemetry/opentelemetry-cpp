@@ -17,14 +17,14 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT Predicate
+class Predicate
 {
 public:
   virtual ~Predicate()                                                        = default;
   virtual bool Match(opentelemetry::nostd::string_view string) const noexcept = 0;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT PatternPredicate : public Predicate
+class PatternPredicate : public Predicate
 {
 public:
   PatternPredicate(opentelemetry::nostd::string_view pattern) : reg_key_{pattern.data()} {}
@@ -48,7 +48,7 @@ private:
 #endif
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT ExactPredicate : public Predicate
+class ExactPredicate : public Predicate
 {
 public:
   ExactPredicate(opentelemetry::nostd::string_view pattern) : pattern_{pattern} {}
@@ -65,12 +65,12 @@ private:
   std::string pattern_;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MatchEverythingPattern : public Predicate
+class MatchEverythingPattern : public Predicate
 {
   bool Match(opentelemetry::nostd::string_view /* str */) const noexcept override { return true; }
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MatchNothingPattern : public Predicate
+class MatchNothingPattern : public Predicate
 {
   bool Match(opentelemetry::nostd::string_view /* str */) const noexcept override { return false; }
 };

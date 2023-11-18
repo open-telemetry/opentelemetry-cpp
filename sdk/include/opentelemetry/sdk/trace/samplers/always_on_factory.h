@@ -17,7 +17,7 @@ class Sampler;
 /**
  * Factory class for AlwaysOnSampler.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT AlwaysOnSamplerFactory
+class OPENTELEMETRY_EXPORT AlwaysOnSamplerFactory
 {
 public:
   /**

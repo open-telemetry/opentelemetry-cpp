@@ -21,23 +21,15 @@ using PointAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 using PointType       = opentelemetry::nostd::
     variant<SumPointData, HistogramPointData, LastValuePointData, DropPointData>;
 
-struct OPENTELEMETRY_SDK_METRICS_EXPORT PointDataAttributes
+struct PointDataAttributes
 {
-        PointDataAttributes(PointDataAttributes &&) = default;
-PointDataAttributes &operator=(PointDataAttributes &&) = default;
-PointDataAttributes(const PointDataAttributes &)       = default;
-PointDataAttributes()                                 = default;
   PointAttributes attributes;
   PointType point_data;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricData
+class MetricData
 {
 public:
-MetricData(MetricData &&) = default;
-MetricData &operator=(MetricData &&) = default;
-MetricData(const MetricData &)       = default;
-MetricData()                                 = default;
   InstrumentDescriptor instrument_descriptor;
   AggregationTemporality aggregation_temporality;
   opentelemetry::common::SystemTimestamp start_ts;

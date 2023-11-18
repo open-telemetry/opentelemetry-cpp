@@ -28,7 +28,7 @@ using std::chrono::microseconds;
  * creation other than by calling the static function Initialize(). This follows the
  * meyers singleton pattern and only a single instance of the class is allowed.
  */
-class OPENTELEMETRY_EXT_ZPAGES_EXPORT ZPages
+class ZPages
 {
 public:
   /**
@@ -45,7 +45,7 @@ public:
    * Note: This will instantiate the Tracez instance and webserver if it hasn't already been
    * instantiated.
    */
-  static ZPages &Instance()
+  static OPENTELEMETRY_EXPORT ZPages &Instance()
   {
     static ZPages instance;
     return instance;

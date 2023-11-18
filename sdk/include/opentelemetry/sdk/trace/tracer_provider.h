@@ -22,11 +22,11 @@ namespace sdk
 {
 namespace trace
 {
-class OPENTELEMETRY_SDK_TRACE_EXPORT SpanProcessor;
-class OPENTELEMETRY_SDK_TRACE_EXPORT Tracer;
-class OPENTELEMETRY_SDK_TRACE_EXPORT TracerContext;
+class SpanProcessor;
+class Tracer;
+class TracerContext;
 
-class OPENTELEMETRY_SDK_TRACE_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**

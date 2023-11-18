@@ -23,7 +23,7 @@ struct ResourceMetrics;
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricReader
+class OPENTELEMETRY_EXPORT MetricReader
 {
 public:
   MetricReader();

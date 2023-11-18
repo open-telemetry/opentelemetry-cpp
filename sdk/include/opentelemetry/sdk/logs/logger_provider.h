@@ -22,11 +22,11 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_SDK_LOGS_EXPORT Logger;
-class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerContext;
-class OPENTELEMETRY_SDK_LOGS_EXPORT LogRecordProcessor;
+class Logger;
+class LoggerContext;
+class LogRecordProcessor;
 
-class OPENTELEMETRY_SDK_LOGS_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
+class OPENTELEMETRY_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

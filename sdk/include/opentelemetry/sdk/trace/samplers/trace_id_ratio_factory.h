@@ -17,7 +17,7 @@ class Sampler;
 /**
  * Factory class for TraceIdRatioBasedSampler.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT TraceIdRatioBasedSamplerFactory
+class OPENTELEMETRY_EXPORT TraceIdRatioBasedSamplerFactory
 {
 public:
   /**

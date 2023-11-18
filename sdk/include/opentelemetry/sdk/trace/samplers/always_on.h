@@ -28,7 +28,7 @@ namespace trace
 /**
  * The always on sampler is a default sampler which always return Decision::RECORD_AND_SAMPLE
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT AlwaysOnSampler : public Sampler
+class AlwaysOnSampler : public Sampler
 {
 public:
   /**

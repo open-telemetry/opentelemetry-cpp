@@ -14,7 +14,7 @@ namespace zipkin
 {
 using ZipkinSpan = nlohmann::json;
 
-class OPENTELEMETRY_EXPORTERS_ZIPKIN_EXPORT Recordable final : public sdk::trace::Recordable
+class OPENTELEMETRY_EXPORT Recordable final : public sdk::trace::Recordable
 {
 public:
   const ZipkinSpan &span() const noexcept { return span_; }

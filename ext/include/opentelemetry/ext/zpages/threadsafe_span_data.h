@@ -25,7 +25,7 @@ namespace zpages
 /**
  * This class is a threadsafe version of span data used for zpages in OT
  */
-class OPENTELEMETRY_EXT_ZPAGES_EXPORT ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable
+class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable
 {
 public:
   /**

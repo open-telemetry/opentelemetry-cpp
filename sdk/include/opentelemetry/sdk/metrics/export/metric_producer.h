@@ -15,12 +15,12 @@ namespace sdk
 {
 namespace resource
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT Resource;
+class Resource;
 }  // namespace resource
 
 namespace instrumentationscope
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT InstrumentationScope;
+class InstrumentationScope;
 }  // namespace instrumentationscope
 
 namespace metrics
@@ -30,13 +30,8 @@ namespace metrics
  * Metric Data to be exported along with resources and
  * Instrumentation scope.
  */
-struct OPENTELEMETRY_SDK_METRICS_EXPORT ScopeMetrics
+struct ScopeMetrics
 {
-    ScopeMetrics(ScopeMetrics &&) = default;
-    ScopeMetrics &operator=(ScopeMetrics &&) = default;
-    ScopeMetrics(const ScopeMetrics &)       = default;
-    ScopeMetrics()                                 = default;
-
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope_ = nullptr;
   std::vector<MetricData> metric_data_;
 
@@ -54,13 +49,8 @@ struct OPENTELEMETRY_SDK_METRICS_EXPORT ScopeMetrics
   inline ScopeMetrics &operator=(ScopeMetrics &&) = default;
 };
 
-struct OPENTELEMETRY_SDK_METRICS_EXPORT ResourceMetrics
+struct ResourceMetrics
 {
-    ResourceMetrics(ResourceMetrics &&) = default;
-    ResourceMetrics &operator=(ResourceMetrics &&) = default;
-    ResourceMetrics(const ResourceMetrics &)       = default;
-    ResourceMetrics()                                 = default;
-
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   std::vector<ScopeMetrics> scope_metric_data_;
 
@@ -87,7 +77,7 @@ struct OPENTELEMETRY_SDK_METRICS_EXPORT ResourceMetrics
  * <p>Implementations must be thread-safe.
  */
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricProducer
+class MetricProducer
 {
 public:
   MetricProducer()          = default;

@@ -15,8 +15,8 @@ namespace metrics
 {
 
 // forward declaration
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterContext;
-class OPENTELEMETRY_SDK_METRICS_EXPORT ViewRegistry;
+class MeterContext;
+class ViewRegistry;
 
 /**
  * Factory class for MeterContext.

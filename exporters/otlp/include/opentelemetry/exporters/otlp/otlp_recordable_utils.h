@@ -26,7 +26,7 @@ namespace otlp
 /**
  * The OtlpRecordableUtils contains utility functions for OTLP recordable
  */
-class OPENTELEMETRY_EXPORTERS_OTLP_EXPORT OtlpRecordableUtils
+class OPENTELEMETRY_EXPORT OtlpRecordableUtils
 {
 public:
   static void PopulateRequest(

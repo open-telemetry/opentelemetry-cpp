@@ -26,9 +26,9 @@ namespace metrics
 {
 
 // forward declaration
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterContext;
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricCollector;
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricReader;
+class MeterContext;
+class MetricCollector;
+class MetricReader;
 
 class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::MeterProvider
 {

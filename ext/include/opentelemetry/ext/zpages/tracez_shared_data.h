@@ -23,7 +23,7 @@ namespace zpages
  * The span processor passes and stores running and completed recordables (casted as span_data)
  * to be used by the TraceZ Data Aggregator.
  */
-class OPENTELEMETRY_EXT_ZPAGES_EXPORT TracezSharedData
+class OPENTELEMETRY_EXPORT TracezSharedData
 {
 public:
   struct CollectedSpans

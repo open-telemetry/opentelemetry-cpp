@@ -18,7 +18,7 @@ namespace ext
 namespace zpages
 {
 
-class OPENTELEMETRY_EXT_ZPAGES_EXPORT zPagesHttpServer : public HTTP_SERVER_NS::HttpServer
+class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer
 {
 protected:
   /**

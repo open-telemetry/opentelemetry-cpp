@@ -23,7 +23,7 @@ namespace otlp
 /**
  * The OtlpCommoneUtils contains utility functions to populate attributes
  */
-class OPENTELEMETRY_EXPORTERS_OTLP_EXPORT OtlpPopulateAttributeUtils
+class OPENTELEMETRY_EXPORT OtlpPopulateAttributeUtils
 {
 
 public:

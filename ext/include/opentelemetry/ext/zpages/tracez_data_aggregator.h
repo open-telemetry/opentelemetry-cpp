@@ -40,7 +40,7 @@ namespace zpages
  * TODO: Consider a singleton pattern for this class, not sure if multiple
  * instances of this class should exist.
  */
-class OPENTELEMETRY_EXT_ZPAGES_EXPORT TracezDataAggregator
+class OPENTELEMETRY_EXPORT TracezDataAggregator
 {
 public:
   /**

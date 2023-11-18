@@ -20,7 +20,7 @@ class MeterProvider;
 /**
  * Stores the singleton global MeterProvider.
  */
-class OPENTELEMETRY_API_EXPORT Provider
+class Provider
 {
 public:
   /**
@@ -45,13 +45,13 @@ public:
   }
 
 private:
-  static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
     return provider;
   }
 
-  static common::SpinLockMutex &GetLock() noexcept
+  OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
     static common::SpinLockMutex lock;
     return lock;

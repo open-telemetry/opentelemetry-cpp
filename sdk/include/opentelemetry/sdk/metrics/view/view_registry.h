@@ -34,7 +34,7 @@ struct RegisteredView
   std::unique_ptr<opentelemetry::sdk::metrics::View> view_;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT ViewRegistry
+class ViewRegistry
 {
 public:
   void AddView(std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> instrument_selector,
@@ -47,9 +47,6 @@ public:
         std::move(instrument_selector), std::move(meter_selector), std::move(view)});
     registered_views_.push_back(std::move(registered_view));
   }
-
-  ViewRegistry() = default;
-  ViewRegistry(ViewRegistry &&) = default;
 
   bool FindViews(
       const opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
@@ -81,6 +78,7 @@ public:
     return true;
   }
 
+  ViewRegistry()  = default;
   ~ViewRegistry() = default;
 
 private:

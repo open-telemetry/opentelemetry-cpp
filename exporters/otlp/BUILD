@@ -6,7 +6,6 @@ load("//:dll_deps.bzl", "dll_deps")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_library(
     name = "otlp_recordable",
     srcs = [
@@ -300,6 +299,8 @@ cc_test(
         ":otlp_recordable",
         "@com_google_googletest//:gtest_main",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        # For gRPC
+        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
     ]),
 )
 
@@ -544,6 +545,6 @@ cc_library(
 
 # This is used for otel_sdk.zip packaging
 filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )

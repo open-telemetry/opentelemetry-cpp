@@ -19,7 +19,7 @@ namespace logs
 {
 class LogRecordProcessor;
 
-class OPENTELEMETRY_SDK_LOGS_EXPORT MultiRecordable final : public Recordable
+class OPENTELEMETRY_EXPORT MultiRecordable final : public Recordable
 {
 public:
   MultiRecordable() = default;

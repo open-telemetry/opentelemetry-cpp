@@ -14,7 +14,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT MeterSelector
+class MeterSelector
 {
 public:
   MeterSelector(const std::string &name, const std::string &version, const std::string &schema)

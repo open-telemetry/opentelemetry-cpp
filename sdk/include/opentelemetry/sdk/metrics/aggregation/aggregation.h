@@ -13,7 +13,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT Aggregation
+class Aggregation
 {
 public:
   virtual void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept = 0;

@@ -180,9 +180,9 @@ alias(
     name = otel_sdk_binary + "_dll",
     # These have to be propagate to users of the dll library
     defines = [
-        "ENABLE_TEST=1",
         "OPENTELEMETRY_DLL=1",
-        "HAVE_CPP_STDLIB=1",
+        "OPENTELEMETRY_ABI_VERSON_NO=2",
+        "OPENTELEMETRY_STL_VERSION=2017",
     ],
     implementation_deps = [
         otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files

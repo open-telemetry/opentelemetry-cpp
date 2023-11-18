@@ -13,7 +13,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT InstrumentSelector;
+class InstrumentSelector;
 
 class OPENTELEMETRY_EXPORT InstrumentSelectorFactory
 {

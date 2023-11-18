@@ -24,7 +24,7 @@ using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
  * attribute(s) are to be reported as metrics dimension(s).
  */
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT AttributesProcessor
+class AttributesProcessor
 {
 public:
   // Process the metric instrument attributes.
@@ -43,7 +43,7 @@ public:
  * any modification.
  */
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT DefaultAttributesProcessor : public AttributesProcessor
+class DefaultAttributesProcessor : public AttributesProcessor
 {
 public:
   MetricAttributes process(
@@ -61,7 +61,7 @@ public:
  * that are not in the allow list.
  */
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT FilteringAttributesProcessor : public AttributesProcessor
+class FilteringAttributesProcessor : public AttributesProcessor
 {
 public:
   FilteringAttributesProcessor(

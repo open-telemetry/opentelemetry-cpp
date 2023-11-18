@@ -19,7 +19,7 @@ namespace trace
  * The always off sampler always returns DROP, effectively disabling
  * tracing functionality.
  */
-class OPENTELEMETRY_SDK_TRACE_EXPORT AlwaysOffSampler : public Sampler
+class AlwaysOffSampler : public Sampler
 {
 public:
   /**

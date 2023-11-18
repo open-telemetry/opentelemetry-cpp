@@ -23,7 +23,7 @@ class Recordable;
  * Built-in log processors are responsible for batching and conversion of
  * logs to exportable representation and passing batches to exporters.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT MultiLogRecordProcessor : public LogRecordProcessor
+class OPENTELEMETRY_EXPORT MultiLogRecordProcessor : public LogRecordProcessor
 {
 public:
   MultiLogRecordProcessor(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);

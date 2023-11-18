@@ -31,9 +31,9 @@ namespace metrics
 {
 
 /* Represent the storage from which to collect the metrics */
-class OPENTELEMETRY_SDK_METRICS_EXPORT CollectorHandle;
+class CollectorHandle;
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT MetricStorage
+class MetricStorage
 {
 public:
   MetricStorage()          = default;
@@ -48,7 +48,7 @@ public:
 };
 
 /* Represents the sync metric storage */
-class OPENTELEMETRY_SDK_METRICS_EXPORT SyncWritableMetricStorage
+class SyncWritableMetricStorage
 {
 public:
   virtual void RecordLong(int64_t value,
@@ -69,7 +69,7 @@ public:
 };
 
 /* Represents the async metric stroage */
-class OPENTELEMETRY_SDK_METRICS_EXPORT AsyncWritableMetricStorage
+class AsyncWritableMetricStorage
 {
 public:
   AsyncWritableMetricStorage()          = default;
@@ -85,7 +85,7 @@ public:
       opentelemetry::common::SystemTimestamp observation_time) noexcept = 0;
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT NoopMetricStorage : public MetricStorage
+class NoopMetricStorage : public MetricStorage
 {
 public:
   bool Collect(CollectorHandle * /* collector */,
@@ -99,7 +99,7 @@ public:
   }
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT NoopWritableMetricStorage : public SyncWritableMetricStorage
+class NoopWritableMetricStorage : public SyncWritableMetricStorage
 {
 public:
   void RecordLong(int64_t value,
@@ -120,7 +120,7 @@ public:
   {}
 };
 
-class OPENTELEMETRY_SDK_METRICS_EXPORT NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
+class NoopAsyncWritableMetricStorage : public AsyncWritableMetricStorage
 {
 public:
   void RecordLong(const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator>

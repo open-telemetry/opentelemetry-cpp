@@ -16,9 +16,9 @@ cc_library(
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
         "//:with_dll_enabled": [
-            "ENABLE_TEST=1",
             "OPENTELEMETRY_DLL=1",
-            "HAVE_CPP_STDLIB=1",
+            "OPENTELEMETRY_ABI_VERSON_NO=2",
+            "OPENTELEMETRY_STL_VERSION=2017",
             "OPENTELEMETRY_DLL_EXPORT=__declspec(dllexport)",
         ],
         "//conditions:default": [],

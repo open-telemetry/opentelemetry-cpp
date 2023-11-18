@@ -18,7 +18,7 @@ class LogRecordProcessor;
 /**
  * Factory class for MultiLogRecordProcessor.
  */
-class OPENTELEMETRY_SDK_LOGS_EXPORT MultiLogRecordProcessorFactory
+class OPENTELEMETRY_EXPORT MultiLogRecordProcessorFactory
 {
 public:
   static std::unique_ptr<LogRecordProcessor> Create(

@@ -25,7 +25,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_SDK_METRICS_EXPORT FilteredExemplarReservoir final : public ExemplarReservoir
+class FilteredExemplarReservoir final : public ExemplarReservoir
 {
 
 public:

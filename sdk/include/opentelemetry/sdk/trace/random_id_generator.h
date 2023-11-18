@@ -12,7 +12,7 @@ namespace sdk
 namespace trace
 {
 
-class OPENTELEMETRY_SDK_TRACE_EXPORT RandomIdGenerator : public IdGenerator
+class OPENTELEMETRY_EXPORT RandomIdGenerator : public IdGenerator
 {
 public:
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override;
