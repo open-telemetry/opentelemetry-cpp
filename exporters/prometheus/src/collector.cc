@@ -17,7 +17,10 @@ namespace metrics
  * This constructor initializes the collection for metrics to export
  * in this class with default capacity
  */
-PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader) : reader_(reader) {}
+PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader,
+                                         bool populate_target_info)
+    : reader_(reader), populate_target_info_(populate_target_info)
+{}
 
 /**
  * Collects all metrics data from metricsToCollect collection.
@@ -36,8 +39,10 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
   collection_lock_.lock();
 
   std::vector<prometheus_client::MetricFamily> result;
-  reader_->Collect([&result](sdk::metrics::ResourceMetrics &metric_data) {
-    auto prometheus_metric_data = PrometheusExporterUtils::TranslateToPrometheus(metric_data);
+
+  reader_->Collect([&result, this](sdk::metrics::ResourceMetrics &metric_data) {
+    auto prometheus_metric_data =
+        PrometheusExporterUtils::TranslateToPrometheus(metric_data, this->populate_target_info_);
     for (auto &data : prometheus_metric_data)
       result.emplace_back(data.second);
     return true;

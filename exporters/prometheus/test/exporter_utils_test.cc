@@ -11,7 +11,6 @@
 
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
-namespace metric_api        = opentelemetry::metrics;
 namespace prometheus_client = ::prometheus;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -66,12 +65,18 @@ void assert_basic(prometheus_client::MetricFamily &metric,
                   const std::string &expected_name,
                   const std::string &description,
                   prometheus_client::MetricType type,
-                  int label_num,
+                  size_t label_num,
                   std::vector<T> vals)
 {
   ASSERT_EQ(metric.name, expected_name);  // name sanitized
   ASSERT_EQ(metric.help, description);    // description not changed
   ASSERT_EQ(metric.type, type);           // type translated
+
+  // Prometheus metric data points should not have explicit timestamps
+  for (const prometheus::ClientMetric &cm : metric.metric)
+  {
+    ASSERT_EQ(cm.timestamp_ms, 0);
+  }
 
   auto metric_data = metric.metric[0];
   ASSERT_EQ(metric_data.label.size(), label_num);
@@ -294,14 +299,122 @@ TEST_F(SanitizeTest, Label)
   CheckSanitizeLabel("name?__name:", "name_name_");
 }
 
-TEST(PrometheusExporterUtils, SanitizeName)
+class SanitizeTest : public ::testing::Test
 {
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name"), "name");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name???"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__"), "name_");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name"), "name_name");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::sanitize("name?__name:"), "name_name:");
+  Resource resource_ = Resource::Create({});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+
+protected:
+  void CheckSanitizeName(const std::string &original, const std::string &sanitized)
+  {
+    metric_sdk::InstrumentDescriptor instrument_descriptor{
+        original, "description", "unit", metric_sdk::InstrumentType::kCounter,
+        metric_sdk::InstrumentValueType::kDouble};
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {{instrument_descriptor, {}, {}, {}, {{{}, {}}}}}}}}},
+        false);
+    EXPECT_EQ(result.begin()->name, sanitized + "_unit");
+  }
+
+  void CheckSanitizeLabel(const std::string &original, const std::string &sanitized)
+  {
+    metric_sdk::InstrumentDescriptor instrument_descriptor{
+        "name", "description", "unit", metric_sdk::InstrumentType::kCounter,
+        metric_sdk::InstrumentValueType::kDouble};
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor, {}, {}, {}, {{{{original, "value"}}, {}}}}}}}},
+        false);
+    EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
+  }
+};
+
+TEST_F(SanitizeTest, Name)
+{
+  CheckSanitizeName("name", "name");
+  CheckSanitizeName("name?", "name_");
+  CheckSanitizeName("name???", "name_");
+  CheckSanitizeName("name?__", "name_");
+  CheckSanitizeName("name?__name", "name_name");
+  CheckSanitizeName("name?__name:", "name_name:");
+}
+
+TEST_F(SanitizeTest, Label)
+{
+  CheckSanitizeLabel("name", "name");
+  CheckSanitizeLabel("name?", "name_");
+  CheckSanitizeLabel("name???", "name_");
+  CheckSanitizeLabel("name?__", "name_");
+  CheckSanitizeLabel("name?__name", "name_name");
+  CheckSanitizeLabel("name?__name:", "name_name_");
+}
+
+class AttributeCollisionTest : public ::testing::Test
+{
+  Resource resource_ = Resource::Create(ResourceAttributes{});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+  metric_sdk::InstrumentDescriptor instrument_descriptor_{"library_name", "description", "unit",
+                                                          metric_sdk::InstrumentType::kCounter,
+                                                          metric_sdk::InstrumentValueType::kDouble};
+
+protected:
+  void CheckTranslation(const metric_sdk::PointAttributes &attrs,
+                        const std::vector<prometheus::ClientMetric::Label> &expected)
+  {
+    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}},
+        false);
+    for (auto &expected_kv : expected)
+    {
+      bool found = false;
+      for (auto &found_kv : result.begin()->metric.begin()->label)
+      {
+        if (found_kv.name == expected_kv.name)
+        {
+          EXPECT_EQ(found_kv.value, expected_kv.value);
+          found = true;
+        }
+      }
+      EXPECT_TRUE(found);
+    }
+  }
+};
+
+TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}}, {{"foo_a", "value1"},
+                                                                {"foo_b", "value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
+}
+
+TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}}, {{"foo_a", "value1;value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
+}
+
+TEST_F(AttributeCollisionTest, DropsInvertedKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
+                   {{"foo_a", "value1"},
+                    {"foo_b", "value2"},
+                    {"otel_scope_name", "library_name"},
+                    {"otel_scope_version", "1.2.0"}});
 }
 
 TEST(PrometheusExporterUtils, PrometheusUnit)

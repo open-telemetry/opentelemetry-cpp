@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,7 +27,7 @@ public:
    * Create a OtlpGrpcLogRecordExporter.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
-      const OtlpGrpcExporterOptions &options);
+      const OtlpGrpcLogRecordExporterOptions &options);
 };
 
 }  // namespace otlp

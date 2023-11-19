@@ -3,9 +3,14 @@
 
 #pragma once
 
-#ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/string_view.h"
-#else
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION >= 2017
+#    include "opentelemetry/std/string_view.h"
+#    define OPENTELEMETRY_HAVE_STD_STRING_VIEW
+#  endif
+#endif
+
+#if !defined(OPENTELEMETRY_HAVE_STD_STRING_VIEW)
 #  include <algorithm>
 #  include <cstddef>
 #  include <cstring>
@@ -216,4 +221,4 @@ struct hash<OPENTELEMETRY_NAMESPACE::nostd::string_view>
   }
 };
 }  // namespace std
-#endif
+#endif /* OPENTELEMETRY_HAVE_STD_STRING_VIEW */

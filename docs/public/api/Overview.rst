@@ -15,7 +15,7 @@ Library design
 --------------
 
 The OpenTelemetry C++ API is provided as a header-only library and
-supports all recent versions of the C++ standard, down to C++11.
+supports all recent versions of the C++ standard, down to C++14.
 
 A single application might dynamically or statically link to different
 libraries that were compiled with different compilers, while several of

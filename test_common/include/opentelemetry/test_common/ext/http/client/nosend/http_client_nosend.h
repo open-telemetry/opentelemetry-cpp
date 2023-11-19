@@ -3,17 +3,16 @@
 
 #pragma once
 
-#ifdef ENABLE_TEST
-#  include "opentelemetry/ext/http/client/http_client.h"
-#  include "opentelemetry/ext/http/common/url_parser.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/version.h"
 
-#  include <map>
-#  include <string>
-#  include <vector>
+#include <map>
+#include <string>
+#include <vector>
 
-#  include <gtest/gtest.h>
-#  include "gmock/gmock.h"
+#include <gtest/gtest.h>
+#include "gmock/gmock.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -37,12 +36,12 @@ public:
     method_ = method;
   }
 
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
+#ifdef ENABLE_HTTP_SSL_PREVIEW
   void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
   {
     ssl_options_ = ssl_options;
   }
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
@@ -66,9 +65,9 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
+#ifdef ENABLE_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
+#endif /* ENABLE_HTTP_SSL_PREVIEW */
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
@@ -186,4 +185,3 @@ public:
 }  // namespace http
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
-#endif

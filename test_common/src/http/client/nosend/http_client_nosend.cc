@@ -1,8 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_TEST
-#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -96,4 +95,3 @@ void HttpClient::CleanupSession(uint64_t /* session_id */) {}
 }  // namespace http
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
-#endif

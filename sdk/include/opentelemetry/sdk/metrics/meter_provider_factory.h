@@ -56,7 +56,7 @@ namespace metrics
   even if this forces, temporarily, existing applications to use a downcast.
 */
 
-class MeterProviderFactory
+class OPENTELEMETRY_EXPORT MeterProviderFactory
 {
 public:
   static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create();
