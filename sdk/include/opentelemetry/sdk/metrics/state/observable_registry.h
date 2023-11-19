@@ -35,6 +35,8 @@ public:
                       void *state,
                       opentelemetry::metrics::ObservableInstrument *instrument);
 
+  void CleanupCallback(opentelemetry::metrics::ObservableInstrument *instrument);
+
   void Observe(opentelemetry::common::SystemTimestamp collection_ts);
 
 private:

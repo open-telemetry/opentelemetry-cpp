@@ -53,17 +53,29 @@ TracerProvider::~TracerProvider()
   }
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
-    nostd::string_view library_name,
-    nostd::string_view library_version,
+    nostd::string_view name,
+    nostd::string_view version,
+    nostd::string_view schema_url,
+    const opentelemetry::common::KeyValueIterable *attributes) noexcept
+#else
+nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
+    nostd::string_view name,
+    nostd::string_view version,
     nostd::string_view schema_url) noexcept
+#endif
 {
-  if (library_name.data() == nullptr)
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  const opentelemetry::common::KeyValueIterable *attributes = nullptr;
+#endif
+
+  if (name.data() == nullptr)
   {
     OTEL_INTERNAL_LOG_ERROR("[TracerProvider::GetTracer] Library name is null.");
-    library_name = "";
+    name = "";
   }
-  else if (library_name == "")
+  else if (name == "")
   {
     OTEL_INTERNAL_LOG_ERROR("[TracerProvider::GetTracer] Library name is empty.");
   }
@@ -72,17 +84,20 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
 
   for (auto &tracer : tracers_)
   {
-    auto &tracer_lib = tracer->GetInstrumentationScope();
-    if (tracer_lib.equal(library_name, library_version, schema_url))
+    auto &tracer_scope = tracer->GetInstrumentationScope();
+    if (tracer_scope.equal(name, version, schema_url))
     {
       return nostd::shared_ptr<trace_api::Tracer>{tracer};
     }
   }
 
-  auto lib = InstrumentationScope::Create(library_name, library_version, schema_url);
-  tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
-      new sdk::trace::Tracer(context_, std::move(lib))));
-  return nostd::shared_ptr<trace_api::Tracer>{tracers_.back()};
+  instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
+  auto scope =
+      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
+
+  auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope)));
+  tracers_.push_back(tracer);
+  return nostd::shared_ptr<trace_api::Tracer>{tracer};
 }
 
 void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept

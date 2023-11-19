@@ -26,20 +26,24 @@ public:
    * to Prometheus metrics data collection
    *
    * @param records a collection of metrics in OpenTelemetry
+   * @param populate_target_info whether to populate target_info
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
-      const sdk::metrics::ResourceMetrics &data);
+      const sdk::metrics::ResourceMetrics &data,
+      bool populate_target_info = true);
 
 private:
   /**
-   * Sanitize the given metric name or label according to Prometheus rule.
+   * Append key-value pair to prometheus labels.
    *
-   * This function is needed because names in OpenTelemetry can contain
-   * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
-   * name should only contain alphanumeric characters and '_'.
+   * @param name label name
+   * @param value label value
+   * @param labels target labels
    */
-  static std::string SanitizeNames(std::string name);
+  static void AddPrometheusLabel(std::string name,
+                                 std::string value,
+                                 std::vector<::prometheus::ClientMetric::Label> *labels);
 
   static opentelemetry::sdk::metrics::AggregationType getAggregationType(
       const opentelemetry::sdk::metrics::PointType &point_type);
@@ -51,15 +55,23 @@ private:
                                                 bool is_monotonic = true);
 
   /**
+   * Add a target_info metric to collect resource attributes
+   */
+  static void SetTarget(const sdk::metrics::ResourceMetrics &data,
+                        const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+                        std::vector<::prometheus::MetricFamily> *output);
+
+  /**
    * Set metric data for:
    * Counter => Prometheus Counter
    */
   template <typename T>
   static void SetData(std::vector<T> values,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
                       ::prometheus::MetricType type,
-                      std::chrono::nanoseconds time,
-                      ::prometheus::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family,
+                      const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Set metric data for:
@@ -70,15 +82,18 @@ private:
                       const std::vector<double> &boundaries,
                       const std::vector<uint64_t> &counts,
                       const opentelemetry::sdk::metrics::PointAttributes &labels,
-                      std::chrono::nanoseconds time,
-                      ::prometheus::MetricFamily *metric_family);
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+                      ::prometheus::MetricFamily *metric_family,
+                      const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Set time and labels to metric data
    */
-  static void SetMetricBasic(::prometheus::ClientMetric &metric,
-                             std::chrono::nanoseconds time,
-                             const opentelemetry::sdk::metrics::PointAttributes &labels);
+  static void SetMetricBasic(
+      ::prometheus::ClientMetric &metric,
+      const opentelemetry::sdk::metrics::PointAttributes &labels,
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+      const opentelemetry::sdk::resource::Resource *resource);
 
   /**
    * Convert attribute value to string
@@ -107,9 +122,6 @@ private:
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
-
-  // For testing
-  friend class SanitizeNameTester;
 };
 }  // namespace metrics
 }  // namespace exporter

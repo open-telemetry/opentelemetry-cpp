@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -23,6 +23,8 @@ namespace exporter
 namespace otlp
 {
 
+struct OtlpGrpcClientOptions;
+
 /**
  * The OTLP gRPC client contains utility functions of gRPC.
  */
@@ -32,13 +34,13 @@ public:
   /**
    * Create gRPC channel from the exporter options.
    */
-  static std::shared_ptr<grpc::Channel> MakeChannel(const OtlpGrpcExporterOptions &options);
+  static std::shared_ptr<grpc::Channel> MakeChannel(const OtlpGrpcClientOptions &options);
 
   /**
    * Create gRPC client context to call RPC.
    */
   static std::unique_ptr<grpc::ClientContext> MakeClientContext(
-      const OtlpGrpcExporterOptions &options);
+      const OtlpGrpcClientOptions &options);
 
   /**
    * Create gRPC CompletionQueue to async call RPC.
@@ -49,19 +51,19 @@ public:
    * Create trace service stub to communicate with the OpenTelemetry Collector.
    */
   static std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>
-  MakeTraceServiceStub(const OtlpGrpcExporterOptions &options);
+  MakeTraceServiceStub(const OtlpGrpcClientOptions &options);
 
   /**
    * Create metrics service stub to communicate with the OpenTelemetry Collector.
    */
   static std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
-  MakeMetricsServiceStub(const OtlpGrpcExporterOptions &options);
+  MakeMetricsServiceStub(const OtlpGrpcClientOptions &options);
 
   /**
    * Create logs service stub to communicate with the OpenTelemetry Collector.
    */
   static std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
-  MakeLogsServiceStub(const OtlpGrpcExporterOptions &options);
+  MakeLogsServiceStub(const OtlpGrpcClientOptions &options);
 
   static grpc::Status DelegateExport(
       proto::collector::trace::v1::TraceService::StubInterface *stub,

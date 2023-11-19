@@ -63,10 +63,23 @@ public:
 
   ~TracerProvider() override;
 
+  /*
+    Make sure GetTracer() helpers from the API are seen in overload resolution.
+  */
+  using opentelemetry::trace::TracerProvider::GetTracer;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
-      nostd::string_view library_name,
-      nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view name,
+      nostd::string_view version,
+      nostd::string_view schema_url,
+      const opentelemetry::common::KeyValueIterable *attributes) noexcept override;
+#else
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+      nostd::string_view name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") noexcept override;
+#endif
 
   /**
    * Attaches a span processor to list of configured processors for this tracer provider.

@@ -40,6 +40,11 @@ proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
   return proto;
 }
 
+const opentelemetry::sdk::resource::Resource *OtlpRecordable::GetResource() const noexcept
+{
+  return resource_;
+}
+
 const std::string OtlpRecordable::GetResourceSchemaURL() const noexcept
 {
   std::string schema_url;
@@ -49,6 +54,12 @@ const std::string OtlpRecordable::GetResourceSchemaURL() const noexcept
   }
 
   return schema_url;
+}
+
+const opentelemetry::sdk::instrumentationscope::InstrumentationScope *
+OtlpRecordable::GetInstrumentationScope() const noexcept
+{
+  return instrumentation_scope_;
 }
 
 const std::string OtlpRecordable::GetInstrumentationLibrarySchemaURL() const noexcept
