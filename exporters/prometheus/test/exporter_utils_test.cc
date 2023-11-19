@@ -6,6 +6,7 @@
 #include "prometheus/metric_type.h"
 
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "prometheus_test_helper.h"
 
 using opentelemetry::exporter::metrics::PrometheusExporterUtils;
@@ -137,42 +138,160 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollect
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 {
 
-  metric_sdk::ResourceMetrics metrics_data = CreateSumPointData();
+  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.name", "test_service"},
+       {"service.namespace", "test_namespace"},
+       {"service.instance.id", "localhost:8000"},
+       {"custom_resource_attr", "custom_resource_value"}});
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateSumPointData();
+  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 1);
-
-  auto metric1          = translated.begin()->second;
+  ASSERT_EQ(translated.size(), 2);
+  auto metric1          = translated[1];
   std::vector<int> vals = {10};
   assert_basic(metric1, "library_name_unit_total", "description",
-               prometheus_client::MetricType::Counter, 1, vals);
+               prometheus_client::MetricType::Counter, 3, vals);
+  int checked_label_num = 0;
+  for (auto &label : translated[0].metric[0].label)
+  {
+    if (label.name == "service_namespace")
+    {
+      ASSERT_EQ(label.value, "test_namespace");
+      checked_label_num++;
+    }
+    else if (label.name == "service_name")
+    {
+      ASSERT_EQ(label.value, "test_service");
+      checked_label_num++;
+    }
+    else if (label.name == "service_instance_id")
+    {
+      ASSERT_EQ(label.value, "localhost:8000");
+      checked_label_num++;
+    }
+    else if (label.name == "custom_resource_attr")
+    {
+      ASSERT_EQ(label.value, "custom_resource_value");
+      checked_label_num++;
+    }
+  }
+  ASSERT_EQ(checked_label_num, 4);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 {
-  metric_sdk::ResourceMetrics metrics_data = CreateLastValuePointData();
+  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.name", "test_service"},
+       {"service.instance.id", "localhost:8000"},
+       {"custom_resource_attr", "custom_resource_value"}});
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateLastValuePointData();
+  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 1);
+  ASSERT_EQ(translated.size(), 2);
 
-  auto metric1          = translated.begin()->second;
+  auto metric1          = translated[1];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 1,
+  assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 3,
                vals);
+
+  int checked_label_num = 0;
+  for (auto &label : translated[0].metric[0].label)
+  {
+    if (label.name == "service_name")
+    {
+      ASSERT_EQ(label.value, "test_service");
+      checked_label_num++;
+    }
+    else if (label.name == "service_instance_id")
+    {
+      ASSERT_EQ(label.value, "localhost:8000");
+      checked_label_num++;
+    }
+    else if (label.name == "custom_resource_attr")
+    {
+      ASSERT_EQ(label.value, "custom_resource_value");
+      checked_label_num++;
+    }
+  }
+  ASSERT_EQ(checked_label_num, 3);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 {
-  metric_sdk::ResourceMetrics metrics_data = CreateHistogramPointData();
+  opentelemetry::sdk::resource::Resource resource = opentelemetry::sdk::resource::Resource::Create(
+      {{"service.instance.id", "localhost:8001"},
+       {"custom_resource_attr", "custom_resource_value"}});
+  TestDataPoints dp;
+  metric_sdk::ResourceMetrics metrics_data = dp.CreateHistogramPointData();
+  metrics_data.resource_                   = &resource;
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
-  ASSERT_EQ(translated.size(), 1);
+  ASSERT_EQ(translated.size(), 2);
 
-  auto metric              = translated.begin()->second;
+  auto metric              = translated[1];
   std::vector<double> vals = {3, 900.5, 4};
   assert_basic(metric, "library_name_unit", "description", prometheus_client::MetricType::Histogram,
-               1, vals);
+               3, vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
+
+  int checked_label_num = 0;
+  for (auto &label : translated[0].metric[0].label)
+  {
+    if (label.name == "service_name")
+    {
+      // default service name is "unknown_service"
+      ASSERT_EQ(label.value, "unknown_service");
+      checked_label_num++;
+    }
+    else if (label.name == "service_instance_id")
+    {
+      ASSERT_EQ(label.value, "localhost:8001");
+      checked_label_num++;
+    }
+    else if (label.name == "custom_resource_attr")
+    {
+      ASSERT_EQ(label.value, "custom_resource_value");
+      checked_label_num++;
+    }
+  }
+  ASSERT_EQ(checked_label_num, 3);
+}
+
+class SanitizeTest : public ::testing::Test
+{
+  Resource resource_ = Resource::Create({});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+
+protected:
+  void CheckSanitizeLabel(const std::string &original, const std::string &sanitized)
+  {
+    metric_sdk::InstrumentDescriptor instrument_descriptor{
+        "name", "description", "unit", metric_sdk::InstrumentType::kCounter,
+        metric_sdk::InstrumentValueType::kDouble};
+    auto result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor, {}, {}, {}, {{{{original, "value"}}, {}}}}}}}},
+        false);
+    EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
+  }
+};
+
+TEST_F(SanitizeTest, Label)
+{
+  CheckSanitizeLabel("name", "name");
+  CheckSanitizeLabel("name?", "name_");
+  CheckSanitizeLabel("name???", "name_");
+  CheckSanitizeLabel("name?__", "name_");
+  CheckSanitizeLabel("name?__name", "name_name");
+  CheckSanitizeLabel("name?__name:", "name_name_");
 }
 
 TEST(PrometheusExporterUtils, SanitizeName)
@@ -258,65 +377,64 @@ TEST(PrometheusExporterUtils, ConvertRateExpressedToPrometheusUnit)
             "_per_minute");
 }
 
-TEST(PrometheusExporterUtils, CleanUpString)
+class AttributeCollisionTest : public ::testing::Test
 {
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("unit/d"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("unit/d_"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("unit_/d_"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit_/d_"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit_d_"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit[]_d_"), "unit_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit[67]_d_"), "unit_67_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit[67_]_d_"), "unit_67_d");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::cleanUpString("_unit[_67_]_d_"), "unit_67_d");
+  Resource resource_ = Resource::Create(ResourceAttributes{});
+  nostd::unique_ptr<InstrumentationScope> instrumentation_scope_ =
+      InstrumentationScope::Create("library_name", "1.2.0");
+  metric_sdk::InstrumentDescriptor instrument_descriptor_{"library_name", "description", "unit",
+                                                          metric_sdk::InstrumentType::kCounter,
+                                                          metric_sdk::InstrumentValueType::kDouble};
+
+protected:
+  void CheckTranslation(const metric_sdk::PointAttributes &attrs,
+                        const std::vector<prometheus::ClientMetric::Label> &expected)
+  {
+    auto result = PrometheusExporterUtils::TranslateToPrometheus(
+        {&resource_,
+         std::vector<metric_sdk::ScopeMetrics>{
+             {instrumentation_scope_.get(),
+              std::vector<metric_sdk::MetricData>{
+                  {instrument_descriptor_, {}, {}, {}, {{attrs, {}}}}}}}},
+        false);
+    for (auto &expected_kv : expected)
+    {
+      bool found = false;
+      for (auto &found_kv : result.begin()->metric.begin()->label)
+      {
+        if (found_kv.name == expected_kv.name)
+        {
+          EXPECT_EQ(found_kv.value, expected_kv.value);
+          found = true;
+        }
+      }
+      EXPECT_TRUE(found);
+    }
+  }
+};
+
+TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
+{
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}}, {{"foo_a", "value1"},
+                                                                {"foo_b", "value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
-TEST(PrometheusExporterUtils, GetEquivalentPrometheusUnit)
+TEST_F(AttributeCollisionTest, JoinsCollidingKeys)
 {
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit("unit/d"),
-            "unit_per_day");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit("unit/m"),
-            "unit_per_minute");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit("unit"), "unit");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit("unit_"), "unit");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit("_unit_"), "unit");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getEquivalentPrometheusUnit(""), "");
+  CheckTranslation({{"foo.a", "value1"}, {"foo_a", "value2"}}, {{"foo_a", "value1;value2"},
+                                                                {"otel_scope_name", "library_name"},
+                                                                {"otel_scope_version", "1.2.0"}});
 }
 
-TEST(PrometheusExporterUtils, MapToPrometheusName)
+TEST_F(AttributeCollisionTest, DropsInvertedKeys)
 {
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "name", "unit", prometheus_client::MetricType::Counter),
-            "name_unit_total");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "name", "total_unit", prometheus_client::MetricType::Counter),
-            "name_total_unit_total");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "foo.bar.total", "s", prometheus_client::MetricType::Counter),
-            "foo_bar_total_seconds_total");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "name", "unit", prometheus_client::MetricType::Gauge),
-            "name_unit");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "name", "1", prometheus_client::MetricType::Gauge),
-            "name_ratio");
-
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "_name_", "unit/s", prometheus_client::MetricType::Counter),
-            "name_unit_per_second_total");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "_name_", "unit/s", prometheus_client::MetricType::Gauge),
-            "name_unit_per_second");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "_name_", "1", prometheus_client::MetricType::Gauge),
-            "name_ratio");
-
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "_name_", "unit/s", prometheus_client::MetricType::Histogram),
-            "name_unit_per_second");
-  ASSERT_EQ(exporter::metrics::SanitizeNameTester::mapToPrometheusName(
-                "_name_", "unit/s", prometheus_client::MetricType::Untyped),
-            "name_unit_per_second");
+  CheckTranslation({{"foo.a", "value1"}, {"foo.b", "value2"}, {"foo__a", "value3"}},
+                   {{"foo_a", "value1"},
+                    {"foo_b", "value2"},
+                    {"otel_scope_name", "library_name"},
+                    {"otel_scope_version", "1.2.0"}});
 }
 
 OPENTELEMETRY_END_NAMESPACE
