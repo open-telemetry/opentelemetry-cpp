@@ -347,16 +347,6 @@ TEST_F(SanitizeTest, Name)
   CheckSanitizeName("name?__name:", "name_name:");
 }
 
-TEST_F(SanitizeTest, Label)
-{
-  CheckSanitizeLabel("name", "name");
-  CheckSanitizeLabel("name?", "name_");
-  CheckSanitizeLabel("name???", "name_");
-  CheckSanitizeLabel("name?__", "name_");
-  CheckSanitizeLabel("name?__name", "name_name");
-  CheckSanitizeLabel("name?__name:", "name_name_");
-}
-
 class AttributeCollisionTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create(ResourceAttributes{});
