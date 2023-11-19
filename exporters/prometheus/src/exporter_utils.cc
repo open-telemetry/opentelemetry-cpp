@@ -566,6 +566,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     const opentelemetry::sdk::resource::Resource *resource)
 {
+  metric.timestamp_ms = time.count() / 1000000;
   if (labels.empty() && nullptr == resource)
   {
     return;
