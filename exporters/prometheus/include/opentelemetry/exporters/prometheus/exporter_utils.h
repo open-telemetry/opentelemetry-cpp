@@ -36,15 +36,14 @@ public:
 
 private:
   /**
-   * Append key-value pair to prometheus labels.
+   * Sanitize the given metric name or label according to Prometheus rule.
    *
-   * @param name label name
-   * @param value label value
-   * @param labels target labels
+   * This function is needed because names in OpenTelemetry can contain
+   * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
+   * name should only contain alphanumeric characters and '_'.
+   * @param name name
    */
-  static void AddPrometheusLabel(std::string name,
-                                 std::string value,
-                                 std::vector<::prometheus::ClientMetric::Label> *labels);
+  static std::string SanitizeNames(std::string name);
 
   /**
    * Sanitize the given metric name or label according to Prometheus rule.
@@ -211,6 +210,9 @@ private:
                        const std::vector<double> &boundaries,
                        const std::vector<uint64_t> &counts,
                        ::prometheus::ClientMetric *metric);
+
+  // For testing
+  friend class SanitizeNameTester;
 };
 }  // namespace metrics
 }  // namespace exporter

@@ -44,7 +44,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
     auto prometheus_metric_data =
         PrometheusExporterUtils::TranslateToPrometheus(metric_data, this->populate_target_info_);
     for (auto &data : prometheus_metric_data)
-      result.emplace_back(data.second);
+      result.emplace_back(data);
     return true;
   });
   collection_lock_.unlock();

@@ -240,10 +240,41 @@ void PrometheusExporterUtils::AddPrometheusLabel(
  */
 std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 {
-  prometheus_client::ClientMetric::Label prometheus_label;
-  prometheus_label.name  = std::move(name);
-  prometheus_label.value = std::move(value);
-  labels->emplace_back(std::move(prometheus_label));
+  constexpr const auto replacement     = '_';
+  constexpr const auto replacement_dup = '=';
+
+  auto valid = [](int i, char c) {
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
+        (c >= '0' && c <= '9' && i > 0))
+    {
+      return true;
+    }
+    return false;
+  };
+
+  bool has_dup = false;
+  for (int i = 0; i < (int)name.size(); ++i)
+  {
+    if (valid(i, name[i]))
+    {
+      continue;
+    }
+    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
+    {
+      has_dup = true;
+      name[i] = replacement_dup;
+    }
+    else
+    {
+      name[i] = replacement;
+    }
+  }
+  if (has_dup)
+  {
+    auto end = std::remove(name.begin(), name.end(), replacement_dup);
+    return std::string{name.begin(), end};
+  }
+  return name;
 }
 
 std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
