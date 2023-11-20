@@ -20,8 +20,8 @@ config_setting(
     },
 )
 
-# TODO: Version is not correct here.
-otel_sdk_prefix = "otel_sdk/" + "1.11.0" + "/"
+# TODO: Version needs to be updated better here.
+otel_sdk_prefix = "otel_sdk/" + "1.12.0" + "/"
 
 # Build configuration settings mimicking MSVC: debug=dbg, release=opt, reldeb=fastbuild
 config_setting(
@@ -180,9 +180,10 @@ alias(
     name = otel_sdk_binary + "_dll",
     # These have to be propagate to users of the dll library
     defines = [
-        "OPENTELEMETRY_DLL=1",
-        "OPENTELEMETRY_ABI_VERSON_NO=2",
+        # Import the dll symbols
+        "OPENTELEMETRY_DLL=1", #1=dllimport, -1=dllexport
         "OPENTELEMETRY_STL_VERSION=2017",
+        "OPENTELEMETRY_ABI_VERSION_NO=2",
     ],
     implementation_deps = [
         otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files

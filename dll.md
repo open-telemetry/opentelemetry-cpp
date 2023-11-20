@@ -1,4 +1,8 @@
-# Windows DLL experiment.
+# OpenTelemetry as single .dll
+
+Opentelemetry can be build only as static library using `vcpkg`, and when build as .dll using CMake it creates a several .dlls.
+This version, based on the `bazel` build creates a single .dll (~8mb in release, and 25mb in debug), that exposes the `api`, `sdk`, `exporters` and additional components.
+This makes it much easier to reuse in other tools.
 
 ## Before going further, please check and fix .bazelrc
 
@@ -21,15 +25,11 @@ To tackle the above issues, this branch creates a dynamic `otel_sdk.dll` library
 
 ## How to use
 
-In order to use the library, the users would need to define these 3 items, before including opentelemetry headers:
-    - `OPENTELEMETRY_DLL=1` - This enables the `dll` path.
-    - `OPENTELEMETRY_STL_VERSION=2017` - The `dll` library was compiled with C++17 and standard STL support (no abseil)
-
-    _(In the future these defines may become part of `version.h` and/or `config.h`)_
+In order to use the library, the users only need to define OPENTELEMETRY_DLL, to any value except -1:
+    - `OPENTELEMETRY_DLL` - This enables the `dll` path.
 
 ```C++
-#define OPENTELEMETRY_DLL 1
-#define OPENTELEMETRY_STL_VERSION 2017
+#define OPENTELEMETRY_DLL
 #include <opentelemetry/... some header file>
 ```
 

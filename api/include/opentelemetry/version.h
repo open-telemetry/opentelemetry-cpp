@@ -27,5 +27,3 @@
 #define OPENTELEMETRY_NAMESPACE opentelemetry :: OPENTELEMETRY_CONCAT(v, OPENTELEMETRY_ABI_VERSION_NO)
 
 // clang-format on
-
-#include "opentelemetry/common/macros.h"

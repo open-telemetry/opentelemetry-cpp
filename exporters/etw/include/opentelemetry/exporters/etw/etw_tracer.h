@@ -868,6 +868,11 @@ public:
     owner_.AddEvent(*this, name, timestamp, attributes);
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void AddLink(const opentelemetry::trace::SpanContext &, const common::KeyValueIterable &) noexcept override {}
+  void AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &) noexcept override {};
+#endif
+
   /**
    * @brief Set Span status
    * @param code Span status code.
@@ -1090,10 +1095,17 @@ public:
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view name,
       nostd::string_view args       = "",
-      nostd::string_view schema_url = "") noexcept override
+      nostd::string_view schema_url = ""
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+      , const common::KeyValueIterable *attributes = nullptr
+#endif
+      ) noexcept override
   {
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    UNREFERENCED_PARAMETER(attributes);
+#endif
     ETWProvider::EventFormat evtFmt = config_.encoding;
     std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
                                                              Tracer(*this, name, evtFmt)};

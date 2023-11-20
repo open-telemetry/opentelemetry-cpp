@@ -16,11 +16,11 @@ cc_library(
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
         "//:with_dll_enabled": [
-            "OPENTELEMETRY_DLL=1",
-            "OPENTELEMETRY_ABI_VERSON_NO=2",
+            # Export the dll symbols
+            "OPENTELEMETRY_DLL=-1", #1=dllimport, -1=dllexport
             "OPENTELEMETRY_STL_VERSION=2017",
-            "OPENTELEMETRY_DLL_EXPORT=__declspec(dllexport)",
-        ],
+            "OPENTELEMETRY_ABI_VERSION_NO=2",
+            ],
         "//conditions:default": [],
     }),
     strip_include_prefix = "include",

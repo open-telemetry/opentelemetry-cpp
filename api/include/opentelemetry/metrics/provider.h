@@ -20,7 +20,7 @@ class MeterProvider;
 /**
  * Stores the singleton global MeterProvider.
  */
-class Provider
+class OPENTELEMETRY_EXPORT Provider
 {
 public:
   /**

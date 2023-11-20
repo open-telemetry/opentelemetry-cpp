@@ -67,8 +67,8 @@ http_file(
     name = "sentry_cli_windows_amd64",
     downloaded_file_path = "sentry-cli.exe",
     executable = True,
-    sha256 = "4ee6d34cce58bed122acc1602d327c28c9b82fa9e64bcc73100012e644e6537a",
+    sha256 = "38ca36c244c6a45e27f4b5a914b2b1eaa99b502972c630a8fec4473f053e76e4",
     urls = [
-        "https://github.com/getsentry/sentry-cli/releases/download/2.17.5/sentry-cli-Windows-x86_64.exe",
+        "https://github.com/getsentry/sentry-cli/releases/download/2.21.5/sentry-cli-Windows-x86_64.exe",
     ],
 )

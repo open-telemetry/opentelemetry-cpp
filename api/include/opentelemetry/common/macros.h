@@ -227,18 +227,37 @@ point.
 
 #endif
 
-// Bazel on MSVC defines COMPILER_MSVC. This is how we detect the combination.
+// Bazel with MSVC defines COMPILER_MSVC. This is how we detect the combination.
 #if defined(COMPILER_MSVC) && COMPILER_MSVC
 // When compiling with --//:with_dll=true OPENTELEMETRY_DLL is set to 1
-#  if defined(OPENTELEMETRY_DLL) && OPENTELEMETRY_DLL
-#    undef OPENTELEMETRY_EXPORT
-#    if !defined(OPENTELEMETRY_STL_VERSION) || OPENTELEMETRY_STL_VERSION<2017
-#      error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION must be 2017 or bigger
+#  if defined(OPENTELEMETRY_DLL)
+
+#    if defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION != 2017)
+#       error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION should be 2017
+#    else
+#       define OPENTELEMETRY_STL_VERSION 2017
 #    endif
-#    if !defined(OPENTELEMETRY_DLL_EXPORT)
-#      define OPENTELEMETRY_DLL_EXPORT __declspec(dllimport)
+
+#    if defined(OPENTELEMETRY_ABI_VERSION_NO) && (OPENTELEMETRY_ABI_VERSION_NO != 2)
+#       error OPENTELEMETRY_DLL: OPENTELEMETRY_ABI_VERSION_NO should be 2
+#    else
+#       define OPENTELEMETRY_ABI_VERSION_NO 2
 #    endif
-#    define OPENTELEMETRY_EXPORT OPENTELEMETRY_DLL_EXPORT
+
+#    if defined(OPENTELEMETRY_EXPORT)
+#      undef OPENTELEMETRY_EXPORT
+#    endif
+#    if OPENTELEMETRY_DLL==-1 // This is used during build
+#      define OPENTELEMETRY_EXPORT __declspec(dllexport)
+#    else
+#      define OPENTELEMETRY_EXPORT __declspec(dllimport)
+#    endif
+
+#    if defined(OPENTELEMETRY_API_SINGLETON)
+#      undef OPENTELEMETRY_API_SINGLETON
+#      define OPENTELEMETRY_API_SINGLETON
+#    endif
+
 #  endif // if defined(OPENTELEMETRY_DLL) && OPENTELEMETRY_DLL
 #endif // if defined(COMPILER_MSVC) && COMPILER_MSVC
 

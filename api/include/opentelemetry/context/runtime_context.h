@@ -187,7 +187,7 @@ inline Token::~Token() noexcept
 // RuntimeContextStorage and provides a wrapper for propagating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
-class ThreadLocalContextStorage : public RuntimeContextStorage
+class OPENTELEMETRY_EXPORT ThreadLocalContextStorage : public RuntimeContextStorage
 {
 public:
   ThreadLocalContextStorage() noexcept = default;
