@@ -211,6 +211,7 @@ TEST_F(TracerShimTest, ExtractOnlyBaggage)
   auto span_context_shim = static_cast<shim::SpanContextShim *>(span_context.value().get());
   ASSERT_TRUE(span_context_shim != nullptr);
   ASSERT_FALSE(span_context_shim->context().IsValid());
+  ASSERT_FALSE(span_context_shim->context().IsSampled());
   ASSERT_FALSE(shim::utils::isBaggageEmpty(span_context_shim->baggage()));
 
   std::string value;

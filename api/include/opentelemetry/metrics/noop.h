@@ -257,7 +257,7 @@ public:
   }
 #endif
 
-#ifdef ENABLE_REMOVE_METER_PREVIEW
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   void RemoveMeter(nostd::string_view /* name */,
                    nostd::string_view /* version */,
                    nostd::string_view /* schema_url */) noexcept override

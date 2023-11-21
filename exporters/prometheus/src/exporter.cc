@@ -30,7 +30,8 @@ PrometheusExporter::PrometheusExporter(const PrometheusExporterOptions &options)
     Shutdown();  // set MetricReader in shutdown state.
     return;
   }
-  collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector(this));
+  collector_ = std::shared_ptr<PrometheusCollector>(
+      new PrometheusCollector(this, options_.populate_target_info));
 
   exposer_->RegisterCollectable(collector_);
 }

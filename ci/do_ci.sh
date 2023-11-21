@@ -69,7 +69,7 @@ fi
 echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
-BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_TEST --copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
+BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
 BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
@@ -112,7 +112,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
-        -DWITH_REMOVE_METER_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -135,7 +134,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
-        -DWITH_REMOVE_METER_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -159,7 +157,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
-        -DWITH_REMOVE_METER_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -181,7 +178,6 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_OTLP_HTTP=ON \
         -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
         -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
-        -DWITH_REMOVE_METER_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \

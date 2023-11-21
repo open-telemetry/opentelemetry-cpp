@@ -264,13 +264,25 @@ public:
     return result;
   }
 
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* library_name */,
-                                             nostd::string_view /* library_version */,
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::shared_ptr<trace::Tracer> GetTracer(
+      nostd::string_view /* name */,
+      nostd::string_view /* version */,
+      nostd::string_view /* schema_url */,
+      const common::KeyValueIterable * /* attributes */) noexcept override
+  {
+    nostd::shared_ptr<trace::Tracer> result(new MyTracer());
+    return result;
+  }
+#else
+  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view /* name */,
+                                             nostd::string_view /* version */,
                                              nostd::string_view /* schema_url */) noexcept override
   {
     nostd::shared_ptr<trace::Tracer> result(new MyTracer());
     return result;
   }
+#endif
 };
 
 void setup_otel()

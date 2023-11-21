@@ -5,7 +5,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
-#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/version.h"
 
 #include <chrono>
 #include <cstddef>
@@ -19,66 +19,90 @@ namespace otlp
 {
 
 /**
- * Struct to hold OTLP HTTP logs exporter options.
+ * Struct to hold OTLP HTTP log record exporter options.
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlphttp
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpHttpLogRecordExporterOptions
+struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
 {
-  // The endpoint to export to. By default
-  // @see
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
-  // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpLogsEndpoint();
+  OtlpHttpLogRecordExporterOptions();
+  ~OtlpHttpLogRecordExporterOptions();
 
-  // By default, post json data
-  HttpRequestContentType content_type = HttpRequestContentType::kJson;
+  /** The endpoint to export to. */
+  std::string url;
 
-  // If convert bytes into hex. By default, we will convert all bytes but id into base64
-  // This option is ignored if content_type is not kJson
-  JsonBytesMappingKind json_bytes_mapping = JsonBytesMappingKind::kHexId;
+  /** HTTP content type. */
+  HttpRequestContentType content_type;
 
-  // If using the json name of protobuf field to set the key of json. By default, we will use the
-  // field name just like proto files.
-  bool use_json_name = false;
+  /**
+    Json byte mapping.
 
-  // Whether to print the status of the exporter in the console
-  bool console_debug = false;
+    Used only for HttpRequestContentType::kJson.
+    Convert bytes to hex / base64.
+  */
+  JsonBytesMappingKind json_bytes_mapping;
 
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultLogsTimeout();
+  /**
+    Use json names (true) or protobuf field names (false) to set the json key.
+  */
+  bool use_json_name;
 
-  // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultLogsHeaders();
+  /** Print debug messages. */
+  bool console_debug;
+
+  /** Export timeout. */
+  std::chrono::system_clock::duration timeout;
+
+  /** Additional HTTP headers. */
+  OtlpHeaders http_headers;
 
 #ifdef ENABLE_ASYNC_EXPORT
-  // Concurrent requests
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-concurrent-requests
-  std::size_t max_concurrent_requests = 64;
+  /** Max number of concurrent requests. */
+  std::size_t max_concurrent_requests;
 
-  // Requests per connections
-  std::size_t max_requests_per_connection = 8;
+  /** Max number of requests per connection. */
+  std::size_t max_requests_per_connection;
 #endif
 
 #ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
-  bool ssl_insecure_skip_verify{false};
+  /** True do disable SSL. */
+  bool ssl_insecure_skip_verify;
 
-  std::string ssl_ca_cert_path   = GetOtlpDefaultLogsSslCertificatePath();
-  std::string ssl_ca_cert_string = GetOtlpDefaultLogsSslCertificateString();
+  /** CA CERT, path to a file. */
+  std::string ssl_ca_cert_path;
 
-  std::string ssl_client_key_path   = GetOtlpDefaultLogsSslClientKeyPath();
-  std::string ssl_client_key_string = GetOtlpDefaultLogsSslClientKeyString();
+  /** CA CERT, as a string. */
+  std::string ssl_ca_cert_string;
 
-  std::string ssl_client_cert_path   = GetOtlpDefaultLogsSslClientCertificatePath();
-  std::string ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
+  /** CLIENT KEY, path to a file. */
+  std::string ssl_client_key_path;
+
+  /** CLIENT KEY, as a string. */
+  std::string ssl_client_key_string;
+
+  /** CLIENT CERT, path to a file. */
+  std::string ssl_client_cert_path;
+
+  /** CLIENT CERT, as a string. */
+  std::string ssl_client_cert_string;
 #endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
 #ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   /** Minimum TLS version. */
-  std::string ssl_min_tls = GetOtlpDefaultLogsSslTlsMinVersion();
+  std::string ssl_min_tls;
+
   /** Maximum TLS version. */
-  std::string ssl_max_tls = GetOtlpDefaultLogsSslTlsMaxVersion();
+  std::string ssl_max_tls;
+
   /** TLS cipher. */
-  std::string ssl_cipher = GetOtlpDefaultLogsSslTlsCipher();
+  std::string ssl_cipher;
+
   /** TLS cipher suite. */
-  std::string ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
+  std::string ssl_cipher_suite;
 #endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 

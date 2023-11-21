@@ -24,7 +24,14 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.21.0";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.22.0";
+
+/**
+ * Uniquely identifies the framework API revision offered by a version ({@code os.version}) of the
+ * android operating system. More information can be found <a
+ * href="https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels">here</a>.
+ */
+static constexpr const char *kAndroidOsApiLevel = "android.os.api_level";
 
 /**
  * Array of brand name and version separated by a space
@@ -35,6 +42,25 @@ static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.21
  navigator.userAgentData.brands}).</li> </ul>
  */
 static constexpr const char *kBrowserBrands = "browser.brands";
+
+/**
+ * Preferred language of the user using the browser
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the Navigator API {@code
+ navigator.language}.</li> </ul>
+ */
+static constexpr const char *kBrowserLanguage = "browser.language";
+
+/**
+ * A boolean that is true if the browser is running on a mobile device
+ *
+ * <p>Notes:
+  <ul> <li>This value is intended to be taken from the <a
+ href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
+ navigator.userAgentData.mobile}). If unavailable, this attribute SHOULD be left unset.</li> </ul>
+ */
+static constexpr const char *kBrowserMobile = "browser.mobile";
 
 /**
  * The platform on which the browser is running
@@ -54,33 +80,33 @@ provides.</li> </ul>
 static constexpr const char *kBrowserPlatform = "browser.platform";
 
 /**
- * A boolean that is true if the browser is running on a mobile device
- *
- * <p>Notes:
-  <ul> <li>This value is intended to be taken from the <a
- href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> ({@code
- navigator.userAgentData.mobile}). If unavailable, this attribute SHOULD be left unset.</li> </ul>
+ * The cloud account ID the resource is assigned to.
  */
-static constexpr const char *kBrowserMobile = "browser.mobile";
+static constexpr const char *kCloudAccountId = "cloud.account.id";
 
 /**
- * Preferred language of the user using the browser
+ * Cloud regions often have multiple, isolated locations known as zones to increase availability.
+ Availability zone represents the zone where the resource is running.
  *
  * <p>Notes:
-  <ul> <li>This value is intended to be taken from the Navigator API {@code
- navigator.language}.</li> </ul>
+  <ul> <li>Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.</li>
+ </ul>
  */
-static constexpr const char *kBrowserLanguage = "browser.language";
+static constexpr const char *kCloudAvailabilityZone = "cloud.availability_zone";
+
+/**
+ * The cloud platform in use.
+ *
+ * <p>Notes:
+  <ul> <li>The prefix of the service SHOULD match the one specified in {@code cloud.provider}.</li>
+ </ul>
+ */
+static constexpr const char *kCloudPlatform = "cloud.platform";
 
 /**
  * Name of the cloud provider.
  */
 static constexpr const char *kCloudProvider = "cloud.provider";
-
-/**
- * The cloud account ID the resource is assigned to.
- */
-static constexpr const char *kCloudAccountId = "cloud.account.id";
 
 /**
  * The geographical region the resource is running.
@@ -127,23 +153,10 @@ that would usually share a TracerProvider.</li>
 static constexpr const char *kCloudResourceId = "cloud.resource_id";
 
 /**
- * Cloud regions often have multiple, isolated locations known as zones to increase availability.
- Availability zone represents the zone where the resource is running.
- *
- * <p>Notes:
-  <ul> <li>Availability zones are called &quot;zones&quot; on Alibaba Cloud and Google Cloud.</li>
- </ul>
+ * The ARN of an <a
+ * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">ECS cluster</a>.
  */
-static constexpr const char *kCloudAvailabilityZone = "cloud.availability_zone";
-
-/**
- * The cloud platform in use.
- *
- * <p>Notes:
-  <ul> <li>The prefix of the service SHOULD match the one specified in {@code cloud.provider}.</li>
- </ul>
- */
-static constexpr const char *kCloudPlatform = "cloud.platform";
+static constexpr const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
 
 /**
  * The Amazon Resource Name (ARN) of an <a
@@ -151,12 +164,6 @@ static constexpr const char *kCloudPlatform = "cloud.platform";
  * container instance</a>.
  */
 static constexpr const char *kAwsEcsContainerArn = "aws.ecs.container.arn";
-
-/**
- * The ARN of an <a
- * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">ECS cluster</a>.
- */
-static constexpr const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
 
 /**
  * The <a
@@ -188,15 +195,6 @@ static constexpr const char *kAwsEcsTaskRevision = "aws.ecs.task.revision";
 static constexpr const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
 
 /**
- * The name(s) of the AWS log group(s) an application is writing to.
- *
- * <p>Notes:
-  <ul> <li>Multiple log groups must be supported for cases like multi-container applications, where
- a single application has sidecar containers, and each write to their own log group.</li> </ul>
- */
-static constexpr const char *kAwsLogGroupNames = "aws.log.group.names";
-
-/**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
  *
  * <p>Notes:
@@ -207,9 +205,13 @@ static constexpr const char *kAwsLogGroupNames = "aws.log.group.names";
 static constexpr const char *kAwsLogGroupArns = "aws.log.group.arns";
 
 /**
- * The name(s) of the AWS log stream(s) an application is writing to.
+ * The name(s) of the AWS log group(s) an application is writing to.
+ *
+ * <p>Notes:
+  <ul> <li>Multiple log groups must be supported for cases like multi-container applications, where
+ a single application has sidecar containers, and each write to their own log group.</li> </ul>
  */
-static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
+static constexpr const char *kAwsLogGroupNames = "aws.log.group.names";
 
 /**
  * The ARN(s) of the AWS log stream(s).
@@ -221,6 +223,11 @@ static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
  necessarily identify both a log group and a log stream.</li> </ul>
  */
 static constexpr const char *kAwsLogStreamArns = "aws.log.stream.arns";
+
+/**
+ * The name(s) of the AWS log stream(s) an application is writing to.
+ */
+static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
 
 /**
  * The name of the Cloud Run <a
@@ -239,6 +246,12 @@ static constexpr const char *kGcpCloudRunJobExecution = "gcp.cloud_run.job.execu
 static constexpr const char *kGcpCloudRunJobTaskIndex = "gcp.cloud_run.job.task_index";
 
 /**
+ * The hostname of a GCE instance. This is the full value of the default or <a
+ * href="https://cloud.google.com/compute/docs/instances/custom-hostname-vm">custom hostname</a>.
+ */
+static constexpr const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
+
+/**
  * The instance name of a GCE instance. This is the value provided by {@code host.name}, the visible
  * name of the instance in the Cloud Console UI, and the prefix for the default hostname of the
  * instance as defined by the <a
@@ -248,15 +261,9 @@ static constexpr const char *kGcpCloudRunJobTaskIndex = "gcp.cloud_run.job.task_
 static constexpr const char *kGcpGceInstanceName = "gcp.gce.instance.name";
 
 /**
- * The hostname of a GCE instance. This is the full value of the default or <a
- * href="https://cloud.google.com/compute/docs/instances/custom-hostname-vm">custom hostname</a>.
+ * Unique identifier for the application
  */
-static constexpr const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
-
-/**
- * Time and date the release was created
- */
-static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
+static constexpr const char *kHerokuAppId = "heroku.app.id";
 
 /**
  * Commit hash for the current release
@@ -264,50 +271,9 @@ static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.c
 static constexpr const char *kHerokuReleaseCommit = "heroku.release.commit";
 
 /**
- * Unique identifier for the application
+ * Time and date the release was created
  */
-static constexpr const char *kHerokuAppId = "heroku.app.id";
-
-/**
- * Container name used by container runtime.
- */
-static constexpr const char *kContainerName = "container.name";
-
-/**
- * Container ID. Usually a UUID, as for example used to <a
- * href="https://docs.docker.com/engine/reference/run/#container-identification">identify Docker
- * containers</a>. The UUID might be abbreviated.
- */
-static constexpr const char *kContainerId = "container.id";
-
-/**
- * The container runtime managing this container.
- */
-static constexpr const char *kContainerRuntime = "container.runtime";
-
-/**
- * Name of the image the container was built on.
- */
-static constexpr const char *kContainerImageName = "container.image.name";
-
-/**
- * Container image tag.
- */
-static constexpr const char *kContainerImageTag = "container.image.tag";
-
-/**
- * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
- *
- * <p>Notes:
-  <ul> <li>Docker defines a sha256 of the image id; {@code container.image.id} corresponds to the
-{@code Image} field from the Docker container inspect <a
-href="https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect">API</a>
-endpoint. K8s defines a link to the container registry repository with digest {@code "imageID":
-"registry.azurecr.io
-/namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"}.
-OCI defines a digest of manifest.</li> </ul>
- */
-static constexpr const char *kContainerImageId = "container.image.id";
+static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
 
 /**
  * The command used to run the container (i.e. the command name).
@@ -319,14 +285,71 @@ static constexpr const char *kContainerImageId = "container.image.id";
 static constexpr const char *kContainerCommand = "container.command";
 
 /**
+ * All the command arguments (including the command/executable itself) run by the container. [2]
+ */
+static constexpr const char *kContainerCommandArgs = "container.command_args";
+
+/**
  * The full command run by the container as a single string representing the full command. [2]
  */
 static constexpr const char *kContainerCommandLine = "container.command_line";
 
 /**
- * All the command arguments (including the command/executable itself) run by the container. [2]
+ * Container ID. Usually a UUID, as for example used to <a
+ * href="https://docs.docker.com/engine/reference/run/#container-identification">identify Docker
+ * containers</a>. The UUID might be abbreviated.
  */
-static constexpr const char *kContainerCommandArgs = "container.command_args";
+static constexpr const char *kContainerId = "container.id";
+
+/**
+ * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
+ *
+ * <p>Notes:
+  <ul> <li>Docker defines a sha256 of the image id; {@code container.image.id} corresponds to the
+{@code Image} field from the Docker container inspect <a
+href="https://docs.docker.com/engine/api/v1.43/#tag/Container/operation/ContainerInspect">API</a>
+endpoint. K8s defines a link to the container registry repository with digest {@code "imageID":
+"registry.azurecr.io
+/namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"}.
+The ID is assinged by the container runtime and can vary in different environments. Consider using
+{@code oci.manifest.digest} if it is important to identify the same image in different
+environments/runtimes.</li> </ul>
+ */
+static constexpr const char *kContainerImageId = "container.image.id";
+
+/**
+ * Name of the image the container was built on.
+ */
+static constexpr const char *kContainerImageName = "container.image.name";
+
+/**
+ * Repo digests of the container image as provided by the container runtime.
+ *
+ * <p>Notes:
+  <ul> <li><a
+ href="https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect">Docker</a> and <a
+ href="https://github.com/kubernetes/cri-api/blob/c75ef5b473bbe2d0a4fc92f82235efd665ea8e9f/pkg/apis/runtime/v1/api.proto#L1237-L1238">CRI</a>
+ report those under the {@code RepoDigests} field.</li> </ul>
+ */
+static constexpr const char *kContainerImageRepoDigests = "container.image.repo_digests";
+
+/**
+ * Container image tags. An example can be found in <a
+ * href="https://docs.docker.com/engine/api/v1.43/#tag/Image/operation/ImageInspect">Docker Image
+ * Inspect</a>. Should be only the {@code <tag>} section of the full name for example from {@code
+ * registry.example.com/my-org/my-image:<tag>}.
+ */
+static constexpr const char *kContainerImageTags = "container.image.tags";
+
+/**
+ * Container name used by container runtime.
+ */
+static constexpr const char *kContainerName = "container.name";
+
+/**
+ * The container runtime managing this container.
+ */
+static constexpr const char *kContainerRuntime = "container.runtime";
 
 /**
  * Name of the <a href="https://en.wikipedia.org/wiki/Deployment_environment">deployment
@@ -353,6 +376,16 @@ static constexpr const char *kDeploymentEnvironment = "deployment.environment";
 static constexpr const char *kDeviceId = "device.id";
 
 /**
+ * The name of the device manufacturer
+ *
+ * <p>Notes:
+  <ul> <li>The Android OS provides this field via <a
+ href="https://developer.android.com/reference/android/os/Build#MANUFACTURER">Build</a>. iOS apps
+ SHOULD hardcode the value {@code Apple}.</li> </ul>
+ */
+static constexpr const char *kDeviceManufacturer = "device.manufacturer";
+
+/**
  * The model identifier for the device
  *
  * <p>Notes:
@@ -371,14 +404,25 @@ static constexpr const char *kDeviceModelIdentifier = "device.model.identifier";
 static constexpr const char *kDeviceModelName = "device.model.name";
 
 /**
- * The name of the device manufacturer
+ * The execution environment ID as a string, that will be potentially reused for other invocations
+ to the same function/function version.
  *
  * <p>Notes:
-  <ul> <li>The Android OS provides this field via <a
- href="https://developer.android.com/reference/android/os/Build#MANUFACTURER">Build</a>. iOS apps
- SHOULD hardcode the value {@code Apple}.</li> </ul>
+  <ul> <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
+ </ul>
  */
-static constexpr const char *kDeviceManufacturer = "device.manufacturer";
+static constexpr const char *kFaasInstance = "faas.instance";
+
+/**
+ * The amount of memory available to the serverless function converted to Bytes.
+ *
+ * <p>Notes:
+  <ul> <li>It's recommended to set this attribute since e.g. too little memory can easily stop a
+ Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable {@code
+ AWS_LAMBDA_FUNCTION_MEMORY_SIZE} provides this information (which must be multiplied by
+ 1,048,576).</li> </ul>
+ */
+static constexpr const char *kFaasMaxMemory = "faas.max_memory";
 
 /**
  * The name of the single function that this runtime instance executes.
@@ -387,7 +431,7 @@ static constexpr const char *kDeviceManufacturer = "device.manufacturer";
   <ul> <li>This is the name of the function as configured/deployed on the FaaS
 platform and is usually different from the name of the callback
 function (which may be stored in the
-<a href="/docs/general/general-attributes.md#source-code-attributes">{@code code.namespace}/{@code
+<a href="/docs/general/attributes.md#source-code-attributes">{@code code.namespace}/{@code
 code.function}</a> span attributes).</li><li>For some cloud providers, the above definition is
 ambiguous. The following definition of function name MUST be used for this attribute (and
 consequently the span name) for the listed cloud providers/products:</li><li><strong>Azure:</strong>
@@ -418,25 +462,9 @@ not set this attribute.</li>
 static constexpr const char *kFaasVersion = "faas.version";
 
 /**
- * The execution environment ID as a string, that will be potentially reused for other invocations
- to the same function/function version.
- *
- * <p>Notes:
-  <ul> <li><strong>AWS Lambda:</strong> Use the (full) log stream name.</li>
- </ul>
+ * The CPU architecture the host system is running on.
  */
-static constexpr const char *kFaasInstance = "faas.instance";
-
-/**
- * The amount of memory available to the serverless function converted to Bytes.
- *
- * <p>Notes:
-  <ul> <li>It's recommended to set this attribute since e.g. too little memory can easily stop a
- Java AWS Lambda function from working correctly. On AWS Lambda, the environment variable {@code
- AWS_LAMBDA_FUNCTION_MEMORY_SIZE} provides this information (which must be multiplied by
- 1,048,576).</li> </ul>
- */
-static constexpr const char *kFaasMaxMemory = "faas.max_memory";
+static constexpr const char *kHostArch = "host.arch";
 
 /**
  * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
@@ -444,6 +472,32 @@ static constexpr const char *kFaasMaxMemory = "faas.max_memory";
  * sources to use to determine the {@code machine-id} based on operating system.
  */
 static constexpr const char *kHostId = "host.id";
+
+/**
+ * VM image ID or host OS image ID. For Cloud, this value is from the provider.
+ */
+static constexpr const char *kHostImageId = "host.image.id";
+
+/**
+ * Name of the VM image or OS install the host was instantiated from.
+ */
+static constexpr const char *kHostImageName = "host.image.name";
+
+/**
+ * The version string of the VM image or host OS as defined in <a
+ * href="README.md#version-attributes">Version Attributes</a>.
+ */
+static constexpr const char *kHostImageVersion = "host.image.version";
+
+/**
+ * Available IP addresses of the host, excluding loopback interfaces.
+ *
+ * <p>Notes:
+  <ul> <li>IPv4 Addresses MUST be specified in dotted-quad notation. IPv6 addresses MUST be
+ specified in the <a href="https://www.rfc-editor.org/rfc/rfc5952.html">RFC 5952</a> format.</li>
+ </ul>
+ */
+static constexpr const char *kHostIp = "host.ip";
 
 /**
  * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully
@@ -457,25 +511,40 @@ static constexpr const char *kHostName = "host.name";
 static constexpr const char *kHostType = "host.type";
 
 /**
- * The CPU architecture the host system is running on.
+ * The amount of level 2 memory cache available to the processor (in Bytes).
  */
-static constexpr const char *kHostArch = "host.arch";
+static constexpr const char *kHostCpuCacheL2Size = "host.cpu.cache.l2.size";
 
 /**
- * Name of the VM image or OS install the host was instantiated from.
+ * Numeric value specifying the family or generation of the CPU.
  */
-static constexpr const char *kHostImageName = "host.image.name";
+static constexpr const char *kHostCpuFamily = "host.cpu.family";
 
 /**
- * VM image ID or host OS image ID. For Cloud, this value is from the provider.
+ * Model identifier. It provides more granular information about the CPU, distinguishing it from
+ * other CPUs within the same family.
  */
-static constexpr const char *kHostImageId = "host.image.id";
+static constexpr const char *kHostCpuModelId = "host.cpu.model.id";
 
 /**
- * The version string of the VM image or host OS as defined in <a
- * href="README.md#version-attributes">Version Attributes</a>.
+ * Model designation of the processor.
  */
-static constexpr const char *kHostImageVersion = "host.image.version";
+static constexpr const char *kHostCpuModelName = "host.cpu.model.name";
+
+/**
+ * Stepping or core revisions.
+ */
+static constexpr const char *kHostCpuStepping = "host.cpu.stepping";
+
+/**
+ * Processor manufacturer identifier. A maximum 12-character string.
+ *
+ * <p>Notes:
+  <ul> <li><a href="https://wiki.osdev.org/CPUID">CPUID</a> command returns the vendor ID string in
+ EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character
+ string.</li> </ul>
+ */
+static constexpr const char *kHostCpuVendorId = "host.cpu.vendor.id";
 
 /**
  * The name of the cluster.
@@ -522,14 +591,14 @@ static constexpr const char *kK8sNodeUid = "k8s.node.uid";
 static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
 
 /**
- * The UID of the Pod.
- */
-static constexpr const char *kK8sPodUid = "k8s.pod.uid";
-
-/**
  * The name of the Pod.
  */
 static constexpr const char *kK8sPodName = "k8s.pod.name";
+
+/**
+ * The UID of the Pod.
+ */
+static constexpr const char *kK8sPodUid = "k8s.pod.uid";
 
 /**
  * The name of the Container from Pod specification, must be unique within a Pod. Container runtime
@@ -544,19 +613,14 @@ static constexpr const char *kK8sContainerName = "k8s.container.name";
 static constexpr const char *kK8sContainerRestartCount = "k8s.container.restart_count";
 
 /**
- * The UID of the ReplicaSet.
- */
-static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
-
-/**
  * The name of the ReplicaSet.
  */
 static constexpr const char *kK8sReplicasetName = "k8s.replicaset.name";
 
 /**
- * The UID of the Deployment.
+ * The UID of the ReplicaSet.
  */
-static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
+static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
 
 /**
  * The name of the Deployment.
@@ -564,9 +628,9 @@ static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
 static constexpr const char *kK8sDeploymentName = "k8s.deployment.name";
 
 /**
- * The UID of the StatefulSet.
+ * The UID of the Deployment.
  */
-static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
+static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
 
 /**
  * The name of the StatefulSet.
@@ -574,9 +638,9 @@ static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
 static constexpr const char *kK8sStatefulsetName = "k8s.statefulset.name";
 
 /**
- * The UID of the DaemonSet.
+ * The UID of the StatefulSet.
  */
-static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
+static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
 
 /**
  * The name of the DaemonSet.
@@ -584,9 +648,9 @@ static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
 static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
 
 /**
- * The UID of the Job.
+ * The UID of the DaemonSet.
  */
-static constexpr const char *kK8sJobUid = "k8s.job.uid";
+static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
 
 /**
  * The name of the Job.
@@ -594,9 +658,9 @@ static constexpr const char *kK8sJobUid = "k8s.job.uid";
 static constexpr const char *kK8sJobName = "k8s.job.name";
 
 /**
- * The UID of the CronJob.
+ * The UID of the Job.
  */
-static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
+static constexpr const char *kK8sJobUid = "k8s.job.uid";
 
 /**
  * The name of the CronJob.
@@ -604,9 +668,28 @@ static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
 static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
 
 /**
- * The operating system type.
+ * The UID of the CronJob.
  */
-static constexpr const char *kOsType = "os.type";
+static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
+
+/**
+ * The digest of the OCI image manifest. For container images specifically is the digest by which
+the container image is known.
+ *
+ * <p>Notes:
+  <ul> <li>Follows <a href="https://github.com/opencontainers/image-spec/blob/main/manifest.md">OCI
+Image Manifest Specification</a>, and specifically the <a
+href="https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests">Digest
+property</a>. An example can be found in <a
+href="https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest">Example Image
+Manifest</a>.</li> </ul>
+ */
+static constexpr const char *kOciManifestDigest = "oci.manifest.digest";
+
+/**
+ * Unique identifier for a particular build or compilation of the operating system.
+ */
+static constexpr const char *kOsBuildId = "os.build_id";
 
 /**
  * Human readable (not intended to be parsed) OS version information, like e.g. reported by {@code
@@ -620,20 +703,37 @@ static constexpr const char *kOsDescription = "os.description";
 static constexpr const char *kOsName = "os.name";
 
 /**
+ * The operating system type.
+ */
+static constexpr const char *kOsType = "os.type";
+
+/**
  * The version string of the operating system as defined in <a
  * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
  */
 static constexpr const char *kOsVersion = "os.version";
 
 /**
- * Process identifier (PID).
+ * The command used to launch the process (i.e. the command name). On Linux based systems, can be
+ * set to the zeroth string in {@code proc/[pid]/cmdline}. On Windows, can be set to the first
+ * parameter extracted from {@code GetCommandLineW}.
  */
-static constexpr const char *kProcessPid = "process.pid";
+static constexpr const char *kProcessCommand = "process.command";
 
 /**
- * Parent Process identifier (PID).
+ * All the command arguments (including the command/executable itself) as received by the process.
+ * On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according
+ * to the list of null-delimited strings extracted from {@code proc/[pid]/cmdline}. For libc-based
+ * executables, this would be the full argv vector passed to {@code main}.
  */
-static constexpr const char *kProcessParentPid = "process.parent_pid";
+static constexpr const char *kProcessCommandArgs = "process.command_args";
+
+/**
+ * The full command used to launch the process as a single string representing the full command. On
+ * Windows, can be set to the result of {@code GetCommandLineW}. Do not set this if you have to
+ * assemble it just for monitoring; use {@code process.command_args} instead.
+ */
+static constexpr const char *kProcessCommandLine = "process.command_line";
 
 /**
  * The name of the process executable. On Linux based systems, can be set to the {@code Name} in
@@ -649,31 +749,25 @@ static constexpr const char *kProcessExecutableName = "process.executable.name";
 static constexpr const char *kProcessExecutablePath = "process.executable.path";
 
 /**
- * The command used to launch the process (i.e. the command name). On Linux based systems, can be
- * set to the zeroth string in {@code proc/[pid]/cmdline}. On Windows, can be set to the first
- * parameter extracted from {@code GetCommandLineW}.
- */
-static constexpr const char *kProcessCommand = "process.command";
-
-/**
- * The full command used to launch the process as a single string representing the full command. On
- * Windows, can be set to the result of {@code GetCommandLineW}. Do not set this if you have to
- * assemble it just for monitoring; use {@code process.command_args} instead.
- */
-static constexpr const char *kProcessCommandLine = "process.command_line";
-
-/**
- * All the command arguments (including the command/executable itself) as received by the process.
- * On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according
- * to the list of null-delimited strings extracted from {@code proc/[pid]/cmdline}. For libc-based
- * executables, this would be the full argv vector passed to {@code main}.
- */
-static constexpr const char *kProcessCommandArgs = "process.command_args";
-
-/**
  * The username of the user that owns the process.
  */
 static constexpr const char *kProcessOwner = "process.owner";
+
+/**
+ * Parent Process identifier (PID).
+ */
+static constexpr const char *kProcessParentPid = "process.parent_pid";
+
+/**
+ * Process identifier (PID).
+ */
+static constexpr const char *kProcessPid = "process.pid";
+
+/**
+ * An additional description about the runtime of the process, for example a specific vendor
+ * customization of the runtime environment.
+ */
+static constexpr const char *kProcessRuntimeDescription = "process.runtime.description";
 
 /**
  * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of
@@ -685,12 +779,6 @@ static constexpr const char *kProcessRuntimeName = "process.runtime.name";
  * The version of the runtime of this process, as returned by the runtime without modification.
  */
 static constexpr const char *kProcessRuntimeVersion = "process.runtime.version";
-
-/**
- * An additional description about the runtime of the process, for example a specific vendor
- * customization of the runtime environment.
- */
-static constexpr const char *kProcessRuntimeDescription = "process.runtime.description";
 
 /**
  * Logical name of the service.
@@ -711,19 +799,6 @@ static constexpr const char *kServiceName = "service.name";
 static constexpr const char *kServiceVersion = "service.version";
 
 /**
- * A namespace for {@code service.name}.
- *
- * <p>Notes:
-  <ul> <li>A string value having a meaning that helps to distinguish a group of services, for
- example the team name that owns a group of services. {@code service.name} is expected to be unique
- within the same namespace. If {@code service.namespace} is not specified in the Resource then
- {@code service.name} is expected to be unique for all services that have no explicit namespace
- defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length
- namespace string is assumed equal to unspecified namespace.</li> </ul>
- */
-static constexpr const char *kServiceNamespace = "service.namespace";
-
-/**
  * The string ID of the service instance.
  *
  * <p>Notes:
@@ -740,6 +815,24 @@ static constexpr const char *kServiceNamespace = "service.namespace";
 static constexpr const char *kServiceInstanceId = "service.instance.id";
 
 /**
+ * A namespace for {@code service.name}.
+ *
+ * <p>Notes:
+  <ul> <li>A string value having a meaning that helps to distinguish a group of services, for
+ example the team name that owns a group of services. {@code service.name} is expected to be unique
+ within the same namespace. If {@code service.namespace} is not specified in the Resource then
+ {@code service.name} is expected to be unique for all services that have no explicit namespace
+ defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length
+ namespace string is assumed equal to unspecified namespace.</li> </ul>
+ */
+static constexpr const char *kServiceNamespace = "service.namespace";
+
+/**
+ * The language of the telemetry SDK.
+ */
+static constexpr const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
+
+/**
  * The name of the telemetry SDK as defined above.
  *
  * <p>Notes:
@@ -754,19 +847,29 @@ stable across different versions of an implementation.</li> </ul>
 static constexpr const char *kTelemetrySdkName = "telemetry.sdk.name";
 
 /**
- * The language of the telemetry SDK.
- */
-static constexpr const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
-
-/**
  * The version string of the telemetry SDK.
  */
 static constexpr const char *kTelemetrySdkVersion = "telemetry.sdk.version";
 
 /**
- * The version string of the auto instrumentation agent, if used.
+ * The name of the auto instrumentation agent or distribution, if used.
+ *
+ * <p>Notes:
+  <ul> <li>Official auto instrumentation agents and distributions SHOULD set the {@code
+telemetry.distro.name} attribute to a string starting with {@code opentelemetry-}, e.g. {@code
+opentelemetry-java-instrumentation}.</li> </ul>
  */
-static constexpr const char *kTelemetryAutoVersion = "telemetry.auto.version";
+static constexpr const char *kTelemetryDistroName = "telemetry.distro.name";
+
+/**
+ * The version string of the auto instrumentation agent or distribution, if used.
+ */
+static constexpr const char *kTelemetryDistroVersion = "telemetry.distro.version";
+
+/**
+ * Additional description of the web engine (e.g. detailed version and edition information).
+ */
+static constexpr const char *kWebengineDescription = "webengine.description";
 
 /**
  * The name of the web engine.
@@ -777,11 +880,6 @@ static constexpr const char *kWebengineName = "webengine.name";
  * The version of the web engine.
  */
 static constexpr const char *kWebengineVersion = "webengine.version";
-
-/**
- * Additional description of the web engine (e.g. detailed version and edition information).
- */
-static constexpr const char *kWebengineDescription = "webengine.description";
 
 /**
  * The name of the instrumentation scope - ({@code InstrumentationScope.Name} in OTLP).
@@ -810,24 +908,6 @@ OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 // Enum definitions
-namespace CloudProviderValues
-{
-/** Alibaba Cloud. */
-static constexpr const char *kAlibabaCloud = "alibaba_cloud";
-/** Amazon Web Services. */
-static constexpr const char *kAws = "aws";
-/** Microsoft Azure. */
-static constexpr const char *kAzure = "azure";
-/** Google Cloud Platform. */
-static constexpr const char *kGcp = "gcp";
-/** Heroku Platform as a Service. */
-static constexpr const char *kHeroku = "heroku";
-/** IBM Cloud. */
-static constexpr const char *kIbmCloud = "ibm_cloud";
-/** Tencent Cloud. */
-static constexpr const char *kTencentCloud = "tencent_cloud";
-}  // namespace CloudProviderValues
-
 namespace CloudPlatformValues
 {
 /** Alibaba Cloud Elastic Compute Service. */
@@ -885,6 +965,24 @@ static constexpr const char *kTencentCloudEks = "tencent_cloud_eks";
 /** Tencent Cloud Serverless Cloud Function (SCF). */
 static constexpr const char *kTencentCloudScf = "tencent_cloud_scf";
 }  // namespace CloudPlatformValues
+
+namespace CloudProviderValues
+{
+/** Alibaba Cloud. */
+static constexpr const char *kAlibabaCloud = "alibaba_cloud";
+/** Amazon Web Services. */
+static constexpr const char *kAws = "aws";
+/** Microsoft Azure. */
+static constexpr const char *kAzure = "azure";
+/** Google Cloud Platform. */
+static constexpr const char *kGcp = "gcp";
+/** Heroku Platform as a Service. */
+static constexpr const char *kHeroku = "heroku";
+/** IBM Cloud. */
+static constexpr const char *kIbmCloud = "ibm_cloud";
+/** Tencent Cloud. */
+static constexpr const char *kTencentCloud = "tencent_cloud";
+}  // namespace CloudProviderValues
 
 namespace AwsEcsLaunchtypeValues
 {

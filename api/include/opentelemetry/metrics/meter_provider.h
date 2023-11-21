@@ -126,7 +126,19 @@ public:
                                             nostd::string_view schema_url = "") noexcept = 0;
 #endif
 
-#ifdef ENABLE_REMOVE_METER_PREVIEW
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Remove a named Meter instance (ABI).
+   *
+   * This API is experimental, see
+   * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
+   *
+   * @since ABI_VERSION 2
+   *
+   * @param[in] name Meter instrumentation scope
+   * @param[in] version Instrumentation scope version, optional
+   * @param[in] schema_url Instrumentation scope schema URL, optional
+   */
   virtual void RemoveMeter(nostd::string_view name,
                            nostd::string_view version    = "",
                            nostd::string_view schema_url = "") noexcept = 0;

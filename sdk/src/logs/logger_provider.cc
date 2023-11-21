@@ -57,6 +57,12 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view schema_url,
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
+  if (library_name.empty())
+  {
+    library_name = logger_name;
+  }
+
   // Ensure only one thread can read/write from the map of loggers
   std::lock_guard<std::mutex> lock_guard{lock_};
 
@@ -84,18 +90,9 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   }
   */
 
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
-  std::unique_ptr<instrumentationscope::InstrumentationScope> lib;
-  if (library_name.empty())
-  {
-    lib = instrumentationscope::InstrumentationScope::Create(logger_name, library_version,
-                                                             schema_url, attributes);
-  }
-  else
-  {
-    lib = instrumentationscope::InstrumentationScope::Create(library_name, library_version,
-                                                             schema_url, attributes);
-  }
+  std::unique_ptr<instrumentationscope::InstrumentationScope> lib =
+      instrumentationscope::InstrumentationScope::Create(library_name, library_version, schema_url,
+                                                         attributes);
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));

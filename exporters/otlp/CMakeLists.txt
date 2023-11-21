@@ -56,8 +56,10 @@ if(WITH_OTLP_GRPC)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_grpc_client)
 
-  add_library(opentelemetry_exporter_otlp_grpc
-              src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc)
+  add_library(
+    opentelemetry_exporter_otlp_grpc
+    src/otlp_grpc_exporter.cc src/otlp_grpc_exporter_factory.cc
+    src/otlp_grpc_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
@@ -73,7 +75,8 @@ if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_exporter_otlp_grpc_log
     src/otlp_grpc_log_record_exporter.cc
-    src/otlp_grpc_log_record_exporter_factory.cc)
+    src/otlp_grpc_log_record_exporter_factory.cc
+    src/otlp_grpc_log_record_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_log
                         PROPERTIES EXPORT_NAME otlp_grpc_log_record_exporter)
@@ -88,7 +91,8 @@ if(WITH_OTLP_GRPC)
 
   add_library(
     opentelemetry_exporter_otlp_grpc_metrics
-    src/otlp_grpc_metric_exporter.cc src/otlp_grpc_metric_exporter_factory.cc)
+    src/otlp_grpc_metric_exporter.cc src/otlp_grpc_metric_exporter_factory.cc
+    src/otlp_grpc_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc_metrics
                         PROPERTIES EXPORT_NAME otlp_grpc_metrics_exporter)
@@ -130,8 +134,10 @@ if(WITH_OTLP_HTTP)
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_client)
 
-  add_library(opentelemetry_exporter_otlp_http
-              src/otlp_http_exporter.cc src/otlp_http_exporter_factory.cc)
+  add_library(
+    opentelemetry_exporter_otlp_http
+    src/otlp_http_exporter.cc src/otlp_http_exporter_factory.cc
+    src/otlp_http_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)
@@ -147,7 +153,8 @@ if(WITH_OTLP_HTTP)
   add_library(
     opentelemetry_exporter_otlp_http_log
     src/otlp_http_log_record_exporter.cc
-    src/otlp_http_log_record_exporter_factory.cc)
+    src/otlp_http_log_record_exporter_factory.cc
+    src/otlp_http_log_record_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http_log
                         PROPERTIES EXPORT_NAME otlp_http_log_record_exporter)
@@ -162,7 +169,8 @@ if(WITH_OTLP_HTTP)
 
   add_library(
     opentelemetry_exporter_otlp_http_metric
-    src/otlp_http_metric_exporter.cc src/otlp_http_metric_exporter_factory.cc)
+    src/otlp_http_metric_exporter.cc src/otlp_http_metric_exporter_factory.cc
+    src/otlp_http_metric_exporter_options.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http_metric
                         PROPERTIES EXPORT_NAME otlp_http_metric_exporter)
@@ -295,6 +303,17 @@ if(BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_grpc_log_record_exporter_factory_test)
 
+    add_executable(otlp_grpc_metric_exporter_test
+                   test/otlp_grpc_metric_exporter_test.cc)
+    target_link_libraries(
+      otlp_grpc_metric_exporter_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
+      opentelemetry_exporter_otlp_grpc_metrics)
+    gtest_add_tests(
+      TARGET otlp_grpc_metric_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_grpc_metric_exporter_test)
+
     add_executable(otlp_grpc_metric_exporter_factory_test
                    test/otlp_grpc_metric_exporter_factory_test.cc)
     target_link_libraries(
@@ -342,7 +361,8 @@ if(BUILD_TESTING)
       ${GMOCK_LIB}
       opentelemetry_exporter_otlp_http_log
       opentelemetry_logs
-      opentelemetry_http_client_nosend)
+      opentelemetry_http_client_nosend
+      nlohmann_json::nlohmann_json)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_test
       TEST_PREFIX exporter.otlp.

@@ -35,7 +35,8 @@ public:
       case AggregationType::kSum:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
                    ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic)))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
+                   : std::move(
+                         std::unique_ptr<Aggregation>(new DoubleSumAggregation(is_monotonic)));
         break;
       case AggregationType::kHistogram: {
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
