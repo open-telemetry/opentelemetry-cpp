@@ -66,7 +66,7 @@ private:
    *
    * @param raw_metric_unitName The raw metric unit for which Prometheus metric unit needs to be
    *     computed.
-   * @return the computed Prometheus metric unit equivalent of the OTLP metric un
+   * @return the computed Prometheus metric unit equivalent of the OTLP metric unit
    */
   static std::string GetEquivalentPrometheusUnit(const std::string &raw_metric_unitName);
 
