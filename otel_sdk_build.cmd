@@ -8,8 +8,10 @@ set BAZEL_VC_FULL_VERSION=
 for /F "usebackq" %%i in (`where bazel`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
-set PATH=c:\windows\system32;c:\python310
+set PATH=c:\windows\system32;c:\program files\python312
 pushd "%~dp0"
+
+"%__BAZEL__%" build -k --//:with_dll=true ...
 
 rem Note that this builds (through the magic of force_debug/release/reldeb) all configurations (unlike tests).
 rem Note that `otel_sdk.zip` is built here for the default fastdbg (e.g. when no -c is specified)
