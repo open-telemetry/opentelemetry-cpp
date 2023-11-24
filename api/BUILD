@@ -15,12 +15,7 @@ cc_library(
     hdrs = glob(["include/**/*.h"]),
     defines = select({
         ":with_external_abseil": ["HAVE_ABSEIL"],
-        "//:with_dll_enabled": [
-            # Export the dll symbols
-            "OPENTELEMETRY_DLL=-1", #1=dllimport, -1=dllexport
-            "OPENTELEMETRY_STL_VERSION=2017",
-            "OPENTELEMETRY_ABI_VERSION_NO=2",
-            ],
+        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1", "OPENTELEMETRY_ABI_VERSION_NO=2", "OPENTELEMETRY_STL_VERSION=2017"], #1=dllimport, -1=dllexport
         "//conditions:default": [],
     }),
     strip_include_prefix = "include",

@@ -227,40 +227,49 @@ point.
 
 #endif
 
-// Bazel with MSVC defines COMPILER_MSVC. This is how we detect the combination.
-#if defined(COMPILER_MSVC) && COMPILER_MSVC
-// When compiling with --//:with_dll=true OPENTELEMETRY_DLL is set to 1
-#  if defined(OPENTELEMETRY_DLL)
+// Below is specific to the single-dll clone of OpenTelemetry C++ here:
+// https://github.com/malkia/opentelemetry-cpp 
+#if defined(OPENTELEMETRY_DLL)
 
-#    if defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION != 2017)
-#       error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION should be 2017
-#    else
-#       define OPENTELEMETRY_STL_VERSION 2017
-#    endif
+#   define OPENTELEMETRY_DLL_STRX(x) #x
+#   define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
 
-#    if defined(OPENTELEMETRY_ABI_VERSION_NO) && (OPENTELEMETRY_ABI_VERSION_NO != 2)
-#       error OPENTELEMETRY_DLL: OPENTELEMETRY_ABI_VERSION_NO should be 2
-#    else
-#       define OPENTELEMETRY_ABI_VERSION_NO 2
-#    endif
+#   if !defined(_MSC_VER)
+#      error OPENTELEMETRY_DLL: Only MSVC compiler is supported.
+#   endif
 
-#    if defined(OPENTELEMETRY_EXPORT)
-#      undef OPENTELEMETRY_EXPORT
-#    endif
-#    if OPENTELEMETRY_DLL==-1 // This is used during build
-#      define OPENTELEMETRY_EXPORT __declspec(dllexport)
-#    else
+#   if _MSVC_LANG < 201703L
+#      error OPENTELEMETRY_DLL: Enable at least c++17 using /std:c++17 or larger
+#   endif
+
+#   if defined(OPENTELEMETRY_STL_VERSION)
+#      if OPENTELEMETRY_STL_VERSION != 2017
+#         error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION must be 2017
+#      endif
+#   else
+#      define OPENTELEMETRY_STL_VERSION 2017
+#   endif
+
+#   if defined(OPENTELEMETRY_ABI_VERSION_NO)
+#      if OPENTELEMETRY_ABI_VERSION_NO != 2
+#         error OPENTELEMETRY_DLL: OPENTELEMETRY_ABI_VERSION_NO must be 2
+#      endif
+#   else
+#      define OPENTELEMETRY_ABI_VERSION_NO 2
+#   endif
+
+#   undef OPENTELEMETRY_EXPORT
+#   undef OPENTELEMETRY_API_SINGLETON
+#   define OPENTELEMETRY_API_SINGLETON
+
+#   if OPENTELEMETRY_DLL==1
 #      define OPENTELEMETRY_EXPORT __declspec(dllimport)
-#    endif
+#   elif OPENTELEMETRY_DLL==-1 // Only used during build
+#      define OPENTELEMETRY_EXPORT __declspec(dllexport)
+#   else
+#      error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
+#   endif
 
-#    if defined(OPENTELEMETRY_API_SINGLETON)
-#      undef OPENTELEMETRY_API_SINGLETON
-#      define OPENTELEMETRY_API_SINGLETON
-#    endif
+#   pragma detect_mismatch("detect_opentelemetry_dll_mismatch", "stl" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) "_abi" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO))
 
-#  endif // if defined(OPENTELEMETRY_DLL) && OPENTELEMETRY_DLL
-#endif // if defined(COMPILER_MSVC) && COMPILER_MSVC
-
-#ifndef OPENTELEMETRY_EXPORT
-#define OPENTELEMETRY_EXPORT
-#endif
+#endif // if defined(OPENTELEMETRY_DLL)

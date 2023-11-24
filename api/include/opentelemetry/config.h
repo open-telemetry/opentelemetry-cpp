@@ -12,3 +12,5 @@
 #if !defined(__GLIBCXX__) || OPENTELEMETRY_HAS_INCLUDE(<codecvt>)  // >= libstdc++-5
 #  define OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
 #endif
+
+#include "version.h"
