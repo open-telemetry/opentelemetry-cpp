@@ -34,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
-        strip_prefix = "benchmark-1.7.1",
+        sha256 = "6bc180a57d23d4d9515519f92b0c83d61b05b5bab188961f36ac7b06b0d9e9ce",
+        strip_prefix = "benchmark-1.8.3",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.8.3.tar.gz",
         ],
     )
 
@@ -46,10 +46,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
-        strip_prefix = "googletest-1.13.0",
+        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
+        strip_prefix = "googletest-1.14.0",
         urls = [
-            "https://github.com/google/googletest/archive/v1.13.0.tar.gz",
+            "https://github.com/google/googletest/archive/v1.14.0.tar.gz",
         ],
     )
 
@@ -57,10 +57,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_absl",
-        sha256 = "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",
-        strip_prefix = "abseil-cpp-20220623.1",
+        sha256 = "987ce98f02eefbaf930d6e38ab16aa05737234d7afbab2d5c4ea7adbe50c28ed",
+        strip_prefix = "abseil-cpp-20230802.1",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20220623.1.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz",
         ],
     )
 
