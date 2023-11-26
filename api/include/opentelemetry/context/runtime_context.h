@@ -41,7 +41,7 @@ private:
  * this class and passing an initialized RuntimeContextStorage object to
  * RuntimeContext::SetRuntimeContextStorage.
  */
-class OPENTELEMETRY_EXPORT RuntimeContextStorage
+class /* OPENTELEMETRY_EXPORT */ RuntimeContextStorage
 {
 public:
   /**
