@@ -64,27 +64,6 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # Load gRPC dependency
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc_legacy",
-        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
-        strip_prefix = "grpc-1.39.1",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc_latest11",
-        sha256 = "e266aa0d9d9cddb876484a370b94f468248594a96ca0b6f87c21f969db2b8c5b",
-        strip_prefix = "grpc-1.46.4",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.46.4.tar.gz",
-        ],
-    )
-
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
@@ -133,10 +112,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "platforms",
-        sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+        sha256 = "8150406605389ececb6da07cbcb509d5637a3ab9a24bc69b1101531367d89d74",
         urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
-            "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
+            "https://github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
         ],
     )
 
@@ -157,19 +136,19 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "rules_foreign_cc",
-        sha256 = "69023642d5781c68911beda769f91fcbc8ca48711db935a75da7f6536b65047f",
-        strip_prefix = "rules_foreign_cc-0.6.0",
-        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
+        sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
+        strip_prefix = "rules_foreign_cc-0.10.1",
+        url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.10.1/rules_foreign_cc-0.10.1.tar.gz",
     )
 
     # bazel skylib
     maybe(
         http_archive,
         name = "bazel_skylib",
-        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+        sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
         urls = [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
         ],
     )
 
