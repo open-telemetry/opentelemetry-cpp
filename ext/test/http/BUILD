@@ -17,3 +17,16 @@ cc_test(
         "@curl",
     ]),
 )
+
+cc_test(
+    name = "url_parser_test",
+    srcs = [
+        "url_parser_test.cc",
+    ],
+    tags = ["test"],
+    deps = dll_deps([
+        "//ext:headers",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ]),
+)

@@ -34,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
-        strip_prefix = "benchmark-1.7.1",
+        sha256 = "6bc180a57d23d4d9515519f92b0c83d61b05b5bab188961f36ac7b06b0d9e9ce",
+        strip_prefix = "benchmark-1.8.3",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.8.3.tar.gz",
         ],
     )
 
@@ -46,10 +46,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
-        strip_prefix = "googletest-1.13.0",
+        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
+        strip_prefix = "googletest-1.14.0",
         urls = [
-            "https://github.com/google/googletest/archive/v1.13.0.tar.gz",
+            "https://github.com/google/googletest/archive/v1.14.0.tar.gz",
         ],
     )
 
@@ -57,41 +57,20 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_absl",
-        sha256 = "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",
-        strip_prefix = "abseil-cpp-20220623.1",
+        sha256 = "987ce98f02eefbaf930d6e38ab16aa05737234d7afbab2d5c4ea7adbe50c28ed",
+        strip_prefix = "abseil-cpp-20230802.1",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20220623.1.tar.gz",
-        ],
-    )
-
-    # Load gRPC dependency
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc_legacy",
-        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
-        strip_prefix = "grpc-1.39.1",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc_latest11",
-        sha256 = "e266aa0d9d9cddb876484a370b94f468248594a96ca0b6f87c21f969db2b8c5b",
-        strip_prefix = "grpc-1.46.4",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.46.4.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz",
         ],
     )
 
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
-        strip_prefix = "grpc-1.49.2",
+        sha256 = "17e4e1b100657b88027721220cbfb694d86c4b807e9257eaf2fb2d273b41b1b1",
+        strip_prefix = "grpc-1.54.3",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.54.3.tar.gz",
         ],
     )
 
@@ -133,10 +112,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "platforms",
-        sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+        sha256 = "8150406605389ececb6da07cbcb509d5637a3ab9a24bc69b1101531367d89d74",
         urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
-            "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
+            "https://github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
         ],
     )
 
@@ -157,19 +136,19 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "rules_foreign_cc",
-        sha256 = "69023642d5781c68911beda769f91fcbc8ca48711db935a75da7f6536b65047f",
-        strip_prefix = "rules_foreign_cc-0.6.0",
-        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
+        sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
+        strip_prefix = "rules_foreign_cc-0.10.1",
+        url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.10.1/rules_foreign_cc-0.10.1.tar.gz",
     )
 
     # bazel skylib
     maybe(
         http_archive,
         name = "bazel_skylib",
-        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+        sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
         urls = [
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
         ],
     )
 

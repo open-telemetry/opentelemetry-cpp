@@ -1,6 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps")
 
 package(default_visibility = ["//visibility:public"])
@@ -70,6 +71,20 @@ cc_test(
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
+    ]),
+)
+
+otel_cc_benchmark(
+    name = "etw_perf_test",
+    srcs = ["test/etw_perf_test.cc"],
+    tags = [
+        "benchmark",
+        "etw",
+        "test",
+    ],
+    deps = dll_deps([
+        ":etw_exporter",
+        "@com_google_googletest//:gtest_main",
     ]),
 )
 
