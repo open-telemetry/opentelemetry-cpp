@@ -44,6 +44,13 @@ public:
               const common::KeyValueIterable & /* attributes */,
               const context::Context & /* context */) noexcept override
   {}
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void Record(T /*value*/,
+              const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
+  {}
+
+  void Record(T /*value*/) noexcept override {}
+#endif
 };
 
 template <class T>
