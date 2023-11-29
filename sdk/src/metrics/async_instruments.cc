@@ -3,9 +3,8 @@
 
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #include "opentelemetry/sdk_config.h"
-
-#include <cmath>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -21,6 +20,11 @@ ObservableInstrument::ObservableInstrument(InstrumentDescriptor instrument_descr
       observable_registry_{observable_registry}
 
 {}
+
+ObservableInstrument::~ObservableInstrument()
+{
+  observable_registry_->CleanupCallback(this);
+}
 
 void ObservableInstrument::AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,
                                        void *state) noexcept

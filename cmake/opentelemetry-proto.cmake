@@ -43,7 +43,7 @@ else()
     message(
       STATUS "opentelemetry-proto dependency satisfied by: github download")
     if("${opentelemetry-proto}" STREQUAL "")
-      set(opentelemetry-proto "v0.19.0")
+      set(opentelemetry-proto "v1.0.0")
     endif()
     include(ExternalProject)
     ExternalProject_Add(
@@ -64,8 +64,6 @@ else()
     set(needs_proto_download TRUE)
   endif()
 endif()
-
-include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO
@@ -169,63 +167,75 @@ if(WITH_OTLP_GRPC)
   message(STATUS "gRPC_CPP_PLUGIN_EXECUTABLE=${gRPC_CPP_PLUGIN_EXECUTABLE}")
 endif()
 
-if(WITH_OTLP_GRPC)
-  add_custom_command(
-    OUTPUT ${COMMON_PB_H_FILE}
-           ${COMMON_PB_CPP_FILE}
-           ${RESOURCE_PB_H_FILE}
-           ${RESOURCE_PB_CPP_FILE}
-           ${TRACE_PB_H_FILE}
-           ${TRACE_PB_CPP_FILE}
-           ${LOGS_PB_H_FILE}
-           ${LOGS_PB_CPP_FILE}
-           ${METRICS_PB_H_FILE}
-           ${METRICS_PB_CPP_FILE}
-           ${TRACE_SERVICE_PB_H_FILE}
-           ${TRACE_SERVICE_PB_CPP_FILE}
-           ${TRACE_SERVICE_GRPC_PB_H_FILE}
-           ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
-           ${LOGS_SERVICE_PB_H_FILE}
-           ${LOGS_SERVICE_PB_CPP_FILE}
-           ${LOGS_SERVICE_GRPC_PB_H_FILE}
-           ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
-           ${METRICS_SERVICE_PB_H_FILE}
-           ${METRICS_SERVICE_PB_CPP_FILE}
-           ${METRICS_SERVICE_GRPC_PB_H_FILE}
-           ${METRICS_SERVICE_GRPC_PB_CPP_FILE}
-    COMMAND
-      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--experimental_allow_proto3_optional"
-      "--proto_path=${PROTO_PATH}" ${PROTOBUF_INCLUDE_FLAGS}
-      "--cpp_out=${GENERATED_PROTOBUF_PATH}"
-      "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
-      --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}" ${COMMON_PROTO}
-      ${RESOURCE_PROTO} ${TRACE_PROTO} ${LOGS_PROTO} ${METRICS_PROTO}
-      ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO} ${METRICS_SERVICE_PROTO})
-else()
-  add_custom_command(
-    OUTPUT ${COMMON_PB_H_FILE}
-           ${COMMON_PB_CPP_FILE}
-           ${RESOURCE_PB_H_FILE}
-           ${RESOURCE_PB_CPP_FILE}
-           ${TRACE_PB_H_FILE}
-           ${TRACE_PB_CPP_FILE}
-           ${LOGS_PB_H_FILE}
-           ${LOGS_PB_CPP_FILE}
-           ${METRICS_PB_H_FILE}
-           ${METRICS_PB_CPP_FILE}
-           ${TRACE_SERVICE_PB_H_FILE}
-           ${TRACE_SERVICE_PB_CPP_FILE}
-           ${LOGS_SERVICE_PB_H_FILE}
-           ${LOGS_SERVICE_PB_CPP_FILE}
-           ${METRICS_SERVICE_PB_H_FILE}
-           ${METRICS_SERVICE_PB_CPP_FILE}
-    COMMAND
-      ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--experimental_allow_proto3_optional"
-      "--proto_path=${PROTO_PATH}" ${PROTOBUF_INCLUDE_FLAGS}
-      "--cpp_out=${GENERATED_PROTOBUF_PATH}" ${COMMON_PROTO} ${RESOURCE_PROTO}
-      ${TRACE_PROTO} ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO}
-      ${LOGS_SERVICE_PROTO} ${METRICS_SERVICE_PROTO})
+set(PROTOBUF_COMMON_FLAGS "--proto_path=${PROTO_PATH}"
+                          "--cpp_out=${GENERATED_PROTOBUF_PATH}")
+# --experimental_allow_proto3_optional is available from 3.13 and be stable and
+# enabled by default from 3.16
+if(Protobuf_VERSION AND Protobuf_VERSION VERSION_LESS "3.16")
+  list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
+elseif(PROTOBUF_VERSION AND PROTOBUF_VERSION VERSION_LESS "3.16")
+  list(APPEND PROTOBUF_COMMON_FLAGS "--experimental_allow_proto3_optional")
 endif()
+
+set(PROTOBUF_GENERATED_FILES
+    ${COMMON_PB_H_FILE}
+    ${COMMON_PB_CPP_FILE}
+    ${RESOURCE_PB_H_FILE}
+    ${RESOURCE_PB_CPP_FILE}
+    ${TRACE_PB_H_FILE}
+    ${TRACE_PB_CPP_FILE}
+    ${LOGS_PB_H_FILE}
+    ${LOGS_PB_CPP_FILE}
+    ${METRICS_PB_H_FILE}
+    ${METRICS_PB_CPP_FILE}
+    ${TRACE_SERVICE_PB_H_FILE}
+    ${TRACE_SERVICE_PB_CPP_FILE}
+    ${LOGS_SERVICE_PB_H_FILE}
+    ${LOGS_SERVICE_PB_CPP_FILE}
+    ${METRICS_SERVICE_PB_H_FILE}
+    ${METRICS_SERVICE_PB_CPP_FILE})
+
+if(WITH_OTLP_GRPC)
+  list(APPEND PROTOBUF_COMMON_FLAGS
+       "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
+       --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}")
+
+  list(
+    APPEND
+    PROTOBUF_GENERATED_FILES
+    ${TRACE_SERVICE_GRPC_PB_H_FILE}
+    ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
+    ${LOGS_SERVICE_GRPC_PB_H_FILE}
+    ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
+    ${METRICS_SERVICE_GRPC_PB_H_FILE}
+    ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+endif()
+
+set(PROTOBUF_RUN_PROTOC_COMMAND "\"${PROTOBUF_PROTOC_EXECUTABLE}\"")
+foreach(
+  PROTOBUF_RUN_PROTOC_ARG
+  ${PROTOBUF_COMMON_FLAGS}
+  ${PROTOBUF_INCLUDE_FLAGS}
+  ${COMMON_PROTO}
+  ${RESOURCE_PROTO}
+  ${TRACE_PROTO}
+  ${LOGS_PROTO}
+  ${METRICS_PROTO}
+  ${TRACE_SERVICE_PROTO}
+  ${LOGS_SERVICE_PROTO}
+  ${METRICS_SERVICE_PROTO})
+  set(PROTOBUF_RUN_PROTOC_COMMAND
+      "${PROTOBUF_RUN_PROTOC_COMMAND} \"${PROTOBUF_RUN_PROTOC_ARG}\"")
+endforeach()
+
+add_custom_command(
+  OUTPUT ${PROTOBUF_GENERATED_FILES}
+  COMMAND
+    ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTOBUF_COMMON_FLAGS}
+    ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
+    ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
+    ${METRICS_SERVICE_PROTO}
+  COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}")
 
 include_directories("${GENERATED_PROTOBUF_PATH}")
 
@@ -251,6 +261,10 @@ add_library(
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
 
+if(WITH_ABSEIL)
+  target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
+endif()
+
 if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
@@ -258,8 +272,14 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
-  target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
+  target_link_libraries(opentelemetry_proto_grpc
+    PUBLIC opentelemetry_proto)
 
+  get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
+  if (grpc_lib_type STREQUAL "SHARED_LIBRARY")
+    target_link_libraries(opentelemetry_proto_grpc
+      PUBLIC gRPC::grpc++)
+  endif()
   set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
                                                             proto_grpc)
   patch_protobuf_targets(opentelemetry_proto_grpc)

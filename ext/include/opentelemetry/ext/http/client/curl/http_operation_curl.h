@@ -269,13 +269,15 @@ private:
 
   CURLcode SetCurlLongOption(CURLoption option, long value);
 
+  CURLcode SetCurlOffOption(CURLoption option, curl_off_t value);
+
   const char *GetCurlErrorMessage(CURLcode code);
 
-  std::atomic<bool> is_aborted_;   // Set to 'true' when async callback is aborted
-  std::atomic<bool> is_finished_;  // Set to 'true' when async callback is finished.
-  std::atomic<bool> is_cleaned_;   // Set to 'true' when async callback is cleaned.
-  const bool is_raw_response_;     // Do not split response headers from response body
-  const bool reuse_connection_;    // Reuse connection
+  std::atomic<bool> is_aborted_{false};   // Set to 'true' when async callback is aborted
+  std::atomic<bool> is_finished_{false};  // Set to 'true' when async callback is finished.
+  std::atomic<bool> is_cleaned_{false};   // Set to 'true' when async callback is cleaned.
+  const bool is_raw_response_;            // Do not split response headers from response body
+  const bool reuse_connection_;           // Reuse connection
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
   char curl_error_message_[CURL_ERROR_SIZE];
@@ -309,7 +311,7 @@ private:
 
     std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;
-    std::atomic<bool> is_promise_running;
+    std::atomic<bool> is_promise_running{false};
     std::promise<CURLcode> result_promise;
     std::future<CURLcode> result_future;
   };

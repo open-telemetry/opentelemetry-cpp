@@ -3,10 +3,9 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-
-#include <memory>
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -16,13 +15,20 @@ namespace otlp
 
 /**
  * Struct to hold OTLP GRPC metrics exporter options.
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlpgrpc
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpGrpcMetricExporterOptions : public OtlpGrpcExporterOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClientOptions
 {
+  OtlpGrpcMetricExporterOptions();
+  ~OtlpGrpcMetricExporterOptions();
 
-  // Preferred Aggregation Temporality
-  sdk::metrics::AggregationTemporality aggregation_temporality =
-      sdk::metrics::AggregationTemporality::kCumulative;
+  /** Preferred Aggregation Temporality. */
+  PreferredAggregationTemporality aggregation_temporality;
 };
 
 }  // namespace otlp

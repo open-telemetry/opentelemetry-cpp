@@ -24,9 +24,10 @@ Both these dependencies are listed here:
   [SDK](/sdk):
   - Uses Standard C++ library for latest features (std::string_view,
     std::variant, std::span, std::shared_ptr, std::unique_ptr) with  C++14/17/20
-    compiler if `WITH_STL` cmake option is enabled or `HAVE_CPP_STDLIB` macro is
-    defined. License: `GNU General Public License`
-    - For C++11/14/17 compilers, fallback to gsl::span if [GSL C++
+    compiler if cmake option `WITH_STL` is enabled
+    or macro `OPENTELEMETRY_STL_VERSION` is defined.
+    License: `GNU General Public License`
+    - For C++14/17 compilers, fallback to gsl::span if [GSL C++
       library](https://github.com/microsoft/GSL) is installed. License: `MIT
       License`
     - libc++ 14.0.0 do not support construct std::span from a range or container
@@ -74,17 +75,6 @@ Both these dependencies are listed here:
   exporter:
   - `libcurl` for connecting with Zipkin server over HTTP protocol.
   - `nlohmann/json` for encoding Zipkin messages.
-
-- [Jaeger](/exporters/jaeger)
-  exporter:
-  - [Thrift](https://github.com/apache/thrift) - Serialization and RPC
-    framework.
-    - `thrift` compiler to generate C++ stubs for IDL data model for Jaeger.
-    - `libthrift`  library to generate serialized trace/metrics/log data to be
-      sent to remote Jaeger service. Note: libthrift **0.12.0** doesn't work
-      with this Jaeger exporter. See
-      [#1680](https://github.com/open-telemetry/opentelemetry-cpp/issues/1680).
-    - License: `Apache License 2.0`
 
 - [ETW](/exporters/etw)
   exporter:

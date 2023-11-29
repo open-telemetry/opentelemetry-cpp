@@ -3,8 +3,11 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/string_view.h"
+#include <memory>
+#include <string>
+
 #include "opentelemetry/sdk/metrics/view/predicate_factory.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -14,9 +17,7 @@ namespace metrics
 class MeterSelector
 {
 public:
-  MeterSelector(opentelemetry::nostd::string_view name,
-                opentelemetry::nostd::string_view version,
-                opentelemetry::nostd::string_view schema)
+  MeterSelector(const std::string &name, const std::string &version, const std::string &schema)
       : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kExact)},
         version_filter_{PredicateFactory::GetPredicate(version, PredicateType::kExact)},
         schema_filter_{PredicateFactory::GetPredicate(schema, PredicateType::kExact)}

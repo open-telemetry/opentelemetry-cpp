@@ -11,16 +11,20 @@
 
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 
+#include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #include <google/protobuf/message_lite.h>
@@ -106,7 +110,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
-    auto http_client = http_client::HttpClientFactory::CreateNoSend();
+    auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
             http_client};
   }
@@ -160,8 +164,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -171,9 +175,9 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["sum"]["data_points"];
-          EXPECT_EQ(10.0, data_points[0]["as_double"].get<double>());
-          EXPECT_EQ(20.0, data_points[1]["as_double"].get<double>());
+          auto data_points = metric["sum"]["dataPoints"];
+          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+          EXPECT_EQ(20.0, data_points[1]["asDouble"].get<double>());
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -341,8 +345,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -352,9 +356,9 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["gauge"]["data_points"];
-          EXPECT_EQ(10.0, data_points[0]["as_double"].get<double>());
-          EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["as_int"]));
+          auto data_points = metric["gauge"]["dataPoints"];
+          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+          EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["asInt"]));
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
           ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
@@ -536,8 +540,8 @@ public:
           auto check_json =
               nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resource_metrics"].begin();
-          auto scope_metrics    = *resource_metrics["scope_metrics"].begin();
+          auto resource_metrics = *check_json["resourceMetrics"].begin();
+          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
           auto scope            = scope_metrics["scope"];
           EXPECT_EQ("library_name", scope["name"].get<std::string>());
           EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
@@ -547,43 +551,43 @@ public:
           EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
           EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["histogram"]["data_points"];
+          auto data_points = metric["histogram"]["dataPoints"];
           EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[0]["count"]));
           EXPECT_EQ(900.5, data_points[0]["sum"].get<double>());
           EXPECT_EQ(1.8, data_points[0]["min"].get<double>());
           EXPECT_EQ(19, data_points[0]["max"].get<double>());
-          EXPECT_EQ(4, data_points[0]["bucket_counts"].size());
-          if (4 == data_points[0]["bucket_counts"].size())
+          EXPECT_EQ(4, data_points[0]["bucketCounts"].size());
+          if (4 == data_points[0]["bucketCounts"].size())
           {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucket_counts"][3]));
+            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][0]));
+            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][1]));
+            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][2]));
+            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][3]));
           }
-          EXPECT_EQ(3, data_points[0]["explicit_bounds"].size());
-          if (3 == data_points[0]["explicit_bounds"].size())
+          EXPECT_EQ(3, data_points[0]["explicitBounds"].size());
+          if (3 == data_points[0]["explicitBounds"].size())
           {
-            EXPECT_EQ(10.1, data_points[0]["explicit_bounds"][0].get<double>());
-            EXPECT_EQ(20.2, data_points[0]["explicit_bounds"][1].get<double>());
-            EXPECT_EQ(30.2, data_points[0]["explicit_bounds"][2].get<double>());
+            EXPECT_EQ(10.1, data_points[0]["explicitBounds"][0].get<double>());
+            EXPECT_EQ(20.2, data_points[0]["explicitBounds"][1].get<double>());
+            EXPECT_EQ(30.2, data_points[0]["explicitBounds"][2].get<double>());
           }
 
           EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[1]["count"]));
           EXPECT_EQ(900.0, data_points[1]["sum"].get<double>());
-          EXPECT_EQ(4, data_points[1]["bucket_counts"].size());
-          if (4 == data_points[1]["bucket_counts"].size())
+          EXPECT_EQ(4, data_points[1]["bucketCounts"].size());
+          if (4 == data_points[1]["bucketCounts"].size())
           {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucket_counts"][3]));
+            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][0]));
+            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][1]));
+            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][2]));
+            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][3]));
           }
-          EXPECT_EQ(3, data_points[1]["explicit_bounds"].size());
-          if (3 == data_points[1]["explicit_bounds"].size())
+          EXPECT_EQ(3, data_points[1]["explicitBounds"].size());
+          if (3 == data_points[1]["explicitBounds"].size())
           {
-            EXPECT_EQ(10.0, data_points[1]["explicit_bounds"][0].get<double>());
-            EXPECT_EQ(20.0, data_points[1]["explicit_bounds"][1].get<double>());
-            EXPECT_EQ(30.0, data_points[1]["explicit_bounds"][2].get<double>());
+            EXPECT_EQ(10.0, data_points[1]["explicitBounds"][0].get<double>());
+            EXPECT_EQ(20.0, data_points[1]["explicitBounds"][1].get<double>());
+            EXPECT_EQ(30.0, data_points[1]["explicitBounds"][2].get<double>());
           }
 
           auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
@@ -973,6 +977,78 @@ TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
                 opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter));
 }
 #endif
+
+// Test Preferred aggregtion temporality selection
+TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
+{
+  // Cummulative aggregation selector : use cummulative aggregation for all instruments.
+  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  EXPECT_EQ(GetOptions(exporter).aggregation_temporality,
+            PreferredAggregationTemporality::kCumulative);
+  auto cumm_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter).aggregation_temporality);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(cumm_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+
+  // LowMemory aggregation selector use:
+  //   - cummulative aggregtion for Counter and Histogram
+  //   - delta aggregation for up-down counter, observable counter, observable gauge, observable
+  //   up-down counter
+  OtlpHttpMetricExporterOptions opts2;
+  opts2.aggregation_temporality = PreferredAggregationTemporality::kLowMemory;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter2(new OtlpHttpMetricExporter(opts2));
+  EXPECT_EQ(GetOptions(exporter2).aggregation_temporality,
+            PreferredAggregationTemporality::kLowMemory);
+  auto lowmemory_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter2).aggregation_temporality);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(
+      lowmemory_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+
+  // Delta aggregation selector use:
+  //   - delta aggregtion for Counter, Histogram, Observable Counter, Observable Gauge
+  //   - cummulative aggregation for up-down counter, observable up-down counter
+  OtlpHttpMetricExporterOptions opts3;
+  opts3.aggregation_temporality = PreferredAggregationTemporality::kDelta;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter3(new OtlpHttpMetricExporter(opts3));
+  EXPECT_EQ(GetOptions(exporter3).aggregation_temporality, PreferredAggregationTemporality::kDelta);
+  auto delta_selector =
+      OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter3).aggregation_temporality);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+            opentelemetry::sdk::metrics::AggregationTemporality::kDelta);
+
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+  EXPECT_EQ(delta_selector(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            opentelemetry::sdk::metrics::AggregationTemporality::kCumulative);
+}
 
 }  // namespace otlp
 }  // namespace exporter

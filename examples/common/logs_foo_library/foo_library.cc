@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-#ifdef ENABLE_LOGS_PREVIEW
-#  include <map>
-#  include <string>
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/version/version.h"
-#  include "opentelemetry/trace/provider.h"
+
+#include <map>
+#include <string>
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/trace/provider.h"
 
 namespace logs  = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
@@ -36,4 +36,3 @@ void foo_library()
                         ctx.span_id(), ctx.trace_flags(),
                         opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 }
-#endif

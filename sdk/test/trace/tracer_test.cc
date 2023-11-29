@@ -17,8 +17,9 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
+namespace nostd     = opentelemetry::nostd;
+namespace common    = opentelemetry::common;
+namespace trace_api = opentelemetry::trace;
 using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
@@ -517,6 +518,392 @@ TEST(Tracer, SpanSetLinks)
     ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr4")), "4");
   }
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Tracer, SpanAddLinkAbiv2)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  {
+    auto span = tracer->StartSpan("span");
+    SpanContext target(false, false);
+    // Single link attribute passed through Initialization list
+    span->AddLink(target, {{"attr2", 2}});
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link  = span_data_links.at(0);
+    auto attrs = link.GetAttributes();
+    ASSERT_EQ(nostd::get<int>(attrs.at("attr2")), 2);
+  }
+
+  {
+    auto span = tracer->StartSpan("span");
+    SpanContext target(false, false);
+    // Multiple link attributes passed through Initialization list
+    span->AddLink(target, {{"attr2", 2}, {"attr3", 3}});
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link  = span_data_links.at(0);
+    auto attrs = link.GetAttributes();
+    ASSERT_EQ(nostd::get<int>(attrs.at("attr2")), 2);
+    ASSERT_EQ(nostd::get<int>(attrs.at("attr3")), 3);
+  }
+
+  {
+    std::map<std::string, std::string> attrs_map = {{"attr1", "1"}, {"attr2", "2"}};
+
+    auto span = tracer->StartSpan("span");
+    SpanContext target(false, false);
+    span->AddLink(target, attrs_map);
+    span->End();
+
+    auto spans = span_data->GetSpans();
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link  = span_data_links.at(0);
+    auto attrs = link.GetAttributes();
+    ASSERT_EQ(nostd::get<std::string>(attrs.at("attr1")), "1");
+    ASSERT_EQ(nostd::get<std::string>(attrs.at("attr2")), "2");
+  }
+
+  {
+    auto span = tracer->StartSpan("span");
+    SpanContext target(false, false);
+
+    // Single link attribute passed through Initialization list
+    span->AddLink(target, {{"attr1", 1}});
+
+    // Multiple link attributes passed through Initialization list
+    span->AddLink(target, {{"attr2", 2}, {"attr3", 3}});
+
+    std::map<std::string, std::string> attrs_map = {{"attr4", "4"}, {"attr5", "5"}};
+    span->AddLink(target, attrs_map);
+
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(3, span_data_links.size());
+
+    {
+      auto link  = span_data_links.at(0);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr1")), 1);
+    }
+
+    {
+      auto link  = span_data_links.at(1);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr2")), 2);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr3")), 3);
+    }
+
+    {
+      auto link  = span_data_links.at(2);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attr4")), "4");
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attr5")), "5");
+    }
+  }
+}
+
+TEST(Tracer, SpanAddLinksAbiv2)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  {
+    auto span = tracer->StartSpan("span");
+    // Single span link passed through Initialization list
+    span->AddLinks({{SpanContext(false, false), {{"attr2", 2}}}});
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link.GetAttributes().at("attr2")), 2);
+  }
+
+  {
+    auto span = tracer->StartSpan("span");
+    // Multiple span links passed through Initialization list
+    span->AddLinks(
+        {{SpanContext(false, false), {{"attr2", 2}}}, {SpanContext(false, false), {{"attr3", 3}}}});
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr3")), 3);
+  }
+
+  {
+    auto span = tracer->StartSpan("span");
+    // Multiple links, each with multiple attributes passed through Initialization list
+    span->AddLinks({{SpanContext(false, false), {{"attr2", 2}, {"attr3", 3}}},
+                    {SpanContext(false, false), {{"attr4", 4}}}});
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr3")), 3);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr4")), 4);
+  }
+
+  {
+    std::map<std::string, std::string> attrs1 = {{"attr1", "1"}, {"attr2", "2"}};
+    std::map<std::string, std::string> attrs2 = {{"attr3", "3"}, {"attr4", "4"}};
+
+    std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
+        {SpanContext(false, false), attrs1}, {SpanContext(false, false), attrs2}};
+
+    auto span = tracer->StartSpan("span");
+    span->AddLinks(links);
+    span->End();
+
+    auto spans = span_data->GetSpans();
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr1")), "1");
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr2")), "2");
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr3")), "3");
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr4")), "4");
+  }
+
+  {
+    auto span = tracer->StartSpan("span");
+
+    // Single span link passed through Initialization list
+    span->AddLinks({{SpanContext(false, false), {{"attr10", 10}}}});
+    span->AddLinks({{SpanContext(false, false), {{"attr11", 11}}}});
+
+    // Multiple span links passed through Initialization list
+    span->AddLinks({{SpanContext(false, false), {{"attr12", 12}}},
+                    {SpanContext(false, false), {{"attr13", 13}}}});
+    span->AddLinks({{SpanContext(false, false), {{"attr14", 14}}},
+                    {SpanContext(false, false), {{"attr15", 15}}}});
+
+    // Multiple links, each with multiple attributes passed through Initialization list
+    span->AddLinks({{SpanContext(false, false), {{"attr16", 16}, {"attr17", 17}}},
+                    {SpanContext(false, false), {{"attr18", 18}}}});
+    span->AddLinks({{SpanContext(false, false), {{"attr19", 19}, {"attr20", 20}}},
+                    {SpanContext(false, false), {{"attr21", 21}}}});
+
+    std::map<std::string, std::string> attrsa1 = {{"attra1", "1"}, {"attra2", "2"}};
+    std::map<std::string, std::string> attrsa2 = {{"attra3", "3"}, {"attra4", "4"}};
+
+    std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> linksa = {
+        {SpanContext(false, false), attrsa1}, {SpanContext(false, false), attrsa2}};
+
+    span->AddLinks(linksa);
+
+    std::map<std::string, std::string> attrsb1 = {{"attrb1", "1"}, {"attrb2", "2"}};
+    std::map<std::string, std::string> attrsb2 = {{"attrb3", "3"}, {"attrb4", "4"}};
+
+    std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> linksb = {
+        {SpanContext(false, false), attrsb1}, {SpanContext(false, false), attrsb2}};
+
+    span->AddLinks(linksb);
+
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(14, span_data_links.size());
+
+    {
+      auto link  = span_data_links.at(0);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr10")), 10);
+    }
+
+    {
+      auto link  = span_data_links.at(1);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr11")), 11);
+    }
+
+    {
+      auto link  = span_data_links.at(2);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr12")), 12);
+    }
+
+    {
+      auto link  = span_data_links.at(3);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr13")), 13);
+    }
+
+    {
+      auto link  = span_data_links.at(4);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr14")), 14);
+    }
+
+    {
+      auto link  = span_data_links.at(5);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr15")), 15);
+    }
+
+    {
+      auto link  = span_data_links.at(6);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr16")), 16);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr17")), 17);
+    }
+
+    {
+      auto link  = span_data_links.at(7);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr18")), 18);
+    }
+
+    {
+      auto link  = span_data_links.at(8);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr19")), 19);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr20")), 20);
+    }
+
+    {
+      auto link  = span_data_links.at(9);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr21")), 21);
+    }
+
+    {
+      auto link  = span_data_links.at(10);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attra1")), "1");
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attra2")), "2");
+    }
+
+    {
+      auto link  = span_data_links.at(11);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attra3")), "3");
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attra4")), "4");
+    }
+
+    {
+      auto link  = span_data_links.at(12);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attrb1")), "1");
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attrb2")), "2");
+    }
+
+    {
+      auto link  = span_data_links.at(13);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 2);
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attrb3")), "3");
+      ASSERT_EQ(nostd::get<std::string>(attrs.at("attrb4")), "4");
+    }
+  }
+}
+
+TEST(Tracer, SpanMixLinksAbiv2)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  {
+    // Link 1 added at StartSpan
+    auto span =
+        tracer->StartSpan("span", {{"attr1", 1}}, {{SpanContext(false, false), {{"attr2", 2}}}});
+
+    SpanContext target(false, false);
+    // Link 2 added with AddLink
+    span->AddLink(target, {{"attr3", 3}});
+
+    // Link 3 added with AddLinks
+    span->AddLinks({{SpanContext(false, false), {{"attr4", 4}}}});
+
+    span->End();
+
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(3, span_data_links.size());
+
+    {
+      auto link  = span_data_links.at(0);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr2")), 2);
+    }
+
+    {
+      auto link  = span_data_links.at(1);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr3")), 3);
+    }
+
+    {
+      auto link  = span_data_links.at(2);
+      auto attrs = link.GetAttributes();
+      ASSERT_EQ(attrs.size(), 1);
+      ASSERT_EQ(nostd::get<int>(attrs.at("attr4")), 4);
+    }
+  }
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 TEST(Tracer, TestAlwaysOnSampler)
 {

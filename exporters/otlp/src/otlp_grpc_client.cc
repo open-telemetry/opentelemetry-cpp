@@ -34,9 +34,21 @@ static std::string GetFileContents(const char *fpath)
   finstream.close();
   return contents;
 }
+
+// If the file path is non-empty, returns the contents of the file. Otherwise returns contents.
+static std::string GetFileContentsOrInMemoryContents(const std::string &file_path,
+                                                     const std::string &contents)
+{
+  if (!file_path.empty())
+  {
+    return GetFileContents(file_path.c_str());
+  }
+  return contents;
+}
+
 }  // namespace
 
-std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporterOptions &options)
+std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
   std::shared_ptr<grpc::Channel> channel;
 
@@ -61,14 +73,14 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
-    if (options.ssl_credentials_cacert_path.empty())
-    {
-      ssl_opts.pem_root_certs = options.ssl_credentials_cacert_as_string;
-    }
-    else
-    {
-      ssl_opts.pem_root_certs = GetFileContents((options.ssl_credentials_cacert_path).c_str());
-    }
+    ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
+        options.ssl_credentials_cacert_path, options.ssl_credentials_cacert_as_string);
+#if ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+    ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
+                                                                 options.ssl_client_key_string);
+    ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
+                                                                options.ssl_client_cert_string);
+#endif
     channel =
         grpc::CreateCustomChannel(grpc_target, grpc::SslCredentials(ssl_opts), grpc_arguments);
   }
@@ -82,7 +94,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcExporte
 }
 
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
-    const OtlpGrpcExporterOptions &options)
+    const OtlpGrpcClientOptions &options)
 {
   std::unique_ptr<grpc::ClientContext> context{new grpc::ClientContext()};
   if (!context)
@@ -109,24 +121,22 @@ std::unique_ptr<grpc::CompletionQueue> OtlpGrpcClient::MakeCompletionQueue()
 }
 
 std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>
-OtlpGrpcClient::MakeTraceServiceStub(const OtlpGrpcExporterOptions &options)
+OtlpGrpcClient::MakeTraceServiceStub(const OtlpGrpcClientOptions &options)
 {
   return proto::collector::trace::v1::TraceService::NewStub(MakeChannel(options));
 }
 
 std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
-OtlpGrpcClient::MakeMetricsServiceStub(const OtlpGrpcExporterOptions &options)
+OtlpGrpcClient::MakeMetricsServiceStub(const OtlpGrpcClientOptions &options)
 {
   return proto::collector::metrics::v1::MetricsService::NewStub(MakeChannel(options));
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
-OtlpGrpcClient::MakeLogsServiceStub(const OtlpGrpcExporterOptions &options)
+OtlpGrpcClient::MakeLogsServiceStub(const OtlpGrpcClientOptions &options)
 {
   return proto::collector::logs::v1::LogsService::NewStub(MakeChannel(options));
 }
-#endif
 
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::trace::v1::TraceService::StubInterface *stub,
@@ -146,7 +156,6 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   return stub->Export(context, request, response);
 }
 
-#ifdef ENABLE_LOGS_PREVIEW
 grpc::Status OtlpGrpcClient::DelegateExport(
     proto::collector::logs::v1::LogsService::StubInterface *stub,
     grpc::ClientContext *context,
@@ -155,7 +164,6 @@ grpc::Status OtlpGrpcClient::DelegateExport(
 {
   return stub->Export(context, request, response);
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

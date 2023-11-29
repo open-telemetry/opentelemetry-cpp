@@ -18,6 +18,9 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+# Prefer cmake CONFIG to auto resolve dependencies.
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -89,17 +92,54 @@ if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
+option(WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
-if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
-   "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
-  math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
-else()
+
+#
+# We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
+# distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
+#
+# This allows:
+#
+# * to have a specific option description for each ABI
+# * to mark experimental/stable/deprecated on flags, for clarity
+# * to search for exact abi usage move easily, discouraging:
+#
+#   * cmake -DWITH_ABI_VERSION=${ARG}
+#
+# While not supported, having distinct WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2
+# flags also opens the possibility to support multiple ABI concurrently, should
+# that become necessary.
+#
+if(WITH_ABI_VERSION_1 AND WITH_ABI_VERSION_2)
+  #
+  # Only one ABI is supported in a build.
+  #
   message(
-    FATAL_ERROR
-      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
-  )
+    FATAL_ERROR "Set either WITH_ABI_VERSION_1 or WITH_ABI_VERSION_2, not both")
 endif()
+
+if(WITH_ABI_VERSION_2)
+  set(OPENTELEMETRY_ABI_VERSION_NO "2")
+elseif(WITH_ABI_VERSION_1)
+  set(OPENTELEMETRY_ABI_VERSION_NO "1")
+else()
+  if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+     "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
+    math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
+  else()
+    message(
+      FATAL_ERROR
+        "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+    )
+  endif()
+endif()
+
+message(STATUS "OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO}")
+
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
    "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
   set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
@@ -110,9 +150,14 @@ else()
   )
 endif()
 
+message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
+
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+set(WITH_STL
+    "OFF"
+    CACHE STRING "Which version of the Standard Library for C++ to use")
+
 option(WITH_GSL
        "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
@@ -125,22 +170,9 @@ endif()
 option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
        ${OPENTELEMETRY_INSTALL_default})
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-  if(WITH_STL)
-    # Require at least C++17. C++20 is needed to avoid gsl::span
-    if(CMAKE_VERSION VERSION_GREATER 3.11.999)
-      # Ask for 20, may get anything below
-      set(CMAKE_CXX_STANDARD 20)
-    else()
-      # Ask for 17, may get anything below
-      set(CMAKE_CXX_STANDARD 17)
-    endif()
-  else()
-    set(CMAKE_CXX_STANDARD 11)
-  endif()
-endif()
+include("${PROJECT_SOURCE_DIR}/cmake/tools.cmake")
 
-if(WITH_STL)
+if(NOT WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
   # opentelemetry-api library directly. We ensure that variant implementation
   # (absl::variant or std::variant) in variant unit test code is consistent with
@@ -159,14 +191,15 @@ if(WITH_STL)
   endif()
 endif()
 
-option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
-
-if(WITH_OTLP)
+if(DEFINED WITH_OTLP)
   message(
-    WARNING
-      "WITH_OTLP is deprecated and will be removed in future. Please set either WITH_OTLP_GRPC or WITH_OTLP_HTTP, or even both."
+    FATAL_ERROR
+      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
   )
 endif()
+
+option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
+       OFF)
 
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
@@ -179,9 +212,8 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
-option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
-
-option(WITH_JAEGER "DEPRECATED - Whether to include the Jaeger exporter" OFF)
+option(WITH_ZPAGES
+       "DEPRECATED - Whether to include the Zpages Server in the SDK" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
@@ -198,6 +230,14 @@ option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
 option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
        OFF)
 
+#
+# This option is experimental, subject to change in the spec:
+#
+# * https://github.com/open-telemetry/opentelemetry-specification/issues/2232
+#
+option(WITH_REMOVE_METER_PREVIEW
+       "EXPERIMENTAL, ABI BREAKING: Allow to remove a meter" OFF)
+
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
@@ -207,13 +247,11 @@ set(OTELCPP_PROTO_PATH
     CACHE PATH "Path to opentelemetry-proto")
 
 if(WIN32)
-  if(BUILD_TESTING)
-    if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
-      add_compile_options(/wd4275)
-    endif()
-  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
+else()
+  if(DEFINED (WITH_ETW))
+    message(FATAL_ERROR "WITH_ETW is only supported on Windows")
+  endif()
 endif(WIN32)
 
 # Do not convert deprecated message to error
@@ -235,19 +273,30 @@ option(
 
 option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
 
-option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+if(DEFINED WITH_LOGS_PREVIEW)
+  message(WARNING "WITH_LOGS_PREVIEW is removed because logs signal is stable")
+endif()
+
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
-# EXPERIMENTAL
-option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" OFF)
+# STABLE
+option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" ON)
 
-# EXPERIMENTAL
+# STABLE
 option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
-       "Whether to enable otlp http ssl tls min/max/cipher options" OFF)
+       "Whether to enable otlp http ssl tls min/max/cipher options" ON)
 
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
+
+if(WITH_ZPAGES)
+  if(WITH_NO_DEPRECATED_CODE)
+    message(FATAL_ERROR "WITH_ZPAGES is DEPRECATED.")
+  else()
+    message(WARNING "WITH_ZPAGES is DEPRECATED.")
+  endif()
+endif()
 
 #
 # Verify options dependencies
@@ -278,7 +327,12 @@ function(install_windows_deps)
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-      PARENT_SCOPE)
+      CACHE FILEPATH "")
+  message(
+    "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
+    Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
+  )
+
 endfunction()
 
 function(set_target_version target_name)
@@ -288,25 +342,6 @@ function(set_target_version target_name)
                                 SOVERSION ${OPENTELEMETRY_ABI_VERSION_NO})
   endif()
 endfunction()
-
-if(WITH_JAEGER)
-  if(WITH_NO_DEPRECATED_CODE)
-    message(FATAL_ERROR "Jaeger is DEPRECATED.")
-  else()
-    message(WARNING "Jaeger is DEPRECATED.")
-  endif()
-
-  find_package(Thrift QUIET)
-  if(Thrift_FOUND)
-    find_package(Boost REQUIRED)
-    include_directories(${Boost_INCLUDE_DIR})
-  else()
-    # Install Thrift and propagate via vcpkg toolchain file
-    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      install_windows_deps()
-    endif()
-  endif()
-endif()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
@@ -350,11 +385,22 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_OTLP)
-  set(protobuf_MODULE_COMPATIBLE ON)
+if(WITH_ABSEIL)
+  find_package(absl CONFIG REQUIRED)
+endif()
+
+if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
-                                                       CACHE{WITH_OTLP_GRPC}))
+  if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
+    if(NOT WITH_ABSEIL)
+      message(
+        FATAL_ERROR
+          "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
+      )
+    endif()
+  endif()
+
+  if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -372,9 +418,7 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(NOT gRPC_FOUND
-       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
-                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
+    if(NOT gRPC_FOUND AND WITH_OTLP_GRPC)
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -385,16 +429,21 @@ if(WITH_OTLP)
         )
       endif()
     endif()
-    # Latest Protobuf uses mixed case instead of uppercase
-    if(Protobuf_PROTOC_EXECUTABLE)
-      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+  endif()
+  # Latest Protobuf imported targets and without legacy module support
+  if(TARGET protobuf::protoc)
+    project_build_tools_get_imported_location(PROTOBUF_PROTOC_EXECUTABLE
+                                              protobuf::protoc)
+    # If protobuf::protoc is not a imported target, then we use the target
+    # directly for fallback
+    if(NOT PROTOBUF_PROTOC_EXECUTABLE)
+      set(PROTOBUF_PROTOC_EXECUTABLE protobuf::protoc)
     endif()
+  elseif(Protobuf_PROTOC_EXECUTABLE)
+    # Some versions of FindProtobuf.cmake uses mixed case instead of uppercase
+    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   include(CMakeDependentOption)
-
-  cmake_dependent_option(
-    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
-    "gRPC_FOUND" OFF)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
   include(cmake/opentelemetry-proto.cmake)
@@ -406,7 +455,6 @@ endif()
 
 if(WITH_OTLP_HTTP
    OR WITH_ELASTICSEARCH
-   OR WITH_JAEGER
    OR WITH_ZIPKIN
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_EXAMPLES_HTTP)
@@ -535,29 +583,43 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 include(CTest)
 if(BUILD_TESTING)
-  add_definitions(-DENABLE_TEST)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
     set(GTEST_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    set(GTEST_BOTH_LIBRARIES
-        ${CMAKE_BINARY_DIR}/lib/libgtest.a
-        ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-        ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    if(TARGET gtest)
+      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
+    else()
+      set(GTEST_BOTH_LIBRARIES
+          ${CMAKE_BINARY_DIR}/lib/libgtest.a
+          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
+          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest REQUIRED)
+    find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
+      include(${CMAKE_TOOLCHAIN_FILE})
       find_package(GTest REQUIRED)
     endif()
   else()
     # Prefer GTest installed by OS distro, brew or vcpkg package manager
     find_package(GTest REQUIRED)
   endif()
-  include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  if(NOT GTEST_BOTH_LIBRARIES)
+    # New GTest package names
+    if(TARGET GTest::gtest)
+      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+    elseif(TARGET GTest::GTest)
+      set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
+    endif()
+  endif()
+  if(GTEST_INCLUDE_DIRS)
+    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  endif()
   message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
@@ -570,6 +632,9 @@ endif()
 include(CMakePackageConfigHelpers)
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(NOT WIN32)
+    message(FATAL_ERROR "Build DLL is only supported on Windows!")
+  endif()
   if(NOT MSVC)
     message(WARNING "Build DLL is supposed to work with MSVC!")
   endif()
@@ -627,6 +692,9 @@ if(NOT WITH_API_ONLY)
     add_subdirectory(functional)
   endif()
 endif()
+
+include(cmake/opentelemetry-build-external-component.cmake)
+include(cmake/patch-imported-config.cmake)
 
 if(OPENTELEMETRY_INSTALL)
   # Export cmake config and support find_packages(opentelemetry-cpp CONFIG)

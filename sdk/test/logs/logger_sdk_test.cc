@@ -1,22 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <string>
 
-#  include <chrono>
-#  include <string>
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/event_logger.h"
+#include "opentelemetry/sdk/logs/event_logger_provider.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/tracer.h"
 
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/logs/event_logger.h"
-#  include "opentelemetry/sdk/logs/event_logger_provider.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/scope.h"
-#  include "opentelemetry/trace/tracer.h"
-
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
@@ -200,13 +202,13 @@ TEST(LoggerSDK, LogToAProcessor)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, true);
+  auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
   nostd::shared_ptr<opentelemetry::trace::Span> include_span;
@@ -261,7 +263,7 @@ TEST(LoggerSDK, EventLog)
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url, false);
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
 
   auto api_elp      = std::shared_ptr<logs_api::EventLoggerProvider>(new EventLoggerProvider());
   auto event_logger = api_elp->CreateEventLogger(logger, "otel-cpp.event_domain");
@@ -284,5 +286,3 @@ TEST(LoggerSDK, EventLog)
   ASSERT_EQ(shared_recordable->GetEventName(), "otel-cpp.event_name");
   ASSERT_EQ(shared_recordable->GetEventDomain(), "otel-cpp.event_domain");
 }
-
-#endif

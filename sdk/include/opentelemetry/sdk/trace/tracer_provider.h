@@ -10,18 +10,22 @@
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
+class SpanProcessor;
+class Tracer;
+class TracerContext;
+
 class TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
@@ -40,31 +44,42 @@ public:
       opentelemetry::sdk::resource::Resource resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
-      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
-          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator())) noexcept;
+      std::unique_ptr<IdGenerator> id_generator =
+          std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       opentelemetry::sdk::resource::Resource resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
-      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
-          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator())) noexcept;
+      std::unique_ptr<IdGenerator> id_generator =
+          std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context
-   * @param context The shared tracer configuration/pipeline for this provider.
+   * @param context The owned tracer configuration/pipeline for this provider.
    */
-  explicit TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
+  explicit TracerProvider(std::unique_ptr<TracerContext> context) noexcept;
 
   ~TracerProvider() override;
 
+  /*
+    Make sure GetTracer() helpers from the API are seen in overload resolution.
+  */
+  using opentelemetry::trace::TracerProvider::GetTracer;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
-      nostd::string_view library_name,
-      nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view name,
+      nostd::string_view version,
+      nostd::string_view schema_url,
+      const opentelemetry::common::KeyValueIterable *attributes) noexcept override;
+#else
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+      nostd::string_view name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") noexcept override;
+#endif
 
   /**
    * Attaches a span processor to list of configured processors for this tracer provider.
@@ -94,8 +109,8 @@ public:
 
 private:
   // order of declaration is important here - tracers should destroy only after context.
-  std::vector<std::shared_ptr<opentelemetry::sdk::trace::Tracer>> tracers_;
-  std::shared_ptr<sdk::trace::TracerContext> context_;
+  std::vector<std::shared_ptr<Tracer>> tracers_;
+  std::shared_ptr<TracerContext> context_;
   std::mutex lock_;
 };
 }  // namespace trace

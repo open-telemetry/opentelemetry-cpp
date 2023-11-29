@@ -12,13 +12,11 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
 using opentelemetry::ext::zpages::ThreadsafeSpanData;
-using opentelemetry::trace::CanonicalCode;
 using opentelemetry::trace::SpanId;
 using opentelemetry::trace::TraceId;
 

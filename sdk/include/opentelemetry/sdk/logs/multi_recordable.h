@@ -3,23 +3,22 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <cstddef>
+#include <memory>
+#include <unordered_map>
 
-#  include <cstddef>
-#  include <memory>
-#  include <unordered_map>
-
-#  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class LogRecordProcessor;
+
 class MultiRecordable final : public Recordable
 {
 public:
@@ -108,5 +107,3 @@ private:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

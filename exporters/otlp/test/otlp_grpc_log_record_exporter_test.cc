@@ -1,37 +1,37 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <unordered_map>
 
-#  include <unordered_map>
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
-#  include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
-#  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
 
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/trace/exporter.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/provider.h"
+#include <gtest/gtest.h>
 
-#  include <gtest/gtest.h>
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -59,7 +59,8 @@ public:
   }
 
   // Get the options associated with the given exporter.
-  const OtlpGrpcExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcLogRecordExporter> &exporter)
+  const OtlpGrpcLogRecordExporterOptions &GetOptions(
+      std::unique_ptr<OtlpGrpcLogRecordExporter> &exporter)
   {
     return exporter->options_;
   }
@@ -152,7 +153,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_stub_interface(
       trace_mock_stub);
 
-  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>(
+  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       opentelemetry::sdk::trace::TracerProviderFactory::Create(
           opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(
               GetExporter(trace_stub_interface))));
@@ -170,9 +171,9 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
     auto trace_span = tracer->StartSpan("test_log");
     opentelemetry::trace::Scope trace_scope{trace_span};
 
-    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url, true,
+    auto logger = provider->GetLogger("test", "opentelelemtry_library", "", schema_url,
                                       {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
-    std::unordered_map<std::string, opentelemetry::v1::common::AttributeValue> attributes;
+    std::unordered_map<std::string, opentelemetry::common::AttributeValue> attributes;
     attributes["service.name"]     = "unit_test_service";
     attributes["tenant.id"]        = "test_user";
     attributes["bool_value"]       = true;
@@ -195,11 +196,9 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
-  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::v1::trace::TracerProvider>();
+  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>();
 }
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif  // ENABLE_LOGS_PREVIEW

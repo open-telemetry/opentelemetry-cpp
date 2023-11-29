@@ -4,7 +4,10 @@
 #pragma once
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_context_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
@@ -67,10 +70,10 @@ void InitTracer()
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.
-  std::shared_ptr<opentelemetry::sdk::trace::TracerContext> context =
+  std::unique_ptr<opentelemetry::sdk::trace::TracerContext> context =
       opentelemetry::sdk::trace::TracerContextFactory::Create(std::move(processors));
   std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(context);
+      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(context));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 

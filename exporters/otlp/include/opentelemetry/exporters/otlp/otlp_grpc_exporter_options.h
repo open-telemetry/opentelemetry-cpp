@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
-
-#include <memory>
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -15,25 +14,17 @@ namespace otlp
 
 /**
  * Struct to hold OTLP GRPC traces exporter options.
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-proto/blob/main/docs/specification.md#otlpgrpc
+ *
+ * See
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md
  */
-struct OtlpGrpcExporterOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcExporterOptions : public OtlpGrpcClientOptions
 {
-  // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = GetOtlpDefaultGrpcEndpoint();
-  // By default when false, uses grpc::InsecureChannelCredentials(); If true,
-  // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
-  bool use_ssl_credentials = GetOtlpDefaultIsSslEnable();
-  // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
-  std::string ssl_credentials_cacert_path = GetOtlpDefaultSslCertificatePath();
-  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
-  // SSL encryption.
-  std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
-  // Timeout for grpc deadline
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
-  // Additional HTTP headers
-  OtlpHeaders metadata = GetOtlpDefaultHeaders();
-  // User agent
-  std::string user_agent = GetOtlpDefaultUserAgent();
+  OtlpGrpcExporterOptions();
+  ~OtlpGrpcExporterOptions();
 };
 
 }  // namespace otlp

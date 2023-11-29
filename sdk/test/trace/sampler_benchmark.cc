@@ -42,6 +42,11 @@ void BM_AlwaysOnSamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerConstruction);
 
+/*
+  Fails to build with GCC.
+  See upstream bug: https://github.com/google/benchmark/issues/1675
+*/
+#if 0
 void BM_ParentBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
@@ -59,6 +64,7 @@ void BM_TraceIdRatioBasedSamplerConstruction(benchmark::State &state)
   }
 }
 BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);
+#endif
 
 // Sampler Helper Function
 void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
@@ -69,11 +75,13 @@ void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
   using M = std::map<std::string, int>;
   M m1    = {{}};
 
-  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
-  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+  using L =
+      std::vector<std::pair<opentelemetry::trace::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{opentelemetry::trace::SpanContext(false, false), {}},
+          {opentelemetry::trace::SpanContext(false, false), {}}};
 
   opentelemetry::common::KeyValueIterableView<M> view{m1};
-  trace_api::SpanContextKeyValueIterableView<L> links{l1};
+  opentelemetry::trace::SpanContextKeyValueIterableView<L> links{l1};
 
   while (state.KeepRunning())
   {

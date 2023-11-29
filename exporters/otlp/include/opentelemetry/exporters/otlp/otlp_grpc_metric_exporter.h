@@ -5,10 +5,10 @@
 
 // clang-format off
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
-#  include "opentelemetry/common/spin_lock_mutex.h"
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
 
@@ -63,7 +63,7 @@ private:
   const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;
 
   // For testing
-  friend class OtlpGrpcExporterTestPeer;
+  friend class OtlpGrpcMetricExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>

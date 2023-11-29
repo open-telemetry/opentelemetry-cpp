@@ -10,7 +10,7 @@ $nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
-$BAZEL_OPTIONS = "--copt=-DENABLE_LOGS_PREVIEW --copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
@@ -27,7 +27,7 @@ $VCPKG_DIR = Join-Path "$SRC_DIR" "tools" "vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
+    bazel build $BAZEL_OPTIONS --action_env=VCPKG_DIR=$VCPKG_DIR --deleted_packages=opentracing-shim -- //...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -58,7 +58,7 @@ switch ($action) {
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       -DOPENTELEMETRY_BUILD_DLL=1 `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
@@ -79,13 +79,22 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    examples\metrics_simple\Debug\metrics_ostream_example.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    examples\logs_simple\Debug\example_logs_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
   }
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_JAEGER=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE

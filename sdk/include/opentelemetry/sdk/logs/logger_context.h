@@ -3,19 +3,20 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <memory>
+#include <vector>
 
-#  include <memory>
-
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+
 /**
  * A class which stores the LoggerContext context.
  *
@@ -37,10 +38,10 @@ public:
                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
-   * Attaches a log processor to list of configured processors to this tracer context.
+   * Attaches a log processor to list of configured processors to this logger context.
    * Processor once attached can't be removed.
    * @param processor The new log processor for this tracer. This must not be
-   * a nullptr. Ownership is given to the `TracerContext`.
+   * a nullptr. Ownership is given to the `LoggerContext`.
    *
    * Note: This method is not thread safe.
    */
@@ -80,4 +81,3 @@ private:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

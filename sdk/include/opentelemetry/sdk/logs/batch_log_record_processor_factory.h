@@ -3,13 +3,9 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <memory>
 
-#  include <memory>
-
-#  include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,6 +13,10 @@ namespace sdk
 
 namespace logs
 {
+
+struct BatchLogRecordProcessorOptions;
+class LogRecordExporter;
+class LogRecordProcessor;
 
 /**
  * Factory class for BatchLogRecordProcessor.
@@ -34,4 +34,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

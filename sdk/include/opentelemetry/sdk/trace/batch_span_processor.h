@@ -3,21 +3,23 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/circular_buffer.h"
-#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
-
 #include <atomic>
 #include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <thread>
+
+#include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-
 namespace trace
 {
+class SpanExporter;
+struct BatchSpanProcessorOptions;
 
 /**
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes
@@ -112,11 +114,11 @@ protected:
     std::mutex cv_m, force_flush_cv_m, shutdown_m;
 
     /* Important boolean flags to handle the workflow of the processor */
-    std::atomic<bool> is_force_wakeup_background_worker;
-    std::atomic<bool> is_force_flush_pending;
-    std::atomic<bool> is_force_flush_notified;
-    std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us;
-    std::atomic<bool> is_shutdown;
+    std::atomic<bool> is_force_wakeup_background_worker{false};
+    std::atomic<bool> is_force_flush_pending{false};
+    std::atomic<bool> is_force_flush_notified{false};
+    std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
+    std::atomic<bool> is_shutdown{false};
   };
 
   /**

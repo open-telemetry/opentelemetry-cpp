@@ -1,21 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <stdint.h>
+#include <algorithm>
+#include <string>
+#include <vector>
 
-#  include <stdint.h>
-#  include <algorithm>
-#  include <string>
-#  include <vector>
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 
-#  include "opentelemetry/logs/logger.h"
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/logs/read_write_log_record.h"
-#  include "opentelemetry/trace/span_id.h"
-#  include "opentelemetry/trace/trace_id.h"
-
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using opentelemetry::sdk::logs::ReadWriteLogRecord;
 namespace trace_api = opentelemetry::trace;
@@ -98,13 +97,13 @@ public:
     }
   }
 
-  const opentelemetry::v1::common::AttributeValue &GetLastLogRecord() const noexcept
+  const opentelemetry::common::AttributeValue &GetLastLogRecord() const noexcept
   {
     return last_body_;
   }
 
 private:
-  opentelemetry::v1::common::AttributeValue last_body_;
+  opentelemetry::common::AttributeValue last_body_;
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -118,7 +117,6 @@ public:
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */,
-      bool /* include_trace_context */,
       const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return nostd::shared_ptr<opentelemetry::logs::Logger>(new TestBodyLogger());
@@ -132,8 +130,7 @@ TEST(LogBody, BodyConversation)
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
   nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto logger =
-      lp.GetLogger("TestBodyProvider", "opentelelemtry_library", "", schema_url, false, {});
+  auto logger = lp.GetLogger("TestBodyProvider", "opentelelemtry_library", "", schema_url, {});
 
   auto real_logger = static_cast<TestBodyLogger *>(logger.get());
 
@@ -323,5 +320,3 @@ TEST(LogBody, BodyConversation)
     }
   }
 }
-
-#endif

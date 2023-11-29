@@ -37,6 +37,7 @@ private:
   HttpCurlGlobalInitializer(HttpCurlGlobalInitializer &&)      = delete;
 
   HttpCurlGlobalInitializer &operator=(const HttpCurlGlobalInitializer &) = delete;
+
   HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&) = delete;
 
   HttpCurlGlobalInitializer();
@@ -159,7 +160,7 @@ public:
           std::string scheme      = "http",
           const std::string &host = "",
           uint16_t port           = 80)
-      : http_client_(http_client), is_session_active_(false)
+      : http_client_(http_client)
   {
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
@@ -190,9 +191,7 @@ public:
    */
   const std::string &GetBaseUri() const { return host_; }
 
-#ifdef ENABLE_TEST
   std::shared_ptr<Request> GetRequest() { return http_request_; }
-#endif
 
   inline HttpClient &GetHttpClient() noexcept { return http_client_; }
   inline const HttpClient &GetHttpClient() const noexcept { return http_client_; }
@@ -216,7 +215,7 @@ private:
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
   HttpClient &http_client_;
-  std::atomic<bool> is_session_active_;
+  std::atomic<bool> is_session_active_{false};
 };
 
 class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
@@ -327,7 +326,6 @@ public:
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-#ifdef ENABLE_TEST
   void WaitBackgroundThreadExit()
   {
     std::unique_ptr<std::thread> background_thread;
@@ -341,7 +339,6 @@ public:
       background_thread->join();
     }
   }
-#endif
 
 private:
   void wakeupBackgroundThread();
@@ -352,7 +349,7 @@ private:
 
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
-  std::atomic<uint64_t> next_session_id_;
+  std::atomic<uint64_t> next_session_id_{0};
   uint64_t max_sessions_per_connection_;
 
   std::mutex sessions_m_;

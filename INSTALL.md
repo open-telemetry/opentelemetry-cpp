@@ -16,7 +16,7 @@ You can link OpenTelemetry C++ SDK with libraries provided in
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
   Supported](./README.md#supported-development-platforms) for more information.
-- A compatible C++ compiler supporting at least C++11. Major compilers are
+- A compatible C++ compiler supporting at least C++14. Major compilers are
   supported. Refer to [Supported Compilers](./README.md#supported-c-versions)
   for more information.
 - [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from
@@ -82,7 +82,8 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
       Please refer to note [below](#building-shared-libs-for-windows) for
       Windows DLL support.
-   - `-DWITH_OTLP=ON` : To enable building OTLP exporter.
+   - `-DWITH_OTLP_GRPC=ON` : To enable building OTLP GRPC exporter.
+   - `-DWITH_OTLP_HTTP=ON` : To enable building OTLP HTTP exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
 3. Once the build configuration is created, build the CMake targets - this
@@ -157,7 +158,7 @@ path.
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
 Supported](./README.md#supported-development-platforms) for more information.
-- A compatible C++ compiler supporting at least C++11. Major compilers are
+- A compatible C++ compiler supporting at least C++14. Major compilers are
 supported. Refer to [Supported Compilers](./README.md#supported-c-versions) for
 more information.
 - [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from

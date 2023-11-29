@@ -1,13 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <gtest/gtest.h>
+#include <array>
 
-#  include <gtest/gtest.h>
-#  include <array>
-
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;
@@ -24,7 +22,6 @@ class TestProvider : public LoggerProvider
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */,
-      bool /* include_trace_context */,
       const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
     return shared_ptr<Logger>(nullptr);
@@ -109,5 +106,3 @@ TEST(Provider, CreateEventLogger)
 
   EXPECT_EQ(nullptr, logger);
 }
-
-#endif

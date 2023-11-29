@@ -1,28 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <chrono>
+#include <memory>
 
-#  include <chrono>
-#  include <memory>
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
-#  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
-#  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
 // clang-format off
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
 
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -32,16 +30,17 @@ namespace otlp
 // -------------------------------- Constructors --------------------------------
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
-    : OtlpGrpcLogRecordExporter(OtlpGrpcExporterOptions())
+    : OtlpGrpcLogRecordExporter(OtlpGrpcLogRecordExporterOptions())
 {}
 
-OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options)
+OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
+    const OtlpGrpcLogRecordExporterOptions &options)
     : options_(options), log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
 {}
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub)
-    : options_(OtlpGrpcExporterOptions()), log_service_stub_(std::move(stub))
+    : options_(OtlpGrpcLogRecordExporterOptions()), log_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
@@ -106,5 +105,3 @@ bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif

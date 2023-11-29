@@ -1,31 +1,32 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
-#  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#  include "opentelemetry/trace/provider.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
 
 // sdk::TracerProvider and sdk::LoggerProvider is just used to call ForceFlush and prevent to cancel
 // running exportings when destroy and shutdown exporters.It's optional to users.
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
-#  include <iostream>
-#  include <string>
+#include <iostream>
+#include <string>
 
-#  ifdef BAZEL_BUILD
-#    include "examples/common/logs_foo_library/foo_library.h"
-#  else
-#    include "logs_foo_library/foo_library.h"
-#  endif
+#ifdef BAZEL_BUILD
+#  include "examples/common/logs_foo_library/foo_library.h"
+#else
+#  include "logs_foo_library/foo_library.h"
+#endif
 
 namespace trace     = opentelemetry::trace;
 namespace otlp      = opentelemetry::exporter::otlp;
@@ -152,9 +153,3 @@ int main(int argc, char *argv[])
   CleanupTracer();
   CleanupLogger();
 }
-#else
-int main()
-{
-  return 0;
-}
-#endif

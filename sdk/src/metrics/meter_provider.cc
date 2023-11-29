@@ -3,6 +3,8 @@
 
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -19,7 +21,9 @@ namespace metrics
 namespace resource    = opentelemetry::sdk::resource;
 namespace metrics_api = opentelemetry::metrics;
 
-MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : context_{context} {}
+MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
+    : context_(std::move(context))
+{}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
@@ -28,11 +32,23 @@ MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
+    nostd::string_view name,
+    nostd::string_view version,
+    nostd::string_view schema_url,
+    const opentelemetry::common::KeyValueIterable *attributes) noexcept
+#else
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url) noexcept
+#endif
 {
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  const opentelemetry::common::KeyValueIterable *attributes = nullptr;
+#endif
+
   if (name.data() == nullptr || name == "")
   {
     OTEL_INTERNAL_LOG_WARN("[MeterProvider::GetMeter] Library name is empty.");
@@ -49,11 +65,32 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
       return nostd::shared_ptr<metrics_api::Meter>{meter};
     }
   }
-  auto lib   = instrumentationscope::InstrumentationScope::Create(name, version, schema_url);
-  auto meter = std::shared_ptr<Meter>(new Meter(context_, std::move(lib)));
+
+  instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
+  auto scope =
+      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
+
+  auto meter = std::shared_ptr<Meter>(new Meter(context_, std::move(scope)));
   context_->AddMeter(meter);
   return nostd::shared_ptr<metrics_api::Meter>{meter};
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void MeterProvider::RemoveMeter(nostd::string_view name,
+                                nostd::string_view version,
+                                nostd::string_view schema_url) noexcept
+{
+  if (name.data() == nullptr || name == "")
+  {
+    OTEL_INTERNAL_LOG_WARN("[MeterProvider::RemoveMeter] Library name is empty.");
+    name = "";
+  }
+
+  const std::lock_guard<std::mutex> guard(lock_);
+
+  context_->RemoveMeter(name, version, schema_url);
+}
+#endif
 
 const resource::Resource &MeterProvider::GetResource() const noexcept
 {

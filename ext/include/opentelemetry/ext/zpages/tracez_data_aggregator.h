@@ -19,9 +19,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/canonical_code.h"
-
-using opentelemetry::trace::CanonicalCode;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -155,7 +152,7 @@ private:
 
   /** A boolean that is set to true in the constructor and false in the
    * destructor to start and end execution of aggregate spans **/
-  std::atomic<bool> execute_;
+  std::atomic<bool> execute_{false};
 
   /** Thread that executes aggregate spans at regurlar intervals during this
   object's lifetime**/

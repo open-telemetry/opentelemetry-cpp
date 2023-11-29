@@ -3,8 +3,18 @@
 
 #pragma once
 
+#include <functional>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <unordered_map>
 #include <utility>
-#include "opentelemetry/common/key_value_iterable_view.h"
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
@@ -14,9 +24,7 @@
 
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-
-#include <list>
-#include <memory>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -32,9 +40,10 @@ public:
                     const AttributesProcessor *attributes_processor,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
                         OPENTELEMETRY_MAYBE_UNUSED,
-                    const AggregationConfig *aggregation_config)
+                    const AggregationConfig *aggregation_config,
+                    size_t attributes_limit = kAggregationCardinalityLimit)
       : instrument_descriptor_(instrument_descriptor),
-        attributes_hashmap_(new AttributesHashMap()),
+        attributes_hashmap_(new AttributesHashMap(attributes_limit)),
         attributes_processor_(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(exemplar_reservoir),
@@ -153,11 +162,6 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
-  // unreported metrics stash for all the collectors
-  std::unordered_map<CollectorHandle *, std::list<std::shared_ptr<AttributesHashMap>>>
-      unreported_metrics_;
-  // last reported metrics stash for all the collectors.
-  std::unordered_map<CollectorHandle *, LastReportedMetrics> last_reported_metrics_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   const AttributesProcessor *attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

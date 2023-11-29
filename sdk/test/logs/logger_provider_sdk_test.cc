@@ -1,21 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <array>
+#include <unordered_map>
 
-#  include <array>
-#  include <unordered_map>
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
-#  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/sdk/logs/simple_log_record_processor.h"
-
-#  include <gtest/gtest.h>
+#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
@@ -75,7 +74,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
   ASSERT_EQ(sdk_logger2->GetInstrumentationScope(), sdk_logger1->GetInstrumentationScope());
 
-  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url, true,
+  auto logger3 = lp->GetLogger("logger3", "opentelelemtry_library", "", schema_url,
                                {{"scope_key1", "scope_value"}, {"scope_key2", 2}});
 
   auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
@@ -89,7 +88,7 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
   std::unordered_map<std::string, std::string> scope_attributes = {{"scope_key", "scope_value"}};
   auto logger4 =
-      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, true, scope_attributes);
+      lp->GetLogger("logger4", "opentelelemtry_library", "", schema_url, scope_attributes);
   auto sdk_logger4 = static_cast<opentelemetry::sdk::logs::Logger *>(logger4.get());
 
   EXPECT_EQ(sdk_logger4->GetInstrumentationScope().GetAttributes().size(), 1);
@@ -110,6 +109,20 @@ TEST(LoggerProviderSDK, EventLoggerProviderFactory)
   auto logger1 = lp->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
 
   auto event_logger = elp->CreateEventLogger(logger1, "otel-cpp.test");
+}
+
+TEST(LoggerPviderSDK, LoggerEquityCheck)
+{
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+
+  auto logger1 = lp->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
+  auto logger2 = lp->GetLogger("logger1", "opentelelemtry_library", "", schema_url);
+  EXPECT_EQ(logger1, logger2);
+
+  auto logger3         = lp->GetLogger("logger3");
+  auto another_logger3 = lp->GetLogger("logger3");
+  EXPECT_EQ(logger3, another_logger3);
 }
 
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
@@ -169,7 +182,8 @@ TEST(LoggerProviderSDK, Shutdown)
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
-  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+  std::unique_ptr<LoggerContext> context(new LoggerContext(std::move(processors)));
+  LoggerProvider lp(std::move(context));
 
   EXPECT_TRUE(lp.Shutdown());
   EXPECT_TRUE(processor_ptr->IsShutdown());
@@ -184,9 +198,8 @@ TEST(LoggerProviderSDK, ForceFlush)
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.push_back(std::move(processor));
 
-  LoggerProvider lp(std::make_shared<LoggerContext>(std::move(processors)));
+  std::unique_ptr<LoggerContext> context(new LoggerContext(std::move(processors)));
+  LoggerProvider lp(std::move(context));
 
   EXPECT_TRUE(lp.ForceFlush());
 }
-
-#endif

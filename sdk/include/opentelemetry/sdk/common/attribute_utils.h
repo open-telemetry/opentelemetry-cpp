@@ -7,8 +7,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -103,10 +105,10 @@ struct AttributeConverter
 class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
 {
 public:
-  // Contruct empty attribute map
+  // Construct empty attribute map
   AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>() {}
 
-  // Contruct attribute map and populate with attributes
+  // Construct attribute map and populate with attributes
   AttributeMap(const opentelemetry::common::KeyValueIterable &attributes) : AttributeMap()
   {
     attributes.ForEachKeyValue(
@@ -114,6 +116,19 @@ public:
           SetAttribute(key, value);
           return true;
         });
+  }
+
+  // Construct attribute map and populate with optional attributes
+  AttributeMap(const opentelemetry::common::KeyValueIterable *attributes) : AttributeMap()
+  {
+    if (attributes != nullptr)
+    {
+      attributes->ForEachKeyValue(
+          [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+            SetAttribute(key, value);
+            return true;
+          });
+    }
   }
 
   // Construct map from initializer list by applying `SetAttribute` transform for every attribute

@@ -1,13 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef HAVE_CPP_STDLIB
+#ifndef OPENTELEMETRY_STL_VERSION
 
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
-#  include <string>
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
+#  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
@@ -15,6 +15,8 @@
 #  include "gmock/gmock.h"
 
 #  include "nlohmann/json.hpp"
+
+#  include <string>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -244,4 +246,4 @@ TEST_F(ZipkinExporterTestPeer, ConfigFromEnv)
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif  // HAVE_CPP_STDLIB
+#endif /* OPENTELEMETRY_STL_VERSION */

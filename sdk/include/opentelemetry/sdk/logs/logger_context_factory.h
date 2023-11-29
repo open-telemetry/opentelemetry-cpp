@@ -3,20 +3,23 @@
 
 #pragma once
 
-#ifdef ENABLE_LOGS_PREVIEW
+#include <memory>
+#include <vector>
 
-#  include <memory>
-
-#  include "opentelemetry/sdk/logs/logger_context.h"
-#  include "opentelemetry/sdk/logs/processor.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace resource
+{
+class Resource;
+}  // namespace resource
+
 namespace logs
 {
+class LoggerContext;
+class LogRecordProcessor;
 
 /**
  * Factory class for LoggerContext.
@@ -42,4 +45,3 @@ public:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-#endif

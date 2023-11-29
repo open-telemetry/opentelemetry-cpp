@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include <chrono>
-#  include <memory>
+#include <chrono>
+#include <memory>
 
-#  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
+
 /**
  * The Log Processor is responsible for passing log records
  * to the configured exporter.
@@ -61,4 +61,3 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_LOGS_PREVIEW
 
-#  include "opentelemetry/version.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -63,4 +63,3 @@ const nostd::string_view SeverityNumToText[25] = {
 
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
-#endif

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/samplers/parent.h"
+#include "opentelemetry/trace/span_context.h"
 
 namespace trace_api = opentelemetry::trace;
 
