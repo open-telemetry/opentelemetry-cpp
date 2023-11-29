@@ -369,7 +369,6 @@ void DoubleHistogram::Record(double value,
     return;
   }
   if (!storage_)
-  if (value < 0 || std::isnan(value) || std::isinf(value))
   {
     OTEL_INTERNAL_LOG_WARN(
         "[DoubleHistogram::Record(V,A,C)] Value not recorded - invalid storage for: "
