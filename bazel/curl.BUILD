@@ -34,7 +34,6 @@ cc_library(
     ]),
     copts = CURL_COPTS + [
         "-DOS=\"os\"",
-        "-DCURL_WITH_MULTI_SSL",
         "-DUSE_SSL",
     ],
     defines = ["CURL_STATICLIB"],
