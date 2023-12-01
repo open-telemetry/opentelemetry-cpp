@@ -93,7 +93,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   if (http_client_->IsShutdown())
   {
     std::size_t metric_count = data.scope_metric_data_.size();
-    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+    OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] ERROR: Export "
                             << metric_count << " metric(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
@@ -121,12 +121,13 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
                                              opentelemetry::sdk::common::ExportResult result) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
-      OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+      OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] ERROR: Export "
                               << metric_count << " metric(s) error: " << static_cast<int>(result));
     }
     else
     {
-      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << metric_count << " metric(s) success");
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP METRIC HTTP Exporter] Export " << metric_count
+                                                                    << " metric(s) success");
     }
     return true;
   });
@@ -135,12 +136,13 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
   if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+    OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] ERROR: Export "
                             << metric_count << " metric(s) error: " << static_cast<int>(result));
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << metric_count << " metric(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP METRIC HTTP Exporter] Export " << metric_count
+                                                                  << " metric(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif

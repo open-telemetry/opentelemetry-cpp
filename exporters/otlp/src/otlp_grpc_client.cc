@@ -35,8 +35,9 @@ namespace otlp
 
 namespace
 {
-struct OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallDataBase
+class OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallDataBase
 {
+public:
   using GrpcAsyncCallback = bool (*)(OtlpGrpcAsyncCallDataBase *);
 
   std::unique_ptr<google::protobuf::Arena> arena;
@@ -52,8 +53,9 @@ struct OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallDataBase
 };
 
 template <class GrpcRequestType, class GrpcResponseType>
-struct OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallData : public OtlpGrpcAsyncCallDataBase
+class OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallData : public OtlpGrpcAsyncCallDataBase
 {
+public:
   using RequestType  = GrpcRequestType;
   using ResponseType = GrpcResponseType;
 
@@ -231,11 +233,15 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 #endif
 }  // namespace
 
+OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-OtlpGrpcClient::OtlpGrpcClient() : is_shutdown_{false} {}
+    : is_shutdown_{false}
+#endif
+{}
 
 OtlpGrpcClient::~OtlpGrpcClient()
 {
+#ifdef ENABLE_ASYNC_EXPORT
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data;
   async_data.swap(async_data_);
 
@@ -247,9 +253,8 @@ OtlpGrpcClient::~OtlpGrpcClient()
              async_data->max_concurrent_requests;
     });
   }
-}
-
 #endif
+}
 
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {

@@ -39,10 +39,9 @@ struct OtlpGrpcClientAsyncData;
 class OtlpGrpcClient
 {
 public:
-#ifdef ENABLE_ASYNC_EXPORT
   OtlpGrpcClient();
+
   ~OtlpGrpcClient();
-#endif
 
   /**
    * Create gRPC channel from the exporter options.

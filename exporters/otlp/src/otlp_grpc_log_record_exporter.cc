@@ -4,6 +4,7 @@
 #include <chrono>
 #include <memory>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
@@ -103,14 +104,14 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
            proto::collector::logs::v1::ExportLogsServiceResponse *) {
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
-            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+            OTEL_INTERNAL_LOG_ERROR("[OTLP LOG GRPC Exporter] ERROR: Export "
                                     << request.resource_logs_size()
                                     << " log(s) error: " << static_cast<int>(result));
           }
           else
           {
-            OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << request.resource_logs_size()
-                                                                 << " log(s) success");
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG GRPC Exporter] Export "
+                                    << request.resource_logs_size() << " log(s) success");
           }
           return true;
         });
@@ -134,7 +135,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcLogRecordExporter::Shutdown(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
@@ -145,7 +147,8 @@ bool OtlpGrpcLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noex
 #endif
 }
 
-bool OtlpGrpcLogRecordExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcLogRecordExporter::ForceFlush(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
 #ifdef ENABLE_ASYNC_EXPORT
   return client_->ForceFlush(timeout);

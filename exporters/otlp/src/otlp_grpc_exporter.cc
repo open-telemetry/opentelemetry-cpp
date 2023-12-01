@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
@@ -90,14 +91,14 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
            proto::collector::trace::v1::ExportTraceServiceResponse *) {
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
-            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+            OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] ERROR: Export "
                                     << request.resource_spans_size()
                                     << " trace span(s) error: " << static_cast<int>(result));
           }
           else
           {
-            OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << request.resource_spans_size()
-                                                                 << " trace span(s) success");
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE GRPC Exporter] Export "
+                                    << request.resource_spans_size() << " trace span(s) success");
           }
           return true;
         });
@@ -121,7 +122,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcExporter::ForceFlush(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
 #ifdef ENABLE_ASYNC_EXPORT
   return client_->ForceFlush(timeout);
@@ -130,7 +132,8 @@ bool OtlpGrpcExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
 #endif
 }
 
-bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcExporter::Shutdown(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;

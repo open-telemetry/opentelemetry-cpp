@@ -4,6 +4,7 @@
 #include <memory>
 #include <mutex>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
@@ -96,14 +97,14 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
            proto::collector::metrics::v1::ExportMetricsServiceResponse *) {
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
-            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+            OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC GRPC Exporter] ERROR: Export "
                                     << request.resource_metrics_size()
                                     << " metric(s) error: " << static_cast<int>(result));
           }
           else
           {
-            OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << request.resource_metrics_size()
-                                                                 << " metric(s) success");
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP METRIC GRPC Exporter] Export "
+                                    << request.resource_metrics_size() << " metric(s) success");
           }
           return true;
         });
@@ -127,7 +128,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
-bool OtlpGrpcMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcMetricExporter::ForceFlush(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
 #ifdef ENABLE_ASYNC_EXPORT
   return client_->ForceFlush(timeout);
@@ -136,7 +138,8 @@ bool OtlpGrpcMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexc
 #endif
 }
 
-bool OtlpGrpcMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcMetricExporter::Shutdown(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
