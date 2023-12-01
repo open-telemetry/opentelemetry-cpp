@@ -235,7 +235,10 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
 OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-    : is_shutdown_{false}
+    : is_shutdown_
+{
+  false
+}
 #endif
 {}
 
