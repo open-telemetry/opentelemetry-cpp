@@ -26,7 +26,7 @@ using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 class ExemplarData
 {
 public:
-  static ExemplarData Create(std::shared_ptr<trace::SpanContext> context,
+  static ExemplarData Create(std::shared_ptr<opentelemetry::trace::SpanContext> context,
                              const opentelemetry::common::SystemTimestamp &timestamp,
                              const PointDataAttributes &point_data_attr)
   {
@@ -47,7 +47,7 @@ public:
    * Returns the SpanContext associated with this exemplar. If the exemplar was not recorded
    * inside a sampled trace, the Context will be invalid.
    */
-  const trace::SpanContext &GetSpanContext() const noexcept { return context_; }
+  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return context_; }
 
   static PointType CreateSumPointData(ValueType value)
   {
@@ -68,13 +68,13 @@ public:
   static PointType CreateDropPointData() { return DropPointData{}; }
 
 private:
-  ExemplarData(std::shared_ptr<trace::SpanContext> context,
+  ExemplarData(std::shared_ptr<opentelemetry::trace::SpanContext> context,
                opentelemetry::common::SystemTimestamp timestamp,
                const PointDataAttributes &point_data_attr)
       : context_(*context.get()), timestamp_(timestamp), point_data_attr_(point_data_attr)
   {}
 
-  trace::SpanContext context_;
+  opentelemetry::trace::SpanContext context_;
   opentelemetry::common::SystemTimestamp timestamp_;
   PointDataAttributes point_data_attr_;
 };
