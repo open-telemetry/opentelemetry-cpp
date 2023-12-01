@@ -137,13 +137,13 @@ private:
       auto current_ctx = span->GetContext();
       if (current_ctx.IsValid())
       {
-        context_.reset(new trace::SpanContext{current_ctx});
+        context_.reset(new opentelemetry::trace::SpanContext{current_ctx});
       }
     }
   }
 
   // Cell stores either long or double values, but must not store both
-  std::shared_ptr<trace::SpanContext> context_;
+  std::shared_ptr<opentelemetry::trace::SpanContext> context_;
   nostd::variant<int64_t, double> value_;
   opentelemetry::common::SystemTimestamp record_time_;
   MetricAttributes attributes_;
