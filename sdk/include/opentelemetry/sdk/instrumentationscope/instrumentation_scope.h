@@ -129,7 +129,7 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
-    attributes_[std::string(key)] = nostd::visit(common::AttributeConverter(), value);
+    attributes_[std::string(key)] = nostd::visit(opentelemetry::sdk::common::AttributeConverter(), value);
   }
 
 private:

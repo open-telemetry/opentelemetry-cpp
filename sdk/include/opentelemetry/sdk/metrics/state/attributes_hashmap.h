@@ -28,7 +28,7 @@ const std::string kAggregationCardinalityLimitOverflowError =
     "Maximum data points for metric stream exceeded. Entry added to overflow";
 const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
 const bool kAttributesLimitOverflowValue      = true;
-const size_t kOverflowAttributesHash          = common::GetHashForAttributeMap(
+const size_t kOverflowAttributesHash          = opentelemetry::sdk::common::GetHashForAttributeMap(
     {{kAttributesLimitOverflowKey,
       kAttributesLimitOverflowValue}});  // precalculated for optimization
 
