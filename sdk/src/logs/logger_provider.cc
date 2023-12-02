@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/logs/logger_provider.h"
+
+#include <memory>
+
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger.h"
@@ -50,7 +53,7 @@ LoggerProvider::~LoggerProvider()
   }
 }
 
-nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+std::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     nostd::string_view logger_name,
     nostd::string_view library_name,
     nostd::string_view library_version,
@@ -73,7 +76,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     if (logger->GetName() == logger_name &&
         logger_lib.equal(library_name, library_version, schema_url))
     {
-      return nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+      return std::shared_ptr<opentelemetry::logs::Logger>{logger};
     }
   }
 
@@ -96,7 +99,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));
-  return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
+  return std::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept

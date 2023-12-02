@@ -3,8 +3,9 @@
 
 #pragma once
 
+#include <memory>
+
 #include "opentelemetry/logs/event_logger_provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
@@ -27,8 +28,8 @@ public:
 
   ~EventLoggerProvider() override;
 
-  nostd::shared_ptr<opentelemetry::logs::EventLogger> CreateEventLogger(
-      nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
+  std::shared_ptr<opentelemetry::logs::EventLogger> CreateEventLogger(
+      std::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
       nostd::string_view event_domain) noexcept override;
 };
 }  // namespace logs

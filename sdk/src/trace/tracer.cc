@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer.h"
+
+#include <memory>
+
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
@@ -19,7 +22,7 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
     : instrumentation_scope_{std::move(instrumentation_scope)}, context_{context}
 {}
 
-nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
+std::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::common::KeyValueIterable &attributes,
     const opentelemetry::trace::SpanContextKeyValueIterable &links,
@@ -78,7 +81,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   {
     // create no-op span with valid span-context.
 
-    auto noop_span = nostd::shared_ptr<opentelemetry::trace::Span>{
+    auto noop_span = std::shared_ptr<opentelemetry::trace::Span>{
         new (std::nothrow)
             opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(span_context))};
     return noop_span;
@@ -86,7 +89,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   else
   {
 
-    auto span = nostd::shared_ptr<opentelemetry::trace::Span>{
+    auto span = std::shared_ptr<opentelemetry::trace::Span>{
         new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options,
                                 parent_context, std::move(span_context)}};
 

@@ -7,7 +7,6 @@
 #include <mutex>
 #include <unordered_map>
 
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
@@ -30,7 +29,7 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
+                     std::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
                          OPENTELEMETRY_MAYBE_UNUSED,
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
@@ -131,7 +130,7 @@ private:
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+  std::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
 };

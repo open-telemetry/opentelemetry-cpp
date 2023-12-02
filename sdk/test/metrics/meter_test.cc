@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
+#include <memory>
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
@@ -17,7 +18,7 @@ using namespace opentelemetry::sdk::metrics;
 
 namespace
 {
-nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
+std::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
                                             std::string meter_name = "meter_name")
 {
   static std::shared_ptr<metrics::MeterProvider> provider(new MeterProvider());
@@ -33,7 +34,7 @@ nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
 void asyc_generate_measurements(opentelemetry::metrics::ObserverResult observer, void * /* state */)
 {
   auto observer_long =
-      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+      nostd::get<std::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
   observer_long->Observe(10);
 }
 
@@ -71,7 +72,7 @@ TEST(MeterTest, StressMultiThread)
   std::atomic<unsigned> threadCount(0);
   std::atomic<size_t> numIterations(MAX_ITERATIONS_MT);
   std::atomic<bool> do_collect{false}, do_sync_create{true}, do_async_create{false};
-  std::vector<nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>>
+  std::vector<std::shared_ptr<opentelemetry::metrics::ObservableInstrument>>
       observable_instruments;
   std::vector<std::thread> meter_operation_threads;
   std::atomic<size_t> instrument_id(0);

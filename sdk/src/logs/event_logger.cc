@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/logs/event_logger.h"
+
+#include <memory>
+
 #include "opentelemetry/sdk_config.h"
 #include "opentelemetry/trace/provider.h"
 
@@ -12,7 +15,7 @@ namespace logs
 {
 namespace nostd = opentelemetry::nostd;
 
-EventLogger::EventLogger(nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
+EventLogger::EventLogger(std::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
                          nostd::string_view event_domain) noexcept
     : delegate_logger_(delegate_logger), event_domain_(event_domain)
 {}
@@ -27,13 +30,13 @@ const nostd::string_view EventLogger::GetName() noexcept
   return {};
 }
 
-nostd::shared_ptr<opentelemetry::logs::Logger> EventLogger::GetDelegateLogger() noexcept
+std::shared_ptr<opentelemetry::logs::Logger> EventLogger::GetDelegateLogger() noexcept
 {
   return delegate_logger_;
 }
 
 void EventLogger::EmitEvent(nostd::string_view event_name,
-                            nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
+                            std::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!delegate_logger_ || !log_record)
   {

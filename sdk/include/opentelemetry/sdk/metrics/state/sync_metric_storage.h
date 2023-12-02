@@ -12,7 +12,6 @@
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
@@ -38,7 +37,7 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
-                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
+                    std::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
                         OPENTELEMETRY_MAYBE_UNUSED,
                     const AggregationConfig *aggregation_config,
                     size_t attributes_limit = kAggregationCardinalityLimit)
@@ -165,7 +164,7 @@ private:
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   const AttributesProcessor *attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+  std::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;

@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "opentelemetry/common/macros.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
@@ -38,7 +37,7 @@ public:
                   std::unique_ptr<InstrumentationScope> instrumentation_scope =
                       InstrumentationScope::Create("")) noexcept;
 
-  nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
+  std::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
       const opentelemetry::common::KeyValueIterable &attributes,
       const opentelemetry::trace::SpanContextKeyValueIterable &links,

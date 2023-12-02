@@ -64,17 +64,17 @@ public:
   virtual std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes &pointAttributes) noexcept = 0;
 
-  static nostd::shared_ptr<ExemplarReservoir> GetFilteredExemplarReservoir(
+  static std::shared_ptr<ExemplarReservoir> GetFilteredExemplarReservoir(
       std::shared_ptr<ExemplarFilter> filter,
       std::shared_ptr<ExemplarReservoir> reservoir);
 
-  static nostd::shared_ptr<ExemplarReservoir> GetHistogramExemplarReservoir(
+  static std::shared_ptr<ExemplarReservoir> GetHistogramExemplarReservoir(
       size_t size,
       std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
       std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
           const common::OrderedAttributeMap &attributes));
 
-  static nostd::shared_ptr<ExemplarReservoir> GetNoExemplarReservoir();
+  static std::shared_ptr<ExemplarReservoir> GetNoExemplarReservoir();
 };
 
 }  // namespace metrics

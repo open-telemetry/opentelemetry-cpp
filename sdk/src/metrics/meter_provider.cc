@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+
+#include <memory>
+#include <vector>
+
+#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
-
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk_config.h"
-#include "opentelemetry/version.h"
-
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -33,13 +34,13 @@ MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
+std::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url,
     const opentelemetry::common::KeyValueIterable *attributes) noexcept
 #else
-nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
+std::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url) noexcept
@@ -62,7 +63,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     auto meter_lib = meter->GetInstrumentationScope();
     if (meter_lib->equal(name, version, schema_url))
     {
-      return nostd::shared_ptr<metrics_api::Meter>{meter};
+      return std::shared_ptr<metrics_api::Meter>{meter};
     }
   }
 
@@ -72,7 +73,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
 
   auto meter = std::shared_ptr<Meter>(new Meter(context_, std::move(scope)));
   context_->AddMeter(meter);
-  return nostd::shared_ptr<metrics_api::Meter>{meter};
+  return std::shared_ptr<metrics_api::Meter>{meter};
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

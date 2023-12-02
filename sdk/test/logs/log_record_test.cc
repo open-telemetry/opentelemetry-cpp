@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -82,14 +83,14 @@ class TestBodyLogger : public opentelemetry::logs::Logger
 public:
   const nostd::string_view GetName() noexcept override { return "test body logger"; }
 
-  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
+  std::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
   {
-    return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new ReadWriteLogRecord());
+    return std::unique_ptr<opentelemetry::logs::LogRecord>(new ReadWriteLogRecord());
   }
 
   using opentelemetry::logs::Logger::EmitLogRecord;
 
-  void EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override
+  void EmitLogRecord(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override
   {
     if (record)
     {
@@ -112,14 +113,14 @@ class TestBodyProvider : public opentelemetry::logs::LoggerProvider
 public:
   using opentelemetry::logs::LoggerProvider::GetLogger;
 
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+  std::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view /* logger_name */,
       nostd::string_view /* library_name */,
       nostd::string_view /* library_version */,
       nostd::string_view /* schema_url */,
       const opentelemetry::common::KeyValueIterable & /* attributes */) override
   {
-    return nostd::shared_ptr<opentelemetry::logs::Logger>(new TestBodyLogger());
+    return std::shared_ptr<opentelemetry::logs::Logger>(new TestBodyLogger());
   }
 };
 

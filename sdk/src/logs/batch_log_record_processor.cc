@@ -6,6 +6,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 
+#include <memory>
 #include <vector>
 
 using opentelemetry::sdk::common::AtomicUniquePtr;

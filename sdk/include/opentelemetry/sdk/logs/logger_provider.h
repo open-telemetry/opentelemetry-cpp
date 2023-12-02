@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -71,7 +70,7 @@ public:
    * @param library_version The version of the library.
    * @param schema_url The schema URL.
    */
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+  std::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
       nostd::string_view library_name,
       nostd::string_view library_version = "",

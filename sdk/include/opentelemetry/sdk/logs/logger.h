@@ -9,7 +9,6 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/version.h"
@@ -40,12 +39,12 @@ public:
    */
   const opentelemetry::nostd::string_view GetName() noexcept override;
 
-  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override;
+  std::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override;
 
   using opentelemetry::logs::Logger::EmitLogRecord;
 
   void EmitLogRecord(
-      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
+      std::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
 
   /** Returns the associated instrumentation scope */
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()

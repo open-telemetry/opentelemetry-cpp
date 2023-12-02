@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
+#include <type_traits>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
@@ -35,13 +35,13 @@ public:
    * @param attributes attributes of the instrumentation scope.
    * @returns the newly created InstrumentationScope.
    */
-  static nostd::unique_ptr<InstrumentationScope> Create(
+  static std::unique_ptr<InstrumentationScope> Create(
       nostd::string_view name,
       nostd::string_view version                  = "",
       nostd::string_view schema_url               = "",
       InstrumentationScopeAttributes &&attributes = {})
   {
-    return nostd::unique_ptr<InstrumentationScope>(
+    return std::unique_ptr<InstrumentationScope>(
         new InstrumentationScope{name, version, schema_url, std::move(attributes)});
   }
 
@@ -53,13 +53,13 @@ public:
    * @param attributes attributes of the instrumentation scope.
    * @returns the newly created InstrumentationScope.
    */
-  static nostd::unique_ptr<InstrumentationScope> Create(
+  static std::unique_ptr<InstrumentationScope> Create(
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
       const InstrumentationScopeAttributes &attributes)
   {
-    return nostd::unique_ptr<InstrumentationScope>(new InstrumentationScope{
+    return std::unique_ptr<InstrumentationScope>(new InstrumentationScope{
         name, version, schema_url, InstrumentationScopeAttributes(attributes)});
   }
 
@@ -73,14 +73,14 @@ public:
    */
   template <
       class ArgumentType,
-      nostd::enable_if_t<opentelemetry::common::detail::is_key_value_iterable<ArgumentType>::value>
+      std::enable_if_t<opentelemetry::common::detail::is_key_value_iterable<ArgumentType>::value>
           * = nullptr>
-  static nostd::unique_ptr<InstrumentationScope> Create(nostd::string_view name,
-                                                        nostd::string_view version,
-                                                        nostd::string_view schema_url,
-                                                        const ArgumentType &arg)
+  static std::unique_ptr<InstrumentationScope> Create(nostd::string_view name,
+                                                      nostd::string_view version,
+                                                      nostd::string_view schema_url,
+                                                      const ArgumentType &arg)
   {
-    nostd::unique_ptr<InstrumentationScope> result = nostd::unique_ptr<InstrumentationScope>(
+    std::unique_ptr<InstrumentationScope> result = std::unique_ptr<InstrumentationScope>(
         new InstrumentationScope{name, version, schema_url});
 
     // Do not construct a KeyValueIterable, so it has better performance.

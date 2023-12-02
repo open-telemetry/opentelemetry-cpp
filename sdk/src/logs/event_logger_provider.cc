@@ -25,11 +25,11 @@ EventLoggerProvider::EventLoggerProvider() noexcept
 
 EventLoggerProvider::~EventLoggerProvider() {}
 
-nostd::shared_ptr<opentelemetry::logs::EventLogger> EventLoggerProvider::CreateEventLogger(
-    nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
+std::shared_ptr<opentelemetry::logs::EventLogger> EventLoggerProvider::CreateEventLogger(
+    std::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
     nostd::string_view event_domain) noexcept
 {
-  return nostd::shared_ptr<opentelemetry::logs::EventLogger>{
+  return std::shared_ptr<opentelemetry::logs::EventLogger>{
       new EventLogger(delegate_logger, event_domain)};
 }
 

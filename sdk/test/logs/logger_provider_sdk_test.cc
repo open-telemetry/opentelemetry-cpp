@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <array>
+#include <memory>
 #include <unordered_map>
 
 #include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -23,7 +23,7 @@ namespace nostd    = opentelemetry::nostd;
 TEST(LoggerProviderSDK, PushToAPI)
 {
   auto lp =
-      nostd::shared_ptr<logs_api::LoggerProvider>(new opentelemetry::sdk::logs::LoggerProvider());
+      std::shared_ptr<logs_api::LoggerProvider>(new opentelemetry::sdk::logs::LoggerProvider());
   logs_api::Provider::SetLoggerProvider(lp);
 
   // Check that the loggerprovider was correctly pushed into the API

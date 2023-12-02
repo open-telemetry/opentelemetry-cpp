@@ -226,7 +226,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   /* Test that when exporting more than max_queue_size spans, some are most likely lost*/
 
   // Set up a log handler to verify a warning is generated.
-  auto log_handler = nostd::shared_ptr<sdk::common::internal_log::LogHandler>(new MockLogHandler());
+  auto log_handler = std::shared_ptr<sdk::common::internal_log::LogHandler>(new MockLogHandler());
   sdk::common::internal_log::GlobalLogHandler::SetLogHandler(log_handler);
 
   std::shared_ptr<std::atomic<std::size_t>> shut_down_counter(new std::atomic<std::size_t>(0));
@@ -273,7 +273,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
 
   // Reinstate the default log handler.
   sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
-      nostd::shared_ptr<sdk::common::internal_log::LogHandler>(
+      std::shared_ptr<sdk::common::internal_log::LogHandler>(
           new sdk::common::internal_log::DefaultLogHandler()));
 }
 

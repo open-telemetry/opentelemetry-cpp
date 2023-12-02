@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+
+#include <memory>
+
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer.h"
@@ -54,13 +57,13 @@ TracerProvider::~TracerProvider()
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
+std::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url,
     const opentelemetry::common::KeyValueIterable *attributes) noexcept
 #else
-nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
+std::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     nostd::string_view name,
     nostd::string_view version,
     nostd::string_view schema_url) noexcept
@@ -87,7 +90,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     auto &tracer_scope = tracer->GetInstrumentationScope();
     if (tracer_scope.equal(name, version, schema_url))
     {
-      return nostd::shared_ptr<trace_api::Tracer>{tracer};
+      return std::shared_ptr<trace_api::Tracer>{tracer};
     }
   }
 
@@ -97,7 +100,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
 
   auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope)));
   tracers_.push_back(tracer);
-  return nostd::shared_ptr<trace_api::Tracer>{tracer};
+  return std::shared_ptr<trace_api::Tracer>{tracer};
 }
 
 void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept

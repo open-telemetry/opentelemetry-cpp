@@ -3,12 +3,11 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "opentelemetry/logs/event_logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,7 +26,7 @@ public:
    * @param delegate_logger The delegate logger instance
    * @param event_domain Event domain
    */
-  explicit EventLogger(nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
+  explicit EventLogger(std::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
                        nostd::string_view event_domain) noexcept;
 
   /**
@@ -35,15 +34,15 @@ public:
    */
   const opentelemetry::nostd::string_view GetName() noexcept override;
 
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetDelegateLogger() noexcept override;
+  std::shared_ptr<opentelemetry::logs::Logger> GetDelegateLogger() noexcept override;
 
   using opentelemetry::logs::EventLogger::EmitEvent;
 
   void EmitEvent(nostd::string_view event_name,
-                 nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
+                 std::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
 
 private:
-  nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger_;
+  std::shared_ptr<opentelemetry::logs::Logger> delegate_logger_;
   std::string event_domain_;
 };
 

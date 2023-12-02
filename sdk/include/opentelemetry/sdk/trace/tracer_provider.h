@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
@@ -69,13 +68,13 @@ public:
   using opentelemetry::trace::TracerProvider::GetTracer;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+  std::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
       const opentelemetry::common::KeyValueIterable *attributes) noexcept override;
 #else
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+  std::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view name,
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") noexcept override;

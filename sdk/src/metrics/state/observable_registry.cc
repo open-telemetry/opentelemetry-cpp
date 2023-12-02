@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
+
+#include <memory>
+
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -68,7 +71,7 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
     }
     if (value_type == InstrumentValueType::kDouble)
     {
-      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
+      std::shared_ptr<opentelemetry::metrics::ObserverResultT<double>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<double>());
       callback_wrap->callback(ob_res, callback_wrap->state);
       storage->RecordDouble(
@@ -78,7 +81,7 @@ void ObservableRegistry::Observe(opentelemetry::common::SystemTimestamp collecti
     }
     else
     {
-      nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>> ob_res(
+      std::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>> ob_res(
           new opentelemetry::sdk::metrics::ObserverResultT<int64_t>());
       callback_wrap->callback(ob_res, callback_wrap->state);
       storage->RecordLong(

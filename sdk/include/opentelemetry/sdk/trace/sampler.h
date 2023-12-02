@@ -8,7 +8,6 @@
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -55,7 +54,7 @@ struct SamplingResult
   // A set of span Attributes that will also be added to the Span. Can be nullptr.
   std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>> attributes;
   //  The tracestate used by the span.
-  nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state;
+  std::shared_ptr<opentelemetry::trace::TraceState> trace_state;
 
   inline bool IsRecording()
   {

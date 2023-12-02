@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <cstring>
+#include <memory>
 
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
@@ -45,7 +46,7 @@ TEST(GlobalLogHandleTest, CustomLogHandler)
       opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
   auto backup_log_level = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogLevel();
 
-  auto custom_log_handler = opentelemetry::nostd::shared_ptr<LogHandler>(new CustomLogHandler{});
+  auto custom_log_handler = std::shared_ptr<LogHandler>(new CustomLogHandler{});
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(custom_log_handler);
   auto before_count = static_cast<CustomLogHandler *>(custom_log_handler.get())->count;
   opentelemetry::sdk::common::AttributeMap attributes = {

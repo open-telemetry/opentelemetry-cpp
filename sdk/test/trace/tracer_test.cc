@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/context.h"
 
+#include <memory>
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
@@ -47,19 +48,19 @@ public:
       // Return two pairs of attributes. These attributes should be added to the
       // span attributes
       return {Decision::RECORD_AND_SAMPLE,
-              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+              std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                   new const std::map<std::string, opentelemetry::common::AttributeValue>(
                       {{"sampling_attr1", 123}, {"sampling_attr2", "string"}})),
-              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+              std::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
     }
     else
     {
       // we should never reach here
       assert(false);
       return {Decision::DROP,
-              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+              std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                   nullptr),
-              nostd::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
+              std::shared_ptr<opentelemetry::trace::TraceState>(nullptr)};
     }
   }
 

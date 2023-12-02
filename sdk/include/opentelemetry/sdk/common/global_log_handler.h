@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include <memory>
 #include <sstream>
 #include <utility>
 
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
@@ -94,7 +94,7 @@ public:
    *
    * By default, a default LogHandler is returned.
    */
-  static inline const nostd::shared_ptr<LogHandler> &GetLogHandler() noexcept
+  static inline const std::shared_ptr<LogHandler> &GetLogHandler() noexcept
   {
     return GetHandlerAndLevel().first;
   }
@@ -104,7 +104,7 @@ public:
    * This should be called once at the start of application before creating any Provider
    * instance.
    */
-  static inline void SetLogHandler(nostd::shared_ptr<LogHandler> eh) noexcept
+  static inline void SetLogHandler(std::shared_ptr<LogHandler> eh) noexcept
   {
     GetHandlerAndLevel().first = eh;
   }
@@ -124,7 +124,7 @@ public:
   static inline void SetLogLevel(LogLevel level) noexcept { GetHandlerAndLevel().second = level; }
 
 private:
-  static std::pair<nostd::shared_ptr<LogHandler>, LogLevel> &GetHandlerAndLevel() noexcept;
+  static std::pair<std::shared_ptr<LogHandler>, LogLevel> &GetHandlerAndLevel() noexcept;
 };
 
 }  // namespace internal_log
@@ -146,7 +146,7 @@ OPENTELEMETRY_END_NAMESPACE
     {                                                                                     \
       break;                                                                              \
     }                                                                                     \
-    const opentelemetry::nostd::shared_ptr<LogHandler> &log_handler =                     \
+    const std::shared_ptr<LogHandler> &log_handler =                                      \
         GlobalLogHandler::GetLogHandler();                                                \
     if (!log_handler)                                                                     \
     {                                                                                     \

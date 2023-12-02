@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <memory>
 #include <string>
 
 #include "opentelemetry/logs/logger_provider.h"
@@ -211,7 +212,7 @@ TEST(LoggerSDK, LogToAProcessor)
   auto logger2 = lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
-  nostd::shared_ptr<opentelemetry::trace::Span> include_span;
+  std::shared_ptr<opentelemetry::trace::Span> include_span;
   {
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> span_processors;
     auto trace_provider =

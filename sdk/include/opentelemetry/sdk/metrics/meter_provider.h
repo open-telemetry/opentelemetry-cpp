@@ -8,7 +8,6 @@
 #include <mutex>
 
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -54,13 +53,13 @@ public:
   using opentelemetry::metrics::MeterProvider::GetMeter;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
+  std::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version,
       nostd::string_view schema_url,
       const opentelemetry::common::KeyValueIterable *attributes) noexcept override;
 #else
-  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
+  std::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view name,
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") noexcept override;

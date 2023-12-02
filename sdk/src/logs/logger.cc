@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/logs/logger.h"
+
+#include <memory>
+
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
@@ -31,7 +34,7 @@ const nostd::string_view Logger::GetName() noexcept
   return logger_name_;
 }
 
-nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
+std::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
   // If this logger does not have a processor, no need to create a log recordable
   if (!context_)
@@ -48,10 +51,10 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
             opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
+    if (nostd::holds_alternative<std::shared_ptr<opentelemetry::trace::Span>>(context_value))
     {
-      nostd::shared_ptr<opentelemetry::trace::Span> &data =
-          nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value);
+      std::shared_ptr<opentelemetry::trace::Span> &data =
+          nostd::get<std::shared_ptr<opentelemetry::trace::Span>>(context_value);
       if (data)
       {
         recordable->SetTraceId(data->GetContext().trace_id());
@@ -59,10 +62,10 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
         recordable->SetSpanId(data->GetContext().span_id());
       }
     }
-    else if (nostd::holds_alternative<nostd::shared_ptr<trace::SpanContext>>(context_value))
+    else if (nostd::holds_alternative<std::shared_ptr<trace::SpanContext>>(context_value))
     {
-      nostd::shared_ptr<trace::SpanContext> &data =
-          nostd::get<nostd::shared_ptr<trace::SpanContext>>(context_value);
+      std::shared_ptr<trace::SpanContext> &data =
+          nostd::get<std::shared_ptr<trace::SpanContext>>(context_value);
       if (data)
       {
         recordable->SetTraceId(data->trace_id());
@@ -72,10 +75,10 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     }
   }
 
-  return nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+  return std::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
 
-void Logger::EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
+void Logger::EmitLogRecord(std::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!log_record)
   {

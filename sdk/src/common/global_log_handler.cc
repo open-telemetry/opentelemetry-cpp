@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include <iostream>
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -43,10 +44,10 @@ void NoopLogHandler::Handle(LogLevel,
                             const sdk::common::AttributeMap &) noexcept
 {}
 
-std::pair<nostd::shared_ptr<LogHandler>, LogLevel> &GlobalLogHandler::GetHandlerAndLevel() noexcept
+std::pair<std::shared_ptr<LogHandler>, LogLevel> &GlobalLogHandler::GetHandlerAndLevel() noexcept
 {
-  static std::pair<nostd::shared_ptr<LogHandler>, LogLevel> handler_and_level{
-      nostd::shared_ptr<LogHandler>(new DefaultLogHandler), LogLevel::Warning};
+  static std::pair<std::shared_ptr<LogHandler>, LogLevel> handler_and_level{
+      std::shared_ptr<LogHandler>(new DefaultLogHandler), LogLevel::Warning};
   return handler_and_level;
 }
 
