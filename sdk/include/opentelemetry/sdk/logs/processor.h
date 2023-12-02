@@ -46,7 +46,7 @@ public:
    * @return a result code indicating whether it succeeded, failed or timed out
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
   /**
    * Shuts down the processor and does any cleanup required.
@@ -56,7 +56,7 @@ public:
    * @return true if the shutdown succeeded, false otherwise
    */
   virtual bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk

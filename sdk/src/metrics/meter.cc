@@ -52,7 +52,7 @@ nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return nostd::unique_ptr<metrics::Counter<uint64_t>>(
-      new LongCounter<uint64_t>(instrument_descriptor, std::move(storage)));
+      new LongCounter(instrument_descriptor, std::move(storage)));
 }
 
 nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -138,7 +138,7 @@ nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return nostd::unique_ptr<metrics::Histogram<uint64_t>>{
-      new LongHistogram<uint64_t>(instrument_descriptor, std::move(storage))};
+      new LongHistogram(instrument_descriptor, std::move(storage))};
 }
 
 nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(

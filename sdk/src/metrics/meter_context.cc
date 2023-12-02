@@ -136,7 +136,7 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
   // Simultaneous flush not allowed.
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
   // Convert to nanos to prevent overflow
-  auto timeout_ns = std::chrono::nanoseconds::max();
+  auto timeout_ns = (std::chrono::nanoseconds::max)();
   if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
   {
     timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
@@ -144,7 +144,7 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   auto current_time = std::chrono::system_clock::now();
   std::chrono::system_clock::time_point expire_time;
-  auto overflow_checker = std::chrono::system_clock::time_point::max();
+  auto overflow_checker = (std::chrono::system_clock::time_point::max)();
 
   // check if the expected expire time doesn't overflow.
   if (overflow_checker - current_time > timeout_ns)
