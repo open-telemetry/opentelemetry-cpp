@@ -38,8 +38,8 @@ LongHistogramAggregation::LongHistogramAggregation(const AggregationConfig *aggr
   point_data_.sum_            = (int64_t)0;
   point_data_.count_          = 0;
   point_data_.record_min_max_ = record_min_max_;
-  point_data_.min_            = std::numeric_limits<int64_t>::max();
-  point_data_.max_            = std::numeric_limits<int64_t>::min();
+  point_data_.min_            = (std::numeric_limits<int64_t>::max)();
+  point_data_.max_            = (std::numeric_limits<int64_t>::min)();
 }
 
 LongHistogramAggregation::LongHistogramAggregation(HistogramPointData &&data)
@@ -58,8 +58,8 @@ void LongHistogramAggregation::Aggregate(int64_t value,
   point_data_.sum_ = nostd::get<int64_t>(point_data_.sum_) + value;
   if (record_min_max_)
   {
-    point_data_.min_ = std::min(nostd::get<int64_t>(point_data_.min_), value);
-    point_data_.max_ = std::max(nostd::get<int64_t>(point_data_.max_), value);
+    point_data_.min_ = (std::min)(nostd::get<int64_t>(point_data_.min_), value);
+    point_data_.max_ = (std::max)(nostd::get<int64_t>(point_data_.max_), value);
   }
   size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
@@ -118,8 +118,8 @@ DoubleHistogramAggregation::DoubleHistogramAggregation(const AggregationConfig *
   point_data_.sum_            = 0.0;
   point_data_.count_          = 0;
   point_data_.record_min_max_ = record_min_max_;
-  point_data_.min_            = std::numeric_limits<double>::max();
-  point_data_.max_            = std::numeric_limits<double>::min();
+  point_data_.min_            = (std::numeric_limits<double>::max)();
+  point_data_.max_            = (std::numeric_limits<double>::min)();
 }
 
 DoubleHistogramAggregation::DoubleHistogramAggregation(HistogramPointData &&data)
@@ -138,8 +138,8 @@ void DoubleHistogramAggregation::Aggregate(double value,
   point_data_.sum_ = nostd::get<double>(point_data_.sum_) + value;
   if (record_min_max_)
   {
-    point_data_.min_ = std::min(nostd::get<double>(point_data_.min_), value);
-    point_data_.max_ = std::max(nostd::get<double>(point_data_.max_), value);
+    point_data_.min_ = (std::min)(nostd::get<double>(point_data_.min_), value);
+    point_data_.max_ = (std::max)(nostd::get<double>(point_data_.max_), value);
   }
   size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
