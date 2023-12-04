@@ -43,6 +43,17 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     {
       parent_context = span_context;
     }
+    else
+    {
+      context::ContextValue is_root_span = context.GetValue("is_root_span");
+      if (nostd::holds_alternative<bool>(is_root_span))
+      {
+        if (nostd::get<bool>(is_root_span))
+        {
+          parent_context = opentelemetry::trace::SpanContext{false, false};
+        }
+      }
+    }
   }
 
   opentelemetry::trace::TraceId trace_id;
@@ -69,10 +80,9 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   auto span_context =
       std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
           trace_id, span_id, trace_flags, false,
-          sampling_result.trace_state
-              ? sampling_result.trace_state
-              : is_parent_span_valid ? parent_context.trace_state()
-                                     : opentelemetry::trace::TraceState::GetDefault()));
+          sampling_result.trace_state ? sampling_result.trace_state
+          : is_parent_span_valid      ? parent_context.trace_state()
+                                      : opentelemetry::trace::TraceState::GetDefault()));
 
   if (!sampling_result.IsRecording())
   {
