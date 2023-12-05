@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #endif
 
@@ -73,7 +73,7 @@ TEST(Histogram, Double)
             actual.counts_);
 }
 
-#if (OPENTELEMETRY_HAVE_WORKING_REGEX)
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 // FIXME - View Preficate search is only supported through regex
 TEST(Histogram, DoubleCustomBuckets)
 {
@@ -188,7 +188,7 @@ TEST(Histogram, UInt64)
             actual.counts_);
 }
 
-#if (OPENTELEMETRY_HAVE_WORKING_REGEX)
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 // FIXME - View Preficate search is only supported through regex
 TEST(Histogram, UInt64CustomBuckets)
 {
