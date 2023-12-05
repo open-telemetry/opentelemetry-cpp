@@ -21,6 +21,7 @@ enum class SpanKind
 
 // The key identifies the active span in the current context.
 constexpr char kSpanKey[] = "active_span";
+constexpr char kIsRootSpanKey[] = "is_root_span";
 
 // StatusCode - Represents the canonical set of status codes of a finished Span.
 enum class StatusCode

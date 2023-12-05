@@ -45,14 +45,9 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     }
     else
     {
-      context::ContextValue is_root_span = context.GetValue("is_root_span");
-      if (nostd::holds_alternative<bool>(is_root_span))
-      {
-        if (nostd::get<bool>(is_root_span))
-        {
+      if (opentelemetry::trace::IsRootSpan(context)) {
           parent_context = opentelemetry::trace::SpanContext{false, false};
         }
-      }
     }
   }
 
