@@ -18,10 +18,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 #   https://github.com/open-telemetry/opentelemetry-specification
 # Repository from 1.21.0:
 #   https://github.com/open-telemetry/semantic-conventions
-SEMCONV_VERSION=1.22.0
+SEMCONV_VERSION=1.23.1
 
 # repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.22.0
+GENERATOR_VERSION=0.23.0
 
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION

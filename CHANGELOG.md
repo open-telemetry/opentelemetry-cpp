@@ -29,6 +29,8 @@ Increment the:
   [#2398](https://github.com/open-telemetry/opentelemetry-cpp/pull/2398)
 * [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
   [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
+* [SEMANTIC CONVENTION] Upgrade to semconv 1.23.1
+  [#2428](https://github.com/open-telemetry/opentelemetry-cpp/pull/2428)
 
 Important changes:
 
