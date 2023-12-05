@@ -74,9 +74,8 @@ Increment the:
   [#2428](https://github.com/open-telemetry/opentelemetry-cpp/pull/2428)
 * [BUILD] Use fully qualified references to trace/common namespace
   [#2424](https://github.com/open-telemetry/opentelemetry-cpp/pull/2424)
-
-* xxx
-  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
+* [API] Create root span with active span
+  [#2427](https://github.com/open-telemetry/opentelemetry-cpp/pull/2427)
 
 * xxx
   [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
