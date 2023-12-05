@@ -344,7 +344,7 @@ public:
         }
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID: {
+        case opentelemetry::common::AttributeType::TYPE_GUID: {
           auto temp = nostd::get<GUID>(value);
           // TODO: add transform from GUID type to string?
           jObj[name] = temp;
