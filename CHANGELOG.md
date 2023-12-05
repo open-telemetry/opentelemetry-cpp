@@ -66,6 +66,14 @@ Increment the:
   [#2421](https://github.com/open-telemetry/opentelemetry-cpp/pull/2421)
 * [BUILD] Remove defining NOMINMAX from api
   [#2420](https://github.com/open-telemetry/opentelemetry-cpp/pull/2420)
+* [BUILD] 'uint8_t' not declared in this scope with gcc 13.2.1
+  [#2423](https://github.com/open-telemetry/opentelemetry-cpp/pull/2423)
+* [BUILD] Improve the handling of OPENTELEMETRY_HAVE_WORKING_REGEX
+  [#2430](https://github.com/open-telemetry/opentelemetry-cpp/pull/2430)
+* [SEMANTIC CONVENTION] Upgrade to semconv 1.23.1
+  [#2428](https://github.com/open-telemetry/opentelemetry-cpp/pull/2428)
+* [BUILD] Use fully qualified references to trace/common namespace
+  [#2424](https://github.com/open-telemetry/opentelemetry-cpp/pull/2424)
 
 * xxx
   [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)

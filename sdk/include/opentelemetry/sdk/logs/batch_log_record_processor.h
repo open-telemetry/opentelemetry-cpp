@@ -143,7 +143,7 @@ protected:
   const std::chrono::milliseconds scheduled_delay_millis_;
   const size_t max_export_batch_size_;
   /* The buffer/queue to which the ended logs are added */
-  common::CircularBuffer<Recordable> buffer_;
+  opentelemetry::sdk::common::CircularBuffer<Recordable> buffer_;
 
   std::shared_ptr<SynchronizationData> synchronization_data_;
 
