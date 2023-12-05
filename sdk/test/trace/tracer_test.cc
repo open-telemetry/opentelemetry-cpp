@@ -1008,6 +1008,26 @@ TEST(Tracer, WithActiveSpan)
     spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
     EXPECT_EQ("span 2", spans.at(0)->GetName());
+    EXPECT_EQ(spans.at(0).get()->GetParentSpanId(), span_first->GetContext().span_id());
+    EXPECT_EQ(spans.at(0).get()->GetTraceId(), span_first->GetContext().trace_id());
+
+    {
+      trace_api::StartSpanOptions options;
+      opentelemetry::context::Context c1;
+      c1             = c1.SetValue(opentelemetry::trace::kIsRootSpanKey, true);
+      options.parent = c1;
+      auto root_span = tracer->StartSpan("span root", options);
+
+      spans = span_data->GetSpans();
+      ASSERT_EQ(0, spans.size());
+
+      root_span->End();
+    }
+    spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+    EXPECT_EQ("span root", spans.at(0)->GetName());
+    EXPECT_EQ(spans.at(0).get()->GetParentSpanId(), opentelemetry::trace::SpanId());
+    EXPECT_NE(spans.at(0).get()->GetTraceId(), span_first->GetContext().trace_id());
 
     span_first->End();
   }
