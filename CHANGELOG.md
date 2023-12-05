@@ -15,20 +15,63 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.13.0] 2023-12-05
+
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
   [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
+* [SDK] Metrics ObservableRegistry Cleanup
+  [#2376](https://github.com/open-telemetry/opentelemetry-cpp/pull/2376)
 * [BUILD] Make WITH_OTLP_HTTP_SSL_PREVIEW mainstream
   [#2378](https://github.com/open-telemetry/opentelemetry-cpp/pull/2378)
+* [SDK] Creating DoubleUpDownCounter with no matching view
+  [#2379](https://github.com/open-telemetry/opentelemetry-cpp/pull/2379)
 * [API] Add InstrumentationScope attributes in TracerProvider::GetTracer()
   [#2371](https://github.com/open-telemetry/opentelemetry-cpp/pull/2371)
+* [BUILD] DLL export interface for Metrics
+  [#2344](https://github.com/open-telemetry/opentelemetry-cpp/pull/2344)
 * [BUILD] enum CanonicalCode names too generic... conflict with old C defines
   [#2385](https://github.com/open-telemetry/opentelemetry-cpp/pull/2385)
+* [BUILD] Fix cpack broken package version
+  [#2386](https://github.com/open-telemetry/opentelemetry-cpp/pull/2386)
 * [API] Add a new AddLink() operation to Span
   [#2380](https://github.com/open-telemetry/opentelemetry-cpp/pull/2380)
+* [opentracing-shim] Add check for sampled context
+  [#2390](https://github.com/open-telemetry/opentelemetry-cpp/pull/2390)
+* [BUILD] Fix exported definitions when building DLL with STL
+  [#2387](https://github.com/open-telemetry/opentelemetry-cpp/pull/2387)
+* [BUILD] Add missing includes to runtime_context_test
+  [#2395](https://github.com/open-telemetry/opentelemetry-cpp/pull/2395)
+* [ADMIN] Add file .github/repository-settings.md
+  [#2392](https://github.com/open-telemetry/opentelemetry-cpp/pull/2392)
 * [SDK] Fix GetLogger with empty library name
   [#2398](https://github.com/open-telemetry/opentelemetry-cpp/pull/2398)
+* [TEST] Fix compiling problem and removed -DENABLE_TEST
+  [#2401](https://github.com/open-telemetry/opentelemetry-cpp/pull/2401)
+* [BUILD] Check windows options are not passed to non-Windows build
+  [#2399](https://github.com/open-telemetry/opentelemetry-cpp/pull/2399)
 * [EXPORTER] Rework OTLP/HTTP and OTLP/GRPC exporter options
   [#2388](https://github.com/open-telemetry/opentelemetry-cpp/pull/2388)
+* [Build] Update vcpkg to latest release
+  [#2412](https://github.com/open-telemetry/opentelemetry-cpp/pull/2412)
+* [SDK] Cardinality limits for metrics streams
+  (Sync Instruments + Delta Temporality)
+  [#2255](https://github.com/open-telemetry/opentelemetry-cpp/pull/2255)
+* [EXPORTER] Prometheus: Add unit to names, convert to word
+  [#2213](https://github.com/open-telemetry/opentelemetry-cpp/pull/2213)
+* [Metrics] Make context optional for histogram instruments in Metrics SDK
+  [#2416](https://github.com/open-telemetry/opentelemetry-cpp/pull/2416)
+* [BUILD] Fix references to trace namespace to be fully qualified
+  [#2422](https://github.com/open-telemetry/opentelemetry-cpp/pull/2422)
+* [BUILD] Bump third_party/googletest to same version as bazel
+  [#2421](https://github.com/open-telemetry/opentelemetry-cpp/pull/2421)
+* [BUILD] Remove defining NOMINMAX from api
+  [#2420](https://github.com/open-telemetry/opentelemetry-cpp/pull/2420)
+
+* xxx
+  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
+
+* xxx
+  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
 
 Important changes:
 
