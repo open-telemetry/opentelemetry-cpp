@@ -360,9 +360,10 @@ public:
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       opentelemetry::nostd::string_view logger_name,
       opentelemetry::nostd::string_view library_name,
-      opentelemetry::nostd::string_view version                 = "",
-      opentelemetry::nostd::string_view schema_url              = "",
-      const opentelemetry::common::KeyValueIterable &attributes = opentelemetry::common::NoopKeyValueIterable()) override
+      opentelemetry::nostd::string_view version    = "",
+      opentelemetry::nostd::string_view schema_url = "",
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::NoopKeyValueIterable()) override
   {
     UNREFERENCED_PARAMETER(library_name);
     UNREFERENCED_PARAMETER(version);

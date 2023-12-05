@@ -214,16 +214,16 @@ class Tracer : public opentelemetry::trace::Tracer,
     {
       size_t idx = 0;
       std::string linksValue;
-      links.ForEachKeyValue(
-          [&](opentelemetry::trace::SpanContext ctx, const opentelemetry::common::KeyValueIterable &) {
-            if (!linksValue.empty())
-            {
-              linksValue += ',';
-              linksValue += ToLowerBase16(ctx.span_id());
-            }
-            idx++;
-            return true;
-          });
+      links.ForEachKeyValue([&](opentelemetry::trace::SpanContext ctx,
+                                const opentelemetry::common::KeyValueIterable &) {
+        if (!linksValue.empty())
+        {
+          linksValue += ',';
+          linksValue += ToLowerBase16(ctx.span_id());
+        }
+        idx++;
+        return true;
+      });
       attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
     }
   }
@@ -425,8 +425,9 @@ public:
     Properties evtCopy = attributes;
     return StartSpan(name, evtCopy, links, options);
 #else  // OPENTELEMETRY_RTTI_ENABLED is defined
-    opentelemetry::common::KeyValueIterable &attribs = const_cast<opentelemetry::common::KeyValueIterable &>(attributes);
-    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+    opentelemetry::common::KeyValueIterable &attribs =
+        const_cast<opentelemetry::common::KeyValueIterable &>(attributes);
+    Properties *evt = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
     {
       // Pass as a reference to original modifyable collection without creating a copy
@@ -492,7 +493,8 @@ public:
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
       auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
-          new (std::nothrow) opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+          new (std::nothrow)
+              opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
       return noopSpan;
     }
 
@@ -614,8 +616,9 @@ public:
     Properties evtCopy = attributes;
     return AddEvent(span, name, timestamp, evtCopy);
 #else  // OPENTELEMETRY_RTTI_ENABLED is defined
-    opentelemetry::common::KeyValueIterable &attribs = const_cast<opentelemetry::common::KeyValueIterable &>(attributes);
-    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+    opentelemetry::common::KeyValueIterable &attribs =
+        const_cast<opentelemetry::common::KeyValueIterable &>(attributes);
+    Properties *evt = dynamic_cast<Properties *>(&attribs);
     if (evt != nullptr)
     {
       // Pass as a reference to original modifyable collection without creating a copy
@@ -849,7 +852,8 @@ public:
    * @param timestamp
    * @return
    */
-  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp) noexcept override
+  void AddEvent(nostd::string_view name,
+                opentelemetry::common::SystemTimestamp timestamp) noexcept override
   {
     owner_.AddEvent(*this, name, timestamp);
   }
@@ -901,7 +905,8 @@ public:
    * @param value
    * @return
    */
-  void SetAttribute(nostd::string_view key, const opentelemetry::common::AttributeValue &value) noexcept override
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
     // don't override fields propagated from span data.
     if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID ||

@@ -412,11 +412,12 @@ public:
   Properties &operator=(const opentelemetry::common::KeyValueIterable &other)
   {
     clear();
-    other.ForEachKeyValue([&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-      std::string k(key.data(), key.length());
-      (*this)[k].FromAttributeValue(value);
-      return true;
-    });
+    other.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          std::string k(key.data(), key.length());
+          (*this)[k].FromAttributeValue(value);
+          return true;
+        });
     return (*this);
   }
 
@@ -431,8 +432,9 @@ public:
    * the iteration is aborted.
    * @return true if every key-value pair was iterated over
    */
-  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)>
-                           callback) const noexcept override
+  bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)> callback)
+      const noexcept override
   {
     for (const auto &kv : (*this))
     {
