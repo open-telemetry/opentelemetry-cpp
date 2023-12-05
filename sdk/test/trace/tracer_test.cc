@@ -1014,7 +1014,7 @@ TEST(Tracer, WithActiveSpan)
     {
       trace_api::StartSpanOptions options;
       opentelemetry::context::Context c1;
-      c1             = c1.SetValue("is_root_span", true);
+      c1             = c1.SetValue(opentelemetry::trace::kIsRootSpanKey, true);
       options.parent = c1;
       auto root_span = tracer->StartSpan("span root", options);
 

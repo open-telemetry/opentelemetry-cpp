@@ -47,6 +47,14 @@ struct StartSpanOptions
   //   2. If the `Context` contains the boolean flag `is_root_span` set to `true`,
   //      it indicates that the new Span should be treated as a root Span, i.e., it
   //      does not have a parent Span.
+  //   Example Usage:
+  //   ```cpp
+  //   trace_api::StartSpanOptions options;
+  //   opentelemetry::context::Context root;
+  //   root                    = root.SetValue(kIsRootSpanKey, true);
+  //   options.parent = root;
+  //   auto root_span = tracer->StartSpan("span root", options);
+  //  ```
   //
   // - If the `parent` field is not set, the newly created Span will inherit the
   // parent of the currently active Span (if any) in the current context.
