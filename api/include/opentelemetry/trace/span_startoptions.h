@@ -34,9 +34,9 @@ struct StartSpanOptions
 
   // Explicitly set the parent of a Span.
   //
-  // The `parent` field in `StartSpanOptions` struct is designed to establish
-  // parent-child relationships in tracing spans. It can be set to either a
-  // `SpanContext` or a `context::Context` object.
+  // The `parent` field is designed to establish  parent-child relationships
+  // in tracing spans. It can be set to either a `SpanContext` or a
+  // `context::Context` object.
   //
   // - When set to valid `SpanContext`, it directly assigns a specific Span as the parent
   // of the newly created Span.
