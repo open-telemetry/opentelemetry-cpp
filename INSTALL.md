@@ -124,10 +124,6 @@ You can link OpenTelemetry C++ SDK with libraries provided in
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config.cmake
    -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config-version.cmake
    ...
-   -- Installing: /<install-root>/include/opentelemetry//ext/zpages/static/tracez_index.h
-   -- Installing: /<install-root>/include/opentelemetry//ext/zpages/static/tracez_style.h
-   -- Installing: /<install-root>/include/opentelemetry//ext/zpages/threadsafe_span_data.h
-   -- Installing: /<install-root>/lib/libopentelemetry_zpages.a
    $
    ```
 
