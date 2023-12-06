@@ -18,7 +18,7 @@ class Tracer;
 /**
  * Creates new Tracer instances.
  */
-class OPENTELEMETRY_EXPORT TracerProvider
+class TracerProvider
 {
 public:
   virtual ~TracerProvider() = default;

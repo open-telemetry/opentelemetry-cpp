@@ -21,7 +21,7 @@ class LoggerProvider;
 /**
  * Stores the singleton global LoggerProvider.
  */
-class OPENTELEMETRY_EXPORT Provider
+class Provider
 {
 public:
   /**

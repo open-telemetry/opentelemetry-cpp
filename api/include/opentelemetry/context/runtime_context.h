@@ -41,7 +41,7 @@ private:
  * this class and passing an initialized RuntimeContextStorage object to
  * RuntimeContext::SetRuntimeContextStorage.
  */
-class /* OPENTELEMETRY_EXPORT */ RuntimeContextStorage
+class RuntimeContextStorage
 {
 public:
   /**
@@ -82,7 +82,7 @@ static RuntimeContextStorage *GetDefaultStorage() noexcept;
 // Provides a wrapper for propagating the context object globally.
 //
 // By default, a thread-local runtime context storage is used.
-class OPENTELEMETRY_EXPORT RuntimeContext
+class RuntimeContext
 {
 public:
   // Return the current context.
@@ -187,7 +187,7 @@ inline Token::~Token() noexcept
 // RuntimeContextStorage and provides a wrapper for propagating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
-class OPENTELEMETRY_EXPORT ThreadLocalContextStorage : public RuntimeContextStorage
+class ThreadLocalContextStorage : public RuntimeContextStorage
 {
 public:
   ThreadLocalContextStorage() noexcept = default;
