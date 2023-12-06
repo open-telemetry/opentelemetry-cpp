@@ -436,7 +436,7 @@ void HttpOperation::Cleanup()
 
 static long parse_min_ssl_version(std::string version)
 {
-#  ifdef HAVE_TLS_VERSION
+#ifdef HAVE_TLS_VERSION
   if (version == "1.0")
   {
     return CURL_SSLVERSION_TLSv1_0;
@@ -456,14 +456,14 @@ static long parse_min_ssl_version(std::string version)
   {
     return CURL_SSLVERSION_TLSv1_3;
   }
-#  endif
+#endif
 
   return 0;
 }
 
 static long parse_max_ssl_version(std::string version)
 {
-#  ifdef HAVE_TLS_VERSION
+#ifdef HAVE_TLS_VERSION
   if (version == "1.0")
   {
     return CURL_SSLVERSION_MAX_TLSv1_0;
@@ -483,7 +483,7 @@ static long parse_max_ssl_version(std::string version)
   {
     return CURL_SSLVERSION_MAX_TLSv1_3;
   }
-#  endif
+#endif
 
   return 0;
 }
@@ -611,7 +611,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
-#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 77, 0)
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 77, 0)
       const char *data = ssl_options_.ssl_ca_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
 
@@ -625,11 +625,11 @@ CURLcode HttpOperation::Setup()
       {
         return rc;
       }
-#  else
+#else
       // CURL 7.77.0 required for CURLOPT_CAINFO_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.77.0 required for CA CERT STRING");
       return CURLE_UNKNOWN_OPTION;
-#  endif
+#endif
     }
 
     /* 2 - CLIENT KEY */
@@ -652,7 +652,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_key_string.empty())
     {
-#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
       const char *data = ssl_options_.ssl_client_key_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_key_string.length();
 
@@ -672,11 +672,11 @@ CURLcode HttpOperation::Setup()
       {
         return rc;
       }
-#  else
+#else
       // CURL 7.71.0 required for CURLOPT_SSLKEY_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT KEY STRING");
       return CURLE_UNKNOWN_OPTION;
-#  endif
+#endif
     }
 
     /* 3 - CLIENT CERT */
@@ -699,7 +699,7 @@ CURLcode HttpOperation::Setup()
     }
     else if (!ssl_options_.ssl_client_cert_string.empty())
     {
-#  if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
       const char *data = ssl_options_.ssl_client_cert_string.c_str();
       size_t data_len  = ssl_options_.ssl_client_cert_string.length();
 
@@ -719,11 +719,11 @@ CURLcode HttpOperation::Setup()
       {
         return rc;
       }
-#  else
+#else
       // CURL 7.71.0 required for CURLOPT_SSLCERT_BLOB.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.71.0 required for CLIENT CERT STRING");
       return CURLE_UNKNOWN_OPTION;
-#  endif
+#endif
     }
 
     /* 4 - TLS */
@@ -732,7 +732,7 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_min_tls.empty())
     {
-#    ifdef HAVE_TLS_VERSION
+#ifdef HAVE_TLS_VERSION
       min_ssl_version = parse_min_ssl_version(ssl_options_.ssl_min_tls);
 
       if (min_ssl_version == 0)
@@ -740,17 +740,17 @@ CURLcode HttpOperation::Setup()
         OTEL_INTERNAL_LOG_ERROR("Unknown min TLS version <" << ssl_options_.ssl_min_tls << ">");
         return CURLE_UNKNOWN_OPTION;
       }
-#    else
+#else
       OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MIN TLS");
       return CURLE_UNKNOWN_OPTION;
-#    endif
+#endif
     }
 
     long max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
     {
-#    ifdef HAVE_TLS_VERSION
+#ifdef HAVE_TLS_VERSION
       max_ssl_version = parse_max_ssl_version(ssl_options_.ssl_max_tls);
 
       if (max_ssl_version == 0)
@@ -758,10 +758,10 @@ CURLcode HttpOperation::Setup()
         OTEL_INTERNAL_LOG_ERROR("Unknown max TLS version <" << ssl_options_.ssl_max_tls << ">");
         return CURLE_UNKNOWN_OPTION;
       }
-#    else
+#else
       OTEL_INTERNAL_LOG_ERROR("CURL 7.54.0 required for MAX TLS");
       return CURLE_UNKNOWN_OPTION;
-#    endif
+#endif
     }
 
     long version_range = min_ssl_version | max_ssl_version;
@@ -790,16 +790,16 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_cipher_suite.empty())
     {
-#    if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 61, 0)
+#if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 61, 0)
       /* TLS 1.3 */
       const char *cipher_list = ssl_options_.ssl_cipher_suite.c_str();
 
       rc = SetCurlStrOption(CURLOPT_TLS13_CIPHERS, cipher_list);
-#    else
+#else
       // CURL 7.61.0 required for CURLOPT_TLS13_CIPHERS.
       OTEL_INTERNAL_LOG_ERROR("CURL 7.61.0 required for CIPHER SUITE");
       return CURLE_UNKNOWN_OPTION;
-#    endif
+#endif
 
       if (rc != CURLE_OK)
       {

@@ -225,8 +225,7 @@ public:
     opentelemetry::ext::http::client::Body body;
 
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
-                                 ssl_options,
-                                 nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body);
 
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
@@ -253,8 +252,7 @@ public:
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-                                 ssl_options,
-                                 nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())

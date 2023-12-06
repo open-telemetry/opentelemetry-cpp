@@ -125,8 +125,7 @@ struct HttpSslOptions
                  nostd::string_view input_ssl_min_tls,
                  nostd::string_view input_ssl_max_tls,
                  nostd::string_view input_ssl_cipher,
-                 nostd::string_view input_ssl_cipher_suite
-                 )
+                 nostd::string_view input_ssl_cipher_suite)
       : use_ssl(false),
         ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
         ssl_ca_cert_path(input_ssl_ca_cert_path),

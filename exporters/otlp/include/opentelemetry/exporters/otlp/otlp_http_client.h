@@ -113,8 +113,7 @@ struct OtlpHttpClientOptions
                     input_ssl_min_tls,
                     input_ssl_max_tls,
                     input_ssl_cipher,
-                    input_ssl_cipher_suite
-                    ),
+                    input_ssl_cipher_suite),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
         use_json_name(input_use_json_name),
