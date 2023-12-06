@@ -235,9 +235,7 @@ void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState
 
 HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              std::string url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
                              const HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
                              opentelemetry::ext::http::client::EventHandler *event_handle,
                              // Default empty headers and empty request body
                              const opentelemetry::ext::http::client::Headers &request_headers,
@@ -258,9 +256,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       event_handle_(event_handle),
       method_(method),
       url_(url),
-#ifdef ENABLE_HTTP_SSL_PREVIEW
       ssl_options_(ssl_options),
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
@@ -438,7 +434,6 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-#ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
 static long parse_min_ssl_version(std::string version)
 {
 #  ifdef HAVE_TLS_VERSION
@@ -492,7 +487,6 @@ static long parse_max_ssl_version(std::string version)
 
   return 0;
 }
-#endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
 
 const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
 {
@@ -601,7 +595,6 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   if (ssl_options_.use_ssl)
   {
     /* 1 - CA CERT */
@@ -733,7 +726,6 @@ CURLcode HttpOperation::Setup()
 #  endif
     }
 
-#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
     /* 4 - TLS */
 
     long min_ssl_version = 0;
@@ -814,7 +806,6 @@ CURLcode HttpOperation::Setup()
         return rc;
       }
     }
-#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
 
     if (ssl_options_.ssl_insecure_skip_verify)
     {
@@ -860,7 +851,6 @@ CURLcode HttpOperation::Setup()
     }
   }
   else
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
   {
     rc = SetCurlLongOption(CURLOPT_SSL_VERIFYPEER, 0L);
     if (rc != CURLE_OK)

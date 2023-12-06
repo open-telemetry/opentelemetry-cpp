@@ -276,13 +276,6 @@ endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
-# STABLE
-option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" ON)
-
-# STABLE
-option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
-       "Whether to enable otlp http ssl tls min/max/cipher options" ON)
-
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
@@ -293,13 +286,6 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
-endif()
-
-if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
-  message(
-    FATAL_ERROR
-      "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
-  )
 endif()
 
 find_package(Threads)
