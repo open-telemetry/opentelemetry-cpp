@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.13.0] 2023-12-05
+## [1.13.0] 2023-12-06
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
   [#2370](https://github.com/open-telemetry/opentelemetry-cpp/pull/2370)
@@ -76,9 +76,8 @@ Increment the:
   [#2424](https://github.com/open-telemetry/opentelemetry-cpp/pull/2424)
 * [API] Create root span with active span
   [#2427](https://github.com/open-telemetry/opentelemetry-cpp/pull/2427)
-
-* xxx
-  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
+* [REMOVAL] Remove ZPAGES
+  [#2433](https://github.com/open-telemetry/opentelemetry-cpp/pull/2433)
 
 Important changes:
 
@@ -150,6 +149,11 @@ Breaking changes:
     `OtlpGrpcExporterOptions` with `OtlpGrpcLogRecordExporterOptions`.
   * Please check configuration variables,
     to make sure `_LOGS_` variables are set as expected.
+
+* [REMOVAL] Remove ZPAGES
+  [#2433](https://github.com/open-telemetry/opentelemetry-cpp/pull/2433)
+  * As announced in release 1.12.0,
+    the deprecated ZPAGES exporter is now removed.
 
 ## [1.12.0] 2023-10-16
 
