@@ -62,7 +62,7 @@ public:
    * @return true if the exporter shutdown succeeded, false otherwise
    */
   virtual bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk

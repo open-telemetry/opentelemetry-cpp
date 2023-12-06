@@ -229,7 +229,7 @@ public:
                    opentelemetry::trace::TraceId trace_id,
                    opentelemetry::trace::SpanId span_id,
                    opentelemetry::trace::TraceFlags trace_flags,
-                   common::SystemTimestamp timestamp) noexcept
+                   opentelemetry::common::SystemTimestamp timestamp) noexcept
   {
     UNREFERENCED_PARAMETER(trace_flags);
 
@@ -358,11 +358,12 @@ public:
   }
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view logger_name,
-      nostd::string_view library_name,
-      nostd::string_view version                 = "",
-      nostd::string_view schema_url              = "",
-      const common::KeyValueIterable &attributes = common::NoopKeyValueIterable()) override
+      opentelemetry::nostd::string_view logger_name,
+      opentelemetry::nostd::string_view library_name,
+      opentelemetry::nostd::string_view version    = "",
+      opentelemetry::nostd::string_view schema_url = "",
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::NoopKeyValueIterable()) override
   {
     UNREFERENCED_PARAMETER(library_name);
     UNREFERENCED_PARAMETER(version);

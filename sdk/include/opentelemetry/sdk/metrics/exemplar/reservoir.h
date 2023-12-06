@@ -72,7 +72,7 @@ public:
       size_t size,
       std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
       std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-          const common::OrderedAttributeMap &attributes));
+          const opentelemetry::sdk::common::OrderedAttributeMap &attributes));
 
   static nostd::shared_ptr<ExemplarReservoir> GetNoExemplarReservoir();
 };

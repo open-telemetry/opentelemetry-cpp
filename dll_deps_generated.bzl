@@ -24,7 +24,6 @@ DLL_DEPS = {
   Label("@//exporters/zipkin:zipkin_recordable"): None,
   Label("@//ext:headers"): None,
   Label("@//ext/src/http/client/curl:http_client_curl"): None,
-  Label("@//ext/src/zpages:zpages"): None,
   Label("@//sdk:headers"): None,
   Label("@//sdk/src/common:base64"): None,
   Label("@//sdk/src/common:env_variables"): None,

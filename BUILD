@@ -62,7 +62,6 @@ cc_library(
         "//exporters/otlp:otlp_http_metric_exporter",
         "//exporters/prometheus:prometheus_exporter",  # metrics
         "//exporters/zipkin:zipkin_exporter",  # traces
-        "//ext/src/zpages",  # traces
     ],
 )
 

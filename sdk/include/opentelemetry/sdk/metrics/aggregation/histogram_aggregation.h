@@ -93,8 +93,8 @@ void HistogramMerge(HistogramPointData &current,
   merge.record_min_max_ = current.record_min_max_ && delta.record_min_max_;
   if (merge.record_min_max_)
   {
-    merge.min_ = std::min(nostd::get<T>(current.min_), nostd::get<T>(delta.min_));
-    merge.max_ = std::max(nostd::get<T>(current.max_), nostd::get<T>(delta.max_));
+    merge.min_ = (std::min)(nostd::get<T>(current.min_), nostd::get<T>(delta.min_));
+    merge.max_ = (std::max)(nostd::get<T>(current.max_), nostd::get<T>(delta.max_));
   }
 }
 

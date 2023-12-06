@@ -42,7 +42,7 @@ public:
   HistogramExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
                              std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                 const common::OrderedAttributeMap &attributes))
+                                 const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
       : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
   {}
 
