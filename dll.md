@@ -19,6 +19,7 @@ Why not `CMake`:
   ```
   pwsh ci/setup_windows_ci_environment.ps1
   pwsh ci/do_ci.ps1 cmake.dll.test
+  pwsh ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
   ```
   
 To tackle the above issues, this branch creates a dynamic `otel_sdk_r.dll` library, exposing only the OpenTelemetry C++ api:

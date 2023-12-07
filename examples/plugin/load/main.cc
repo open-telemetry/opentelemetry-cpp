@@ -24,13 +24,15 @@ int main(int argc, char *argv[])
     std::cerr << "Failed to load opentelemetry plugin: " << error_message << "\n";
     return -1;
   }
-  std::ifstream config_in{argv[2]};
+  std::ifstream config_in{argv[2], std::ios::binary};
+  printf("DUMMY CONFIG FILE: %s\n", argv[2] );
   if (!config_in.good())
   {
     std::perror("Failed to open config file");
     return -1;
   }
   std::string config{std::istreambuf_iterator<char>{config_in}, std::istreambuf_iterator<char>{}};
+  printf("DUMMY CONFIG SIZE: %zd\n", config.size() );
   auto tracer = factory->MakeTracer(config, error_message);
   if (tracer == nullptr)
   {
@@ -38,5 +40,7 @@ int main(int argc, char *argv[])
     return -1;
   }
   auto span = tracer->StartSpan("abc");
+  auto scope = tracer->WithActiveSpan(span);
+  auto span2 = tracer->StartSpan("abcd");
   return 0;
 }
