@@ -580,9 +580,8 @@ if(BUILD_TESTING)
     if(TARGET gtest)
       set(GTEST_BOTH_LIBRARIES gtest gtest_main)
     else()
-      set(GTEST_BOTH_LIBRARIES
-          ${CMAKE_BINARY_DIR}/lib/libgtest.a
-          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
+      set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a
+                               ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
     endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
