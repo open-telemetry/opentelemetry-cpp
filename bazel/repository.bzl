@@ -101,10 +101,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        sha256 = "397544fe91e183029120b4eebcfab24ed9ec833d15850aae78fd5db19062d13a",
-        strip_prefix = "prometheus-cpp-1.1.0",
+        sha256 = "82d145f39b447d77021200755fab19bd37451ae018cbf256673e2c144a20e4a7",
+        strip_prefix = "prometheus-cpp-a944ec100251019cd44d070bbf2fd22f5139d6d0",
         urls = [
-            "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.1.0.tar.gz",
+            "https://github.com/jupp0r/prometheus-cpp/archive/a944ec100251019cd44d070bbf2fd22f5139d6d0.tar.gz",
         ],
     )
 

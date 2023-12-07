@@ -3,15 +3,6 @@
 
 workspace(name = "io_opentelemetry_cpp")
 
-# This overrides jupp0r/prometheus own use of zlib, from the @net_zlib_zlib//:z target
-# in the bazel/net_zlib_overide.BUILD file, there is 'z' target that is alias to @zlib//:zlib (used by grpc)
-new_local_repository(
-    name = "net_zlib_zlib",
-    build_file = "//bazel:net_zlib_override.BUILD",
-    # Feel weird about this, but it's needed.
-    path = "",
-)
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
