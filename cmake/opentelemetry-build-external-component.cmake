@@ -13,14 +13,14 @@
 if(OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
   # Add custom component path to build tree and consolidate binary artifacts in
   # current project binary output directory.
-  foreach(DIR IN LSITS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
+  foreach(DIR IN LISTS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
     add_subdirectory(${DIR} ${PROJECT_BINARY_DIR}/external)
   endforeach()
 elseif(DEFINED ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
   # Add custom component path to build tree and consolidate binary artifacts in
   # current project binary output directory.
   set(OPENTELEMETRY_EXTERNAL_COMPONENT_PATH_VAR $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
-  foreach(DIR IN LSITS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH_VAR)
+  foreach(DIR IN LISTS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH_VAR)
     add_subdirectory(${DIR} ${PROJECT_BINARY_DIR}/external)
   endforeach()
 elseif(DEFINED $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_URL})
