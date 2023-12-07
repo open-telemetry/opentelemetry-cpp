@@ -578,12 +578,11 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
     if(TARGET gtest)
-      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
+      set(GTEST_BOTH_LIBRARIES gtest gtest_main)
     else()
       set(GTEST_BOTH_LIBRARIES
           ${CMAKE_BINARY_DIR}/lib/libgtest.a
-          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
     endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
@@ -600,7 +599,7 @@ if(BUILD_TESTING)
   if(NOT GTEST_BOTH_LIBRARIES)
     # New GTest package names
     if(TARGET GTest::gtest)
-      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
     elseif(TARGET GTest::GTest)
       set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
     endif()
