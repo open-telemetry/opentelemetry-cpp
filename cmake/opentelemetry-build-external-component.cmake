@@ -3,8 +3,7 @@
 
 function(get_directory_name_in_path PATH_VAR RESULT_VAR)
   # get_filename_component does not work with paths ending in / or \, so remove it.
-  string(REGEX REPLACE "/$" "" PATH_TRIMMED "${PATH_VAR}")
-  string(REGEX REPLACE "\\$" "" PATH_TRIMMED "${PATH_VAR}")
+  string(REGEX REPLACE "[/\\]$" "" PATH_TRIMMED "${PATH_VAR}")
 
   get_filename_component(DIR_NAME ${PATH_TRIMMED} NAME)
 
