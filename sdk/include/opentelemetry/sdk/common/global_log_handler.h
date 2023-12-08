@@ -60,7 +60,7 @@ public:
                       const char *file,
                       int line,
                       const char *msg,
-                      const sdk::common::AttributeMap &attributes) noexcept = 0;
+                      const opentelemetry::sdk::common::AttributeMap &attributes) noexcept = 0;
 };
 
 class DefaultLogHandler : public LogHandler
@@ -70,7 +70,7 @@ public:
               const char *file,
               int line,
               const char *msg,
-              const sdk::common::AttributeMap &attributes) noexcept override;
+              const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override;
 };
 
 class NoopLogHandler : public LogHandler
@@ -80,7 +80,7 @@ public:
               const char *file,
               int line,
               const char *msg,
-              const sdk::common::AttributeMap &error_attributes) noexcept override;
+              const opentelemetry::sdk::common::AttributeMap &error_attributes) noexcept override;
 };
 
 /**

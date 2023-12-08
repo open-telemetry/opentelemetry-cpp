@@ -35,6 +35,9 @@ namespace otlp
 
 namespace
 {
+// When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
+// local version of OtlpGrpcAsyncCallDataBase and OtlpGrpcAsyncCallData. It's used to keep
+// compatibility when executables links multiple versions of otel-cpp.
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallDataBase
 {
 public:
@@ -52,6 +55,9 @@ public:
   virtual ~OtlpGrpcAsyncCallDataBase() {}
 };
 
+// When building with -fvisibility=default, we hide the symbols and vtable to ensure we always use
+// local version of OtlpGrpcAsyncCallDataBase and OtlpGrpcAsyncCallData. It's used to keep
+// compatibility when executables links multiple versions of otel-cpp.
 template <class GrpcRequestType, class GrpcResponseType>
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpGrpcAsyncCallData : public OtlpGrpcAsyncCallDataBase
 {
@@ -235,10 +241,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
 OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-    : is_shutdown_
-{
-  false
-}
+    : is_shutdown_{false}
 #endif
 {}
 
@@ -297,7 +300,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
                                                                  options.ssl_client_key_string);
     ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
-                                                                options.ssl_client_cert_string);
+                                                                 options.ssl_client_cert_string);
 
 #endif
     channel =

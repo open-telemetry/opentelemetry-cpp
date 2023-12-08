@@ -26,7 +26,7 @@ public:
 
   ~Span() override;
 
-  // trace::Span
+  // opentelemetry::trace::Span
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
 

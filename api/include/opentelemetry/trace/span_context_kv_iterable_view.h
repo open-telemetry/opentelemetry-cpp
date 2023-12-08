@@ -24,7 +24,7 @@ namespace trace
 namespace detail
 {
 template <class T>
-inline void take_span_context_kv(SpanContext, common::KeyValueIterableView<T>)
+inline void take_span_context_kv(SpanContext, opentelemetry::common::KeyValueIterableView<T>)
 {}
 
 template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>

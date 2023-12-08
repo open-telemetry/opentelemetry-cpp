@@ -92,9 +92,6 @@ Both these dependencies are listed here:
   - `libcurl` for connecting with Elasticsearch server over HTTP protocol.
   - `nlohmann/json` for encoding Elastic Search messages.
 
-- [Zpages](/ext/src/zpages):
-  - None
-
 - [Opentracing](/opentracing-shim)
   shim:
   - [`opentracing-cpp`](https://github.com/opentracing/opentracing-cpp)
