@@ -241,7 +241,10 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
 OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-    : is_shutdown_{false}
+    : is_shutdown_
+{
+  false
+}
 #endif
 {}
 
@@ -300,7 +303,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
                                                                  options.ssl_client_key_string);
     ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
-                                                                 options.ssl_client_cert_string);
+                                                                options.ssl_client_cert_string);
 
 #endif
     channel =
