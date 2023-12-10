@@ -23,7 +23,7 @@ class TextMapPropagator;
 
 /* Stores the singleton TextMapPropagator */
 
-class OPENTELEMETRY_EXPORT GlobalTextMapPropagator
+class GlobalTextMapPropagator
 {
 public:
   static nostd::shared_ptr<TextMapPropagator> GetGlobalPropagator() noexcept

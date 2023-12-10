@@ -20,7 +20,7 @@ class TracerProvider;
 /**
  * Stores the singleton global TracerProvider.
  */
-class OPENTELEMETRY_EXPORT Provider
+class Provider
 {
 public:
   /**

@@ -13,5 +13,12 @@ cc_binary(
     ],
     deps = dll_deps([
         "//api",
+        "//examples/plugin/plugin:example_plugin.so",
     ]),
+    args = [
+        "$(rootpath //examples/plugin/plugin:example_plugin.so)",
+        # This argument here is a dummy config file, that's been read and ignored
+        "$(rootpath //examples/plugin/plugin:example_plugin.so)",
+    ]
 )
+

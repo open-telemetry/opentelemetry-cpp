@@ -14,4 +14,7 @@ cc_binary(
     deps = dll_deps([
         "//api",
     ]),
+    visibility = [
+        "//examples/plugin/load:__pkg__",
+    ],
 )

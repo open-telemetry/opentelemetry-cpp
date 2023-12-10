@@ -14,7 +14,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
-#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #endif
 
@@ -30,7 +30,7 @@ namespace trace
  * For more information, see the W3C Trace Context specification:
  * https://www.w3.org/TR/trace-context
  */
-class /* OPENTELEMETRY_EXPORT */ TraceState
+class TraceState
 {
 public:
   static constexpr int kKeyMaxSize         = 256;
@@ -246,6 +246,7 @@ private:
     return str.substr(left, right - left + 1);
   }
 
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
   static bool IsValidKeyRegEx(nostd::string_view key)
   {
     static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
@@ -267,7 +268,7 @@ private:
     // Need to benchmark without regex, as a string object is created here.
     return std::regex_match(std::string(value.data(), value.size()), reg_value);
   }
-
+#else
   static bool IsValidKeyNonRegEx(nostd::string_view key)
   {
     if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
@@ -307,6 +308,7 @@ private:
     }
     return true;
   }
+#endif
 
   static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
 

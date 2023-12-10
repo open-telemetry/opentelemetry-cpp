@@ -3,15 +3,6 @@
 
 workspace(name = "io_opentelemetry_cpp")
 
-# This overrides jupp0r/prometheus own use of zlib, from the @net_zlib_zlib//:z target
-# in the bazel/net_zlib_overide.BUILD file, there is 'z' target that is alias to @zlib//:zlib (used by grpc)
-new_local_repository(
-    name = "net_zlib_zlib",
-    build_file = "//bazel:net_zlib_override.BUILD",
-    # Feel weird about this, but it's needed.
-    path = "",
-)
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
@@ -73,8 +64,8 @@ http_file(
     name = "sentry_cli_windows_amd64",
     downloaded_file_path = "sentry-cli.exe",
     executable = True,
-    sha256 = "38ca36c244c6a45e27f4b5a914b2b1eaa99b502972c630a8fec4473f053e76e4",
+    sha256 = "bc51a87a60fa13a619ecaa93f9d442ae7e638a1718cb4616c6595ce7ab02ab25",
     urls = [
-        "https://github.com/getsentry/sentry-cli/releases/download/2.21.5/sentry-cli-Windows-x86_64.exe",
+        "https://github.com/getsentry/sentry-cli/releases/download/2.23.0/sentry-cli-Windows-x86_64.exe",
     ],
 )

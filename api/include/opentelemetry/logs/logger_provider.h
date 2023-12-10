@@ -20,7 +20,7 @@ class Logger;
 /**
  * Creates new Logger instances.
  */
-class OPENTELEMETRY_EXPORT LoggerProvider
+class LoggerProvider
 {
 public:
   virtual ~LoggerProvider() = default;

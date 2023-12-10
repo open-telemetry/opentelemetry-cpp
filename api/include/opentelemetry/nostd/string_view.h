@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 #if defined(OPENTELEMETRY_STL_VERSION)
 #  if OPENTELEMETRY_STL_VERSION >= 2017
 #    include "opentelemetry/std/string_view.h"

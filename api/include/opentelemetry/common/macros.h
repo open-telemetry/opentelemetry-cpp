@@ -259,8 +259,6 @@ point.
 #   endif
 
 #   undef OPENTELEMETRY_EXPORT
-#   undef OPENTELEMETRY_API_SINGLETON
-#   define OPENTELEMETRY_API_SINGLETON
 
 #   if OPENTELEMETRY_DLL==1
 #      define OPENTELEMETRY_EXPORT __declspec(dllimport)
@@ -269,6 +267,9 @@ point.
 #   else
 #      error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
 #   endif
+
+#   undef OPENTELEMETRY_API_SINGLETON
+#   define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
 
 #   pragma detect_mismatch("detect_opentelemetry_dll_mismatch", "stl" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) "_abi" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO))
 

@@ -16,7 +16,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace baggage
 {
 
-class OPENTELEMETRY_EXPORT Baggage
+class Baggage
 {
 public:
   static constexpr size_t kMaxKeyValuePairs = 180;

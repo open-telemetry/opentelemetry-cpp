@@ -33,7 +33,7 @@ protected:
   std::unique_ptr<SyncWritableMetricStorage> storage_;
 };
 
-class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
+class OPENTELEMETRY_EXPORT LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
@@ -100,7 +100,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
+class OPENTELEMETRY_EXPORT LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,
