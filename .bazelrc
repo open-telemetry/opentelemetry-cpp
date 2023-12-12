@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+common --noenable_bzlmod 
+
 # This auto-enables --config=windows if targeting Windows (and same for linux, osx, etc.)
 common --enable_platform_specific_config
 
