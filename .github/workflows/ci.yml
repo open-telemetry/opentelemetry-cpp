@@ -203,7 +203,7 @@ jobs:
       run: ./ci/do_ci.ps1 cmake.maintainer.test
 
   cmake_msvc_maintainer_test_cxx20:
-    name: CMake msvc (maintainer mode)
+    name: CMake msvc (maintainer mode) with C++20
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
