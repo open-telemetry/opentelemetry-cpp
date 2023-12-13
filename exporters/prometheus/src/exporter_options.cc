@@ -36,8 +36,21 @@ inline bool GetPrometheusPopulateOtelScope()
   return exists ? setting : true;
 }
 
+inline bool GetPrometheusPopulateTargetInfo()
+{
+  constexpr char kPrometheusPopulateTargetInfo[] = "PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
+
+  bool setting;
+  auto exists = opentelemetry::sdk::common::GetBoolEnvironmentVariable(
+      kPrometheusPopulateTargetInfo, setting);
+
+  return exists ? setting : true;
+}
+
 PrometheusExporterOptions::PrometheusExporterOptions()
-    : url(GetPrometheusDefaultHttpEndpoint()), populate_otel_scope(GetPrometheusPopulateOtelScope())
+    : url(GetPrometheusDefaultHttpEndpoint()),
+      populate_target_info(GetPrometheusPopulateTargetInfo()),
+      populate_otel_scope(GetPrometheusPopulateOtelScope())
 {}
 
 }  // namespace metrics
