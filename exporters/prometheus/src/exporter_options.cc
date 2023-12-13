@@ -25,7 +25,20 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
   return exists ? endpoint : kPrometheusEndpointDefault;
 }
 
-PrometheusExporterOptions::PrometheusExporterOptions() : url(GetPrometheusDefaultHttpEndpoint()) {}
+inline bool GetPrometheusPopulateOtelScope()
+{
+  constexpr char kPrometheusPopulateOtelScope[] = "PROMETHEUS_EXPORTER_POPULATE_OTEL_SCOPE";
+
+  bool setting;
+  auto exists =
+      opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusPopulateOtelScope, setting);
+
+  return exists ? setting : true;
+}
+
+PrometheusExporterOptions::PrometheusExporterOptions()
+    : url(GetPrometheusDefaultHttpEndpoint()), populate_otel_scope(GetPrometheusPopulateOtelScope())
+{}
 
 }  // namespace metrics
 }  // namespace exporter

@@ -25,6 +25,9 @@ struct PrometheusExporterOptions
 
   // Populating target_info
   bool populate_target_info = true;
+
+  // Populating otel_scope_name/otel_scope_labels attributes
+  bool populate_otel_scope = true;
 };
 
 }  // namespace metrics

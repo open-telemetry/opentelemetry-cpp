@@ -18,8 +18,11 @@ namespace metrics
  * in this class with default capacity
  */
 PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader,
-                                         bool populate_target_info)
-    : reader_(reader), populate_target_info_(populate_target_info)
+                                         bool populate_target_info,
+                                         bool populate_otel_scope)
+    : reader_(reader),
+      populate_target_info_(populate_target_info),
+      populate_otel_scope_(populate_otel_scope)
 {}
 
 /**
