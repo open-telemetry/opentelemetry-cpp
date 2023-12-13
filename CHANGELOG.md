@@ -17,6 +17,8 @@ Increment the:
 
 * [REMOVAL] Remove option WITH_OTLP_HTTP_SSL_PREVIEW
   [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
+* [BUILD] Fix removing of NOMINMAX on Windows
+  [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
 
 Important changes:
 
