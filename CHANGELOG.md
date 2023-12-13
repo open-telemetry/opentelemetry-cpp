@@ -15,8 +15,20 @@ Increment the:
 
 ## [Unreleased]
 
+* [REMOVAL] Remove option WITH_OTLP_HTTP_SSL_PREVIEW
+  [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
 * [BUILD] Fix removing of NOMINMAX on Windows
   [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
+
+Important changes:
+
+Breaking changes:
+
+* [REMOVAL] Remove option WITH_OTLP_HTTP_SSL_PREVIEW
+  [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
+  * CMake options `WITH_OTLP_HTTP_SSL_PREVIEW`
+    and `WITH_OTLP_HTTP_SSL_TLS_PREVIEW` are removed.
+    Building opentelemetry-cpp without SSL support is no longer possible.
 
 ## [1.13.0] 2023-12-06
 

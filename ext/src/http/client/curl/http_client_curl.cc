@@ -48,10 +48,7 @@ void Session::SendRequest(
     reuse_connection = session_id_ % http_client_.GetMaxSessionsPerConnection() != 0;
   }
 
-  curl_operation_.reset(new HttpOperation(http_request_->method_, url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                          http_request_->ssl_options_,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
+  curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
                                           callback_ptr, http_request_->headers_,
                                           http_request_->body_, false, http_request_->timeout_ms_,
                                           reuse_connection));

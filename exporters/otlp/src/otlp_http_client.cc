@@ -951,9 +951,7 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   request->SetSslOptions(options_.ssl_options);
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);
