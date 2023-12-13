@@ -11,10 +11,9 @@ namespace sdk
 namespace metrics
 {
 
-std::unique_ptr<MeterSelector> MeterSelectorFactory::Create(
-    opentelemetry::nostd::string_view name,
-    opentelemetry::nostd::string_view version,
-    opentelemetry::nostd::string_view schema)
+std::unique_ptr<MeterSelector> MeterSelectorFactory::Create(const std::string &name,
+                                                            const std::string &version,
+                                                            const std::string &schema)
 {
   std::unique_ptr<MeterSelector> meter_selector(new MeterSelector(name, version, schema));
   return meter_selector;

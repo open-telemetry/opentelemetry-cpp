@@ -48,12 +48,12 @@ public:
   /**
    * Shutdown the metric reader.
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the metric read by the reader.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Return the status of Metric reader.

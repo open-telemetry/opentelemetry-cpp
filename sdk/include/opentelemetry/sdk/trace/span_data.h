@@ -55,7 +55,8 @@ public:
    * Get the attributes for this event
    * @return the attributes for this event
    */
-  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+      &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -63,7 +64,7 @@ public:
 private:
   std::string name_;
   opentelemetry::common::SystemTimestamp timestamp_;
-  common::AttributeMap attribute_map_;
+  opentelemetry::sdk::common::AttributeMap attribute_map_;
 };
 
 /**
@@ -81,7 +82,8 @@ public:
    * Get the attributes for this link
    * @return the attributes for this link
    */
-  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+      &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -94,7 +96,7 @@ public:
 
 private:
   opentelemetry::trace::SpanContext span_context_;
-  common::AttributeMap attribute_map_;
+  opentelemetry::sdk::common::AttributeMap attribute_map_;
 };
 
 /**
@@ -210,7 +212,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+      &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -300,7 +303,7 @@ private:
   std::string name_;
   opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
-  common::AttributeMap attribute_map_;
+  opentelemetry::sdk::common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};

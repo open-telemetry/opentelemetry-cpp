@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
@@ -37,6 +39,7 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
+opentelemetry::exporter::otlp::OtlpGrpcLogRecordExporterOptions log_opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
@@ -65,7 +68,7 @@ void CleanupTracer()
 void InitLogger()
 {
   // Create OTLP exporter instance
-  auto exporter  = otlp::OtlpGrpcLogRecordExporterFactory::Create(opts);
+  auto exporter  = otlp::OtlpGrpcLogRecordExporterFactory::Create(log_opts);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
   nostd::shared_ptr<logs::LoggerProvider> provider(
       logs_sdk::LoggerProviderFactory::Create(std::move(processor)));
@@ -92,11 +95,14 @@ int main(int argc, char *argv[])
 {
   if (argc > 1)
   {
-    opts.endpoint = argv[1];
+    opts.endpoint     = argv[1];
+    log_opts.endpoint = argv[1];
     if (argc > 2)
     {
-      opts.use_ssl_credentials         = true;
-      opts.ssl_credentials_cacert_path = argv[2];
+      opts.use_ssl_credentials             = true;
+      log_opts.use_ssl_credentials         = true;
+      opts.ssl_credentials_cacert_path     = argv[2];
+      log_opts.ssl_credentials_cacert_path = argv[2];
     }
   }
   InitLogger();

@@ -46,6 +46,21 @@ TEST(NoopTest, UseNoopTracers)
   s1->GetContext();
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(NoopTest, UseNoopTracersAbiv2)
+{
+  std::shared_ptr<trace_api::Tracer> tracer{new trace_api::NoopTracer{}};
+  auto s1 = tracer->StartSpan("abc");
+
+  EXPECT_EQ(s1->IsRecording(), false);
+
+  trace_api::SpanContext target(false, false);
+  s1->AddLink(target, {{"noop1", 1}});
+
+  s1->AddLinks({{trace_api::SpanContext(false, false), {{"noop2", 2}}}});
+}
+#endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
 TEST(NoopTest, StartSpan)
 {
   std::shared_ptr<trace_api::Tracer> tracer{new trace_api::NoopTracer{}};

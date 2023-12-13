@@ -15,6 +15,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
@@ -57,6 +58,14 @@ public:
                 common::SystemTimestamp /*timestamp*/,
                 const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void AddLink(const SpanContext & /* target */,
+               const common::KeyValueIterable & /* attrs */) noexcept override
+  {}
+
+  void AddLinks(const SpanContextKeyValueIterable & /* links */) noexcept override {}
+#endif
 
   void SetStatus(StatusCode /*code*/, nostd::string_view /*description*/) noexcept override {}
 

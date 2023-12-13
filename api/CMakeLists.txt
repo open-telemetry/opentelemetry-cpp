@@ -104,7 +104,6 @@ if(WITH_NO_GETENV)
 endif()
 
 if(WIN32)
-  target_compile_definitions(opentelemetry_api INTERFACE NOMINMAX)
   if(WITH_ETW)
     target_compile_definitions(opentelemetry_api INTERFACE HAVE_MSGPACK)
   endif()

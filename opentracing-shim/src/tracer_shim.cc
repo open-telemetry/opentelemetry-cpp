@@ -148,13 +148,20 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
   auto span_context    = opentelemetry::trace::GetSpan(context)->GetContext();
   auto baggage         = opentelemetry::baggage::GetBaggage(context);
 
-  // If the extracted SpanContext is invalid AND the extracted Baggage is empty,
-  // this operation MUST return a null value, and otherwise it MUST return a
-  // SpanContext Shim instance with the extracted values.
-  SpanContextShim *context_shim = (!span_context.IsValid() && utils::isBaggageEmpty(baggage))
-                                      ? nullptr
-                                      : new (std::nothrow) SpanContextShim(span_context, baggage);
+  // The operation MUST return a `SpanContext` Shim instance with the extracted values if any of
+  // these conditions are met:
+  // * `SpanContext` is valid.
+  // * `SpanContext` is sampled.
+  // * `SpanContext` contains non-empty extracted `Baggage`.
+  // Otherwise, the operation MUST return null or empty value.
+  SpanContextShim *context_shim =
+      (!span_context.IsValid() && !span_context.IsSampled() && utils::isBaggageEmpty(baggage))
+          ? nullptr
+          : new (std::nothrow) SpanContextShim(span_context, baggage);
 
+  // Note: Invalid but sampled `SpanContext` instances are returned as a way to support
+  // jaeger-debug-id headers (https://github.com/jaegertracing/jaeger-client-java#via-http-headers)
+  // which are used to force propagation of debug information.
   return opentracing::make_expected(std::unique_ptr<opentracing::SpanContext>(context_shim));
 }
 
