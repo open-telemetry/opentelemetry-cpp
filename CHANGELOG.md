@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Fix removing of NOMINMAX on Windows
+  [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
+
 ## [1.13.0] 2023-12-06
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
