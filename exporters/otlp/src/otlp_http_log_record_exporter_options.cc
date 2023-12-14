@@ -29,7 +29,6 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   max_requests_per_connection = 8;
 #endif
 
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   ssl_insecure_skip_verify = false;
   ssl_ca_cert_path         = GetOtlpDefaultLogsSslCertificatePath();
   ssl_ca_cert_string       = GetOtlpDefaultLogsSslCertificateString();
@@ -37,14 +36,11 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   ssl_client_key_string    = GetOtlpDefaultLogsSslClientKeyString();
   ssl_client_cert_path     = GetOtlpDefaultLogsSslClientCertificatePath();
   ssl_client_cert_string   = GetOtlpDefaultLogsSslClientCertificateString();
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   ssl_min_tls      = GetOtlpDefaultLogsSslTlsMinVersion();
   ssl_max_tls      = GetOtlpDefaultLogsSslTlsMaxVersion();
   ssl_cipher       = GetOtlpDefaultLogsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 }
 
 OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}

@@ -110,8 +110,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -132,8 +130,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -155,8 +151,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   cmake ${CMAKE_OPTIONS[@]}  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -176,8 +170,6 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \

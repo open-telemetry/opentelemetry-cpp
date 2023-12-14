@@ -139,9 +139,7 @@ public:
    */
   HttpOperation(opentelemetry::ext::http::client::Method method,
                 std::string url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
                 const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
                 opentelemetry::ext::http::client::EventHandler *event_handle,
                 // Default empty headers and empty request body
                 const opentelemetry::ext::http::client::Headers &request_headers =
@@ -290,9 +288,7 @@ private:
   opentelemetry::ext::http::client::Method method_;
   std::string url_;
 
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   const opentelemetry::ext::http::client::HttpSslOptions &ssl_options_;
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
