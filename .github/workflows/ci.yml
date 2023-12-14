@@ -202,6 +202,22 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
 
+  cmake_msvc_maintainer_test_stl_cxx20:
+    name: CMake msvc (maintainer mode) with C++20
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      env:
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.ps1 cmake.maintainer.cxx20.stl.test
+
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
     runs-on: ubuntu-latest

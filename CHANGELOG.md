@@ -19,6 +19,8 @@ Increment the:
   [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
 * [BUILD] Fix removing of NOMINMAX on Windows
   [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
+* [BUILD] Introduce CXX 20 CI pipeline for MSVC/Windows
+  [#2450](https://github.com/open-telemetry/opentelemetry-cpp/pull/2450)
 
 Important changes:
 
