@@ -115,7 +115,7 @@ switch ($action) {
   "cmake.maintainer.cxx20.stl.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-      -DWITH_STL=20 `
+      -DWITH_STL=CXX20 `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
