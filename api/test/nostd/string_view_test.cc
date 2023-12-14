@@ -71,7 +71,7 @@ TEST(StringViewTest, SubstrPortion)
 TEST(StringViewTest, SubstrOutOfRange)
 {
   string_view s = "abc123";
-#if __EXCEPTIONS || ((defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION >= 2020)))
+#if __EXCEPTIONS || (defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION >= 2020))
   EXPECT_THROW((void)s.substr(10), std::out_of_range);
 #else
   EXPECT_DEATH({ s.substr(10); }, "");
