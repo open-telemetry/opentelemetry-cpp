@@ -116,6 +116,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DWITH_STL=CXX20 `
+      -DCMAKE_CXX_STANDARD=20 `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
