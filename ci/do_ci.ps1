@@ -112,6 +112,29 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.maintainer.cxx20.stl.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DWITH_STL=20 `
+      -DOTELCPP_MAINTAINER_MODE=ON `
+      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.with_async_export.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
