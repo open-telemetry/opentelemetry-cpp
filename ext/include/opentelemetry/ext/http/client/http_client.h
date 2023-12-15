@@ -110,7 +110,6 @@ struct cmp_ic
 };
 using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
-#ifdef ENABLE_HTTP_SSL_PREVIEW
 struct HttpSslOptions
 {
   HttpSslOptions() {}
@@ -122,15 +121,11 @@ struct HttpSslOptions
                  nostd::string_view input_ssl_client_key_path,
                  nostd::string_view input_ssl_client_key_string,
                  nostd::string_view input_ssl_client_cert_path,
-                 nostd::string_view input_ssl_client_cert_string
-#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
-                 ,
+                 nostd::string_view input_ssl_client_cert_string,
                  nostd::string_view input_ssl_min_tls,
                  nostd::string_view input_ssl_max_tls,
                  nostd::string_view input_ssl_cipher,
-                 nostd::string_view input_ssl_cipher_suite
-#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
-                 )
+                 nostd::string_view input_ssl_cipher_suite)
       : use_ssl(false),
         ssl_insecure_skip_verify(input_ssl_insecure_skip_verify),
         ssl_ca_cert_path(input_ssl_ca_cert_path),
@@ -138,15 +133,11 @@ struct HttpSslOptions
         ssl_client_key_path(input_ssl_client_key_path),
         ssl_client_key_string(input_ssl_client_key_string),
         ssl_client_cert_path(input_ssl_client_cert_path),
-        ssl_client_cert_string(input_ssl_client_cert_string)
-
-#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
-        ,
+        ssl_client_cert_string(input_ssl_client_cert_string),
         ssl_min_tls(input_ssl_min_tls),
         ssl_max_tls(input_ssl_max_tls),
         ssl_cipher(input_ssl_cipher),
         ssl_cipher_suite(input_ssl_cipher_suite)
-#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
   {
     /* Use SSL if url starts with "https:" */
     if (strncmp(url.data(), "https:", 6) == 0)
@@ -192,7 +183,6 @@ struct HttpSslOptions
   */
   std::string ssl_client_cert_string{};
 
-#  ifdef ENABLE_HTTP_SSL_TLS_PREVIEW
   /**
     Minimum SSL version to use.
     Valid values are:
@@ -230,9 +220,7 @@ struct HttpSslOptions
     Cipher names depends on the underlying CURL implementation.
   */
   std::string ssl_cipher_suite{};
-#  endif /* ENABLE_HTTP_SSL_TLS_PREVIEW */
 };
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
 class Request
 {
@@ -241,9 +229,7 @@ public:
 
   virtual void SetUri(nostd::string_view uri) noexcept = 0;
 
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   virtual void SetSslOptions(const HttpSslOptions &options) noexcept = 0;
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   virtual void SetBody(Body &body) noexcept = 0;
 
@@ -369,36 +355,24 @@ class HttpClientSync
 public:
   Result GetNoSsl(const nostd::string_view &url, const Headers &headers = {{}}) noexcept
   {
-#ifdef ENABLE_HTTP_SSL_PREVIEW
     static const HttpSslOptions no_ssl;
     return Get(url, no_ssl, headers);
-#else
-    return Get(url, headers);
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
   }
 
   virtual Result PostNoSsl(const nostd::string_view &url,
                            const Body &body,
                            const Headers &headers = {{"content-type", "application/json"}}) noexcept
   {
-#ifdef ENABLE_HTTP_SSL_PREVIEW
     static const HttpSslOptions no_ssl;
     return Post(url, no_ssl, body, headers);
-#else
-    return Post(url, body, headers);
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
   }
 
   virtual Result Get(const nostd::string_view &url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
                      const HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
                      const Headers & = {{}}) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
                       const HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
                       const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 

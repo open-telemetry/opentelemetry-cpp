@@ -308,7 +308,6 @@ struct test_case
 
 int test_basic();
 
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
 int test_cert_not_found();
 int test_cert_invalid();
 int test_cert_unreadable();
@@ -321,9 +320,7 @@ int test_client_key_not_found();
 int test_client_key_invalid();
 int test_client_key_unreadable();
 int test_client_key_ok();
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
 int test_min_tls_unknown();
 int test_min_tls_10();
 int test_min_tls_11();
@@ -350,10 +347,8 @@ int test_range_tls_12_13();
 int test_range_tls_13_10();
 int test_range_tls_13_11();
 int test_range_tls_13_12();
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 
 static const test_case all_tests[] = {{"basic", test_basic},
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
                                       {"cert-not-found", test_cert_not_found},
                                       {"cert-invalid", test_cert_invalid},
                                       {"cert-unreadable", test_cert_unreadable},
@@ -366,9 +361,6 @@ static const test_case all_tests[] = {{"basic", test_basic},
                                       {"client-key-invalid", test_client_key_invalid},
                                       {"client-key-unreadable", test_client_key_unreadable},
                                       {"client-key-ok", test_client_key_ok},
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
                                       {"min-tls-unknown", test_min_tls_unknown},
                                       {"min-tls-10", test_min_tls_10},
                                       {"min-tls-11", test_min_tls_11},
@@ -395,7 +387,6 @@ static const test_case all_tests[] = {{"basic", test_basic},
                                       {"range-tls-13-10", test_range_tls_13_10},
                                       {"range-tls-13-11", test_range_tls_13_11},
                                       {"range-tls-13-12", test_range_tls_13_12},
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
                                       {"", nullptr}};
 
 void list_test_cases()
@@ -560,8 +551,6 @@ int test_basic()
 
   return expect_connection_failed();
 }
-
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
 
 int test_cert_not_found()
 {
@@ -908,9 +897,6 @@ int test_client_key_ok()
 
   return expect_success();
 }
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
 
 int test_min_tls_unknown()
 {
@@ -1808,5 +1794,3 @@ int test_range_tls_13_12()
   // Impossible
   return expect_connection_failed();
 }
-
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
