@@ -27,7 +27,8 @@ inline const std::string GetPrometheusDefaultHttpEndpoint()
 
 inline bool GetPrometheusPopulateOtelScope()
 {
-  constexpr char kPrometheusPopulateOtelScope[] = "PROMETHEUS_EXPORTER_POPULATE_OTEL_SCOPE";
+  constexpr char kPrometheusPopulateOtelScope[] =
+      "OTEL_CPP_PROMETHEUS_EXPORTER_POPULATE_OTEL_SCOPE";
 
   bool setting;
   auto exists =
@@ -38,7 +39,8 @@ inline bool GetPrometheusPopulateOtelScope()
 
 inline bool GetPrometheusPopulateTargetInfo()
 {
-  constexpr char kPrometheusPopulateTargetInfo[] = "PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
+  constexpr char kPrometheusPopulateTargetInfo[] =
+      "OTEL_CPP_PROMETHEUS_EXPORTER_POPULATE_TARGET_INFO";
 
   bool setting;
   auto exists = opentelemetry::sdk::common::GetBoolEnvironmentVariable(
