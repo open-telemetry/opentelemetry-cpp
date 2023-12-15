@@ -48,7 +48,7 @@ TEST(VariantTest, Get)
   EXPECT_EQ(nostd::get<int>(w), 12);
   EXPECT_EQ(*nostd::get_if<int>(&v), 12);
   EXPECT_EQ(nostd::get_if<float>(&v), nullptr);
-#if __EXCEPTIONS
+#if __EXCEPTIONS || (defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION >= 2017))
   EXPECT_THROW(nostd::get<float>(w), nostd::bad_variant_access);
 #else
   EXPECT_DEATH({ nostd::get<float>(w); }, "");

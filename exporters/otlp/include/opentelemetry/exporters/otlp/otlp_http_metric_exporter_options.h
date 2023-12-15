@@ -71,7 +71,6 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
   std::size_t max_requests_per_connection;
 #endif
 
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   /** True do disable SSL. */
   bool ssl_insecure_skip_verify;
 
@@ -92,9 +91,7 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 
   /** CLIENT CERT, as a string. */
   std::string ssl_client_cert_string;
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
 
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
   /** Minimum TLS version. */
   std::string ssl_min_tls;
 
@@ -106,7 +103,6 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 
   /** TLS cipher suite. */
   std::string ssl_cipher_suite;
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
 };
 
 }  // namespace otlp
