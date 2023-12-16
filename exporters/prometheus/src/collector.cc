@@ -18,8 +18,11 @@ namespace metrics
  * in this class with default capacity
  */
 PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader,
-                                         bool populate_target_info)
-    : reader_(reader), populate_target_info_(populate_target_info)
+                                         bool populate_target_info,
+                                         bool populate_otel_scope)
+    : reader_(reader),
+      populate_target_info_(populate_target_info),
+      populate_otel_scope_(populate_otel_scope)
 {}
 
 /**
@@ -41,8 +44,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
   std::vector<prometheus_client::MetricFamily> result;
 
   reader_->Collect([&result, this](sdk::metrics::ResourceMetrics &metric_data) {
-    auto prometheus_metric_data =
-        PrometheusExporterUtils::TranslateToPrometheus(metric_data, this->populate_target_info_);
+    auto prometheus_metric_data = PrometheusExporterUtils::TranslateToPrometheus(
+        metric_data, this->populate_target_info_, this->populate_otel_scope_);
     for (auto &data : prometheus_metric_data)
       result.emplace_back(data);
     return true;
