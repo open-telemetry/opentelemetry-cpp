@@ -19,7 +19,7 @@ jobs:
       run: |
         echo "build --disk_cache=c:/b/d" > ../top.bazelrc1
         echo "common --repository_cache=c:/b/r" >> ../top.bazelrc
-        echo "startup --output_user_root=f:/b/u" >> ../top.bazelrc
+        echo "startup --output_user_root=c:/b/u" >> ../top.bazelrc
         type ../top.bazelrc
         ./otel_sdk_build.cmd
 
