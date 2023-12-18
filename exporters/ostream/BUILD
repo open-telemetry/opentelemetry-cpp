@@ -3,7 +3,9 @@
 
 package(default_visibility = ["//visibility:public"])
 
-load("//:dll_deps.bzl", "dll_deps")
+load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+
+avoid_dll_lock()
 
 cc_library(
     name = "ostream_log_record_exporter",

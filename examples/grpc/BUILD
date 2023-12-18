@@ -5,7 +5,9 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-load ("//:dll_deps.bzl", "dll_deps")
+load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+
+avoid_dll_lock()
 
 proto_library(
     name = "messages_proto",

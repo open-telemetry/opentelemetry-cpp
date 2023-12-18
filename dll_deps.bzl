@@ -22,7 +22,7 @@ def _filter_libs(deps):
 def dll_deps(deps):
     """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
-        "//:with_dll_enabled": ["//:dll"] + _filter_libs(deps),
+        "//:with_dll_enabled": [":avoid_dll_lock"] + _filter_libs(deps),
         "//conditions:default": deps
     })
 
@@ -51,3 +51,18 @@ force_compilation_mode = rule(
         ),
     }
 )
+
+def avoid_dll_lock():
+    """
+    Dummy target to avoid dll locking when the otel_sdk.dll has to be copied
+    simualtenously into the same output folder. This ensures the copying
+    happens once, through this target, as others depends on it
+
+    Example, place this somewhere in your BUILD file:
+
+      avoid_dll_lock()
+    """
+    native.cc_library(
+        name = "avoid_dll_lock",
+        deps = ["//:dll"]
+    )

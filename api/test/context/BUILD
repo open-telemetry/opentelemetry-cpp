@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
-load("//:dll_deps.bzl", "dll_deps")
+load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+
+avoid_dll_lock()
 
 cc_test(
     name = "context_test",
