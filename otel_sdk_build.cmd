@@ -5,7 +5,8 @@ set BAZEL_SH=
 set BAZEL_VC=
 set BAZEL_VC_FULL_VERSION=
 
-for /F "usebackq" %%i in (`where bazel`) do set __BAZEL__=%%i
+rem Look first for bazelisk, then bazel
+for /F "usebackq" %%i in (`where bazelisk bazel`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
 set PATH=c:\windows\system32;c:\program files\python312
