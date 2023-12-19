@@ -2,25 +2,26 @@ name: otel_sdk
 
 on:
   push:
-    branches: [ main ]
+    tags:
+      - "*"
 
 jobs:
   otel_sdk_release:
     name: build otel_sdk
     runs-on: windows-latest
     permissions:
-      contents: write    
+      contents: write
     steps:
-    - uses: actions/checkout@v4
-    - name: run otel_sdk_build.cmd
-      run: |
-        echo "build --disk_cache=c:/b/d" > ../top.bazelrc
-        echo "common --repository_cache=c:/b/r" >> ../top.bazelrc
-        echo "startup --output_user_root=c:/b/u" >> ../top.bazelrc
-        ./otel_sdk_build.cmd
-    - name: release otel_sdk.zip
-      uses: ncipollo/release-action@v1.13.0
-      with:
-        allowUpdates: true
-        replacesArtifacts: true
-        artifacts: ./otel_sdk.zip
+      - uses: actions/checkout@v4
+      - name: run otel_sdk_build.cmd
+        run: |
+          echo "build --disk_cache=c:/b/d" > ../top.bazelrc
+          echo "common --repository_cache=c:/b/r" >> ../top.bazelrc
+          echo "startup --output_user_root=c:/b/u" >> ../top.bazelrc
+          ./otel_sdk_build.cmd
+      - name: release otel_sdk.zip
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: ./otel_sdk.zip
