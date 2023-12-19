@@ -1,5 +1,7 @@
 name: otel_sdk
 
+# Example:
+#  git tag -a v1.13.0-dll-0.3 -m "Tagged. You are it!" && git push --tags
 on:
   push:
     tags:
