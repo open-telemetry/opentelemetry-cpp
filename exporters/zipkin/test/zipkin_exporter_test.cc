@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/version.h"
+
 #ifndef OPENTELEMETRY_STL_VERSION
 
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"

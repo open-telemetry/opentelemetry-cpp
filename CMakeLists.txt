@@ -617,6 +617,9 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
   add_definitions(-DOPENTELEMETRY_BUILD_EXPORT_DLL)
 endif()
 
+# This definition must be kept to 0, it's only used in the bazel build
+add_definitions(-DOPENTELEMETRY_DLL=0)
+
 include_directories(api/include)
 
 add_subdirectory(api)

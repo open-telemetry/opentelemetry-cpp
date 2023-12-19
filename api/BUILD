@@ -14,9 +14,9 @@ cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = select({
-        ":with_external_abseil": ["HAVE_ABSEIL"],
-        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1", "OPENTELEMETRY_ABI_VERSION_NO=2", "OPENTELEMETRY_STL_VERSION=2017"], #1=dllimport, -1=dllexport
-        "//conditions:default": [],
+        ":with_external_abseil": ["HAVE_ABSEIL", "OPENTELEMETRY_DLL=0"],
+        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1"], # -1=dllexport, 1=dllimport, 0=static
+        "//conditions:default": ["OPENTELEMETRY_DLL=0"],
     }),
     strip_include_prefix = "include",
     tags = ["api"],

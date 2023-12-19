@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/version.h"
+
 #ifndef OPENTELEMETRY_STL_VERSION
 // Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
 // Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.

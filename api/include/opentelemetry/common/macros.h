@@ -227,12 +227,26 @@ point.
 
 #endif
 
-// Below is specific to the single-dll clone of OpenTelemetry C++ here:
-// https://github.com/malkia/opentelemetry-cpp 
-#if defined(OPENTELEMETRY_DLL)
+// TODO: Simplfiy below even further. Make it even more succint, but don't let errors escape!
 
-#   define OPENTELEMETRY_DLL_STRX(x) #x
-#   define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
+// What follows below is strictly for the otel_sdk.dll Windows version compiled with bazel using MSVC from the https://github.com/malkia/opentelemetry-cpp clone
+// In the CMake scripts, the OPENTELEMETRY_BUILD_IMPORT_DLL and OPENTELEMETRY_BUILD_EXPORT_DLL are used (above). We ignore them, and redefine OPENTELEMETRY_EXPORT below.
+
+// Users of the otel_sdk.dll library must be able to #include <opentelemetry/...> with ease, avoiding any extra #defines.
+// Certain defaults would have to be set for them, like OPENTELEMETRY_DLL=1 (dllimport), the STL/ABI version and others in the future.
+// The only requirement for MSVC is to enable C++17 or later.
+
+#if !defined(OPENTELEMETRY_DLL)
+#define OPENTELEMETRY_DLL 1 // dllimport default
+#define OPENTELEMETRY_STL_VERSION 2017
+#define OPENTELEMETRY_ABI_VERSION_NO 2
+#endif
+
+#define OPENTELEMETRY_DLL_STRX(x) #x
+#define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
+
+#if defined(OPENTELEMETRY_DLL) 
+#if OPENTELEMETRY_DLL != 0 // OPENTELEMETRY_DLL=0 is defined during the static bazel build. This probably breaks CMake one.
 
 #   if !defined(_MSC_VER)
 #      error OPENTELEMETRY_DLL: Only MSVC compiler is supported.
@@ -263,14 +277,24 @@ point.
 #   if OPENTELEMETRY_DLL==1
 #      define OPENTELEMETRY_EXPORT __declspec(dllimport)
 #   elif OPENTELEMETRY_DLL==-1 // Only used during build
+#      undef OPENTELEMETRY_DLL
+#      define OPENTELEMETRY_DLL 1 // this is for the detect_mismatch down below
 #      define OPENTELEMETRY_EXPORT __declspec(dllexport)
 #   else
 #      error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
 #   endif
 
+// The rule is that if there is struct/class with one or more OPENTELEMETRY_API_SINGLETON function members,
+// then itself can't be defined OPENTELEMETRY_EXPORT 
 #   undef OPENTELEMETRY_API_SINGLETON
 #   define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
 
-#   pragma detect_mismatch("detect_opentelemetry_dll_mismatch", "stl" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) "_abi" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO))
-
+#endif // if OPENTELEMETRY_DLL != 0
 #endif // if defined(OPENTELEMETRY_DLL)
+
+#ifdef _MSC_VER
+#  pragma detect_mismatch("otel_sdk_detect_mismatch", "dll" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) "_stl" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) "_abi" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO))
+#endif
+
+#undef OPENTELEMETRY_DLL_STRX
+#undef OPENTELEMETRY_DLL_STR
