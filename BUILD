@@ -384,3 +384,12 @@ write_source_file(
     in_file = "dll_deps_generated_internally.bzl",
     out_file = "dll_deps_generated.bzl",
 )
+
+platform(
+    name = "x64_windows-clang-cl",
+    constraint_values = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:windows",
+        "@bazel_tools//tools/cpp:clang-cl",
+    ],
+)

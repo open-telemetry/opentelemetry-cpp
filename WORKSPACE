@@ -30,19 +30,24 @@ http_archive(
         "https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
     ],
 )
+
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
 bazel_skylib_workspace()
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
 http_archive(
     name = "rules_pkg",
+    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
     urls = [
         "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
         "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
     ],
-    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
 )
+
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
 rules_pkg_dependencies()
 
 # Rules apple for bazel 7.0.0, as the project somehow pulls by default too old rules - 0.32.0
@@ -62,17 +67,21 @@ apple_rules_dependencies()
 
 # Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
+
 opentelemetry_cpp_deps()
 
 load("//bazel:extra_deps.bzl", "opentelemetry_extra_deps")
+
 opentelemetry_extra_deps()
 
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
 grpc_deps()
 
 # Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
 grpc_extra_deps()
 
 http_file(
@@ -84,3 +93,13 @@ http_file(
         "https://github.com/getsentry/sentry-cli/releases/download/2.23.0/sentry-cli-Windows-x86_64.exe",
     ],
 )
+
+# Use clang-cl for compilation. The alternative form is now in the .bazelrc, this is kept here just for reference
+# The toolchain config is in the BUILD file
+#
+# register_execution_platforms(
+#     ":x64_windows-clang-cl",
+# )
+# register_toolchains(
+#     "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
+# )

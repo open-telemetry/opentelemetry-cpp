@@ -15,6 +15,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+        with:
+          path: c:/b/u
+          key: otel_sdk_bazel_cache
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/b/d" > ../top.bazelrc
@@ -24,6 +28,4 @@ jobs:
       - name: release otel_sdk.zip
         uses: ncipollo/release-action@v1.13.0
         with:
-          allowUpdates: true
-          replacesArtifacts: true
           artifacts: ./otel_sdk.zip
