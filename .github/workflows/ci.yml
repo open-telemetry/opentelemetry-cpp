@@ -732,6 +732,8 @@ jobs:
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
       run: ./ci/do_ci.ps1 cmake.dll.test
+    - name: run cmake cxx20 test (DLL build)
+      run: ./ci/do_ci.ps1 cmake.dll.cxx20.test
     - name: run otprotocol test (DLL build)
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
 
