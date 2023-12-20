@@ -13,7 +13,8 @@ test --enable_runfiles
 build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
-build --experimental_convenience_symlinks=clean
+# The github do/ci_do.sh needs `bazel-bin` folder, enabling it just for this case.
+build:windows --experimental_convenience_symlinks=clean
 build --experimental_cc_implementation_deps
 
 build:windows    --copt="/Brepro"    --copt="/guard:cf" --copt="/Z7" --copt="/JMC-" --cxxopt="/std:c++17" --copt="/sdl" --copt="-D_CRT_NONSTDC_NO_DEPRECATE"
