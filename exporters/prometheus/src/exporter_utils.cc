@@ -423,8 +423,8 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
     if (trim_end != i)
     {
       cleaned_string[trim_end] = cleaned_string[i];
-      ++trim_end;
     }
+    ++trim_end;
   }
 
   while (trim_end > 0 && cleaned_string[trim_end - 1] == '_')
