@@ -1,0 +1,20 @@
+
+name: Add comment
+on:
+  issues:
+    types:
+      - labeled
+jobs:
+  add-comment:
+    if: github.event.label.name == 'help wanted'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            This issue is available for anyone to work on. **Make sure to reference this issue in your pull request.**
+            :sparkles: Thank you for your contribution! :sparkles:

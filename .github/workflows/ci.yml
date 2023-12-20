@@ -1,0 +1,840 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cmake_test:
+    name: CMake test (without otlp-exporter)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake tests (without otlp-exporter)
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        ./ci/do_ci.sh cmake.test
+
+  cmake_gcc_maintainer_sync_test:
+    name: CMake gcc 12 (maintainer mode, sync)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake gcc (maintainer mode, sync)
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.sync.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
+  cmake_gcc_maintainer_async_test:
+    name: CMake gcc 12 (maintainer mode, async)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake gcc (maintainer mode, async)
+      env:
+        CC: /usr/bin/gcc-12
+        CXX: /usr/bin/g++-12
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.async.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
+  cmake_clang_maintainer_sync_test:
+    name: CMake clang 14 (maintainer mode, sync)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake clang (maintainer mode, sync)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.sync.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
+  cmake_clang_maintainer_async_test:
+    name: CMake clang 14 (maintainer mode, async)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake clang (maintainer mode, async)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.async.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
+  cmake_clang_maintainer_abiv2_test:
+    name: CMake clang 14 (maintainer mode, abiv2)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+        PROTOBUF_VERSION: 21.12
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run cmake clang (maintainer mode, abiv2)
+      env:
+        CC: /usr/bin/clang-14
+        CXX: /usr/bin/clang++-14
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: generate test cert
+      env:
+        CFSSL_VERSION: 1.6.3
+      run: |
+        sudo -E ./tools/setup-cfssl.sh
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
+  cmake_msvc_maintainer_test:
+    name: CMake msvc (maintainer mode)
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 cmake.maintainer.test
+
+  cmake_msvc_maintainer_test_stl_cxx20:
+    name: CMake msvc (maintainer mode) with C++20
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      env:
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.ps1 cmake.maintainer.cxx20.stl.test
+
+  cmake_with_async_export_test:
+    name: CMake test (without otlp-exporter and with async export)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake tests (without otlp-exporter)
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        ./ci/do_ci.sh cmake.with_async_export.test
+
+  cmake_abseil_stl_test:
+    name: CMake test (with abseil)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake tests (enable abseil-cpp)
+      run: |
+        sudo ./ci/install_abseil.sh
+        ./ci/do_ci.sh cmake.abseil.test
+
+  cmake_opentracing_shim_test:
+    name: CMake test (with opentracing-shim)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake tests (enable opentracing-shim)
+      run: ./ci/do_ci.sh cmake.opentracing_shim.test
+
+  cmake_test_cxx14_gcc:
+    name: CMake C++14 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '14'
+      run: ./ci/do_ci.sh cmake.c++14.stl.test
+
+  cmake_test_cxx17_gcc:
+    name: CMake C++17 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '17'
+      run: ./ci/do_ci.sh cmake.c++17.stl.test
+
+  cmake_test_cxx20_gcc:
+    name: CMake C++20 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.sh cmake.c++20.test
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
+
+  cmake_test_cxx20_clang:
+    name: CMake C++20 test(Clang with libc++)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.sh cmake.c++20.test
+    - name: run tests (enable stl)
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '20'
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
+
+  cmake_otprotocol_test:
+    name: CMake test (with otlp-exporter)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_modern_protobuf_grpc_with_abseil_test:
+    name: CMake test (with modern protobuf,grpc and abseil)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        PROTOBUF_VERSION: '23.3'
+        ABSEIL_CPP_VERSION: '20230125.3'
+        CXX_STANDARD: '14'
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run otlp exporter tests
+      env:
+        WITH_ABSEIL: 'ON'
+        CXX_STANDARD: '14'
+      run: |
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
+  cmake_do_not_install_test:
+    name: CMake do not install test (with otlp-exporter)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.do_not_install.test
+
+  cmake_otprotocol_shared_libs_with_static_grpc_test:
+    name: CMake test (build shared libraries with otlp-exporter and static gRPC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh -T
+        ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
+
+  cmake_install_test:
+    name: CMake install test (with abseil)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake install (with abseil)
+      run: |
+        sudo ./ci/install_abseil.sh
+        ./ci/do_ci.sh cmake.install.test
+    - name: verify packages
+      run: |
+        ./ci/verify_packages.sh
+
+  plugin_test:
+    name: Plugin -> CMake
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: ./ci/do_ci.sh cmake.test_example_plugin
+
+  bazel_test:
+    name: Bazel
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
+  bazel_test_async:
+    name: Bazel with async export
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.with_async_export.test
+
+  bazel_with_abseil:
+    name: Bazel with external abseil
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.with_abseil
+
+  bazel_valgrind:
+    name: Bazel valgrind
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_valgrind
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.valgrind
+
+  bazel_noexcept:
+    name: Bazel noexcept
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_noexcept
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.noexcept
+
+  bazel_nortti:
+    name: Bazel nortti
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_nortti
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.nortti
+
+  bazel_asan:
+    name: Bazel asan config
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_asan
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.asan
+
+  bazel_tsan:
+    name: Bazel tsan config
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_tsan
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.tsan
+
+  bazel_osx:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /Users/runner/.cache/bazel
+        key: bazel_osx
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.macos.test
+
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_benchmark
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: |
+        env BENCHMARK_DIR=/benchmark
+        ./ci/do_ci.sh benchmark
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark_reports
+        path: /home/runner/benchmark
+
+  format:
+    name: Format
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: setup
+      run: sudo ./ci/install_format_tools.sh
+    - name: run tests
+      run: ./ci/do_ci.sh format
+
+  copyright:
+    name: Copyright
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: check copyright
+      run: ./tools/check_copyright.sh
+
+  windows:
+    name: CMake -> exporter proto
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
+    - name: run cmake test
+      run: ./ci/do_ci.ps1 cmake.test
+    - name: run otprotocol test
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.test
+
+  windows-build-dll:
+    name: CMake -> exporter proto (Build as DLL)
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
+    - name: run cmake test (DLL build)
+      run: ./ci/do_ci.ps1 cmake.dll.test
+    - name: run otprotocol test (DLL build)
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
+
+  windows_with_async_export:
+    name: CMake (With async export) -> exporter proto
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
+    - name: run cmake test
+      run: ./ci/do_ci.ps1 cmake.with_async_export.test
+    - name: run otprotocol test
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.with_async_export.test
+
+  windows_bazel:
+    name: Bazel Windows
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/install_windows_bazelisk.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 bazel.build
+
+  windows_plugin_test:
+    name: Plugin -> CMake Windows
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 cmake.test_example_plugin
+
+  code_coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run tests and generate report
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: ./ci/do_ci.sh code.coverage
+    - name: upload report
+      uses: codecov/codecov-action@v3
+      with:
+        file: /home/runner/build/coverage.info
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: check out code
+      uses: actions/checkout@v4
+
+    - name: install markdownlint-cli
+      run: sudo npm install -g markdownlint-cli
+
+    - name: run markdownlint
+      run: markdownlint .
+
+  misspell:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v4
+    - name: install misspell
+      run: |
+        curl -L -o ./install-misspell.sh https://git.io/misspell
+        sh ./install-misspell.sh
+    - name: run misspell
+      run: ./bin/misspell -error .
+
+  docfx_check:
+    name: DocFX check
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: install docfx
+      run: choco install docfx -y --version=2.58.5
+    - name: run ./ci/docfx.cmd
+      shell: cmd
+      run: ./ci/docfx.cmd

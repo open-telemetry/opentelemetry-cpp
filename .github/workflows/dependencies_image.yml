@@ -1,0 +1,46 @@
+name: 'OpenTelemetry-cpp dependencies image'
+on:
+  schedule:
+    - cron: "0 3 * * 6"
+
+jobs:
+  docker_image:
+    name: Docker Image
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+    -
+      name: checkout
+      uses: actions/checkout@v4
+    -
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    -
+      name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v3
+    -
+      name: Build Image
+      uses: docker/build-push-action@v5
+      with:
+        builder: ${{ steps.buildx.outputs.name }}
+        context: ci/
+        file: ./docker/Dockerfile
+        build-args: BASE_IMAGE=ubuntu:latest
+        platforms: linux/amd64
+        # platforms: linux/amd64,linux/arm64
+        push: false
+        tags: otel-cpp-deps
+        load: true
+    -
+      name: Save Image
+      run: |
+        docker images
+        docker save -o /opt/otel-cpp-deps-debian.tar otel-cpp-deps
+    -
+      name: Upload Image
+      uses: actions/upload-artifact@v4
+      with:
+        name: otel-cpp-deps
+        path: /opt/otel-cpp-deps-debian.tar
+        retention-days: 14
