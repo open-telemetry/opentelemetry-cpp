@@ -46,6 +46,7 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
   {
     return metric_sdk::AggregationType::kLastValue;
   }
+  return metric_sdk::AggregationType::kDrop;
 }
 
 void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
