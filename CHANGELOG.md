@@ -21,6 +21,8 @@ Increment the:
   [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
 * [BUILD] Introduce CXX 20 CI pipeline for MSVC/Windows
   [#2450](https://github.com/open-telemetry/opentelemetry-cpp/pull/2450)
+* [BUILD] Add DLL build CI pipeline with CXX20
+  [#2465](https://github.com/open-telemetry/opentelemetry-cpp/pull/2465)
 
 Important changes:
 
