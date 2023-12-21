@@ -25,7 +25,7 @@ proto::metrics::v1::AggregationTemporality OtlpMetricUtils::GetProtoAggregationT
 }
 
 metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
-    const opentelemetry::v1::sdk::metrics::MetricData &metric_data) noexcept
+    const opentelemetry::sdk::metrics::MetricData &metric_data) noexcept
 {
   if (metric_data.point_data_attr_.size() == 0)
   {
