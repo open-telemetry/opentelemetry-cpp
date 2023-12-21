@@ -9,3 +9,5 @@ bazel-testlogs
 bazel-opentelemetry-cpp
 .bazelignore
 otel_sdk.zip
+WORKSPACE
+.bazelrc
