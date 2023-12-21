@@ -25,25 +25,27 @@ proto::metrics::v1::AggregationTemporality OtlpMetricUtils::GetProtoAggregationT
 }
 
 metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
-    const opentelemetry::sdk::metrics::InstrumentType &instrument_type) noexcept
+    const opentelemetry::v1::sdk::metrics::MetricData &metric_data) noexcept
 {
-
-  if (instrument_type == metric_sdk::InstrumentType::kCounter ||
-      instrument_type == metric_sdk::InstrumentType::kUpDownCounter ||
-      instrument_type == metric_sdk::InstrumentType::kObservableCounter ||
-      instrument_type == metric_sdk::InstrumentType::kObservableUpDownCounter)
+  if (metric_data.point_data_attr_.size() == 0)
+  {
+    return metric_sdk::AggregationType::kDrop;
+  }
+  auto point_data_with_attributes = metric_data.point_data_attr_[0];
+  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kSum;
   }
-  else if (instrument_type == metric_sdk::InstrumentType::kHistogram)
+  else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(
+               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kHistogram;
   }
-  else if (instrument_type == metric_sdk::InstrumentType::kObservableGauge)
+  else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
+               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kLastValue;
   }
-  return metric_sdk::AggregationType::kDrop;
 }
 
 void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data,
@@ -188,7 +190,7 @@ void OtlpMetricUtils::PopulateInstrumentInfoMetrics(
   metric->set_name(metric_data.instrument_descriptor.name_);
   metric->set_description(metric_data.instrument_descriptor.description_);
   metric->set_unit(metric_data.instrument_descriptor.unit_);
-  auto kind = GetAggregationType(metric_data.instrument_descriptor.type_);
+  auto kind = GetAggregationType(metric_data);
   switch (kind)
   {
     case metric_sdk::AggregationType::kSum: {
