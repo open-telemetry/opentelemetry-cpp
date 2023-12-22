@@ -103,5 +103,3 @@ http_file(
 # register_toolchains(
 #     "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
 # )
-
-
