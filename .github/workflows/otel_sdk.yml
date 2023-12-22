@@ -20,7 +20,7 @@ jobs:
           path: c:/b
           enableCrossOsArchive: true
           key: otel_sdk-${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
-          restore-keys: otel_sdk-${{ runner.os }}-bazel-
+#          restore-keys: otel_sdk-${{ runner.os }}-bazel-
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/b/d" > ../top.bazelrc
