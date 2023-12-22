@@ -6,7 +6,8 @@ on:
   push:
     tags:
       - "*"
-
+    branches:
+      - main
 jobs:
   otel_sdk_release:
     name: build otel_sdk
@@ -14,13 +15,13 @@ jobs:
     permissions:
       contents: write
     steps:
+      - run: choco upgrade llvm
       - uses: actions/checkout@v4.1.1
       - uses: actions/cache@v3.3.2
         with:
           path: c:/b
           enableCrossOsArchive: true
-          key: otel_sdk-${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
-#          restore-keys: otel_sdk-${{ runner.os }}-bazel-
+          key: otel_sdk-${{ runner.os }}
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/b/d" > ../top.bazelrc
