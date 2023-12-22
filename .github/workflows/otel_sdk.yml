@@ -14,11 +14,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/cache@v3.3.2
         with:
-          path: c:/b/u
-          key: otel_sdk_bazel_cache
+          path: c:/b
+          enableCrossOsArchive: true
+          key: otel_sdk-${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'WORKSPACE', 'WORKSPACE.bazel', 'MODULE.bazel') }}
+          restore-keys: otel_sdk-${{ runner.os }}-bazel-
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/b/d" > ../top.bazelrc
