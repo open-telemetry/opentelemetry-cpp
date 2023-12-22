@@ -227,35 +227,37 @@ point.
 
 #endif
 
-// TODO: Simplfiy below even further. Make it even more succint, but don't let errors escape!
-
-// What follows below is strictly for the otel_sdk.dll Windows version compiled with bazel using MSVC from the https://github.com/malkia/opentelemetry-cpp clone
-// In the CMake scripts, the OPENTELEMETRY_BUILD_IMPORT_DLL and OPENTELEMETRY_BUILD_EXPORT_DLL are used (above). We ignore them, and redefine OPENTELEMETRY_EXPORT below.
-
-// Users of the otel_sdk.dll library must be able to #include <opentelemetry/...> with ease, avoiding any extra #defines.
-// Certain defaults would have to be set for them, like OPENTELEMETRY_DLL=1 (dllimport), the STL/ABI version and others in the future.
-// The only requirement for MSVC is to enable C++17 or later.
-
+// What follows is specific to the https://github.com/malkia/opentelemetry-cpp windows-dll branch.
+// Users should not predefine OPENTELEMETRY_DLL, and it would get set to 1 ("dllimport").
+// When building, using bazel --//:with_dll=true, OPENTELEMETRY_DLL is set to -1, except for tests.
+// In all other cases (CMake, or bazel with_dll=false), then OPENTELEMETRY is set explicitly to 0.
 #if !defined(OPENTELEMETRY_DLL)
-#define OPENTELEMETRY_DLL 1 // dllimport default
-#define OPENTELEMETRY_STL_VERSION 2017
-#define OPENTELEMETRY_ABI_VERSION_NO 2
+#define OPENTELEMETRY_DLL 1
+#elif OPENTELEMETRY_DLL == 1
+#error OPENTELEMETRY_DLL: Users should not pre-define OPENTELEMETRY_DLL
 #endif
 
-#define OPENTELEMETRY_DLL_STRX(x) #x
-#define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
-
-#if defined(OPENTELEMETRY_DLL) 
-#if OPENTELEMETRY_DLL != 0 // OPENTELEMETRY_DLL=0 is defined during the static bazel build. This probably breaks CMake one.
-
+// bazel --//:with_dll=true build only cares if OPENTELEMETRY_DLL is 1 (dllimport) or -1 (dllexport)
+#if OPENTELEMETRY_DLL != 0
+//  Build settings are hard-coded here, instead of the build files, in order to minimize ODR violations.
+#   define OPENTELEMETRY_STL_VERSION 2017
+#   define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, we don't want surprises.
+#   define OPENTELEMETRY_ABI_VERSION_NO 2 // Use the new api
+#   define ENABLE_METRICS_EXEMPLAR_PREVIEW 1
+#   define ENABLE_ASYNC_EXPORT 1
+#   define ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW 1
+#   if defined(OPENTELEMETRY_BUILD_IMPORT_DLL) || defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
+#      error OPENTELEMETRY_DLL: Somehow CMake specific defines OPENTELEMETRY_BUILD_IMPORT_DLL and/or OPENTELEMETRY_BUILD_EXPORT_DLL got in. This is not expected!
+#   endif
 #   if !defined(_MSC_VER)
 #      error OPENTELEMETRY_DLL: Only MSVC compiler is supported.
 #   endif
-
 #   if _MSVC_LANG < 201703L
 #      error OPENTELEMETRY_DLL: Enable at least c++17 using /std:c++17 or larger
 #   endif
-
+#   if !defined(OPENTELEMETRY_RTTI_ENABLED)
+#      error OPENTELEMETRY_DLL: RTTI must be enabled (/GR)
+#   endif
 #   if defined(OPENTELEMETRY_STL_VERSION)
 #      if OPENTELEMETRY_STL_VERSION != 2017
 #         error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION must be 2017
@@ -263,7 +265,6 @@ point.
 #   else
 #      define OPENTELEMETRY_STL_VERSION 2017
 #   endif
-
 #   if defined(OPENTELEMETRY_ABI_VERSION_NO)
 #      if OPENTELEMETRY_ABI_VERSION_NO != 2
 #         error OPENTELEMETRY_DLL: OPENTELEMETRY_ABI_VERSION_NO must be 2
@@ -271,9 +272,7 @@ point.
 #   else
 #      define OPENTELEMETRY_ABI_VERSION_NO 2
 #   endif
-
 #   undef OPENTELEMETRY_EXPORT
-
 #   if OPENTELEMETRY_DLL==1
 #      define OPENTELEMETRY_EXPORT __declspec(dllimport)
 #   elif OPENTELEMETRY_DLL==-1 // Only used during build
@@ -283,18 +282,24 @@ point.
 #   else
 #      error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
 #   endif
-
 // The rule is that if there is struct/class with one or more OPENTELEMETRY_API_SINGLETON function members,
 // then itself can't be defined OPENTELEMETRY_EXPORT 
-#   undef OPENTELEMETRY_API_SINGLETON
-#   define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
-
+#  undef OPENTELEMETRY_API_SINGLETON
+#  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
+#  define OPENTELEMETRY_DLL_STRX(x) #x
+#  define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
+#  if defined(_MSC_VER)
+#     pragma detect_mismatch("otel_sdk_detect_mismatch", \
+        " dll:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) \
+        " stl:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) \
+        " rtti:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_RTTI_ENABLED) \
+        " std_span:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_OPTION_USE_STD_SPAN) \
+        " abi:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO) \
+        " exemplar:" OPENTELEMETRY_DLL_STR(ENABLE_METRICS_EXEMPLAR_PREVIEW) \
+        " async:" OPENTELEMETRY_DLL_STR(ENABLE_ASYNC_EXPORT) \
+        " mtls:" OPENTELEMETRY_DLL_STR(ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW) \
+      )
+#  endif
+#  undef OPENTELEMETRY_DLL_STRX
+#  undef OPENTELEMETRY_DLL_STR
 #endif // if OPENTELEMETRY_DLL != 0
-#endif // if defined(OPENTELEMETRY_DLL)
-
-#ifdef _MSC_VER
-#  pragma detect_mismatch("otel_sdk_detect_mismatch", "dll" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) "_stl" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) "_abi" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_ABI_VERSION_NO))
-#endif
-
-#undef OPENTELEMETRY_DLL_STRX
-#undef OPENTELEMETRY_DLL_STR

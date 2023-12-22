@@ -1,10 +1,10 @@
 # NOTE: This below code is Windows specific
 
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("dll_deps.bzl", "force_compilation_mode")
 
 bool_flag(
@@ -177,15 +177,6 @@ alias(
 # Present the import library above as cc_library so we can add headers to it, force defines, and make it public.
 [cc_library(
     name = otel_sdk_binary + "_dll",
-    # There should be no need to define OPENTELEMETRY_DLL=1 in this clone (https://github.com/malkia/opentelemetry-cpp)
-    # By default OPENTELEMETRY_DLL=1 would be defined in macros.h (1=dllimport -1=dllexport 0=static)
-    # Also there OPENTELEMETRY_ABI_VERSION_NO=2 and OPENTELEMETRY_STL_VERSION=2017
-    # Keeping these just in case if something breaks to uncomment them easy
-    # defines = [
-    #     "OPENTELEMETRY_DLL=1",
-    #     "OPENTELEMETRY_ABI_VERSION_NO=2",
-    #     "OPENTELEMETRY_STL_VERSION=2017",
-    # ],
     implementation_deps = [
         otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files
     ],

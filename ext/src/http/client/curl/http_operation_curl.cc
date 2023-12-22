@@ -434,7 +434,7 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-static long parse_min_ssl_version(std::string version)
+static long parse_min_ssl_version(const std::string& version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.0")

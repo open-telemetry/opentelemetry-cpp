@@ -188,7 +188,7 @@ public:
         provHandle(initProvHandle())
   {}
 
-  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
   {
     return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new LogRecord());
   }
@@ -322,7 +322,7 @@ public:
     etwProvider().write(provHandle, evt, nullptr, nullptr, 0, encoding);
   }
 
-  const nostd::string_view GetName() noexcept override { return std::string(); }
+  const nostd::string_view GetName() noexcept override { return {}; }
   // TODO : Flush and Shutdown method in main Logger API
   ~Logger() { etwProvider().close(provHandle); }
 };
