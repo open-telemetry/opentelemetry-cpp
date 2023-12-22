@@ -26,7 +26,7 @@ class OtlpMetricUtils
 {
 public:
   static opentelemetry::sdk::metrics::AggregationType GetAggregationType(
-      const opentelemetry::sdk::metrics::InstrumentType &instrument_type) noexcept;
+      const opentelemetry::sdk::metrics::MetricData &metric_data) noexcept;
 
   static proto::metrics::v1::AggregationTemporality GetProtoAggregationTemporality(
       const opentelemetry::sdk::metrics::AggregationTemporality &aggregation_temporality) noexcept;
