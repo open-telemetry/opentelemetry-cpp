@@ -14,6 +14,7 @@
 #include "prometheus/metric_family.h"
 #include "prometheus/metric_type.h"
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -281,7 +282,13 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   return name;
 }
 
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
 std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
+std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
+std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
+std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
+#endif
 
 std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
     const std::string &raw_metric_unit_name)
@@ -357,7 +364,32 @@ std::string PrometheusExporterUtils::GetPrometheusPerUnit(const std::string &per
 
 std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string &unit)
 {
-  return std::regex_replace(unit, CHARACTERS_BETWEEN_BRACES_PATTERN, std::string(""));
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+  return std::regex_replace(unit, CHARACTERS_BETWEEN_BRACES_PATTERN, "");
+#else
+  bool in_braces = false;
+  std::string cleaned_unit;
+  cleaned_unit.reserve(unit.size());
+  for (auto c : unit)
+  {
+    if (in_braces)
+    {
+      if (c == '}')
+      {
+        in_braces = false;
+      }
+    }
+    else if (c == '{')
+    {
+      in_braces = true;
+    }
+    else
+    {
+      cleaned_unit += c;
+    }
+  }
+  return cleaned_unit;
+#endif
 }
 
 std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
@@ -386,12 +418,18 @@ std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
 
 std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
 {
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+  std::string cleaned_string = std::regex_replace(str, INVALID_CHARACTERS_PATTERN, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_CONSECUTIVE_UNDERSCORES, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_TRAILING_UNDERSCORES, "");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_LEADING_UNDERSCORES, "");
+  return cleaned_string;
+#else
   std::string cleaned_string = str;
   if (cleaned_string.empty())
   {
     return cleaned_string;
   }
-
   std::transform(cleaned_string.begin(), cleaned_string.end(), cleaned_string.begin(),
                  [](const char c) {
                    if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
@@ -447,6 +485,7 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
   }
 
   return cleaned_string;
+#endif
 }
 
 std::string PrometheusExporterUtils::MapToPrometheusName(
