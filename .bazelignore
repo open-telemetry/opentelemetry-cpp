@@ -11,3 +11,4 @@ bazel-opentelemetry-cpp
 otel_sdk.zip
 WORKSPACE
 .bazelrc
+otel_sdk_build.cmd

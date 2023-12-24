@@ -66,3 +66,7 @@ try-import %workspace%/../top.bazelrc
 
 # Select the clang-cli, the definion is in the WORKSPACE (x64_windows-clang-cl)
 common:windows --extra_execution_platforms=//:x64_windows-clang-cl --extra_toolchains=@local_config_cc//:cc-toolchain-x64_windows-clang-cl
+
+test --test_size_filters=small,medium,large,enormous
+test --test_timeout_filters=short,moderate,long,eternal
+test --test_verbose_timeout_warnings

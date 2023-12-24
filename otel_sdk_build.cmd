@@ -24,9 +24,9 @@ REM Exclude building otel_sdk_zip right now, do it later. This warms up the test
 "%__BAZEL__%" build --//:with_dll=true -- ... -otel_sdk_zip || goto:error
 
 rem We can't test dbg, fastbuild and opt at the same time, as done above ^^^ (no config "transition" possible when doing testing (AFAIK))
-"%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c dbg -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c fastbuild -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test --//:with_dll=true --test_size_filters=small,medium,large,enormous --test_timeout_filters=short,moderate,long,eternal --test_verbose_timeout_warnings -c opt -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
 
 "%__BAZEL__%" build --//:with_dll=true otel_sdk_zip || goto:error
 
