@@ -12,5 +12,5 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
   target_link_libraries(common_foo_library opentelemetry_cpp)
 else()
   target_link_libraries(common_foo_library PUBLIC ${CMAKE_THREAD_LIBS_INIT}
-                                                opentelemetry_api)
+                                                  opentelemetry_api)
 endif()
