@@ -13,9 +13,9 @@ target_link_libraries(example_multi_processor ${CMAKE_THREAD_LIBS_INIT}
                       common_foo_library)
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  target_link_libraries(example_simple opentelemetry_cpp)
+  target_link_libraries(example_multi_processor opentelemetry_cpp)
 else()
-  target_link_libraries(example_multi_processor opentelemetry_trace
-                        opentelemetry_exporter_ostream_span
-                        opentelemetry_exporter_in_memory)
+  target_link_libraries(
+    example_multi_processor opentelemetry_trace
+    opentelemetry_exporter_ostream_span opentelemetry_exporter_in_memory)
 endif()
