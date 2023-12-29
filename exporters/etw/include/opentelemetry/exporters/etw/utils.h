@@ -27,11 +27,12 @@
 #  include <codecvt>
 #endif
 
-#if defined(ENABLE_ENV_PROPERTIES)
-
+#if defined(ENABLE_ENV_PROPERTIES) || defined(HAVE_MSGPACK)
 #  include <nlohmann/json.hpp>
-#  include "etw_properties.h"
+#endif
 
+#if defined(ENABLE_ENV_PROPERTIES)
+#  include "etw_properties.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -382,6 +383,29 @@ static inline void PopulateAttribute(nlohmann::json &attribute,
 }
 
 #endif  // defined(ENABLE_ENV_PROPERTIES)
+
+static inline nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>
+get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0) {
+  if ((seconds == 0) && (nanoseconds == 0)) {
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+    auto duration = tp.time_since_epoch();
+    seconds = static_cast<int32_t>(
+        std::chrono::duration_cast<std::chrono::seconds>(duration).count());
+    nanoseconds = static_cast<int32_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count() %
+        1000000000);
+  }
+  nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>> ts{
+      std::vector<uint8_t>{0, 0, 0, 0, 0, 0, 0, 0}};
+  for (int i = 3; i >= 0; i--) {
+    ts[i] = seconds & 0xff;
+    ts[i + 4] = nanoseconds & 0xff;
+    seconds >>= 8;
+    nanoseconds >>= 8;
+  }
+  ts.set_subtype(0x00);
+  return ts;
+}
 
 };  // namespace utils
 
