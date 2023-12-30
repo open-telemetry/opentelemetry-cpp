@@ -299,6 +299,7 @@ cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
+        ":otlp_grpc_client",
         "@com_google_googletest//:gtest_main",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
         # For gRPC
