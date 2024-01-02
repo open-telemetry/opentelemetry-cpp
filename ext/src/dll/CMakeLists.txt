@@ -6,18 +6,20 @@ set(OPENTELEMETRY_EXPORT_DEF
 
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
+target_compile_definitions(opentelemetry_cpp INTERFACE OPENTELEMETRY_BUILD_IMPORT_DLL)
+
 target_link_libraries(
   opentelemetry_cpp PRIVATE opentelemetry_trace
                             opentelemetry_exporter_ostream_span)
 
 if(WITH_OTLP_GRPC)
-  add_compile_definitions(WITH_OTLP_GRPC)
+  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc)
 endif()
 
 if(WITH_OTLP_HTTP)
-  add_compile_definitions(WITH_OTLP_HTTP)
+  target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http)
 endif()
