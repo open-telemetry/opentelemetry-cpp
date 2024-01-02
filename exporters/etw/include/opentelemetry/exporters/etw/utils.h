@@ -401,16 +401,14 @@ get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0)
   }
 
   uint64_t timestamp =
-      ((static_cast<uint32_t>(seconds / 100)) & ((1ull << 34) - 1)) |
-      ((static_cast<uint32_t>(seconds % 100 * 1e7 + nanoseconds / 100) & ((1ull << 30) - 1)) << 34);
+      ((seconds / 100) & ((1ull << 34) - 1)) |
+      (((seconds % 100 * 10000000 + nanoseconds / 100) & ((1ull << 30) - 1)) << 34);
 
   nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>> ts{std::vector<uint8_t>(8)};
-  for (int i = 0; i < 8; i++)
-  {
-    ts[i] = timestamp & 0xff;
-    timestamp >>= 8;
-  }
+
+  *reinterpret_cast<uint64_t *>(ts.data()) = timestamp;
   ts.set_subtype(0x00);
+
   return ts;
 }
 
@@ -423,7 +421,7 @@ GetMsgPackEventTimeFromSystemTimestamp(opentelemetry::common::SystemTimestamp ti
           std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count()),
       // Add any remaining nanoseconds past the last whole second
       std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count() %
-          1e9);
+          1000000000);
 }
 
 #endif  // defined(HAVE_MSGPACK)
