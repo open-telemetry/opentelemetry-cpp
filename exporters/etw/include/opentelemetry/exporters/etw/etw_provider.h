@@ -368,7 +368,7 @@ public:
     // forwardMessage.push_back(nameField);
     forwardMessage.push_back(eventName);
 
-    // forwardMessage.push_back(eventData[ETW_FIELD_TIME]);
+    forwardMessage.push_back(utils::GetMsgPackEventTimeFromSystemTimestamp(std::chrono::system_clock::now()));
 
     forwardMessage.push_back(jObj);
 

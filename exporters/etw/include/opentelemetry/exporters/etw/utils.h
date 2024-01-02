@@ -12,6 +12,7 @@
 #include <string>
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
@@ -384,6 +385,8 @@ static inline void PopulateAttribute(nlohmann::json &attribute,
 
 #endif  // defined(ENABLE_ENV_PROPERTIES)
 
+#if defined(HAVE_MSGPACK)
+
 static inline nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>
 get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0) {
   if ((seconds == 0) && (nanoseconds == 0)) {
@@ -406,6 +409,22 @@ get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0) {
   ts.set_subtype(0x00);
   return ts;
 }
+
+static inline nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>
+    GetMsgPackEventTimeFromSystemTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept {
+  return get_msgpack_eventtimeext(
+      // Add all whole seconds to the event time
+      static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(
+                               timestamp.time_since_epoch())
+                               .count()),
+      // Add any remaining nanoseconds past the last whole second
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+          timestamp.time_since_epoch())
+              .count() %
+          1000000000);
+}
+
+#endif // defined(HAVE_MSGPACK)
 
 };  // namespace utils
 
