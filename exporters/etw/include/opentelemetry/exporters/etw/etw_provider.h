@@ -280,11 +280,10 @@ public:
     }
 
     /* clang-format off */
-    nlohmann::json jObj = {};
-    // {
-    //   { ETW_FIELD_NAME, eventName },
-    //   { ETW_FIELD_OPCODE, Opcode }
-    // };
+    nlohmann::json jObj =
+    {
+      { ETW_FIELD_OPCODE, Opcode }
+    };
     /* clang-format on */
 
     std::string eventFieldName(ETW_FIELD_NAME);
