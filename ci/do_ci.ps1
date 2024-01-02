@@ -63,7 +63,8 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc -- -clp:ShowCommandLine
+    # cmake --build . -j $nproc -- -clp:ShowCommandLine
+    Start-Process cmake -ArgumentList "--build . -j $nproc -- -clp:ShowCommandLine" -NoNewWindow
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
