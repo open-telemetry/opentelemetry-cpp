@@ -26,7 +26,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   long record_value = 100;
   for (auto i = 0; i < 10; i++)
   {
-    OrderedAttributeMap attributes = {{"key", std::to_string(i)}};
+    FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
     auto hash                      = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
@@ -37,7 +37,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   // overflowmetric point.
   for (auto i = 10; i < 15; i++)
   {
-    OrderedAttributeMap attributes = {{"key", std::to_string(i)}};
+    FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
     auto hash                      = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
@@ -46,7 +46,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
   // get the overflow metric point
   auto agg = hash_map.GetOrSetDefault(
-      OrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
+      FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
       aggregation_callback, kOverflowAttributesHash);
   EXPECT_NE(agg, nullptr);
   auto sum_agg = static_cast<LongSumAggregation *>(agg);

@@ -30,15 +30,7 @@ public:
 
   void Observe(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    if (attributes_processor_)
-    {
-      auto attr = attributes_processor_->process(attributes);
-      data_.insert({attr, value});
-    }
-    else
-    {
-      data_.insert({MetricAttributes{attributes}, value});
-    }
+      data_.insert({MetricAttributes{attributes, attributes_processor_}, value});
   }
 
   const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &GetMeasurements()

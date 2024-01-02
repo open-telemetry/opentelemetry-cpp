@@ -110,7 +110,6 @@ public:
   }
 
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
-                               const AttributesProcessor *attributes_processor,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
                                size_t hash)
   {
@@ -158,7 +157,6 @@ public:
   }
 
   void Set(const MetricAttributes &attributes,
-           const AttributesProcessor *attributes_processor,
            std::unique_ptr<Aggregation> aggr,
            size_t hash)
   {
@@ -175,8 +173,7 @@ public:
     }
     else
     {
-      MetricAttributes attr{attributes};
-      hash_map_[hash] = {attr, std::move(aggr)};
+      hash_map_[hash] = {attributes, std::move(aggr)};
     }
   }
 
