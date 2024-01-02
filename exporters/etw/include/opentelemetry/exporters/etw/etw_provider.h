@@ -363,17 +363,18 @@ public:
       }
     }
 
-    nlohmann::json forwardMessage = nlohmann::json::array();
 
     // forwardMessage.push_back(nameField);
-    forwardMessage.push_back(eventName);
+    nlohmann::json payloadPair = nlohmann::json::array();
 
-    forwardMessage.push_back(utils::GetMsgPackEventTimeFromSystemTimestamp(std::chrono::system_clock::now()));
+    payloadPair.push_back(utils::GetMsgPackEventTimeFromSystemTimestamp(std::chrono::system_clock::now()));
+    payloadPair.push_back(jObj);
 
-    forwardMessage.push_back(jObj);
+    nlohmann::json payloadArray = nlohmann::json::array({payloadPair});
+
+    nlohmann::json forwardMessage = nlohmann::json::array({eventName, payloadArray});
 
     std::vector<uint8_t> v = nlohmann::json::to_msgpack(forwardMessage);
-
 
     EVENT_DESCRIPTOR evtDescriptor;
     // TODO: event descriptor may be populated with additional values as follows:
@@ -383,7 +384,7 @@ public:
     // Level    - verbosity level
     // Task     - TaskId
     // Opcode   - described in evntprov.h:259 : 0 - info, 1 - activity start, 2 - activity stop.
-    EventDescCreate(&evtDescriptor, 0, 100, 0, 0, 0, Opcode, 0);
+    EventDescCreate(&evtDescriptor, 100, 0x1, 0, 0, 0, Opcode, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
     EventDataDescCreate(&evtData[0], v.data(), static_cast<ULONG>(v.size()));
     ULONG writeResponse = 0;
