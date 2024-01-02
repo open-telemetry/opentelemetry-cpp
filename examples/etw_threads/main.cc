@@ -64,7 +64,7 @@ using namespace opentelemetry::exporter::etw;
 // - Specify "OpenTelemetry-ETW-TLD" in the list of providers.
 //
 // Event view shows event flow in realtime.
-const char *kGlobalProviderName = "OpenTelemetry";
+const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
 
 std::string providerName = kGlobalProviderName;
 
