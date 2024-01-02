@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  add_definitions(-DOPENTELEMETRY_BUILD_IMPORT_DLL)
+  target_compile_definitions(example_simple PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL=1)
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include)
