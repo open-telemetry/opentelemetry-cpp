@@ -211,15 +211,16 @@ point.
 // https://gcc.gnu.org/wiki/Visibility#How_to_use_the_new_C.2B-.2B-_visibility_support
 //
 #if defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_IMPORT_DLL)
-
+#pragma message ( "OPENTELEMETRY_EXPORT __declspec(dllimport)" )
 #  define OPENTELEMETRY_EXPORT __declspec(dllimport)
 
 #elif defined(_MSC_VER) && defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
-
+#pragma message ( "OPENTELEMETRY_EXPORT __declspec(dllexport)" )
 #  define OPENTELEMETRY_EXPORT __declspec(dllexport)
 
 #else
 
+#pragma message ( "OPENTELEMETRY_EXPORT EMPTY" )
 //
 // build OpenTelemetry as static library or not on Windows.
 //
