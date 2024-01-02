@@ -28,7 +28,10 @@ def opentelemetry_cpp_deps():
             "https://github.com/grpc/grpc/archive/v1.54.3.tar.gz",
         ],
         repo_mapping = {
-            "@zlib": "@zlib~1.3"
+            "@zlib": "@zlib~1.3",
+            "@com_googlesource_code_re2": "@re2~2023-11-01",
+#            "@com_github_cares_cares": "@c-ares~1.16.1",
+#            "@boringssl": "@boringssl~0.0.0-20230215-5c22014",
         }
     )
 
