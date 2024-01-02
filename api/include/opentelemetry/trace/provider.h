@@ -14,7 +14,7 @@
 #define XSTR(x) STR(x)
 #define STR(x) #x
 
-#pragma message ( "OPENTELEMETRY_EXPORT value: " STR(OPENTELEMETRY_EXPORT) )
+#pragma message ( "OPENTELEMETRY_EXPORT value: " XSTR(OPENTELEMETRY_EXPORT) )
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
