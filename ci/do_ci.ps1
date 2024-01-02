@@ -57,7 +57,8 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
+      -DOPENTELEMETRY_BUILD_DLL=1 ` 
+      -DCMAKE_VERBOSE_MAKEFILE=ON `
      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
