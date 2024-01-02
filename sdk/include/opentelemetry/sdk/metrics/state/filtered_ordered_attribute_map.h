@@ -17,8 +17,7 @@ class AttributesProcessor;
 class FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
 {
 public:
-  FilteredOrderedAttributeMap()                                         = default;
-  FilteredOrderedAttributeMap(const FilteredOrderedAttributeMap &other) = default;
+  FilteredOrderedAttributeMap() = default;
   FilteredOrderedAttributeMap(
       std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
           attributes)
