@@ -3,15 +3,6 @@
 
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-_ALL_CONTENT = """
-filegroup(
-    name = "all_srcs",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
-"""
 
 #
 # MAINTAINER
@@ -30,23 +21,15 @@ def opentelemetry_cpp_deps():
     """Loads dependencies need to compile the opentelemetry-cpp library."""
     maybe(
         http_archive,
-        name = "civetweb",
-        strip_prefix = "civetweb-1.16",
-        sha256 = "f0e471c1bf4e7804a6cfb41ea9d13e7d623b2bcc7bc1e2a4dd54951a24d60285",
-        urls = [
-            "https://github.com/civetweb/civetweb/archive/v1.16.tar.gz",
-        ],
-        build_file = "@com_github_jupp0r_prometheus_cpp//bazel:civetweb.BUILD",
-    )
-
-    maybe(
-        http_archive,
         name = "com_github_grpc_grpc",
         sha256 = "17e4e1b100657b88027721220cbfb694d86c4b807e9257eaf2fb2d273b41b1b1",
         strip_prefix = "grpc-1.54.3",
         urls = [
             "https://github.com/grpc/grpc/archive/v1.54.3.tar.gz",
         ],
+        repo_mapping = {
+            "@zlib": "@zlib~1.3"
+        }
     )
 
     # OTLP Protocol definition
@@ -59,19 +42,6 @@ def opentelemetry_cpp_deps():
         urls = [
             "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.0.0.tar.gz",
         ],
-    )
-
-    maybe(
-        http_archive,
-        name = "zlib",
-        sha256 = "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30",
-        strip_prefix = "zlib-1.2.13",
-        urls = [
-            "https://mirror.bazel.build/zlib.net/zlib-1.2.13.tar.gz",
-            "https://zlib.net/zlib-1.2.13.tar.gz",
-            "https://storage.googleapis.com/bazel-mirror/zlib.net/zlib-1.2.13.tar.gz",
-        ],
-        build_file = "@com_github_jupp0r_prometheus_cpp//bazel:zlib.BUILD",
     )
 
     # C++ Prometheus Client library.
@@ -96,15 +66,6 @@ def opentelemetry_cpp_deps():
             "https://curl.haxx.se/download/curl-8.4.0.tar.gz",
             "https://github.com/curl/curl/releases/download/curl-8_4_0/curl-8.4.0.tar.gz",
         ],
-    )
-
-    # rules foreign cc
-    maybe(
-        http_archive,
-        name = "rules_foreign_cc",
-        sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
-        strip_prefix = "rules_foreign_cc-0.10.1",
-        url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.10.1/rules_foreign_cc-0.10.1.tar.gz",
     )
 
     # Opentracing
