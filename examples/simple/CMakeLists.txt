@@ -10,7 +10,7 @@ target_link_libraries(example_simple ${CMAKE_THREAD_LIBS_INIT}
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   message(STATUS "OPENTELEMETRY_BUILD_DLL for example_simple")
   
-  target_compile_definitions(example_simple PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL=1)
+  target_compile_definitions(example_simple PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
   
   target_link_libraries(example_simple opentelemetry_cpp)
 else()
