@@ -156,9 +156,7 @@ public:
     }
   }
 
-  void Set(const MetricAttributes &attributes,
-           std::unique_ptr<Aggregation> aggr,
-           size_t hash)
+  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr, size_t hash)
   {
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())

@@ -27,7 +27,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash                      = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
+    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
         ->Aggregate(record_value);
@@ -38,7 +38,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
-    auto hash                      = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
+    auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
     static_cast<LongSumAggregation *>(
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
         ->Aggregate(record_value);
