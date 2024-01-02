@@ -11,6 +11,11 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/version.h"
 
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
+#pragma message ( "OPENTELEMETRY_EXPORT value: " STR(OPENTELEMETRY_EXPORT) )
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
