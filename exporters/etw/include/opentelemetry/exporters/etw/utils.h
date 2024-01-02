@@ -399,16 +399,16 @@ get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0) {
         1000000000);
   }
 
-  uint64_t timestamp = (seconds & ((1ull << 34) - 1)) |
-                        (nanoseconds & ((1ull << 30) - 1) << 34);
+  uint64_t timestamp = ((static_cast<uint32_t>(seconds/100)) & ((1ull << 34) - 1)) |
+                        ((static_cast<uint32_t>(seconds % 100 * 1e7 + nanoseconds/100) & ((1ull << 30) - 1)) << 34);
 
   nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>> ts{
-      std::vector<uint8_t>{}};
+      std::vector<uint8_t>(8)};
   for (int i = 0; i < 8; i++) {
       ts[i] = timestamp & 0xff;
       timestamp >>= 8;
   }
-  ts.set_subtype(0);
+  ts.set_subtype(0x00);
   return ts;
 }
 
