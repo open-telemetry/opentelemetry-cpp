@@ -63,7 +63,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . -j $nproc -- -v
+    cmake --build . -j $nproc -- -verbosity:d
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
