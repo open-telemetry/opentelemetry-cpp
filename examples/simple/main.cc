@@ -8,11 +8,11 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
-#else
-#  include "foo_library/foo_library.h"
-#endif
+//#ifdef BAZEL_BUILD
+//#  include "examples/common/foo_library/foo_library.h"
+//#else
+//#  include "foo_library/foo_library.h"
+//#endif
 
 namespace trace_api      = opentelemetry::trace;
 namespace trace_sdk      = opentelemetry::sdk::trace;
@@ -43,7 +43,7 @@ int main()
   // Removing this line will leave the default noop TracerProvider in place.
   InitTracer();
 
-  foo_library();
+  // foo_library();
 
   CleanupTracer();
 }
