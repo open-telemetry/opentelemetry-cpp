@@ -1,15 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-common --noenable_bzlmod
+common --enable_bzlmod
 common --skip_incompatible_explicit_targets
-
-# This auto-enables --config=windows if targeting Windows (and same for linux, osx, etc.)
 common --enable_platform_specific_config
-
-# Needed for aspect-dev's write_source_file to actually write the file back on Windows (where runfiles are disabled by default)
-build --enable_runfiles
-test --enable_runfiles
+common --enable_runfiles
 
 build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
@@ -19,7 +14,7 @@ build:windows --experimental_convenience_symlinks=clean
 build --experimental_cc_implementation_deps
 
 build:windows    --copt="/Brepro"    --copt="/guard:cf" --copt="/Z7" --copt="/JMC-" --cxxopt="/std:c++17" --copt="/sdl" --copt="-D_CRT_NONSTDC_NO_DEPRECATE"
-build:windows --linkopt="/Brepro" --linkopt="/guard:cf" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/FUNCTIONPADMIN" --linkopt="/SWAPRUN:NET,CD" --linkopt="/PROFILE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP"
+build:windows --linkopt="/Brepro" --linkopt="/guard:cf" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP"
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
 
@@ -70,3 +65,4 @@ common:windows --extra_execution_platforms=//:x64_windows-clang-cl --extra_toolc
 test --test_size_filters=small,medium,large,enormous
 test --test_timeout_filters=short,moderate,long,eternal
 test --test_verbose_timeout_warnings
+test --test_summary=terse

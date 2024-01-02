@@ -28,40 +28,15 @@ filegroup(
 
 def opentelemetry_cpp_deps():
     """Loads dependencies need to compile the opentelemetry-cpp library."""
-
-    # Google Benchmark library.
-    # Only needed for benchmarks, not to build the OpenTelemetry library.
     maybe(
         http_archive,
-        name = "com_github_google_benchmark",
-        sha256 = "6bc180a57d23d4d9515519f92b0c83d61b05b5bab188961f36ac7b06b0d9e9ce",
-        strip_prefix = "benchmark-1.8.3",
+        name = "civetweb",
+        strip_prefix = "civetweb-1.16",
+        sha256 = "f0e471c1bf4e7804a6cfb41ea9d13e7d623b2bcc7bc1e2a4dd54951a24d60285",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.8.3.tar.gz",
+            "https://github.com/civetweb/civetweb/archive/v1.16.tar.gz",
         ],
-    )
-
-    # GoogleTest framework.
-    # Only needed for tests, not to build the OpenTelemetry library.
-    maybe(
-        http_archive,
-        name = "com_google_googletest",
-        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
-        strip_prefix = "googletest-1.14.0",
-        urls = [
-            "https://github.com/google/googletest/archive/v1.14.0.tar.gz",
-        ],
-    )
-
-    # Load abseil dependency(optional)
-    maybe(
-        http_archive,
-        name = "com_google_absl",
-        sha256 = "987ce98f02eefbaf930d6e38ab16aa05737234d7afbab2d5c4ea7adbe50c28ed",
-        strip_prefix = "abseil-cpp-20230802.1",
-        urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.1.tar.gz",
-        ],
+        build_file = "@com_github_jupp0r_prometheus_cpp//bazel:civetweb.BUILD",
     )
 
     maybe(
@@ -86,37 +61,27 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # JSON library
     maybe(
         http_archive,
-        name = "github_nlohmann_json",
-        build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        # sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
-        integrity = "sha256-oiRh0TEZrFx48gXT3x2xNAPljOG7F5TtyTE2dzE/Sp0=",
+        name = "zlib",
+        sha256 = "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30",
+        strip_prefix = "zlib-1.2.13",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip",
+            "https://mirror.bazel.build/zlib.net/zlib-1.2.13.tar.gz",
+            "https://zlib.net/zlib-1.2.13.tar.gz",
+            "https://storage.googleapis.com/bazel-mirror/zlib.net/zlib-1.2.13.tar.gz",
         ],
+        build_file = "@com_github_jupp0r_prometheus_cpp//bazel:zlib.BUILD",
     )
 
     # C++ Prometheus Client library.
     maybe(
         http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        sha256 = "82d145f39b447d77021200755fab19bd37451ae018cbf256673e2c144a20e4a7",
-        strip_prefix = "prometheus-cpp-a944ec100251019cd44d070bbf2fd22f5139d6d0",
+        integrity = "sha256-Yp/fRT8CJvaTwI37Xcra582bOWiXrywPJ6zRUIg9d5w=",
+        strip_prefix = "prometheus-cpp-with-submodules",
         urls = [
-            "https://github.com/jupp0r/prometheus-cpp/archive/a944ec100251019cd44d070bbf2fd22f5139d6d0.tar.gz",
-        ],
-    )
-
-    # bazel platforms
-    maybe(
-        http_archive,
-        name = "platforms",
-        sha256 = "8150406605389ececb6da07cbcb509d5637a3ab9a24bc69b1101531367d89d74",
-        urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
-            "https://github.com/bazelbuild/platforms/releases/download/0.0.8/platforms-0.0.8.tar.gz",
+            "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.0/prometheus-cpp-with-submodules.tar.gz",
         ],
     )
 
@@ -140,17 +105,6 @@ def opentelemetry_cpp_deps():
         sha256 = "476303bd0f1b04cc311fc258f1708a5f6ef82d3091e53fd1977fa20383425a6a",
         strip_prefix = "rules_foreign_cc-0.10.1",
         url = "https://github.com/bazelbuild/rules_foreign_cc/releases/download/0.10.1/rules_foreign_cc-0.10.1.tar.gz",
-    )
-
-    # bazel skylib
-    maybe(
-        http_archive,
-        name = "bazel_skylib",
-        sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
-        urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
-        ],
     )
 
     # Opentracing

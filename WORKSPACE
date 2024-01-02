@@ -6,64 +6,17 @@ workspace(name = "io_opentelemetry_cpp")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
-    name = "aspect_bazel_lib",
-    sha256 = "c4f36285ceed51f75da44ffcf8fa393794d0dc2e273a2e03be50462e347740cd",
-    strip_prefix = "bazel-lib-2.0.0",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.0.0/bazel-lib-v2.0.0.tar.gz",
-)
-
-load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
-
-# Required bazel-lib dependencies
-
-aspect_bazel_lib_dependencies()
-
-# Register bazel-lib toolchains
-
-aspect_bazel_lib_register_toolchains()
-
-http_archive(
-    name = "bazel_skylib",
-    sha256 = "cd55a062e763b9349921f0f5db8c3933288dc8ba4f76dd9416aac68acee3cb94",
+    name = "io_bazel_rules_go",
+    sha256 = "c8035e8ae248b56040a65ad3f0b7434712e2037e5dfdcebfe97576e620422709",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
-        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.5.0/bazel-skylib-1.5.0.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.44.0/rules_go-v0.44.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.44.0/rules_go-v0.44.0.zip",
     ],
 )
 
-load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
-
-bazel_skylib_workspace()
-
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-http_archive(
-    name = "rules_pkg",
-    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
-        "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
-    ],
-)
-
-load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
-
-rules_pkg_dependencies()
-
-# Rules apple for bazel 7.0.0, as the project somehow pulls by default too old rules - 0.32.0
-
-http_archive(
-    name = "build_bazel_rules_apple",
-    sha256 = "34c41bfb59cdaea29ac2df5a2fa79e5add609c71bb303b2ebb10985f93fa20e7",
-    url = "https://github.com/bazelbuild/rules_apple/releases/download/3.1.1/rules_apple.3.1.1.tar.gz",
-)
-
-load(
-    "@build_bazel_rules_apple//apple:repositories.bzl",
-    "apple_rules_dependencies",
-)
-
-apple_rules_dependencies()
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+go_rules_dependencies()
+go_register_toolchains(version = "1.21.5")
 
 # Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
@@ -79,10 +32,8 @@ load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
 
-# Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
-load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
-
-grpc_extra_deps()
+load("@com_google_googleapis//:repository_rules.bzl", "switched_rules_by_language")
+switched_rules_by_language(name = "com_google_googleapis_imports")
 
 http_file(
     name = "sentry_cli_windows_amd64",
@@ -93,6 +44,60 @@ http_file(
         "https://github.com/getsentry/sentry-cli/releases/download/2.23.0/sentry-cli-Windows-x86_64.exe",
     ],
 )
+
+http_archive(
+    name = "loki_w64",
+    integrity = "sha256-WHHTfjECfVv7Arj2xDoZLQH/qwQzxN59fe/F7duw3NQ=",
+    urls = [
+        "https://github.com/grafana/loki/releases/download/v2.8.7/loki-windows-amd64.exe.zip",
+    ],
+    build_file_content = """exports_files(["loki-windows-amd64.exe"],visibility=["//visibility:public"])"""
+)
+
+http_archive(
+    name = "tempo_w64",
+    integrity = "sha256-wx/dRthhU3jN5TIslzA+TfkTq33FfCdeqOhrWTwRTeY=",
+    urls = [
+        "https://github.com/grafana/tempo/releases/download/v2.3.1/tempo_2.3.1_windows_amd64.tar.gz",
+    ],
+    build_file_content = """exports_files(["tempo.exe", "temp-cli.exe", "tempo-query.exe"],visibility=["//visibility:public"])"""
+)
+
+# https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.91.0/otelcol-contrib_0.91.0_windows_amd64.tar.gz
+
+http_archive(
+    name = "otel_w64",
+    integrity = "sha256-Uw7ZNY7PUEpsq2I5zRfeAjWIV09V5DP/E0/ZFYmKDbY=",
+    urls = [
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.91.0/otelcol-contrib_0.91.0_windows_amd64.tar.gz",
+    ],
+    build_file_content = """exports_files(["otelcol-contrib.exe"],visibility=["//visibility:public"])"""
+)
+
+http_archive(
+    name = "prom_w64",
+    integrity = "sha256-RRm4zod7IKcTfcsaBFiEOYlYy3CpSG+px74FpeM4lus=",
+    urls = [
+        "https://github.com/prometheus/prometheus/releases/download/v2.48.1/prometheus-2.48.1.windows-amd64.tar.gz",
+    ],
+    strip_prefix = "prometheus-2.48.1.windows-amd64",
+    build_file_content = """exports_files(["prometheus.exe","prometheus.yml","promtool.exe"],visibility=["//visibility:public"])"""
+)
+
+http_archive(
+    name = "graf_w64",
+    integrity = "sha256-Fq71INEDaRciK/Fj+Y+c16FYZnQnQMUe67rSxD7MPJA=",
+    urls = [
+        "https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip",
+    ],
+    strip_prefix = "grafana-v10.2.3",
+    build_file_content = """
+exports_files(glob(["**/*"]),visibility=["//visibility:public"])
+filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
+"""
+)
+
+# https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip
 
 # Use clang-cl for compilation. The alternative form is now in the .bazelrc, this is kept here just for reference
 # The toolchain config is in the BUILD file
