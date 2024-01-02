@@ -1078,7 +1078,7 @@ public:
     config_.enableActivityTracking  = false;
     config_.enableRelatedActivityId = false;
     config_.enableAutoParent        = false;
-    config_.encoding                = ETWProvider::EventFormat::ETW_MSGPACK;
+    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
   /**
