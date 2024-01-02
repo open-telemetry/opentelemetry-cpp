@@ -6,7 +6,7 @@
 #include <functional>
 #include <string>
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -63,7 +63,7 @@ struct InstrumentDescriptor
   InstrumentValueType value_type_;
 };
 
-using MetricAttributes               = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes               = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 using AggregationTemporalitySelector = std::function<AggregationTemporality(InstrumentType)>;
 
 /*class InstrumentSelector {

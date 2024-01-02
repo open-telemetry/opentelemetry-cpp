@@ -69,6 +69,7 @@ public:
    * value and store in the hash
    */
   Aggregation *GetOrSetDefault(const opentelemetry::common::KeyValueIterable &attributes,
+                               const AttributesProcessor *attributes_processor,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
                                size_t hash)
   {
@@ -83,7 +84,7 @@ public:
       return GetOrSetOveflowAttributes(aggregation_callback);
     }
 
-    MetricAttributes attr{attributes};
+    MetricAttributes attr{attributes, attributes_processor};
 
     hash_map_[hash] = {attr, aggregation_callback()};
     return hash_map_[hash].second.get();
@@ -109,6 +110,7 @@ public:
   }
 
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
+                               const AttributesProcessor *attributes_processor,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback,
                                size_t hash)
   {
@@ -133,6 +135,7 @@ public:
    * Set the value for given key, overwriting the value if already present
    */
   void Set(const opentelemetry::common::KeyValueIterable &attributes,
+           const AttributesProcessor *attributes_processor,
            std::unique_ptr<Aggregation> aggr,
            size_t hash)
   {
@@ -149,12 +152,15 @@ public:
     }
     else
     {
-      MetricAttributes attr{attributes};
+      MetricAttributes attr{attributes, attributes_processor};
       hash_map_[hash] = {attr, std::move(aggr)};
     }
   }
 
-  void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr, size_t hash)
+  void Set(const MetricAttributes &attributes,
+           const AttributesProcessor *attributes_processor,
+           std::unique_ptr<Aggregation> aggr,
+           size_t hash)
   {
     auto it = hash_map_.find(hash);
     if (it != hash_map_.end())

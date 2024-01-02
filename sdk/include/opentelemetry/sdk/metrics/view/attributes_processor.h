@@ -5,11 +5,12 @@
 
 #include <string>
 #include <unordered_map>
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+//#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,7 +18,7 @@ namespace sdk
 {
 namespace metrics
 {
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 
 /**
  * The AttributesProcessor is responsible for customizing which
