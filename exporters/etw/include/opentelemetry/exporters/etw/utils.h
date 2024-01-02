@@ -388,45 +388,45 @@ static inline void PopulateAttribute(nlohmann::json &attribute,
 #if defined(HAVE_MSGPACK)
 
 static inline nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>
-get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0) {
-  if ((seconds == 0) && (nanoseconds == 0)) {
+get_msgpack_eventtimeext(int32_t seconds = 0, int32_t nanoseconds = 0)
+{
+  if ((seconds == 0) && (nanoseconds == 0))
+  {
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
-    auto duration = tp.time_since_epoch();
-    seconds = static_cast<int32_t>(
-        std::chrono::duration_cast<std::chrono::seconds>(duration).count());
+    auto duration                            = tp.time_since_epoch();
+    seconds =
+        static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(duration).count());
     nanoseconds = static_cast<int32_t>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count() %
-        1000000000);
+        std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count() % 1000000000);
   }
 
-  uint64_t timestamp = ((static_cast<uint32_t>(seconds/100)) & ((1ull << 34) - 1)) |
-                        ((static_cast<uint32_t>(seconds % 100 * 1e7 + nanoseconds/100) & ((1ull << 30) - 1)) << 34);
+  uint64_t timestamp =
+      ((static_cast<uint32_t>(seconds / 100)) & ((1ull << 34) - 1)) |
+      ((static_cast<uint32_t>(seconds % 100 * 1e7 + nanoseconds / 100) & ((1ull << 30) - 1)) << 34);
 
-  nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>> ts{
-      std::vector<uint8_t>(8)};
-  for (int i = 0; i < 8; i++) {
-      ts[i] = timestamp & 0xff;
-      timestamp >>= 8;
+  nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>> ts{std::vector<uint8_t>(8)};
+  for (int i = 0; i < 8; i++)
+  {
+    ts[i] = timestamp & 0xff;
+    timestamp >>= 8;
   }
   ts.set_subtype(0x00);
   return ts;
 }
 
 static inline nlohmann::byte_container_with_subtype<std::vector<std::uint8_t>>
-    GetMsgPackEventTimeFromSystemTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept {
+GetMsgPackEventTimeFromSystemTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
+{
   return get_msgpack_eventtimeext(
       // Add all whole seconds to the event time
-      static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(
-                               timestamp.time_since_epoch())
-                               .count()),
+      static_cast<int32_t>(
+          std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count()),
       // Add any remaining nanoseconds past the last whole second
-      std::chrono::duration_cast<std::chrono::nanoseconds>(
-          timestamp.time_since_epoch())
-              .count() %
-          1000000000);
+      std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count() %
+          1e9);
 }
 
-#endif // defined(HAVE_MSGPACK)
+#endif  // defined(HAVE_MSGPACK)
 
 };  // namespace utils
 

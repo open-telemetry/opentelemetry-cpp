@@ -363,11 +363,11 @@ public:
       }
     }
 
-
     // forwardMessage.push_back(nameField);
     nlohmann::json payloadPair = nlohmann::json::array();
 
-    payloadPair.push_back(utils::GetMsgPackEventTimeFromSystemTimestamp(std::chrono::system_clock::now()));
+    payloadPair.push_back(
+        utils::GetMsgPackEventTimeFromSystemTimestamp(std::chrono::system_clock::now()));
     payloadPair.push_back(jObj);
 
     nlohmann::json payloadArray = nlohmann::json::array({payloadPair});
