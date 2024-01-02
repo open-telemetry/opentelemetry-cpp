@@ -4,6 +4,17 @@
 set(OPENTELEMETRY_EXPORT_DEF
     "${CMAKE_CURRENT_BINARY_DIR}/opentelemetry_cpp.def")
 
+add_custom_command(
+  OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
+  COMMENT "Generating ${OPENTELEMETRY_EXPORT_DEF} file with explicitly exported symbols from opentelemetry_cpp.src"
+  COMMAND
+    ${CMAKE_CXX_COMPILER}
+    "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
+    ${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry_cpp.src >
+    ${OPENTELEMETRY_EXPORT_DEF}
+  DEPENDS ${OPENTELEMETRY_EXPORT_DEF}
+  COMMAND_EXPAND_LISTS VERBATIM)
+  
 add_library(opentelemetry_cpp SHARED dllmain.cc ${OPENTELEMETRY_EXPORT_DEF})
 
 target_compile_definitions(opentelemetry_cpp INTERFACE OPENTELEMETRY_BUILD_IMPORT_DLL)
@@ -51,15 +62,6 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_log)
 endif()
-
-add_custom_command(
-  OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
-  COMMAND
-    ${CMAKE_CXX_COMPILER}
-    "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
-    ${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry_cpp.src >
-    ${OPENTELEMETRY_EXPORT_DEF}
-  COMMAND_EXPAND_LISTS VERBATIM)
 
 if(OPENTELEMETRY_INSTALL)
   install(
