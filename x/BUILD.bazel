@@ -1,4 +1,6 @@
-load("@bazel_skylib//lib:paths.bzl", "paths")
+load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+
+avoid_dll_lock()
 
 cc_binary(
     name = "x",
@@ -6,7 +8,7 @@ cc_binary(
     args = [
         "--loki-bin=\"$(execpath @loki_w64//:loki-windows-amd64.exe)\"",
         "--loki-arg=--config.file=\"$(execpath loki.yaml)\"",
-        # # "--loki-chk=http://localhost:3100",
+        "--loki-chk=http://localhost:3100",
 
         # "--tempo-bin=\"$(execpath @tempo_w64//:tempo.exe)\"",
         # "--tempo-arg=--config.file=\"$(execpath tempo.yaml)\"",
@@ -14,7 +16,7 @@ cc_binary(
 
         "--otel-bin=\"$(execpath @otel_w64//:otelcol-contrib.exe)\"",
         "--otel-arg=--config=file:\"$(execpath otel.yaml)\"",
-        # # "--otelcol-chk=http://localhost:3200",
+        "--otel-chk=http://localhost:8888",
 
         # "--prom-bin=\"$(execpath @prom_w64//:prometheus.exe)\"",
         # "--prom-arg=--config.file=\"$(execpath prom.yaml)\"",
@@ -41,4 +43,8 @@ cc_binary(
         # "grafana-dashboards.yaml",
         # "grafana-datasources.yaml"
     ],
+    deps = dll_deps([
+        "//sdk/src/common:global_log_handler",
+        "//ext/src/http/client/curl:http_client_curl",
+    ]),    
 )

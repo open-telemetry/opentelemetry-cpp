@@ -1,8 +1,12 @@
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+//#include "opentelemetry/ext/http/client/http_client.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 #include <vector>
 #include <thread>
+#include <chrono>
 #include <process.h>
 
 struct Process {
@@ -10,11 +14,22 @@ struct Process {
 	std::string bin;
 	std::vector<std::string> args;
 	std::thread runner;
+	std::thread waiter;
+	std::string healthCheckURL;
+	intptr_t waitResult{};
+	intptr_t handle{};
+	intptr_t exitHandle{};
+	int exitCode{};
 };
 
 static const char* cmd_exe = std::getenv("ComSpec");
 
-void runner(const Process* proc)
+void waiter(Process* proc)
+{
+	proc->exitHandle = _cwait(&proc->exitCode, proc->handle, 0);
+}
+
+void runner(Process* proc)
 {
 	std::string cmd;
 	for( const auto& arg : proc->args )
@@ -24,8 +39,40 @@ void runner(const Process* proc)
 		cmd.append( arg );
 	}
 	printf("%s: Running %s %s\n", proc->name.c_str(), proc->bin.c_str(), cmd.c_str() );
-	const auto r{ _spawnl( _P_WAIT, cmd_exe ? cmd_exe : "c:\\windows\\system32\\cmd.exe", "/c", "start", ("\"" + proc->name + "\"").c_str(), "/WAIT", proc->bin.c_str(), cmd.c_str(), nullptr ) };
-	printf("%s: %s exited with %d\n", proc->name.c_str(), proc->bin.c_str(), r);
+	proc->handle = _spawnl( _P_NOWAIT, cmd_exe ? cmd_exe : "c:\\windows\\system32\\cmd.exe", "/c", "start", ("\"" + proc->name + "\"").c_str(), "/WAIT", proc->bin.c_str(), cmd.c_str(), nullptr );
+	if( proc->handle == -1 )
+	{
+		printf("%s: %s failed!\n", proc->name.c_str(), proc->bin.c_str() );	
+		return;
+	}
+	proc->waiter = std::thread(waiter, proc);
+	int state{-1};
+	while( proc->waiter.joinable() )
+	{
+		if( !proc->healthCheckURL.empty() )
+		{
+			const auto client{ opentelemetry::ext::http::client::HttpClientFactory::CreateSync() };
+			const auto r{ client->GetNoSsl( proc->healthCheckURL ) };
+			if( r )
+			{
+				if( state != 1 )
+					printf("%s: healthy\n", proc->name.c_str());
+				state = 1;
+			}
+			else
+			{
+				if( state != 0 )
+					printf("%s: not healthy\n", proc->name.c_str());
+				if( state == 1 )
+					break;
+				state = 0;
+			}
+		}
+ 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+	if( proc->waiter.joinable() )
+		proc->waiter.join();
+	printf("%s: %s exited with %d (exitHandle=%zd)\n", proc->name.c_str(), proc->bin.c_str(), proc->exitCode, proc->exitHandle);
 }
 
 int main(int argc, const char*argv[])
@@ -60,6 +107,8 @@ int main(int argc, const char*argv[])
 				proc.bin = val;
 			else if( key == "--" + proc.name + "-arg" )
 				proc.args.push_back(val);
+			else if( key == "--" + proc.name + "-chk" )
+				proc.healthCheckURL = val;
 		}
 	}
 
