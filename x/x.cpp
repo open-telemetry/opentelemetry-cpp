@@ -1,5 +1,4 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-//#include "opentelemetry/ext/http/client/http_client.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -7,6 +6,9 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <map>
+#include <filesystem>
 #include <process.h>
 
 struct Process {
@@ -16,10 +18,12 @@ struct Process {
 	std::thread runner;
 	std::thread waiter;
 	std::string healthCheckURL;
-	intptr_t waitResult{};
 	intptr_t handle{};
 	intptr_t exitHandle{};
 	int exitCode{};
+	volatile bool waitFinished{};
+	volatile bool healthy{};
+	volatile bool exited{};
 };
 
 static const char* cmd_exe = std::getenv("ComSpec");
@@ -27,6 +31,7 @@ static const char* cmd_exe = std::getenv("ComSpec");
 void waiter(Process* proc)
 {
 	proc->exitHandle = _cwait(&proc->exitCode, proc->handle, 0);
+	proc->waitFinished = true;
 }
 
 void runner(Process* proc)
@@ -39,15 +44,16 @@ void runner(Process* proc)
 		cmd.append( arg );
 	}
 	printf("%s: Running %s %s\n", proc->name.c_str(), proc->bin.c_str(), cmd.c_str() );
-	proc->handle = _spawnl( _P_NOWAIT, cmd_exe ? cmd_exe : "c:\\windows\\system32\\cmd.exe", "/c", "start", ("\"" + proc->name + "\"").c_str(), "/WAIT", proc->bin.c_str(), cmd.c_str(), nullptr );
+	proc->handle = _spawnl( _P_NOWAIT, cmd_exe ? cmd_exe : "c:\\windows\\system32\\cmd.exe", "/c", "start", ("\"" + proc->name + "\"").c_str(), "/MIN", "/WAIT", proc->bin.c_str(), cmd.c_str(), nullptr );
 	if( proc->handle == -1 )
 	{
+		proc->exited = true;
 		printf("%s: %s failed!\n", proc->name.c_str(), proc->bin.c_str() );	
 		return;
 	}
 	proc->waiter = std::thread(waiter, proc);
 	int state{-1};
-	while( proc->waiter.joinable() )
+	while( !proc->waitFinished )
 	{
 		if( !proc->healthCheckURL.empty() )
 		{
@@ -55,12 +61,14 @@ void runner(Process* proc)
 			const auto r{ client->GetNoSsl( proc->healthCheckURL ) };
 			if( r )
 			{
+				proc->healthy = true;
 				if( state != 1 )
 					printf("%s: healthy\n", proc->name.c_str());
-				state = 1;
+					state = 1;
 			}
 			else
 			{
+				proc->healthy = false;
 				if( state != 0 )
 					printf("%s: not healthy\n", proc->name.c_str());
 				if( state == 1 )
@@ -72,18 +80,19 @@ void runner(Process* proc)
 	}
 	if( proc->waiter.joinable() )
 		proc->waiter.join();
+	proc->exited = true;
 	printf("%s: %s exited with %d (exitHandle=%zd)\n", proc->name.c_str(), proc->bin.c_str(), proc->exitCode, proc->exitHandle);
 }
 
+void demo();
+
 int main(int argc, const char*argv[])
 {
-	std::vector<Process> procs;
+	std::vector<std::string> procNames{ "loki", "tempo", "otel", "prom", "graf" };
+	std::map<std::string, Process> procs;
 
-	procs.push_back(Process{"loki"});
-	procs.push_back(Process{"tempo"});
-	procs.push_back(Process{"prom"});
-	procs.push_back(Process{"otel"});
-	procs.push_back(Process{"graf"});
+	const auto cwd_path{ std::filesystem::current_path() };
+	printf("cwd=%s\n", cwd_path.u8string().c_str() );
 
 	for(int i=1; i<argc; i++ )
 	{
@@ -100,30 +109,65 @@ int main(int argc, const char*argv[])
 			printf("Invalid argument: %s\n", arg.c_str());
 			return 1;
 		}
-		printf("key=%s val=%s\n", key.c_str(), val.c_str());
-		for( auto& proc : procs )
+//		printf("key=%s val=%s\n", key.c_str(), val.c_str());
+		for( const auto& procName : procNames )
 		{
-			if( key == "--" + proc.name + "-bin" )
+			auto it = procs.try_emplace(procName, Process{procName});
+			auto& proc = it.first->second;
+			if( key == "--" + procName + "-bin" )
 				proc.bin = val;
-			else if( key == "--" + proc.name + "-arg" )
+			else if( key == "--" + procName + "-arg" )
 				proc.args.push_back(val);
-			else if( key == "--" + proc.name + "-chk" )
+			else if( key == "--" + procName + "-chk" )
 				proc.healthCheckURL = val;
 		}
 	}
 
-	for( auto& proc : procs )
+	for( auto it = procs.begin(); it != procs.end(); )
 	{
-		if( proc.bin.empty() )
-			continue;
+		if( it->second.bin.empty() )
+			it = procs.erase(it);
+		else
+			++it;
+	}
+
+	for( auto& it : procs )
+	{
+		auto& proc = it.second;
 		proc.runner = std::thread( runner, &proc );
 	}
 
-	for( auto& proc : procs )
+	bool allHealthyOnce = true;
+	for( ;; ) 
 	{
-		if( proc.runner.joinable() )
-			proc.runner.join();
+		bool allHealthy = true;
+		for( const auto& it : procs )
+		{
+			const auto& proc = it.second;
+			if( proc.exited )
+				return 1;
+			//printf("%s=%d\n\n", proc.bin.c_str(), proc.healthy );
+			if( !proc.healthy )
+				allHealthy = false;
+		}
+		if( allHealthy )
+		{
+			if( allHealthyOnce )
+			{
+				printf("ALL HEALTHY\n");
+				demo();
+			}
+			allHealthyOnce = false;
+		}
+ 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return 0;
+}
+
+// ---------------------------
+
+void demo()
+{
+
 }

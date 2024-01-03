@@ -6,25 +6,28 @@ cc_binary(
     name = "x",
     srcs = ["x.cpp"],
     args = [
-        "--loki-bin=\"$(execpath @loki_w64//:loki-windows-amd64.exe)\"",
-        "--loki-arg=--config.file=\"$(execpath loki.yaml)\"",
-        "--loki-chk=http://localhost:3100",
+        "--loki-bin=\"$(location @loki_w64//:loki-windows-amd64.exe)\"",
+        "--loki-arg=--config.file=\"$(location loki.yaml)\"",
+        "--loki-chk=http://localhost:3100/metrics",
 
         # "--tempo-bin=\"$(execpath @tempo_w64//:tempo.exe)\"",
         # "--tempo-arg=--config.file=\"$(execpath tempo.yaml)\"",
         # # "--tempo-chk=http://localhost:3200",
 
-        "--otel-bin=\"$(execpath @otel_w64//:otelcol-contrib.exe)\"",
-        "--otel-arg=--config=file:\"$(execpath otel.yaml)\"",
-        "--otel-chk=http://localhost:8888",
+        "--otel-bin=\"$(location @otel_w64//:otelcol-contrib.exe)\"",
+        "--otel-arg=--config=file:\"$(location otel.yaml)\"",
+        "--otel-chk=http://localhost:8888/metrics",
 
-        # "--prom-bin=\"$(execpath @prom_w64//:prometheus.exe)\"",
-        # "--prom-arg=--config.file=\"$(execpath prom.yaml)\"",
-        # "--prom-chk=http://localhost:3200",\
+        "--prom-bin=\"$(location @prom_w64//:prometheus.exe)\"",
+        "--prom-arg=--config.file=\"$(location prom.yaml)\"",
+        "--prom-arg=--web.enable-remote-write-receiver",
+        "--prom-arg=--enable-feature=exemplar-storage",
+        "--prom-arg=--enable-feature=native-histograms",
+        "--prom-chk=http://localhost:9090",
 
-        # "--graf-bin=\"$(execpath @graf_w64//:bin/grafana.exe)\"",
+        # "--graf-bin=\"$(location @graf_w64//:bin/grafana.exe)\"",
         # "--graf-arg=server",
-        # "--graf-arg=--homepath=\"$(execpath @graf_w64//:bin/grafana.exe)/../..\"",
+        # "--graf-arg=--homepath=\"$(location @graf_w64//:bin/grafana.exe)/../..\"",
     ],
     data = [
         "loki.yaml",

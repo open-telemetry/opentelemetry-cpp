@@ -1,6 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
-
+common --nolegacy_external_runfiles
 common --enable_bzlmod
 common --skip_incompatible_explicit_targets
 common --enable_platform_specific_config
