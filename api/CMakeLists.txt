@@ -16,14 +16,7 @@ if(OPENTELEMETRY_INSTALL)
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry
-    DESTINATION include
-    FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "metrics" EXCLUDE)
-
+  
   install(
     DIRECTORY include/opentelemetry
     DESTINATION include
