@@ -154,7 +154,7 @@ public:
         return sdktrace::ExportResult::kSuccess;
     }
 
-    bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept
+    bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max())) noexcept
     {
         isShutdown = true;
         return true;

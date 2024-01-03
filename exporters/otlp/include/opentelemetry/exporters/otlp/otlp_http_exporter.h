@@ -59,7 +59,7 @@ public:
    * @return return true when all data are exported, and false when timeout
    */
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max())) noexcept override;
 
   /**
    * Shut down the exporter.
@@ -68,7 +68,7 @@ public:
    * @return return the status of this operation
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max())) noexcept override;
 
 private:
   // The configuration options associated with this exporter.
