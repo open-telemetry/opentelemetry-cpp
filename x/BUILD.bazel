@@ -1,0 +1,44 @@
+load("@bazel_skylib//lib:paths.bzl", "paths")
+
+cc_binary(
+    name = "x",
+    srcs = ["x.cpp"],
+    args = [
+        "--loki-bin=\"$(execpath @loki_w64//:loki-windows-amd64.exe)\"",
+        "--loki-arg=--config.file=\"$(execpath loki.yaml)\"",
+        # # "--loki-chk=http://localhost:3100",
+
+        # "--tempo-bin=\"$(execpath @tempo_w64//:tempo.exe)\"",
+        # "--tempo-arg=--config.file=\"$(execpath tempo.yaml)\"",
+        # # "--tempo-chk=http://localhost:3200",
+
+        "--otel-bin=\"$(execpath @otel_w64//:otelcol-contrib.exe)\"",
+        "--otel-arg=--config=file:\"$(execpath otel.yaml)\"",
+        # # "--otelcol-chk=http://localhost:3200",
+
+        # "--prom-bin=\"$(execpath @prom_w64//:prometheus.exe)\"",
+        # "--prom-arg=--config.file=\"$(execpath prom.yaml)\"",
+        # "--prom-chk=http://localhost:3200",\
+
+        # "--graf-bin=\"$(execpath @graf_w64//:bin/grafana.exe)\"",
+        # "--graf-arg=server",
+        # "--graf-arg=--homepath=\"$(execpath @graf_w64//:bin/grafana.exe)/../..\"",
+    ],
+    data = [
+        "loki.yaml",
+        "otel.yaml",
+        "prom.yaml",
+        "tempo.yaml",
+        "@loki_w64//:loki-windows-amd64.exe",
+        "@otel_w64//:otelcol-contrib.exe",
+        "@prom_w64//:prometheus.exe",
+        "@tempo_w64//:tempo.exe",
+        # "@graf_w64//:bin/grafana.exe",
+        # "@graf_w64//:files",
+        # "grafana-dashboard-jvm-metrics.json",
+        # "grafana-dashboard-red-metrics-classic.json",
+        # "grafana-dashboard-red-metrics-native.json",
+        # "grafana-dashboards.yaml",
+        # "grafana-datasources.yaml"
+    ],
+)

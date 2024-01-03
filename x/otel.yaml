@@ -1,0 +1,74 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      # http:
+  # prometheus/collector:
+  #   config:
+  #     scrape_configs:
+  #       - job_name: 'opentelemetry-collector'
+  #         static_configs:
+  #           - targets: ['localhost:8888']
+
+# service:
+#   # https://opentelemetry.io/docs/collector/configuration/#telemetry
+#   telemetry:
+#     logs:
+#       level: INFO
+#       development: false
+#       encoding: console # or json
+#     metrics:
+#       level: none # none, basic, normal, detailed
+#       address: 0.0.0.0:8888 # localhost:8888
+#     # https://github.com/open-telemetry/opentelemetry-collector/blob/v0.91.0/service/telemetry/config.go#L131
+#     traces:
+#       propagators:
+#         - tracecontext
+#         - b3
+#       processors:
+#         - batch
+
+processors:
+  batch:
+
+exporters:
+  # prometheusremotewrite:
+  #   endpoint: http://localhost:9090/api/v1/write
+  #   add_metric_suffixes: true
+  # otlphttp:
+  #   endpoint: http://localhost:4418
+  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configgrpc/README.md
+  # otlp/tempo:
+  #   endpoint: 
+  #   tls:
+  #     insecure: false
+  #     insecure_skip_verify: true
+  #   compression: none
+  loki:
+    endpoint: http://localhost:3100/loki/api/v1/push
+    tls:
+      insecure: true
+  # logging/metrics:
+  #   verbosity: detailed
+  # logging/traces:
+  #   verbosity: detailed
+  # logging/logs:
+  #   verbosity: detailed
+
+service:
+  pipelines:
+    # traces:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [otlphttp]
+    #   #exporters: [otlphttp,logging/traces]
+    # metrics:
+    #   receivers: [otlp,prometheus/collector]
+    #   processors: [batch]
+    #   exporters: [prometheusremotewrite]
+    #   #exporters: [prometheusremotewrite,logging/metrics]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [loki]
+      #exporters: [loki,logging/logs]
