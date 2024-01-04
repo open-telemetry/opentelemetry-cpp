@@ -66,3 +66,9 @@ test --test_size_filters=small,medium,large,enormous
 test --test_timeout_filters=short,moderate,long,eternal
 test --test_verbose_timeout_warnings
 test --test_summary=terse
+
+mod --charset=ascii
+
+# This doesn't work with 
+# ../com_github_opentelemetry_proto/opentelemetry/proto/collector/metrics/v1/metrics_service.proto: File does not reside within any path specified using --proto_path (or -I).  You must specify a --proto_path which encompasses this file.  Note that the proto_path must be a
+# common --experimental_sibling_repository_layout
