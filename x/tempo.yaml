@@ -22,9 +22,9 @@ storage:
 metrics_generator:
   storage:
     path: data/tempo/generator/wal
-    # remote_write:
-    #   - url: http://localhost:9090/api/v1/write
-    #     send_exemplars: true
+    remote_write:
+      - url: http://localhost:9090/api/v1/write
+        send_exemplars: true
 
 overrides:
   metrics_generator_processors: [service-graphs]

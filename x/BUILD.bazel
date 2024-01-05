@@ -2,17 +2,25 @@ load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
 
 avoid_dll_lock()
 
-cc_binary(
+# loki would listen on localhost:3100/metics
+# temp on 3200/metrics but also 4417, 4418, 9096
+# prom on 9090/metrics
+# otel 4317, 4318, 8888/metrics
+
+cc_test(
     name = "x",
     srcs = ["x.cpp"],
+    timeout = "eternal",
+    size = "enormous",
+    tags = ["external", "manual", "exclusive"],
     args = [
         "--loki-bin=\"$(location @loki_w64//:loki-windows-amd64.exe)\"",
         "--loki-arg=--config.file=\"$(location loki.yaml)\"",
         "--loki-chk=http://localhost:3100/metrics",
 
-        # "--tempo-bin=\"$(execpath @tempo_w64//:tempo.exe)\"",
-        # "--tempo-arg=--config.file=\"$(execpath tempo.yaml)\"",
-        # # "--tempo-chk=http://localhost:3200",
+        "--tempo-bin=\"$(location @tempo_w64//:tempo.exe)\"",
+        "--tempo-arg=--config.file=\"$(location tempo.yaml)\"",
+        "--tempo-chk=http://localhost:3200/metrics",
 
         "--otel-bin=\"$(location @otel_w64//:otelcol-contrib.exe)\"",
         "--otel-arg=--config=file:\"$(location otel.yaml)\"",
@@ -23,7 +31,9 @@ cc_binary(
         "--prom-arg=--web.enable-remote-write-receiver",
         "--prom-arg=--enable-feature=exemplar-storage",
         "--prom-arg=--enable-feature=native-histograms",
-        "--prom-chk=http://localhost:9090",
+        "--prom-arg=--storage.tsdb.path=data/prom",
+        "--prom-chk=http://localhost:9090/metrics",
+        "--prom-url=http://localhost:9090/",
 
         # "--graf-bin=\"$(location @graf_w64//:bin/grafana.exe)\"",
         # "--graf-arg=server",
@@ -47,7 +57,14 @@ cc_binary(
         # "grafana-datasources.yaml"
     ],
     deps = dll_deps([
+        "//api",
         "//sdk/src/common:global_log_handler",
         "//ext/src/http/client/curl:http_client_curl",
+
+        "//exporters/otlp:otlp_grpc_exporter",
+        "//exporters/otlp:otlp_grpc_log_record_exporter",
+        "//exporters/otlp:otlp_grpc_metric_exporter",
+        "//sdk/src/trace",
+        "//sdk/src/metrics",
     ]),    
 )

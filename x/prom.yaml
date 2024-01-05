@@ -1,1 +1,8 @@
-# empty
+# http://localhost:9090/flags
+
+# storage:
+#   tsdb:
+#     path: data/prom/
+
+# web:
+#   enable-admin-api: true
