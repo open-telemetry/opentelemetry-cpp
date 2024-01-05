@@ -11,7 +11,7 @@ External\s+\|\s+(\?Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@openteleme
 External\s+\|\s+(\?Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?ForceFlush@TracerProvider@trace@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
-External\s+\|\s+(\??0OStreamLogRecordExporter@logs@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OStreamLogRecordExporter@logs@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?Create@OStreamMetricExporterFactory@metrics@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?Create@PeriodicExportingMetricReaderFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?Create@MeterProviderFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
@@ -21,6 +21,7 @@ External\s+\|\s+(\?Create@ViewFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.
 External\s+\|\s+(\?Create@MeterSelectorFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?Create@InstrumentSelectorFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?AddMetricReader@MeterProvider@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 External\s+\|\s+(\?AddView@MeterProvider@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
 
 #if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
