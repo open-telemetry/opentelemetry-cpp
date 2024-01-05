@@ -89,7 +89,7 @@ add_custom_command(
     "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
     ${CMAKE_CURRENT_SOURCE_DIR}/input.src >
     ${OPENTELEMETRY_INPUT_DEF}
-  VERBATIM)
+  VERBATIM COMMAND_EXPAND_LISTS)
 
 add_custom_command(
   OUTPUT ${OPENTELEMETRY_EXPORT_DEF}

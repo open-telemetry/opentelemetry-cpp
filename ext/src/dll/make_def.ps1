@@ -1,4 +1,7 @@
- param ($dumpbin, $bindir, $inputfile, $targetfile)
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+param ($dumpbin, $bindir, $inputfile, $targetfile)
    
  "LIBRARY opentelemetry_cpp`r`nEXPORTS`r`n" > $targetfile
     
