@@ -1,0 +1,73 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+// clang-format off
+External\s+\|\s+(\?Create@OStreamSpanExporterFactory@trace@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@SimpleSpanProcessorFactory@trace@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@TracerProviderFactory@trace@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@BatchLogRecordProcessorFactory@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?ForceFlush@TracerProvider@trace@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\??0OStreamLogRecordExporter@logs@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@OStreamMetricExporterFactory@metrics@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@PeriodicExportingMetricReaderFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@MeterProviderFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@MeterContextFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@MeterProviderFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@ViewFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@MeterSelectorFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@InstrumentSelectorFactory@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?AddView@MeterProvider@metrics@sdk@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+
+#if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
+External\s+\|\s+(\?GetOtlpDefaultTracesTimeout@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultTracesHeaders@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultLogsTimeout@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultLogsHeaders@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultMetricsTimeout@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultMetricsHeaders@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultTracesSslCertificatePath@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultMetricsSslCertificatePath@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultLogsSslCertificatePath@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultTracesSslCertificateString@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultMetricsSslCertificateString@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultLogsSslCertificateString@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+#endif  // defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
+
+#if defined(WITH_OTLP_GRPC)
+External\s+\|\s+(\?Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@OtlpGrpcMetricExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@OtlpGrpcLogRecordExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpGrpcExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpGrpcExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpGrpcMetricExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpGrpcMetricExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpGrpcLogRecordExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpGrpcLogRecordExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcTracesEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcMetricsEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcLogsEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcTracesIsInsecure@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcMetricsIsInsecure@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultGrpcLogsIsInsecure@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+#endif  // defined(WITH_OTLP_GRPC)
+
+#if defined(WITH_OTLP_HTTP)
+External\s+\|\s+(\?Create@OtlpHttpExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@OtlpHttpMetricExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?Create@OtlpHttpLogRecordExporterFactory@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpHttpExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpHttpExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpHttpMetricExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpHttpMetricExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?0OtlpHttpLogRecordExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?\?1OtlpHttpLogRecordExporterOptions@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultHttpTracesEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultHttpMetricsEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+External\s+\|\s+(\?GetOtlpDefaultHttpLogsEndpoint@otlp@exporter@v1@opentelemetry[^\s]*)\s+\((.*)\)$
+#endif  // defined(WITH_OTLP_HTTP)
+// clang-format on

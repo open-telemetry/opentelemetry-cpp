@@ -50,14 +50,44 @@ if(WITH_OTLP_HTTP)
                         PRIVATE opentelemetry_exporter_otlp_http_log)
 endif()
 
+
+# find Powershell executable
+find_program(DUMPBIN_PATH NAMES dumpbin)
+
+# find Powershell executable
+find_program(POWERSHELL_PATH NAMES pwsh powershell)
+
+set(OPENTELEMETRY_INPUT_DEF
+    "${CMAKE_CURRENT_SOURCE_DIR}/input.txt")
+
 add_custom_command(
-  OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
+  OUTPUT ${OPENTELEMETRY_INPUT_DEF}
+  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/input.src"
   COMMAND
     ${CMAKE_CXX_COMPILER}
     "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
-    ${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry_cpp.src >
+    ${CMAKE_CURRENT_SOURCE_DIR}/input.src >
+    ${OPENTELEMETRY_INPUT_DEF}
+  VERBATIM)
+
+add_custom_command(
+  OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
+  DEPENDS "${OPENTELEMETRY_INPUT_DEF}" "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1"
+  COMMAND
+    ${POWERSHELL_PATH}
+    "-ExecutionPolicy" 
+    "Bypass"
+    "-File"
+    "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1"
+    "-dumpbin"
+    ${DUMPBIN_PATH}
+    "-bindir"
+    ${PROJECT_BINARY_DIR}
+    "-inputfile"
+    ${OPENTELEMETRY_INPUT_DEF}
+    "-targetfile"
     ${OPENTELEMETRY_EXPORT_DEF}
-  COMMAND_EXPAND_LISTS VERBATIM)
+  VERBATIM)
 
 if(OPENTELEMETRY_INSTALL)
   install(
