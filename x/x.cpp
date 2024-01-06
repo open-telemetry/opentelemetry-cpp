@@ -1,46 +1,49 @@
 
-#include <opentelemetry/version.h>
+#include <ftxui/component/captured_mouse.hpp>
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/component_options.hpp>
+#include <ftxui/component/screen_interactive.hpp>
 
+#include <opentelemetry/version.h>
 #include <opentelemetry/metrics/provider.h>
 #include <opentelemetry/trace/provider.h>
 #include <opentelemetry/logs/provider.h>
-
 #include <opentelemetry/sdk/common/env_variables.h>
 #include <opentelemetry/sdk/common/global_log_handler.h>
-
 #include <opentelemetry/sdk/resource/semantic_conventions.h>
-
 #include <opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h>
 #include <opentelemetry/sdk/metrics/meter_provider_factory.h>
 #include <opentelemetry/sdk/metrics/meter_provider.h>
-
 #include <opentelemetry/sdk/trace/batch_span_processor_factory.h>
 #include <opentelemetry/sdk/trace/batch_span_processor_options.h>
 #include <opentelemetry/sdk/trace/tracer_provider_factory.h>
 #include <opentelemetry/sdk/trace/tracer_provider.h>
 #include <opentelemetry/sdk/trace/processor.h>
-
 #include <opentelemetry/sdk/logs/batch_log_record_processor_factory.h>
 #include <opentelemetry/sdk/logs/batch_log_record_processor_options.h>
 #include <opentelemetry/sdk/logs/logger_provider_factory.h>
 #include <opentelemetry/sdk/logs/processor.h>
-
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h>
-
 #include <opentelemetry/ext/http/client/http_client_factory.h>
 
+#include <process.h>
+
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
-#include <string>
-#include <vector>
-#include <thread>
-#include <chrono>
-#include <atomic>
-#include <map>
 #include <filesystem>
-#include <process.h>
+#include <functional>
+#include <iostream>
+#include <iostream>
+#include <istream>
+#include <map>
+#include <ostream>
+#include <string>
+#include <string>
+#include <thread>
+#include <vector>
 
 struct Process {
 	std::string name;
@@ -477,6 +480,8 @@ void logger_setup()
 
 }
 
+void ui_main();
+
 void demo()
 {
 	setup();
@@ -531,9 +536,67 @@ void demo()
 
 	get_logger()->Info( "Joining threads" );
 
+	ui_main();
+
 	counter_example_thread.join();
 	observable_counter_example_thread.join();
 	histogram_example_thread.join();
 
 	get_logger()->Info( "Joined all threads" );
+}
+
+#include <windows.h>
+#include <cstdlib>
+
+void BindStdHandlesToConsole()
+{
+#ifdef _WIN32
+	FreeConsole();
+	AllocConsole();
+#endif
+
+    freopen("CONIN$", "r", stdin);
+    freopen("CONOUT$", "w", stderr);
+    freopen("CONOUT$", "w", stdout);
+    
+#ifdef _WIN32
+    // Note that there is no CONERR$ file
+    HANDLE hStdout = CreateFileA("CONOUT$",  GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE hStdin = CreateFileA("CONIN$",  GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    
+    SetStdHandle(STD_OUTPUT_HANDLE,hStdout);
+    SetStdHandle(STD_ERROR_HANDLE,hStdout);
+    SetStdHandle(STD_INPUT_HANDLE,hStdin);
+#endif
+
+    // //Clear the error state for each of the C++ standard stream objects. 
+    std::wclog.clear();
+    std::clog.clear();
+    std::wcout.clear();
+    std::wcerr.clear();
+    std::wcin.clear();
+    std::cerr.clear();
+    std::cout.clear();
+    std::cin.clear();
+}
+
+void ui_main() {
+  BindStdHandlesToConsole();
+  using namespace ftxui;
+  auto screen = ScreenInteractive::TerminalOutput();
+
+  std::vector<std::string> entries = {
+      "entry 1",
+      "entry 2",
+      "entry 3",
+  };
+  int selected = 0;
+
+  MenuOption option;
+//  option.on_enter = screen.ExitLoopClosure();
+  auto menu = Menu(&entries, &selected, option);
+
+  screen.Loop(menu);
+
+  std::cout << "Selected element = " << selected << std::endl;
 }
