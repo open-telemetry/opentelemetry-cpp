@@ -81,6 +81,17 @@ filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
 """
 )
 
+http_archive(
+    name = "ftxui",
+    # integrity = ""
+    strip_prefix = "FTXUI-d5d9e587bf638699d56a1b6d89635d7e3e8002ee",
+    integrity = "sha256-JOyhFUi5TxI97IRCIbjROH4XAHzcPH6hcmi2rZSH7p0=",
+    type = "zip",
+    urls = [
+        "https://codeload.github.com/malkia/FTXUI/zip/d5d9e587bf638699d56a1b6d89635d7e3e8002ee"
+    ]
+)
+
 # https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip
 
 # Use clang-cl for compilation. The alternative form is now in the .bazelrc, this is kept here just for reference
@@ -92,3 +103,5 @@ filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
 # register_toolchains(
 #     "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
 # )
+
+

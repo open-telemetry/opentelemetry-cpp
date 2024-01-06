@@ -66,5 +66,7 @@ cc_test(
         "//exporters/otlp:otlp_grpc_metric_exporter",
         "//sdk/src/trace",
         "//sdk/src/metrics",
+
+        "@ftxui//src:component",
     ]),    
 )

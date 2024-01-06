@@ -32,6 +32,10 @@ build:windows --copt="-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS"
 # Use this define, instead of disabling 4996 - /wd4996
 build:windows --copt="-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 
+# fix ftxui later
+build:windows --copt="-DUNICODE"
+build:windows --copt="-D_UNICODE"
+
 # --copt="/wd4996"
 
 # --config=asan : Address Sanitizer.
