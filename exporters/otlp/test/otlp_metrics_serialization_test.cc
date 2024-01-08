@@ -130,6 +130,66 @@ static metrics_sdk::MetricData CreateObservableGaugeAggregationData()
   return data;
 }
 
+static metrics_sdk::MetricData CreateObservableCounterAggregationData()
+{
+  metrics_sdk::MetricData data;
+  data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  metrics_sdk::InstrumentDescriptor inst_desc = {
+      "ObservableCounter", "test description", "test unit",
+      metrics_sdk::InstrumentType::kObservableCounter, metrics_sdk::InstrumentValueType::kDouble};
+  metrics_sdk::SumPointData s_data_1, s_data_2;
+  s_data_1.value_ = 1.23;
+  s_data_2.value_ = 4.56;
+
+  data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
+  data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  data.instrument_descriptor = inst_desc;
+  metrics_sdk::PointDataAttributes point_data_attr_1, point_data_attr_2;
+  point_data_attr_1.attributes = {{"key1", "value1"}};
+  point_data_attr_1.point_data = s_data_1;
+
+  point_data_attr_2.attributes = {{"key2", "value2"}};
+  point_data_attr_2.point_data = s_data_2;
+  std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
+  point_data_attr.push_back(point_data_attr_1);
+  point_data_attr.push_back(point_data_attr_2);
+  data.point_data_attr_ = std::move(point_data_attr);
+  return data;
+}
+
+static metrics_sdk::MetricData CreateObservableUpDownCounterAggregationData()
+{
+  metrics_sdk::MetricData data;
+  data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  metrics_sdk::InstrumentDescriptor inst_desc = {
+      "ObservableUpDownCounter", "test description", "test unit",
+      metrics_sdk::InstrumentType::kObservableUpDownCounter,
+      metrics_sdk::InstrumentValueType::kDouble};
+  metrics_sdk::SumPointData s_data_1, s_data_2, s_data_3;
+  s_data_1.value_ = 1.23;
+  s_data_2.value_ = 4.56;
+  s_data_3.value_ = 2.34;
+
+  data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
+  data.end_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  data.instrument_descriptor = inst_desc;
+  metrics_sdk::PointDataAttributes point_data_attr_1, point_data_attr_2, point_data_attr_3;
+  point_data_attr_1.attributes = {{"key1", "value1"}};
+  point_data_attr_1.point_data = s_data_1;
+
+  point_data_attr_2.attributes = {{"key2", "value2"}};
+  point_data_attr_2.point_data = s_data_2;
+
+  point_data_attr_3.attributes = {{"key3", "value3"}};
+  point_data_attr_3.point_data = s_data_3;
+  std::vector<metrics_sdk::PointDataAttributes> point_data_attr;
+  point_data_attr.push_back(point_data_attr_1);
+  point_data_attr.push_back(point_data_attr_2);
+  point_data_attr.push_back(point_data_attr_3);
+  data.point_data_attr_ = std::move(point_data_attr);
+  return data;
+}
+
 TEST(OtlpMetricSerializationTest, Counter)
 {
   metrics_sdk::MetricData data = CreateSumAggregationData();
@@ -187,6 +247,37 @@ TEST(OtlpMetricSerializationTest, ObservableGauge)
     auto proto_number_point = gauge.data_points(i);
     EXPECT_EQ(proto_number_point.as_double(), i == 0 ? 30.2 : 50.2);
   }
+
+  EXPECT_EQ(1, 1);
+}
+
+TEST(OtlpMetricSerializationTest, ObservableCounter)
+{
+  metrics_sdk::MetricData data = CreateObservableCounterAggregationData();
+  opentelemetry::proto::metrics::v1::Sum sum;
+  otlp_exporter::OtlpMetricUtils::ConvertSumMetric(data, &sum);
+  EXPECT_EQ(sum.aggregation_temporality(),
+            proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
+  EXPECT_EQ(sum.is_monotonic(), true);
+  EXPECT_EQ(sum.data_points_size(), 2);
+  EXPECT_EQ(sum.data_points(0).as_double(), 1.23);
+  EXPECT_EQ(sum.data_points(1).as_double(), 4.56);
+
+  EXPECT_EQ(1, 1);
+}
+
+TEST(OtlpMetricSerializationTest, ObservableUpDownCounter)
+{
+  metrics_sdk::MetricData data = CreateObservableUpDownCounterAggregationData();
+  opentelemetry::proto::metrics::v1::Sum sum;
+  otlp_exporter::OtlpMetricUtils::ConvertSumMetric(data, &sum);
+  EXPECT_EQ(sum.aggregation_temporality(),
+            proto::metrics::v1::AggregationTemporality::AGGREGATION_TEMPORALITY_CUMULATIVE);
+  EXPECT_EQ(sum.is_monotonic(), false);
+  EXPECT_EQ(sum.data_points_size(), 3);
+  EXPECT_EQ(sum.data_points(0).as_double(), 1.23);
+  EXPECT_EQ(sum.data_points(1).as_double(), 4.56);
+  EXPECT_EQ(sum.data_points(2).as_double(), 2.34);
 
   EXPECT_EQ(1, 1);
 }

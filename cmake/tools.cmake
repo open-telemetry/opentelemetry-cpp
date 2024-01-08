@@ -14,7 +14,16 @@ endmacro()
 if(NOT PATCH_PROTOBUF_SOURCES_OPTIONS_SET)
   if(MSVC)
     unset(PATCH_PROTOBUF_SOURCES_OPTIONS CACHE)
-    set(PATCH_PROTOBUF_SOURCES_OPTIONS /wd4244 /wd4251 /wd4267 /wd4309 /wd4668 /wd4946 /wd6001 /wd6244 /wd6246)
+    set(PATCH_PROTOBUF_SOURCES_OPTIONS
+        /wd4244
+        /wd4251
+        /wd4267
+        /wd4309
+        /wd4668
+        /wd4946
+        /wd6001
+        /wd6244
+        /wd6246)
 
     if(MSVC_VERSION GREATER_EQUAL 1922)
       # see
@@ -144,6 +153,11 @@ function(project_build_tools_patch_default_imported_config)
     if(TARGET ${TARGET_NAME})
       get_target_property(IS_IMPORTED_TARGET ${TARGET_NAME} IMPORTED)
       if(NOT IS_IMPORTED_TARGET)
+        continue()
+      endif()
+
+      get_target_property(IS_ALIAS_TARGET ${TARGET_NAME} ALIASED_TARGET)
+      if(IS_ALIAS_TARGET)
         continue()
       endif()
 
