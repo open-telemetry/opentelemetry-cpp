@@ -83,12 +83,11 @@ filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
 
 http_archive(
     name = "ftxui",
-    # integrity = ""
-    strip_prefix = "FTXUI-d5d9e587bf638699d56a1b6d89635d7e3e8002ee",
-    integrity = "sha256-JOyhFUi5TxI97IRCIbjROH4XAHzcPH6hcmi2rZSH7p0=",
+    strip_prefix = "FTXUI-8178c7ac3adb9a14d76589126d611b10e1c45a97",
+    integrity = "sha256-muqkm+RrpTI0MpOcQ455vRXwrOm0rs5rUfvI3BXHwGk=",
     type = "zip",
     urls = [
-        "https://codeload.github.com/malkia/FTXUI/zip/d5d9e587bf638699d56a1b6d89635d7e3e8002ee"
+        "https://codeload.github.com/malkia/FTXUI/zip/8178c7ac3adb9a14d76589126d611b10e1c45a97"
     ]
 )
 
