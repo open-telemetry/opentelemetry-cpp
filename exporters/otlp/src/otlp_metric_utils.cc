@@ -54,8 +54,9 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
 {
   sum->set_aggregation_temporality(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
-  sum->set_is_monotonic(metric_data.instrument_descriptor.type_ ==
-                        metric_sdk::InstrumentType::kCounter);
+  sum->set_is_monotonic(
+      (metric_data.instrument_descriptor.type_ == metric_sdk::InstrumentType::kCounter) ||
+      (metric_data.instrument_descriptor.type_ == metric_sdk::InstrumentType::kObservableCounter));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
