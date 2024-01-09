@@ -103,7 +103,7 @@ public:
             http_client};
   }
 
-  void ExportJsonIntegrationTest()
+  void ExportBinaryIntegrationTest()
   {
     auto mock_otlp_client =
         OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
