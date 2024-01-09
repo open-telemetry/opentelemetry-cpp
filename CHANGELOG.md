@@ -33,7 +33,9 @@ Breaking changes:
   * CMake options `WITH_OTLP_HTTP_SSL_PREVIEW`
     and `WITH_OTLP_HTTP_SSL_TLS_PREVIEW` are removed.
     Building opentelemetry-cpp without SSL support is no longer possible.
-* [#240] Change default OTLP Http Exporter content type from kJson to kBInary
+* [#2480] Change default OTLP Http Exporter content type from kJson to kBInary
+  See The default is http/protobuf, which means binary, [HERE](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#specify-protocol
+
 ## [1.13.0] 2023-12-06
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
