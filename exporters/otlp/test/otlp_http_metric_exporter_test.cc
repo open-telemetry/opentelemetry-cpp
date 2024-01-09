@@ -117,7 +117,7 @@ public:
   )
   {
     auto mock_otlp_client =
-        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
+        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
 #ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
@@ -293,7 +293,7 @@ public:
   )
   {
     auto mock_otlp_client =
-        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
+        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
 #ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
@@ -483,7 +483,7 @@ public:
   )
   {
     auto mock_otlp_client =
-        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson
+        OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary
 #ifdef ENABLE_ASYNC_EXPORT
                                                               ,
                                                               async_mode
