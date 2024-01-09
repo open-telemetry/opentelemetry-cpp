@@ -106,7 +106,7 @@ public:
   void ExportJsonIntegrationTest()
   {
     auto mock_otlp_client =
-        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
@@ -197,7 +197,7 @@ public:
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client =
-        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson, true);
+        OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary, true);
     auto mock_otlp_http_client = mock_otlp_client.first;
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
