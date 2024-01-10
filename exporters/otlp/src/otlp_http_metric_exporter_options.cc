@@ -17,7 +17,7 @@ namespace otlp
 OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
 {
   url                     = GetOtlpDefaultMetricsEndpoint();
-  content_type            = HttpRequestContentType::kJson;
+  content_type            = HttpRequestContentType::kBinary;
   json_bytes_mapping      = JsonBytesMappingKind::kHexId;
   use_json_name           = false;
   console_debug           = false;
