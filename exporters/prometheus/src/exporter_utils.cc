@@ -108,7 +108,7 @@ std::string SanitizeLabel(std::string label_key)
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data,
     bool populate_target_info,
-    bool populate_otel_scope)
+    bool without_otel_scope)
 {
 
   // initialize output vector
@@ -129,7 +129,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     SetTarget(data,
               data.scope_metric_data_.begin()->metric_data_.begin()->end_ts.time_since_epoch(),
-              populate_otel_scope ? (*data.scope_metric_data_.begin()).scope_ : nullptr, &output);
+              without_otel_scope ? nullptr : (*data.scope_metric_data_.begin()).scope_, &output);
   }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
@@ -153,7 +153,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
                                                metric_data.instrument_descriptor.unit_, type);
       metric_family.type = type;
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
-          populate_otel_scope ? instrumentation_info.scope_ : nullptr;
+          without_otel_scope ? nullptr : instrumentation_info.scope_;
 
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
