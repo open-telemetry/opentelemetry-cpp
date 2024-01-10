@@ -18,10 +18,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 #   https://github.com/open-telemetry/opentelemetry-specification
 # Repository from 1.21.0:
 #   https://github.com/open-telemetry/semantic-conventions
-SEMCONV_VERSION=1.22.0
+SEMCONV_VERSION=1.23.1
 
 # repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.22.0
+GENERATOR_VERSION=0.23.0
 
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
@@ -38,6 +38,19 @@ git fetch origin "$SPEC_VERSION"
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
+# SELINUX
+# https://docs.docker.com/storage/bind-mounts/#configure-the-selinux-label
+
+USE_MOUNT_OPTION=""
+
+if [ -x "$(command -v getenforce)" ]; then
+  SELINUXSTATUS=$(getenforce);
+  if [ "${SELINUXSTATUS}" == "Enforcing" ]; then
+    echo "Detected SELINUX"
+    USE_MOUNT_OPTION=":z"
+  fi;
+fi
+
 # echo "Help ..."
 
 # docker run --rm otel/semconvgen:$GENERATOR_VERSION -h
@@ -45,9 +58,9 @@ cd ${SCRIPT_DIR}
 echo "Generating semantic conventions for traces ..."
 
 docker run --rm \
-  -v ${SCRIPT_DIR}/tmp-semconv/model:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/api/include/opentelemetry/trace/:/output \
+  -v ${SCRIPT_DIR}/tmp-semconv/model:/source${USE_MOUNT_OPTION} \
+  -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
+  -v ${ROOT_DIR}/api/include/opentelemetry/trace/:/output${USE_MOUNT_OPTION} \
   otel/semconvgen:$GENERATOR_VERSION \
   --only span,event,attribute_group,scope \
   -f /source code \
@@ -62,9 +75,9 @@ docker run --rm \
 echo "Generating semantic conventions for resources ..."
 
 docker run --rm \
-  -v ${SCRIPT_DIR}/tmp-semconv/model:/source \
-  -v ${SCRIPT_DIR}/templates:/templates \
-  -v ${ROOT_DIR}/sdk/include/opentelemetry/sdk/resource/:/output \
+  -v ${SCRIPT_DIR}/tmp-semconv/model:/source${USE_MOUNT_OPTION} \
+  -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
+  -v ${ROOT_DIR}/sdk/include/opentelemetry/sdk/resource/:/output${USE_MOUNT_OPTION} \
   otel/semconvgen:$GENERATOR_VERSION \
   --only resource \
   -f /source code \

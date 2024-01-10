@@ -782,7 +782,7 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    timeout_steady = std::chrono::steady_clock::duration::max();
+    timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
@@ -951,9 +951,7 @@ OtlpHttpClient::createSession(
     request->AddHeader(header.first, header.second);
   }
   request->SetUri(http_uri_);
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
   request->SetSslOptions(options_.ssl_options);
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
   request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);

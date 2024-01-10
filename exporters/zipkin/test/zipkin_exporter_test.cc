@@ -60,7 +60,6 @@ public:
 class MockHttpClient : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Post,
               (const nostd::string_view &,
@@ -68,28 +67,13 @@ public:
                const ext::http::client::Body &,
                const ext::http::client::Headers &),
               (noexcept, override));
-#  else
-  MOCK_METHOD(ext::http::client::Result,
-              Post,
-              (const nostd::string_view &,
-               const ext::http::client::Body &,
-               const ext::http::client::Headers &),
-              (noexcept, override));
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
   MOCK_METHOD(ext::http::client::Result,
               Get,
               (const nostd::string_view &,
                const ext::http::client::HttpSslOptions &,
                const ext::http::client::Headers &),
               (noexcept, override));
-#  else
-  MOCK_METHOD(ext::http::client::Result,
-              Get,
-              (const nostd::string_view &, const ext::http::client::Headers &),
-              (noexcept, override));
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 };
 
 class IsValidMessageMatcher
@@ -169,11 +153,7 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 
   auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
 
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
   EXPECT_CALL(*mock_http_client, Post(expected_url, _, IsValidMessage(report_trace_id), _))
-#  else
-  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{
@@ -199,11 +179,7 @@ TEST_F(ZipkinExporterTestPeer, ShutdownTest)
   // exporter should not be shutdown by default
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
 
-#  ifdef ENABLE_HTTP_SSL_PREVIEW
   EXPECT_CALL(*mock_http_client, Post(_, _, _, _))
-#  else
-  EXPECT_CALL(*mock_http_client, Post(_, _, _))
-#  endif /* ENABLE_HTTP_SSL_PREVIEW */
 
       .Times(Exactly(1))
       .WillOnce(Return(ByMove(ext::http::client::Result{

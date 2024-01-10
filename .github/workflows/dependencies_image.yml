@@ -39,7 +39,7 @@ jobs:
         docker save -o /opt/otel-cpp-deps-debian.tar otel-cpp-deps
     -
       name: Upload Image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: otel-cpp-deps
         path: /opt/otel-cpp-deps-debian.tar

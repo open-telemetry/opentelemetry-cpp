@@ -110,8 +110,6 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -132,8 +130,6 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -155,8 +151,6 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   cmake ${CMAKE_OPTIONS[@]}  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -176,8 +170,6 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake ${CMAKE_OPTIONS[@]}  \
         -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_HTTP_SSL_PREVIEW=ON \
-        -DWITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -484,8 +476,7 @@ elif [[ "$1" == "bazel.asan" ]]; then
 elif [[ "$1" == "bazel.tsan" ]]; then
 # TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
 # https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-# zpages test failing with tsan. Ignoring the tests for now, as zpages will be removed soon.
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...  -//ext/test/zpages/...
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...

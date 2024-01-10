@@ -212,9 +212,6 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
-option(WITH_ZPAGES
-       "DEPRECATED - Whether to include the Zpages Server in the SDK" OFF)
-
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
@@ -281,24 +278,9 @@ endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
-# STABLE
-option(WITH_OTLP_HTTP_SSL_PREVIEW "Whether to enable otlp http ssl export" ON)
-
-# STABLE
-option(WITH_OTLP_HTTP_SSL_TLS_PREVIEW
-       "Whether to enable otlp http ssl tls min/max/cipher options" ON)
-
 # Exemplar specs status is experimental, so behind feature flag by default
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
-
-if(WITH_ZPAGES)
-  if(WITH_NO_DEPRECATED_CODE)
-    message(FATAL_ERROR "WITH_ZPAGES is DEPRECATED.")
-  else()
-    message(WARNING "WITH_ZPAGES is DEPRECATED.")
-  endif()
-endif()
 
 #
 # Verify options dependencies
@@ -306,13 +288,6 @@ endif()
 
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
-endif()
-
-if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW AND NOT WITH_OTLP_HTTP_SSL_PREVIEW)
-  message(
-    FATAL_ERROR
-      "WITH_OTLP_HTTP_SSL_TLS_PREVIEW=ON requires WITH_OTLP_HTTP_SSL_PREVIEW=ON"
-  )
 endif()
 
 find_package(Threads)
@@ -482,7 +457,6 @@ endif()
 if(WITH_ELASTICSEARCH
    OR WITH_ZIPKIN
    OR WITH_OTLP_HTTP
-   OR WITH_ZPAGES
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_ETW)
   set(USE_NLOHMANN_JSON ON)
@@ -592,12 +566,10 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
     if(TARGET gtest)
-      set(GTEST_BOTH_LIBRARIES gtest gtest_main gmock)
+      set(GTEST_BOTH_LIBRARIES gtest gtest_main)
     else()
-      set(GTEST_BOTH_LIBRARIES
-          ${CMAKE_BINARY_DIR}/lib/libgtest.a
-          ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
-          ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+      set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a
+                               ${CMAKE_BINARY_DIR}/lib/libgtest_main.a)
     endif()
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
@@ -614,7 +586,7 @@ if(BUILD_TESTING)
   if(NOT GTEST_BOTH_LIBRARIES)
     # New GTest package names
     if(TARGET GTest::gtest)
-      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+      set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main)
     elseif(TARGET GTest::GTest)
       set(GTEST_BOTH_LIBRARIES GTest::GTest GTest::Main)
     endif()

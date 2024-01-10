@@ -26,7 +26,6 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
       http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-#ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
                                                             options.ssl_insecure_skip_verify,
                                                             options.ssl_ca_cert_path,
                                                             options.ssl_ca_cert_string,
@@ -34,13 +33,10 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.ssl_client_key_string,
                                                             options.ssl_client_cert_path,
                                                             options.ssl_client_cert_string,
-#endif /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
                                                             options.ssl_min_tls,
                                                             options.ssl_max_tls,
                                                             options.ssl_cipher,
                                                             options.ssl_cipher_suite,
-#endif /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
                                                             options.content_type,
                                                             options.json_bytes_mapping,
                                                             options.use_json_name,
