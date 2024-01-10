@@ -239,11 +239,15 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 #endif
 }  // namespace
 
+OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-OtlpGrpcClient::OtlpGrpcClient() : is_shutdown_(false) {}
+    : is_shutdown_(false)
+#endif
+{}
 
 OtlpGrpcClient::~OtlpGrpcClient()
 {
+#ifdef ENABLE_ASYNC_EXPORT
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data;
   async_data.swap(async_data_);
 
@@ -251,11 +255,12 @@ OtlpGrpcClient::~OtlpGrpcClient()
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
     async_data->session_waker.wait_for(lock, async_data->export_timeout, [async_data]() {
-      return async_data->running_requests.load(std::memory_order_acquire) == 0;
+      return async_data->running_requests.load(std::memory_order_acquire) <=
+             async_data->max_concurrent_requests;
     });
   }
-}
 #endif
+}
 
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
