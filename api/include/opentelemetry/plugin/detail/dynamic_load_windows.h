@@ -26,11 +26,11 @@ inline void GetLastErrorMessage(std::string &error_message) noexcept
 {
   auto error_code = ::GetLastError();
   // See https://stackoverflow.com/a/455533/4447365
-  LPTSTR error_text = nullptr;
-  auto size         = ::FormatMessage(
+  LPSTR error_text = nullptr;
+  auto size         = ::FormatMessageA(
       FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
       nullptr, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      reinterpret_cast<LPTSTR>(&error_text), 0, nullptr);
+      reinterpret_cast<LPSTR>(&error_text), 0, nullptr);
   if (size == 0)
   {
     return;
@@ -53,7 +53,7 @@ private:
 
 inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &error_message) noexcept
 {
-  auto handle = ::LoadLibrary(plugin);
+  auto handle = ::LoadLibraryA(plugin);
   if (handle == nullptr)
   {
     detail::GetLastErrorMessage(error_message);
