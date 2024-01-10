@@ -21,13 +21,6 @@ if(OPENTELEMETRY_INSTALL)
     DIRECTORY include/opentelemetry
     DESTINATION include
     FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "metrics" EXCLUDE)
-
-  install(
-    DIRECTORY include/opentelemetry
-    DESTINATION include
-    FILES_MATCHING
     PATTERN "*.h")
 
   unset(TARGET_DEPS)
