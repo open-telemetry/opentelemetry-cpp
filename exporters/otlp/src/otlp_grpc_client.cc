@@ -225,7 +225,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
                  async_data->session_waker.notify_all();
                });
 
-  // Can not cancle when start the request
+  // Can not cancel when start the request
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
     async_data->session_waker.wait_for(lock, async_data->export_timeout, [async_data]() {
@@ -239,18 +239,11 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 #endif
 }  // namespace
 
-OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
-    : is_shutdown_
-{
-  false
-}
-#endif
-{}
+OtlpGrpcClient::OtlpGrpcClient() : is_shutdown_(false) {}
 
 OtlpGrpcClient::~OtlpGrpcClient()
 {
-#ifdef ENABLE_ASYNC_EXPORT
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data;
   async_data.swap(async_data_);
 
@@ -258,12 +251,11 @@ OtlpGrpcClient::~OtlpGrpcClient()
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
     async_data->session_waker.wait_for(lock, async_data->export_timeout, [async_data]() {
-      return async_data->running_requests.load(std::memory_order_acquire) <=
-             async_data->max_concurrent_requests;
+      return async_data->running_requests.load(std::memory_order_acquire) == 0;
     });
   }
-#endif
 }
+#endif
 
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
@@ -338,11 +330,6 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
   }
 
   return context;
-}
-
-std::unique_ptr<grpc::CompletionQueue> OtlpGrpcClient::MakeCompletionQueue()
-{
-  return std::unique_ptr<grpc::CompletionQueue>(new grpc::CompletionQueue());
 }
 
 std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>

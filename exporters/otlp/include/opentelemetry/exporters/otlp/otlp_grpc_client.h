@@ -39,9 +39,11 @@ struct OtlpGrpcClientAsyncData;
 class OtlpGrpcClient
 {
 public:
+#ifdef ENABLE_ASYNC_EXPORT
   OtlpGrpcClient();
 
   ~OtlpGrpcClient();
+#endif
 
   /**
    * Create gRPC channel from the exporter options.
@@ -53,11 +55,6 @@ public:
    */
   static std::unique_ptr<grpc::ClientContext> MakeClientContext(
       const OtlpGrpcClientOptions &options);
-
-  /**
-   * Create gRPC CompletionQueue to async call RPC.
-   */
-  static std::unique_ptr<grpc::CompletionQueue> MakeCompletionQueue();
 
   /**
    * Create trace service stub to communicate with the OpenTelemetry Collector.
