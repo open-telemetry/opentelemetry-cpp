@@ -275,10 +275,7 @@ public:
     name_ = std::string(name.data(), name.length());
   }
 
-  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override
-  {
-    flags_ = flags;
-  }
+  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override { flags_ = flags; }
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
   {

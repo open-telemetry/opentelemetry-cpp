@@ -19,7 +19,7 @@ class TraceFlags final
 {
 public:
   static constexpr uint8_t kIsSampled = 1;
-  static constexpr uint8_t kIsRandom = 2;
+  static constexpr uint8_t kIsRandom  = 2;
 
   TraceFlags() noexcept : rep_{0} {}
 
