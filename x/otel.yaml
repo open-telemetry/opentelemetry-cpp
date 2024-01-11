@@ -3,12 +3,12 @@ receivers:
     protocols:
       grpc:
       http:
-  prometheus/collector:
-    config:
-      scrape_configs:
-        - job_name: 'opentelemetry-collector'
-          static_configs:
-            - targets: ['localhost:8888']
+  # prometheus/collector:
+  #   config:
+  #     scrape_configs:
+  #       - job_name: 'opentelemetry-collector'
+  #         static_configs:
+  #           - targets: ['localhost:8888']
 
 # service:
 #   # https://opentelemetry.io/docs/collector/configuration/#telemetry
@@ -62,7 +62,8 @@ service:
       processors: [batch]
       exporters: [otlphttp,logging/traces]
     metrics:
-      receivers: [otlp,prometheus/collector]
+      receivers: [otlp]
+      #,prometheus/collector]
       processors: [batch]
       exporters: [prometheusremotewrite,logging/metrics]
     logs:

@@ -19,10 +19,10 @@ namespace metrics
  */
 PrometheusCollector::PrometheusCollector(sdk::metrics::MetricReader *reader,
                                          bool populate_target_info,
-                                         bool populate_otel_scope)
+                                         bool without_otel_scope)
     : reader_(reader),
       populate_target_info_(populate_target_info),
-      populate_otel_scope_(populate_otel_scope)
+      without_otel_scope_(without_otel_scope)
 {}
 
 /**
@@ -45,7 +45,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
 
   reader_->Collect([&result, this](sdk::metrics::ResourceMetrics &metric_data) {
     auto prometheus_metric_data = PrometheusExporterUtils::TranslateToPrometheus(
-        metric_data, this->populate_target_info_, this->populate_otel_scope_);
+        metric_data, this->populate_target_info_, this->without_otel_scope_);
     for (auto &data : prometheus_metric_data)
       result.emplace_back(data);
     return true;

@@ -33,7 +33,7 @@ public:
    */
   explicit PrometheusCollector(sdk::metrics::MetricReader *reader,
                                bool populate_target_info,
-                               bool populate_otel_scope);
+                               bool without_otel_scope);
 
   /**
    * Collects all metrics data from metricsToCollect collection.
@@ -45,7 +45,7 @@ public:
 private:
   sdk::metrics::MetricReader *reader_;
   bool populate_target_info_;
-  bool populate_otel_scope_;
+  bool without_otel_scope_;
 
   /*
    * Lock when operating the metricsToCollect collection

@@ -276,7 +276,7 @@ static std::map<std::string, std::string> get_random_attr()
 	return { labels[rand() % ( labels.size() - 1 )], labels[rand() % ( labels.size() - 1 )] };
 }
 
-static void counter_example( const std::string &name, const opentelemetry::trace::SpanContext &spanContext )
+static void counter_example( const std::string &name, double startValue, const opentelemetry::trace::SpanContext &spanContext )
 {
 	get_logger()->Info( "counter_example" );
 	opentelemetry::trace::StartSpanOptions options;
@@ -285,16 +285,17 @@ static void counter_example( const std::string &name, const opentelemetry::trace
 
 	const auto provider{ opentelemetry::metrics::Provider::GetMeterProvider() };
 	const auto meter{ provider->GetMeter( name ) };
-
 	const auto double_counter{ meter->CreateDoubleCounter( name + "_counter" ) };
+	const auto double_updown_counter{ meter->CreateDoubleUpDownCounter( name + "_updown_counter" ) };
+
+	double_counter->Add( startValue );
+	double_updown_counter->Add( startValue + 500.0 );
 
 	for ( auto i = 0; i < 1000; ++i )
 	{
-		const double val{ rand() % 7 + 1.1 };
-
-		double_counter->Add( val );
-
-		std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
+		double_counter->Add( 1.0 );
+		double_updown_counter->Add( 1.0 );
+		std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
 	}
 }
 
@@ -530,17 +531,23 @@ void demo()
 	get_logger()->Info( "Spawning threads" );
 
 	auto context = span->GetContext();
-	std::thread counter_example_thread( counter_example, metric_prefix_name, context );
-	std::thread observable_counter_example_thread( observable_counter_example, metric_prefix_name, context );
-	std::thread histogram_example_thread( histogram_example, metric_prefix_name, context );
+	std::thread counter_example_thread1( counter_example, metric_prefix_name + "_0", 100.0, context );
+	std::thread counter_example_thread2( counter_example, metric_prefix_name + "_1", 200.0, context );
+	std::thread counter_example_thread3( counter_example, metric_prefix_name + "_1", 200.0, context );
+	std::thread counter_example_thread4( counter_example, metric_prefix_name + "_1", 300.0, context );
+	//std::thread observable_counter_example_thread( observable_counter_example, metric_prefix_name, context );
+	//std::thread histogram_example_thread( histogram_example, metric_prefix_name, context );
 
 	get_logger()->Info( "Joining threads" );
 
-	ui_main();
+	//ui_main();
 
-	counter_example_thread.join();
-	observable_counter_example_thread.join();
-	histogram_example_thread.join();
+	counter_example_thread1.join();
+	counter_example_thread2.join();
+	counter_example_thread3.join();
+	counter_example_thread4.join();
+	//observable_counter_example_thread.join();
+	//histogram_example_thread.join();
 
 	get_logger()->Info( "Joined all threads" );
 }
