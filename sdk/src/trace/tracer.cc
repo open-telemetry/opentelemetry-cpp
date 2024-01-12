@@ -52,26 +52,36 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     }
   }
 
+  IdGenerator &generator = GetIdGenerator();
   opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::SpanId span_id = GetIdGenerator().GenerateSpanId();
+  opentelemetry::trace::SpanId span_id = generator.GenerateSpanId();
   bool is_parent_span_valid            = false;
+  uint8_t flags                        = 0;
 
   if (parent_context.IsValid())
   {
     trace_id             = parent_context.trace_id();
+    flags                = parent_context.trace_flags().flags();
     is_parent_span_valid = true;
   }
   else
   {
-    trace_id = GetIdGenerator().GenerateTraceId();
+    trace_id = generator.GenerateTraceId();
+    if (generator.IsRandom())
+    {
+      flags = opentelemetry::trace::TraceFlags::kIsRandom;
+    }
   }
 
+  /* TODO: investigate if ShouldSample needs to know if trace_id is kIsRandom ? */
   auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
-  auto trace_flags =
-      sampling_result.IsSampled()
-          ? opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}
-          : opentelemetry::trace::TraceFlags{};
+  if (sampling_result.IsSampled())
+  {
+    flags |= opentelemetry::trace::TraceFlags::kIsSampled;
+  }
+
+  opentelemetry::trace::TraceFlags trace_flags(flags);
 
   auto span_context =
       std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(

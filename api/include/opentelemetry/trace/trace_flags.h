@@ -18,8 +18,10 @@ namespace trace
 class TraceFlags final
 {
 public:
+  /** See https://www.w3.org/TR/trace-context-1/#trace-flags */
   static constexpr uint8_t kIsSampled = 1;
-  static constexpr uint8_t kIsRandom  = 2;
+  /** See https://www.w3.org/TR/trace-context-2/#trace-flags */
+  static constexpr uint8_t kIsRandom = 2;
 
   TraceFlags() noexcept : rep_{0} {}
 
