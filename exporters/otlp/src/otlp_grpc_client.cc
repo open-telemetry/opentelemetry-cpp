@@ -255,8 +255,7 @@ OtlpGrpcClient::~OtlpGrpcClient()
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
     async_data->session_waker.wait_for(lock, async_data->export_timeout, [async_data]() {
-      return async_data->running_requests.load(std::memory_order_acquire) <=
-             async_data->max_concurrent_requests;
+      return async_data->running_requests.load(std::memory_order_acquire) == 0;
     });
   }
 #endif
