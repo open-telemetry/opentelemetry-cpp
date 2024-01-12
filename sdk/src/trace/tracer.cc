@@ -73,13 +73,24 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     }
   }
 
-  /* TODO: investigate if ShouldSample needs to know if trace_id is kIsRandom ? */
   auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
   if (sampling_result.IsSampled())
   {
     flags |= opentelemetry::trace::TraceFlags::kIsSampled;
   }
+
+#if 1
+  /* https://github.com/open-telemetry/opentelemetry-specification as of v1.29.0 */
+  /* Support W3C Trace Context version 1. */
+  flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags;
+#endif
+
+#if 0
+  /* Waiting for https://github.com/open-telemetry/opentelemetry-specification/issues/3411 */
+  /* Support W3C Trace Context version 2. */
+  flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags;
+#endif
 
   opentelemetry::trace::TraceFlags trace_flags(flags);
 
