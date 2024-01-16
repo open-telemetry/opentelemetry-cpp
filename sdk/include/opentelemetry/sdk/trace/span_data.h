@@ -136,6 +136,10 @@ public:
    */
   opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
 
+  /**
+   * Get the trace flags for this span
+   * @return the trace flags for this span
+   */
   opentelemetry::trace::TraceFlags GetFlags() const noexcept { return flags_; }
 
   /**
