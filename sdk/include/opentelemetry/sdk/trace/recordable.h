@@ -136,6 +136,12 @@ public:
   virtual void SetName(nostd::string_view name) noexcept = 0;
 
   /**
+   * Set the trace flags of the span.
+   * @param flags the flags to set
+   */
+  virtual void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept = 0;
+
+  /**
    * Set the spankind of the span.
    * @param span_kind the spankind to set
    */
