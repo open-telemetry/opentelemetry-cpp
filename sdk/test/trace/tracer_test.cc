@@ -71,6 +71,9 @@ public:
  */
 class MockIdGenerator : public IdGenerator
 {
+public:
+  MockIdGenerator() : IdGenerator(false) {}
+
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override
   {
     return opentelemetry::trace::SpanId(buf_span);

@@ -39,6 +39,8 @@ public:
 
   void SetName(nostd::string_view name) noexcept override;
 
+  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override;
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
