@@ -6,6 +6,13 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/detail/preprocessor.h"
 
+#if defined(OPENTELEMETRY_STL_VERSION)
+#  if OPENTELEMETRY_STL_VERSION > (__cplusplus/100)
+#    pragma message OPENTELEMETRY_STRINGIFY(OPENTELEMETRY_STL_VERSION) " vs. " OPENTELEMETRY_STRINGIFY(__cplusplus)
+#    error "OPENTELEMETRY_STL_VERSION set to version newer than compilation version."
+#  endif
+#endif
+
 #ifndef OPENTELEMETRY_ABI_VERSION_NO
 #  define OPENTELEMETRY_ABI_VERSION_NO 1
 #endif
