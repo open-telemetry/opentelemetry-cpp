@@ -213,6 +213,12 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
+void Recordable::SetTraceFlags(opentelemetry::trace::TraceFlags /* flags */) noexcept
+{
+  // TODO: Currently not supported by specs:
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk_exporters/zipkin.md
+}
+
 void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
