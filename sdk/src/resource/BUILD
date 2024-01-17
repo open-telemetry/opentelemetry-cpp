@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "resource",
     srcs = glob(["**/*.cc"]),
-    hdrs = glob(["**/*.h"]),
+    hdrs = glob(["**/*.h"], allow_empty = True ),
     include_prefix = "src/resource",
     deps = [
         "//api",

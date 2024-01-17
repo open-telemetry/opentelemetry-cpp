@@ -32,12 +32,6 @@ build:windows --copt="-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS"
 # Use this define, instead of disabling 4996 - /wd4996
 build:windows --copt="-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 
-# fix ftxui later
-build:windows --copt="-DUNICODE"
-build:windows --copt="-D_UNICODE"
-
-# --copt="/wd4996"
-
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
 common:asan --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
@@ -81,3 +75,15 @@ mod --charset=ascii
 
 common --nobuild_runfile_links
 startup --windows_enable_symlinks
+
+# Ideally all of these should get uncommented for further bazel migrations
+# This list was taken from here https://github.com/bazelbuild/bazel/releases/tag/7.0.0
+common --incompatible_auto_exec_groups
+common --incompatible_disable_non_executable_java_binary
+# common --incompatible_disallow_struct_provider_syntax
+common --incompatible_disable_target_provider_fields
+common --incompatible_struct_has_no_methods
+# common --incompatible_stop_exporting_language_modules
+# common --incompatible_disallow_empty_glob
+# common --incompatible_disable_starlark_host_transitions
+common --incompatible_config_setting_private_default_visibility
