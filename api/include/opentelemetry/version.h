@@ -7,9 +7,10 @@
 #include "opentelemetry/detail/preprocessor.h"
 
 #if defined(OPENTELEMETRY_STL_VERSION)
-#  if OPENTELEMETRY_STL_VERSION > (__cplusplus/100)
+#  if (!defined(_MSVC_LANG) && OPENTELEMETRY_STL_VERSION > (__cplusplus/100)) || \
+      (defined(_MSVC_LANG) && OPENTELEMETRY_STL_VERSION > (_MSVC_LANG/100))
 #    pragma message OPENTELEMETRY_STRINGIFY(OPENTELEMETRY_STL_VERSION) " vs. " OPENTELEMETRY_STRINGIFY(__cplusplus)
-#    error "OPENTELEMETRY_STL_VERSION set to version newer than compilation version."
+#    error "OPENTELEMETRY_STL_VERSION is set to a version newer than the curent C++ version."
 #  endif
 #endif
 
