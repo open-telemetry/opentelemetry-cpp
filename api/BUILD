@@ -21,8 +21,8 @@ CPP_STDLIBS = [
 
 string_flag(
     name = "with_cxx_stdlib",
-    values = CPP_STDLIBS,
     build_setting_default = "best",
+    values = CPP_STDLIBS,
 )
 
 cc_library(
@@ -33,11 +33,11 @@ cc_library(
         "//conditions:default": [],
     }) + select({
         ":set_cxx_stdlib_none": [],
-
+        ### automatic selection
         ":set_cxx_stdlib_best": ["OPENTELEMETRY_STL_VERSION=(__cplusplus/100)"],
         # See https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus
         ":set_cxx_stdlib_best_and_msvc": ["OPENTELEMETRY_STL_VERSION=(_MSVC_LANG/100)"],
-
+        ### manual selection
         ":set_cxx_stdlib_2014": ["OPENTELEMETRY_STL_VERSION=2014"],
         ":set_cxx_stdlib_2017": ["OPENTELEMETRY_STL_VERSION=2017"],
         ":set_cxx_stdlib_2020": ["OPENTELEMETRY_STL_VERSION=2020"],
@@ -68,6 +68,6 @@ config_setting(
 
 config_setting(
     name = "set_cxx_stdlib_best_and_msvc",
-    flag_values = {":with_cxx_stdlib": "best"},
     constraint_values = ["@bazel_tools//tools/cpp:msvc"],
+    flag_values = {":with_cxx_stdlib": "best"},
 )
