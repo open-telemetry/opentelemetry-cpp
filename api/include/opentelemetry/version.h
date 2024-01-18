@@ -14,8 +14,7 @@
           OPENTELEMETRY_STL_VERSION) " vs. " OPENTELEMETRY_STRINGIFY(_MSVC_LANG)
 #    else
 #      pragma message OPENTELEMETRY_STRINGIFY( \
-          OPENTELEMETRY_STL_VERSION) " vs. " OPENTELEMETRY_STRINGIFY( \
-          __cplusplus)
+          OPENTELEMETRY_STL_VERSION) " vs. " OPENTELEMETRY_STRINGIFY(__cplusplus)
 #    endif
 #    error "OPENTELEMETRY_STL_VERSION is set to a version newer than the curent C++ version."
 #  endif
