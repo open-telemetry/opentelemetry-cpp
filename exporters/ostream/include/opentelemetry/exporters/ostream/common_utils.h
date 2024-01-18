@@ -58,7 +58,8 @@ void print_value(const nostd::span<T> &vec, std::ostream &sout)
 }
 
 // Prior to C++14, generic lambda is not available so fallback to functor.
-#if __cplusplus < 201402L
+#if (!defined(_MSVC_LANG) && (__cplusplus < 201402L)) || \
+    (defined(_MSVC_LANG) && (_MSVC_LANG < 201402L))
 
 class OwnedAttributeValueVisitor
 {
@@ -97,7 +98,8 @@ private:
 inline void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &value,
                         std::ostream &sout)
 {
-#if __cplusplus < 201402L
+#if (!defined(_MSVC_LANG) && (__cplusplus < 201402L)) || \
+    (defined(_MSVC_LANG) && (_MSVC_LANG < 201402L))
   opentelemetry::nostd::visit(OwnedAttributeValueVisitor(sout), value);
 #else
   opentelemetry::nostd::visit(
@@ -111,7 +113,8 @@ inline void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &v
 
 inline void print_value(const opentelemetry::common::AttributeValue &value, std::ostream &sout)
 {
-#if __cplusplus < 201402L
+#if (!defined(_MSVC_LANG) && (__cplusplus < 201402L)) || \
+    (defined(_MSVC_LANG) && (_MSVC_LANG < 201402L))
   opentelemetry::nostd::visit(AttributeValueVisitor(sout), value);
 #else
   opentelemetry::nostd::visit(
