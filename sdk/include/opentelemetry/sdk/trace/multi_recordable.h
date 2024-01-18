@@ -112,6 +112,14 @@ public:
     }
   }
 
+  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override
+  {
+    for (auto &recordable : recordables_)
+    {
+      recordable.second->SetTraceFlags(flags);
+    }
+  }
+
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
   {
     for (auto &recordable : recordables_)

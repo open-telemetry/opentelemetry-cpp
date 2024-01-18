@@ -140,6 +140,13 @@ void OtlpRecordable::SetName(nostd::string_view name) noexcept
   span_.set_name(name.data(), name.size());
 }
 
+void OtlpRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept
+{
+  uint32_t all_flags = flags.flags() & opentelemetry::proto::trace::v1::SPAN_FLAGS_TRACE_FLAGS_MASK;
+
+  span_.set_flags(all_flags);
+}
+
 void OtlpRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 {
   proto::trace::v1::Span_SpanKind proto_span_kind =
