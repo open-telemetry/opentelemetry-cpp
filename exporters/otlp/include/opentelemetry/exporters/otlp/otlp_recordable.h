@@ -53,6 +53,8 @@ public:
 
   void SetName(nostd::string_view name) noexcept override;
 
+  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override;
+
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 
   void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
