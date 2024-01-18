@@ -25,6 +25,8 @@ Increment the:
   [#2450](https://github.com/open-telemetry/opentelemetry-cpp/pull/2450)
 * [EXPORTER] Set `is_monotonic` flag for Observable Counters
   [#2478](https://github.com/open-telemetry/opentelemetry-cpp/pull/2478)
+* [PROTO] Upgrade to opentelemetry-proto v1.1.0
+  [#2488](https://github.com/open-telemetry/opentelemetry-cpp/pull/2488)
 
 Important changes:
 
