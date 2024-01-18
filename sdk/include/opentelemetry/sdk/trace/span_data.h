@@ -137,6 +137,12 @@ public:
   opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
 
   /**
+   * Get the trace flags for this span
+   * @return the trace flags for this span
+   */
+  opentelemetry::trace::TraceFlags GetFlags() const noexcept { return flags_; }
+
+  /**
    * Get the kind of this span
    * @return the kind of this span
    */
@@ -273,6 +279,8 @@ public:
     name_ = std::string(name.data(), name.length());
   }
 
+  void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept override { flags_ = flags; }
+
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
   {
     span_kind_ = span_kind;
@@ -306,6 +314,7 @@ private:
   opentelemetry::sdk::common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
+  opentelemetry::trace::TraceFlags flags_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   const opentelemetry::sdk::resource::Resource *resource_;
   const InstrumentationScope *instrumentation_scope_;
