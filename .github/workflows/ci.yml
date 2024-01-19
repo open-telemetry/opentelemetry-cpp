@@ -358,6 +358,59 @@ jobs:
         CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.stl.test
 
+  cmake_test_cxx23_gcc:
+    name: CMake C++23 test(GCC)
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.test
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.stl.test
+
+  cmake_test_cxx23_clang:
+    name: CMake C++23 test(Clang with libc++)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.test
+    - name: run tests (enable stl)
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.stl.test
+
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
     runs-on: ubuntu-20.04
