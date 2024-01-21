@@ -90,6 +90,44 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.dll.cxx20.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      -DCMAKE_CXX_STANDARD=20 `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      -DOPENTELEMETRY_BUILD_DLL=1 `
+     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    $env:PATH = "$BUILD_DIR\ext\src\dll\Debug;$env:PATH"
+    examples\simple\Debug\example_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    examples\metrics_simple\Debug\metrics_ostream_example.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    examples\logs_simple\Debug\example_logs_simple.exe
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.maintainer.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
