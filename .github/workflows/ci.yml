@@ -360,7 +360,7 @@ jobs:
 
   cmake_test_cxx23_gcc:
     name: CMake C++23 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
