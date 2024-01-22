@@ -50,19 +50,20 @@ if(WITH_OTLP_HTTP)
                         PRIVATE opentelemetry_exporter_otlp_http_log)
 endif()
 
-find_program(_vswhere_tool 
-NAMES vswhere 
-PATHS "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/Installer")
-if (NOT ${vswhere})
-message(FATAL_ERROR "Could not locate vswhere.exe - unable to locate dumpbin.exe")
+find_program(
+  _vswhere_tool
+  NAMES vswhere
+  PATHS "$ENV{ProgramFiles\(x86\)}/Microsoft Visual Studio/Installer")
+if(NOT ${vswhere})
+  message(
+    FATAL_ERROR "Could not locate vswhere.exe - unable to locate dumpbin.exe")
 endif()
 
 execute_process(
   COMMAND "${_vswhere_tool}" -latest -find **/dumpbin.exe
   OUTPUT_VARIABLE DUMPBIN_PATHS
   RESULT_VARIABLE _vs_where_exitcode
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "DUMPBIN PATHS: ${DUMPBIN_PATHS} ${RESULT_VARIABLE}")
 
@@ -72,14 +73,12 @@ list(POP_FRONT DUMPBIN_PATHS_LIST DUMPBIN_PATH)
 
 message(STATUS "DUMPBIN PATH: ${DUMPBIN_PATH}")
 
-# find Powershell executable
-#find_program(DUMPBIN_PATH NAMES dumpbin REQUIRED)
+# find Powershell executable find_program(DUMPBIN_PATH NAMES dumpbin REQUIRED)
 
 # find Powershell executable
 find_program(POWERSHELL_PATH NAMES pwsh powershell REQUIRED)
 
-set(OPENTELEMETRY_INPUT_DEF
-    "${CMAKE_CURRENT_SOURCE_DIR}/input.txt")
+set(OPENTELEMETRY_INPUT_DEF "${CMAKE_CURRENT_SOURCE_DIR}/input.txt")
 
 add_custom_command(
   OUTPUT ${OPENTELEMETRY_INPUT_DEF}
@@ -87,27 +86,18 @@ add_custom_command(
   COMMAND
     ${CMAKE_CXX_COMPILER}
     "-D$<JOIN:$<TARGET_PROPERTY:opentelemetry_cpp,COMPILE_DEFINITIONS>,;-D>" /EP
-    ${CMAKE_CURRENT_SOURCE_DIR}/input.src >
-    ${OPENTELEMETRY_INPUT_DEF}
+    ${CMAKE_CURRENT_SOURCE_DIR}/input.src > ${OPENTELEMETRY_INPUT_DEF}
   VERBATIM COMMAND_EXPAND_LISTS)
 
 add_custom_command(
   OUTPUT ${OPENTELEMETRY_EXPORT_DEF}
-  DEPENDS "${OPENTELEMETRY_INPUT_DEF}" "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1"
+  DEPENDS "${OPENTELEMETRY_INPUT_DEF}"
+          "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1"
   COMMAND
-    ${POWERSHELL_PATH}
-    "-ExecutionPolicy" 
-    "Bypass"
-    "-File"
-    "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1"
-    "-dumpbin"
-    "${DUMPBIN_PATH}"
-    "-bindir"
-    ${PROJECT_BINARY_DIR}
-    "-inputfile"
-    ${OPENTELEMETRY_INPUT_DEF}
-    "-targetfile"
-    ${OPENTELEMETRY_EXPORT_DEF}
+    ${POWERSHELL_PATH} "-ExecutionPolicy" "Bypass" "-File"
+    "${CMAKE_CURRENT_SOURCE_DIR}/make_def.ps1" "-dumpbin" "${DUMPBIN_PATH}"
+    "-bindir" ${PROJECT_BINARY_DIR} "-inputfile" ${OPENTELEMETRY_INPUT_DEF}
+    "-targetfile" ${OPENTELEMETRY_EXPORT_DEF}
   VERBATIM)
 
 if(OPENTELEMETRY_INSTALL)
