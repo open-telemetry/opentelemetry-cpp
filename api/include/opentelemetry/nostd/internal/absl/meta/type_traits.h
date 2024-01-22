@@ -296,8 +296,12 @@ struct is_function
 // https://gcc.gnu.org/onlinedocs/gcc/Type-Traits.html#Type-Traits.
 template <typename T>
 struct is_trivially_destructible
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+    : std::is_trivially_destructible<T> {
+#else
     : std::integral_constant<bool, __has_trivial_destructor(T) &&
                                    std::is_destructible<T>::value> {
+#endif
 #ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
  private:
   static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
@@ -345,9 +349,13 @@ struct is_trivially_destructible
 // Nontrivially destructible types will cause the expression to be nontrivial.
 template <typename T>
 struct is_trivially_default_constructible
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+    : std::is_trivially_default_constructible<T> {
+#else
     : std::integral_constant<bool, __has_trivial_constructor(T) &&
                                    std::is_default_constructible<T>::value &&
                                    is_trivially_destructible<T>::value> {
+#endif
 #if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
         OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
@@ -379,10 +387,14 @@ struct is_trivially_default_constructible
 // expression to be nontrivial.
 template <typename T>
 struct is_trivially_move_constructible
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+    : std::is_trivially_move_constructible<T> {
+#else
     : std::conditional<
           std::is_object<T>::value && !std::is_array<T>::value,
           type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
           std::is_reference<T>>::type::type {
+#endif
 #if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
         OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
