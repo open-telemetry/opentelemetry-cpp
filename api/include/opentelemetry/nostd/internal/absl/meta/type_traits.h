@@ -500,9 +500,13 @@ struct is_trivially_move_assignable
 // `is_trivially_assignable<T&, const T&>`.
 template <typename T>
 struct is_trivially_copy_assignable
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+    : std::is_trivially_copy_assignable<T> {
+#else
     : std::integral_constant<
           bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
                     absl::is_copy_assignable<T>::value> {
+#endif
 #ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
@@ -533,6 +537,11 @@ namespace type_traits_internal {
 // destructible. Arrays of trivially copyable types are trivially copyable.
 //
 // We expose this metafunction only for internal use within absl.
+
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_COPYABLE)
+template <typename T>
+struct is_trivially_copyable : std::is_trivially_copyable<T> {};
+#else
 template <typename T>
 class is_trivially_copyable_impl {
   using ExtentsRemoved = typename std::remove_all_extents<T>::type;
@@ -558,6 +567,7 @@ template <typename T>
 struct is_trivially_copyable
     : std::integral_constant<
           bool, type_traits_internal::is_trivially_copyable_impl<T>::kValue> {};
+#endif
 }  // namespace type_traits_internal
 
 // -----------------------------------------------------------------------------
