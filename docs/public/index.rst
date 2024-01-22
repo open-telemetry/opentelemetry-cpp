@@ -28,6 +28,7 @@ OpenTelemetry C++
    otel_docs/namespace_opentelemetry__common
    otel_docs/namespace_opentelemetry__context
    otel_docs/namespace_opentelemetry__metrics
+   otel_docs/namespace_opentelemetry__logs
 
 .. toctree::
    :maxdepth: 1
@@ -37,7 +38,7 @@ OpenTelemetry C++
    otel_docs/namespace_opentelemetry__sdk__instrumentationlibrary
    otel_docs/namespace_opentelemetry__sdk__resource
    otel_docs/namespace_opentelemetry__sdk__metrics
-
+   otel_docs/namespace_opentelemetry__sdk__logs
 
 .. toctree::
     :maxdepth: 1

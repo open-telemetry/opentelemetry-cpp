@@ -35,8 +35,8 @@ class function_ref<R(Args...)>
   void BindTo(F &f) noexcept
   {
     callable_ = static_cast<void *>(std::addressof(f));
-    invoker_  = [](void *callable_, Args... args) -> R {
-      return (*static_cast<FunctionPointer<F>>(callable_))(std::forward<Args>(args)...);
+    invoker_  = [](void *callable, Args... args) -> R {
+      return (*static_cast<FunctionPointer<F>>(callable))(std::forward<Args>(args)...);
     };
   }
 
@@ -49,8 +49,8 @@ class function_ref<R(Args...)>
       return BindTo(nullptr);
     }
     callable_ = reinterpret_cast<void *>(f);
-    invoker_  = [](void *callable_, Args... args) -> R {
-      return (F(callable_))(std::forward<Args>(args)...);
+    invoker_  = [](void *callable, Args... args) -> R {
+      return (F(callable))(std::forward<Args>(args)...);
     };
   }
 
