@@ -172,6 +172,7 @@ static_assert(OTABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
 #error OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE cannot be directly set
 #elif defined(_LIBCPP_VERSION) ||                                        \
+    (defined(__clang__) && __clang_major__ >= 15) ||                     \
     (!defined(__clang__) && defined(__GNUC__) && defined(__GLIBCXX__) && \
      (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))) ||        \
     defined(_MSC_VER)
@@ -194,6 +195,7 @@ static_assert(OTABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #elif defined(OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE)
 #error OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE cannot directly set
 #elif (defined(__clang__) && defined(_LIBCPP_VERSION)) ||        \
+    (defined(__clang__) && __clang_major__ >= 15) ||             \
     (!defined(__clang__) && defined(__GNUC__) &&                 \
      (__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 4)) && \
      (defined(_LIBCPP_VERSION) || defined(__GLIBCXX__))) ||      \
