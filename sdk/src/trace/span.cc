@@ -70,6 +70,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
                                                ? parent_span_context.span_id()
                                                : opentelemetry::trace::SpanId());
 
+  recordable_->SetTraceFlags(span_context_->trace_flags());
+
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable_->SetAttribute(key, value);
     return true;
@@ -145,6 +147,35 @@ void Span::AddEvent(nostd::string_view name,
   }
   recordable_->AddEvent(name, timestamp, attributes);
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Span::AddLink(const opentelemetry::trace::SpanContext &target,
+                   const opentelemetry::common::KeyValueIterable &attrs) noexcept
+{
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+
+  recordable_->AddLink(target, attrs);
+}
+
+void Span::AddLinks(const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
+{
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+                            const common::KeyValueIterable &attributes) {
+    recordable_->AddLink(span_context, attributes);
+    return true;
+  });
+}
+#endif
 
 void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {

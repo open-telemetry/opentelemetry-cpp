@@ -25,21 +25,24 @@ proto::metrics::v1::AggregationTemporality OtlpMetricUtils::GetProtoAggregationT
 }
 
 metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
-    const opentelemetry::sdk::metrics::InstrumentType &instrument_type) noexcept
+    const opentelemetry::sdk::metrics::MetricData &metric_data) noexcept
 {
-
-  if (instrument_type == metric_sdk::InstrumentType::kCounter ||
-      instrument_type == metric_sdk::InstrumentType::kUpDownCounter ||
-      instrument_type == metric_sdk::InstrumentType::kObservableCounter ||
-      instrument_type == metric_sdk::InstrumentType::kObservableUpDownCounter)
+  if (metric_data.point_data_attr_.size() == 0)
+  {
+    return metric_sdk::AggregationType::kDrop;
+  }
+  auto point_data_with_attributes = metric_data.point_data_attr_[0];
+  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kSum;
   }
-  else if (instrument_type == metric_sdk::InstrumentType::kHistogram)
+  else if (nostd::holds_alternative<sdk::metrics::HistogramPointData>(
+               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kHistogram;
   }
-  else if (instrument_type == metric_sdk::InstrumentType::kObservableGauge)
+  else if (nostd::holds_alternative<sdk::metrics::LastValuePointData>(
+               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kLastValue;
   }
@@ -51,8 +54,9 @@ void OtlpMetricUtils::ConvertSumMetric(const metric_sdk::MetricData &metric_data
 {
   sum->set_aggregation_temporality(
       GetProtoAggregationTemporality(metric_data.aggregation_temporality));
-  sum->set_is_monotonic(metric_data.instrument_descriptor.type_ ==
-                        metric_sdk::InstrumentType::kCounter);
+  sum->set_is_monotonic(
+      (metric_data.instrument_descriptor.type_ == metric_sdk::InstrumentType::kCounter) ||
+      (metric_data.instrument_descriptor.type_ == metric_sdk::InstrumentType::kObservableCounter));
   auto start_ts = metric_data.start_ts.time_since_epoch().count();
   auto ts       = metric_data.end_ts.time_since_epoch().count();
   for (auto &point_data_with_attributes : metric_data.point_data_attr_)
@@ -188,7 +192,7 @@ void OtlpMetricUtils::PopulateInstrumentInfoMetrics(
   metric->set_name(metric_data.instrument_descriptor.name_);
   metric->set_description(metric_data.instrument_descriptor.description_);
   metric->set_unit(metric_data.instrument_descriptor.unit_);
-  auto kind = GetAggregationType(metric_data.instrument_descriptor.type_);
+  auto kind = GetAggregationType(metric_data);
   switch (kind)
   {
     case metric_sdk::AggregationType::kSum: {

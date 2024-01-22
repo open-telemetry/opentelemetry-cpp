@@ -290,9 +290,7 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
 
 TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 {
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   http_client::HttpSslOptions no_ssl;
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   GetEventHandler *handler = new GetEventHandler();
 
@@ -302,25 +300,16 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
 
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get",
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                       no_ssl,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-                                       handler, headers, body, true);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", no_ssl, handler, headers,
+                                       body, true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get",
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                       no_ssl,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-                                       handler, headers, body, true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", no_ssl, handler, headers,
+                                       body, true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get",
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                       no_ssl,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-                                       handler, headers, body, false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", no_ssl, handler, headers,
+                                       body, false);
   http_operations3.Send();
   delete handler;
 }

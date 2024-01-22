@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <limits>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -12,6 +14,7 @@
 #include "prometheus/metric_family.h"
 #include "prometheus/metric_type.h"
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -93,22 +96,6 @@ std::string SanitizeLabel(std::string label_key)
   });
 }
 
-/**
- * Sanitize the given metric name according to Prometheus rule.
- * Prometheus metric names are required to match the following regex:
- *   [a-zA-Z_:]([a-zA-Z0-9_:])*
- * and multiple consecutive _ characters must be collapsed to a single _.
- */
-std::string SanitizeName(std::string name)
-{
-  return Sanitize(name, [](int i, char c) {
-    return (c >= 'a' && c <= 'z') ||  //
-           (c >= 'A' && c <= 'Z') ||  //
-           c == '_' ||                //
-           c == ':' ||                //
-           (c >= '0' && c <= '9' && i > 0);
-  });
-}
 }  // namespace
 
 /**
@@ -120,7 +107,8 @@ std::string SanitizeName(std::string name)
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data,
-    bool populate_target_info)
+    bool populate_target_info,
+    bool without_otel_scope)
 {
 
   // initialize output vector
@@ -132,11 +120,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
 
   std::vector<prometheus_client::MetricFamily> output;
   output.reserve(reserve_size);
-
+  if (data.scope_metric_data_.empty())
+  {
+    return output;
+  }
   // Append target_info as the first metric
   if (populate_target_info && !data.scope_metric_data_.empty())
   {
-    SetTarget(data, (*data.scope_metric_data_.begin()).scope_, &output);
+    SetTarget(data,
+              data.scope_metric_data_.begin()->metric_data_.begin()->end_ts.time_since_epoch(),
+              without_otel_scope ? nullptr : (*data.scope_metric_data_.begin()).scope_, &output);
   }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
@@ -145,21 +138,25 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
     {
       auto origin_name = metric_data.instrument_descriptor.name_;
       auto unit        = metric_data.instrument_descriptor.unit_;
-      auto sanitized   = SanitizeName(origin_name);
       prometheus_client::MetricFamily metric_family;
-      metric_family.name = sanitized + "_" + unit;
       metric_family.help = metric_data.instrument_descriptor.description_;
+      auto time          = metric_data.end_ts.time_since_epoch();
+      auto front         = metric_data.point_data_attr_.front();
+      auto kind          = getAggregationType(front.point_data);
+      bool is_monotonic  = true;
+      if (kind == sdk::metrics::AggregationType::kSum)
+      {
+        is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
+      }
+      const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
+      metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
+                                               metric_data.instrument_descriptor.unit_, type);
+      metric_family.type = type;
+      const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
+          without_otel_scope ? nullptr : instrumentation_info.scope_;
+
       for (const auto &point_data_attr : metric_data.point_data_attr_)
       {
-        auto kind         = getAggregationType(point_data_attr.point_data);
-        bool is_monotonic = true;
-        if (kind == sdk::metrics::AggregationType::kSum)
-        {
-          is_monotonic =
-              nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data).is_monotonic_;
-        }
-        const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
-        metric_family.type                       = type;
         if (type == prometheus_client::MetricType::Histogram)  // Histogram
         {
           auto histogram_point_data =
@@ -176,8 +173,7 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             sum = static_cast<double>(nostd::get<int64_t>(histogram_point_data.sum_));
           }
           SetData(std::vector<double>{sum, (double)histogram_point_data.count_}, boundaries, counts,
-                  point_data_attr.attributes, instrumentation_info.scope_, &metric_family,
-                  data.resource_);
+                  point_data_attr.attributes, scope, time, &metric_family, data.resource_);
         }
         else if (type == prometheus_client::MetricType::Gauge)
         {
@@ -187,16 +183,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto last_value_point_data =
                 nostd::get<sdk::metrics::LastValuePointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{last_value_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
+                    data.resource_);
           }
           else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
+                    data.resource_);
           }
           else
           {
@@ -212,8 +208,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             auto sum_point_data =
                 nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
-            SetData(values, point_data_attr.attributes, instrumentation_info.scope_, type,
-                    &metric_family, data.resource_);
+            SetData(values, point_data_attr.attributes, scope, type, time, &metric_family,
+                    data.resource_);
           }
           else
           {
@@ -238,6 +234,294 @@ void PrometheusExporterUtils::AddPrometheusLabel(
   prometheus_label.name  = std::move(name);
   prometheus_label.value = std::move(value);
   labels->emplace_back(std::move(prometheus_label));
+}
+
+/**
+ * Sanitize the given metric name or label according to Prometheus rule.
+ *
+ * This function is needed because names in OpenTelemetry can contain
+ * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
+ * name should only contain alphanumeric characters and '_'.
+ */
+std::string PrometheusExporterUtils::SanitizeNames(std::string name)
+{
+  constexpr const auto replacement     = '_';
+  constexpr const auto replacement_dup = '=';
+
+  auto valid = [](int i, char c) {
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
+        (c >= '0' && c <= '9' && i > 0))
+    {
+      return true;
+    }
+    return false;
+  };
+
+  bool has_dup = false;
+  for (int i = 0; i < (int)name.size(); ++i)
+  {
+    if (valid(i, name[i]))
+    {
+      continue;
+    }
+    if (i > 0 && (name[i - 1] == replacement || name[i - 1] == replacement_dup))
+    {
+      has_dup = true;
+      name[i] = replacement_dup;
+    }
+    else
+    {
+      name[i] = replacement;
+    }
+  }
+  if (has_dup)
+  {
+    auto end = std::remove(name.begin(), name.end(), replacement_dup);
+    return std::string{name.begin(), end};
+  }
+  return name;
+}
+
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
+std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
+std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
+std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
+std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
+#endif
+
+std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
+    const std::string &raw_metric_unit_name)
+{
+  if (raw_metric_unit_name.empty())
+  {
+    return raw_metric_unit_name;
+  }
+
+  std::string converted_metric_unit_name = RemoveUnitPortionInBraces(raw_metric_unit_name);
+  converted_metric_unit_name = ConvertRateExpressedToPrometheusUnit(converted_metric_unit_name);
+
+  return CleanUpString(GetPrometheusUnit(converted_metric_unit_name));
+}
+
+std::string PrometheusExporterUtils::GetPrometheusUnit(const std::string &unit_abbreviation)
+{
+  static std::unordered_map<std::string, std::string> units{// Time
+                                                            {"d", "days"},
+                                                            {"h", "hours"},
+                                                            {"min", "minutes"},
+                                                            {"s", "seconds"},
+                                                            {"ms", "milliseconds"},
+                                                            {"us", "microseconds"},
+                                                            {"ns", "nanoseconds"},
+                                                            // Bytes
+                                                            {"By", "bytes"},
+                                                            {"KiBy", "kibibytes"},
+                                                            {"MiBy", "mebibytes"},
+                                                            {"GiBy", "gibibytes"},
+                                                            {"TiBy", "tibibytes"},
+                                                            {"KBy", "kilobytes"},
+                                                            {"MBy", "megabytes"},
+                                                            {"GBy", "gigabytes"},
+                                                            {"TBy", "terabytes"},
+                                                            {"By", "bytes"},
+                                                            {"KBy", "kilobytes"},
+                                                            {"MBy", "megabytes"},
+                                                            {"GBy", "gigabytes"},
+                                                            {"TBy", "terabytes"},
+                                                            // SI
+                                                            {"m", "meters"},
+                                                            {"V", "volts"},
+                                                            {"A", "amperes"},
+                                                            {"J", "joules"},
+                                                            {"W", "watts"},
+                                                            {"g", "grams"},
+                                                            // Misc
+                                                            {"Cel", "celsius"},
+                                                            {"Hz", "hertz"},
+                                                            {"1", ""},
+                                                            {"%", "percent"}};
+  auto res_it = units.find(unit_abbreviation);
+  if (res_it == units.end())
+  {
+    return unit_abbreviation;
+  }
+  return res_it->second;
+}
+
+std::string PrometheusExporterUtils::GetPrometheusPerUnit(const std::string &per_unit_abbreviation)
+{
+  static std::unordered_map<std::string, std::string> per_units{
+      {"s", "second"}, {"m", "minute"}, {"h", "hour"}, {"d", "day"},
+      {"w", "week"},   {"mo", "month"}, {"y", "year"}};
+  auto res_it = per_units.find(per_unit_abbreviation);
+  if (res_it == per_units.end())
+  {
+    return per_unit_abbreviation;
+  }
+  return res_it->second;
+}
+
+std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string &unit)
+{
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+  return std::regex_replace(unit, CHARACTERS_BETWEEN_BRACES_PATTERN, "");
+#else
+  bool in_braces = false;
+  std::string cleaned_unit;
+  cleaned_unit.reserve(unit.size());
+  for (auto c : unit)
+  {
+    if (in_braces)
+    {
+      if (c == '}')
+      {
+        in_braces = false;
+      }
+    }
+    else if (c == '{')
+    {
+      in_braces = true;
+    }
+    else
+    {
+      cleaned_unit += c;
+    }
+  }
+  return cleaned_unit;
+#endif
+}
+
+std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
+    const std::string &rate_expressed_unit)
+{
+  size_t pos = rate_expressed_unit.find("/");
+  if (pos == std::string::npos)
+  {
+    return rate_expressed_unit;
+  }
+
+  std::vector<std::string> rate_entities;
+  rate_entities.push_back(rate_expressed_unit.substr(0, pos));
+  rate_entities.push_back(rate_expressed_unit.substr(pos + 1));
+
+  if (rate_entities[1].empty())
+  {
+    return rate_expressed_unit;
+  }
+
+  std::string prometheus_unit     = GetPrometheusUnit(rate_entities[0]);
+  std::string prometheus_per_unit = GetPrometheusPerUnit(rate_entities[1]);
+
+  return prometheus_unit + "_per_" + prometheus_per_unit;
+}
+
+std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
+{
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+  std::string cleaned_string = std::regex_replace(str, INVALID_CHARACTERS_PATTERN, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_CONSECUTIVE_UNDERSCORES, "_");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_TRAILING_UNDERSCORES, "");
+  cleaned_string = std::regex_replace(cleaned_string, SANITIZE_LEADING_UNDERSCORES, "");
+  return cleaned_string;
+#else
+  std::string cleaned_string = str;
+  if (cleaned_string.empty())
+  {
+    return cleaned_string;
+  }
+  std::transform(cleaned_string.begin(), cleaned_string.end(), cleaned_string.begin(),
+                 [](const char c) {
+                   if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                   {
+                     return c;
+                   }
+                   return '_';
+                 });
+
+  std::string::size_type trim_start = 0;
+  std::string::size_type trim_end   = 0;
+  bool previous_underscore          = false;
+  for (std::string::size_type i = 0; i < cleaned_string.size(); ++i)
+  {
+    if (cleaned_string[i] == '_')
+    {
+      if (previous_underscore)
+      {
+        continue;
+      }
+
+      previous_underscore = true;
+    }
+    else
+    {
+      previous_underscore = false;
+    }
+
+    if (trim_end != i)
+    {
+      cleaned_string[trim_end] = cleaned_string[i];
+    }
+    ++trim_end;
+  }
+
+  while (trim_end > 0 && cleaned_string[trim_end - 1] == '_')
+  {
+    --trim_end;
+  }
+  while (trim_start < trim_end && cleaned_string[trim_start] == '_')
+  {
+    ++trim_start;
+  }
+
+  // All characters are underscore
+  if (trim_start >= trim_end)
+  {
+    return "_";
+  }
+  if (0 != trim_start || cleaned_string.size() != trim_end)
+  {
+    return cleaned_string.substr(trim_start, trim_end - trim_start);
+  }
+
+  return cleaned_string;
+#endif
+}
+
+std::string PrometheusExporterUtils::MapToPrometheusName(
+    const std::string &name,
+    const std::string &unit,
+    prometheus_client::MetricType prometheus_type)
+{
+  auto sanitized_name                    = SanitizeNames(name);
+  std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+
+  // Append prometheus unit if not null or empty.
+  if (!prometheus_equivalent_unit.empty() &&
+      sanitized_name.find(prometheus_equivalent_unit) == std::string::npos)
+  {
+    sanitized_name += "_" + prometheus_equivalent_unit;
+  }
+
+  // Special case - counter
+  if (prometheus_type == prometheus_client::MetricType::Counter)
+  {
+    auto t_pos           = sanitized_name.rfind("_total");
+    bool ends_with_total = t_pos == sanitized_name.size() - 6;
+    if (!ends_with_total)
+    {
+      sanitized_name += "_total";
+    }
+  }
+
+  // Special case - gauge
+  if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
+      sanitized_name.find("ratio") == std::string::npos)
+  {
+    sanitized_name += "_ratio";
+  }
+
+  return CleanUpString(SanitizeNames(sanitized_name));
 }
 
 metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
@@ -295,6 +579,7 @@ prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
 
 void PrometheusExporterUtils::SetTarget(
     const sdk::metrics::ResourceMetrics &data,
+    std::chrono::nanoseconds time,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     std::vector<::prometheus::MetricFamily> *output)
 {
@@ -313,11 +598,11 @@ void PrometheusExporterUtils::SetTarget(
   metric.info.value                       = 1.0;
 
   metric_sdk::PointAttributes empty_attributes;
-  SetMetricBasic(metric, empty_attributes, scope, data.resource_);
+  SetMetricBasic(metric, empty_attributes, time, scope, data.resource_);
 
   for (auto &label : data.resource_->GetAttributes())
   {
-    AddPrometheusLabel(SanitizeName(label.first), AttributeValueToString(label.second),
+    AddPrometheusLabel(SanitizeNames(label.first), AttributeValueToString(label.second),
                        &metric.label);
   }
 
@@ -334,12 +619,13 @@ void PrometheusExporterUtils::SetData(
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     prometheus_client::MetricType type,
+    std::chrono::nanoseconds time,
     prometheus_client::MetricFamily *metric_family,
     const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, scope, resource);
+  SetMetricBasic(metric, labels, time, scope, resource);
   SetValue(values, type, &metric);
 }
 
@@ -354,12 +640,13 @@ void PrometheusExporterUtils::SetData(
     const std::vector<uint64_t> &counts,
     const metric_sdk::PointAttributes &labels,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
+    std::chrono::nanoseconds time,
     prometheus_client::MetricFamily *metric_family,
     const opentelemetry::sdk::resource::Resource *resource)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
-  SetMetricBasic(metric, labels, scope, resource);
+  SetMetricBasic(metric, labels, time, scope, resource);
   SetValue(values, boundaries, counts, &metric);
 }
 
@@ -369,9 +656,11 @@ void PrometheusExporterUtils::SetData(
 void PrometheusExporterUtils::SetMetricBasic(
     prometheus_client::ClientMetric &metric,
     const metric_sdk::PointAttributes &labels,
+    std::chrono::nanoseconds time,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     const opentelemetry::sdk::resource::Resource *resource)
 {
+  metric.timestamp_ms = time.count() / 1000000;
   if (labels.empty() && nullptr == resource)
   {
     return;

@@ -31,7 +31,7 @@ class MeterContext;
 class MetricCollector;
 class MetricReader;
 
-class MeterProvider final : public opentelemetry::metrics::MeterProvider
+class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**

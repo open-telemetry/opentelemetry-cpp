@@ -69,7 +69,7 @@ public:
    * NOTE: Timeout functionality not supported yet.
    */
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
@@ -79,7 +79,7 @@ public:
    * NOTE: Timeout functionality not supported yet.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   /**
    * Class destructor which invokes the Shutdown() method. The Shutdown() method is supposed to be
@@ -143,7 +143,7 @@ protected:
   const size_t max_export_batch_size_;
 
   /* The buffer/queue to which the ended spans are added */
-  common::CircularBuffer<Recordable> buffer_;
+  opentelemetry::sdk::common::CircularBuffer<Recordable> buffer_;
 
   std::shared_ptr<SynchronizationData> synchronization_data_;
 

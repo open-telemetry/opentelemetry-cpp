@@ -43,28 +43,56 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     {
       parent_context = span_context;
     }
+    else
+    {
+      if (opentelemetry::trace::IsRootSpan(context))
+      {
+        parent_context = opentelemetry::trace::SpanContext{false, false};
+      }
+    }
   }
 
+  IdGenerator &generator = GetIdGenerator();
   opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::SpanId span_id = GetIdGenerator().GenerateSpanId();
+  opentelemetry::trace::SpanId span_id = generator.GenerateSpanId();
   bool is_parent_span_valid            = false;
+  uint8_t flags                        = 0;
 
   if (parent_context.IsValid())
   {
     trace_id             = parent_context.trace_id();
+    flags                = parent_context.trace_flags().flags();
     is_parent_span_valid = true;
   }
   else
   {
-    trace_id = GetIdGenerator().GenerateTraceId();
+    trace_id = generator.GenerateTraceId();
+    if (generator.IsRandom())
+    {
+      flags = opentelemetry::trace::TraceFlags::kIsRandom;
+    }
   }
 
   auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
-  auto trace_flags =
-      sampling_result.IsSampled()
-          ? opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}
-          : opentelemetry::trace::TraceFlags{};
+  if (sampling_result.IsSampled())
+  {
+    flags |= opentelemetry::trace::TraceFlags::kIsSampled;
+  }
+
+#if 1
+  /* https://github.com/open-telemetry/opentelemetry-specification as of v1.29.0 */
+  /* Support W3C Trace Context version 1. */
+  flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags;
+#endif
+
+#if 0
+  /* Waiting for https://github.com/open-telemetry/opentelemetry-specification/issues/3411 */
+  /* Support W3C Trace Context version 2. */
+  flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags;
+#endif
+
+  opentelemetry::trace::TraceFlags trace_flags(flags);
 
   auto span_context =
       std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(

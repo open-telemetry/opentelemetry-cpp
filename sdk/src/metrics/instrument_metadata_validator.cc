@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <iostream>
 
-#if defined(OPENTELEMETRY_HAVE_WORKING_REGEX)
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #endif
 

@@ -102,7 +102,7 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    timeout_steady = std::chrono::steady_clock::duration::max();
+    timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
   bool result = false;

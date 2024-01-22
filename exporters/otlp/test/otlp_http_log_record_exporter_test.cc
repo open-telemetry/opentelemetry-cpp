@@ -22,6 +22,7 @@
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 #  include <google/protobuf/message_lite.h>
@@ -59,20 +60,15 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
-      options.url,
-#  ifdef ENABLE_OTLP_HTTP_SSL_PREVIEW
-      false,                              /* ssl_insecure_skip_verify */
+      options.url, false,                 /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
       "",                                 /* ssl_client_key_path */
       "", /* ssl_client_key_string */ "", /* ssl_client_cert_path */
       "",                                 /* ssl_client_cert_string */
-#  endif                                  /* ENABLE_OTLP_HTTP_SSL_PREVIEW */
-#  ifdef ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW
-      "", /* ssl_min_tls */
-      "", /* ssl_max_tls */
-      "", /* ssl_cipher */
-      "", /* ssl_cipher_suite */
-#  endif  /* ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW */
+      "",                                 /* ssl_min_tls */
+      "",                                 /* ssl_max_tls */
+      "",                                 /* ssl_cipher */
+      "",                                 /* ssl_cipher_suite */
       options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
@@ -103,7 +99,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type, bool async_mode = false)
   {
-    auto http_client = http_client::HttpClientFactory::CreateNoSend();
+    auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type, async_mode), http_client),
             http_client};
   }

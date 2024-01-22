@@ -23,6 +23,16 @@ inline nostd::shared_ptr<Span> GetSpan(const context::Context &context) noexcept
   return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
 }
 
+inline bool IsRootSpan(const context::Context &context) noexcept
+{
+  context::ContextValue is_root_span = context.GetValue(kIsRootSpanKey);
+  if (nostd::holds_alternative<bool>(is_root_span))
+  {
+    return nostd::get<bool>(is_root_span);
+  }
+  return false;
+}
+
 // Set Span into explicit context
 inline context::Context SetSpan(context::Context &context, nostd::shared_ptr<Span> span) noexcept
 {

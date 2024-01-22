@@ -430,7 +430,7 @@ bool ElasticsearchLogRecordExporter::ForceFlush(
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
   {
-    timeout_steady = std::chrono::steady_clock::duration::max();
+    timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
   std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);

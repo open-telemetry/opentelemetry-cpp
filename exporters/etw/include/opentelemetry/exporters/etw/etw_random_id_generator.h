@@ -17,6 +17,8 @@ namespace trace
 
 class ETWRandomIdGenerator : public IdGenerator
 {
+public:
+  ETWRandomIdGenerator() : IdGenerator(false) {}
 
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override
   {

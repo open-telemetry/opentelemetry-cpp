@@ -37,6 +37,7 @@ private:
   HttpCurlGlobalInitializer(HttpCurlGlobalInitializer &&)      = delete;
 
   HttpCurlGlobalInitializer &operator=(const HttpCurlGlobalInitializer &) = delete;
+
   HttpCurlGlobalInitializer &operator=(HttpCurlGlobalInitializer &&) = delete;
 
   HttpCurlGlobalInitializer();
@@ -57,12 +58,10 @@ public:
     method_ = method;
   }
 
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   void SetSslOptions(const HttpSslOptions &ssl_options) noexcept override
   {
     ssl_options_ = ssl_options;
   }
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
 
   void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
   {
@@ -92,11 +91,7 @@ public:
 
 public:
   opentelemetry::ext::http::client::Method method_;
-
-#ifdef ENABLE_HTTP_SSL_PREVIEW
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-
   opentelemetry::ext::http::client::Body body_;
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
@@ -190,9 +185,7 @@ public:
    */
   const std::string &GetBaseUri() const { return host_; }
 
-#ifdef ENABLE_TEST
   std::shared_ptr<Request> GetRequest() { return http_request_; }
-#endif
 
   inline HttpClient &GetHttpClient() noexcept { return http_client_; }
   inline const HttpClient &GetHttpClient() const noexcept { return http_client_; }
@@ -226,18 +219,13 @@ public:
 
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     opentelemetry::ext::http::client::Body body;
 
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                 ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-                                 nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body);
 
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
@@ -259,17 +247,12 @@ public:
 
   opentelemetry::ext::http::client::Result Post(
       const nostd::string_view &url,
-#ifdef ENABLE_HTTP_SSL_PREVIEW
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
       const Body &body,
       const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-#ifdef ENABLE_HTTP_SSL_PREVIEW
-                                 ssl_options,
-#endif /* ENABLE_HTTP_SSL_PREVIEW */
-                                 nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
@@ -327,7 +310,6 @@ public:
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
-#ifdef ENABLE_TEST
   void WaitBackgroundThreadExit()
   {
     std::unique_ptr<std::thread> background_thread;
@@ -341,7 +323,6 @@ public:
       background_thread->join();
     }
   }
-#endif
 
 private:
   void wakeupBackgroundThread();

@@ -46,7 +46,6 @@
 #   opentelemetry-cpp::ostream_span_exporter             - Imported target of opentelemetry-cpp::ostream_span_exporter
 #   opentelemetry-cpp::elasticsearch_log_record_exporter - Imported target of opentelemetry-cpp::elasticsearch_log_record_exporter
 #   opentelemetry-cpp::etw_exporter                      - Imported target of opentelemetry-cpp::etw_exporter
-#   opentelemetry-cpp::zpages                            - Imported target of opentelemetry-cpp::zpages
 #   opentelemetry-cpp::http_client_curl                  - Imported target of opentelemetry-cpp::http_client_curl
 #   opentelemetry-cpp::opentracing_shim                  - Imported target of opentelemetry-cpp::opentracing_shim
 #
@@ -100,7 +99,6 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     prometheus_exporter
     elasticsearch_log_record_exporter
     etw_exporter
-    zpages
     http_client_curl
     opentracing_shim)
 foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)

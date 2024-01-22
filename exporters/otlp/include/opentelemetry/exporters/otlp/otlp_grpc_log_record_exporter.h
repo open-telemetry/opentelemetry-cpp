@@ -13,7 +13,7 @@
 // clang-format on
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,7 +37,7 @@ public:
    * Create an OtlpGrpcLogRecordExporter with user specified options.
    * @param options An object containing the user's configuration options.
    */
-  OtlpGrpcLogRecordExporter(const OtlpGrpcExporterOptions &options);
+  OtlpGrpcLogRecordExporter(const OtlpGrpcLogRecordExporterOptions &options);
 
   /**
    * Creates a recordable that stores the data in protobuf.
@@ -60,18 +60,18 @@ public:
    * @return return true when all data are exported, and false when timeout
    */
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   /**
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
 private:
   // Configuration options for the exporter
-  const OtlpGrpcExporterOptions options_;
+  const OtlpGrpcLogRecordExporterOptions options_;
 
   // For testing
   friend class OtlpGrpcLogRecordExporterTestPeer;

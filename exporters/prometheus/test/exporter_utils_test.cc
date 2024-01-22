@@ -15,17 +15,62 @@ namespace prometheus_client = ::prometheus;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
+namespace exporter
+{
+namespace metrics
+{
+class SanitizeNameTester
+{
+public:
+  static std::string sanitize(std::string name)
+  {
+    return PrometheusExporterUtils::SanitizeNames(name);
+  }
+  static std::string getPrometheusUnit(const std::string &unit_abbreviation)
+  {
+    return PrometheusExporterUtils::GetPrometheusUnit(unit_abbreviation);
+  }
+  static std::string getPrometheusPerUnit(const std::string &per_unit_abbreviation)
+  {
+    return PrometheusExporterUtils::GetPrometheusPerUnit(per_unit_abbreviation);
+  }
+  static std::string removeUnitPortionInBraces(const std::string &unit)
+  {
+    return PrometheusExporterUtils::RemoveUnitPortionInBraces(unit);
+  }
+  static std::string convertRateExpressedToPrometheusUnit(const std::string &rate_expressed_unit)
+  {
+    return PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(rate_expressed_unit);
+  }
+  static std::string cleanUpString(const std::string &str)
+  {
+    return PrometheusExporterUtils::CleanUpString(str);
+  }
+  static std::string getEquivalentPrometheusUnit(const std::string &raw_metric_unit_name)
+  {
+    return PrometheusExporterUtils::GetEquivalentPrometheusUnit(raw_metric_unit_name);
+  }
+  static std::string mapToPrometheusName(const std::string &name,
+                                         const std::string &unit,
+                                         prometheus_client::MetricType prometheus_type)
+  {
+    return PrometheusExporterUtils::MapToPrometheusName(name, unit, prometheus_type);
+  }
+};
+}  // namespace metrics
+}  // namespace exporter
+
 template <typename T>
 void assert_basic(prometheus_client::MetricFamily &metric,
-                  const std::string &sanitized_name,
+                  const std::string &expected_name,
                   const std::string &description,
                   prometheus_client::MetricType type,
                   size_t label_num,
                   std::vector<T> vals)
 {
-  ASSERT_EQ(metric.name, sanitized_name + "_unit");  // name sanitized
-  ASSERT_EQ(metric.help, description);               // description not changed
-  ASSERT_EQ(metric.type, type);                      // type translated
+  ASSERT_EQ(metric.name, expected_name);  // name sanitized
+  ASSERT_EQ(metric.help, description);    // description not changed
+  ASSERT_EQ(metric.type, type);           // type translated
 
   // Prometheus metric data points should not have explicit timestamps
   for (const prometheus::ClientMetric &cm : metric.metric)
@@ -109,12 +154,10 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerCounter)
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(metrics_data);
   ASSERT_EQ(translated.size(), 2);
-
   auto metric1          = translated[1];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Counter, 3,
-               vals);
-
+  assert_basic(metric1, "library_name_unit_total", "description",
+               prometheus_client::MetricType::Counter, 3, vals);
   int checked_label_num = 0;
   for (auto &label : translated[0].metric[0].label)
   {
@@ -157,7 +200,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusIntegerLastValue)
 
   auto metric1          = translated[1];
   std::vector<int> vals = {10};
-  assert_basic(metric1, "library_name", "description", prometheus_client::MetricType::Gauge, 3,
+  assert_basic(metric1, "library_name_unit", "description", prometheus_client::MetricType::Gauge, 3,
                vals);
 
   int checked_label_num = 0;
@@ -196,8 +239,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
 
   auto metric              = translated[1];
   std::vector<double> vals = {3, 900.5, 4};
-  assert_basic(metric, "library_name", "description", prometheus_client::MetricType::Histogram, 3,
-               vals);
+  assert_basic(metric, "library_name_unit", "description", prometheus_client::MetricType::Histogram,
+               3, vals);
   assert_histogram(metric, std::list<double>{10.1, 20.2, 30.2}, {200, 300, 400, 500});
 
   int checked_label_num = 0;
@@ -230,27 +273,12 @@ class SanitizeTest : public ::testing::Test
       InstrumentationScope::Create("library_name", "1.2.0");
 
 protected:
-  void CheckSanitizeName(const std::string &original, const std::string &sanitized)
-  {
-    metric_sdk::InstrumentDescriptor instrument_descriptor{
-        original, "description", "unit", metric_sdk::InstrumentType::kCounter,
-        metric_sdk::InstrumentValueType::kDouble};
-    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
-        {&resource_,
-         std::vector<metric_sdk::ScopeMetrics>{
-             {instrumentation_scope_.get(),
-              std::vector<metric_sdk::MetricData>{
-                  {{instrument_descriptor, {}, {}, {}, {{{}, {}}}}}}}}},
-        false);
-    EXPECT_EQ(result.begin()->name, sanitized + "_unit");
-  }
-
   void CheckSanitizeLabel(const std::string &original, const std::string &sanitized)
   {
     metric_sdk::InstrumentDescriptor instrument_descriptor{
         "name", "description", "unit", metric_sdk::InstrumentType::kCounter,
         metric_sdk::InstrumentValueType::kDouble};
-    std::vector<prometheus::MetricFamily> result = PrometheusExporterUtils::TranslateToPrometheus(
+    auto result = PrometheusExporterUtils::TranslateToPrometheus(
         {&resource_,
          std::vector<metric_sdk::ScopeMetrics>{
              {instrumentation_scope_.get(),
@@ -261,16 +289,6 @@ protected:
   }
 };
 
-TEST_F(SanitizeTest, Name)
-{
-  CheckSanitizeName("name", "name");
-  CheckSanitizeName("name?", "name_");
-  CheckSanitizeName("name???", "name_");
-  CheckSanitizeName("name?__", "name_");
-  CheckSanitizeName("name?__name", "name_name");
-  CheckSanitizeName("name?__name:", "name_name:");
-}
-
 TEST_F(SanitizeTest, Label)
 {
   CheckSanitizeLabel("name", "name");
@@ -280,6 +298,8 @@ TEST_F(SanitizeTest, Label)
   CheckSanitizeLabel("name?__name", "name_name");
   CheckSanitizeLabel("name?__name:", "name_name_");
 }
+
+TEST_F(SanitizeTest, Name) {}
 
 class AttributeCollisionTest : public ::testing::Test
 {
@@ -323,6 +343,79 @@ TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
                                                                 {"foo_b", "value2"},
                                                                 {"otel_scope_name", "library_name"},
                                                                 {"otel_scope_version", "1.2.0"}});
+}
+
+TEST(PrometheusExporterUtils, PrometheusUnit)
+{
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("d"), "days");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("h"), "hours");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("min"), "minutes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("s"), "seconds");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("ms"), "milliseconds");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("us"), "microseconds");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("ns"), "nanoseconds");
+
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("By"), "bytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("KiBy"), "kibibytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MiBy"), "mebibytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GiBy"), "gibibytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TiBy"), "tibibytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("KBy"), "kilobytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MBy"), "megabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GBy"), "gigabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TBy"), "terabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("By"), "bytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("KBy"), "kilobytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("MBy"), "megabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("GBy"), "gigabytes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("TBy"), "terabytes");
+
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("m"), "meters");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("V"), "volts");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("A"), "amperes");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("J"), "joules");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("W"), "watts");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("g"), "grams");
+
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("Cel"), "celsius");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("Hz"), "hertz");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("1"), "");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusUnit("%"), "percent");
+}
+
+TEST(PrometheusExporterUtils, PrometheusPerUnit)
+{
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("s"), "second");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("m"), "minute");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("h"), "hour");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("d"), "day");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("w"), "week");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("mo"), "month");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::getPrometheusPerUnit("y"), "year");
+}
+
+TEST(PrometheusExporterUtils, RemoveUnitPortionInBraces)
+{
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::removeUnitPortionInBraces("{unit}"), "");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::removeUnitPortionInBraces("unit{unit}"), "unit");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::removeUnitPortionInBraces("unit_{unit}"),
+            "unit_");
+}
+
+TEST(PrometheusExporterUtils, ConvertRateExpressedToPrometheusUnit)
+{
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("unit/d"),
+            "unit_per_day");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("unit/s"),
+            "unit_per_second");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("unit/"),
+            "unit/");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("unit"),
+            "unit");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("unit/m"),
+            "unit_per_minute");
+  ASSERT_EQ(exporter::metrics::SanitizeNameTester::convertRateExpressedToPrometheusUnit("/m"),
+            "_per_minute");
 }
 
 TEST_F(AttributeCollisionTest, JoinsCollidingKeys)

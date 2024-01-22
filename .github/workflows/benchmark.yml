@@ -17,7 +17,7 @@ jobs:
         with:
           submodules: 'recursive'
       - name: Mount Bazel Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: bazel_cache
         with:
@@ -35,7 +35,7 @@ jobs:
           mv api-benchmark_result.json benchmarks
           mv sdk-benchmark_result.json benchmarks
           mv exporters-benchmark_result.json benchmarks
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: benchmark_results
           path: benchmarks

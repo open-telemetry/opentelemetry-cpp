@@ -44,10 +44,10 @@ public:
    * @return return true when all data are exported, and false when timeout
    */
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
 private:
   std::ostream &sout_;
@@ -55,7 +55,7 @@ private:
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
 
-  // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
+  // Mapping status number to the string from api/include/opentelemetry/trace/span_metadata.h
   std::map<int, std::string> statusMap{{0, "Unset"}, {1, "Ok"}, {2, "Error"}};
 
   // various print helpers

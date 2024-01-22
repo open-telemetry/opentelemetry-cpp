@@ -21,13 +21,6 @@ if(OPENTELEMETRY_INSTALL)
     DIRECTORY include/opentelemetry
     DESTINATION include
     FILES_MATCHING
-    PATTERN "*.h"
-    PATTERN "metrics" EXCLUDE)
-
-  install(
-    DIRECTORY include/opentelemetry
-    DESTINATION include
-    FILES_MATCHING
     PATTERN "*.h")
 
   unset(TARGET_DEPS)
@@ -104,7 +97,6 @@ if(WITH_NO_GETENV)
 endif()
 
 if(WIN32)
-  target_compile_definitions(opentelemetry_api INTERFACE NOMINMAX)
   if(WITH_ETW)
     target_compile_definitions(opentelemetry_api INTERFACE HAVE_MSGPACK)
   endif()
@@ -117,21 +109,6 @@ endif()
 target_compile_definitions(
   opentelemetry_api
   INTERFACE OPENTELEMETRY_ABI_VERSION_NO=${OPENTELEMETRY_ABI_VERSION_NO})
-
-# A better place should be in sdk, not api
-if(WITH_OTLP_HTTP_SSL_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_OTLP_HTTP_SSL_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_HTTP_SSL_PREVIEW)
-
-  if(WITH_OTLP_HTTP_SSL_TLS_PREVIEW)
-    target_compile_definitions(opentelemetry_api
-                               INTERFACE ENABLE_OTLP_HTTP_SSL_TLS_PREVIEW)
-    target_compile_definitions(opentelemetry_api
-                               INTERFACE ENABLE_HTTP_SSL_TLS_PREVIEW)
-  endif()
-endif()
 
 if(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
   target_compile_definitions(opentelemetry_api

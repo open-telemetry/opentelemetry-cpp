@@ -12,9 +12,6 @@
 #include "opentelemetry/plugin/hook.h"
 #include "opentelemetry/version.h"
 
-#ifndef NOMINMAX
-#  define NOMINMAX
-#endif
 #include <Windows.h>
 
 #include <WinBase.h>
