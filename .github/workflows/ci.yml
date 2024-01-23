@@ -29,7 +29,7 @@ jobs:
         ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_sync_test:
-    name: CMake gcc 12 (maintainer mode, sync)
+    name: CMake gcc 13 (maintainer mode, sync)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -37,8 +37,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -46,8 +46,8 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, sync)
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -61,7 +61,7 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_gcc_maintainer_async_test:
-    name: CMake gcc 12 (maintainer mode, async)
+    name: CMake gcc 13 (maintainer mode, async)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -69,8 +69,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -78,8 +78,8 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, async)
       env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        CC: /usr/bin/gcc-13
+        CXX: /usr/bin/g++-13
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -93,7 +93,7 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_sync_test:
-    name: CMake clang 14 (maintainer mode, sync)
+    name: CMake clang 15 (maintainer mode, sync)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -101,8 +101,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -110,8 +110,8 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, sync)
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -125,7 +125,7 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_async_test:
-    name: CMake clang 14 (maintainer mode, async)
+    name: CMake clang 15 (maintainer mode, async)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -133,8 +133,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -142,8 +142,8 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, async)
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -157,7 +157,7 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_abiv2_test:
-    name: CMake clang 14 (maintainer mode, abiv2)
+    name: CMake clang 15 (maintainer mode, abiv2)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -165,8 +165,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
         sudo -E ./ci/setup_cmake.sh
@@ -174,8 +174,8 @@ jobs:
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, abiv2)
       env:
-        CC: /usr/bin/clang-14
-        CXX: /usr/bin/clang++-14
+        CC: /usr/bin/clang-15
+        CXX: /usr/bin/clang++-15
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
@@ -357,6 +357,59 @@ jobs:
         CXXFLAGS: "-stdlib=libc++"
         CXX_STANDARD: '20'
       run: ./ci/do_ci.sh cmake.c++20.stl.test
+
+  cmake_test_cxx23_gcc:
+    name: CMake C++23 test(GCC)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.test
+    - name: run tests (enable stl)
+      env:
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.stl.test
+
+  cmake_test_cxx23_clang:
+    name: CMake C++23 test(Clang with libc++)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CMAKE_VERSION: 3.20.6
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_cmake.sh
+    - name: run tests
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.test
+    - name: run tests (enable stl)
+      env:
+        CC: /usr/bin/clang
+        CXX: /usr/bin/clang++
+        CXXFLAGS: "-stdlib=libc++"
+        CXX_STANDARD: '23'
+      run: ./ci/do_ci.sh cmake.c++23.stl.test
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
@@ -732,6 +785,8 @@ jobs:
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
       run: ./ci/do_ci.ps1 cmake.dll.test
+    - name: run cmake cxx20 test (DLL build)
+      run: ./ci/do_ci.ps1 cmake.dll.cxx20.test
     - name: run otprotocol test (DLL build)
       run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.dll.test
 
