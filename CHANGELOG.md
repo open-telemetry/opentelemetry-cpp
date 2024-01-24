@@ -21,6 +21,8 @@ Increment the:
   [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
 * [BUILD] Introduce CXX 20 CI pipeline for MSVC/Windows
   [#2450](https://github.com/open-telemetry/opentelemetry-cpp/pull/2450)
+* [BUILD] Add DLL build CI pipeline with CXX20
+  [#2465](https://github.com/open-telemetry/opentelemetry-cpp/pull/2465)
 * [EXPORTER] Set `is_monotonic` flag for Observable Counters
   [#2478](https://github.com/open-telemetry/opentelemetry-cpp/pull/2478)
 * [PROTO] Upgrade to opentelemetry-proto v1.1.0
