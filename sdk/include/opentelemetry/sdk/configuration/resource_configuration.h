@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class ResourceConfiguration {
+class ResourceConfiguration
+{
 public:
 };
 

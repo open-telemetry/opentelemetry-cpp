@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,7 +12,7 @@ namespace sdk
 namespace configuration
 {
 
-class MeterProviderConfiguration
+class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
 };

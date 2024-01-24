@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class PropagatorConfiguration {
+class PropagatorConfiguration
+{
 public:
 };
 

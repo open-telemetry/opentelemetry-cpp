@@ -13,7 +13,8 @@ namespace sdk
 namespace configuration
 {
 
-class AttributeLimitConfiguration {
+class AttributeLimitConfiguration
+{
 public:
   size_t attribute_value_length_limit;
   size_t attribute_count_limit;

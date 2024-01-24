@@ -11,7 +11,7 @@ namespace sdk
 namespace configuration
 {
 
-class MeterProviderConfiguration
+class HeadersConfiguration
 {
 public:
 };

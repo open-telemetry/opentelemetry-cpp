@@ -11,7 +11,8 @@ namespace sdk
 namespace configuration
 {
 
-class SpanProcessorConfiguration {
+class SpanProcessorConfiguration
+{
 public:
 };
 

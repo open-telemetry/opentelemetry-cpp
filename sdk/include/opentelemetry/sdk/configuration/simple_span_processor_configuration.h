@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -12,7 +12,8 @@ namespace sdk
 namespace configuration
 {
 
-class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration {
+class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
+{
 public:
 };
 

@@ -5,8 +5,12 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -151,7 +155,7 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseYamlLoggerProviderConfi
 {
   std::unique_ptr<LoggerProviderConfiguration> model(new LoggerProviderConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlLoggerProviderConfiguration: FIXME");
 
   return model;
 }
@@ -161,7 +165,7 @@ static std::unique_ptr<MeterProviderConfiguration> ParseYamlMeterProviderConfigu
 {
   std::unique_ptr<MeterProviderConfiguration> model(new MeterProviderConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlMeterProviderConfiguration: FIXME");
 
   return model;
 }
@@ -171,17 +175,7 @@ static std::unique_ptr<PropagatorConfiguration> ParseYamlPropagatorConfiguration
 {
   std::unique_ptr<PropagatorConfiguration> model(new PropagatorConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
-
-  return model;
-}
-
-static std::unique_ptr<SpanProcessorConfiguration> ParseYamlSpanProcessorConfiguration(
-    const YAML::Node &yaml)
-{
-  std::unique_ptr<SpanProcessorConfiguration> model(new SpanProcessorConfiguration);
-
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlPropagatorConfiguration: FIXME");
 
   return model;
 }
@@ -191,7 +185,7 @@ static std::unique_ptr<SpanLimitsConfiguration> ParseYamlSpanLimitsConfiguration
 {
   std::unique_ptr<SpanLimitsConfiguration> model(new SpanLimitsConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlSpanLimitsConfiguration: FIXME");
 
   return model;
 }
@@ -200,7 +194,135 @@ static std::unique_ptr<SamplerConfiguration> ParseYamlSamplerConfiguration(const
 {
   std::unique_ptr<SamplerConfiguration> model(new SamplerConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlSamplerConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<HeadersConfiguration> ParseYamlHeadersConfiguration(const YAML::Node &yaml)
+{
+  std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("HeadersConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<OtlpSpanExporterConfiguration> ParseYamlOtlpSpanExporterConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<OtlpSpanExporterConfiguration> model(new OtlpSpanExporterConfiguration);
+
+  model->protocol           = GetRequiredString("protocol", yaml);
+  model->endpoint           = GetRequiredString("endpoint", yaml);
+  model->certificate        = GetString("certificate", yaml, "");
+  model->client_key         = GetString("client_key", yaml, "");
+  model->client_certificate = GetString("client_certificate", yaml, "");
+
+  YAML::Node n   = GetChild("headers", yaml);
+  model->headers = ParseYamlHeadersConfiguration(n);
+
+  model->compression = GetString("compression", yaml, "");
+  model->timeout     = GetInteger("timeout", yaml, 10000);
+  model->insecure    = GetBoolean("insecure", yaml, false);
+
+  return model;
+}
+
+static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseYamlZipkinSpanExporterConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<ZipkinSpanExporterConfiguration> model(new ZipkinSpanExporterConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ZipkinSpanExporterConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<SpanExporterConfiguration> ParseYamlSpanExporterConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<SpanExporterConfiguration> model;
+
+  for (const auto &kv : yaml)
+  {
+    std::string k = kv.first.as<std::string>();
+    YAML::Node v  = kv.second;
+
+    if (k == "otlp")
+    {
+      model = ParseYamlOtlpSpanExporterConfiguration(v);
+    }
+    else if (k == "zipkin")
+    {
+      model = ParseYamlZipkinSpanExporterConfiguration(v);
+    }
+    else
+    {
+#ifdef LATER
+      model = ParseYamlSpanExporterExtensionConfiguration(k, v);
+#endif
+    }
+
+    break;
+  }
+
+  return model;
+}
+
+static std::unique_ptr<BatchSpanProcessorConfiguration> ParseYamlBatchSpanProcessorConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<BatchSpanProcessorConfiguration> model(new BatchSpanProcessorConfiguration);
+
+  model->schedule_delay        = GetInteger("schedule_delay", yaml, 5000);
+  model->export_timeout        = GetInteger("export_timeout", yaml, 30000);
+  model->max_queue_size        = GetInteger("max_queue_size", yaml, 2048);
+  model->max_export_batch_size = GetInteger("max_export_batch_size", yaml, 512);
+
+  YAML::Node n    = GetRequiredChild("exporter", yaml);
+  model->exporter = ParseYamlSpanExporterConfiguration(n);
+
+  return model;
+}
+
+static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseYamlSimpleSpanProcessorConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<SimpleSpanProcessorConfiguration> model(new SimpleSpanProcessorConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlSimpleSpanProcessorConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<SpanProcessorConfiguration> ParseYamlSpanProcessorConfiguration(
+    const YAML::Node &yaml)
+{
+  std::unique_ptr<SpanProcessorConfiguration> model;
+
+  for (const auto &kv : yaml)
+  {
+    std::string k = kv.first.as<std::string>();
+    YAML::Node v  = kv.second;
+
+    if (k == "batch")
+    {
+      model = ParseYamlBatchSpanProcessorConfiguration(v);
+    }
+    else if (k == "simple")
+    {
+      model = ParseYamlSimpleSpanProcessorConfiguration(v);
+    }
+    else
+    {
+#ifdef LATER
+      model = ParseYamlSpanProcessorExtensionConfiguration(k, v);
+#endif
+    }
+
+    break;
+  }
 
   return model;
 }
@@ -211,17 +333,12 @@ static std::unique_ptr<TracerProviderConfiguration> ParseYamlTracerProviderConfi
   std::unique_ptr<TracerProviderConfiguration> model(new TracerProviderConfiguration);
 
   {
-    YAML::Node n = GetChild("processors", yaml);
+    YAML::Node n = GetRequiredChild("processors", yaml);
 
-    if (n)
+    for (YAML::const_iterator it = n.begin(); it != n.end(); ++it)
     {
-      OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
-      // model->processors = n.as<std::string>();
-    }
-    else
-    {
-      OTEL_INTERNAL_LOG_ERROR("Yaml: required node processors");
-      return nullptr;
+      OTEL_INTERNAL_LOG_ERROR("processor = " << *it);
+      model->processors.push_back(ParseYamlSpanProcessorConfiguration(*it));
     }
   }
 
@@ -260,7 +377,7 @@ static std::unique_ptr<ResourceConfiguration> ParseYamlResourceConfiguration(con
 {
   std::unique_ptr<ResourceConfiguration> model(new ResourceConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("Yaml: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseYamlResourceConfiguration: FIXME");
 
   return model;
 }
