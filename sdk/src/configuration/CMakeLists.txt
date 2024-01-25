@@ -3,7 +3,7 @@
 
 add_library(
   opentelemetry_configuration
-  configuration_factory.cc)
+  configuration_factory.cc yaml_document.cc yaml_document_node.cc)
 
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME configuration)
 set_target_version(opentelemetry_configuration)
