@@ -24,7 +24,7 @@ inline void SpinThrash(benchmark::State &s, SpinLockType &spinlock, LockF lock, 
   // Value we will increment, fighting over a spinlock.
   // The contention is meant to be brief, as close to our expected
   // use cases of "updating pointers" or "pushing an event onto a buffer".
-  std::int64_t value = 0;
+  std::int64_t value OPENTELEMETRY_MAYBE_UNUSED = 0;
 
   std::vector<std::thread> threads;
   threads.reserve(num_threads);
