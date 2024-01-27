@@ -4,8 +4,14 @@
  */
 {#
   Adapted from:
-  opentelemetry-java/buildscripts/semantic-convention/templates/SemanticAttributes.java.j2
+  https://github.com/open-telemetry/semantic-conventions-java/blob/main/buildscripts/templates/SemanticAttributes.java.j2
   for opentelemetry-cpp
+
+  For doc on the template syntax:
+  https://jinja.palletsprojects.com/en/3.0.x/
+
+  For doc on the semantic convention:
+  https://github.com/open-telemetry/build-tools/tree/main/semantic-conventions
 #}
 {%- macro to_cpp_return_type(type) -%}
   {%- if type == "string" -%}
@@ -60,12 +66,12 @@ static constexpr const char *kSchemaUrl = "{{schemaUrl}}";
  * <p>Notes:
   <ul> {{attribute.note | render_markdown(code="{{@code {0}}}", paragraph="<li>{0}</li>", list="{0}")}} </ul>
   {%- endif %}
-{%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
+{%- if (attribute.deprecated) %}
  *
  * @deprecated {{attribute.brief | to_doc_brief}}.
   {%- endif %}
  */
-  {%- if (attribute.stability | string()) == "StabilityLevel.DEPRECATED" %}
+  {%- if (attribute.deprecated) %}
 OPENTELEMETRY_DEPRECATED
   {%- endif %}
 static constexpr const char *k{{attribute.fqn | to_camelcase(True)}} = "{{attribute.fqn}}";
