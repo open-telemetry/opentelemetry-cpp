@@ -4,7 +4,7 @@
 #pragma once
 
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
