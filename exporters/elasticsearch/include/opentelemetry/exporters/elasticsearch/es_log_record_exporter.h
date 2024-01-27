@@ -7,7 +7,6 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 
