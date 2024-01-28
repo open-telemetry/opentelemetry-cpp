@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,10 +12,9 @@ namespace sdk
 namespace configuration
 {
 
-class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
+class AlwaysOffSamplerConfiguration : public SamplerConfiguration
 {
 public:
-  std::unique_ptr<SpanExporterConfiguration> exporter;
 };
 
 }  // namespace configuration

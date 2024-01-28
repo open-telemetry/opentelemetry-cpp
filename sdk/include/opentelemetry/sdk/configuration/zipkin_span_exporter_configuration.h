@@ -15,6 +15,8 @@ namespace configuration
 class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
+  std::string endpoint;
+  size_t timeout;
 };
 
 }  // namespace configuration

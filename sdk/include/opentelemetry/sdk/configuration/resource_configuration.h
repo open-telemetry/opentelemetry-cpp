@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,6 +15,8 @@ namespace configuration
 class ResourceConfiguration
 {
 public:
+  std::unique_ptr<AttributesConfiguration> attributes;
+  std::string schema_url;
 };
 
 }  // namespace configuration

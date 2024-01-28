@@ -27,6 +27,7 @@ public:
 
   bool AsBoolean() override;
   size_t AsInteger() override;
+  double AsDouble() override;
   std::string AsString() override;
 
   std::unique_ptr<DocumentNode> GetRequiredChildNode(std::string_view name) override;
@@ -38,6 +39,9 @@ public:
   size_t GetRequiredInteger(std::string_view name) override;
   size_t GetInteger(std::string_view name, size_t default_value) override;
 
+  double GetRequiredDouble(std::string_view name) override;
+  double GetDouble(std::string_view name, double default_value) override;
+
   std::string GetRequiredString(std::string_view name) override;
   std::string GetString(std::string_view name, std::string_view default_value) override;
 
@@ -45,7 +49,7 @@ public:
   DocumentNodeConstIterator end() const override;
 
   PropertiesNodeConstIterator begin_properties() const override;
-  PropertiesNodeConstIterator end_properties() const  override;
+  PropertiesNodeConstIterator end_properties() const override;
 
   std::string Dump() const override;
 

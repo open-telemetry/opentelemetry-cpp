@@ -5,13 +5,18 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/trace_id_ration_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
@@ -83,17 +88,167 @@ static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
 {
   std::unique_ptr<SpanLimitsConfiguration> model(new SpanLimitsConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParseSpanLimitsConfiguration: FIXME");
+  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
+  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
+  model->event_count_limit            = node->GetInteger("event_count_limit", 128);
+  model->link_count_limit             = node->GetInteger("link_count_limit", 128);
+  model->event_attribute_count_limit  = node->GetInteger("event_attribute_count_limit", 128);
+  model->link_attribute_count_limit   = node->GetInteger("link_attribute_count_limit", 128);
 
   return model;
 }
+
+static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node);
+
+static std::unique_ptr<SamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SamplerConfiguration> model(new AlwaysOffSamplerConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<SamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SamplerConfiguration> model(new AlwaysOnSamplerConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<SamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<JaegerRemoteSamplerConfiguration> model(new JaegerRemoteSamplerConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  // Unclear if endpoint and interval are required/optional
+  OTEL_INTERNAL_LOG_ERROR("JaegerRemoteSamplerConfiguration: FIXME");
+
+  model->endpoint = node->GetString("endpoint", "FIXME");
+  model->interval = node->GetInteger("interval", 0);
+
+  child = node->GetChildNode("initial_sampler");
+  if (child)
+  {
+    model->initial_sampler = ParseSamplerConfiguration(child);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<SamplerConfiguration> ParseParentBasedSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<ParentBasedSamplerConfiguration> model(new ParentBasedSamplerConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("root");
+  if (child)
+  {
+    model->root = ParseSamplerConfiguration(child);
+  }
+
+  child = node->GetChildNode("remote_parent_sampled");
+  if (child)
+  {
+    model->remote_parent_sampled = ParseSamplerConfiguration(child);
+  }
+
+  child = node->GetChildNode("remote_parent_not_sampled");
+  if (child)
+  {
+    model->remote_parent_not_sampled = ParseSamplerConfiguration(child);
+  }
+
+  child = node->GetChildNode("local_parent_sampled");
+  if (child)
+  {
+    model->local_parent_sampled = ParseSamplerConfiguration(child);
+  }
+
+  child = node->GetChildNode("local_parent_not_sampled");
+  if (child)
+  {
+    model->local_parent_not_sampled = ParseSamplerConfiguration(child);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<TraceIdRatioBasedSamplerConfiguration> model(
+      new TraceIdRatioBasedSamplerConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->ratio = node->GetDouble("ratio", 0);
+
+  return model;
+}
+
+#ifdef LATER
+static std::unique_ptr<SamplerConfiguration> ParseSamplerExtensionConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SamplerConfiguration> model(new SamplerExtensionConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("SamplerExtensionConfiguration: FIXME");
+
+  return model;
+}
+#endif
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<SamplerConfiguration> model(new SamplerConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: FIXME");
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: count " << count);
+    // Throw
+  }
+
+  if (name == "always_off")
+  {
+    model = ParseAlwaysOffSamplerConfiguration(child);
+  }
+  else if (name == "always_on")
+  {
+    model = ParseAlwaysOnSamplerConfiguration(child);
+  }
+  else if (name == "jaeger_remote")
+  {
+    model = ParseJaegerRemoteSamplerConfiguration(child);
+  }
+  else if (name == "parent_based")
+  {
+    model = ParseParentBasedSamplerConfiguration(child);
+  }
+  else if (name == "trace_id_ratio_based")
+  {
+    model = ParseTraceIdRatioBasedSamplerConfiguration(child);
+  }
+  else
+  {
+#ifdef LATER
+    model = ParseSamplerExtensionConfiguration(name, child);
+#endif
+  }
 
   return model;
 }
@@ -105,13 +260,13 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
 
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
-    std::string name = it.Name();
+    std::string name                    = it.Name();
     std::unique_ptr<DocumentNode> child = it.Value();
-    std::string string_value = child->AsString();
+    std::string string_value            = child->AsString();
 
     OTEL_INTERNAL_LOG_ERROR("name = " << name << ", value = " << string_value);
     std::pair<std::string, std::string> entry(name, string_value);
-    model->m_kv_map.insert(entry);
+    model->kv_map.insert(entry);
   }
 
   return model;
@@ -147,7 +302,8 @@ static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterC
 {
   std::unique_ptr<ZipkinSpanExporterConfiguration> model(new ZipkinSpanExporterConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ZipkinSpanExporterConfiguration: FIXME");
+  model->endpoint = node->GetRequiredString("endpoint");
+  model->timeout  = node->GetInteger("timeout", 10000);
 
   return model;
 }
@@ -163,12 +319,13 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
 
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
-    name = it.Name();
+    name  = it.Name();
     child = it.Value();
     count++;
   }
 
-  if (count != 1) {
+  if (count != 1)
+  {
     OTEL_INTERNAL_LOG_ERROR("ParseSpanExporterConfiguration: count " << count);
     // Throw
   }
@@ -212,8 +369,10 @@ static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcesso
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<SimpleSpanProcessorConfiguration> model(new SimpleSpanProcessorConfiguration);
+  std::unique_ptr<DocumentNode> child;
 
-  OTEL_INTERNAL_LOG_ERROR("ParseSimpleSpanProcessorConfiguration: FIXME");
+  child           = node->GetRequiredChildNode("exporter");
+  model->exporter = ParseSpanExporterConfiguration(child);
 
   return model;
 }
@@ -229,12 +388,13 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
 
   for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
   {
-    name = it.Name();
+    name  = it.Name();
     child = it.Value();
     count++;
   }
 
-  if (count != 1) {
+  if (count != 1)
+  {
     OTEL_INTERNAL_LOG_ERROR("ParseSpanProcessorConfiguration: count " << count);
     // Throw
   }
@@ -279,12 +439,46 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
   return model;
 }
 
+static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<AttributesConfiguration> model(new AttributesConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    std::string name                    = it.Name();
+    std::unique_ptr<DocumentNode> child = it.Value();
+    std::string string_value            = child->AsString();
+
+    OTEL_INTERNAL_LOG_ERROR("name = " << name << ", value = " << string_value);
+    if (name == "service.name")
+    {
+      model->service_name = name;
+    }
+    else
+    {
+      std::pair<std::string, std::string> entry(name, string_value);
+      model->kv_map.insert(entry);
+    }
+  }
+
+  return model;
+}
+
 static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<ResourceConfiguration> model(new ResourceConfiguration);
+  std::unique_ptr<DocumentNode> child;
 
-  OTEL_INTERNAL_LOG_ERROR("ParseResourceConfiguration: FIXME");
+  model->schema_url = node->GetString("schema_url", "");
+
+  child = node->GetRequiredChildNode("attributes");
+  if (child)
+  {
+    model->attributes = ParseAttributesConfiguration(child);
+  }
 
   return model;
 }

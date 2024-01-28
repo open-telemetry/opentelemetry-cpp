@@ -22,8 +22,9 @@ static void DebugNode(std::string_view name, const YAML::Node &yaml)
     OTEL_INTERNAL_LOG_DEBUG("Processing: " << name << ", IsDefined: " << yaml.IsDefined());
     OTEL_INTERNAL_LOG_DEBUG("Processing: " << name << ", Size: " << yaml.size());
 
-    const char* msg;
-    switch(yaml.Type()) {
+    const char *msg;
+    switch (yaml.Type())
+    {
       case YAML::NodeType::Undefined:
         msg = "NodeType::Undefined";
         break;
@@ -72,6 +73,17 @@ size_t YamlDocumentNode::AsInteger()
     // FIXME: throw
   }
   size_t value = m_yaml.as<size_t>();
+  return value;
+}
+
+double YamlDocumentNode::AsDouble()
+{
+  if (!m_yaml.IsScalar())
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
+    // FIXME: throw
+  }
+  double value = m_yaml.as<double>();
   return value;
 }
 
@@ -176,6 +188,39 @@ size_t YamlDocumentNode::GetInteger(std::string_view name, size_t default_value)
       // FIXME: throw
     }
     value = attr.as<size_t>();
+  }
+  return value;
+}
+
+double YamlDocumentNode::GetRequiredDouble(std::string_view name)
+{
+  YAML::Node attr = m_yaml[name];
+  if (!attr)
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
+    // FIXME: throw
+  }
+  if (!attr.IsScalar())
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml: double node: " << name);
+    // FIXME: throw
+  }
+  double value = attr.as<double>();
+  return value;
+}
+
+double YamlDocumentNode::GetDouble(std::string_view name, double default_value)
+{
+  double value    = default_value;
+  YAML::Node attr = m_yaml[name];
+  if (attr)
+  {
+    if (!attr.IsScalar())
+    {
+      OTEL_INTERNAL_LOG_ERROR("Yaml: double node: " << name);
+      // FIXME: throw
+    }
+    value = attr.as<double>();
   }
   return value;
 }
@@ -302,7 +347,7 @@ std::string YamlPropertiesNodeConstIteratorImpl::Name() const
 {
   std::pair<std::string, std::unique_ptr<DocumentNode>> result;
   std::pair<YAML::Node, YAML::Node> kv = *m_iter;
-  std::string name = kv.first.as<std::string>();
+  std::string name                     = kv.first.as<std::string>();
   return name;
 }
 

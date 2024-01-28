@@ -28,8 +28,9 @@ public:
   DocumentNode() {}
   virtual ~DocumentNode() {}
 
-  virtual bool AsBoolean() = 0;
-  virtual size_t AsInteger() = 0;
+  virtual bool AsBoolean()       = 0;
+  virtual size_t AsInteger()     = 0;
+  virtual double AsDouble()      = 0;
   virtual std::string AsString() = 0;
 
   virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(std::string_view name) = 0;
@@ -40,6 +41,9 @@ public:
 
   virtual size_t GetRequiredInteger(std::string_view name)               = 0;
   virtual size_t GetInteger(std::string_view name, size_t default_value) = 0;
+
+  virtual double GetRequiredDouble(std::string_view name)               = 0;
+  virtual double GetDouble(std::string_view name, double default_value) = 0;
 
   virtual std::string GetRequiredString(std::string_view name)                         = 0;
   virtual std::string GetString(std::string_view name, std::string_view default_value) = 0;
@@ -70,9 +74,9 @@ public:
   PropertiesNodeConstIteratorImpl() {}
   virtual ~PropertiesNodeConstIteratorImpl() {}
 
-  virtual void Next()                                                = 0;
-  virtual std::string Name() const                 = 0;
-  virtual std::unique_ptr<DocumentNode> Value() const                 = 0;
+  virtual void Next()                                                  = 0;
+  virtual std::string Name() const                                     = 0;
+  virtual std::unique_ptr<DocumentNode> Value() const                  = 0;
   virtual bool Equal(const PropertiesNodeConstIteratorImpl *rhs) const = 0;
 };
 

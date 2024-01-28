@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include <map>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,10 +13,11 @@ namespace sdk
 namespace configuration
 {
 
-class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
+class AttributesConfiguration
 {
 public:
-  std::unique_ptr<SpanExporterConfiguration> exporter;
+  std::string service_name;
+  std::map<std::string, std::string> kv_map;
 };
 
 }  // namespace configuration
