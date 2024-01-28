@@ -103,7 +103,16 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
 {
   std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("HeadersConfiguration: FIXME");
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    std::string name = it.Name();
+    std::unique_ptr<DocumentNode> child = it.Value();
+    std::string string_value = child->AsString();
+
+    OTEL_INTERNAL_LOG_ERROR("name = " << name << ", value = " << string_value);
+    std::pair<std::string, std::string> entry(name, string_value);
+    model->m_kv_map.insert(entry);
+  }
 
   return model;
 }
@@ -148,9 +157,21 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
 {
   std::unique_ptr<SpanExporterConfiguration> model;
 
-  auto name_and_content               = node->GetNameAndContent();
-  std::string name                    = name_and_content.first;
-  std::unique_ptr<DocumentNode> child = std::move(name_and_content.second);
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1) {
+    OTEL_INTERNAL_LOG_ERROR("ParseSpanExporterConfiguration: count " << count);
+    // Throw
+  }
 
   if (name == "otlp")
   {
@@ -202,24 +223,34 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
 {
   std::unique_ptr<SpanProcessorConfiguration> model;
 
-  auto name_and_content                 = node->GetNameAndContent();
-  std::string name                      = name_and_content.first;
-  std::unique_ptr<DocumentNode> content = std::move(name_and_content.second);
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
 
-  OTEL_INTERNAL_LOG_ERROR("Found " << name);
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1) {
+    OTEL_INTERNAL_LOG_ERROR("ParseSpanProcessorConfiguration: count " << count);
+    // Throw
+  }
 
   if (name == "batch")
   {
-    model = ParseBatchSpanProcessorConfiguration(content);
+    model = ParseBatchSpanProcessorConfiguration(child);
   }
   else if (name == "simple")
   {
-    model = ParseSimpleSpanProcessorConfiguration(content);
+    model = ParseSimpleSpanProcessorConfiguration(child);
   }
   else
   {
 #ifdef LATER
-    model = ParseSpanProcessorExtensionConfiguration(name, content);
+    model = ParseSpanProcessorExtensionConfiguration(name, child);
 #endif
   }
 
@@ -234,21 +265,10 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
 
   child = node->GetRequiredChildNode("processors");
 
-  OTEL_INTERNAL_LOG_ERROR("FIXME iterator");
-
   for (auto it = child->begin(); it != child->end(); ++it)
   {
-    OTEL_INTERNAL_LOG_ERROR("processor = ");
     model->processors.push_back(ParseSpanProcessorConfiguration(*it));
   }
-
-#ifdef LATER
-  for (YAML::const_iterator it = n.begin(); it != n.end(); ++it)
-  {
-    OTEL_INTERNAL_LOG_ERROR("processor = " << *it);
-    model->processors.push_back(ParseSpanProcessorConfiguration(*it));
-  }
-#endif
 
   child         = node->GetRequiredChildNode("limits");
   model->limits = ParseSpanLimitsConfiguration(child);

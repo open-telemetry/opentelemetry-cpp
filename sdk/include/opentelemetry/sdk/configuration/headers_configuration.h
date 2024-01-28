@@ -14,6 +14,7 @@ namespace configuration
 class HeadersConfiguration
 {
 public:
+  std::map<std::string, std::string> m_kv_map;
 };
 
 }  // namespace configuration

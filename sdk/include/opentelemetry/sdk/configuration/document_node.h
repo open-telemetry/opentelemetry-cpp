@@ -20,6 +20,7 @@ namespace configuration
 {
 
 class DocumentNodeConstIterator;
+class PropertiesNodeConstIterator;
 
 class DocumentNode
 {
@@ -27,7 +28,9 @@ public:
   DocumentNode() {}
   virtual ~DocumentNode() {}
 
-  virtual std::pair<std::string, std::unique_ptr<DocumentNode>> GetNameAndContent() = 0;
+  virtual bool AsBoolean() = 0;
+  virtual size_t AsInteger() = 0;
+  virtual std::string AsString() = 0;
 
   virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(std::string_view name) = 0;
   virtual std::unique_ptr<DocumentNode> GetChildNode(std::string_view name)         = 0;
@@ -43,6 +46,11 @@ public:
 
   virtual DocumentNodeConstIterator begin() const = 0;
   virtual DocumentNodeConstIterator end() const   = 0;
+
+  virtual PropertiesNodeConstIterator begin_properties() const = 0;
+  virtual PropertiesNodeConstIterator end_properties() const   = 0;
+
+  virtual std::string Dump() const = 0;
 };
 
 class DocumentNodeConstIteratorImpl
@@ -54,6 +62,18 @@ public:
   virtual void Next()                                                = 0;
   virtual std::unique_ptr<DocumentNode> Item() const                 = 0;
   virtual bool Equal(const DocumentNodeConstIteratorImpl *rhs) const = 0;
+};
+
+class PropertiesNodeConstIteratorImpl
+{
+public:
+  PropertiesNodeConstIteratorImpl() {}
+  virtual ~PropertiesNodeConstIteratorImpl() {}
+
+  virtual void Next()                                                = 0;
+  virtual std::string Name() const                 = 0;
+  virtual std::unique_ptr<DocumentNode> Value() const                 = 0;
+  virtual bool Equal(const PropertiesNodeConstIteratorImpl *rhs) const = 0;
 };
 
 class DocumentNodeConstIterator
@@ -90,6 +110,35 @@ public:
 
 private:
   DocumentNodeConstIteratorImpl *m_impl;
+};
+
+class PropertiesNodeConstIterator
+{
+public:
+  PropertiesNodeConstIterator(PropertiesNodeConstIteratorImpl *impl) : m_impl(impl) {}
+  ~PropertiesNodeConstIterator() { delete m_impl; }
+
+  bool operator==(const PropertiesNodeConstIterator &rhs) const
+  {
+    return (m_impl->Equal(rhs.m_impl));
+  }
+
+  bool operator!=(const PropertiesNodeConstIterator &rhs) const
+  {
+    return (!m_impl->Equal(rhs.m_impl));
+  }
+
+  std::string Name() const { return m_impl->Name(); }
+  std::unique_ptr<DocumentNode> Value() const { return m_impl->Value(); }
+
+  PropertiesNodeConstIterator &operator++()
+  {
+    m_impl->Next();
+    return *this;
+  }
+
+private:
+  PropertiesNodeConstIteratorImpl *m_impl;
 };
 
 }  // namespace configuration
