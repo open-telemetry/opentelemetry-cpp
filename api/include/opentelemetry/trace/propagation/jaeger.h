@@ -57,7 +57,14 @@ public:
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return trace::SetSpan(context, sp);
+    if (span_context.IsValid())
+    {
+      return trace::SetSpan(context, sp);
+    }
+    else
+    {
+      return context;
+    }
   }
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
