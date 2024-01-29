@@ -1,5 +1,8 @@
 # Simple Metrics Example
 
+See [INSTALL.md](../../INSTALL.md) for instructions on building and
+running the example.
+
 This example initializes the metrics pipeline with 3 different instrument types:
 
 - [Counter](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter)
@@ -44,8 +47,9 @@ custom aggregation config, and attribute processor. Metrics SDK  will implicitly
 create a missing view with default mapping between Instrument and Aggregation.
 
     ```cpp
+    std::string counter_name = "counter_name";
     std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{
-        new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, "counter_name")};
+        new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, counter_name)};
     std::unique_ptr<metric_sdk::MeterSelector> meter_selector{
         new metric_sdk::MeterSelector(name, version, schema)};
     std::unique_ptr<metric_sdk::View> sum_view{
@@ -111,6 +115,3 @@ Ensure to keep the Instrument object active for the lifetime of collection.
     auto counter = meter->CreateDoubleObservableCounter(counter_name);
     counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
     ```
-
-See [INSTALL.md](../../INSTALL.md) for instructions on building and
-running the example.

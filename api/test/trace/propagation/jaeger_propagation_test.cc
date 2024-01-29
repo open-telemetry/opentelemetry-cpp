@@ -134,6 +134,25 @@ TEST(JaegerPropagatorTest, ExctractInvalidSpans)
   }
 }
 
+TEST(JaegerPropagatorTest, DoNotOverwriteContextWithInvalidSpan)
+{
+  TextMapCarrierTest carrier;
+  constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+  trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
+                                  trace::TraceFlags{true}, false};
+  nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
+
+  // Make sure this invalid span does not overwrite the active span context
+  carrier.headers_ = {{"uber-trace-id", "foo:bar:0:00"}};
+  context::Context ctx1{trace::kSpanKey, sp};
+  context::Context ctx2 = format.Extract(carrier, ctx1);
+  auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
+  auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "0102030405060708090a0b0c0d0e0f10");
+}
+
 TEST(JaegerPropagatorTest, InjectsContext)
 {
   TextMapCarrierTest carrier;
@@ -161,7 +180,7 @@ TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)
 {
   TextMapCarrierTest carrier;
   context::Context ctx{
-      "current-span",
+      trace::kSpanKey,
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(carrier, ctx);
   EXPECT_TRUE(carrier.headers_.count("uber-trace-id") == 0);
