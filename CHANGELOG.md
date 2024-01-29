@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix b3, w3c and jaeger propagators: they will not overwrite
+  the active span with a default invalid span, which is especially useful
+  when used with CompositePropagator
+  [TEST] fix string "current-span" to trace:kSpan which is "active_span"
+  [#2511](https://github.com/open-telemetry/opentelemetry-cpp/pull/2511)
 * [REMOVAL] Remove option WITH_OTLP_HTTP_SSL_PREVIEW
   [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
 * [BUILD] Fix removing of NOMINMAX on Windows
