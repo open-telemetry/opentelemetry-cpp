@@ -8,7 +8,8 @@
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentracing/propagation.h"
 #include "opentracing/value.h"
 
