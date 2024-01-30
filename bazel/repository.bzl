@@ -30,7 +30,7 @@ def opentelemetry_cpp_deps():
         repo_mapping = {
             "@zlib": "@zlib~1.3",
             "@com_googlesource_code_re2": "@re2~2023-11-01",
-#            "@com_github_cares_cares": "@c-ares~1.16.1",
+            "@com_github_cares_cares": "@c-ares~1.16.1",
 #            "@boringssl": "@boringssl~0.0.0-20230215-5c22014",
         }
     )
@@ -51,10 +51,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        integrity = "sha256-Yp/fRT8CJvaTwI37Xcra582bOWiXrywPJ6zRUIg9d5w=",
+        integrity = "sha256-WUysSxxkAkxieXveBx4JQRooOIIgHzztEGMNceJpN9M=",
         strip_prefix = "prometheus-cpp-with-submodules",
         urls = [
-            "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.0/prometheus-cpp-with-submodules.tar.gz",
+            "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.1/prometheus-cpp-with-submodules.tar.gz",
         ],
     )
 
