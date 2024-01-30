@@ -70,3 +70,14 @@ cc_test(
         "@ftxui//src:component",
     ]),    
 )
+
+cc_test(
+   name = "y",
+   srcs = ["y.cpp"],
+   timeout = "eternal",
+   size = "enormous",
+   tags = ["external", "manual", "exclusive"],
+   deps = dll_deps([
+        "@ftxui//src:component"
+    ])
+)
