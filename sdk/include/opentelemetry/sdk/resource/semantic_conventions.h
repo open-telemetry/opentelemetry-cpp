@@ -24,7 +24,7 @@ namespace SemanticConventions
 /**
  * The URL of the OpenTelemetry schema for these keys and values.
  */
-static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.23.1";
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.24.0";
 
 /**
  * The cloud account ID the resource is assigned to.
@@ -176,6 +176,274 @@ static constexpr const char *kContainerName = "container.name";
 static constexpr const char *kContainerRuntime = "container.runtime";
 
 /**
+ * A unique identifier representing the device
+ *
+ * <p>Notes:
+  <ul> <li>The device identifier MUST only be defined using the values outlined below. This value is
+ not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this
+ value MUST be equal to the <a
+ href="https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor">vendor
+ identifier</a>. On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation
+ ID or a globally unique UUID which is persisted across sessions in your application. More
+ information can be found <a
+ href="https://developer.android.com/training/articles/user-data-ids">here</a> on best practices and
+ exact implementation details. Caution should be taken when storing personal data or anything which
+ can identify a user. GDPR and data protection laws may apply, ensure you do your own due
+ diligence.</li> </ul>
+ */
+static constexpr const char *kDeviceId = "device.id";
+
+/**
+ * The name of the device manufacturer
+ *
+ * <p>Notes:
+  <ul> <li>The Android OS provides this field via <a
+ href="https://developer.android.com/reference/android/os/Build#MANUFACTURER">Build</a>. iOS apps
+ SHOULD hardcode the value {@code Apple}.</li> </ul>
+ */
+static constexpr const char *kDeviceManufacturer = "device.manufacturer";
+
+/**
+ * The model identifier for the device
+ *
+ * <p>Notes:
+  <ul> <li>It's recommended this value represents a machine-readable version of the model identifier
+ rather than the market or consumer-friendly name of the device.</li> </ul>
+ */
+static constexpr const char *kDeviceModelIdentifier = "device.model.identifier";
+
+/**
+ * The marketing name for the device model
+ *
+ * <p>Notes:
+  <ul> <li>It's recommended this value represents a human-readable version of the device model
+ rather than a machine-readable alternative.</li> </ul>
+ */
+static constexpr const char *kDeviceModelName = "device.model.name";
+
+/**
+ * The CPU architecture the host system is running on.
+ */
+static constexpr const char *kHostArch = "host.arch";
+
+/**
+ * The amount of level 2 memory cache available to the processor (in Bytes).
+ */
+static constexpr const char *kHostCpuCacheL2Size = "host.cpu.cache.l2.size";
+
+/**
+ * Family or generation of the CPU.
+ */
+static constexpr const char *kHostCpuFamily = "host.cpu.family";
+
+/**
+ * Model identifier. It provides more granular information about the CPU, distinguishing it from
+ * other CPUs within the same family.
+ */
+static constexpr const char *kHostCpuModelId = "host.cpu.model.id";
+
+/**
+ * Model designation of the processor.
+ */
+static constexpr const char *kHostCpuModelName = "host.cpu.model.name";
+
+/**
+ * Stepping or core revisions.
+ */
+static constexpr const char *kHostCpuStepping = "host.cpu.stepping";
+
+/**
+ * Processor manufacturer identifier. A maximum 12-character string.
+ *
+ * <p>Notes:
+  <ul> <li><a href="https://wiki.osdev.org/CPUID">CPUID</a> command returns the vendor ID string in
+ EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character
+ string.</li> </ul>
+ */
+static constexpr const char *kHostCpuVendorId = "host.cpu.vendor.id";
+
+/**
+ * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
+ * non-containerized systems, this should be the {@code machine-id}. See the table below for the
+ * sources to use to determine the {@code machine-id} based on operating system.
+ */
+static constexpr const char *kHostId = "host.id";
+
+/**
+ * VM image ID or host OS image ID. For Cloud, this value is from the provider.
+ */
+static constexpr const char *kHostImageId = "host.image.id";
+
+/**
+ * Name of the VM image or OS install the host was instantiated from.
+ */
+static constexpr const char *kHostImageName = "host.image.name";
+
+/**
+ * The version string of the VM image or host OS as defined in <a
+ * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
+ */
+static constexpr const char *kHostImageVersion = "host.image.version";
+
+/**
+ * Available IP addresses of the host, excluding loopback interfaces.
+ *
+ * <p>Notes:
+  <ul> <li>IPv4 Addresses MUST be specified in dotted-quad notation. IPv6 addresses MUST be
+ specified in the <a href="https://www.rfc-editor.org/rfc/rfc5952.html">RFC 5952</a> format.</li>
+ </ul>
+ */
+static constexpr const char *kHostIp = "host.ip";
+
+/**
+ * Available MAC addresses of the host, excluding loopback interfaces.
+ *
+ * <p>Notes:
+  <ul> <li>MAC Addresses MUST be represented in <a
+ href="https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eui.pdf">IEEE RA
+ hexadecimal form</a>: as hyphen-separated octets in uppercase hexadecimal form from most to least
+ significant.</li> </ul>
+ */
+static constexpr const char *kHostMac = "host.mac";
+
+/**
+ * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully
+ * qualified hostname, or another name specified by the user.
+ */
+static constexpr const char *kHostName = "host.name";
+
+/**
+ * Type of host. For Cloud, this must be the machine type.
+ */
+static constexpr const char *kHostType = "host.type";
+
+/**
+ * The name of the cluster.
+ */
+static constexpr const char *kK8sClusterName = "k8s.cluster.name";
+
+/**
+ * A pseudo-ID for the cluster, set to the UID of the {@code kube-system} namespace.
+ *
+ * <p>Notes:
+  <ul> <li>K8s doesn't have support for obtaining a cluster ID. If this is ever
+added, we will recommend collecting the {@code k8s.cluster.uid} through the
+official APIs. In the meantime, we are able to use the {@code uid} of the
+{@code kube-system} namespace as a proxy for cluster ID. Read on for the
+rationale.</li><li>Every object created in a K8s cluster is assigned a distinct UID. The
+{@code kube-system} namespace is used by Kubernetes itself and will exist
+for the lifetime of the cluster. Using the {@code uid} of the {@code kube-system}
+namespace is a reasonable proxy for the K8s ClusterID as it will only
+change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
+UUIDs as standardized by
+<a href="https://www.itu.int/ITU-T/studygroups/com17/oid.html">ISO/IEC 9834-8 and ITU-T X.667</a>.
+Which states:</li><blockquote>
+<li>If generated according to one of the mechanisms defined in Rec.</li></blockquote>
+<li>ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
+  different from all other UUIDs generated before 3603 A.D., or is
+  extremely likely to be different (depending on the mechanism chosen).</li><li>Therefore, UIDs
+between clusters should be extremely unlikely to conflict.</li> </ul>
+ */
+static constexpr const char *kK8sClusterUid = "k8s.cluster.uid";
+
+/**
+ * The name of the Container from Pod specification, must be unique within a Pod. Container runtime
+ * usually uses different globally unique name ({@code container.name}).
+ */
+static constexpr const char *kK8sContainerName = "k8s.container.name";
+
+/**
+ * Number of times the container was restarted. This attribute can be used to identify a particular
+ * container (running or stopped) within a container spec.
+ */
+static constexpr const char *kK8sContainerRestartCount = "k8s.container.restart_count";
+
+/**
+ * The name of the CronJob.
+ */
+static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
+
+/**
+ * The UID of the CronJob.
+ */
+static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
+
+/**
+ * The name of the DaemonSet.
+ */
+static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
+
+/**
+ * The UID of the DaemonSet.
+ */
+static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
+
+/**
+ * The name of the Deployment.
+ */
+static constexpr const char *kK8sDeploymentName = "k8s.deployment.name";
+
+/**
+ * The UID of the Deployment.
+ */
+static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
+
+/**
+ * The name of the Job.
+ */
+static constexpr const char *kK8sJobName = "k8s.job.name";
+
+/**
+ * The UID of the Job.
+ */
+static constexpr const char *kK8sJobUid = "k8s.job.uid";
+
+/**
+ * The name of the namespace that the pod is running in.
+ */
+static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
+
+/**
+ * The name of the Node.
+ */
+static constexpr const char *kK8sNodeName = "k8s.node.name";
+
+/**
+ * The UID of the Node.
+ */
+static constexpr const char *kK8sNodeUid = "k8s.node.uid";
+
+/**
+ * The name of the Pod.
+ */
+static constexpr const char *kK8sPodName = "k8s.pod.name";
+
+/**
+ * The UID of the Pod.
+ */
+static constexpr const char *kK8sPodUid = "k8s.pod.uid";
+
+/**
+ * The name of the ReplicaSet.
+ */
+static constexpr const char *kK8sReplicasetName = "k8s.replicaset.name";
+
+/**
+ * The UID of the ReplicaSet.
+ */
+static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
+
+/**
+ * The name of the StatefulSet.
+ */
+static constexpr const char *kK8sStatefulsetName = "k8s.statefulset.name";
+
+/**
+ * The UID of the StatefulSet.
+ */
+static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
+
+/**
  * The digest of the OCI image manifest. For container images specifically is the digest by which
 the container image is known.
  *
@@ -188,6 +456,100 @@ href="https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifes
 Manifest</a>.</li> </ul>
  */
 static constexpr const char *kOciManifestDigest = "oci.manifest.digest";
+
+/**
+ * Unique identifier for a particular build or compilation of the operating system.
+ */
+static constexpr const char *kOsBuildId = "os.build_id";
+
+/**
+ * Human readable (not intended to be parsed) OS version information, like e.g. reported by {@code
+ * ver} or {@code lsb_release -a} commands.
+ */
+static constexpr const char *kOsDescription = "os.description";
+
+/**
+ * Human readable operating system name.
+ */
+static constexpr const char *kOsName = "os.name";
+
+/**
+ * The operating system type.
+ */
+static constexpr const char *kOsType = "os.type";
+
+/**
+ * The version string of the operating system as defined in <a
+ * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
+ */
+static constexpr const char *kOsVersion = "os.version";
+
+/**
+ * The command used to launch the process (i.e. the command name). On Linux based systems, can be
+ * set to the zeroth string in {@code proc/[pid]/cmdline}. On Windows, can be set to the first
+ * parameter extracted from {@code GetCommandLineW}.
+ */
+static constexpr const char *kProcessCommand = "process.command";
+
+/**
+ * All the command arguments (including the command/executable itself) as received by the process.
+ * On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according
+ * to the list of null-delimited strings extracted from {@code proc/[pid]/cmdline}. For libc-based
+ * executables, this would be the full argv vector passed to {@code main}.
+ */
+static constexpr const char *kProcessCommandArgs = "process.command_args";
+
+/**
+ * The full command used to launch the process as a single string representing the full command. On
+ * Windows, can be set to the result of {@code GetCommandLineW}. Do not set this if you have to
+ * assemble it just for monitoring; use {@code process.command_args} instead.
+ */
+static constexpr const char *kProcessCommandLine = "process.command_line";
+
+/**
+ * The name of the process executable. On Linux based systems, can be set to the {@code Name} in
+ * {@code proc/[pid]/status}. On Windows, can be set to the base name of {@code
+ * GetProcessImageFileNameW}.
+ */
+static constexpr const char *kProcessExecutableName = "process.executable.name";
+
+/**
+ * The full path to the process executable. On Linux based systems, can be set to the target of
+ * {@code proc/[pid]/exe}. On Windows, can be set to the result of {@code GetProcessImageFileNameW}.
+ */
+static constexpr const char *kProcessExecutablePath = "process.executable.path";
+
+/**
+ * The username of the user that owns the process.
+ */
+static constexpr const char *kProcessOwner = "process.owner";
+
+/**
+ * Parent Process identifier (PPID).
+ */
+static constexpr const char *kProcessParentPid = "process.parent_pid";
+
+/**
+ * Process identifier (PID).
+ */
+static constexpr const char *kProcessPid = "process.pid";
+
+/**
+ * An additional description about the runtime of the process, for example a specific vendor
+ * customization of the runtime environment.
+ */
+static constexpr const char *kProcessRuntimeDescription = "process.runtime.description";
+
+/**
+ * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of
+ * the compiler.
+ */
+static constexpr const char *kProcessRuntimeName = "process.runtime.name";
+
+/**
+ * The version of the runtime of this process, as returned by the runtime without modification.
+ */
+static constexpr const char *kProcessRuntimeVersion = "process.runtime.version";
 
 /**
  * Uniquely identifies the framework API revision offered by a version ({@code os.version}) of the
@@ -367,55 +729,18 @@ static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.c
 
 /**
  * Name of the <a href="https://wikipedia.org/wiki/Deployment_environment">deployment
- * environment</a> (aka deployment tier).
+environment</a> (aka deployment tier).
+ *
+ * <p>Notes:
+  <ul> <li>{@code deployment.environment} does not affect the uniqueness constraints defined through
+the {@code service.namespace}, {@code service.name} and {@code service.instance.id} resource
+attributes. This implies that resources carrying the following attribute combinations MUST be
+considered to be identifying the same service:</li><li>{@code service.name=frontend}, {@code
+deployment.environment=production}</li> <li>{@code service.name=frontend}, {@code
+deployment.environment=staging}.</li>
+ </ul>
  */
 static constexpr const char *kDeploymentEnvironment = "deployment.environment";
-
-/**
- * A unique identifier representing the device
- *
- * <p>Notes:
-  <ul> <li>The device identifier MUST only be defined using the values outlined below. This value is
- not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this
- value MUST be equal to the <a
- href="https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor">vendor
- identifier</a>. On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation
- ID or a globally unique UUID which is persisted across sessions in your application. More
- information can be found <a
- href="https://developer.android.com/training/articles/user-data-ids">here</a> on best practices and
- exact implementation details. Caution should be taken when storing personal data or anything which
- can identify a user. GDPR and data protection laws may apply, ensure you do your own due
- diligence.</li> </ul>
- */
-static constexpr const char *kDeviceId = "device.id";
-
-/**
- * The name of the device manufacturer
- *
- * <p>Notes:
-  <ul> <li>The Android OS provides this field via <a
- href="https://developer.android.com/reference/android/os/Build#MANUFACTURER">Build</a>. iOS apps
- SHOULD hardcode the value {@code Apple}.</li> </ul>
- */
-static constexpr const char *kDeviceManufacturer = "device.manufacturer";
-
-/**
- * The model identifier for the device
- *
- * <p>Notes:
-  <ul> <li>It's recommended this value represents a machine readable version of the model identifier
- rather than the market or consumer-friendly name of the device.</li> </ul>
- */
-static constexpr const char *kDeviceModelIdentifier = "device.model.identifier";
-
-/**
- * The marketing name for the device model
- *
- * <p>Notes:
-  <ul> <li>It's recommended this value represents a human readable version of the device model
- rather than a machine readable alternative.</li> </ul>
- */
-static constexpr const char *kDeviceModelName = "device.model.name";
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations
@@ -474,322 +799,6 @@ not set this attribute.</li>
  </ul>
  */
 static constexpr const char *kFaasVersion = "faas.version";
-
-/**
- * The CPU architecture the host system is running on.
- */
-static constexpr const char *kHostArch = "host.arch";
-
-/**
- * Unique host ID. For Cloud, this must be the instance_id assigned by the cloud provider. For
- * non-containerized systems, this should be the {@code machine-id}. See the table below for the
- * sources to use to determine the {@code machine-id} based on operating system.
- */
-static constexpr const char *kHostId = "host.id";
-
-/**
- * VM image ID or host OS image ID. For Cloud, this value is from the provider.
- */
-static constexpr const char *kHostImageId = "host.image.id";
-
-/**
- * Name of the VM image or OS install the host was instantiated from.
- */
-static constexpr const char *kHostImageName = "host.image.name";
-
-/**
- * The version string of the VM image or host OS as defined in <a
- * href="README.md#version-attributes">Version Attributes</a>.
- */
-static constexpr const char *kHostImageVersion = "host.image.version";
-
-/**
- * Available IP addresses of the host, excluding loopback interfaces.
- *
- * <p>Notes:
-  <ul> <li>IPv4 Addresses MUST be specified in dotted-quad notation. IPv6 addresses MUST be
- specified in the <a href="https://www.rfc-editor.org/rfc/rfc5952.html">RFC 5952</a> format.</li>
- </ul>
- */
-static constexpr const char *kHostIp = "host.ip";
-
-/**
- * Available MAC addresses of the host, excluding loopback interfaces.
- *
- * <p>Notes:
-  <ul> <li>MAC Addresses MUST be represented in <a
- href="https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eui.pdf">IEEE RA
- hexadecimal form</a>: as hyphen-separated octets in uppercase hexadecimal form from most to least
- significant.</li> </ul>
- */
-static constexpr const char *kHostMac = "host.mac";
-
-/**
- * Name of the host. On Unix systems, it may contain what the hostname command returns, or the fully
- * qualified hostname, or another name specified by the user.
- */
-static constexpr const char *kHostName = "host.name";
-
-/**
- * Type of host. For Cloud, this must be the machine type.
- */
-static constexpr const char *kHostType = "host.type";
-
-/**
- * The amount of level 2 memory cache available to the processor (in Bytes).
- */
-static constexpr const char *kHostCpuCacheL2Size = "host.cpu.cache.l2.size";
-
-/**
- * Numeric value specifying the family or generation of the CPU.
- */
-static constexpr const char *kHostCpuFamily = "host.cpu.family";
-
-/**
- * Model identifier. It provides more granular information about the CPU, distinguishing it from
- * other CPUs within the same family.
- */
-static constexpr const char *kHostCpuModelId = "host.cpu.model.id";
-
-/**
- * Model designation of the processor.
- */
-static constexpr const char *kHostCpuModelName = "host.cpu.model.name";
-
-/**
- * Stepping or core revisions.
- */
-static constexpr const char *kHostCpuStepping = "host.cpu.stepping";
-
-/**
- * Processor manufacturer identifier. A maximum 12-character string.
- *
- * <p>Notes:
-  <ul> <li><a href="https://wiki.osdev.org/CPUID">CPUID</a> command returns the vendor ID string in
- EBX, EDX and ECX registers. Writing these to memory in this order results in a 12-character
- string.</li> </ul>
- */
-static constexpr const char *kHostCpuVendorId = "host.cpu.vendor.id";
-
-/**
- * The name of the cluster.
- */
-static constexpr const char *kK8sClusterName = "k8s.cluster.name";
-
-/**
- * A pseudo-ID for the cluster, set to the UID of the {@code kube-system} namespace.
- *
- * <p>Notes:
-  <ul> <li>K8s doesn't have support for obtaining a cluster ID. If this is ever
-added, we will recommend collecting the {@code k8s.cluster.uid} through the
-official APIs. In the meantime, we are able to use the {@code uid} of the
-{@code kube-system} namespace as a proxy for cluster ID. Read on for the
-rationale.</li><li>Every object created in a K8s cluster is assigned a distinct UID. The
-{@code kube-system} namespace is used by Kubernetes itself and will exist
-for the lifetime of the cluster. Using the {@code uid} of the {@code kube-system}
-namespace is a reasonable proxy for the K8s ClusterID as it will only
-change if the cluster is rebuilt. Furthermore, Kubernetes UIDs are
-UUIDs as standardized by
-<a href="https://www.itu.int/ITU-T/studygroups/com17/oid.html">ISO/IEC 9834-8 and ITU-T X.667</a>.
-Which states:</li><blockquote>
-<li>If generated according to one of the mechanisms defined in Rec.</li></blockquote>
-<li>ITU-T X.667 | ISO/IEC 9834-8, a UUID is either guaranteed to be
-  different from all other UUIDs generated before 3603 A.D., or is
-  extremely likely to be different (depending on the mechanism chosen).</li><li>Therefore, UIDs
-between clusters should be extremely unlikely to conflict.</li> </ul>
- */
-static constexpr const char *kK8sClusterUid = "k8s.cluster.uid";
-
-/**
- * The name of the Node.
- */
-static constexpr const char *kK8sNodeName = "k8s.node.name";
-
-/**
- * The UID of the Node.
- */
-static constexpr const char *kK8sNodeUid = "k8s.node.uid";
-
-/**
- * The name of the namespace that the pod is running in.
- */
-static constexpr const char *kK8sNamespaceName = "k8s.namespace.name";
-
-/**
- * The name of the Pod.
- */
-static constexpr const char *kK8sPodName = "k8s.pod.name";
-
-/**
- * The UID of the Pod.
- */
-static constexpr const char *kK8sPodUid = "k8s.pod.uid";
-
-/**
- * The name of the Container from Pod specification, must be unique within a Pod. Container runtime
- * usually uses different globally unique name ({@code container.name}).
- */
-static constexpr const char *kK8sContainerName = "k8s.container.name";
-
-/**
- * Number of times the container was restarted. This attribute can be used to identify a particular
- * container (running or stopped) within a container spec.
- */
-static constexpr const char *kK8sContainerRestartCount = "k8s.container.restart_count";
-
-/**
- * The name of the ReplicaSet.
- */
-static constexpr const char *kK8sReplicasetName = "k8s.replicaset.name";
-
-/**
- * The UID of the ReplicaSet.
- */
-static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
-
-/**
- * The name of the Deployment.
- */
-static constexpr const char *kK8sDeploymentName = "k8s.deployment.name";
-
-/**
- * The UID of the Deployment.
- */
-static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
-
-/**
- * The name of the StatefulSet.
- */
-static constexpr const char *kK8sStatefulsetName = "k8s.statefulset.name";
-
-/**
- * The UID of the StatefulSet.
- */
-static constexpr const char *kK8sStatefulsetUid = "k8s.statefulset.uid";
-
-/**
- * The name of the DaemonSet.
- */
-static constexpr const char *kK8sDaemonsetName = "k8s.daemonset.name";
-
-/**
- * The UID of the DaemonSet.
- */
-static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
-
-/**
- * The name of the Job.
- */
-static constexpr const char *kK8sJobName = "k8s.job.name";
-
-/**
- * The UID of the Job.
- */
-static constexpr const char *kK8sJobUid = "k8s.job.uid";
-
-/**
- * The name of the CronJob.
- */
-static constexpr const char *kK8sCronjobName = "k8s.cronjob.name";
-
-/**
- * The UID of the CronJob.
- */
-static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
-
-/**
- * Unique identifier for a particular build or compilation of the operating system.
- */
-static constexpr const char *kOsBuildId = "os.build_id";
-
-/**
- * Human readable (not intended to be parsed) OS version information, like e.g. reported by {@code
- * ver} or {@code lsb_release -a} commands.
- */
-static constexpr const char *kOsDescription = "os.description";
-
-/**
- * Human readable operating system name.
- */
-static constexpr const char *kOsName = "os.name";
-
-/**
- * The operating system type.
- */
-static constexpr const char *kOsType = "os.type";
-
-/**
- * The version string of the operating system as defined in <a
- * href="/docs/resource/README.md#version-attributes">Version Attributes</a>.
- */
-static constexpr const char *kOsVersion = "os.version";
-
-/**
- * The command used to launch the process (i.e. the command name). On Linux based systems, can be
- * set to the zeroth string in {@code proc/[pid]/cmdline}. On Windows, can be set to the first
- * parameter extracted from {@code GetCommandLineW}.
- */
-static constexpr const char *kProcessCommand = "process.command";
-
-/**
- * All the command arguments (including the command/executable itself) as received by the process.
- * On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according
- * to the list of null-delimited strings extracted from {@code proc/[pid]/cmdline}. For libc-based
- * executables, this would be the full argv vector passed to {@code main}.
- */
-static constexpr const char *kProcessCommandArgs = "process.command_args";
-
-/**
- * The full command used to launch the process as a single string representing the full command. On
- * Windows, can be set to the result of {@code GetCommandLineW}. Do not set this if you have to
- * assemble it just for monitoring; use {@code process.command_args} instead.
- */
-static constexpr const char *kProcessCommandLine = "process.command_line";
-
-/**
- * The name of the process executable. On Linux based systems, can be set to the {@code Name} in
- * {@code proc/[pid]/status}. On Windows, can be set to the base name of {@code
- * GetProcessImageFileNameW}.
- */
-static constexpr const char *kProcessExecutableName = "process.executable.name";
-
-/**
- * The full path to the process executable. On Linux based systems, can be set to the target of
- * {@code proc/[pid]/exe}. On Windows, can be set to the result of {@code GetProcessImageFileNameW}.
- */
-static constexpr const char *kProcessExecutablePath = "process.executable.path";
-
-/**
- * The username of the user that owns the process.
- */
-static constexpr const char *kProcessOwner = "process.owner";
-
-/**
- * Parent Process identifier (PID).
- */
-static constexpr const char *kProcessParentPid = "process.parent_pid";
-
-/**
- * Process identifier (PID).
- */
-static constexpr const char *kProcessPid = "process.pid";
-
-/**
- * An additional description about the runtime of the process, for example a specific vendor
- * customization of the runtime environment.
- */
-static constexpr const char *kProcessRuntimeDescription = "process.runtime.description";
-
-/**
- * The name of the runtime of this process. For compiled native binaries, this SHOULD be the name of
- * the compiler.
- */
-static constexpr const char *kProcessRuntimeName = "process.runtime.name";
-
-/**
- * The version of the runtime of this process, as returned by the runtime without modification.
- */
-static constexpr const char *kProcessRuntimeVersion = "process.runtime.version";
 
 /**
  * Logical name of the service.
@@ -904,18 +913,12 @@ static constexpr const char *kOtelScopeVersion = "otel.scope.version";
 
 /**
  * Deprecated, use the {@code otel.scope.name} attribute.
- *
- * @deprecated Deprecated, use the `otel.scope.name` attribute.
  */
-OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
  * Deprecated, use the {@code otel.scope.version} attribute.
- *
- * @deprecated Deprecated, use the `otel.scope.version` attribute.
  */
-OPENTELEMETRY_DEPRECATED
 static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 // Enum definitions
@@ -995,14 +998,6 @@ static constexpr const char *kIbmCloud = "ibm_cloud";
 static constexpr const char *kTencentCloud = "tencent_cloud";
 }  // namespace CloudProviderValues
 
-namespace AwsEcsLaunchtypeValues
-{
-/** ec2. */
-static constexpr const char *kEc2 = "ec2";
-/** fargate. */
-static constexpr const char *kFargate = "fargate";
-}  // namespace AwsEcsLaunchtypeValues
-
 namespace HostArchValues
 {
 /** AMD64. */
@@ -1048,6 +1043,14 @@ static constexpr const char *kSolaris = "solaris";
 /** IBM z/OS. */
 static constexpr const char *kZOs = "z_os";
 }  // namespace OsTypeValues
+
+namespace AwsEcsLaunchtypeValues
+{
+/** ec2. */
+static constexpr const char *kEc2 = "ec2";
+/** fargate. */
+static constexpr const char *kFargate = "fargate";
+}  // namespace AwsEcsLaunchtypeValues
 
 namespace TelemetrySdkLanguageValues
 {

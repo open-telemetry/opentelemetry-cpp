@@ -159,15 +159,15 @@ Valid values for `OPENTELEMETRY_STL_VERSION` are `2011`, `2014`, `2017`, `2020` 
 
 List of compilers that support building with standard library classes:
 
-Compiler           | Language standard | Notes
--------------------|-------------------|-------------------
-Visual Studio 2015 | C++14             | requires `gsl::span` for `std::span` implementation
-Visual Studio 2017 | C++17             | requires `gsl::span` for `std::span` implementation
-Visual Studio 2019 | C++20             |
-Xcode 11.x         | C++17             | requires `gsl::span` for `std::span` implementation
-Xcode 12.x         | C++20             |
-gcc-7              | C++17             | requires `gsl::span` for `std::span` implementation
-gcc-9+             | C++20             |
+| Compiler           | Language standard | Notes                                               |
+| ------------------ | ----------------- | --------------------------------------------------- |
+| Visual Studio 2015 | C++14             | requires `gsl::span` for `std::span` implementation |
+| Visual Studio 2017 | C++17             | requires `gsl::span` for `std::span` implementation |
+| Visual Studio 2019 | C++20             |                                                     |
+| Xcode 11.x         | C++17             | requires `gsl::span` for `std::span` implementation |
+| Xcode 12.x         | C++20             |                                                     |
+| gcc-7              | C++17             | requires `gsl::span` for `std::span` implementation |
+| gcc-9+             | C++20             |                                                     |
 
 If SDK is compiled without standard library classes, then `nostd::variant`
 implementation internally uses a private snapshot of [Abseil
