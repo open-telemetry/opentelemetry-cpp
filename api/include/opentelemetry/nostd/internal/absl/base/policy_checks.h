@@ -71,13 +71,15 @@
 // C++ Version Check
 // -----------------------------------------------------------------------------
 
-// Enforce C++11 as the minimum.  Note that Visual Studio has not
-// advanced __cplusplus despite being good enough for our purposes, so
-// so we exempt it from the check.
-#if defined(__cplusplus) && !defined(_MSC_VER)
+// Enforce C++11 as the minimum.
+#if defined(_MSVC_LANG)
+#if _MSVC_LANG < 201103L
+#error "C++ versions less than C++11 are not supported."
+#endif  // _MSVC_LANG < 201103L
+#elif defined(__cplusplus)
 #if __cplusplus < 201103L
 #error "C++ versions less than C++11 are not supported."
-#endif
+#endif  // __cplusplus < 201103L
 #endif
 
 // -----------------------------------------------------------------------------

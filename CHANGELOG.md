@@ -15,12 +15,19 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix b3, w3c and jaeger propagators: they will not overwrite
+  the active span with a default invalid span, which is especially useful
+  when used with CompositePropagator
+  [TEST] fix string "current-span" to trace:kSpan which is "active_span"
+  [#2511](https://github.com/open-telemetry/opentelemetry-cpp/pull/2511)
 * [REMOVAL] Remove option WITH_OTLP_HTTP_SSL_PREVIEW
   [#2435](https://github.com/open-telemetry/opentelemetry-cpp/pull/2435)
 * [BUILD] Fix removing of NOMINMAX on Windows
   [#2449](https://github.com/open-telemetry/opentelemetry-cpp/pull/2449)
 * [BUILD] Introduce CXX 20 CI pipeline for MSVC/Windows
   [#2450](https://github.com/open-telemetry/opentelemetry-cpp/pull/2450)
+* [BUILD] Add DLL build CI pipeline with CXX20
+  [#2465](https://github.com/open-telemetry/opentelemetry-cpp/pull/2465)
 * [EXPORTER] Set `is_monotonic` flag for Observable Counters
   [#2478](https://github.com/open-telemetry/opentelemetry-cpp/pull/2478)
 * [PROTO] Upgrade to opentelemetry-proto v1.1.0
