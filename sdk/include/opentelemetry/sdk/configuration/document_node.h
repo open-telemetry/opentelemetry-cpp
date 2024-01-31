@@ -33,20 +33,20 @@ public:
   virtual double AsDouble()      = 0;
   virtual std::string AsString() = 0;
 
-  virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(std::string_view name) = 0;
-  virtual std::unique_ptr<DocumentNode> GetChildNode(std::string_view name)         = 0;
+  virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) = 0;
+  virtual std::unique_ptr<DocumentNode> GetChildNode(const std::string &name)         = 0;
 
-  virtual bool GetRequiredBoolean(std::string_view name)             = 0;
-  virtual bool GetBoolean(std::string_view name, bool default_value) = 0;
+  virtual bool GetRequiredBoolean(const std::string &name)             = 0;
+  virtual bool GetBoolean(const std::string &name, bool default_value) = 0;
 
-  virtual size_t GetRequiredInteger(std::string_view name)               = 0;
-  virtual size_t GetInteger(std::string_view name, size_t default_value) = 0;
+  virtual size_t GetRequiredInteger(const std::string &name)               = 0;
+  virtual size_t GetInteger(const std::string &name, size_t default_value) = 0;
 
-  virtual double GetRequiredDouble(std::string_view name)               = 0;
-  virtual double GetDouble(std::string_view name, double default_value) = 0;
+  virtual double GetRequiredDouble(const std::string &name)               = 0;
+  virtual double GetDouble(const std::string &name, double default_value) = 0;
 
-  virtual std::string GetRequiredString(std::string_view name)                         = 0;
-  virtual std::string GetString(std::string_view name, std::string_view default_value) = 0;
+  virtual std::string GetRequiredString(const std::string &name)                           = 0;
+  virtual std::string GetString(const std::string &name, const std::string &default_value) = 0;
 
   virtual DocumentNodeConstIterator begin() const = 0;
   virtual DocumentNodeConstIterator end() const   = 0;

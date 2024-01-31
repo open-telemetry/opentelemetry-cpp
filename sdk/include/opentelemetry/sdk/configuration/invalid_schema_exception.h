@@ -16,18 +16,12 @@ namespace sdk
 namespace configuration
 {
 
-class YamlDocument : public Document
+class InvalidSchemaException : public std::runtime_error
 {
 public:
-  static std::unique_ptr<Document> Parse(std::istream &in);
+  InvalidSchemaException(const std::string &msg) : std::runtime_error(msg) {}
 
-  YamlDocument(YAML::Node root) : m_root(root) {}
-  ~YamlDocument() = default;
-
-  std::unique_ptr<DocumentNode> GetRootNode() override;
-
-private:
-  YAML::Node m_root;
+  ~InvalidSchemaException() override = default;
 };
 
 }  // namespace configuration

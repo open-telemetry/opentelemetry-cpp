@@ -15,29 +15,29 @@ namespace sdk
 namespace configuration
 {
 
-std::unique_ptr<Document> YamlDocument::Parse(std::string file_path)
+std::unique_ptr<Document> YamlDocument::Parse(std::istream &in)
 {
   YAML::Node yaml;
   std::unique_ptr<Document> doc;
 
   try
   {
-    yaml = YAML::LoadFile(file_path);
+    yaml = YAML::Load(in);
   }
   catch (YAML::BadFile e)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml file <" << file_path << ">, " << e.what());
+    OTEL_INTERNAL_LOG_ERROR("Failed to load yaml, " << e.what());
     return doc;
   }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml file <" << file_path << ">");
+    OTEL_INTERNAL_LOG_ERROR("Failed to load yaml.");
     return doc;
   }
 
   if (yaml.Type() == YAML::NodeType::Undefined)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml file <" << file_path << ">");
+    OTEL_INTERNAL_LOG_ERROR("Failed to load yaml.");
     return doc;
   }
 

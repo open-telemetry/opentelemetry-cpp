@@ -5,6 +5,7 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
 #include "opentelemetry/sdk/configuration/yaml_document_node.h"
 #include "opentelemetry/version.h"
@@ -59,7 +60,7 @@ bool YamlDocumentNode::AsBoolean()
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    // FIXME: throw
+    throw InvalidSchemaException("");
   }
   bool value = m_yaml.as<bool>();
   return value;
@@ -70,7 +71,7 @@ size_t YamlDocumentNode::AsInteger()
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    // FIXME: throw
+    throw InvalidSchemaException("");
   }
   size_t value = m_yaml.as<size_t>();
   return value;
@@ -81,7 +82,7 @@ double YamlDocumentNode::AsDouble()
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    // FIXME: throw
+    throw InvalidSchemaException("");
   }
   double value = m_yaml.as<double>();
   return value;
@@ -92,13 +93,13 @@ std::string YamlDocumentNode::AsString()
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
-    // FIXME: throw
+    throw InvalidSchemaException("");
   }
   std::string value = m_yaml.as<std::string>();
   return value;
 }
 
-std::unique_ptr<DocumentNode> YamlDocumentNode::GetRequiredChildNode(std::string_view name)
+std::unique_ptr<DocumentNode> YamlDocumentNode::GetRequiredChildNode(const std::string &name)
 {
   std::unique_ptr<DocumentNode> child;
 
@@ -107,13 +108,13 @@ std::unique_ptr<DocumentNode> YamlDocumentNode::GetRequiredChildNode(std::string
   if (!yaml_child)
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   child = std::unique_ptr<DocumentNode>(new YamlDocumentNode(yaml_child));
   return child;
 }
 
-std::unique_ptr<DocumentNode> YamlDocumentNode::GetChildNode(std::string_view name)
+std::unique_ptr<DocumentNode> YamlDocumentNode::GetChildNode(const std::string &name)
 {
   std::unique_ptr<DocumentNode> child;
 
@@ -126,24 +127,24 @@ std::unique_ptr<DocumentNode> YamlDocumentNode::GetChildNode(std::string_view na
   return child;
 }
 
-bool YamlDocumentNode::GetRequiredBoolean(std::string_view name)
+bool YamlDocumentNode::GetRequiredBoolean(const std::string &name)
 {
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   if (!attr.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: bool node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   bool value = attr.as<bool>();
   return value;
 }
 
-bool YamlDocumentNode::GetBoolean(std::string_view name, bool default_value)
+bool YamlDocumentNode::GetBoolean(const std::string &name, bool default_value)
 {
   bool value      = default_value;
   YAML::Node attr = m_yaml[name];
@@ -152,31 +153,31 @@ bool YamlDocumentNode::GetBoolean(std::string_view name, bool default_value)
     if (!attr.IsScalar())
     {
       OTEL_INTERNAL_LOG_ERROR("Yaml: bool node: " << name);
-      // FIXME: throw
+      throw InvalidSchemaException(name);
     }
     value = attr.as<bool>();
   }
   return value;
 }
 
-size_t YamlDocumentNode::GetRequiredInteger(std::string_view name)
+size_t YamlDocumentNode::GetRequiredInteger(const std::string &name)
 {
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   if (!attr.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: integer node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   size_t value = attr.as<size_t>();
   return value;
 }
 
-size_t YamlDocumentNode::GetInteger(std::string_view name, size_t default_value)
+size_t YamlDocumentNode::GetInteger(const std::string &name, size_t default_value)
 {
   size_t value    = default_value;
   YAML::Node attr = m_yaml[name];
@@ -185,31 +186,31 @@ size_t YamlDocumentNode::GetInteger(std::string_view name, size_t default_value)
     if (!attr.IsScalar())
     {
       OTEL_INTERNAL_LOG_ERROR("Yaml: integer node: " << name);
-      // FIXME: throw
+      throw InvalidSchemaException(name);
     }
     value = attr.as<size_t>();
   }
   return value;
 }
 
-double YamlDocumentNode::GetRequiredDouble(std::string_view name)
+double YamlDocumentNode::GetRequiredDouble(const std::string &name)
 {
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   if (!attr.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: double node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   double value = attr.as<double>();
   return value;
 }
 
-double YamlDocumentNode::GetDouble(std::string_view name, double default_value)
+double YamlDocumentNode::GetDouble(const std::string &name, double default_value)
 {
   double value    = default_value;
   YAML::Node attr = m_yaml[name];
@@ -218,31 +219,31 @@ double YamlDocumentNode::GetDouble(std::string_view name, double default_value)
     if (!attr.IsScalar())
     {
       OTEL_INTERNAL_LOG_ERROR("Yaml: double node: " << name);
-      // FIXME: throw
+      throw InvalidSchemaException(name);
     }
     value = attr.as<double>();
   }
   return value;
 }
 
-std::string YamlDocumentNode::GetRequiredString(std::string_view name)
+std::string YamlDocumentNode::GetRequiredString(const std::string &name)
 {
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: required node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   if (!attr.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: string node: " << name);
-    // FIXME: throw
+    throw InvalidSchemaException(name);
   }
   std::string value = attr.as<std::string>();
   return value;
 }
 
-std::string YamlDocumentNode::GetString(std::string_view name, std::string_view default_value)
+std::string YamlDocumentNode::GetString(const std::string &name, const std::string &default_value)
 {
   std::string value(default_value);
   YAML::Node attr = m_yaml[name];
@@ -251,7 +252,7 @@ std::string YamlDocumentNode::GetString(std::string_view name, std::string_view 
     if (!attr.IsScalar())
     {
       OTEL_INTERNAL_LOG_ERROR("Yaml: string node: " << name);
-      // FIXME: throw
+      throw InvalidSchemaException(name);
     }
     value = attr.as<std::string>();
   }

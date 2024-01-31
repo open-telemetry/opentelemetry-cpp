@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <yaml-cpp/yaml.h>
+#include <fstream>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
@@ -514,7 +515,29 @@ static std::unique_ptr<Configuration> ParseConfiguration(const std::unique_ptr<D
   return model;
 }
 
-std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::string file_path)
+std::unique_ptr<Configuration> ConfigurationFactory::ParseFile(std::string filename)
+{
+  std::unique_ptr<Configuration> conf;
+  std::ifstream in(filename, std::ios::binary);
+  if (!in.is_open())
+  {
+    OTEL_INTERNAL_LOG_ERROR("Failed to open yaml file <" << filename << ">.");
+  }
+  else
+  {
+    conf = ConfigurationFactory::Parse(in);
+  }
+
+  return Parse(in);
+}
+
+std::unique_ptr<Configuration> ConfigurationFactory::ParseString(std::string content)
+{
+  std::istringstream in(content);
+  return Parse(in);
+}
+
+std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::istream &in)
 {
   std::unique_ptr<Document> doc;
   std::unique_ptr<DocumentNode> root;
@@ -522,17 +545,17 @@ std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::string file_path
 
   try
   {
-    doc  = YamlDocument::Parse(file_path);
+    doc  = YamlDocument::Parse(in);
     root = doc->GetRootNode();
   }
   catch (YAML::BadFile e)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml file <" << file_path << ">, " << e.what());
+    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml, " << e.what());
     return config;
   }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml file <" << file_path << ">");
+    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml.");
     return config;
   }
 
@@ -542,11 +565,11 @@ std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::string file_path
   }
   catch (YAML::Exception e)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml file <" << file_path << ">, " << e.what());
+    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml, " << e.what());
   }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml file <" << file_path << ">");
+    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml.");
   }
 
   return config;

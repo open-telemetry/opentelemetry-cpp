@@ -19,7 +19,7 @@ void InitOtel()
   // See
   // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/examples/kitchen-sink.yaml
   std::string config_file = "config.yaml";
-  auto model = opentelemetry::sdk::configuration::ConfigurationFactory::Parse(config_file);
+  auto model = opentelemetry::sdk::configuration::ConfigurationFactory::ParseFile(config_file);
 
   sdk = opentelemetry::sdk::init::ConfiguredSdk::Create(model);
 

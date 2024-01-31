@@ -30,20 +30,20 @@ public:
   double AsDouble() override;
   std::string AsString() override;
 
-  std::unique_ptr<DocumentNode> GetRequiredChildNode(std::string_view name) override;
-  std::unique_ptr<DocumentNode> GetChildNode(std::string_view name) override;
+  std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) override;
+  std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) override;
 
-  bool GetRequiredBoolean(std::string_view name) override;
-  bool GetBoolean(std::string_view name, bool default_value) override;
+  bool GetRequiredBoolean(const std::string &name) override;
+  bool GetBoolean(const std::string &name, bool default_value) override;
 
-  size_t GetRequiredInteger(std::string_view name) override;
-  size_t GetInteger(std::string_view name, size_t default_value) override;
+  size_t GetRequiredInteger(const std::string &name) override;
+  size_t GetInteger(const std::string &name, size_t default_value) override;
 
-  double GetRequiredDouble(std::string_view name) override;
-  double GetDouble(std::string_view name, double default_value) override;
+  double GetRequiredDouble(const std::string &name) override;
+  double GetDouble(const std::string &name, double default_value) override;
 
-  std::string GetRequiredString(std::string_view name) override;
-  std::string GetString(std::string_view name, std::string_view default_value) override;
+  std::string GetRequiredString(const std::string &name) override;
+  std::string GetString(const std::string &name, const std::string &default_value) override;
 
   DocumentNodeConstIterator begin() const override;
   DocumentNodeConstIterator end() const override;
