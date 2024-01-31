@@ -12,11 +12,12 @@
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/trace_id_ration_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
@@ -26,21 +27,6 @@ namespace sdk
 {
 namespace configuration
 {
-
-static void DebugNode(std::string_view name, const YAML::Node &yaml)
-{
-  if (yaml)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Processing: " << name << ", IsDefined: " << yaml.IsDefined());
-    OTEL_INTERNAL_LOG_ERROR("Processing: " << name << ", Size: " << yaml.size());
-    OTEL_INTERNAL_LOG_ERROR("Processing: " << name << ", Type: " << yaml.Type());
-    OTEL_INTERNAL_LOG_ERROR("Processing: " << name << ", Scalar: " << yaml.Scalar());
-  }
-  else
-  {
-    OTEL_INTERNAL_LOG_ERROR("Processing: " << name << ", missing node.");
-  }
-}
 
 static std::unique_ptr<AttributeLimitConfiguration> ParseAttributeLimitConfiguration(
     const std::unique_ptr<DocumentNode> &node)
@@ -189,22 +175,21 @@ static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfig
   return model;
 }
 
-#ifdef LATER
 static std::unique_ptr<SamplerConfiguration> ParseSamplerExtensionConfiguration(
+    std::string name,
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SamplerConfiguration> model(new SamplerExtensionConfiguration);
+  std::unique_ptr<SamplerConfiguration> model(new ExtensionSamplerConfiguration);
 
   OTEL_INTERNAL_LOG_ERROR("SamplerExtensionConfiguration: FIXME");
 
   return model;
 }
-#endif
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<SamplerConfiguration> model(new SamplerConfiguration);
+  std::unique_ptr<SamplerConfiguration> model;
 
   std::string name;
   std::unique_ptr<DocumentNode> child;
@@ -245,9 +230,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
   }
   else
   {
-#ifdef LATER
     model = ParseSamplerExtensionConfiguration(name, child);
-#endif
   }
 
   return model;

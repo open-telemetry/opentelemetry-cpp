@@ -15,5 +15,6 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
   target_link_libraries(example_yaml opentelemetry_cpp)
 else()
   target_link_libraries(example_yaml opentelemetry_configuration
-opentelemetry_common)
+opentelemetry_init
+opentelemetry_common opentelemetry_trace)
 endif()

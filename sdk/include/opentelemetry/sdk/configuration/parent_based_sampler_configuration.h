@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,6 +16,11 @@ namespace configuration
 class ParentBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:
+  void Accept(SamplerConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitParentBased(this);
+  }
+
   std::unique_ptr<SamplerConfiguration> root;
   std::unique_ptr<SamplerConfiguration> remote_parent_sampled;
   std::unique_ptr<SamplerConfiguration> remote_parent_not_sampled;

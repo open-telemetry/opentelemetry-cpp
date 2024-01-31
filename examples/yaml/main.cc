@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/init/configured_sdk.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -9,25 +10,40 @@
 #  include "foo_library/foo_library.h"
 #endif
 
+std::unique_ptr<opentelemetry::sdk::init::ConfiguredSdk> sdk;
+
 namespace
 {
-void InitTracer()
+void InitOtel()
 {
+  // See
+  // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/examples/kitchen-sink.yaml
   std::string config_file = "config.yaml";
   auto model = opentelemetry::sdk::configuration::ConfigurationFactory::Parse(config_file);
+
+  sdk = opentelemetry::sdk::init::ConfiguredSdk::Create(model);
+
+  if (sdk != nullptr)
+  {
+    sdk->Install();
+  }
 }
 
-void CleanupTracer()
+void CleanupOtel()
 {
+  if (sdk != nullptr)
+  {
+    sdk->UnInstall();
+  }
+  sdk.reset(nullptr);
 }
 }  // namespace
 
 int main()
 {
-  // Removing this line will leave the default noop TracerProvider in place.
-  InitTracer();
+  InitOtel();
 
   foo_library();
 
-  CleanupTracer();
+  CleanupOtel();
 }

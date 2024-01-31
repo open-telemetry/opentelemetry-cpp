@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -13,13 +14,16 @@ namespace sdk
 namespace configuration
 {
 
-class AlwaysOffSamplerConfiguration : public SamplerConfiguration
+class ExtensionSamplerConfiguration : public SamplerConfiguration
 {
 public:
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
-    visitor->VisitAlwaysOff(this);
+    visitor->VisitExtension(this);
   }
+
+  std::string name;
+  std::unique_ptr<DocumentNode> node;
 };
 
 }  // namespace configuration

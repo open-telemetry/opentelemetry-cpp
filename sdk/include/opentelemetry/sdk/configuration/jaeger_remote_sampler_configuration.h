@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,6 +16,11 @@ namespace configuration
 class JaegerRemoteSamplerConfiguration : public SamplerConfiguration
 {
 public:
+  void Accept(SamplerConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitJaegerRemote(this);
+  }
+
   std::string endpoint;
   size_t interval;
   std::unique_ptr<SamplerConfiguration> initial_sampler;

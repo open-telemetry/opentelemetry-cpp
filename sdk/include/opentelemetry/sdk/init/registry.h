@@ -3,22 +3,18 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace configuration
+namespace init
 {
 
-class SamplerConfigurationVisitor;
+class Registry
+{};
 
-class SamplerConfiguration
-{
-public:
-  virtual void Accept(SamplerConfigurationVisitor *visitor) const = 0;
-};
-
-}  // namespace configuration
+}  // namespace init
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
