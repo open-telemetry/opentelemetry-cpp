@@ -102,7 +102,7 @@ private:
 
   static size_t ReadMemoryCallback(char *buffer, size_t size, size_t nitems, void *userp);
 
-#if LIBCURL_VERSION_NUM >= 0x075000
+#if LIBCURL_VERSION_NUM >= 0x078000
   static int PreRequestCallback(void *clientp,
                                 char *conn_primary_ip,
                                 char *conn_local_ip,

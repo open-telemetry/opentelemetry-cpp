@@ -152,7 +152,7 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
   return nwrite;
 }
 
-#if LIBCURL_VERSION_NUM >= 0x075000
+#if LIBCURL_VERSION_NUM >= 0x078000
 int HttpOperation::PreRequestCallback(void *clientp, char *, char *, int, int)
 {
   HttpOperation *self = reinterpret_cast<HttpOperation *>(clientp);
@@ -1044,7 +1044,7 @@ CURLcode HttpOperation::Setup()
   }
 #endif
 
-#if LIBCURL_VERSION_NUM >= 0x075000
+#if LIBCURL_VERSION_NUM >= 0x078000
   rc = SetCurlPtrOption(CURLOPT_PREREQFUNCTION, (void *)&HttpOperation::PreRequestCallback);
   if (rc != CURLE_OK)
   {
