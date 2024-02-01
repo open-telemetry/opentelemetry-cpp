@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -13,16 +14,16 @@ namespace sdk
 namespace configuration
 {
 
-class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
+class ExtensionSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
-    visitor->VisitZipkin(this);
+    visitor->VisitExtension(this);
   }
 
-  std::string endpoint;
-  size_t timeout;
+  std::string name;
+  std::unique_ptr<DocumentNode> node;
 };
 
 }  // namespace configuration

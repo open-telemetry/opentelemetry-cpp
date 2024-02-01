@@ -10,10 +10,12 @@ namespace sdk
 {
 namespace configuration
 {
+class SpanProcessorConfigurationVisitor;
 
 class SpanProcessorConfiguration
 {
 public:
+  virtual void Accept(SpanProcessorConfigurationVisitor *visitor) const = 0;
 };
 
 }  // namespace configuration

@@ -15,17 +15,22 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
 
@@ -76,6 +81,56 @@ public:
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
+};
+
+class SpanProcessorBuilder
+    : public opentelemetry::sdk::configuration::SpanProcessorConfigurationVisitor
+{
+public:
+  void VisitBatch(
+      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) override
+  {
+    processor = SdkBuilder::CreateBatchSpanProcessor(model);
+  }
+
+  void VisitSimple(
+      const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model) override
+  {
+    processor = SdkBuilder::CreateSimpleSpanProcessor(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) override
+  {
+    processor = SdkBuilder::CreateExtensionSpanProcessor(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> processor;
+};
+
+class SpanExporterBuilder
+    : public opentelemetry::sdk::configuration::SpanExporterConfigurationVisitor
+{
+public:
+  void VisitOtlp(
+      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
+  {
+    exporter = SdkBuilder::CreateOtlpSpanExporter(model);
+  }
+
+  void VisitZipkin(
+      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
+  {
+    exporter = SdkBuilder::CreateZipkinSpanExporter(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) override
+  {
+    exporter = SdkBuilder::CreateExtensionSpanExporter(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter;
 };
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
@@ -158,6 +213,95 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateSampler(
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpSpanExporter(
+    const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateOtlpSpanExporter: FIXME");
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipkinSpanExporter(
+    const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateZipkinSpanExporter: FIXME");
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExtensionSpanExporter(
+    const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanExporter: FIXME");
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateSpanExporter(
+    const std::unique_ptr<opentelemetry::sdk::configuration::SpanExporterConfiguration> &model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: FIXME");
+
+  SpanExporterBuilder builder;
+  model->Accept(&builder);
+  sdk = std::move(builder.exporter);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatchSpanProcessor(
+    const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
+  opentelemetry::sdk::trace::BatchSpanProcessorOptions options;
+
+  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+
+#ifdef LATER
+  options.xxx = model->export_timeout;
+#endif
+
+  options.max_queue_size        = model->max_queue_size;
+  options.max_export_batch_size = model->max_export_batch_size;
+
+  auto exporter_sdk = CreateSpanExporter(model->exporter);
+
+  OTEL_INTERNAL_LOG_ERROR("CreateBatchSpanProcessor: FIXME");
+
+  // sdk = opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(exporter_sdk, options);
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSimpleSpanProcessor(
+    const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
+
+  auto exporter_sdk = CreateSpanExporter(model->exporter);
+
+  sdk = opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter_sdk));
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExtensionSpanProcessor(
+    const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanProcessor: FIXME");
+
+  return sdk;
+}
+
 std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateProcessor(
     const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
 {
@@ -165,7 +309,9 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateProc
 
   OTEL_INTERNAL_LOG_ERROR("CreateProcessor: FIXME");
 
-  // sdk = xxx;
+  SpanProcessorBuilder builder;
+  model->Accept(&builder);
+  sdk = std::move(builder.processor);
 
   return sdk;
 }

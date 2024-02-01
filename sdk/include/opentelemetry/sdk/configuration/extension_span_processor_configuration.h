@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -13,15 +14,16 @@ namespace sdk
 namespace configuration
 {
 
-class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
+class ExtensionSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
-    visitor->VisitSimple(this);
+    visitor->VisitExtension(this);
   }
 
-  std::unique_ptr<SpanExporterConfiguration> exporter;
+  std::string name;
+  std::unique_ptr<DocumentNode> node;
 };
 
 }  // namespace configuration

@@ -5,6 +5,7 @@
 
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,6 +17,11 @@ namespace configuration
 class BatchSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
+  void Accept(SpanProcessorConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitBatch(this);
+  }
+
   size_t schedule_delay;
   size_t export_timeout;
   size_t max_queue_size;

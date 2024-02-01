@@ -528,7 +528,7 @@ std::unique_ptr<Configuration> ConfigurationFactory::ParseFile(std::string filen
     conf = ConfigurationFactory::Parse(in);
   }
 
-  return Parse(in);
+  return conf;
 }
 
 std::unique_ptr<Configuration> ConfigurationFactory::ParseString(std::string content)
