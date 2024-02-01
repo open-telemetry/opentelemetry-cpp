@@ -51,7 +51,14 @@ public:
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return trace::SetSpan(context, sp);
+    if (span_context.IsValid())
+    {
+      return trace::SetSpan(context, sp);
+    }
+    else
+    {
+      return context;
+    }
   }
 
   static TraceId TraceIdFromHex(nostd::string_view trace_id)

@@ -19,12 +19,27 @@ class TraceFlags final
 {
 public:
   static constexpr uint8_t kIsSampled = 1;
+  static constexpr uint8_t kIsRandom  = 2;
+
+  /**
+   * Valid flags in W3C Trace Context version 1.
+   * See https://www.w3.org/TR/trace-context-1/#trace-flags
+   */
+  static constexpr uint8_t kAllW3CTraceContext1Flags = kIsSampled;
+
+  /**
+   * Valid flags in W3C Trace Context version 2.
+   * See https://www.w3.org/TR/trace-context-1/#trace-flags
+   */
+  static constexpr uint8_t kAllW3CTraceContext2Flags = kIsSampled | kIsRandom;
 
   TraceFlags() noexcept : rep_{0} {}
 
   explicit TraceFlags(uint8_t flags) noexcept : rep_(flags) {}
 
   bool IsSampled() const noexcept { return rep_ & kIsSampled; }
+
+  bool IsRandom() const noexcept { return rep_ & kIsRandom; }
 
   // Populates the buffer with the lowercase base16 representation of the flags.
   void ToLowerBase16(nostd::span<char, 2> buffer) const noexcept
