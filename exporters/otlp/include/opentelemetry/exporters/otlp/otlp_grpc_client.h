@@ -6,6 +6,7 @@
 #include <grpcpp/completion_queue.h>
 #include <grpcpp/grpcpp.h>
 
+#include <atomic>
 #include <memory>
 
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -172,7 +173,7 @@ public:
 
 private:
   // Stores if this gRPC client had its Shutdown() method called
-  bool is_shutdown_;
+  std::atomic<bool> is_shutdown_;
 
   // Stores shared data between threads of this gRPC client
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data_;

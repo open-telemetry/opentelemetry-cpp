@@ -199,6 +199,7 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
   ++async_data->start_request_counter;
   ++async_data->running_requests;
+  // Some old toolchains can only use gRPC 1.33 and it's experimental.
 #  if defined(GRPC_CPP_VERSION_MAJOR) && \
       (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   stub->async()
@@ -407,7 +408,7 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
         &&result_callback) noexcept
 {
   auto span_count = request.resource_spans_size();
-  if (is_shutdown_)
+  if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << span_count << " trace span(s) failed, exporter is shutdown");
@@ -438,7 +439,7 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
         &&result_callback) noexcept
 {
   auto metrics_count = request.resource_metrics_size();
-  if (is_shutdown_)
+  if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << metrics_count << " metric(s) failed, exporter is shutdown");
@@ -469,7 +470,7 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
         &&result_callback) noexcept
 {
   auto logs_count = request.resource_logs_size();
-  if (is_shutdown_)
+  if (is_shutdown_.load(std::memory_order_acquire))
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] ERROR: Export "
                             << logs_count << " log(s) failed, exporter is shutdown");
@@ -554,7 +555,7 @@ bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
     return true;
   }
 
-  if (!is_shutdown_)
+  if (false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
     is_shutdown_ = true;
 

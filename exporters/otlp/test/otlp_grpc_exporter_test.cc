@@ -51,6 +51,7 @@ namespace
 class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceServiceStub
 {
 public:
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
 #  if defined(GRPC_CPP_VERSION_MAJOR) && \
       (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   using async_interface_base =
@@ -79,6 +80,7 @@ public:
       callback(stub_->last_async_status_);
     }
 
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
 #  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
           (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
       defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
