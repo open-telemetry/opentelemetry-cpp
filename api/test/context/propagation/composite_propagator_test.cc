@@ -93,6 +93,23 @@ TEST_F(CompositePropagatorTest, Extract)
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
   EXPECT_EQ(span->GetContext().IsRemote(), true);
+
+  // Now check that last propagator does not win if there is no header for it
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-00"}};
+  ctx1             = context::Context{};
+
+  ctx2 = composite_propagator_->Extract(carrier, ctx1);
+
+  ctx2_span = ctx2.GetValue(trace::kSpanKey);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
+
+  span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  // Here the first propagator (W3C) wins
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "4bf92f3577b34da6a3ce929d0e0e4736");
+  EXPECT_EQ(Hex(span->GetContext().span_id()), "0102030405060708");
+  EXPECT_EQ(span->GetContext().IsSampled(), false);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST_F(CompositePropagatorTest, Inject)

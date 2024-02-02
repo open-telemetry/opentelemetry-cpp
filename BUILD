@@ -14,11 +14,11 @@ bool_flag(
 
 config_setting(
     name = "with_dll_enabled",
-    visibility = ["//visibility:public"],
     flag_values = {
         "with_dll": "true",
         "//api:with_abseil": "false",
     },
+    visibility = ["//visibility:public"],
 )
 
 # TODO: Version needs to be updated better here.
