@@ -51,6 +51,9 @@ public:
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpSpanExporter(
       const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model);
 
+  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
+      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model);
+
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateZipkinSpanExporter(
       const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model);
 

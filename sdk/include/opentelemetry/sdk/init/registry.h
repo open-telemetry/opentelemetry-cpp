@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,9 +10,22 @@ namespace sdk
 {
 namespace init
 {
+class OtlpSpanExporterBuilder;
+class ConsoleSpanExporterBuilder;
+class ZipkinSpanExporterBuilder;
 
 class Registry
-{};
+{
+public:
+  static const OtlpSpanExporterBuilder *GetOtlpBuilder();
+  static void SetOtlpBuilder(const OtlpSpanExporterBuilder * builder);
+
+  static const ConsoleSpanExporterBuilder *GetConsoleBuilder();
+  static void SetConsoleBuilder(const ConsoleSpanExporterBuilder * builder);
+
+  static const ZipkinSpanExporterBuilder *GetZipkinBuilder();
+  static void SetZipkinBuilder(const ZipkinSpanExporterBuilder * builder);
+};
 
 }  // namespace init
 }  // namespace sdk

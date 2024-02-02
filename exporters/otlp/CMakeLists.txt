@@ -2,6 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_library(
+  opentelemetry_otlp_builder src/otlp_builder.cc)
+set_target_properties(opentelemetry_otlp_builder PROPERTIES EXPORT_NAME
+                                                               otlp_builder)
+set_target_version(opentelemetry_otlp_builder)
+
+target_include_directories(
+  opentelemetry_otlp_builder
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+add_library(
   opentelemetry_otlp_recordable
   src/otlp_environment.cc src/otlp_log_recordable.cc src/otlp_recordable.cc
   src/otlp_populate_attribute_utils.cc src/otlp_recordable_utils.cc

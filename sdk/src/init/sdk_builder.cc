@@ -19,9 +19,14 @@
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
+#include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
+#include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/console_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -116,6 +121,12 @@ public:
       const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
   {
     exporter = SdkBuilder::CreateOtlpSpanExporter(model);
+  }
+
+  void VisitConsole(
+      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
+  {
+    exporter = SdkBuilder::CreateConsoleSpanExporter(model);
   }
 
   void VisitZipkin(
@@ -217,8 +228,34 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
     const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  const OtlpSpanExporterBuilder *builder = Registry::GetOtlpBuilder();
 
-  OTEL_INTERNAL_LOG_ERROR("CreateOtlpSpanExporter: FIXME");
+  if (builder != nullptr) {
+    OTEL_INTERNAL_LOG_ERROR("before builder for OtlpSpanExporter");
+    sdk = builder->Build(model);
+    OTEL_INTERNAL_LOG_ERROR("after builder for OtlpSpanExporter");
+  } else {
+    OTEL_INTERNAL_LOG_ERROR("No builder for OtlpSpanExporter");
+    // Throw
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConsoleSpanExporter(
+    const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  const ConsoleSpanExporterBuilder *builder = Registry::GetConsoleBuilder();
+
+  if (builder != nullptr) {
+    OTEL_INTERNAL_LOG_ERROR("before builder for ConsoleSpanExporter");
+    sdk = builder->Build(model);
+    OTEL_INTERNAL_LOG_ERROR("after builder for ConsoleSpanExporter");
+  } else {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ConsoleSpanExporter");
+    // Throw
+  }
 
   return sdk;
 }
@@ -227,8 +264,16 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
     const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model)
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  const ZipkinSpanExporterBuilder *builder = Registry::GetZipkinBuilder();
 
-  OTEL_INTERNAL_LOG_ERROR("CreateZipkinSpanExporter: FIXME");
+  if (builder != nullptr) {
+    OTEL_INTERNAL_LOG_ERROR("before builder for ZipkinSpanExporter");
+    sdk = builder->Build(model);
+    OTEL_INTERNAL_LOG_ERROR("after builder for ZipkinSpanExporter");
+  } else {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ZipkinSpanExporter");
+    // Throw
+  }
 
   return sdk;
 }
@@ -248,11 +293,13 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateSpanE
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: before");
 
   SpanExporterBuilder builder;
   model->Accept(&builder);
   sdk = std::move(builder.exporter);
+
+  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: after");
 
   return sdk;
 }

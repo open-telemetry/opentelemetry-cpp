@@ -3,7 +3,7 @@
 
 add_library(
   opentelemetry_init
-  configured_sdk.cc sdk_builder.cc)
+  configured_sdk.cc sdk_builder.cc registry.cc)
 
 set_target_properties(opentelemetry_init PROPERTIES EXPORT_NAME init)
 set_target_version(opentelemetry_init)

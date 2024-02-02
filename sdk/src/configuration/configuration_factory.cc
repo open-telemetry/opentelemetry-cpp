@@ -14,12 +14,15 @@
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
+#include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
@@ -281,6 +284,14 @@ static std::unique_ptr<OtlpSpanExporterConfiguration> ParseOtlpSpanExporterConfi
   return model;
 }
 
+static std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<ConsoleSpanExporterConfiguration> model(new ConsoleSpanExporterConfiguration);
+
+  return model;
+}
+
 static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
@@ -288,6 +299,18 @@ static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterC
 
   model->endpoint = node->GetRequiredString("endpoint");
   model->timeout  = node->GetInteger("timeout", 10000);
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExporterConfiguration(
+    const std::string &name,
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<ExtensionSpanExporterConfiguration> model(new ExtensionSpanExporterConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParseExtensionSpanExporterConfiguration: FIXME");
+  model->name = name;
 
   return model;
 }
@@ -318,15 +341,17 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
   {
     model = ParseOtlpSpanExporterConfiguration(child);
   }
+  else if (name == "console")
+  {
+    model = ParseConsoleSpanExporterConfiguration(child);
+  }
   else if (name == "zipkin")
   {
     model = ParseZipkinSpanExporterConfiguration(child);
   }
   else
   {
-#ifdef LATER
-    model = ParseSpanExporterExtensionConfiguration(name, child);
-#endif
+    model = ParseExtensionSpanExporterConfiguration(name, child);
   }
 
   return model;
@@ -357,6 +382,18 @@ static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcesso
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseSpanExporterConfiguration(child);
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionSpanProcessorConfiguration> ParseExtensionSpanProcessorConfiguration(
+   const std::string &name,
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(new ExtensionSpanProcessorConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParseExtensionSpanProcessorConfiguration: FIXME");
+  model->name = name;
 
   return model;
 }
@@ -393,9 +430,7 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
   }
   else
   {
-#ifdef LATER
-    model = ParseSpanProcessorExtensionConfiguration(name, child);
-#endif
+    model = ParseExtensionSpanProcessorConfiguration(name, child);
   }
 
   return model;
