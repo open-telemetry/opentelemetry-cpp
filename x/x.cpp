@@ -178,15 +178,15 @@ int main(int argc, const char*argv[])
 	for( ;; ) 
 	{
 		bool allHealthy = true;
-		for( const auto& it : procs )
-		{
-			const auto& proc = it.second;
-			if( proc.exited )
-				return 1;
-			//printf("%s=%d\n\n", proc.bin.c_str(), proc.healthy );
-			if( !proc.healthy )
-				allHealthy = false;
-		}
+		// for( const auto& it : procs )
+		// {
+		// 	const auto& proc = it.second;
+		// 	if( proc.exited )
+		// 		return 1;
+		// 	//printf("%s=%d\n\n", proc.bin.c_str(), proc.healthy );
+		// 	if( !proc.healthy )
+		// 		allHealthy = false;
+		// }
 		if( allHealthy )
 		{
 			if( allHealthyOnce )
@@ -590,7 +590,7 @@ void BindStdHandlesToConsole()
 void ui_main() {
   BindStdHandlesToConsole();
   using namespace ftxui;
-  auto screen = ScreenInteractive::TerminalOutput();
+  auto screen = ScreenInteractive::Fullscreen(); //TerminalOutput();
 
   std::vector<std::string> entries = {
       "entry 1",
