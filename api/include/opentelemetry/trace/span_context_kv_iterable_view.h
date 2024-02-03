@@ -27,7 +27,7 @@ template <class T>
 inline void take_span_context_kv(SpanContext, opentelemetry::common::KeyValueIterableView<T>)
 {}
 
-template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+template <class T, std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
 inline void take_span_context_kv(SpanContext, T &)
 {}
 
@@ -94,7 +94,7 @@ private:
   }
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   bool do_callback(SpanContext span_context,
                    const U &attributes,
                    nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)>

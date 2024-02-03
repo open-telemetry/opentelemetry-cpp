@@ -4,12 +4,12 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
@@ -96,7 +96,7 @@ public:
   }
 
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
                 common::SystemTimestamp timestamp,
                 const T &attributes) noexcept
@@ -105,7 +105,7 @@ public:
   }
 
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
     this->AddEvent(name, common::KeyValueIterableView<T>{attributes});
@@ -159,7 +159,7 @@ public:
    * @since ABI_VERSION 2
    */
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void AddLink(const SpanContext &target, const U &attrs)
   {
     common::KeyValueIterableView<U> view(attrs);
@@ -195,7 +195,7 @@ public:
    *
    * @since ABI_VERSION 2
    */
-  template <class U, nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
+  template <class U, std::enable_if_t<detail::is_span_context_kv_iterable<U>::value> * = nullptr>
   void AddLinks(const U &links)
   {
     SpanContextKeyValueIterableView<U> view(links);

@@ -3,11 +3,12 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -98,7 +99,7 @@ public:
    * @param[in] attributes Instrumentation scope attributes container
    */
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Meter> GetMeter(nostd::string_view name,
                                     nostd::string_view version,
                                     nostd::string_view schema_url,

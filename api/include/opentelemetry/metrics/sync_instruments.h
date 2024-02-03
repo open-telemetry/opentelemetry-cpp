@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -64,14 +65,14 @@ public:
                    const context::Context &context) noexcept = 0;
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes});
   }
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);
@@ -121,7 +122,7 @@ public:
   virtual void Record(T value, const common::KeyValueIterable &attribute) noexcept = 0;
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Record(T value, const U &attributes) noexcept
   {
     this->Record(value, common::KeyValueIterableView<U>{attributes});
@@ -156,7 +157,7 @@ public:
                       const context::Context &context) noexcept = 0;
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Record(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Record(value, common::KeyValueIterableView<U>{attributes}, context);
@@ -215,14 +216,14 @@ public:
                    const context::Context &context) noexcept = 0;
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes});
   }
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes, const context::Context &context) noexcept
   {
     this->Add(value, common::KeyValueIterableView<U>{attributes}, context);

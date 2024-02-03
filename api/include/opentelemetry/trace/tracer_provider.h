@@ -97,7 +97,7 @@ public:
    * @param[in] attributes Instrumentation scope attributes container
    */
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Tracer> GetTracer(nostd::string_view name,
                                       nostd::string_view version,
                                       nostd::string_view schema_url,

@@ -13,7 +13,6 @@
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -146,7 +145,7 @@ template <class ValueType>
 struct LogRecordSetterTrait
 {
   template <class ArgumentType,
-            nostd::enable_if_t<std::is_convertible<ArgumentType, nostd::string_view>::value ||
+            std::enable_if_t<std::is_convertible<ArgumentType, nostd::string_view>::value ||
                                    std::is_convertible<ArgumentType, common::AttributeValue>::value,
                                void> * = nullptr>
   inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
@@ -157,7 +156,7 @@ struct LogRecordSetterTrait
   }
 
   template <class ArgumentType,
-            nostd::enable_if_t<std::is_base_of<common::KeyValueIterable, ArgumentType>::value, bool>
+            std::enable_if_t<std::is_base_of<common::KeyValueIterable, ArgumentType>::value, bool>
                 * = nullptr>
   inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {
@@ -166,7 +165,7 @@ struct LogRecordSetterTrait
   }
 
   template <class ArgumentType,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value, int> * =
+            std::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value, int> * =
                 nullptr>
   inline static LogRecord *Set(LogRecord *log_record, ArgumentType &&arg) noexcept
   {

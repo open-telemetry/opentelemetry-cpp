@@ -48,7 +48,7 @@ public:
   }
 
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
@@ -65,8 +65,8 @@ public:
 
   template <class T,
             class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
-            nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> *   = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
+            std::enable_if_t<detail::is_span_context_kv_iterable<U>::value> *   = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const U &links,
@@ -86,7 +86,7 @@ public:
   }
 
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(
       nostd::string_view name,
       const T &attributes,
@@ -105,7 +105,7 @@ public:
   }
 
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(
       nostd::string_view name,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,

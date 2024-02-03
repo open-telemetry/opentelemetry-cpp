@@ -5,12 +5,12 @@
 
 #include <iterator>
 #include <utility>
+#include <type_traits>
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
@@ -77,7 +77,7 @@ private:
   const T *container_;
 };
 
-template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+template <class T, std::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
 KeyValueIterableView<T> MakeKeyValueIterableView(const T &container) noexcept
 {
   return KeyValueIterableView<T>(container);
@@ -130,7 +130,7 @@ inline static const common::KeyValueIterable &MakeAttributes(
  */
 template <
     class ArgumentType,
-    nostd::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
+    std::enable_if_t<common::detail::is_key_value_iterable<ArgumentType>::value> * = nullptr>
 inline static common::KeyValueIterableView<ArgumentType> MakeAttributes(
     const ArgumentType &arg) noexcept
 {

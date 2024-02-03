@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <map>
-#include "opentelemetry/nostd/type_traits.h"
+#include <type_traits>
 
 using namespace opentelemetry;
 
@@ -21,7 +21,7 @@ static int TakeKeyValues(const common::KeyValueIterable &iterable)
   return count;
 }
 
-template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+template <class T, std::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
 static int TakeKeyValues(const T &iterable)
 {
   return TakeKeyValues(common::KeyValueIterableView<T>{iterable});

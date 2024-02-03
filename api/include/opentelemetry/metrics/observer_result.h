@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
 
@@ -32,7 +33,7 @@ public:
   virtual void Observe(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
   template <class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+            std::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Observe(T value, const U &attributes) noexcept
   {
     this->Observe(value, common::KeyValueIterableView<U>{attributes});
