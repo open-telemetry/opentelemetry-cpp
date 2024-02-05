@@ -15,6 +15,8 @@ namespace trace
 class RandomIdGenerator : public IdGenerator
 {
 public:
+  RandomIdGenerator() : IdGenerator(true) {}
+
   opentelemetry::trace::SpanId GenerateSpanId() noexcept override;
 
   opentelemetry::trace::TraceId GenerateTraceId() noexcept override;

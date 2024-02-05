@@ -229,6 +229,19 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cmake ${CMAKE_OPTIONS[@]}  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX20 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++23.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX23 \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -267,7 +280,20 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=ON \
+        -DWITH_STL=CXX20 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX23 \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
