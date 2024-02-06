@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
@@ -17,6 +18,7 @@ class ConfiguredSdk
 {
 public:
   static std::unique_ptr<ConfiguredSdk> Create(
+      std::shared_ptr<Registry> registry,
       const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model);
 
   void Install();

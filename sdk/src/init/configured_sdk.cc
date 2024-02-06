@@ -17,9 +17,11 @@ namespace init
 {
 
 std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
+    std::shared_ptr<Registry> registry,
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model)
 {
-  return SdkBuilder::CreateConfiguredSdk(model);
+  SdkBuilder builder(registry);
+  return builder.CreateConfiguredSdk(model);
 }
 
 void ConfiguredSdk::Install()

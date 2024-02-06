@@ -24,7 +24,7 @@ std::unique_ptr<Document> YamlDocument::Parse(std::istream &in)
   {
     yaml = YAML::Load(in);
   }
-  catch (YAML::BadFile e)
+  catch (const YAML::BadFile &e)
   {
     OTEL_INTERNAL_LOG_ERROR("Failed to load yaml, " << e.what());
     return doc;

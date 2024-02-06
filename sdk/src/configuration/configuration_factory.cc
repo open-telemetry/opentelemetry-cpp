@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
@@ -22,7 +23,6 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
-#include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
@@ -44,7 +44,7 @@ static std::unique_ptr<AttributeLimitConfiguration> ParseAttributeLimitConfigura
 }
 
 static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<LoggerProviderConfiguration> model(new LoggerProviderConfiguration);
 
@@ -54,7 +54,7 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfigura
 }
 
 static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<MeterProviderConfiguration> model(new MeterProviderConfiguration);
 
@@ -64,7 +64,7 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
 }
 
 static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<PropagatorConfiguration> model(new PropagatorConfiguration);
 
@@ -92,7 +92,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node);
 
 static std::unique_ptr<SamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<SamplerConfiguration> model(new AlwaysOffSamplerConfiguration);
 
@@ -100,7 +100,7 @@ static std::unique_ptr<SamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
 }
 
 static std::unique_ptr<SamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<SamplerConfiguration> model(new AlwaysOnSamplerConfiguration);
 
@@ -180,8 +180,8 @@ static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfig
 }
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerExtensionConfiguration(
-    std::string name,
-    const std::unique_ptr<DocumentNode> &node)
+    std::string /* name */,
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<SamplerConfiguration> model(new ExtensionSamplerConfiguration);
 
@@ -285,7 +285,7 @@ static std::unique_ptr<OtlpSpanExporterConfiguration> ParseOtlpSpanExporterConfi
 }
 
 static std::unique_ptr<ConsoleSpanExporterConfiguration> ParseConsoleSpanExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<ConsoleSpanExporterConfiguration> model(new ConsoleSpanExporterConfiguration);
 
@@ -305,7 +305,7 @@ static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterC
 
 static std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExporterConfiguration(
     const std::string &name,
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<ExtensionSpanExporterConfiguration> model(new ExtensionSpanExporterConfiguration);
 
@@ -386,11 +386,12 @@ static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcesso
   return model;
 }
 
-static std::unique_ptr<ExtensionSpanProcessorConfiguration> ParseExtensionSpanProcessorConfiguration(
-   const std::string &name,
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<ExtensionSpanProcessorConfiguration>
+ParseExtensionSpanProcessorConfiguration(const std::string &name,
+                                         const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(new ExtensionSpanProcessorConfiguration);
+  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(
+      new ExtensionSpanProcessorConfiguration);
 
   OTEL_INTERNAL_LOG_ERROR("ParseExtensionSpanProcessorConfiguration: FIXME");
   model->name = name;
@@ -583,7 +584,7 @@ std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::istream &in)
     doc  = YamlDocument::Parse(in);
     root = doc->GetRootNode();
   }
-  catch (YAML::BadFile e)
+  catch (const YAML::BadFile &e)
   {
     OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml, " << e.what());
     return config;
@@ -598,7 +599,7 @@ std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::istream &in)
   {
     config = ParseConfiguration(root);
   }
-  catch (YAML::Exception e)
+  catch (const YAML::Exception &e)
   {
     OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml, " << e.what());
   }

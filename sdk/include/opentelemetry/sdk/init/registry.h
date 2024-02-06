@@ -17,14 +17,22 @@ class ZipkinSpanExporterBuilder;
 class Registry
 {
 public:
-  static const OtlpSpanExporterBuilder *GetOtlpBuilder();
-  static void SetOtlpBuilder(const OtlpSpanExporterBuilder * builder);
+  Registry()  = default;
+  ~Registry() = default;
 
-  static const ConsoleSpanExporterBuilder *GetConsoleBuilder();
-  static void SetConsoleBuilder(const ConsoleSpanExporterBuilder * builder);
+  const OtlpSpanExporterBuilder *GetOtlpBuilder() { return m_otlp_builder; }
+  void SetOtlpBuilder(const OtlpSpanExporterBuilder *builder) { m_otlp_builder = builder; }
 
-  static const ZipkinSpanExporterBuilder *GetZipkinBuilder();
-  static void SetZipkinBuilder(const ZipkinSpanExporterBuilder * builder);
+  const ConsoleSpanExporterBuilder *GetConsoleBuilder() { return m_console_builder; }
+  void SetConsoleBuilder(const ConsoleSpanExporterBuilder *builder) { m_console_builder = builder; }
+
+  const ZipkinSpanExporterBuilder *GetZipkinBuilder() { return m_zipkin_builder; }
+  void SetZipkinBuilder(const ZipkinSpanExporterBuilder *builder) { m_zipkin_builder = builder; }
+
+private:
+  const OtlpSpanExporterBuilder *m_otlp_builder;
+  const ConsoleSpanExporterBuilder *m_console_builder;
+  const ZipkinSpanExporterBuilder *m_zipkin_builder;
 };
 
 }  // namespace init

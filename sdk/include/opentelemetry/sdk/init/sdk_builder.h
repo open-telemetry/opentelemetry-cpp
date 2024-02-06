@@ -12,6 +12,7 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
+#include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -27,64 +28,68 @@ namespace init
 class SdkBuilder
 {
 public:
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOffSampler(
-      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model);
+  SdkBuilder(std::shared_ptr<Registry> registry) : m_registry(registry) {}
+  ~SdkBuilder() = default;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOnSampler(
-      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOffSampler(
+      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateJaegerRemoteSampler(
-      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOnSampler(
+      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
-      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateJaegerRemoteSampler(
+      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
+      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateExtensionSampler(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateExtensionSampler(
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
+      const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
-      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpSpanExporter(
+      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateZipkinSpanExporter(
-      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
+      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateExtensionSpanExporter(
-      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateZipkinSpanExporter(
+      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateSpanExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanExporterConfiguration> &model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateExtensionSpanExporter(
+      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateBatchSpanProcessor(
-      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateSpanExporter(
+      const std::unique_ptr<opentelemetry::sdk::configuration::SpanExporterConfiguration> &model)
+      const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSimpleSpanProcessor(
-      const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateBatchSpanProcessor(
+      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateExtensionSpanProcessor(
-      const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSimpleSpanProcessor(
+      const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateProcessor(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateExtensionSpanProcessor(
+      const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) const;
 
-  static std::unique_ptr<opentelemetry::trace::TracerProvider> CreateTracerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model);
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateProcessor(
+      const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
+      const;
 
-  static std::unique_ptr<ConfiguredSdk> CreateConfiguredSdk(
-      const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model);
+  std::unique_ptr<opentelemetry::trace::TracerProvider> CreateTracerProvider(
+      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model)
+      const;
 
-#if 0
-  static std::unique_ptr<opentelemetry::trace::XXX> CreateXXX(
-      const std::unique_ptr<opentelemetry::sdk::configuration::XXX> &model);
-#endif
+  std::unique_ptr<ConfiguredSdk> CreateConfiguredSdk(
+      const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const;
+
+private:
+  std::shared_ptr<Registry> m_registry;
 };
 
 }  // namespace init
