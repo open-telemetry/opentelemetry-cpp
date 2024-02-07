@@ -16,6 +16,9 @@ namespace configuration
 class ZipkinSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
+  ZipkinSpanExporterConfiguration()           = default;
+  ~ZipkinSpanExporterConfiguration() override = default;
+
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitZipkin(this);

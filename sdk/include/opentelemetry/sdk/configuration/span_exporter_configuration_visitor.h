@@ -19,8 +19,11 @@ class ExtensionSpanExporterConfiguration;
 class SpanExporterConfigurationVisitor
 {
 public:
+  SpanExporterConfigurationVisitor()          = default;
+  virtual ~SpanExporterConfigurationVisitor() = default;
+
   virtual void VisitOtlp(const OtlpSpanExporterConfiguration *model)           = 0;
-  virtual void VisitConsole(const ConsoleSpanExporterConfiguration *model)       = 0;
+  virtual void VisitConsole(const ConsoleSpanExporterConfiguration *model)     = 0;
   virtual void VisitZipkin(const ZipkinSpanExporterConfiguration *model)       = 0;
   virtual void VisitExtension(const ExtensionSpanExporterConfiguration *model) = 0;
 };

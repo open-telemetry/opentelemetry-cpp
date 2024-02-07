@@ -17,6 +17,9 @@ namespace configuration
 class Document
 {
 public:
+  Document()          = default;
+  virtual ~Document() = default;
+
   virtual std::unique_ptr<DocumentNode> GetRootNode() = 0;
 };
 

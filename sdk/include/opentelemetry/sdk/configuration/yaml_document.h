@@ -22,7 +22,7 @@ public:
   static std::unique_ptr<Document> Parse(std::istream &in);
 
   YamlDocument(YAML::Node root) : m_root(root) {}
-  ~YamlDocument() = default;
+  ~YamlDocument() override = default;
 
   std::unique_ptr<DocumentNode> GetRootNode() override;
 

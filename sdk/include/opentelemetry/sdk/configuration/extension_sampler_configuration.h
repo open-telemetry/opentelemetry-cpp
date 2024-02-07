@@ -17,6 +17,9 @@ namespace configuration
 class ExtensionSamplerConfiguration : public SamplerConfiguration
 {
 public:
+  ExtensionSamplerConfiguration()           = default;
+  ~ExtensionSamplerConfiguration() override = default;
+
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

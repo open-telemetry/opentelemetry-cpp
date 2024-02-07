@@ -41,9 +41,11 @@ void InitOtel()
   std::string config_file = "config.yaml";
   auto model = opentelemetry::sdk::configuration::ConfigurationFactory::ParseFile(config_file);
 
-  /* 5 - Build the SDL from the parsed a config.yaml */
+  /* 5 - Build the SDK from the parsed config.yaml */
 
   sdk = opentelemetry::sdk::init::ConfiguredSdk::Create(registry, model);
+
+  /* 6 - Deploy the SDK */
 
   if (sdk != nullptr)
   {

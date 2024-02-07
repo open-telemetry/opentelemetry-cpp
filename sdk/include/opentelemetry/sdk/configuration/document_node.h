@@ -25,8 +25,8 @@ class PropertiesNodeConstIterator;
 class DocumentNode
 {
 public:
-  DocumentNode() {}
-  virtual ~DocumentNode() {}
+  DocumentNode()          = default;
+  virtual ~DocumentNode() = default;
 
   virtual bool AsBoolean()       = 0;
   virtual size_t AsInteger()     = 0;
@@ -60,8 +60,8 @@ public:
 class DocumentNodeConstIteratorImpl
 {
 public:
-  DocumentNodeConstIteratorImpl() {}
-  virtual ~DocumentNodeConstIteratorImpl() {}
+  DocumentNodeConstIteratorImpl()          = default;
+  virtual ~DocumentNodeConstIteratorImpl() = default;
 
   virtual void Next()                                                = 0;
   virtual std::unique_ptr<DocumentNode> Item() const                 = 0;
@@ -71,8 +71,8 @@ public:
 class PropertiesNodeConstIteratorImpl
 {
 public:
-  PropertiesNodeConstIteratorImpl() {}
-  virtual ~PropertiesNodeConstIteratorImpl() {}
+  PropertiesNodeConstIteratorImpl()          = default;
+  virtual ~PropertiesNodeConstIteratorImpl() = default;
 
   virtual void Next()                                                  = 0;
   virtual std::string Name() const                                     = 0;

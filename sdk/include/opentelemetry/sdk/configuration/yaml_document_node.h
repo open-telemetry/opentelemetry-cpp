@@ -61,7 +61,7 @@ class YamlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl
 {
 public:
   YamlDocumentNodeConstIteratorImpl(const YAML::const_iterator &iter);
-  virtual ~YamlDocumentNodeConstIteratorImpl();
+  ~YamlDocumentNodeConstIteratorImpl() override;
 
   void Next() override;
   std::unique_ptr<DocumentNode> Item() const override;
@@ -75,7 +75,7 @@ class YamlPropertiesNodeConstIteratorImpl : public PropertiesNodeConstIteratorIm
 {
 public:
   YamlPropertiesNodeConstIteratorImpl(const YAML::const_iterator &iter);
-  virtual ~YamlPropertiesNodeConstIteratorImpl();
+  ~YamlPropertiesNodeConstIteratorImpl() override;
 
   void Next() override;
   std::string Name() const override;

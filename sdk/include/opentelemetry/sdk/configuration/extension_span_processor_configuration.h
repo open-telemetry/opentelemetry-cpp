@@ -17,6 +17,9 @@ namespace configuration
 class ExtensionSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
+  ExtensionSpanProcessorConfiguration()           = default;
+  ~ExtensionSpanProcessorConfiguration() override = default;
+
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

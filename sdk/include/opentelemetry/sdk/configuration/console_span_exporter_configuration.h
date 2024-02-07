@@ -16,6 +16,9 @@ namespace configuration
 class ConsoleSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
+  ConsoleSpanExporterConfiguration()           = default;
+  ~ConsoleSpanExporterConfiguration() override = default;
+
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitConsole(this);

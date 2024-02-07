@@ -17,6 +17,9 @@ namespace configuration
 class BatchSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
+  BatchSpanProcessorConfiguration()           = default;
+  ~BatchSpanProcessorConfiguration() override = default;
+
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitBatch(this);

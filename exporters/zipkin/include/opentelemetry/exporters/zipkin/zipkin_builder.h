@@ -6,8 +6,8 @@
 #include <memory>
 
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
-#include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,10 +22,14 @@ class OPENTELEMETRY_EXPORT ZipkinBuilder
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
+  ZipkinBuilder()           = default;
+  ~ZipkinBuilder() override = default;
+
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
-      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const override;
+      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model)
+      const override;
 };
 
-}  // namespace otlp
+}  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

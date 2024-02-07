@@ -21,10 +21,14 @@ class OPENTELEMETRY_EXPORT ConsoleBuilder
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
+  ConsoleBuilder()           = default;
+  ~ConsoleBuilder() override = default;
+
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
-      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const override;
+      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model)
+      const override;
 };
 
-}  // namespace otlp
+}  // namespace trace
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

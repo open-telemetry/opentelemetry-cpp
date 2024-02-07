@@ -16,6 +16,9 @@ namespace configuration
 class TraceIdRatioBasedSamplerConfiguration : public SamplerConfiguration
 {
 public:
+  TraceIdRatioBasedSamplerConfiguration()           = default;
+  ~TraceIdRatioBasedSamplerConfiguration() override = default;
+
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitTraceIdRatioBased(this);

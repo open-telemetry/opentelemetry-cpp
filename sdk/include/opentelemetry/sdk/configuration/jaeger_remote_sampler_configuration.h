@@ -16,6 +16,9 @@ namespace configuration
 class JaegerRemoteSamplerConfiguration : public SamplerConfiguration
 {
 public:
+  JaegerRemoteSamplerConfiguration()           = default;
+  ~JaegerRemoteSamplerConfiguration() override = default;
+
   void Accept(SamplerConfigurationVisitor *visitor) const override
   {
     visitor->VisitJaegerRemote(this);

@@ -17,6 +17,9 @@ namespace configuration
 class ExtensionSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
+  ExtensionSpanExporterConfiguration()           = default;
+  ~ExtensionSpanExporterConfiguration() override = default;
+
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitExtension(this);

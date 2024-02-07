@@ -21,6 +21,9 @@ class ExtensionSamplerConfiguration;
 class SamplerConfigurationVisitor
 {
 public:
+  SamplerConfigurationVisitor()          = default;
+  virtual ~SamplerConfigurationVisitor() = default;
+
   virtual void VisitAlwaysOff(const AlwaysOffSamplerConfiguration *model)                 = 0;
   virtual void VisitAlwaysOn(const AlwaysOnSamplerConfiguration *model)                   = 0;
   virtual void VisitJaegerRemote(const JaegerRemoteSamplerConfiguration *model)           = 0;

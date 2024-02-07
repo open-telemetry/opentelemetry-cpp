@@ -18,6 +18,9 @@ class ExtensionSpanProcessorConfiguration;
 class SpanProcessorConfigurationVisitor
 {
 public:
+  SpanProcessorConfigurationVisitor()          = default;
+  virtual ~SpanProcessorConfigurationVisitor() = default;
+
   virtual void VisitBatch(const BatchSpanProcessorConfiguration *model)         = 0;
   virtual void VisitSimple(const SimpleSpanProcessorConfiguration *model)       = 0;
   virtual void VisitExtension(const ExtensionSpanProcessorConfiguration *model) = 0;

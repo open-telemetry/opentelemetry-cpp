@@ -15,6 +15,9 @@ class SpanExporterConfigurationVisitor;
 class SpanExporterConfiguration
 {
 public:
+  SpanExporterConfiguration()          = default;
+  virtual ~SpanExporterConfiguration() = default;
+
   virtual void Accept(SpanExporterConfigurationVisitor *visitor) const = 0;
 };
 

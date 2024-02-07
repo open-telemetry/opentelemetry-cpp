@@ -16,6 +16,9 @@ namespace configuration
 class SimpleSpanProcessorConfiguration : public SpanProcessorConfiguration
 {
 public:
+  SimpleSpanProcessorConfiguration()           = default;
+  ~SimpleSpanProcessorConfiguration() override = default;
+
   void Accept(SpanProcessorConfigurationVisitor *visitor) const override
   {
     visitor->VisitSimple(this);

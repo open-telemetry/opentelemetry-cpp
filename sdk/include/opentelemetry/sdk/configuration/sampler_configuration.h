@@ -16,6 +16,9 @@ class SamplerConfigurationVisitor;
 class SamplerConfiguration
 {
 public:
+  SamplerConfiguration()          = default;
+  virtual ~SamplerConfiguration() = default;
+
   virtual void Accept(SamplerConfigurationVisitor *visitor) const = 0;
 };
 
