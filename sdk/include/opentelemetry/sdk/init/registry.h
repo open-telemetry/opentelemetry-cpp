@@ -30,9 +30,9 @@ public:
   void SetZipkinBuilder(const ZipkinSpanExporterBuilder *builder) { m_zipkin_builder = builder; }
 
 private:
-  const OtlpSpanExporterBuilder *m_otlp_builder;
-  const ConsoleSpanExporterBuilder *m_console_builder;
-  const ZipkinSpanExporterBuilder *m_zipkin_builder;
+  const OtlpSpanExporterBuilder *m_otlp_builder{nullptr};
+  const ConsoleSpanExporterBuilder *m_console_builder{nullptr};
+  const ZipkinSpanExporterBuilder *m_zipkin_builder{nullptr};
 };
 
 }  // namespace init

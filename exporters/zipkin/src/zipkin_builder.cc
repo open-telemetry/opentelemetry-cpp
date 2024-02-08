@@ -5,6 +5,7 @@
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_factory.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -21,10 +22,16 @@ void ZipkinBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ZipkinBuilder::Build(
-    const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
 {
-  // FIXME: from model
   ZipkinExporterOptions options;
+
+  options.endpoint = model->endpoint;
+
+#ifdef LATER
+  options.xxx = model->timeout;
+#endif
+
   return ZipkinExporterFactory::Create(options);
 }
 
