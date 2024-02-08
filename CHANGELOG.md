@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add async exporting for OTLP/GRPC exporter
+  [#2407](https://github.com/open-telemetry/opentelemetry-cpp/pull/2407)
 * [API] Fix b3, w3c and jaeger propagators: they will not overwrite
   the active span with a default invalid span, which is especially useful
   when used with CompositePropagator
