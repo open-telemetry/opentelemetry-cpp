@@ -574,7 +574,10 @@ if(BUILD_TESTING)
     find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
       if(DEFINED CMAKE_TOOLCHAIN_FILE)
-        message(FATAL_ERROR "Pleaes install GTest with the CMAKE_TOOLCHAIN_FILE at ${CMAKE_TOOLCHAIN_FILE}")
+        message(
+          FATAL_ERROR
+            "Pleaes install GTest with the CMAKE_TOOLCHAIN_FILE at ${CMAKE_TOOLCHAIN_FILE}"
+        )
       else()
         install_windows_deps()
         include(${CMAKE_TOOLCHAIN_FILE})
