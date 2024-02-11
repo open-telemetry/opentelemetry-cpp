@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
+#include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
@@ -30,6 +31,7 @@
 #include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
+#include "opentelemetry/sdk/init/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
@@ -281,9 +283,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_ERROR("before builder for OtlpSpanExporter");
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpSpanExporter() using registered builder");
     sdk = builder->Build(model);
-    OTEL_INTERNAL_LOG_ERROR("after builder for OtlpSpanExporter");
   }
   else
   {
@@ -302,9 +303,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_ERROR("before builder for ConsoleSpanExporter");
+    OTEL_INTERNAL_LOG_DEBUG("CreateConsoleSpanExporter() using registered builder");
     sdk = builder->Build(model);
-    OTEL_INTERNAL_LOG_ERROR("after builder for ConsoleSpanExporter");
   }
   else
   {
@@ -323,9 +323,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_ERROR("before builder for ZipkinSpanExporter");
+    OTEL_INTERNAL_LOG_DEBUG("CreateZipkinSpanExporter() using registered builder");
     sdk = builder->Build(model);
-    OTEL_INTERNAL_LOG_ERROR("after builder for ZipkinSpanExporter");
   }
   else
   {
@@ -352,13 +351,9 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateSpanE
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: before");
-
   SpanExporterBuilder builder(this);
   model->Accept(&builder);
   sdk = std::move(builder.exporter);
-
-  OTEL_INTERNAL_LOG_ERROR("CreateSpanExporter: after");
 
   return sdk;
 }
@@ -380,9 +375,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
 
   auto exporter_sdk = CreateSpanExporter(model->exporter);
 
-  OTEL_INTERNAL_LOG_ERROR("CreateBatchSpanProcessor: FIXME");
-
-  // sdk = opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(exporter_sdk, options);
+  sdk = opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create(std::move(exporter_sdk),
+                                                                     options);
   return sdk;
 }
 
@@ -415,8 +409,6 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateProc
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateProcessor: FIXME");
-
   SpanProcessorBuilder builder(this);
   model->Accept(&builder);
   sdk = std::move(builder.processor);
@@ -430,7 +422,8 @@ std::unique_ptr<opentelemetry::trace::TracerProvider> SdkBuilder::CreateTracerPr
 {
   std::unique_ptr<opentelemetry::trace::TracerProvider> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME");
+  // https://github.com/open-telemetry/opentelemetry-configuration/issues/70
+  OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME (IdGenerator)");
 
   auto sampler = CreateSampler(model->sampler);
 
@@ -451,36 +444,18 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
 {
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
 
-  if (name == "tracecontext")
+  const TextMapPropagatorBuilder *builder = m_registry->GetTextMapPropagatorBuilder(name);
+
+  if (builder != nullptr)
   {
-    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-        new opentelemetry::trace::propagation::HttpTraceContext());
-  }
-  else if (name == "baggage")
-  {
-    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-        new opentelemetry::baggage::propagation::BaggagePropagator());
-  }
-  else if (name == "b3")
-  {
-    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-        new opentelemetry::trace::propagation::B3Propagator());
-  }
-  else if (name == "b3multi")
-  {
-    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-        new opentelemetry::trace::propagation::B3PropagatorMultiHeader());
-  }
-  else if (name == "jaeger")
-  {
-    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-        new opentelemetry::trace::propagation::JaegerPropagator());
+    OTEL_INTERNAL_LOG_DEBUG("CreateTextMapPropagator() using registered builder");
+    sdk = builder->Build();
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateTextMapPropagator: unsupported: " << name);
+    OTEL_INTERNAL_LOG_ERROR("CreateTextMapPropagator() no builder for " << name);
+    // Throw
   }
-
   return sdk;
 }
 
@@ -497,11 +472,19 @@ SdkBuilder::CreateSimplePropagator(
 
 std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
 SdkBuilder::CreateCompositePropagator(
-    const opentelemetry::sdk::configuration::CompositePropagatorConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::CompositePropagatorConfiguration *model) const
 {
-  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
+  std::vector<std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>> propagators;
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateCompositePropagator: FIXME");
+  for (const auto &name : model->names)
+  {
+    propagator = CreateTextMapPropagator(name);
+    propagators.push_back(std::move(propagator));
+  }
+
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk(
+      new opentelemetry::context::propagation::CompositePropagator(std::move(propagators)));
 
   return sdk;
 }

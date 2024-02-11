@@ -16,6 +16,7 @@ namespace sdk
 namespace configuration
 {
 
+#if 0
 static void DebugNode(std::string_view name, const YAML::Node &yaml)
 {
   if (yaml)
@@ -54,9 +55,12 @@ static void DebugNode(std::string_view name, const YAML::Node &yaml)
     OTEL_INTERNAL_LOG_DEBUG("Processing: " << name << ", missing node.");
   }
 }
+#endif
 
 bool YamlDocumentNode::AsBoolean()
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::AsBoolean()");
+
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
@@ -68,6 +72,8 @@ bool YamlDocumentNode::AsBoolean()
 
 size_t YamlDocumentNode::AsInteger()
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::AsInteger()");
+
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
@@ -79,6 +85,8 @@ size_t YamlDocumentNode::AsInteger()
 
 double YamlDocumentNode::AsDouble()
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::AsDouble()");
+
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
@@ -90,6 +98,8 @@ double YamlDocumentNode::AsDouble()
 
 std::string YamlDocumentNode::AsString()
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::AsString()");
+
   if (!m_yaml.IsScalar())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
@@ -101,6 +111,8 @@ std::string YamlDocumentNode::AsString()
 
 std::unique_ptr<DocumentNode> YamlDocumentNode::GetRequiredChildNode(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetRequiredChildNode(" << name << ")");
+
   std::unique_ptr<DocumentNode> child;
 
   YAML::Node yaml_child = m_yaml[name];
@@ -116,6 +128,8 @@ std::unique_ptr<DocumentNode> YamlDocumentNode::GetRequiredChildNode(const std::
 
 std::unique_ptr<DocumentNode> YamlDocumentNode::GetChildNode(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetChildNode(" << name << ")");
+
   std::unique_ptr<DocumentNode> child;
 
   YAML::Node yaml_child = m_yaml[name];
@@ -129,6 +143,8 @@ std::unique_ptr<DocumentNode> YamlDocumentNode::GetChildNode(const std::string &
 
 bool YamlDocumentNode::GetRequiredBoolean(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetRequiredBoolean(" << name << ")");
+
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
@@ -146,6 +162,8 @@ bool YamlDocumentNode::GetRequiredBoolean(const std::string &name)
 
 bool YamlDocumentNode::GetBoolean(const std::string &name, bool default_value)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetBoolean(" << name << ", " << default_value << ")");
+
   bool value      = default_value;
   YAML::Node attr = m_yaml[name];
   if (attr)
@@ -162,6 +180,8 @@ bool YamlDocumentNode::GetBoolean(const std::string &name, bool default_value)
 
 size_t YamlDocumentNode::GetRequiredInteger(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetRequiredInteger(" << name << ")");
+
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
@@ -179,6 +199,8 @@ size_t YamlDocumentNode::GetRequiredInteger(const std::string &name)
 
 size_t YamlDocumentNode::GetInteger(const std::string &name, size_t default_value)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetInteger(" << name << ", " << default_value << ")");
+
   size_t value    = default_value;
   YAML::Node attr = m_yaml[name];
   if (attr)
@@ -195,6 +217,8 @@ size_t YamlDocumentNode::GetInteger(const std::string &name, size_t default_valu
 
 double YamlDocumentNode::GetRequiredDouble(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetRequiredDouble(" << name << ")");
+
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
@@ -212,6 +236,8 @@ double YamlDocumentNode::GetRequiredDouble(const std::string &name)
 
 double YamlDocumentNode::GetDouble(const std::string &name, double default_value)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetDouble(" << name << ", " << default_value << ")");
+
   double value    = default_value;
   YAML::Node attr = m_yaml[name];
   if (attr)
@@ -228,6 +254,8 @@ double YamlDocumentNode::GetDouble(const std::string &name, double default_value
 
 std::string YamlDocumentNode::GetRequiredString(const std::string &name)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetRequiredString(" << name << ")");
+
   YAML::Node attr = m_yaml[name];
   if (!attr)
   {
@@ -245,6 +273,8 @@ std::string YamlDocumentNode::GetRequiredString(const std::string &name)
 
 std::string YamlDocumentNode::GetString(const std::string &name, const std::string &default_value)
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::GetString(" << name << ", " << default_value << ")");
+
   std::string value(default_value);
   YAML::Node attr = m_yaml[name];
   if (attr)
@@ -261,23 +291,23 @@ std::string YamlDocumentNode::GetString(const std::string &name, const std::stri
 
 DocumentNodeConstIterator YamlDocumentNode::begin() const
 {
-  DebugNode("::begin()", m_yaml);
-
-  for (auto it = m_yaml.begin(); it != m_yaml.end(); ++it)
-  {
-    DebugNode("<iter> whole", *it);
-  }
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::begin()");
 
   return DocumentNodeConstIterator(new YamlDocumentNodeConstIteratorImpl(m_yaml.begin()));
 }
 
 DocumentNodeConstIterator YamlDocumentNode::end() const
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::end()");
+
   return DocumentNodeConstIterator(new YamlDocumentNodeConstIteratorImpl(m_yaml.end()));
 }
 
 PropertiesNodeConstIterator YamlDocumentNode::begin_properties() const
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::begin_properties()");
+
+#if 0
   DebugNode("::begin_properties()", m_yaml);
 
   for (auto it = m_yaml.begin(); it != m_yaml.end(); ++it)
@@ -286,12 +316,15 @@ PropertiesNodeConstIterator YamlDocumentNode::begin_properties() const
     DebugNode("<iter> first", pair.first);
     DebugNode("<iter> second", pair.second);
   }
+#endif
 
   return PropertiesNodeConstIterator(new YamlPropertiesNodeConstIteratorImpl(m_yaml.begin()));
 }
 
 PropertiesNodeConstIterator YamlDocumentNode::end_properties() const
 {
+  OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::end_properties()");
+
   return PropertiesNodeConstIterator(new YamlPropertiesNodeConstIteratorImpl(m_yaml.end()));
 }
 
@@ -349,6 +382,9 @@ std::string YamlPropertiesNodeConstIteratorImpl::Name() const
   std::pair<std::string, std::unique_ptr<DocumentNode>> result;
   std::pair<YAML::Node, YAML::Node> kv = *m_iter;
   std::string name                     = kv.first.as<std::string>();
+
+  OTEL_INTERNAL_LOG_DEBUG("YamlPropertiesNodeConstIteratorImpl::Name() = " << name);
+
   return name;
 }
 

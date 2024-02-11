@@ -17,8 +17,8 @@ namespace configuration
 class OtlpSpanExporterConfiguration : public SpanExporterConfiguration
 {
 public:
-  OtlpSpanExporterConfiguration()          = default;
-  virtual ~OtlpSpanExporterConfiguration() = default;
+  OtlpSpanExporterConfiguration()           = default;
+  ~OtlpSpanExporterConfiguration() override = default;
 
   void Accept(SpanExporterConfigurationVisitor *visitor) const override
   {

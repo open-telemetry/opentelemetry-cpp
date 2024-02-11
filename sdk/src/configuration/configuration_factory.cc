@@ -88,7 +88,6 @@ static std::unique_ptr<CompositePropagatorConfiguration> ParseCompositePropagato
 
     std::string name = child->AsString();
 
-    OTEL_INTERNAL_LOG_ERROR("ParseCompositePropagatorConfiguration: name = " << name);
     model->names.push_back(name);
   }
 
@@ -307,7 +306,8 @@ static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
     std::unique_ptr<DocumentNode> child = it.Value();
     std::string string_value            = child->AsString();
 
-    OTEL_INTERNAL_LOG_ERROR("name = " << name << ", value = " << string_value);
+    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name
+                                                                  << ", value = " << string_value);
     std::pair<std::string, std::string> entry(name, string_value);
     model->kv_map.insert(entry);
   }
@@ -527,7 +527,8 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
     std::unique_ptr<DocumentNode> child = it.Value();
     std::string string_value            = child->AsString();
 
-    OTEL_INTERNAL_LOG_ERROR("name = " << name << ", value = " << string_value);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "ParseAttributesConfiguration() name = " << name << ", value = " << string_value);
     if (name == "service.name")
     {
       model->service_name = name;

@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
@@ -27,6 +28,10 @@ namespace
 {
 void InitOtel()
 {
+  auto level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
+
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
+
   /* 1 - Create a registry */
 
   std::shared_ptr<opentelemetry::sdk::init::Registry> registry(
