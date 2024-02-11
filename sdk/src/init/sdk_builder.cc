@@ -3,9 +3,11 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -14,7 +16,9 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
@@ -37,6 +41,9 @@
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/propagation/b3_propagator.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/propagation/jaeger.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -44,6 +51,30 @@ namespace sdk
 {
 namespace init
 {
+
+class PropagatorBuilder : public opentelemetry::sdk::configuration::PropagatorConfigurationVisitor
+{
+public:
+  PropagatorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  virtual ~PropagatorBuilder() = default;
+
+  void VisitSimple(
+      const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) override
+  {
+    propagator = m_sdk_builder->CreateSimplePropagator(model);
+  }
+
+  void VisitComposite(
+      const opentelemetry::sdk::configuration::CompositePropagatorConfiguration *model) override
+  {
+    propagator = m_sdk_builder->CreateCompositePropagator(model);
+  }
+
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> propagator;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
 
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
@@ -415,6 +446,79 @@ std::unique_ptr<opentelemetry::trace::TracerProvider> SdkBuilder::CreateTracerPr
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
+SdkBuilder::CreateTextMapPropagator(const std::string &name) const
+{
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
+
+  if (name == "tracecontext")
+  {
+    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+        new opentelemetry::trace::propagation::HttpTraceContext());
+  }
+  else if (name == "baggage")
+  {
+    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+        new opentelemetry::baggage::propagation::BaggagePropagator());
+  }
+  else if (name == "b3")
+  {
+    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+        new opentelemetry::trace::propagation::B3Propagator());
+  }
+  else if (name == "b3multi")
+  {
+    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+        new opentelemetry::trace::propagation::B3PropagatorMultiHeader());
+  }
+  else if (name == "jaeger")
+  {
+    sdk = std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+        new opentelemetry::trace::propagation::JaegerPropagator());
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateTextMapPropagator: unsupported: " << name);
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
+SdkBuilder::CreateSimplePropagator(
+    const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
+
+  sdk = CreateTextMapPropagator(model->name);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
+SdkBuilder::CreateCompositePropagator(
+    const opentelemetry::sdk::configuration::CompositePropagatorConfiguration * /* model */) const
+{
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateCompositePropagator: FIXME");
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
+SdkBuilder::CreatePropagator(
+    const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model) const
+{
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> sdk;
+
+  PropagatorBuilder builder(this);
+  model->Accept(&builder);
+  sdk = std::move(builder.propagator);
+
+  return sdk;
+}
+
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
@@ -423,6 +527,7 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
   if (!model->disabled)
   {
     sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider);
+    sdk->m_propagator      = CreatePropagator(model->propagator);
   }
 
   return sdk;

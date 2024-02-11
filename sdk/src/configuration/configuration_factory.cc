@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -20,6 +21,9 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/propagator_configuration.h"
+#include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_document.h"
@@ -63,12 +67,64 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
   return model;
 }
 
-static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+static std::unique_ptr<SimplePropagatorConfiguration> ParseSinglePropagatorConfiguration(
+    const std::string &name)
 {
-  std::unique_ptr<PropagatorConfiguration> model(new PropagatorConfiguration);
+  std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: FIXME");
+  model->name = name;
+
+  return model;
+}
+
+static std::unique_ptr<CompositePropagatorConfiguration> ParseCompositePropagatorConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<CompositePropagatorConfiguration> model(new CompositePropagatorConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    std::string name = child->AsString();
+
+    OTEL_INTERNAL_LOG_ERROR("ParseCompositePropagatorConfiguration: name = " << name);
+    model->names.push_back(name);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<PropagatorConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: count " << count);
+    // Throw
+  }
+
+  if (name == "composite")
+  {
+    model = ParseCompositePropagatorConfiguration(child);
+  }
+  else
+  {
+    model = ParseSinglePropagatorConfiguration(name);
+  }
 
   return model;
 }
