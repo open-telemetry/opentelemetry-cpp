@@ -55,6 +55,9 @@ struct OtlpGrpcClientOptions
   /** max number of threads that can be allocated from this */
   std::size_t max_threads;
 
+  /** Compression type. */
+  std::string compression;
+
 #ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
   std::size_t max_concurrent_requests;
