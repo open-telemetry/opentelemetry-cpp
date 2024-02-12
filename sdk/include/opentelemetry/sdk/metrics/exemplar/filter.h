@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,7 +23,7 @@ class OrderedAttributeMap;
 
 namespace metrics
 {
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 
 /**
  * Exemplar filters are used to pre-filter measurements before attempting to store them in a

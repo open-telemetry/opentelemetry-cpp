@@ -31,6 +31,7 @@
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
+#  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
 
 #  if defined(_MSC_VER)
