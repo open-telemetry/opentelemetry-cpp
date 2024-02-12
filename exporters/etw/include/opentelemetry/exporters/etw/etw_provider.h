@@ -50,7 +50,7 @@
 
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
-using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
+namespace exporter_etw=OPENTELEMETRY_NAMESPACE::exporter::etw;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -237,7 +237,7 @@ public:
   }
 
   unsigned long writeMsgPack(Handle &providerData,
-                             Properties &eventData,
+                             exporter_etw::Properties &eventData,
                              LPCGUID ActivityId        = nullptr,
                              LPCGUID RelatedActivityId = nullptr,
                              uint8_t Opcode            = 0)
@@ -268,10 +268,10 @@ public:
 
     switch (nameField.index())
     {
-      case PropertyType::kTypeString:
+      case exporter_etw::PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
-      case PropertyType::kTypeCString:
+      case exporter_etw::PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
       default:
@@ -298,41 +298,41 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case PropertyType::kTypeBool: {
+        case exporter_etw::PropertyType::kTypeBool: {
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeInt: {
+        case exporter_etw::PropertyType::kTypeInt: {
           auto temp  = nostd::get<int32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeInt64: {
+        case exporter_etw::PropertyType::kTypeInt64: {
           auto temp  = nostd::get<int64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeUInt: {
+        case exporter_etw::PropertyType::kTypeUInt: {
           auto temp  = nostd::get<uint32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeUInt64: {
+        case exporter_etw::PropertyType::kTypeUInt64: {
           auto temp  = nostd::get<uint64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeDouble: {
+        case exporter_etw::PropertyType::kTypeDouble: {
           auto temp  = nostd::get<double>(value);
           jObj[name] = temp;
           break;
         }
-        case PropertyType::kTypeString: {
+        case exporter_etw::PropertyType::kTypeString: {
           jObj[name] = nostd::get<std::string>(value);
           break;
         }
-        case PropertyType::kTypeCString: {
+        case exporter_etw::PropertyType::kTypeCString: {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
@@ -348,14 +348,14 @@ public:
 #  endif
 
         // TODO: arrays are not supported yet
-        case PropertyType::kTypeSpanByte:
-        case PropertyType::kTypeSpanBool:
-        case PropertyType::kTypeSpanInt:
-        case PropertyType::kTypeSpanInt64:
-        case PropertyType::kTypeSpanUInt:
-        case PropertyType::kTypeSpanUInt64:
-        case PropertyType::kTypeSpanDouble:
-        case PropertyType::kTypeSpanString:
+        case exporter_etw::PropertyType::kTypeSpanByte:
+        case exporter_etw::PropertyType::kTypeSpanBool:
+        case exporter_etw::PropertyType::kTypeSpanInt:
+        case exporter_etw::PropertyType::kTypeSpanInt64:
+        case exporter_etw::PropertyType::kTypeSpanUInt:
+        case exporter_etw::PropertyType::kTypeSpanUInt64:
+        case exporter_etw::PropertyType::kTypeSpanDouble:
+        case exporter_etw::PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
@@ -435,7 +435,7 @@ public:
   /// <param name="eventData"></param>
   /// <returns></returns>
   unsigned long writeTld(Handle &providerData,
-                         Properties &eventData,
+                         exporter_etw::Properties &eventData,
                          LPCGUID ActivityId        = nullptr,
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
@@ -459,10 +459,10 @@ public:
     auto nameField               = eventData[EVENT_NAME];
     switch (nameField.index())
     {
-      case PropertyType::kTypeString:
+      case exporter_etw::PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());
         break;
-      case PropertyType::kTypeCString:
+      case exporter_etw::PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
       default:
@@ -479,48 +479,48 @@ public:
       auto &value      = kv.second;
       switch (value.index())
       {
-        case PropertyType::kTypeBool: {
+        case exporter_etw::PropertyType::kTypeBool: {
           builder.AddField(name, tld::TypeBool8);
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           dbuilder.AddByte(temp);
           break;
         }
-        case PropertyType::kTypeInt: {
+        case exporter_etw::PropertyType::kTypeInt: {
           builder.AddField(name, tld::TypeInt32);
           auto temp = nostd::get<int32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case PropertyType::kTypeInt64: {
+        case exporter_etw::PropertyType::kTypeInt64: {
           builder.AddField(name, tld::TypeInt64);
           auto temp = nostd::get<int64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case PropertyType::kTypeUInt: {
+        case exporter_etw::PropertyType::kTypeUInt: {
           builder.AddField(name, tld::TypeUInt32);
           auto temp = nostd::get<uint32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case PropertyType::kTypeUInt64: {
+        case exporter_etw::PropertyType::kTypeUInt64: {
           builder.AddField(name, tld::TypeUInt64);
           auto temp = nostd::get<uint64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case PropertyType::kTypeDouble: {
+        case exporter_etw::PropertyType::kTypeDouble: {
           builder.AddField(name, tld::TypeDouble);
           auto temp = nostd::get<double>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case PropertyType::kTypeString: {
+        case exporter_etw::PropertyType::kTypeString: {
           builder.AddField(name, tld::TypeUtf8String);
           dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
-        case PropertyType::kTypeCString: {
+        case exporter_etw::PropertyType::kTypeCString: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
@@ -528,7 +528,7 @@ public:
         }
 #if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case PropertyType::kGUID: {
+        case exporter_etw::PropertyType::kGUID: {
           builder.AddField(name.c_str(), TypeGuid);
           auto temp = nostd::get<GUID>(value);
           dbuilder.AddBytes(&temp, sizeof(GUID));
@@ -537,14 +537,14 @@ public:
 #endif
 
         // TODO: arrays are not supported
-        case PropertyType::kTypeSpanByte:
-        case PropertyType::kTypeSpanBool:
-        case PropertyType::kTypeSpanInt:
-        case PropertyType::kTypeSpanInt64:
-        case PropertyType::kTypeSpanUInt:
-        case PropertyType::kTypeSpanUInt64:
-        case PropertyType::kTypeSpanDouble:
-        case PropertyType::kTypeSpanString:
+        case exporter_etw::PropertyType::kTypeSpanByte:
+        case exporter_etw::PropertyType::kTypeSpanBool:
+        case exporter_etw::PropertyType::kTypeSpanInt:
+        case exporter_etw::PropertyType::kTypeSpanInt64:
+        case exporter_etw::PropertyType::kTypeSpanUInt:
+        case exporter_etw::PropertyType::kTypeSpanUInt64:
+        case exporter_etw::PropertyType::kTypeSpanDouble:
+        case exporter_etw::PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
@@ -588,7 +588,7 @@ public:
   }
 
   unsigned long write(Handle &providerData,
-                      Properties &eventData,
+                      exporter_etw::Properties &eventData,
                       LPCGUID ActivityId,
                       LPCGUID RelatedActivityId,
                       uint8_t Opcode,
