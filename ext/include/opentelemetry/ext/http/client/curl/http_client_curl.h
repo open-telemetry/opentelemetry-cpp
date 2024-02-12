@@ -89,7 +89,8 @@ public:
     timeout_ms_ = timeout_ms;
   }
 
-  void SetCompression(const opentelemetry::ext::http::client::Compression &compression) noexcept override
+  void SetCompression(
+      const opentelemetry::ext::http::client::Compression &compression) noexcept override
   {
     compression_ = compression;
   }

@@ -360,7 +360,9 @@ public:
 class HttpClientSync
 {
 public:
-  Result GetNoSsl(const nostd::string_view &url, const Headers &headers = {{}}, const Compression &compression = Compression::kNone) noexcept
+  Result GetNoSsl(const nostd::string_view &url,
+                  const Headers &headers         = {{}},
+                  const Compression &compression = Compression::kNone) noexcept
   {
     static const HttpSslOptions no_ssl;
     return Get(url, no_ssl, headers, compression);
@@ -368,7 +370,7 @@ public:
 
   virtual Result PostNoSsl(const nostd::string_view &url,
                            const Body &body,
-                           const Headers &headers = {{"content-type", "application/json"}},
+                           const Headers &headers         = {{"content-type", "application/json"}},
                            const Compression &compression = Compression::kNone) noexcept
   {
     static const HttpSslOptions no_ssl;
@@ -377,13 +379,13 @@ public:
 
   virtual Result Get(const nostd::string_view &url,
                      const HttpSslOptions &ssl_options,
-                     const Headers & = {{}},
+                     const Headers &                = {{}},
                      const Compression &compression = Compression::kNone) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
                       const HttpSslOptions &ssl_options,
                       const Body &body,
-                      const Headers & = {{"content-type", "application/json"}},
+                      const Headers &                = {{"content-type", "application/json"}},
                       const Compression &compression = Compression::kNone) noexcept = 0;
 
   virtual ~HttpClientSync() = default;

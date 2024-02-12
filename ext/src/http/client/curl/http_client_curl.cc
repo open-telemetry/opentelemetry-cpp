@@ -57,8 +57,9 @@ void Session::SendRequest(
     uLong compressed_size = compressBound(static_cast<uLong>(http_request_->body_.size()));
     opentelemetry::ext::http::client::Body compressed_body(compressed_size);
 
-    int compression_result = 
-      compress(compressed_body.data(), &compressed_size, http_request_->body_.data(), static_cast<uLong>(http_request_->body_.size()));
+    int compression_result =
+        compress(compressed_body.data(), &compressed_size, http_request_->body_.data(),
+                 static_cast<uLong>(http_request_->body_.size()));
 
     if (compression_result == Z_OK)
     {
@@ -77,8 +78,8 @@ void Session::SendRequest(
 
   curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
                                           callback_ptr, http_request_->headers_,
-                                          http_request_->body_, http_request_->compression_, false, http_request_->timeout_ms_,
-                                          reuse_connection));
+                                          http_request_->body_, http_request_->compression_, false,
+                                          http_request_->timeout_ms_, reuse_connection));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())

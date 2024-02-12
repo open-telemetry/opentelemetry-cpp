@@ -146,7 +146,7 @@ public:
                     opentelemetry::ext::http::client::Headers(),
                 const opentelemetry::ext::http::client::Body &request_body =
                     opentelemetry::ext::http::client::Body(),
-                const opentelemetry::ext::http::client::Compression &compression = 
+                const opentelemetry::ext::http::client::Compression &compression =
                     opentelemetry::ext::http::client::Compression::kNone,
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
