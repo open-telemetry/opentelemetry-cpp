@@ -61,6 +61,11 @@ public:
     timeout_ms_ = timeout_ms;
   }
 
+  void SetCompression(const opentelemetry::ext::http::client::Compression &compression) noexcept override
+  {
+    compression_ = compression;
+  }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -68,6 +73,7 @@ public:
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
+  opentelemetry::ext::http::client::Compression compression_;
 };
 
 class Response : public opentelemetry::ext::http::client::Response
