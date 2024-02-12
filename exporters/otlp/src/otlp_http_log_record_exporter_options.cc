@@ -19,7 +19,6 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   url                = GetOtlpDefaultHttpLogsEndpoint();
   content_type       = HttpRequestContentType::kJson;
   json_bytes_mapping = JsonBytesMappingKind::kHexId;
-  compression_type   = HttpCompressionType::kNone;
   use_json_name      = false;
   console_debug      = false;
   timeout            = GetOtlpDefaultLogsTimeout();
@@ -42,6 +41,8 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   ssl_max_tls      = GetOtlpDefaultLogsSslTlsMaxVersion();
   ssl_cipher       = GetOtlpDefaultLogsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
+
+  compression = GetOtlpDefaultLogsCompression();
 }
 
 OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}

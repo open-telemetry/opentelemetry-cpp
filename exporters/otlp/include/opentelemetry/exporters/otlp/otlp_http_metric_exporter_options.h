@@ -47,9 +47,6 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
   */
   JsonBytesMappingKind json_bytes_mapping;
 
-  /* Compression type. */
-  HttpCompressionType compression_type;
-
   /**
     Use json names (true) or protobuf field names (false) to set the json key.
   */
@@ -106,6 +103,9 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 
   /** TLS cipher suite. */
   std::string ssl_cipher_suite;
+
+  /** Compression type. */
+  std::string compression;
 };
 
 }  // namespace otlp

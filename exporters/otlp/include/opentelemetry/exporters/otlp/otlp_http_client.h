@@ -60,7 +60,7 @@ struct OtlpHttpClientOptions
   JsonBytesMappingKind json_bytes_mapping = JsonBytesMappingKind::kHexId;
 
   // By default, do not compress data
-  HttpCompressionType compression_type = HttpCompressionType::kNone;
+  std::string compression = "none";
 
   // If using the json name of protobuf field to set the key of json. By default, we will use the
   // field name just like proto files.
@@ -97,7 +97,7 @@ struct OtlpHttpClientOptions
                                nostd::string_view input_ssl_cipher_suite,
                                HttpRequestContentType input_content_type,
                                JsonBytesMappingKind input_json_bytes_mapping,
-                               HttpCompressionType input_compression_type,
+                               nostd::string_view input_compression,
                                bool input_use_json_name,
                                bool input_console_debug,
                                std::chrono::system_clock::duration input_timeout,
@@ -120,7 +120,7 @@ struct OtlpHttpClientOptions
                     input_ssl_cipher_suite),
         content_type(input_content_type),
         json_bytes_mapping(input_json_bytes_mapping),
-        compression_type(input_compression_type),
+        compression(input_compression),
         use_json_name(input_use_json_name),
         console_debug(input_console_debug),
         timeout(input_timeout),

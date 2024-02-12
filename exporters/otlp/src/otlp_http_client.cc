@@ -958,7 +958,7 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
 
-  if (options_.compression_type == HttpCompressionType::kGzip)
+  if (options_.compression == "gzip")
   {
     request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
   }

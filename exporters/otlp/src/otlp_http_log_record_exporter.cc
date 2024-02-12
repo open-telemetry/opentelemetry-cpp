@@ -43,7 +43,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                                             options.ssl_cipher_suite,
                                                             options.content_type,
                                                             options.json_bytes_mapping,
-                                                            options.compression_type,
+                                                            options.compression,
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
