@@ -958,6 +958,11 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
 
+  if (options_.compression_type == HttpCompressionType::kGzip)
+  {
+    request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  }
+
   // Returns the created session data
   return HttpSessionData{
       std::move(session),

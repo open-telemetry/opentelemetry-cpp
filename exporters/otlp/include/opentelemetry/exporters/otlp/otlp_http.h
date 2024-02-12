@@ -24,6 +24,12 @@ enum class HttpRequestContentType
   kBinary,
 };
 
+enum class HttpCompressionType
+{
+  kNone,
+  kGzip,
+};
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

@@ -19,6 +19,7 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
   url                     = GetOtlpDefaultMetricsEndpoint();
   content_type            = HttpRequestContentType::kJson;
   json_bytes_mapping      = JsonBytesMappingKind::kHexId;
+  compression_type        = HttpCompressionType::kNone;
   use_json_name           = false;
   console_debug           = false;
   timeout                 = GetOtlpDefaultMetricsTimeout();

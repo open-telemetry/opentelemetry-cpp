@@ -46,6 +46,9 @@ struct OPENTELEMETRY_EXPORT OtlpHttpExporterOptions
   */
   JsonBytesMappingKind json_bytes_mapping;
 
+  /* Compression type. */
+  HttpCompressionType compression_type;
+
   /**
     Use json names (true) or protobuf field names (false) to set the json key.
   */
