@@ -3,6 +3,8 @@
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 
+#include <zlib.h>
+
 #include <list>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -48,9 +50,34 @@ void Session::SendRequest(
     reuse_connection = session_id_ % http_client_.GetMaxSessionsPerConnection() != 0;
   }
 
+  if (http_request_->compression_ == opentelemetry::ext::http::client::Compression::kGzip)
+  {
+    http_request_->AddHeader("Content-Encoding", "gzip");
+
+    uLong compressed_size = compressBound(static_cast<uLong>(http_request_->body_.size()));
+    opentelemetry::ext::http::client::Body compressed_body(compressed_size);
+
+    int compression_result = 
+      compress(compressed_body.data(), &compressed_size, http_request_->body_.data(), static_cast<uLong>(http_request_->body_.size()));
+
+    if (compression_result == Z_OK)
+    {
+      compressed_body.resize(compressed_size);
+      http_request_->SetBody(compressed_body);
+    }
+    else
+    {
+      if (callback)
+      {
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+      }
+      is_session_active_.store(false, std::memory_order_release);
+    }
+  }
+
   curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
                                           callback_ptr, http_request_->headers_,
-                                          http_request_->body_, false, http_request_->timeout_ms_,
+                                          http_request_->body_, http_request_->compression_, false, http_request_->timeout_ms_,
                                           reuse_connection));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
