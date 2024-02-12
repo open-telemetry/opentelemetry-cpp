@@ -261,9 +261,9 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       // Local vars
       request_headers_(request_headers),
       request_body_(request_body),
-      compression_(compression),
       request_nwrite_(0),
       session_state_(opentelemetry::ext::http::client::SessionState::Created),
+      compression_(compression),
       response_code_(0)
 {
   /* get a curl handle */
