@@ -50,7 +50,7 @@
 
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
-namespace exporter_etw=OPENTELEMETRY_NAMESPACE::exporter::etw;
+namespace exporter_etw = OPENTELEMETRY_NAMESPACE::exporter::etw;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
