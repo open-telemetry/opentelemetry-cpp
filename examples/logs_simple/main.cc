@@ -14,11 +14,7 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/logs_foo_library/foo_library.h"
-#else
-#  include "logs_foo_library/foo_library.h"
-#endif
+#include "logs_foo_library/foo_library.h"
 
 namespace logs_api      = opentelemetry::logs;
 namespace logs_sdk      = opentelemetry::sdk::logs;

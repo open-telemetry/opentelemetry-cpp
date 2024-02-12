@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//:dll_deps.bzl", "avoid_dll_lock", "dll_deps")
 
 avoid_dll_lock()
 
@@ -171,7 +171,6 @@ cc_test(
     srcs = [
         "singleton_test.cc",
     ],
-    defines = ["BAZEL_BUILD"],
     linkopts = [
         "-ldl",
     ],
@@ -179,6 +178,10 @@ cc_test(
     tags = [
         "api",
         "test",
+    ],
+    data = [
+        "component_g",
+        "component_h"
     ],
     deps = dll_deps([
         "component_a",

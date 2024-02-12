@@ -15,11 +15,7 @@
 
 #include <string>
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
-#else
-#  include "foo_library/foo_library.h"
-#endif
+#include "foo_library/foo_library.h"
 
 namespace trace     = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;

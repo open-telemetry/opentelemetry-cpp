@@ -10,6 +10,7 @@ load("dll_deps.bzl", "force_compilation_mode")
 bool_flag(
     name = "with_dll",
     build_setting_default = False,
+    visibility = ["//visibility:public"],
 )
 
 config_setting(

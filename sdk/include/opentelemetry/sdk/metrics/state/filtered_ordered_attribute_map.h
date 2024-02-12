@@ -14,7 +14,7 @@ namespace sdk
 namespace metrics
 {
 class AttributesProcessor;
-class FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
+class OPENTELEMETRY_EXPORT FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
 {
 public:
   FilteredOrderedAttributeMap() = default;

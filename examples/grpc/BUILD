@@ -20,16 +20,24 @@ cc_proto_library(
 )
 
 cc_grpc_library(
-    name = "messages_cc_grpc",
+    name = "_messages_cc_grpc",
     srcs = [":messages_proto"],
     grpc_only = True,
     deps = [":messages_cc_proto"],
 )
 
+# Ideally we should not need this proxy cc_library
+# But neither cc_proto_library nor cc_grpc_library allow for
+# include_prefix, includes or strip_include_prefix right now.
+cc_library(
+    name = "messages_cc_grpc",
+    deps = [ "_messages_cc_grpc" ],
+    includes = ["protos"],
+)
+
 cc_library(
     name = "tracer_common",
     srcs = ["tracer_common.h"],
-    defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
     deps = dll_deps([
         "//exporters/ostream:ostream_span_exporter",
@@ -41,7 +49,6 @@ cc_binary(
     srcs = [
         "client.cc",
     ],
-    defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
     deps = dll_deps([
         "messages_cc_grpc",
@@ -57,7 +64,6 @@ cc_binary(
     srcs = [
         "server.cc",
     ],
-    defines = ["BAZEL_BUILD"],
     tags = ["ostream"],
     deps = dll_deps([
         "messages_cc_grpc",

@@ -16,11 +16,7 @@
 #include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
 #include "opentelemetry/sdk/metrics/view/view_factory.h"
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/metrics_foo_library/foo_library.h"
-#else
-#  include "metrics_foo_library/foo_library.h"
-#endif
+#include "metrics_foo_library/foo_library.h"
 
 namespace metrics_sdk      = opentelemetry::sdk::metrics;
 namespace common           = opentelemetry::common;

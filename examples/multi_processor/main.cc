@@ -9,11 +9,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
-#else
-#  include "foo_library/foo_library.h"
-#endif
+#include "foo_library/foo_library.h"
 
 using opentelemetry::exporter::memory::InMemorySpanData;
 namespace trace_api = opentelemetry::trace;

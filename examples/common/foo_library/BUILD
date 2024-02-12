@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//:dll_deps.bzl", "avoid_dll_lock", "dll_deps")
 
 avoid_dll_lock()
 
@@ -15,7 +15,8 @@ cc_library(
     hdrs = [
         "foo_library.h",
     ],
-    defines = ["BAZEL_BUILD"],
+    # TODO(malkia): Find out why include_prefix / strip_include_prefix do not work here!
+    includes = [".."],
     deps = dll_deps([
         "//api",
         "//sdk:headers",

@@ -1,11 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifdef BAZEL_BUILD
-#  include "examples/grpc/protos/messages.grpc.pb.h"
-#else
-#  include "messages.grpc.pb.h"
-#endif
+#include "messages.grpc.pb.h"
 
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/semantic_conventions.h"

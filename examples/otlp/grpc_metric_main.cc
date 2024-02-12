@@ -14,11 +14,7 @@
 #include <memory>
 #include <thread>
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/metrics_foo_library/foo_library.h"
-#else
-#  include "metrics_foo_library/foo_library.h"
-#endif
+#include "metrics_foo_library/foo_library.h"
 
 namespace metric_sdk    = opentelemetry::sdk::metrics;
 namespace common        = opentelemetry::common;

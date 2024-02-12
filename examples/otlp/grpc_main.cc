@@ -11,11 +11,7 @@
 // destroy and shutdown exporters.It's optional to users.
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
-#else
-#  include "foo_library/foo_library.h"
-#endif
+#include "foo_library/foo_library.h"
 
 namespace trace     = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;

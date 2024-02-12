@@ -29,9 +29,7 @@ cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = select({
-        ":with_external_abseil": ["HAVE_ABSEIL", "OPENTELEMETRY_DLL=0"],
-        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1"], # -1=dllexport, 1=dllimport, 0=static
-#    }) + select({
+        ":with_external_abseil": ["HAVE_ABSEIL"],
         ":set_cxx_stdlib_none": [],
         ### automatic selection
         ":set_cxx_stdlib_best": ["OPENTELEMETRY_STL_VERSION=(__cplusplus/100)"],
@@ -42,7 +40,10 @@ cc_library(
         ":set_cxx_stdlib_2017": ["OPENTELEMETRY_STL_VERSION=2017"],
         ":set_cxx_stdlib_2020": ["OPENTELEMETRY_STL_VERSION=2020"],
         ":set_cxx_stdlib_2023": ["OPENTELEMETRY_STL_VERSION=2023"],
-        "//conditions:default": [],
+        "//:with_dll_enabled": [],  # For select completeness
+    }) + select({
+        "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1"],
+        "//conditions:default": ["OPENTELEMETRY_DLL=0"],
     }),
     strip_include_prefix = "include",
     tags = ["api"],
@@ -75,7 +76,10 @@ filegroup(
 
 [config_setting(
     name = "set_cxx_stdlib_%s" % v,
-    flag_values = {":with_cxx_stdlib": v},
+    flag_values = {
+        ":with_cxx_stdlib": v,
+        "//:with_dll": "false",
+    },
 ) for v in CPP_STDLIBS]
 
 config_setting(
