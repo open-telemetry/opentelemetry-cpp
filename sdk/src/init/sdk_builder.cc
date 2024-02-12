@@ -32,6 +32,7 @@
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
+#include "opentelemetry/sdk/init/unsupported_exception.h"
 #include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
@@ -221,6 +222,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemo
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
 
   OTEL_INTERNAL_LOG_ERROR("CreateJaegerRemoteSampler: FIXME");
+  throw UnsupportedException("JeagerRemoteSampler not available in opentelemetry-cpp");
 
   return sdk;
 }
@@ -289,7 +291,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
   else
   {
     OTEL_INTERNAL_LOG_ERROR("No builder for OtlpSpanExporter");
-    // Throw
+    throw UnsupportedException("No builder for OtlpSpanExporter");
   }
 
   return sdk;
@@ -309,7 +311,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
   else
   {
     OTEL_INTERNAL_LOG_ERROR("No builder for ConsoleSpanExporter");
-    // Throw
+    throw UnsupportedException("No builder for ConsoleSpanExporter");
   }
 
   return sdk;
@@ -329,7 +331,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
   else
   {
     OTEL_INTERNAL_LOG_ERROR("No builder for ZipkinSpanExporter");
-    // Throw
+    throw UnsupportedException("No builder for ZipkinSpanExporter");
   }
 
   return sdk;
@@ -454,7 +456,7 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
   else
   {
     OTEL_INTERNAL_LOG_ERROR("CreateTextMapPropagator() no builder for " << name);
-    // Throw
+    throw UnsupportedException("CreateTextMapPropagator() no builder for " + name);
   }
   return sdk;
 }

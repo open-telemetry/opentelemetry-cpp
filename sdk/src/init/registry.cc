@@ -127,6 +127,61 @@ void Registry::AddTextMapPropagatorBuilder(const std::string &name,
   m_propagator_builders.insert(entry);
 }
 
+const ExtensionSamplerBuilder *Registry::GetExtensionSamplerBuilder(const std::string &name)
+{
+  ExtensionSamplerBuilder *builder = nullptr;
+  auto search                      = m_sampler_builders.find(name);
+  if (search != m_sampler_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionSamplerBuilder(const std::string &name, ExtensionSamplerBuilder *builder)
+{
+  std::pair<std::string, ExtensionSamplerBuilder *> entry{name, builder};
+  m_sampler_builders.insert(entry);
+}
+
+const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(
+    const std::string &name)
+{
+  ExtensionSpanExporterBuilder *builder = nullptr;
+  auto search                           = m_span_exporter_builders.find(name);
+  if (search != m_span_exporter_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionSpanExporterBuilder(const std::string &name,
+                                               ExtensionSpanExporterBuilder *builder)
+{
+  std::pair<std::string, ExtensionSpanExporterBuilder *> entry{name, builder};
+  m_span_exporter_builders.insert(entry);
+}
+
+const ExtensionSpanProcessorBuilder *Registry::GetExtensionSpanProcessorBuilder(
+    const std::string &name)
+{
+  ExtensionSpanProcessorBuilder *builder = nullptr;
+  auto search                            = m_span_processor_builders.find(name);
+  if (search != m_span_processor_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionSpanProcessorBuilder(const std::string &name,
+                                                ExtensionSpanProcessorBuilder *builder)
+{
+  std::pair<std::string, ExtensionSpanProcessorBuilder *> entry{name, builder};
+  m_span_processor_builders.insert(entry);
+}
+
 }  // namespace init
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

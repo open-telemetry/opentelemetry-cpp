@@ -18,6 +18,7 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
@@ -67,12 +68,24 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
   return model;
 }
 
+#ifdef NEVER
 static std::unique_ptr<SimplePropagatorConfiguration> ParseSinglePropagatorConfiguration(
     const std::string &name)
 {
   std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
 
   model->name = name;
+
+  return model;
+}
+#endif
+
+static std::unique_ptr<SimplePropagatorConfiguration> ParseSinglePropagatorConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
+
+  model->name = node->AsString();
 
   return model;
 }
@@ -97,8 +110,27 @@ static std::unique_ptr<CompositePropagatorConfiguration> ParseCompositePropagato
 static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PropagatorConfiguration> model;
+  std::unique_ptr<DocumentNode> child;
 
+  child = node->GetChildNode("composite");
+  if (child)
+  {
+    return ParseCompositePropagatorConfiguration(child);
+  }
+
+  // FIXME: File bug with opentelemetry-configuration
+  child = node->GetChildNode("simple");
+  if (child)
+  {
+    return ParseSinglePropagatorConfiguration(child);
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: illegal propagator");
+  throw InvalidSchemaException("Illegal propagator");
+  return nullptr;
+
+#ifdef NEVER
+  // This is the code that complies with the current model spec
   std::string name;
   std::unique_ptr<DocumentNode> child;
   size_t count = 0;
@@ -113,7 +145,7 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
   if (count != 1)
   {
     OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: count " << count);
-    // Throw
+    throw InvalidSchemaException("Illegal propagator");
   }
 
   if (name == "composite")
@@ -126,6 +158,7 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
   }
 
   return model;
+#endif
 }
 
 static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
@@ -264,7 +297,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
   if (count != 1)
   {
     OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: count " << count);
-    // Throw
+    throw InvalidSchemaException("Illegal sampler");
   }
 
   if (name == "always_off")
@@ -390,7 +423,7 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
   if (count != 1)
   {
     OTEL_INTERNAL_LOG_ERROR("ParseSpanExporterConfiguration: count " << count);
-    // Throw
+    throw InvalidSchemaException("Illegal span exporter");
   }
 
   if (name == "otlp")
@@ -474,7 +507,7 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
   if (count != 1)
   {
     OTEL_INTERNAL_LOG_ERROR("ParseSpanProcessorConfiguration: count " << count);
-    // Throw
+    throw InvalidSchemaException("Illegal span processor");
   }
 
   if (name == "batch")
@@ -658,11 +691,11 @@ std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::istream &in)
   }
   catch (const YAML::Exception &e)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml, " << e.what());
+    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml, " << e.what());
   }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed interpret yaml.");
+    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml.");
   }
 
   return config;
