@@ -183,3 +183,16 @@ def opentelemetry_cpp_deps():
             "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
         ],
     )
+
+    # Zlib (optional)
+    maybe(
+        http_archive,
+        name = "zlib",
+        build_file = "@io_opentelemetry_cpp//bazel:zlib.BUILD",
+        sha256 = "d14c38e313afc35a9a8760dadf26042f51ea0f5d154b0630a31da0540107fb98",
+        strip_prefix = "zlib-1.2.13",
+        urls = [
+            "https://github.com/madler/zlib/releases/download/v1.2.13/zlib-1.2.13.tar.xz",
+            "https://zlib.net/zlib-1.2.13.tar.xz",
+        ],
+    )
