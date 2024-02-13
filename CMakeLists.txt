@@ -449,6 +449,16 @@ if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
 endif()
 
 #
+# Do we need ZLIB ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+  # No specific version required.
+  find_package(ZLIB REQUIRED)
+  message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")
+endif()
+
+#
 # Do we need NLOHMANN_JSON ?
 #
 

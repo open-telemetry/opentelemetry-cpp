@@ -14,14 +14,28 @@ if(TARGET CURL::libcurl)
   target_link_libraries(
     opentelemetry_http_client_curl
     PUBLIC opentelemetry_ext
-    PRIVATE CURL::libcurl ZLIB::ZLIB)
+    PRIVATE CURL::libcurl)
 else()
   target_include_directories(opentelemetry_http_client_curl
                              INTERFACE "${CURL_INCLUDE_DIRS}")
   target_link_libraries(
     opentelemetry_http_client_curl
     PUBLIC opentelemetry_ext
-    PRIVATE ${CURL_LIBRARIES} ZLIB::ZLIB)
+    PRIVATE ${CURL_LIBRARIES})
+endif()
+
+if(TARGET ZLIB::ZLIB)
+  target_link_libraries(
+    opentelemetry_http_client_curl
+    PUBLIC opentelemetry_ext
+    PRIVATE ZLIB::ZLIB)
+else()
+  target_include_directories(opentelemetry_http_client_curl
+                             INTERFACE "${ZLIB_INCLUDE_DIRS}")
+  target_link_libraries(
+    opentelemetry_http_client_curl
+    PUBLIC opentelemetry_ext
+    PRIVATE ${ZLIB_LIBRARIES})
 endif()
 
 if(OPENTELEMETRY_INSTALL)
