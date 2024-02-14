@@ -61,15 +61,17 @@ inline bool HexToBinary(nostd::string_view hex, uint8_t *buffer, size_t buffer_s
   int64_t buffer_pos   = int64_t(buffer_size) - (hex_size + 1) / 2;
   int64_t last_hex_pos = hex_size - 1;
 
-  int64_t i = 0;
+  bool is_hex_size_odd = (hex_size % 2) == 1;
+  int64_t i            = 0;
+
+  if (is_hex_size_odd)
+  {
+    buffer[buffer_pos++] = HexToInt(hex[i++]);
+  }
+
   for (; i < last_hex_pos; i += 2)
   {
     buffer[buffer_pos++] = (HexToInt(hex[i]) << 4) | HexToInt(hex[i + 1]);
-  }
-
-  if (i == last_hex_pos)
-  {
-    buffer[buffer_pos] = HexToInt(hex[i]);
   }
 
   return true;
