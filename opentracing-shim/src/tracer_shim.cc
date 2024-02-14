@@ -124,12 +124,21 @@ opentracing::expected<void> TracerShim::injectImpl(const opentracing::SpanContex
   if (auto context_shim = SpanContextShim::extractFrom(&sc))
   {
     auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
-    // It MUST inject any non-empty Baggage even amidst no valid SpanContext.
-    const auto &context =
-        opentelemetry::baggage::SetBaggage(current_context, context_shim->baggage());
+
+    // Inject dummy span to provide SpanContext information
+    auto span_context = opentelemetry::trace::SpanContext(
+        context_shim->context().trace_id(), context_shim->context().span_id(),
+        context_shim->context().trace_flags(), false);
+    opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> sp{
+        new opentelemetry::trace::DefaultSpan(span_context)};
+    auto context_with_span = opentelemetry::trace::SetSpan(current_context, sp);
+
+    // Inject any non-empty Baggage
+    const auto &context_with_span_baggage =
+        opentelemetry::baggage::SetBaggage(context_with_span, context_shim->baggage());
 
     CarrierWriterShim carrier{writer};
-    propagator->Inject(carrier, context);
+    propagator->Inject(carrier, context_with_span_baggage);
     return opentracing::make_expected();
   }
 
