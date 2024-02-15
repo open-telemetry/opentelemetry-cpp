@@ -54,16 +54,27 @@ void Session::SendRequest(
   {
     http_request_->AddHeader("Content-Encoding", "gzip");
 
-    uLong compressed_size = compressBound(static_cast<uLong>(http_request_->body_.size()));
-    opentelemetry::ext::http::client::Body compressed_body(compressed_size);
+    opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
 
-    int compression_result =
-        compress(compressed_body.data(), &compressed_size, http_request_->body_.data(),
-                 static_cast<uLong>(http_request_->body_.size()));
+    zs.zalloc    = Z_NULL;
+    zs.zfree     = Z_NULL;
+    zs.opaque    = Z_NULL;
+    zs.avail_in  = static_cast<uInt>(http_request_->body_.size());
+    zs.next_in   = http_request_->body_.data();
+    zs.avail_out = static_cast<uInt>(compressed_body.size());
+    zs.next_out  = compressed_body.data();
 
-    if (compression_result == Z_OK)
+    // ZLIB: Have to maually specify 16 bits for the Gzip headers
+    const int window_bits = 15 + 16;
+
+    int stream =
+        deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, window_bits, 8, Z_DEFAULT_STRATEGY);
+
+    if (stream == Z_OK)
     {
-      compressed_body.resize(compressed_size);
+      deflate(&zs, Z_FINISH);
+      deflateEnd(&zs);
+      compressed_body.resize(zs.total_out);
       http_request_->SetBody(compressed_body);
     }
     else
