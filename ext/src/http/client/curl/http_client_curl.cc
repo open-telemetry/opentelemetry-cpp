@@ -55,7 +55,7 @@ void Session::SendRequest(
     http_request_->AddHeader("Content-Encoding", "gzip");
 
     opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
-    zstream zs;
+    z_stream zs;
     zs.zalloc    = Z_NULL;
     zs.zfree     = Z_NULL;
     zs.opaque    = Z_NULL;
