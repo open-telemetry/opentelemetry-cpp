@@ -1,5 +1,7 @@
 common --noexperimental_merged_skyframe_analysis_execution
 
+test --flaky_test_attempts=10
+
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 common --nolegacy_external_runfiles

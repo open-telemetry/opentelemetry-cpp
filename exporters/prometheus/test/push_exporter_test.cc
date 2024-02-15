@@ -136,8 +136,6 @@ TEST(PrometheusPushExporter, CollectionNotEnoughSpace)
 
   int max_collection_size = exporter.GetMaxCollectionSize();
 
-  GTEST_LOG_(INFO) << max_collection_size;
-
   // send export request to fill the
   // collection in the collector
   ExportResult code = ExportResult::kSuccess;

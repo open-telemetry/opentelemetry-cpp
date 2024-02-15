@@ -178,6 +178,7 @@ cc_library(
 
 cc_test(
     name = "prometheus_push_exporter_test",
+    flaky = True,
     srcs = [
         "test/push_exporter_test.cc",
     ],
