@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
 
@@ -28,7 +28,7 @@ namespace
 {
 void InitOtel()
 {
-  auto level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
+  auto level = opentelemetry::sdk::common::internal_log::LogLevel::Debug;
 
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(level);
 
@@ -56,7 +56,7 @@ void InitOtel()
   // See
   // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/examples/kitchen-sink.yaml
   std::string config_file = "config.yaml";
-  auto model = opentelemetry::sdk::configuration::ConfigurationFactory::ParseFile(config_file);
+  auto model = opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseFile(config_file);
 
   /* 5 - Build the SDK from the parsed config.yaml */
 

@@ -474,6 +474,7 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
 endif()
 
 find_package(yaml-cpp REQUIRED)
+find_package(ryml REQUIRED)
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

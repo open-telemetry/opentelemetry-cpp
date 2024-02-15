@@ -8,7 +8,6 @@
 #include <string>
 
 #include "opentelemetry/sdk/configuration/configuration.h"
-#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,11 +16,11 @@ namespace sdk
 namespace configuration
 {
 
-class ConfigurationFactory
+class YamlConfigurationFactory
 {
 public:
-  static std::unique_ptr<Configuration> ParseConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+  static std::unique_ptr<Configuration> ParseFile(std::string filename);
+  static std::unique_ptr<Configuration> ParseString(std::string content);
 };
 
 }  // namespace configuration

@@ -511,8 +511,15 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
   if (!model->disabled)
   {
-    sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider);
-    sdk->m_propagator      = CreatePropagator(model->propagator);
+    if (model->tracer_provider)
+    {
+      sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider);
+    }
+
+    if (model->propagator)
+    {
+      sdk->m_propagator = CreatePropagator(model->propagator);
+    }
   }
 
   return sdk;

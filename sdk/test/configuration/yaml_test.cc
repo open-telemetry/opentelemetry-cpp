@@ -3,11 +3,11 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 
 std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(std::string yaml)
 {
-  return opentelemetry::sdk::configuration::ConfigurationFactory::ParseString(yaml);
+  return opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseString(yaml);
 }
 
 TEST(Yaml, empty)

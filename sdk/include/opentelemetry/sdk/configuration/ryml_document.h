@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <yaml-cpp/yaml.h>
+#include <ryml.hpp>
 #include <string>
 
 #include "opentelemetry/sdk/configuration/document.h"
@@ -16,18 +16,18 @@ namespace sdk
 namespace configuration
 {
 
-class YamlDocument : public Document
+class RymlDocument : public Document
 {
 public:
   static std::unique_ptr<Document> Parse(std::string content);
 
-  YamlDocument(YAML::Node root) : m_root(root) {}
-  ~YamlDocument() override = default;
+  RymlDocument(ryml::Tree tree) : m_tree(tree) {}
+  ~RymlDocument() override = default;
 
   std::unique_ptr<DocumentNode> GetRootNode() override;
 
 private:
-  YAML::Node m_root;
+  ryml::Tree m_tree;
 };
 
 }  // namespace configuration

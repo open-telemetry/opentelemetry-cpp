@@ -593,7 +593,8 @@ static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
   return model;
 }
 
-static std::unique_ptr<Configuration> ParseConfiguration(const std::unique_ptr<DocumentNode> &node)
+std::unique_ptr<Configuration> ConfigurationFactory::ParseConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<Configuration> model(new Configuration);
 
@@ -639,66 +640,6 @@ static std::unique_ptr<Configuration> ParseConfiguration(const std::unique_ptr<D
   }
 
   return model;
-}
-
-std::unique_ptr<Configuration> ConfigurationFactory::ParseFile(std::string filename)
-{
-  std::unique_ptr<Configuration> conf;
-  std::ifstream in(filename, std::ios::binary);
-  if (!in.is_open())
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to open yaml file <" << filename << ">.");
-  }
-  else
-  {
-    conf = ConfigurationFactory::Parse(in);
-  }
-
-  return conf;
-}
-
-std::unique_ptr<Configuration> ConfigurationFactory::ParseString(std::string content)
-{
-  std::istringstream in(content);
-  return Parse(in);
-}
-
-std::unique_ptr<Configuration> ConfigurationFactory::Parse(std::istream &in)
-{
-  std::unique_ptr<Document> doc;
-  std::unique_ptr<DocumentNode> root;
-  std::unique_ptr<Configuration> config;
-
-  try
-  {
-    doc  = YamlDocument::Parse(in);
-    root = doc->GetRootNode();
-  }
-  catch (const YAML::BadFile &e)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml, " << e.what());
-    return config;
-  }
-  catch (...)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml.");
-    return config;
-  }
-
-  try
-  {
-    config = ParseConfiguration(root);
-  }
-  catch (const YAML::Exception &e)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml, " << e.what());
-  }
-  catch (...)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml.");
-  }
-
-  return config;
 }
 
 }  // namespace configuration

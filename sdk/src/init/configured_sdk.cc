@@ -20,19 +20,39 @@ std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
     std::shared_ptr<Registry> registry,
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model)
 {
-  SdkBuilder builder(registry);
-  return builder.CreateConfiguredSdk(model);
+  std::unique_ptr<ConfiguredSdk> sdk;
+
+  if (model)
+  {
+    try
+    {
+      SdkBuilder builder(registry);
+      sdk = builder.CreateConfiguredSdk(model);
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_ERROR("Failed to build from the model.");
+    }
+  }
+
+  return sdk;
 }
 
 void ConfiguredSdk::Install()
 {
-  opentelemetry::trace::Provider::SetTracerProvider(m_tracer_provider);
+  if (m_tracer_provider)
+  {
+    opentelemetry::trace::Provider::SetTracerProvider(m_tracer_provider);
+  }
 }
 
 void ConfiguredSdk::UnInstall()
 {
-  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  opentelemetry::trace::Provider::SetTracerProvider(none);
+  if (m_tracer_provider)
+  {
+    std::shared_ptr<opentelemetry::trace::TracerProvider> none;
+    opentelemetry::trace::Provider::SetTracerProvider(none);
+  }
 }
 
 }  // namespace init

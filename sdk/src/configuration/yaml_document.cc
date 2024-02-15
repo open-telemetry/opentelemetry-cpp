@@ -15,14 +15,14 @@ namespace sdk
 namespace configuration
 {
 
-std::unique_ptr<Document> YamlDocument::Parse(std::istream &in)
+std::unique_ptr<Document> YamlDocument::Parse(std::string content)
 {
   YAML::Node yaml;
   std::unique_ptr<Document> doc;
 
   try
   {
-    yaml = YAML::Load(in);
+    yaml = YAML::Load(content);
   }
   catch (const YAML::BadFile &e)
   {
