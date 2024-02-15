@@ -101,6 +101,7 @@ cc_test(
 
 cc_library(
     name = "baseline_circular_buffer",
+    testonly = 1,
     hdrs = [
         "baseline_circular_buffer.h",
     ],

@@ -70,15 +70,16 @@ cc_library(
 
 cc_library(
     name = "prometheus_test_helper",
+    testonly = 1,
     hdrs = [
         "test/prometheus_test_helper.h",
     ],
     tags = ["prometheus"],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//sdk:headers",
         "//sdk/src/trace",
-    ],
+    ]),
 )
 
 cc_test(
@@ -134,6 +135,64 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",        
+    ]),
+)
+
+cc_library(
+    name = "prometheus_push_exporter",
+    srcs = [
+        "src/push_exporter.cc",
+        "src/push_exporter_factory.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/push_exporter.h",
+        "include/opentelemetry/exporters/prometheus/push_exporter_factory.h",
+        "include/opentelemetry/exporters/prometheus/push_exporter_options.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["prometheus"],
+    deps = [
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//push",
+        "//api",
+        "//exporters/prometheus:prometheus_collector",
+        "//exporters/prometheus:prometheus_exporter_utils",
+        "//sdk:headers",
+        "//sdk/src/metrics",
+    ],
+)
+
+cc_library(
+    name = "prometheus_push_test_helper",
+    testonly = 1,
+    hdrs = [
+        "test/prometheus_push_test_helper.h",
+    ],
+    tags = ["prometheus"],
+    deps = dll_deps([
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/trace",
+    ]),
+)
+
+cc_test(
+    name = "prometheus_push_exporter_test",
+    srcs = [
+        "test/push_exporter_test.cc",
+    ],
+    tags = [
+        "prometheus",
+        "test",
+    ],
+    deps = dll_deps([
+        ":prometheus_push_exporter",
+        ":prometheus_push_test_helper",
+        "@com_google_googletest//:gtest_main",
+        "//api",
+        "//exporters/prometheus:prometheus_collector",
+        "//exporters/prometheus:prometheus_exporter_utils",
+        "//sdk:headers",
     ]),
 )
 

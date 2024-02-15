@@ -92,13 +92,14 @@ cc_library(
 
 cc_library(
     name = "ostream_capture",
+    testonly = 1,
     hdrs = [
         "test/ostream_capture.h",
     ],
     tags = ["ostream"],
-    deps = [
+    deps = dll_deps([
         "//api",
-    ],
+    ]),
 )
 
 cc_test(

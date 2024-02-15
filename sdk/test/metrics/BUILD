@@ -8,6 +8,7 @@ avoid_dll_lock()
 
 cc_library(
     name = "metrics_common_test_utils",
+    testonly = 1,
     srcs = [
         "common.cc",
     ],
