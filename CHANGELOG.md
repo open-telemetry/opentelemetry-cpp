@@ -34,6 +34,8 @@ Increment the:
   [#2478](https://github.com/open-telemetry/opentelemetry-cpp/pull/2478)
 * [PROTO] Upgrade to opentelemetry-proto v1.1.0
   [#2488](https://github.com/open-telemetry/opentelemetry-cpp/pull/2488)
+* [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
+  [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
 
 Important changes:
 
@@ -44,6 +46,12 @@ Breaking changes:
   * CMake options `WITH_OTLP_HTTP_SSL_PREVIEW`
     and `WITH_OTLP_HTTP_SSL_TLS_PREVIEW` are removed.
     Building opentelemetry-cpp without SSL support is no longer possible.
+* [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
+  [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
+  * In the `OtlpHttpExporterOptions` and `OtlpGrpcExporterOptions`, a new
+    field called compression has been introduced. This field can be set
+    to "gzip” to enable gzip compression.
+  * The CMake option `WITH_OTLP_HTTP` now includes a dependency on zlib.
 
 ## [1.13.0] 2023-12-06
 
