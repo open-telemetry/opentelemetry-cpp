@@ -58,7 +58,7 @@ Increment the:
   [#2501](https://github.com/open-telemetry/opentelemetry-cpp/pull/2501)
 * [BUILD] Alternative way of exporting symbols (generating .def file)
   [#2476](https://github.com/open-telemetry/opentelemetry-cpp/pull/2476)
-* [CI] Make cmake.c++20*.test actualy use C++20 and add cmake.c++23*.test
+* [CI] Make cmake.c++20*.test actually use C++20 and add cmake.c++23*.test
   [#2496](https://github.com/open-telemetry/opentelemetry-cpp/pull/2496)
 * [DOCUMENTATION] Add api reference documentation for logs
   [#2497](https://github.com/open-telemetry/opentelemetry-cpp/pull/2497)
