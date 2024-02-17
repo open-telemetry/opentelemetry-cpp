@@ -1,10 +1,13 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+# DEAD
+# yaml_document.cc yaml_document_node.cc
+
 add_library(
   opentelemetry_configuration
   configuration_factory.cc
-  yaml_configuration_factory.cc yaml_document.cc yaml_document_node.cc
+  yaml_configuration_factory.cc
   ryml_document.cc ryml_document_node.cc)
 
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME configuration)
@@ -18,10 +21,9 @@ target_link_libraries(
   opentelemetry_configuration
   PUBLIC opentelemetry_api opentelemetry_common)
 
-target_link_libraries(
-  opentelemetry_configuration
-  PUBLIC yaml-cpp::yaml-cpp)
-
+# target_link_libraries(
+#   opentelemetry_configuration
+#   PUBLIC yaml-cpp::yaml-cpp)
 
 target_link_libraries(
   opentelemetry_configuration

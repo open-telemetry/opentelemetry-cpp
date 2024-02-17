@@ -140,7 +140,7 @@ jobs:
         sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
-        sudo -E ./ci/install_yaml_cpp.sh
+        sudo -E ./ci/install_ryml.sh
     - name: run cmake clang (maintainer mode, sync)
       env:
         CC: /usr/bin/clang-15

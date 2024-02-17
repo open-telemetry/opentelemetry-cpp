@@ -1,8 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <yaml-cpp/yaml.h>
 #include <fstream>
+
+// #define WITH_YAML_CPP
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
@@ -11,9 +12,12 @@
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
-#include "opentelemetry/sdk/configuration/yaml_document.h"
-#include "opentelemetry/sdk/configuration/yaml_document_node.h"
 #include "opentelemetry/version.h"
+
+#ifdef WITH_YAML_CPP
+#  include "opentelemetry/sdk/configuration/yaml_document.h"
+#  include "opentelemetry/sdk/configuration/yaml_document_node.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -39,6 +43,7 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(std::string f
   return conf;
 }
 
+#ifdef WITH_YAML_CPP
 static std::unique_ptr<Document> YamlCppParse(const std::string &content)
 {
   std::unique_ptr<Document> doc;
@@ -60,6 +65,7 @@ static std::unique_ptr<Document> YamlCppParse(const std::string &content)
 
   return doc;
 }
+#endif
 
 static std::unique_ptr<Document> RymlParse(const std::string &content)
 {
@@ -84,8 +90,6 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(std::string
   std::unique_ptr<DocumentNode> root;
   std::unique_ptr<Configuration> config;
 
-  // #define WITH_YAML_CPP
-
 #ifdef WITH_YAML_CPP
   doc = YamlCppParse(content);
 #else
@@ -99,10 +103,6 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(std::string
       root   = doc->GetRootNode();
       config = ConfigurationFactory::ParseConfiguration(root);
     }
-  }
-  catch (const YAML::Exception &e)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml, " << e.what());
   }
   catch (...)
   {

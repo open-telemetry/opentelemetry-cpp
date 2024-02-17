@@ -95,8 +95,7 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
-option(WITH_CONFIGURATION "EXPERIMENTAL: configuration model" OFF)
-option(WITH_CONFIGURATION_YAML "EXPERIMENTAL: YAML configuration file" OFF)
+option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
@@ -287,10 +286,6 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 # Verify options dependencies
 #
 
-if(WITH_CONFIGURATION_YAML AND NOT WITH_CONFIGURATION)
-  message(FATAL_ERROR "CONFIGURATION_YAML=ON requires WITH_CONFIGURATION=ON")
-endif()
-
 if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
   message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
 endif()
@@ -473,8 +468,18 @@ if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
   include(cmake/nlohmann-json.cmake)
 endif()
 
-find_package(yaml-cpp REQUIRED)
-find_package(ryml REQUIRED)
+#
+# Do we need RapidYaml ?
+#
+
+if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+  # No specific version required.
+  find_package(ryml REQUIRED)
+  message(STATUS "Found ryml: include ${RYML_INCLUDE_DIR}, lib ${RYML_LIB_DIR}, version ${ryml_VERSION}")
+endif()
+
+# DEAD
+# find_package(yaml-cpp REQUIRED)
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
