@@ -29,6 +29,7 @@
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
+#  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
 
 #  if defined(_MSC_VER)
@@ -44,6 +45,74 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceServiceStub
+{
+public:
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) && \
+      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+  using async_interface_base =
+      proto::collector::trace::v1::TraceService::StubInterface::async_interface;
+#  else
+  using async_interface_base =
+      proto::collector::trace::v1::TraceService::StubInterface::experimental_async_interface;
+#  endif
+
+  OtlpMockTraceServiceStub() : async_interface_(this) {}
+
+  class async_interface : public async_interface_base
+  {
+  public:
+    async_interface(OtlpMockTraceServiceStub *owner) : stub_(owner) {}
+
+    virtual ~async_interface() {}
+
+    void Export(
+        ::grpc::ClientContext *context,
+        const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest *request,
+        ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *response,
+        std::function<void(::grpc::Status)> callback) override
+    {
+      stub_->last_async_status_ = stub_->Export(context, *request, response);
+      callback(stub_->last_async_status_);
+    }
+
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest * /*request*/,
+        ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse * /*response*/,
+        ::grpc::ClientUnaryReactor * /*reactor*/) override
+    {}
+#  else
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest * /*request*/,
+        ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse * /*response*/,
+        ::grpc::experimental::ClientUnaryReactor * /*reactor*/)
+    {}
+#  endif
+
+  private:
+    OtlpMockTraceServiceStub *stub_;
+  };
+
+  async_interface_base *async() { return &async_interface_; }
+  async_interface_base *experimental_async() { return &async_interface_; }
+
+  ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
+
+private:
+  ::grpc::Status last_async_status_;
+  async_interface async_interface_;
+};
+}  // namespace
 
 class OtlpGrpcExporterTestPeer : public ::testing::Test
 {
@@ -64,7 +133,7 @@ public:
 
 TEST_F(OtlpGrpcExporterTestPeer, ShutdownTest)
 {
-  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  auto mock_stub = new OtlpMockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
   auto exporter = GetExporter(stub_interface);
@@ -78,6 +147,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ShutdownTest)
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
   EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
   auto result = exporter->Export(batch_1);
+  exporter->ForceFlush();
   EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
 
   exporter->Shutdown();
@@ -90,7 +160,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ShutdownTest)
 // Call Export() directly
 TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
 {
-  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  auto mock_stub = new OtlpMockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
   auto exporter = GetExporter(stub_interface);
@@ -112,13 +182,19 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
       .Times(Exactly(1))
       .WillOnce(Return(grpc::Status::CANCELLED));
   result = exporter->Export(batch_2);
+  exporter->ForceFlush();
+#  if defined(ENABLE_ASYNC_EXPORT)
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
+  EXPECT_FALSE(mock_stub->GetLastAsyncStatus().ok());
+#  else
   EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
+#  endif
 }
 
 // Create spans, let processor call Export()
 TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 {
-  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  auto mock_stub = new OtlpMockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
 

@@ -583,9 +583,16 @@ if(BUILD_TESTING)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
     if(NOT (GTEST_FOUND OR GTest_FOUND))
-      install_windows_deps()
-      include(${CMAKE_TOOLCHAIN_FILE})
-      find_package(GTest REQUIRED)
+      if(DEFINED CMAKE_TOOLCHAIN_FILE)
+        message(
+          FATAL_ERROR
+            "Pleaes install GTest with the CMAKE_TOOLCHAIN_FILE at ${CMAKE_TOOLCHAIN_FILE}"
+        )
+      else()
+        install_windows_deps()
+        include(${CMAKE_TOOLCHAIN_FILE})
+        find_package(GTest REQUIRED)
+      endif()
     endif()
   else()
     # Prefer GTest installed by OS distro, brew or vcpkg package manager

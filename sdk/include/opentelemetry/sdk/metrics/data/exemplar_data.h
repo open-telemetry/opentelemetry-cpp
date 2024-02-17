@@ -6,8 +6,8 @@
 #include <memory>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
@@ -16,7 +16,7 @@ namespace sdk
 {
 namespace metrics
 {
-using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
+using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 /**
  * A sample input measurement.
  *

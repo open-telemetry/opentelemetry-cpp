@@ -74,7 +74,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 We meet weekly, and the time of the meeting alternates between Monday at 13:00
 PT and Wednesday at 9:00 PT. The meeting is subject to change depending on
 contributors' availability. Check the [OpenTelemetry community
-calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com)
+calendar](https://github.com/open-telemetry/community#calendar)
 for specific dates and Zoom meeting links.
 
 Meeting notes are available as a public [Google
