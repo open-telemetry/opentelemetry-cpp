@@ -303,6 +303,19 @@ DocumentNodeConstIterator YamlDocumentNode::end() const
   return DocumentNodeConstIterator(new YamlDocumentNodeConstIteratorImpl(m_yaml.end()));
 }
 
+size_t YamlDocumentNode::num_children() const
+{
+  OTEL_INTERNAL_LOG_ERROR("YamlDocumentNode::num_children(): FIXME");
+  return 0;
+}
+
+std::unique_ptr<DocumentNode> YamlDocumentNode::GetChild(size_t index) const
+{
+  std::unique_ptr<DocumentNode> child;
+  OTEL_INTERNAL_LOG_ERROR("YamlDocumentNode::GetChild(): FIXME");
+  return child;
+}
+
 PropertiesNodeConstIterator YamlDocumentNode::begin_properties() const
 {
   OTEL_INTERNAL_LOG_DEBUG("YamlDocumentNode::begin_properties()");

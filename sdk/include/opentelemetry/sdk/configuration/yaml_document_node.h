@@ -48,6 +48,9 @@ public:
   DocumentNodeConstIterator begin() const override;
   DocumentNodeConstIterator end() const override;
 
+  size_t num_children() const override;
+  std::unique_ptr<DocumentNode> GetChild(size_t index) const override;
+
   PropertiesNodeConstIterator begin_properties() const override;
   PropertiesNodeConstIterator end_properties() const override;
 

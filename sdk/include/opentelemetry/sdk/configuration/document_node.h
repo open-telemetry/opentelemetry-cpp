@@ -51,6 +51,9 @@ public:
   virtual DocumentNodeConstIterator begin() const = 0;
   virtual DocumentNodeConstIterator end() const   = 0;
 
+  virtual size_t num_children() const                                = 0;
+  virtual std::unique_ptr<DocumentNode> GetChild(size_t index) const = 0;
+
   virtual PropertiesNodeConstIterator begin_properties() const = 0;
   virtual PropertiesNodeConstIterator end_properties() const   = 0;
 

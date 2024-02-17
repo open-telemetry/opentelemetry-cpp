@@ -25,7 +25,8 @@ file_format:
 )";
 
   auto config = DoParse(yaml);
-  ASSERT_EQ(config, nullptr);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "");
 }
 
 TEST(Yaml, just_format)

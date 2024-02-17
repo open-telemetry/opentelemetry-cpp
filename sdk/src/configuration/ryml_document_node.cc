@@ -122,8 +122,7 @@ ryml::ConstNodeRef RymlDocumentNode::GetRymlChildNode(const std::string &name)
 {
   if (!m_node.is_map())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not a map, looking for " << name);
-    throw InvalidSchemaException(name);
+    return ryml::ConstNodeRef{};
   }
 
   const char *name_str = name.c_str();
@@ -365,17 +364,14 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::begin()");
 
+#if 0
   DebugNode("::begin()", m_node);
-
-  for (auto it = m_node.cbegin(); it != m_node.cend(); ++it)
-  {
-    DebugNode("(iter)", *it);
-  }
 
   for (int index = 0; index < m_node.num_children(); index++)
   {
     DebugNode("(child)", m_node[index]);
   }
+#endif
 
   return DocumentNodeConstIterator(new RymlDocumentNodeConstIteratorImpl(m_node, 0));
 }
@@ -388,21 +384,31 @@ DocumentNodeConstIterator RymlDocumentNode::end() const
       new RymlDocumentNodeConstIteratorImpl(m_node, m_node.num_children()));
 }
 
+size_t RymlDocumentNode::num_children() const
+{
+  return m_node.num_children();
+}
+
+std::unique_ptr<DocumentNode> RymlDocumentNode::GetChild(size_t index) const
+{
+  std::unique_ptr<DocumentNode> child;
+  ryml::ConstNodeRef ryml_child = m_node[index];
+  child                         = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child));
+  return child;
+}
+
 PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::begin_properties()");
 
+#if 0
   DebugNode("::begin_properties()", m_node);
-
-  for (auto it = m_node.cbegin(); it != m_node.cend(); ++it)
-  {
-    DebugNode("(iter)", *it);
-  }
 
   for (int index = 0; index < m_node.num_children(); index++)
   {
     DebugNode("(child)", m_node[index]);
   }
+#endif
 
   return PropertiesNodeConstIterator(new RymlPropertiesNodeConstIteratorImpl(m_node, 0));
 }

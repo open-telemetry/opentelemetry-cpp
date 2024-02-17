@@ -450,7 +450,7 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateTextMapPropagator() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("CreateTextMapPropagator() using registered builder " << name);
     sdk = builder->Build();
   }
   else
