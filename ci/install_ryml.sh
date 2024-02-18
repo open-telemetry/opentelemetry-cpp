@@ -11,7 +11,7 @@ BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
 git clone --recursive -b ${RYML_VERSION} https://github.com/biojppm/rapidyaml.git
-cd yaml-cpp
+cd rapidyaml
 RYML_BUILD_OPTIONS=(
     "-DBUILD_TESTING=OFF"
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"

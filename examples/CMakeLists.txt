@@ -30,6 +30,6 @@ if(WITH_EXAMPLES_HTTP)
   add_subdirectory(http)
 endif()
 
-if(WITH_CONFIGURATION_YAML)
+if(WITH_CONFIGURATION)
   add_subdirectory(yaml)
 endif()

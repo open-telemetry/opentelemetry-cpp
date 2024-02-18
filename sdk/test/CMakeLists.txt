@@ -7,4 +7,7 @@ add_subdirectory(metrics)
 add_subdirectory(logs)
 add_subdirectory(resource)
 add_subdirectory(instrumentationscope)
-add_subdirectory(configuration)
+
+if(WITH_CONFIGURATION)
+  add_subdirectory(configuration)
+endif()
