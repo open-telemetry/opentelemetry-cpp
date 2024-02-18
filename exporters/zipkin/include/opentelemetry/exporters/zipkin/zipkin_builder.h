@@ -5,10 +5,11 @@
 
 #include <memory>
 
-#include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

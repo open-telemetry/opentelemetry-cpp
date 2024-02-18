@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 #include <map>
+#include <string>
+
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

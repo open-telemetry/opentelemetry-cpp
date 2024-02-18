@@ -5,9 +5,11 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

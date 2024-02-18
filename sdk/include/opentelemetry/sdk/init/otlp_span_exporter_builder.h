@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,7 +16,7 @@ namespace init
 class OtlpSpanExporterBuilder
 {
 public:
-  OtlpSpanExporterBuilder() = default;
+  OtlpSpanExporterBuilder()          = default;
   virtual ~OtlpSpanExporterBuilder() = default;
 
   virtual std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
