@@ -169,6 +169,61 @@ cc_library(
 )
 
 cc_library(
+    name = "otlp_file_client",
+    srcs = [
+        "src/otlp_file_client.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_client.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_client_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_file",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:base64",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_google_absl//absl/strings",
+        "@github_nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "otlp_file_exporter",
+    srcs = [
+        "src/otlp_file_exporter.cc",
+        "src/otlp_file_exporter_factory.cc",
+        "src/otlp_file_exporter_options.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_file",
+    ],
+    deps = [
+        ":otlp_file_client",
+        ":otlp_recordable",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+    ],
+)
+
+cc_library(
     name = "otlp_grpc_metric_exporter",
     srcs = [
         "src/otlp_grpc_metric_exporter.cc",
@@ -229,6 +284,33 @@ cc_library(
 )
 
 cc_library(
+    name = "otlp_file_metric_exporter",
+    srcs = [
+        "src/otlp_file_metric_exporter.cc",
+        "src/otlp_file_metric_exporter_factory.cc",
+        "src/otlp_file_metric_exporter_options.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_metric_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_file_metric",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+    ],
+)
+
+cc_library(
     name = "otlp_http_log_record_exporter",
     srcs = [
         "src/otlp_http_log_record_exporter.cc",
@@ -250,6 +332,34 @@ cc_library(
     ],
     deps = [
         ":otlp_http_client",
+        ":otlp_recordable",
+        "//sdk/src/logs",
+        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+    ],
+)
+
+cc_library(
+    name = "otlp_file_log_record_exporter",
+    srcs = [
+        "src/otlp_file_log_record_exporter.cc",
+        "src/otlp_file_log_record_exporter_factory.cc",
+        "src/otlp_file_log_record_exporter_options.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_log_record_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = [
+        "otlp",
+        "otlp_file_log",
+    ],
+    deps = [
+        ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/logs",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",

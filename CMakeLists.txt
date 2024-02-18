@@ -204,6 +204,9 @@ option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
+option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
+       OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -364,7 +367,9 @@ if(WITH_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 endif()
 
-if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
+if(WITH_OTLP_GRPC
+   OR WITH_OTLP_HTTP
+   OR WITH_OTLP_FILE)
   find_package(Protobuf)
   if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
     if(NOT WITH_ABSEIL)
@@ -455,6 +460,7 @@ endif()
 if(WITH_ELASTICSEARCH
    OR WITH_ZIPKIN
    OR WITH_OTLP_HTTP
+   OR WITH_OTLP_FILE
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_ETW)
   set(USE_NLOHMANN_JSON ON)

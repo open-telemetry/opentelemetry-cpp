@@ -185,6 +185,83 @@ if(WITH_OTLP_HTTP)
        opentelemetry_exporter_otlp_http_metric)
 endif()
 
+if(WITH_OTLP_FILE)
+  add_library(opentelemetry_exporter_otlp_file_client src/otlp_file_client.cc)
+  set_target_properties(opentelemetry_exporter_otlp_file_client
+                        PROPERTIES EXPORT_NAME otlp_file_client)
+  set_target_version(opentelemetry_exporter_otlp_file_client)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_client
+    PUBLIC opentelemetry_sdk
+    PRIVATE opentelemetry_proto nlohmann_json::nlohmann_json)
+  if(TARGET absl::strings)
+    target_link_libraries(opentelemetry_exporter_otlp_file_client
+                          PUBLIC absl::strings)
+  endif()
+  if(nlohmann_json_clone)
+    add_dependencies(opentelemetry_exporter_otlp_file_client
+                     nlohmann_json::nlohmann_json)
+  endif()
+  target_include_directories(
+    opentelemetry_exporter_otlp_file_client
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+       opentelemetry_exporter_otlp_file_client)
+
+  add_library(
+    opentelemetry_exporter_otlp_file
+    src/otlp_file_exporter.cc src/otlp_file_exporter_factory.cc
+    src/otlp_file_exporter_options.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_file
+                        PROPERTIES EXPORT_NAME otlp_file_exporter)
+  set_target_version(opentelemetry_exporter_otlp_file)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_file_client)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_file)
+
+  add_library(
+    opentelemetry_exporter_otlp_file_log
+    src/otlp_file_log_record_exporter.cc
+    src/otlp_file_log_record_exporter_factory.cc
+    src/otlp_file_log_record_exporter_options.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_file_log
+                        PROPERTIES EXPORT_NAME otlp_file_log_record_exporter)
+  set_target_version(opentelemetry_exporter_otlp_file_log)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_log
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_file_client)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_file_log)
+
+  add_library(
+    opentelemetry_exporter_otlp_file_metric
+    src/otlp_file_metric_exporter.cc src/otlp_file_metric_exporter_factory.cc
+    src/otlp_file_metric_exporter_options.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_file_metric
+                        PROPERTIES EXPORT_NAME otlp_file_metric_exporter)
+  set_target_version(opentelemetry_exporter_otlp_file_metric)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_file_metric
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_file_client)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+       opentelemetry_exporter_otlp_file_metric)
+endif()
+
 target_link_libraries(
   opentelemetry_otlp_recordable
   PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
