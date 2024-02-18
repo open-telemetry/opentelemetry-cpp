@@ -34,6 +34,7 @@
 #include <fstream>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #if !defined(__CYGWIN__) && defined(_WIN32)
@@ -379,6 +380,7 @@ static std::size_t FormatPath(char *buff,
       case 'N': {
         std::size_t value = fmt[i] == 'n' ? rotate_index + 1 : rotate_index;
         auto res          = OTLP_FILE_SNPRINTF(&buff[ret], bufz - ret, "%llu",
+                                               // Format may be different on different clang-format 10
                                                static_cast<unsigned long long>(value));
         if (res < 0)
         {
