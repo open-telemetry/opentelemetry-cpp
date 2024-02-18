@@ -379,9 +379,18 @@ static std::size_t FormatPath(char *buff,
       case 'n':
       case 'N': {
         std::size_t value = fmt[i] == 'n' ? rotate_index + 1 : rotate_index;
-        auto res          = OTLP_FILE_SNPRINTF(&buff[ret], bufz - ret, "%llu",
-                                               // Format may be different on different clang-format 10
-                                               static_cast<unsigned long long>(value));
+#if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || defined(__STDC_LIB_EXT1__)
+#  ifdef _MSC_VER
+        auto res =
+            sprintf_s(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
+#  else
+        auto res =
+            snprintf_s(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
+#  endif
+#else
+        auto res = snprintf(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
+#endif
         if (res < 0)
         {
           running = false;

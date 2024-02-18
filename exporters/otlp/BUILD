@@ -304,6 +304,7 @@ cc_library(
         "otlp_file_metric",
     ],
     deps = [
+        ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/metrics",
         "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
