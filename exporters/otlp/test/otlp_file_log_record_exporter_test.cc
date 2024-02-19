@@ -37,6 +37,13 @@ namespace exporter
 namespace otlp
 {
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() {}
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+};
+
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
 {
@@ -48,6 +55,8 @@ class OtlpFileLogRecordExporterTestPeer : public ::testing::Test
 public:
   void ExportJsonIntegrationTest()
   {
+    static ProtobufGlobalSymbolGuard global_symbol_guard;
+
     std::stringstream output;
     OtlpFileLogRecordExporterOptions opts;
     opts.backend_options = std::ref(output);

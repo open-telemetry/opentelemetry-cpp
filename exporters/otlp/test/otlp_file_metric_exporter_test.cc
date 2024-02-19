@@ -41,6 +41,13 @@ namespace exporter
 namespace otlp
 {
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() {}
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+};
+
 template <class IntegerType>
 static IntegerType JsonToInteger(nlohmann::json value)
 {
@@ -63,6 +70,8 @@ public:
 
   void ExportJsonIntegrationTestExportSumPointData()
   {
+    static ProtobufGlobalSymbolGuard global_symbol_guard;
+
     std::stringstream output;
     OtlpFileMetricExporterOptions opts;
     opts.backend_options = std::ref(output);

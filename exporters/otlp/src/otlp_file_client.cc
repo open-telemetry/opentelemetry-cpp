@@ -1067,7 +1067,7 @@ public:
 
       // Wait result
       {
-        std::unique_lock<std::mutex> lk(file_->background_thread_waker_lock);
+        std::unique_lock<std::mutex> lk(file_->background_thread_waiter_lock);
         file_->background_thread_waiter_cv.wait_for(lk, wait_interval);
       }
 

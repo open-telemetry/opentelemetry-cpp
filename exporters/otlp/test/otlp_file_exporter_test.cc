@@ -38,6 +38,13 @@ namespace otlp
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() {}
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+};
+
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
 {
@@ -49,6 +56,8 @@ class OtlpFileExporterTestPeer : public ::testing::Test
 public:
   void ExportJsonIntegrationTest()
   {
+    static ProtobufGlobalSymbolGuard global_symbol_guard;
+
     std::stringstream output;
     OtlpFileExporterOptions opts;
     opts.backend_options = std::ref(output);

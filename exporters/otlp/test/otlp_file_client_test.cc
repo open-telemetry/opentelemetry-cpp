@@ -40,6 +40,13 @@ namespace otlp
 
 namespace resource = opentelemetry::sdk::resource;
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() {}
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+};
+
 static std::tm GetLocalTime(std::chrono::system_clock::time_point tp)
 {
   std::time_t now = std::chrono::system_clock::to_time_t(tp);
@@ -67,6 +74,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
 
 static resource::Resource MakeResource()
 {
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
+
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
                                                       {"tenant.id", "test_user"}};
   resource_attributes["bool_value"]                = true;
