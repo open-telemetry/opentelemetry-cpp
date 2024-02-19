@@ -438,6 +438,7 @@ cc_test(
     ],
     deps = [
         ":otlp_file_client",
+        ":otlp_file_exporter",
         ":otlp_recordable",
         "//api",
         "@com_google_googletest//:gtest_main",
