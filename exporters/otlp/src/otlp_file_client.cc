@@ -1090,16 +1090,6 @@ public:
     file_->is_shutdown.store(true, std::memory_order_release);
 
     bool result = ForceFlush(timeout);
-
-    // Detach background thread when shuting down
-    {
-      std::lock_guard<std::mutex> lock_guard{file_->background_thread_lock};
-      if (file_->background_flush_thread && file_->background_flush_thread->joinable())
-      {
-        file_->background_flush_thread->detach();
-      }
-    }
-
     return result;
   }
 
