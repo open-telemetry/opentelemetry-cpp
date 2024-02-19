@@ -74,8 +74,9 @@ public:
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
     opentelemetry::trace::TraceId trace_id{trace_id_bin};
-    uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize]  = {'7', '6', '5', '4',
-                                                                 '3', '2', '1', '0'};
+    uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize] = {
+        // Fix clang-format 10 has different behavior for this line
+        '7', '6', '5', '4', '3', '2', '1', '0'};
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 

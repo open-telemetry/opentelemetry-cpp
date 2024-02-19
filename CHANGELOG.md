@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add OTLP File exporters
+  [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
+
 ## [1.14.0] 2024-02-16
 
 * [BUILD] Add DLL build CI pipeline with CXX20

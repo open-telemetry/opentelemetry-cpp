@@ -437,6 +437,7 @@ cc_test(
         "test",
     ],
     deps = [
+        ":otlp_file_client",
         ":otlp_recordable",
         "//api",
         "@com_google_googletest//:gtest_main",
