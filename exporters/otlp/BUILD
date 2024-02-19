@@ -429,6 +429,21 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_file_client_test",
+    srcs = ["test/otlp_file_client_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_grpc_exporter_test",
     srcs = ["test/otlp_grpc_exporter_test.cc"],
     tags = [
@@ -490,20 +505,20 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "otlp_file_exporter_test",
-#     srcs = ["test/otlp_file_exporter_test.cc"],
-#     tags = [
-#         "otlp",
-#         "otlp_file",
-#         "test",
-#     ],
-#     deps = [
-#         ":otlp_file_exporter",
-#         "//api",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "otlp_file_exporter_test",
+    srcs = ["test/otlp_file_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 cc_test(
     name = "otlp_file_exporter_factory_test",
@@ -514,7 +529,7 @@ cc_test(
         "test",
     ],
     deps = [
-        ":otlp_http_exporter",
+        ":otlp_file_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
     ],
@@ -552,20 +567,20 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "otlp_file_log_record_exporter_test",
-#     srcs = ["test/otlp_file_log_record_exporter_test.cc"],
-#     tags = [
-#         "otlp",
-#         "otlp_file_log",
-#         "test",
-#     ],
-#     deps = [
-#         ":otlp_file_log_record_exporter",
-#         "//api",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "otlp_file_log_record_exporter_test",
+    srcs = ["test/otlp_file_log_record_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file_log",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_log_record_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 cc_test(
     name = "otlp_file_log_record_exporter_factory_test",
@@ -678,20 +693,20 @@ cc_test(
     ],
 )
 
-# cc_test(
-#     name = "otlp_file_metric_exporter_test",
-#     srcs = ["test/otlp_file_metric_exporter_test.cc"],
-#     tags = [
-#         "otlp",
-#         "otlp_file_metric",
-#         "test",
-#     ],
-#     deps = [
-#         ":otlp_file_metric_exporter",
-#         "//api",
-#         "@com_google_googletest//:gtest_main",
-#     ],
-# )
+cc_test(
+    name = "otlp_file_metric_exporter_test",
+    srcs = ["test/otlp_file_metric_exporter_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file_metric",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_metric_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
 
 cc_test(
     name = "otlp_file_metric_exporter_factory_test",

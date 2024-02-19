@@ -57,6 +57,8 @@ public:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
 private:
+  friend class OtlpFileMetricExporterTestPeer;
+
   // Configuration options for the exporter
   const OtlpFileMetricExporterOptions options_;
 

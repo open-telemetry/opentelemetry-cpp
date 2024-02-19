@@ -977,7 +977,7 @@ public:
       Initialize();
     }
 
-    if (file_->written_size > 0 && file_->written_size >= options_.file_size)
+    if (file_->written_size > 0 && file_->written_size + data.size() > options_.file_size)
     {
       RotateLog();
     }

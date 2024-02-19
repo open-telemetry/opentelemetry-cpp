@@ -54,16 +54,16 @@ struct OtlpFileClientFileSystemOptions
   std::string alias_pattern;
 
   // Flush interval
-  std::chrono::microseconds flush_interval;
+  std::chrono::microseconds flush_interval = std::chrono::microseconds(30000000);
 
   // Flush record count
-  std::size_t flush_count;
+  std::size_t flush_count = 256;
 
   // Maximum file size
-  std::size_t file_size;
+  std::size_t file_size = 1024 * 1024 * 20;
 
   // Maximum file count
-  std::size_t rotate_size;
+  std::size_t rotate_size = 3;
 
   inline OtlpFileClientFileSystemOptions() noexcept {}
 };
@@ -77,9 +77,11 @@ using OtlpFileClientBackendOptions =
 struct OtlpFileClientOptions
 {
   // Whether to print the status of the FILE client in the console
-  bool console_debug;
+  bool console_debug = false;
 
   OtlpFileClientBackendOptions backend_options;
+
+  inline OtlpFileClientOptions() noexcept {}
 };
 }  // namespace otlp
 }  // namespace exporter
