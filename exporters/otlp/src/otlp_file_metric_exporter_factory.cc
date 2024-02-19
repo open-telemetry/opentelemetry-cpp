@@ -11,14 +11,15 @@ namespace exporter
 namespace otlp
 {
 
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpFileExporterFactory::Create()
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpFileMetricExporterFactory::Create()
 {
   OtlpFileMetricExporterOptions options;
   return Create(options);
 }
 
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpFileExporterFactory::Create(
-    const OtlpFileMetricExporterOptions &options)
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpFileMetricExporterFactory::Create(const OtlpFileMetricExporterOptions &options)
 {
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter(
       new OtlpFileMetricExporter(options));

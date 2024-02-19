@@ -484,4 +484,90 @@ if(BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_metric_exporter_factory_test)
   endif()
+
+  if(WITH_OTLP_FILE)
+    #[[
+    add_executable(otlp_file_exporter_test test/otlp_file_exporter_test.cc)
+    target_link_libraries(
+      otlp_file_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_file
+      nlohmann_json::nlohmann_json
+      protobuf::libprotobuf)
+    gtest_add_tests(
+      TARGET otlp_file_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_exporter_test)
+    ]]
+
+    add_executable(otlp_file_exporter_factory_test
+                   test/otlp_file_exporter_factory_test.cc)
+    target_link_libraries(
+      otlp_file_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_file)
+    gtest_add_tests(
+      TARGET otlp_file_exporter_factory_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_exporter_factory_test)
+
+    #[[
+    add_executable(otlp_file_log_record_exporter_test
+                   test/otlp_file_log_record_exporter_test.cc)
+    target_link_libraries(
+      otlp_file_log_record_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_file_log
+      opentelemetry_logs
+      nlohmann_json::nlohmann_json)
+    gtest_add_tests(
+      TARGET otlp_file_log_record_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_log_record_exporter_test)
+    ]]
+
+    add_executable(otlp_file_log_record_exporter_factory_test
+                   test/otlp_file_log_record_exporter_factory_test.cc)
+    target_link_libraries(
+      otlp_file_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_file_log opentelemetry_logs)
+    gtest_add_tests(
+      TARGET otlp_file_log_record_exporter_factory_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_log_record_exporter_factory_test)
+
+    #[[
+    add_executable(otlp_file_metric_exporter_test
+                   test/otlp_file_metric_exporter_test.cc)
+    target_link_libraries(
+      otlp_file_metric_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_file_metric
+      opentelemetry_metrics
+      opentelemetry_file_client_nosend
+      nlohmann_json::nlohmann_json
+      protobuf::libprotobuf)
+    gtest_add_tests(
+      TARGET otlp_file_metric_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_metric_exporter_test)
+    ]]
+
+    add_executable(otlp_file_metric_exporter_factory_test
+                   test/otlp_file_metric_exporter_factory_test.cc)
+    target_link_libraries(
+      otlp_file_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_file_metric opentelemetry_metrics)
+    gtest_add_tests(
+      TARGET otlp_file_metric_exporter_factory_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_file_metric_exporter_factory_test)
+  endif()
 endif() # BUILD_TESTING
