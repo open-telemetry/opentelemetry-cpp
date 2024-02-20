@@ -1,9 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(
-  opentelemetry_init
-  configured_sdk.cc sdk_builder.cc registry.cc)
+add_library(opentelemetry_init configured_sdk.cc sdk_builder.cc registry.cc)
 
 set_target_properties(opentelemetry_init PROPERTIES EXPORT_NAME init)
 set_target_version(opentelemetry_init)
@@ -12,9 +10,8 @@ target_include_directories(
   opentelemetry_init
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-target_link_libraries(
-  opentelemetry_init
-  PUBLIC opentelemetry_configuration opentelemetry_trace)
+target_link_libraries(opentelemetry_init PUBLIC opentelemetry_configuration
+                                                opentelemetry_trace)
 
 if(OPENTELEMETRY_INSTALL)
   install(

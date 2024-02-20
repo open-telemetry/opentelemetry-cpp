@@ -1,9 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc
-                                                src/span_exporter_factory.cc
-                                                src/console_builder.cc)
+add_library(
+  opentelemetry_exporter_ostream_span
+  src/span_exporter.cc src/span_exporter_factory.cc src/console_builder.cc)
 
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
