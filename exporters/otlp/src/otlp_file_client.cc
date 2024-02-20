@@ -935,10 +935,10 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 }  // namespace
 
-class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileBackend
+class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
 public:
-  explicit OtlpFileBackend(const OtlpFileClientFileSystemOptions &options)
+  explicit OtlpFileSystemBackend(const OtlpFileClientFileSystemOptions &options)
       : options_(options), is_initialized_{false}, check_file_path_interval_{0}
   {
     file_ = std::make_shared<FileStats>();
@@ -951,7 +951,7 @@ public:
     file_->flushed_record_count.store(0);
   }
 
-  ~OtlpFileBackend()
+  ~OtlpFileSystemBackend()
   {
     if (file_)
     {
@@ -1470,13 +1470,50 @@ private:
   std::time_t check_file_path_interval_;
 };
 
+class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppender
+{
+public:
+  explicit OtlpFileOstreamBackend(const std::reference_wrapper<std::ostream> &os) : os_(os) {}
+
+  ~OtlpFileOstreamBackend() {}
+
+  void Export(nostd::string_view data, std::size_t record_count)
+  {
+    os_.get().write(data.data(), data.size());
+    os_.get().write("\n", 1);
+  }
+
+  bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept
+  {
+    os_.get().flush();
+
+    return true;
+  }
+
+  bool Shutdown(std::chrono::microseconds timeout) noexcept { return ForceFlush(timeout); }
+
+private:
+  std::reference_wrapper<std::ostream> os_;
+};
+
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options)
     : is_shutdown_(false), options_(options)
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {
-    backend_ = std::make_shared<OtlpFileBackend>(
-        nostd::get<OtlpFileClientFileSystemOptions>(options_.backend_options));
+    backend_ = opentelemetry::nostd::shared_ptr<OtlpFileAppender>(new OtlpFileSystemBackend(
+        nostd::get<OtlpFileClientFileSystemOptions>(options_.backend_options)));
+  }
+  else if (nostd::holds_alternative<std::reference_wrapper<std::ostream>>(options_.backend_options))
+  {
+    backend_ = opentelemetry::nostd::shared_ptr<OtlpFileAppender>(new OtlpFileOstreamBackend(
+        nostd::get<std::reference_wrapper<std::ostream>>(options_.backend_options)));
+  }
+  else if (nostd::holds_alternative<opentelemetry::nostd::shared_ptr<OtlpFileAppender>>(
+               options_.backend_options))
+  {
+    backend_ =
+        nostd::get<opentelemetry::nostd::shared_ptr<OtlpFileAppender>>(options_.backend_options);
   }
 }
 
@@ -1514,18 +1551,8 @@ opentelemetry::sdk::common::ExportResult OtlpFileClient::Export(
     backend_->Export(post_body_json, record_count);
     return ::opentelemetry::sdk::common::ExportResult::kSuccess;
   }
-  else if (nostd::holds_alternative<std::reference_wrapper<std::ostream>>(options_.backend_options))
-  {
-    std::ostream &out = nostd::get<std::reference_wrapper<std::ostream>>(options_.backend_options);
-    out.write(post_body_json.data(), post_body_json.size());
-    out.write("\n", 1);
-  }
-  else
-  {
-    return ::opentelemetry::sdk::common::ExportResult::kFailure;
-  }
 
-  return opentelemetry::sdk::common::ExportResult::kSuccess;
+  return ::opentelemetry::sdk::common::ExportResult::kFailure;
 }
 
 bool OtlpFileClient::ForceFlush(std::chrono::microseconds timeout) noexcept

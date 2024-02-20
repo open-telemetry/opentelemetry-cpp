@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
@@ -25,7 +26,6 @@ namespace exporter
 {
 namespace otlp
 {
-class OtlpFileBackend;
 
 /**
  * The OTLP File client exports data in OpenTelemetry Protocol (OTLP) format.
@@ -82,7 +82,7 @@ private:
   // The configuration options associated with this file client.
   const OtlpFileClientOptions options_;
 
-  std::shared_ptr<OtlpFileBackend> backend_;
+  opentelemetry::nostd::shared_ptr<OtlpFileAppender> backend_;
 };
 }  // namespace otlp
 }  // namespace exporter

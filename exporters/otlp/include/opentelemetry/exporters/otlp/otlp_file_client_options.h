@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 
 #include <chrono>
@@ -68,8 +71,25 @@ struct OtlpFileClientFileSystemOptions
   inline OtlpFileClientFileSystemOptions() noexcept {}
 };
 
+/**
+ * Class to append data of OTLP format.
+ */
+class OtlpFileAppender
+{
+public:
+  virtual ~OtlpFileAppender() = default;
+
+  virtual void Export(opentelemetry::nostd::string_view data, std::size_t record_count) = 0;
+
+  virtual bool ForceFlush(std::chrono::microseconds timeout) noexcept = 0;
+
+  virtual bool Shutdown(std::chrono::microseconds timeout) noexcept = 0;
+};
+
 using OtlpFileClientBackendOptions =
-    nostd::variant<OtlpFileClientFileSystemOptions, std::reference_wrapper<std::ostream>>;
+    nostd::variant<OtlpFileClientFileSystemOptions,
+                   std::reference_wrapper<std::ostream>,
+                   opentelemetry::nostd::shared_ptr<OtlpFileAppender>>;
 
 /**
  * Struct to hold OTLP FILE client options.
