@@ -6,6 +6,10 @@
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/registry.h"
 
+#include "custom_sampler_builder.h"
+#include "custom_span_exporter_builder.h"
+#include "custom_span_processor_builder.h"
+
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
 #else
@@ -50,6 +54,10 @@ void InitOtel()
 #endif
 
   /* 3 - Populate the registry with external extensions plugins */
+
+  CustomSamplerBuilder::Register(registry.get());
+  CustomSpanExporterBuilder::Register(registry.get());
+  CustomSpanProcessorBuilder::Register(registry.get());
 
   /* 4 - Parse a config.yaml */
 

@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
@@ -27,6 +28,9 @@
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/console_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/extension_sampler_builder.h"
+#include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/extension_span_processor_builder.h"
 #include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
@@ -255,12 +259,23 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateTraceIdRat
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateExtensionSampler(
-    const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
+  std::string name = model->name;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateExtensionSampler: FIXME");
+  const ExtensionSamplerBuilder *builder = m_registry->GetExtensionSamplerBuilder(name);
 
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSampler() using registered builder " << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSampler() no builder for " << name);
+    throw UnsupportedException("CreateExtensionSampler() no builder for " + name);
+  }
   return sdk;
 }
 
@@ -337,12 +352,23 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExtensionSpanExporter(
-    const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
+  std::string name = model->name;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanExporter: FIXME");
+  const ExtensionSpanExporterBuilder *builder = m_registry->GetExtensionSpanExporterBuilder(name);
 
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanExporter() using registered builder " << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanExporter() no builder for " << name);
+    throw UnsupportedException("CreateExtensionSpanExporter() no builder for " + name);
+  }
   return sdk;
 }
 
@@ -394,13 +420,23 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSimp
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExtensionSpanProcessor(
-    const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
+  std::string name = model->name;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanProcessor: FIXME");
+  const ExtensionSpanProcessorBuilder *builder = m_registry->GetExtensionSpanProcessorBuilder(name);
 
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanProcessor() using registered builder " << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanProcessor() no builder for " << name);
+    throw UnsupportedException("CreateExtensionSpanProcessor() no builder for " + name);
+  }
   return sdk;
 }
 

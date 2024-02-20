@@ -100,8 +100,7 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(std::string
   {
     if (doc)
     {
-      root   = doc->GetRootNode();
-      config = ConfigurationFactory::ParseConfiguration(root);
+      config = ConfigurationFactory::ParseConfiguration(std::move(doc));
     }
   }
   catch (...)

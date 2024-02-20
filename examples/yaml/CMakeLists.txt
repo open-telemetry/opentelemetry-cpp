@@ -7,7 +7,11 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/sdk/include)
 
-add_executable(example_yaml main.cc)
+add_executable(example_yaml main.cc
+  custom_sampler.cc custom_sampler_builder.cc
+  custom_span_exporter.cc custom_span_exporter_builder.cc
+  custom_span_processor.cc custom_span_processor_builder.cc)
+
 target_link_libraries(example_yaml ${CMAKE_THREAD_LIBS_INIT}
                       common_foo_library
                       opentelemetry_exporter_ostream_span)

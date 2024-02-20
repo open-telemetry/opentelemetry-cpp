@@ -266,13 +266,13 @@ static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfig
 }
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerExtensionConfiguration(
-    std::string /* name */,
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<SamplerConfiguration> model(new ExtensionSamplerConfiguration);
-
-  OTEL_INTERNAL_LOG_ERROR("SamplerExtensionConfiguration: FIXME");
-
+  auto extension  = new ExtensionSamplerConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<SamplerConfiguration> model(extension);
   return model;
 }
 
@@ -320,7 +320,7 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
   }
   else
   {
-    model = ParseSamplerExtensionConfiguration(name, child);
+    model = ParseSamplerExtensionConfiguration(name, std::move(child));
   }
 
   return model;
@@ -392,13 +392,12 @@ static std::unique_ptr<ZipkinSpanExporterConfiguration> ParseZipkinSpanExporterC
 
 static std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExporterConfiguration(
     const std::string &name,
-    const std::unique_ptr<DocumentNode> & /* node */)
+    std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionSpanExporterConfiguration> model(new ExtensionSpanExporterConfiguration);
-
-  OTEL_INTERNAL_LOG_ERROR("ParseExtensionSpanExporterConfiguration: FIXME");
-  model->name = name;
-
+  auto extension  = new ExtensionSpanExporterConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<ExtensionSpanExporterConfiguration> model(extension);
   return model;
 }
 
@@ -438,7 +437,7 @@ static std::unique_ptr<SpanExporterConfiguration> ParseSpanExporterConfiguration
   }
   else
   {
-    model = ParseExtensionSpanExporterConfiguration(name, child);
+    model = ParseExtensionSpanExporterConfiguration(name, std::move(child));
   }
 
   return model;
@@ -475,14 +474,12 @@ static std::unique_ptr<SimpleSpanProcessorConfiguration> ParseSimpleSpanProcesso
 
 static std::unique_ptr<ExtensionSpanProcessorConfiguration>
 ParseExtensionSpanProcessorConfiguration(const std::string &name,
-                                         const std::unique_ptr<DocumentNode> & /* node */)
+                                         std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(
-      new ExtensionSpanProcessorConfiguration);
-
-  OTEL_INTERNAL_LOG_ERROR("ParseExtensionSpanProcessorConfiguration: FIXME");
-  model->name = name;
-
+  auto extension  = new ExtensionSpanProcessorConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(extension);
   return model;
 }
 
@@ -518,7 +515,7 @@ static std::unique_ptr<SpanProcessorConfiguration> ParseSpanProcessorConfigurati
   }
   else
   {
-    model = ParseExtensionSpanProcessorConfiguration(name, child);
+    model = ParseExtensionSpanProcessorConfiguration(name, std::move(child));
   }
 
   return model;
@@ -592,9 +589,10 @@ static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
 }
 
 std::unique_ptr<Configuration> ConfigurationFactory::ParseConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    std::unique_ptr<Document> doc)
 {
-  std::unique_ptr<Configuration> model(new Configuration);
+  std::unique_ptr<DocumentNode> node = doc->GetRootNode();
+  std::unique_ptr<Configuration> model(new Configuration(std::move(doc)));
 
   model->file_format = node->GetRequiredString("file_format");
   model->disabled    = node->GetBoolean("disabled", false);

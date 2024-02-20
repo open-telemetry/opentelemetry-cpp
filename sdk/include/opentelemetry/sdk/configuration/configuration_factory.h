@@ -20,8 +20,7 @@ namespace configuration
 class ConfigurationFactory
 {
 public:
-  static std::unique_ptr<Configuration> ParseConfiguration(
-      const std::unique_ptr<DocumentNode> &node);
+  static std::unique_ptr<Configuration> ParseConfiguration(std::unique_ptr<Document> doc);
 };
 
 }  // namespace configuration
