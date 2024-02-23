@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
 
 #include <chrono>
 #if defined(_MSC_VER)
@@ -101,6 +102,7 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
   bool notify_force_flush = is_force_flush_pending_.exchange(false, std::memory_order_acq_rel);
   if (notify_force_flush)
   {
+    std::unique_lock<std::mutex> lk(force_flush_m_);
     is_force_flush_notified_.store(true, std::memory_order_release);
     force_flush_cv_.notify_one();
   }
@@ -191,7 +193,11 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
 {
   if (worker_thread_.joinable())
   {
-    cv_.notify_one();
+    {
+      //ensure that `cv_` is awaiting, and the update doesn't get lost
+      std::unique_lock<std::mutex> lk(cv_m_);
+      cv_.notify_one();
+    }
     worker_thread_.join();
   }
   return exporter_->Shutdown(timeout);
