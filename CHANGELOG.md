@@ -105,6 +105,16 @@ Breaking changes:
     `WITH_OTLP_HTTP_SSL_TLS_PREVIEW` are removed. Building opentelemetry-cpp
     without SSL support is no longer possible.
 
+* [PROTO] Upgrade to opentelemetry-proto v1.1.0
+  [#2488](https://github.com/open-telemetry/opentelemetry-cpp/pull/2488)
+  * Class `opentelemetry::sdk::trace::Recordable` has a new virtual method,
+    `SetTraceFlags()`.
+  * This is an incompatible change for the SDK Recordable API and ABI.
+  * Applications _configuring_ the SDK are not affected.
+  * Third parties providing SDK _extensions_ are affected,
+    and must provide a `SetTraceFlags()` implementation,
+    starting with opentelemetry-cpp 1.14.0.
+
 ## [1.13.0] 2023-12-06
 
 * [BUILD] Remove WITH_REMOVE_METER_PREVIEW, use WITH_ABI_VERSION_2 instead
