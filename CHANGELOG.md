@@ -15,6 +15,28 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.14.1] 2024-02-23
+
+* [SDK] Restore Recordable API compatibility with versions < 1.14.0
+  [#2547](https://github.com/open-telemetry/opentelemetry-cpp/pull/2547)
+* [DOC] Add missing CHANGELOG.
+  [#2549](https://github.com/open-telemetry/opentelemetry-cpp/pull/2549)
+* [EXPORTER] Error when grpc endpoint is empty
+  [#2507](https://github.com/open-telemetry/opentelemetry-cpp/pull/2507)
+* [DOC] Fix typo in benchmarks.rst
+  [#2542](https://github.com/open-telemetry/opentelemetry-cpp/pull/2542)
+
+Important changes:
+
+* [SDK] Restore Recordable API compatibility with versions < 1.14.0
+  [#2547](https://github.com/open-telemetry/opentelemetry-cpp/pull/2547)
+  * For third party _extending_ the SDK, release 1.14.0 introduced
+    an API breaking change compared to 1.13.0
+  * This fix restores API (but not ABI) compatibility of
+    release 1.14.1 with release 1.13.0.
+  * This allows to build a third party exporter with no source code changes,
+    for both releases 1.14.1 and 1.13.0.
+
 ## [1.14.0] 2024-02-16
 
 * [BUILD] Add DLL build CI pipeline with CXX20
