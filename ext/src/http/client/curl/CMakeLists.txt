@@ -32,7 +32,7 @@ if(WITH_OTLP_HTTP_COMPRESSION)
       PRIVATE ZLIB::ZLIB)
   else()
     target_include_directories(opentelemetry_http_client_curl
-                              INTERFACE "${ZLIB_INCLUDE_DIRS}")
+                               INTERFACE "${ZLIB_INCLUDE_DIRS}")
     target_link_libraries(
       opentelemetry_http_client_curl
       PUBLIC opentelemetry_ext

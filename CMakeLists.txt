@@ -204,8 +204,10 @@ option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
-option(WITH_OTLP_HTTP_COMPRESSION "Whether to include gzip compression for the OTLP http exporter in the SDK"
-       OFF)
+option(
+  WITH_OTLP_HTTP_COMPRESSION
+  "Whether to include gzip compression for the OTLP http exporter in the SDK"
+  OFF)
 
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
@@ -455,7 +457,9 @@ endif()
 # Do we need ZLIB ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP_COMPRESSION)
+if((NOT WITH_API_ONLY)
+   AND WITH_HTTP_CLIENT_CURL
+   AND WITH_OTLP_HTTP_COMPRESSION)
   # No specific version required.
   find_package(ZLIB REQUIRED)
   message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")

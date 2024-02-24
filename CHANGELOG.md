@@ -26,7 +26,7 @@ Important changes:
     field called compression has been introduced. This field can be set
     to "gzip” to enable gzip compression.
   * The CMake option `WITH_OTLP_HTTP_COMPRESSION` is introduced to enable
-    gzip compression support for the OTLP HTTP Exporter and includes a 
+    gzip compression support for the OTLP HTTP Exporter and includes a
     dependency on zlib.
 
 ## [1.14.1] 2024-02-23

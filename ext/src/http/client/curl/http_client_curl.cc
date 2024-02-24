@@ -5,7 +5,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
-#include <zlib.h>
+#  include <zlib.h>
 #endif
 
 #include <list>
@@ -90,7 +90,9 @@ void Session::SendRequest(
       is_session_active_.store(false, std::memory_order_release);
     }
 #else
-    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the OTLP HTTP Exporter");
+    OTEL_INTERNAL_LOG_ERROR(
+        "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
+        "OTLP HTTP Exporter");
 #endif
   }
 
