@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #include <zlib.h>
+#endif
 
 #include <list>
 
@@ -52,6 +55,7 @@ void Session::SendRequest(
 
   if (http_request_->compression_ == opentelemetry::ext::http::client::Compression::kGzip)
   {
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
     http_request_->AddHeader("Content-Encoding", "gzip");
 
     opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
@@ -85,6 +89,9 @@ void Session::SendRequest(
       }
       is_session_active_.store(false, std::memory_order_release);
     }
+#else
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the OTLP HTTP Exporter");
+#endif
   }
 
   curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
