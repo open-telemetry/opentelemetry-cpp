@@ -462,7 +462,12 @@ std::unique_ptr<opentelemetry::trace::TracerProvider> SdkBuilder::CreateTracerPr
   // https://github.com/open-telemetry/opentelemetry-configuration/issues/70
   OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME (IdGenerator)");
 
-  auto sampler = CreateSampler(model->sampler);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
+
+  if (model->sampler)
+  {
+    sampler = CreateSampler(model->sampler);
+  }
 
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sdk_processors;
 
@@ -471,6 +476,7 @@ std::unique_ptr<opentelemetry::trace::TracerProvider> SdkBuilder::CreateTracerPr
     sdk_processors.push_back(CreateProcessor(processor_model));
   }
 
+  // FIXME: use sampler, limits, id_generator, ...
   sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors));
 
   return sdk;

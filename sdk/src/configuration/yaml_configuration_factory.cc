@@ -3,8 +3,6 @@
 
 #include <fstream>
 
-// #define WITH_YAML_CPP
-
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include "opentelemetry/sdk/configuration/configuration.h"
@@ -14,24 +12,35 @@
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/version.h"
 
-#ifdef WITH_YAML_CPP
-#  include "opentelemetry/sdk/configuration/yaml_document.h"
-#  include "opentelemetry/sdk/configuration/yaml_document_node.h"
-#endif
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace configuration
 {
 
-std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(std::string filename)
+std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(const std::string &filename)
 {
+  std::string input_file = filename;
+
+  if (input_file.empty())
+  {
+    const char *env_var = std::getenv("OTEL_CONFIG_FILE");
+    if (env_var != nullptr)
+    {
+      input_file = env_var;
+    }
+  }
+
+  if (input_file.empty())
+  {
+    input_file = "config.yaml";
+  }
+
   std::unique_ptr<Configuration> conf;
-  std::ifstream in(filename, std::ios::binary);
+  std::ifstream in(input_file, std::ios::binary);
   if (!in.is_open())
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to open yaml file <" << filename << ">.");
+    OTEL_INTERNAL_LOG_ERROR("Failed to open yaml file <" << input_file << ">.");
   }
   else
   {
@@ -42,30 +51,6 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(std::string f
 
   return conf;
 }
-
-#ifdef WITH_YAML_CPP
-static std::unique_ptr<Document> YamlCppParse(const std::string &content)
-{
-  std::unique_ptr<Document> doc;
-
-  try
-  {
-    doc = YamlDocument::Parse(content);
-  }
-  catch (const YAML::BadFile &e)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml, " << e.what());
-    return nullptr;
-  }
-  catch (...)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml.");
-    return nullptr;
-  }
-
-  return doc;
-}
-#endif
 
 static std::unique_ptr<Document> RymlParse(const std::string &content)
 {
@@ -84,17 +69,13 @@ static std::unique_ptr<Document> RymlParse(const std::string &content)
   return doc;
 }
 
-std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(std::string content)
+std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(const std::string &content)
 {
   std::unique_ptr<Document> doc;
   std::unique_ptr<DocumentNode> root;
   std::unique_ptr<Configuration> config;
 
-#ifdef WITH_YAML_CPP
-  doc = YamlCppParse(content);
-#else
   doc = RymlParse(content);
-#endif
 
   try
   {

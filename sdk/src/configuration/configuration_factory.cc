@@ -534,11 +534,24 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
     model->processors.push_back(ParseSpanProcessorConfiguration(*it));
   }
 
-  child         = node->GetRequiredChildNode("limits");
-  model->limits = ParseSpanLimitsConfiguration(child);
+  size_t count = model->processors.size();
+  if (count == 0)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseTracerProviderConfiguration: 0 processors ");
+    throw InvalidSchemaException("Illegal processors");
+  }
 
-  child          = node->GetRequiredChildNode("sampler");
-  model->sampler = ParseSamplerConfiguration(child);
+  child = node->GetChildNode("limits");
+  if (child)
+  {
+    model->limits = ParseSpanLimitsConfiguration(child);
+  }
+
+  child = node->GetChildNode("sampler");
+  if (child)
+  {
+    model->sampler = ParseSamplerConfiguration(child);
+  }
 
   return model;
 }

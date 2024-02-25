@@ -1,0 +1,55 @@
+# The file format version
+file_format: "0.1"
+
+# Configure if the SDK is disabled or not. This is not required to be provided
+# to ensure the SDK isn't disabled, the default value when this is not provided
+# is for the SDK to be enabled.
+#
+# Environment variable: OTEL_SDK_DISABLED
+disabled: false
+
+# Configure text map context propagators.
+#
+# Environment variable: OTEL_PROPAGATORS
+propagator:
+  # composite: [tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace]
+  simple: tracecontext
+
+# Configure tracer provider.
+tracer_provider:
+  # Configure span processors.
+  processors:
+    # Configure a batch span processor.
+    - batch:
+        # Configure exporter.
+        #
+        # Environment variable: OTEL_TRACES_EXPORTER
+        exporter:
+          # Configure exporter to be zipkin.
+          zipkin:
+            # Configure endpoint.
+            #
+            # Environment variable: OTEL_EXPORTER_ZIPKIN_ENDPOINT
+            endpoint: http://localhost:9411/api/v2/spans
+            # Configure max time (in milliseconds) to wait for each export.
+            #
+            # Environment variable: OTEL_EXPORTER_ZIPKIN_TIMEOUT
+            timeout: 10000
+    # Configure a simple span processor.
+    - simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console: {}
+    - my_custom_span_processor:
+        comment: "This is a span processor extension point, with properties."
+    - batch:
+        exporter:
+          my_custom_span_exporter:
+            comment: "This is a span exporter extension point, with properties."
+
+  # Configure the sampler.
+  sampler:
+    my_custom_sampler:
+      comment: "This is a sampler extension point, with properties."
+

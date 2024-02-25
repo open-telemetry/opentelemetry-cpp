@@ -1,0 +1,42 @@
+# anchors.yaml demonstrates anchor substitution to reuse OTLP exporter configuration across signals.
+
+file_format: "0.1"
+exporters:
+  otlp: &otlp-exporter
+    protocol: http/protobuf
+    endpoint: http://localhost:4318
+    certificate: /app/cert.pem
+    client_key: /app/cert.pem
+    client_certificate: /app/cert.pem
+    headers:
+      api-key: !!str 1234
+    compression: gzip
+    timeout: 10000
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp:
+            # expand the otlp-exporter anchor
+            <<: *otlp-exporter
+
+meter_provider:
+  readers:
+    - periodic:
+        interval: 5000
+        timeout: 30000
+        exporter:
+          otlp:
+            # expand the otlp-exporter anchor and add metric specific configuration
+            <<: *otlp-exporter
+            temporality_preference: delta
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp:
+            # expand the otlp-exporter anchor
+            <<: *otlp-exporter

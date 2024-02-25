@@ -24,6 +24,7 @@ std::unique_ptr<Document> RymlDocument::Parse(std::string content)
   try
   {
     tree = ryml::parse_in_arena(ryml::to_csubstr(content));
+    tree.resolve();
   }
   catch (...)
   {

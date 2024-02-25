@@ -24,5 +24,5 @@ static CustomSamplerBuilder singleton;
 
 void CustomSamplerBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 {
-  registry->AddExtensionSamplerBuilder("custom", &singleton);
+  registry->AddExtensionSamplerBuilder("my_custom_sampler", &singleton);
 };

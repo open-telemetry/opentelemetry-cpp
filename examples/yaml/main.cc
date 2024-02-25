@@ -26,11 +26,18 @@
 #  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #endif
 
+#include <iostream>
+#include <string>
+
+static bool opt_help              = false;
+static std::string yaml_file_path = "";
+
 std::unique_ptr<opentelemetry::sdk::init::ConfiguredSdk> sdk;
 
 namespace
 {
-void InitOtel()
+
+void InitOtel(const std::string &config_file)
 {
   auto level = opentelemetry::sdk::common::internal_log::LogLevel::Debug;
 
@@ -63,7 +70,6 @@ void InitOtel()
 
   // See
   // https://github.com/open-telemetry/opentelemetry-configuration/blob/main/examples/kitchen-sink.yaml
-  std::string config_file = "config.yaml";
   auto model = opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseFile(config_file);
 
   /* 5 - Build the SDK from the parsed config.yaml */
@@ -88,9 +94,79 @@ void CleanupOtel()
 }
 }  // namespace
 
-int main()
+void usage(FILE *out)
 {
-  InitOtel();
+  static const char *msg =
+      "Usage: example_yaml [options]\n"
+      "Valid options are:\n"
+      "  --help            Print this help\n"
+      "  --yaml            Path to a yaml configuration file\n"
+      "\n"
+      "The configuration file used will be:\n"
+      "  1) the file provided in the command line\n"
+      "  2) the file provided in environment variable ${OTEL_CONFIG_FILE}\n"
+      "  3) file config.yaml\n";
+
+  fprintf(out, "%s", msg);
+}
+
+int parse_args(int argc, char *argv[])
+{
+  int remaining_argc    = argc;
+  char **remaining_argv = argv;
+
+  while (remaining_argc > 0)
+  {
+    if (strcmp(*remaining_argv, "--help") == 0)
+    {
+      opt_help = true;
+      return 0;
+    }
+
+    if (remaining_argc >= 2)
+    {
+      if (strcmp(*remaining_argv, "--yaml") == 0)
+      {
+        remaining_argc--;
+        remaining_argv++;
+        yaml_file_path = *remaining_argv;
+        remaining_argc--;
+        remaining_argv++;
+        continue;
+      }
+    }
+
+    if (remaining_argc)
+    {
+      // Unknown option
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int main(int argc, char *argv[])
+{
+  // Program name
+  argc--;
+  argv++;
+
+  int rc = parse_args(argc, argv);
+
+  if (rc != 0)
+  {
+    usage(stderr);
+    return 1;
+  }
+
+  if (opt_help)
+  {
+    usage(stdout);
+    return 0;
+  }
+
+  InitOtel(yaml_file_path);
 
   foo_library();
 

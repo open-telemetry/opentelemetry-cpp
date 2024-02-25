@@ -19,8 +19,8 @@ namespace configuration
 class YamlConfigurationFactory
 {
 public:
-  static std::unique_ptr<Configuration> ParseFile(std::string filename);
-  static std::unique_ptr<Configuration> ParseString(std::string content);
+  static std::unique_ptr<Configuration> ParseFile(const std::string &filename);
+  static std::unique_ptr<Configuration> ParseString(const std::string &content);
 };
 
 }  // namespace configuration
