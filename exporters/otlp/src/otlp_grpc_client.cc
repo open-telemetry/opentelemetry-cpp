@@ -264,8 +264,13 @@ OtlpGrpcClient::~OtlpGrpcClient()
 
 std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientOptions &options)
 {
-  std::shared_ptr<grpc::Channel> channel;
 
+  if (options.endpoint.empty())
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP GRPC Client] empty endpoint");
+
+    return nullptr;
+  }
   //
   // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
   // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
@@ -280,6 +285,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     return nullptr;
   }
 
+  std::shared_ptr<grpc::Channel> channel;
   std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
   grpc::ChannelArguments grpc_arguments;
   grpc_arguments.SetUserAgentPrefix(options.user_agent);
@@ -296,7 +302,7 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     grpc::SslCredentialsOptions ssl_opts;
     ssl_opts.pem_root_certs = GetFileContentsOrInMemoryContents(
         options.ssl_credentials_cacert_path, options.ssl_credentials_cacert_as_string);
-#if ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
     ssl_opts.pem_private_key = GetFileContentsOrInMemoryContents(options.ssl_client_key_path,
                                                                  options.ssl_client_key_string);
     ssl_opts.pem_cert_chain  = GetFileContentsOrInMemoryContents(options.ssl_client_cert_path,
