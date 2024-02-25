@@ -256,6 +256,8 @@ std::string RymlDocumentNode::GetRequiredString(const std::string &name)
   ryml::csubstr view            = ryml_child.val();
   std::string value(view.str, view.len);
 
+  DoSubstitution(value);
+
   return value;
 }
 
@@ -272,6 +274,9 @@ std::string RymlDocumentNode::GetString(const std::string &name, const std::stri
 
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
   return value;
 }
 

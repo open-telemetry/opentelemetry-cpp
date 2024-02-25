@@ -58,6 +58,13 @@ public:
   virtual PropertiesNodeConstIterator end_properties() const   = 0;
 
   virtual std::string Dump() const = 0;
+
+protected:
+  void DoSubstitution(std::string &value);
+
+  bool BooleanFromString(const std::string &value);
+  size_t IntegerFromString(const std::string &value);
+  double DoubleFromString(const std::string &value);
 };
 
 class DocumentNodeConstIteratorImpl

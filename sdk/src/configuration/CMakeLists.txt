@@ -5,7 +5,7 @@
 
 add_library(
   opentelemetry_configuration
-  configuration_factory.cc yaml_configuration_factory.cc ryml_document.cc
+  configuration_factory.cc document_node.cc yaml_configuration_factory.cc ryml_document.cc
   ryml_document_node.cc)
 
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME

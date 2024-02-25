@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
 
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 
@@ -142,4 +143,43 @@ tracer_provider:
 
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, no_substitution)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "");
+}
+
+TEST(Yaml, empty_substitution)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "");
+}
+
+TEST(Yaml, with_substitution)
+{
+  setenv("ENV_NAME", "foo.bar", 1);
+
+  std::string yaml = R"(
+file_format: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "foo.bar");
 }
