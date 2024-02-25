@@ -139,7 +139,7 @@ public:
    * Set the trace flags of the span.
    * @param flags the flags to set
    */
-  virtual void SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept = 0;
+  virtual void SetTraceFlags(opentelemetry::trace::TraceFlags /* flags */) noexcept {}
 
   /**
    * Set the spankind of the span.
