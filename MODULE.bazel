@@ -1,50 +1,47 @@
-module(name="opentelemetry-cpp", version="1.13.0", repo_name="io_opentelemetry_cpp")
+module(name="opentelemetry-cpp", version="1.14.1", repo_name="io_opentelemetry_cpp")
 
 bazel_dep(name = "abseil-cpp", version = "20230802.1", repo_name="com_google_absl")
-single_version_override(module_name = "abseil-cpp", version = "20230802.1")
-
 bazel_dep(name = "aspect_bazel_lib", version = "2.4.2")
 bazel_dep(name = "rules_pkg", version = "0.10.1")
 bazel_dep(name = "rules_cc", version = "0.0.9", repo_name="rules_cc")
-bazel_dep(name = "rules_go", version = "0.46.0", repo_name = "io_bazel_rules_go")
-
-go_sdk = use_extension("@io_bazel_rules_go//go:extensions.bzl", "go_sdk")
-go_sdk.download(version = "1.22.0")
-
-# 23.1 has issues with 
-# bazel-out/x64_windows-fastbuild/bin/api/_virtual_includes/api\opentelemetry/nostd/./internal/absl/types/../utility/../base/internal/../../meta/type_traits.h(84,27): error: reference to 'is_trivially_destructible' is ambiguous
-#    84 |                     absl::is_trivially_destructible<T>::value> {};
-bazel_dep(name = "protobuf", version = "21.7" )
-
-bazel_dep(name = "zlib", version = "1.3.1")
 bazel_dep(name = "bazel_skylib", version = "1.5.0")
-bazel_dep(name = "platforms", version = "0.0.8")
-bazel_dep(name = "google_benchmark", version = "1.8.3")
-bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
-bazel_dep(name = "rules_python", version = "0.31.0")
+bazel_dep(name = "platforms", version = "0.0.8", repo_name="platforms")
+bazel_dep(name = "google_benchmark", version = "1.8.3", repo_name="com_github_google_benchmark")
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1", repo_name="com_google_googletest")
+bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name="github_nlohmann_json")
+bazel_dep(name = "grpc", version = "1.56.3.bcr.1", repo_name="com_github_grpc_grpc")
+bazel_dep(name = "prometheus-cpp", version = "1.2.3", repo_name = "com_github_jupp0r_prometheus_cpp")
+archive_override(
+    integrity = "sha256-VeIKdR/CWf7WpDjoz1o8vOvjqpP4OqTqjYgKdQgQyu4=",
+    module_name = "prometheus-cpp",
+    strip_prefix = "prometheus-cpp-with-submodules",
+    urls = [
+        "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.3/prometheus-cpp-with-submodules.tar.gz",
+    ],
+    patches = [
+        "bazel/prometheus.patch",
+    ],
+    patch_strip = 1,
+)
+
+# local_path_override(
+#     module_name = "prometheus-cpp",
+#     path = "../prometheus-cpp",
+# )
+
+bazel_dep(name = "boringssl", version = "0.0.0-20240126-22d349c")
 bazel_dep(name = "rules_proto", version = "6.0.0-rc2")
 
-# 
-# bazel_dep(name = "abseil-cpp", version = "20240116.0")
-# external/com_github_grpc_grpc/src/core/lib/iomgr/event_engine_shims/tcp_client.cc(74,23): error: no member named 'StrCat' in namespace 'absl'   
-# absl::StrCat("tcp-client:", addr_uri.value()))
-bazel_dep(name = "rules_apple", version = "3.3.0", repo_name = "build_bazel_rules_apple")
-bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name="github_nlohmann_json")
-
-#bazel_dep(name = "libpfm", version = "4.11.0")
-
-bazel_dep(name = "re2", version = "2024-02-01")
-#bazel_dep(name = "upb", version = "0.0.0-20220923-a547704")
-bazel_dep(name = "c-ares", version = "1.16.1", repo_name="com_github_cares_cares")
-#bazel_dep(name = "boringssl", version = "0.0.0-20230215-5c22014", repo_name="boringssl")
-bazel_dep(name = "grpc", version = "1.48.1.bcr.2") # We are not really using this one, this is just to stick to latest in the registry
-
-# bazel_dep(name = "prometheus-cpp", version = "1.2.0", repo_name = "com_github_jupp0r_prometheus_cpp")
-# archive_override(
-#     integrity = "sha256-Yp/fRT8CJvaTwI37Xcra582bOWiXrywPJ6zRUIg9d5w=",
-#     module_name = "prometheus-cpp",
-#     strip_prefix = "prometheus-cpp-with-submodules",
-#     urls = [
-#         "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.0/prometheus-cpp-with-submodules.tar.gz",
-#     ],
-# )
+use_repo(
+    use_extension("//bazel:repository.bzl", "deps1"),
+    "com_github_opentelemetry_proto",
+    "curl",
+#    "com_github_opentracing",
+    "sentry_cli_windows_amd64",
+    "loki_w64",
+    "tempo_w64",
+    "otel_w64",
+    "prom_w64",
+    "graf_w64",
+    "ftxui",
+)
