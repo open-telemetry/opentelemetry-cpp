@@ -1,41 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-#
-# MAINTAINER
-#
-# This file is used for the Bazel build.
-#
-# When changing (add, upgrade, remove) dependencies
-# please update:
-# - the CMake build, see file
-#   <root>/third_party_release
-# - git submodule, see command
-#   git submodule status
-#
-
-def opentelemetry_cpp_deps():
-    """Loads dependencies need to compile the opentelemetry-cpp library."""
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc",
-        sha256 = "17e4e1b100657b88027721220cbfb694d86c4b807e9257eaf2fb2d273b41b1b1",
-        strip_prefix = "grpc-1.54.3",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.54.3.tar.gz",
-        ],
-        repo_mapping = {
-            "@zlib": "@zlib~1.3.1",
-            "@com_googlesource_code_re2": "@re2~2024-02-01",
-            "@com_github_cares_cares": "@c-ares~1.16.1",
-            #"@com_google_absl": "@@abseil-cpp~20230802.1",
-#            "@boringssl": "@boringssl~0.0.0-20230215-5c22014",
-        }
-    )
-
+def _deps1(mod_ext):
     # OTLP Protocol definition
     maybe(
         http_archive,
@@ -45,17 +14,6 @@ def opentelemetry_cpp_deps():
         strip_prefix = "opentelemetry-proto-1.1.0",
         urls = [
             "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.1.0.tar.gz",
-        ],
-    )
-
-    # C++ Prometheus Client library.
-    maybe(
-        http_archive,
-        name = "com_github_jupp0r_prometheus_cpp",
-        integrity = "sha256-WUysSxxkAkxieXveBx4JQRooOIIgHzztEGMNceJpN9M=",
-        strip_prefix = "prometheus-cpp-with-submodules",
-        urls = [
-            "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.1/prometheus-cpp-with-submodules.tar.gz",
         ],
     )
 
@@ -82,3 +40,82 @@ def opentelemetry_cpp_deps():
             "https://github.com/opentracing/opentracing-cpp/archive/refs/tags/v1.6.0.tar.gz",
         ],
     )
+
+    maybe(
+        http_file,
+        name = "sentry_cli_windows_amd64",
+        downloaded_file_path = "sentry-cli.exe",
+        executable = True,
+        sha256 = "bc51a87a60fa13a619ecaa93f9d442ae7e638a1718cb4616c6595ce7ab02ab25",
+        urls = [
+            "https://github.com/getsentry/sentry-cli/releases/download/2.23.0/sentry-cli-Windows-x86_64.exe",
+        ],
+    )
+
+    maybe(
+        http_archive,
+        name = "loki_w64",
+        integrity = "sha256-WHHTfjECfVv7Arj2xDoZLQH/qwQzxN59fe/F7duw3NQ=",
+        urls = [
+            "https://github.com/grafana/loki/releases/download/v2.8.7/loki-windows-amd64.exe.zip",
+        ],
+        build_file_content = """exports_files(["loki-windows-amd64.exe"],visibility=["//visibility:public"])"""
+    )
+
+    maybe(
+        http_archive,
+        name = "tempo_w64",
+        integrity = "sha256-wx/dRthhU3jN5TIslzA+TfkTq33FfCdeqOhrWTwRTeY=",
+        urls = [
+            "https://github.com/grafana/tempo/releases/download/v2.3.1/tempo_2.3.1_windows_amd64.tar.gz",
+        ],
+        build_file_content = """exports_files(["tempo.exe", "temp-cli.exe", "tempo-query.exe"],visibility=["//visibility:public"])"""
+    )
+
+    maybe(
+        http_archive,
+        name = "otel_w64",
+        integrity = "sha256-Uw7ZNY7PUEpsq2I5zRfeAjWIV09V5DP/E0/ZFYmKDbY=",
+        urls = [
+            "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.91.0/otelcol-contrib_0.91.0_windows_amd64.tar.gz",
+        ],
+        build_file_content = """exports_files(["otelcol-contrib.exe"],visibility=["//visibility:public"])"""
+    )
+
+    maybe(
+        http_archive,
+        name = "prom_w64",
+        integrity = "sha256-RRm4zod7IKcTfcsaBFiEOYlYy3CpSG+px74FpeM4lus=",
+        urls = [
+            "https://github.com/prometheus/prometheus/releases/download/v2.48.1/prometheus-2.48.1.windows-amd64.tar.gz",
+        ],
+        strip_prefix = "prometheus-2.48.1.windows-amd64",
+        build_file_content = """exports_files(["prometheus.exe","prometheus.yml","promtool.exe"],visibility=["//visibility:public"])"""
+    )
+
+    maybe(
+        http_archive,
+        name = "graf_w64",
+        integrity = "sha256-Fq71INEDaRciK/Fj+Y+c16FYZnQnQMUe67rSxD7MPJA=",
+        urls = [
+            "https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip",
+        ],
+        strip_prefix = "grafana-v10.2.3",
+        build_file_content = """
+exports_files(glob(["**/*"]),visibility=["//visibility:public"])
+filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
+"""
+    )
+
+    maybe(
+        http_archive,
+        name = "ftxui",
+        strip_prefix = "FTXUI-8178c7ac3adb9a14d76589126d611b10e1c45a97",
+        integrity = "sha256-muqkm+RrpTI0MpOcQ455vRXwrOm0rs5rUfvI3BXHwGk=",
+        type = "zip",
+        urls = [
+            "https://codeload.github.com/malkia/FTXUI/zip/8178c7ac3adb9a14d76589126d611b10e1c45a97"
+        ]
+    )
+
+deps1 = module_extension(implementation = _deps1)
