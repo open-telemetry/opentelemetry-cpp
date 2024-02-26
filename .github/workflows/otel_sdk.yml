@@ -17,11 +17,12 @@ jobs:
     steps:
       - run: choco upgrade llvm
       - uses: actions/checkout@v4.1.1
-      - uses: actions/cache@v3.3.2
+      - uses: actions/cache@v4
         with:
           path: c:/b
           enableCrossOsArchive: true
-          key: otel_sdk-${{ runner.os }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel') }}
+          restore-keys: ${{ runner.os }}-bazel-
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/b/d" > ../top.bazelrc
