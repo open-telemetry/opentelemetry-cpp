@@ -15,9 +15,6 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Change OTLP HTTP content_type default to binary
-  [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
-
 ## [1.14.1] 2024-02-23
 
 * [SDK] Restore Recordable API compatibility with versions < 1.14.0
