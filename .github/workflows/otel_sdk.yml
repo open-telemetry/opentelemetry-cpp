@@ -32,7 +32,6 @@ jobs:
       - uses: actions/cache/save@v4
         with:
           path: c:/c
-          save-always: true
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
       - name: release otel_sdk.zip
