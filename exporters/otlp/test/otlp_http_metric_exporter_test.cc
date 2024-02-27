@@ -920,7 +920,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromMetricsEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_TIMEOUT", "20s", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS", "k1=v3,k1=v4", 1);
-  setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL ", "http/json", 1);
+  setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", "http/json", 1);
 
   std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
