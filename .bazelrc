@@ -1,4 +1,4 @@
-common --remote_download_minimal
+#common --remote_download_minimal
 
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
