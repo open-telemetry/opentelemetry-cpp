@@ -642,12 +642,6 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
-TEST(OtlpHttpLogRecordExporterTest, ConfigDefaultProtocolTest)
-{
-  OtlpHttpLogRecordExporterOptions opts;
-  EXPECT_EQ(opts.content_type, HttpRequestContentType::kBinary);
-}
-
 #  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
@@ -657,7 +651,6 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
-  setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/json", 1);
 
   std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -684,13 +677,11 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-  EXPECT_EQ(GetOptions(exporter).content_type, HttpRequestContentType::kJson);
 
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
-  unsetenv("OTEL_EXPORTER_OTLP_PROTOCOL");
 }
 
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
@@ -700,7 +691,6 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
   setenv("OTEL_EXPORTER_OTLP_LOGS_TIMEOUT", "20s", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
-  setenv("OTEL_EXPORTER_OTLP_LOGS_PROTOCOL", "http/json", 1);
 
   std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -727,13 +717,11 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-  EXPECT_EQ(GetOptions(exporter).content_type, HttpRequestContentType::kJson);
 
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
-  unsetenv("OTEL_EXPORTER_OTLP_LOGS_PROTOCOL");
 }
 
 TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)

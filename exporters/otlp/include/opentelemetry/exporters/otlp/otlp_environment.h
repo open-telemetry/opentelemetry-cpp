@@ -41,10 +41,6 @@ std::string GetOtlpDefaultHttpTracesEndpoint();
 std::string GetOtlpDefaultHttpMetricsEndpoint();
 std::string GetOtlpDefaultHttpLogsEndpoint();
 
-std::string GetOtlpDefaultHttpTracesProtocol();
-std::string GetOtlpDefaultHttpMetricsProtocol();
-std::string GetOtlpDefaultHttpLogsProtocol();
-
 // Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultHttpEndpoint()
 {
