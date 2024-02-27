@@ -107,7 +107,6 @@ cc_library(
 cc_library(
     name = "otlp_http_client",
     srcs = [
-        "src/otlp_http.cc",
         "src/otlp_http_client.cc",
     ],
     hdrs = [

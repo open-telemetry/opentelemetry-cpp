@@ -41,10 +41,6 @@ std::string OPENTELEMETRY_EXPORT GetOtlpDefaultHttpTracesEndpoint();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultHttpMetricsEndpoint();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultHttpLogsEndpoint();
 
-std::string GetOtlpDefaultHttpTracesProtocol();
-std::string GetOtlpDefaultHttpMetricsProtocol();
-std::string GetOtlpDefaultHttpLogsProtocol();
-
 // Compatibility with OTELCPP 1.8.2
 inline std::string GetOtlpDefaultHttpEndpoint()
 {
