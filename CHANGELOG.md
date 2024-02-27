@@ -31,6 +31,11 @@ Important changes:
 * [SDK] Change OTLP HTTP content_type default to binary
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
 
+## [1.14.2] 2024-02-27
+
+* [SDK] Fix observable attributes drop
+   [#2557](https://github.com/open-telemetry/opentelemetry-cpp/pull/2557)
+
 ## [1.14.1] 2024-02-23
 
 * [SDK] Restore Recordable API compatibility with versions < 1.14.0
