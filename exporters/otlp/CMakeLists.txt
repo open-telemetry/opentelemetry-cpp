@@ -108,8 +108,7 @@ if(WITH_OTLP_GRPC)
 endif()
 
 if(WITH_OTLP_HTTP)
-  add_library(opentelemetry_exporter_otlp_http_client src/otlp_http.cc
-                                                      src/otlp_http_client.cc)
+  add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_http_client
                         PROPERTIES EXPORT_NAME otlp_http_client)
   set_target_version(opentelemetry_exporter_otlp_http_client)
