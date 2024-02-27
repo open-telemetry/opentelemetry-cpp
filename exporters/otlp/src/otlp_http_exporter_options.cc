@@ -17,7 +17,7 @@ namespace otlp
 OtlpHttpExporterOptions::OtlpHttpExporterOptions()
 {
   url                = GetOtlpDefaultHttpTracesEndpoint();
-  content_type       = HttpRequestContentType::kJson;
+  content_type       = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpTracesProtocol());
   json_bytes_mapping = JsonBytesMappingKind::kHexId;
   use_json_name      = false;
   console_debug      = false;

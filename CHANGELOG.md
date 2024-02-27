@@ -28,6 +28,8 @@ Important changes:
   * The CMake option `WITH_OTLP_HTTP_COMPRESSION` is introduced to enable
     gzip compression support for the OTLP HTTP Exporter and includes a
     dependency on zlib.
+* [SDK] Change OTLP HTTP content_type default to binary
+  [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
 
 ## [1.14.1] 2024-02-23
 

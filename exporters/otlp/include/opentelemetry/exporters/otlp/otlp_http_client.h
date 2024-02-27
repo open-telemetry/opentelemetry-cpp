@@ -52,8 +52,8 @@ struct OtlpHttpClientOptions
   /** SSL options. */
   ext::http::client::HttpSslOptions ssl_options;
 
-  // By default, post json data
-  HttpRequestContentType content_type = HttpRequestContentType::kJson;
+  // By default, post binary data
+  HttpRequestContentType content_type = HttpRequestContentType::kBinary;
 
   // If convert bytes into hex. By default, we will convert all bytes but id into base64
   // This option is ignored if content_type is not kJson

@@ -17,7 +17,7 @@ namespace otlp
 OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
 {
   url                = GetOtlpDefaultHttpLogsEndpoint();
-  content_type       = HttpRequestContentType::kJson;
+  content_type       = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpLogsProtocol());
   json_bytes_mapping = JsonBytesMappingKind::kHexId;
   use_json_name      = false;
   console_debug      = false;
