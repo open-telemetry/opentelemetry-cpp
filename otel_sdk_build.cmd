@@ -23,7 +23,6 @@ REM singleton_test does not work when linked as static under Windows
 REM Exclude building otel_sdk_zip right now, do it later. This warms up the tests bellow
 "%__BAZEL__%" build --//:with_dll=true -- ... -otel_sdk_zip || goto:error
 
-rem We can't test dbg, fastbuild and opt at the same time, as done above ^^^ (no config "transition" possible when doing testing (AFAIK))
 "%__BAZEL__%" test --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
@@ -35,7 +34,7 @@ for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel
 
 if "%__ZIP__%"=="" goto:broken-build-zip-file
 
-for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /D /Y || goto:error
+for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /L /V || goto:error
 
 echo. ALL GOOD!
 popd
