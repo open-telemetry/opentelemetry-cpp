@@ -18,6 +18,28 @@ Increment the:
 * [EXPORTER] Add OTLP File exporters
   [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
 
+## [1.14.1] 2024-02-23
+
+* [SDK] Restore Recordable API compatibility with versions < 1.14.0
+  [#2547](https://github.com/open-telemetry/opentelemetry-cpp/pull/2547)
+* [DOC] Add missing CHANGELOG.
+  [#2549](https://github.com/open-telemetry/opentelemetry-cpp/pull/2549)
+* [EXPORTER] Error when grpc endpoint is empty
+  [#2507](https://github.com/open-telemetry/opentelemetry-cpp/pull/2507)
+* [DOC] Fix typo in benchmarks.rst
+  [#2542](https://github.com/open-telemetry/opentelemetry-cpp/pull/2542)
+
+Important changes:
+
+* [SDK] Restore Recordable API compatibility with versions < 1.14.0
+  [#2547](https://github.com/open-telemetry/opentelemetry-cpp/pull/2547)
+  * For third party _extending_ the SDK, release 1.14.0 introduced
+    an API breaking change compared to 1.13.0
+  * This fix restores API (but not ABI) compatibility of
+    release 1.14.1 with release 1.13.0.
+  * This allows to build a third party exporter with no source code changes,
+    for both releases 1.14.1 and 1.13.0.
+
 ## [1.14.0] 2024-02-16
 
 * [BUILD] Add DLL build CI pipeline with CXX20
@@ -107,6 +129,16 @@ Breaking changes:
   * CMake options `WITH_OTLP_HTTP_SSL_PREVIEW` and
     `WITH_OTLP_HTTP_SSL_TLS_PREVIEW` are removed. Building opentelemetry-cpp
     without SSL support is no longer possible.
+
+* [PROTO] Upgrade to opentelemetry-proto v1.1.0
+  [#2488](https://github.com/open-telemetry/opentelemetry-cpp/pull/2488)
+  * Class `opentelemetry::sdk::trace::Recordable` has a new virtual method,
+    `SetTraceFlags()`.
+  * This is an incompatible change for the SDK Recordable API and ABI.
+  * Applications _configuring_ the SDK are not affected.
+  * Third parties providing SDK _extensions_ are affected,
+    and must provide a `SetTraceFlags()` implementation,
+    starting with opentelemetry-cpp 1.14.0.
 
 ## [1.13.0] 2023-12-06
 
