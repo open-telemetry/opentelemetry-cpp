@@ -15,8 +15,29 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.15.0] 2024-02-27
+
 * [SDK] Change OTLP HTTP content_type default to binary
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+* [SDK] Fix observable attributes drop
+   [#2557](https://github.com/open-telemetry/opentelemetry-cpp/pull/2557)
+
+Important changes:
+
+* [SDK] Change OTLP HTTP content_type default to binary
+  [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+  * Support for specifying OTLP serialization protocol using env variables
+  `OTEL_EXPORTER_OTLP_PROTOCOL`, `OTEL_EXPORTER_OTLP_TRACES_PROTOCOL`,
+  `OTEL_EXPORTER_OTLP_METRICS_PROTOCOL`. The accepted values are
+  `http/protobuf` or `http/json`.
+
+Breaking changes:
+
+* [SDK] Change OTLP HTTP content_type default to binary
+  [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+  * The default serialization protocol for OTLP HTTP Exporter is changed
+  from `http/json` to `http/protobuf`. The application need to explicitly
+  configure the `http/json` if they want so.
 
 ## [1.14.1] 2024-02-23
 
