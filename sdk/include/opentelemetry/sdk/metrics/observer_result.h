@@ -26,11 +26,15 @@ public:
 
   ~ObserverResultT() override = default;
 
-  void Observe(T value) noexcept override { data_.insert({{}, value}); }
+  void Observe(T value) noexcept override
+  {
+    data_[MetricAttributes{{}, attributes_processor_}] = value;
+  }
 
   void Observe(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    data_.insert({MetricAttributes{attributes, attributes_processor_}, value});
+    data_[MetricAttributes{attributes, attributes_processor_}] =
+        value;  // overwrites the previous value if present
   }
 
   const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &GetMeasurements()
