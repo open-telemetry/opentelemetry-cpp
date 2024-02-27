@@ -22,6 +22,8 @@ namespace exporter
 namespace otlp
 {
 
+class OtlpGrpcClient;
+
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
@@ -58,6 +60,10 @@ public:
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcMetricExporterOptions options_;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  std::shared_ptr<OtlpGrpcClient> client_;
+#endif
 
   // Aggregation Temporality selector
   const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;

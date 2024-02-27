@@ -72,6 +72,60 @@ TEST(HistogramToSum, Double)
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
 }
 
+TEST(HistogramToSumFilterAttributes, Double)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
+
+  std::unordered_map<std::string, bool> allowedattr;
+  allowedattr["attr1"] = true;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
+      new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> dummy_aggregation_config{
+      new opentelemetry::sdk::metrics::AggregationConfig};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+                                      AggregationType::kSum, dummy_aggregation_config,
+                                      std::move(attrproc))};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto h = m->CreateDoubleHistogram(instrument_name, instrument_desc, instrument_unit);
+  std::unordered_map<std::string, std::string> attr1 = {{"attr1", "val1"}, {"attr2", "val2"}};
+  std::unordered_map<std::string, std::string> attr2 = {{"attr1", "val1"}, {"attr2", "val2"}};
+  h->Record(5, attr1, opentelemetry::context::Context{});
+  h->Record(10, attr2, opentelemetry::context::Context{});
+
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        EXPECT_EQ(1, md.point_data_attr_.size());
+        if (md.point_data_attr_.size() == 1)
+        {
+          EXPECT_EQ(15.0, opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                                md.point_data_attr_[0].point_data)
+                                                                .value_));
+          EXPECT_EQ(1, md.point_data_attr_[0].attributes.size());
+          EXPECT_NE(md.point_data_attr_[0].attributes.end(),
+                    md.point_data_attr_[0].attributes.find("attr1"));
+        }
+      }
+    }
+    return true;
+  });
+}
+
 TEST(CounterToSum, Double)
 {
   MeterProvider mp;
@@ -119,6 +173,60 @@ TEST(CounterToSum, Double)
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
   ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+}
+
+TEST(CounterToSumFilterAttributes, Double)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "counter1";
+  std::string instrument_desc = "counter metrics";
+
+  std::unordered_map<std::string, bool> allowedattr;
+  allowedattr["attr1"] = true;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
+      new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> dummy_aggregation_config{
+      new opentelemetry::sdk::metrics::AggregationConfig};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::unique_ptr<View> view{new View("view1", "view1_description", instrument_unit,
+                                      AggregationType::kSum, dummy_aggregation_config,
+                                      std::move(attrproc))};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kCounter, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto c = m->CreateDoubleCounter(instrument_name, instrument_desc, instrument_unit);
+  std::unordered_map<std::string, std::string> attr1 = {{"attr1", "val1"}, {"attr2", "val2"}};
+  std::unordered_map<std::string, std::string> attr2 = {{"attr1", "val1"}, {"attr2", "val2"}};
+  c->Add(5, attr1, opentelemetry::context::Context{});
+  c->Add(10, attr2, opentelemetry::context::Context{});
+
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        EXPECT_EQ(1, md.point_data_attr_.size());
+        if (md.point_data_attr_.size() == 1)
+        {
+          EXPECT_EQ(15.0, opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
+                                                                md.point_data_attr_[0].point_data)
+                                                                .value_));
+          EXPECT_EQ(1, md.point_data_attr_[0].attributes.size());
+          EXPECT_NE(md.point_data_attr_[0].attributes.end(),
+                    md.point_data_attr_[0].attributes.find("attr1"));
+        }
+      }
+    }
+    return true;
+  });
 }
 
 class UpDownCounterToSumFixture : public ::testing::TestWithParam<bool>

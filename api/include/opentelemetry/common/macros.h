@@ -164,16 +164,19 @@ point.
 #if defined(__clang__)
 
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+#  define OPENTELEMETRY_LOCAL_SYMBOL __attribute__((visibility("hidden")))
 
 #elif defined(__GNUC__)
 
 #  define OPENTELEMETRY_API_SINGLETON __attribute__((visibility("default")))
+#  define OPENTELEMETRY_LOCAL_SYMBOL __attribute__((visibility("hidden")))
 
 #else
 
 /* Add support for other compilers here. */
 
 #  define OPENTELEMETRY_API_SINGLETON
+#  define OPENTELEMETRY_LOCAL_SYMBOL
 
 #endif
 
