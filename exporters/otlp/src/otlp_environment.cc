@@ -207,6 +207,78 @@ std::string GetOtlpDefaultHttpLogsEndpoint()
   return kDefault;
 }
 
+std::string GetOtlpDefaultHttpTracesProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
+std::string GetOtlpDefaultHttpMetricsProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
+std::string GetOtlpDefaultHttpLogsProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
 bool GetOtlpDefaultGrpcTracesIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcTracesEndpoint();
