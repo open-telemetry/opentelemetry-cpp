@@ -117,6 +117,18 @@ struct MockTracerProvider final : public trace_api::TracerProvider
 
 struct MockPropagator : public context::propagation::TextMapPropagator
 {
+  static constexpr const char *kTraceIdKey    = "trace_id";
+  static constexpr const char *kSpanIdKey     = "span_id";
+  static constexpr const char *kTraceFlagsKey = "trace_flags_id";
+
+  template <class T, int N>
+  static inline std::string ToLowerBase16(const T &id)
+  {
+    char buf[N] = {0};
+    id.ToLowerBase16(buf);
+    return std::string(buf, sizeof(buf));
+  }
+
   // Returns the context that is stored in the carrier with the TextMapCarrier as extractor.
   context::Context Extract(const context::propagation::TextMapCarrier &carrier,
                            context::Context &context) noexcept override
@@ -140,6 +152,24 @@ struct MockPropagator : public context::propagation::TextMapPropagator
       carrier.Set(k, v);
       return true;
     });
+
+    auto span_key_value = context.GetValue(trace_api::kSpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(span_key_value))
+    {
+      auto span = nostd::get<nostd::shared_ptr<trace_api::Span>>(span_key_value);
+      if (span)
+      {
+        // Store span context information in TextMapCarrier to allow verifying propagation
+        auto span_context = span->GetContext();
+        carrier.Set(kTraceIdKey, ToLowerBase16<trace_api::TraceId, 2 * trace_api::TraceId::kSize>(
+                                     span_context.trace_id()));
+        carrier.Set(kSpanIdKey, ToLowerBase16<trace_api::SpanId, 2 * trace_api::SpanId::kSize>(
+                                    span_context.span_id()));
+        carrier.Set(kTraceFlagsKey,
+                    ToLowerBase16<trace_api::TraceFlags, 2>(span_context.trace_flags()));
+      }
+    }
+
     is_injected = true;
   }
 
