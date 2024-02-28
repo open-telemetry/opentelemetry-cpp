@@ -11,21 +11,30 @@
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/console_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/extension_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/prometheus_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
@@ -56,12 +65,185 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfigura
   return model;
 }
 
-static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
+static std::unique_ptr<OtlpMetricExporterConfiguration> ParseOtlpMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<MeterProviderConfiguration> model(new MeterProviderConfiguration);
+  std::unique_ptr<OtlpMetricExporterConfiguration> model(new OtlpMetricExporterConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParseMeterProviderConfiguration: FIXME");
+  OTEL_INTERNAL_LOG_ERROR("ParseOtlpMetricExporterConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<ConsoleMetricExporterConfiguration> ParseConsoleMetricExporterConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */)
+{
+  std::unique_ptr<ConsoleMetricExporterConfiguration> model(new ConsoleMetricExporterConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParseConsoleMetricExporterConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<PrometheusMetricExporterConfiguration>
+ParsePrometheusMetricExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
+{
+  std::unique_ptr<PrometheusMetricExporterConfiguration> model(
+      new PrometheusMetricExporterConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParsePrometheusMetricExporterConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionMetricExporterConfiguration>
+ParseMetricExporterExtensionConfiguration(const std::string &name,
+                                          std::unique_ptr<DocumentNode> node)
+{
+  auto extension  = new ExtensionMetricExporterConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<ExtensionMetricExporterConfiguration> model(extension);
+  return model;
+}
+
+static std::unique_ptr<MetricExporterConfiguration> ParseMetricExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<MetricExporterConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseMetricExporterConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal metric exporter");
+  }
+
+  if (name == "otlp")
+  {
+    model = ParseOtlpMetricExporterConfiguration(child);
+  }
+  else if (name == "console")
+  {
+    model = ParseConsoleMetricExporterConfiguration(child);
+  }
+  else if (name == "prometheus")
+  {
+    model = ParsePrometheusMetricExporterConfiguration(child);
+  }
+  else
+  {
+    model = ParseMetricExporterExtensionConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+static std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricReaderConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<PeriodicMetricReaderConfiguration> model(new PeriodicMetricReaderConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->interval = node->GetInteger("interval", 5000);
+  model->timeout  = node->GetInteger("timeout", 30000);
+
+  child           = node->GetRequiredChildNode("exporter");
+  model->exporter = ParseMetricExporterConfiguration(child);
+
+  return model;
+}
+
+static std::unique_ptr<PullMetricReaderConfiguration> ParsePullMetricReaderConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<PullMetricReaderConfiguration> model(new PullMetricReaderConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child           = node->GetRequiredChildNode("exporter");
+  model->exporter = ParseMetricExporterConfiguration(child);
+
+  return model;
+}
+
+static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<MetricReaderConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseMetricReaderConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal metric reader");
+  }
+
+  if (name == "periodic")
+  {
+    model = ParsePeriodicMetricReaderConfiguration(child);
+  }
+  else if (name == "pull")
+  {
+    model = ParsePullMetricReaderConfiguration(child);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseMetricReaderConfiguration: name " << name);
+    throw InvalidSchemaException("Illegal metric reader");
+  }
+
+  return model;
+}
+
+static std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */)
+{
+  std::unique_ptr<ViewConfiguration> model(new ViewConfiguration);
+
+  OTEL_INTERNAL_LOG_ERROR("ParseViewConfiguration: FIXME");
+
+  return model;
+}
+
+static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<MeterProviderConfiguration> model(new MeterProviderConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetRequiredChildNode("readers");
+
+  for (auto it = child->begin(); it != child->end(); ++it)
+  {
+    model->readers.push_back(ParseMetricReaderConfiguration(*it));
+  }
+
+  child = node->GetRequiredChildNode("views");
+
+  for (auto it = child->begin(); it != child->end(); ++it)
+  {
+    model->views.push_back(ParseViewConfiguration(*it));
+  }
 
   return model;
 }

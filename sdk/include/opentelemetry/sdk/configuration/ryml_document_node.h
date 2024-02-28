@@ -55,9 +55,6 @@ private:
   ryml::ConstNodeRef GetRequiredRymlChildNode(const std::string &name);
   ryml::ConstNodeRef GetRymlChildNode(const std::string &name);
 
-  std::string GetRequiredRaw(const std::string &name);
-  std::pair<bool, std::string> GetRaw(const std::string &name);
-
   ryml::ConstNodeRef m_node;
 };
 
