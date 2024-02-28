@@ -35,7 +35,7 @@ LongHistogramAggregation::LongHistogramAggregation(const AggregationConfig *aggr
     record_min_max_ = ac->record_min_max_;
   }
   point_data_.counts_         = std::vector<uint64_t>(point_data_.boundaries_.size() + 1, 0);
-  point_data_.sum_            = (int64_t)0;
+  point_data_.sum_            = static_cast<int64_t>(0);
   point_data_.count_          = 0;
   point_data_.record_min_max_ = record_min_max_;
   point_data_.min_            = (std::numeric_limits<int64_t>::max)();

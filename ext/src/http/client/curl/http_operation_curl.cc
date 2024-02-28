@@ -60,7 +60,7 @@ size_t HttpOperation::WriteVectorHeaderCallback(void *ptr, size_t size, size_t n
     return 0;
   }
 
-  const unsigned char *begin = (unsigned char *)(ptr);
+  const unsigned char *begin = static_cast<unsigned char *>(ptr);
   const unsigned char *end   = begin + size * nmemb;
   self->response_headers_.insert(self->response_headers_.end(), begin, end);
 
@@ -90,7 +90,7 @@ size_t HttpOperation::WriteVectorBodyCallback(void *ptr, size_t size, size_t nme
     return 0;
   }
 
-  const unsigned char *begin = (unsigned char *)(ptr);
+  const unsigned char *begin = static_cast<unsigned char *>(ptr);
   const unsigned char *end   = begin + size * nmemb;
   self->response_body_.insert(self->response_body_.end(), begin, end);
 
@@ -812,7 +812,7 @@ CURLcode HttpOperation::Setup()
     if (ssl_options_.ssl_insecure_skip_verify)
     {
       /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, (long)CURLUSESSL_NONE);
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_NONE));
       if (rc != CURLE_OK)
       {
         return rc;
@@ -833,7 +833,7 @@ CURLcode HttpOperation::Setup()
     else
     {
       /* 6 - ENFORCE VERIFICATION */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
       if (rc != CURLE_OK)
       {
         return rc;
@@ -943,13 +943,14 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, (void *)&HttpOperation::WriteMemoryCallback);
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::WriteMemoryCallback));
     if (rc != CURLE_OK)
     {
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, (void *)this);
+    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, this);
     if (rc != CURLE_OK)
     {
       return rc;
@@ -957,26 +958,27 @@ CURLcode HttpOperation::Setup()
   }
   else
   {
-    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION, (void *)&HttpOperation::WriteVectorBodyCallback);
+    rc = SetCurlPtrOption(CURLOPT_WRITEFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::WriteVectorBodyCallback));
     if (rc != CURLE_OK)
     {
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, (void *)this);
+    rc = SetCurlPtrOption(CURLOPT_WRITEDATA, this);
     if (rc != CURLE_OK)
     {
       return rc;
     }
 
-    rc =
-        SetCurlPtrOption(CURLOPT_HEADERFUNCTION, (void *)&HttpOperation::WriteVectorHeaderCallback);
+    rc = SetCurlPtrOption(CURLOPT_HEADERFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::WriteVectorHeaderCallback));
     if (rc != CURLE_OK)
     {
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_HEADERDATA, (void *)this);
+    rc = SetCurlPtrOption(CURLOPT_HEADERDATA, this);
     if (rc != CURLE_OK)
     {
       return rc;
@@ -1007,13 +1009,14 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_READFUNCTION, (void *)&HttpOperation::ReadMemoryCallback);
+    rc = SetCurlPtrOption(CURLOPT_READFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::ReadMemoryCallback));
     if (rc != CURLE_OK)
     {
       return rc;
     }
 
-    rc = SetCurlPtrOption(CURLOPT_READDATA, (void *)this);
+    rc = SetCurlPtrOption(CURLOPT_READDATA, this);
     if (rc != CURLE_OK)
     {
       return rc;
@@ -1030,13 +1033,14 @@ CURLcode HttpOperation::Setup()
   }
 
 #if LIBCURL_VERSION_NUM >= 0x072000
-  rc = SetCurlPtrOption(CURLOPT_XFERINFOFUNCTION, (void *)&HttpOperation::OnProgressCallback);
+  rc = SetCurlPtrOption(CURLOPT_XFERINFOFUNCTION,
+                        reinterpret_cast<void *>(&HttpOperation::OnProgressCallback));
   if (rc != CURLE_OK)
   {
     return rc;
   }
 
-  rc = SetCurlPtrOption(CURLOPT_XFERINFODATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_XFERINFODATA, this);
   if (rc != CURLE_OK)
   {
     return rc;
@@ -1048,7 +1052,7 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
-  rc = SetCurlPtrOption(CURLOPT_PROGRESSDATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_PROGRESSDATA, this);
   if (rc != CURLE_OK)
   {
     return rc;
@@ -1056,13 +1060,14 @@ CURLcode HttpOperation::Setup()
 #endif
 
 #if LIBCURL_VERSION_NUM >= 0x075000
-  rc = SetCurlPtrOption(CURLOPT_PREREQFUNCTION, (void *)&HttpOperation::PreRequestCallback);
+  rc = SetCurlPtrOption(CURLOPT_PREREQFUNCTION,
+                        reinterpret_cast<void *>(&HttpOperation::PreRequestCallback));
   if (rc != CURLE_OK)
   {
     return rc;
   }
 
-  rc = SetCurlPtrOption(CURLOPT_PREREQDATA, (void *)this);
+  rc = SetCurlPtrOption(CURLOPT_PREREQDATA, this);
   if (rc != CURLE_OK)
   {
     return rc;
@@ -1159,7 +1164,8 @@ Headers HttpOperation::GetResponseHeaders()
     return result;
 
   std::stringstream ss;
-  std::string headers((const char *)&response_headers_[0], response_headers_.size());
+  std::string headers(reinterpret_cast<const char *>(&response_headers_[0]),
+                      response_headers_.size());
   ss.str(headers);
 
   std::string header;

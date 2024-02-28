@@ -34,7 +34,7 @@ TEST(ResourceTest, create_without_servicename)
 {
   ResourceAttributes expected_attributes = {
       {"service", "backend"},
-      {"version", (uint32_t)1},
+      {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
       {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
       {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
@@ -42,7 +42,7 @@ TEST(ResourceTest, create_without_servicename)
       {SemanticConventions::kServiceName, "unknown_service"}};
 
   ResourceAttributes attributes = {
-      {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
   auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -67,7 +67,7 @@ TEST(ResourceTest, create_without_servicename)
 TEST(ResourceTest, create_with_servicename)
 {
   ResourceAttributes expected_attributes = {
-      {"version", (uint32_t)1},
+      {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
       {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
       {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
@@ -75,7 +75,7 @@ TEST(ResourceTest, create_with_servicename)
       {SemanticConventions::kServiceName, "backend"},
   };
   ResourceAttributes attributes = {
-      {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service.name", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
   auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)

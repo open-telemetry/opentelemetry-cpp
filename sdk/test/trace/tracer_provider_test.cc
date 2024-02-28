@@ -172,11 +172,11 @@ TEST(TracerProvider, GetTracerAbiv2)
                          {{"a", "string"},
                           {"b", false},
                           {"c", 314159},
-                          {"d", (unsigned int)314159},
-                          {"e", (int32_t)-20},
-                          {"f", (uint32_t)20},
-                          {"g", (int64_t)-20},
-                          {"h", (uint64_t)20},
+                          {"d", static_cast<unsigned int>(314159)},
+                          {"e", static_cast<int32_t>(-20)},
+                          {"f", static_cast<uint32_t>(20)},
+                          {"g", static_cast<int64_t>(-20)},
+                          {"h", static_cast<uint64_t>(20)},
                           {"i", 3.1},
                           {"j", "string"}});
   ASSERT_NE(nullptr, t8);
@@ -192,9 +192,16 @@ TEST(TracerProvider, GetTracerAbiv2)
   }
 
   std::map<std::string, opentelemetry::common::AttributeValue> attr9{
-      {"a", "string"},     {"b", false},        {"c", 314159},       {"d", (unsigned int)314159},
-      {"e", (int32_t)-20}, {"f", (uint32_t)20}, {"g", (int64_t)-20}, {"h", (uint64_t)20},
-      {"i", 3.1},          {"j", "string"}};
+      {"a", "string"},
+      {"b", false},
+      {"c", 314159},
+      {"d", static_cast<unsigned int>(314159)},
+      {"e", static_cast<int32_t>(-20)},
+      {"f", static_cast<uint32_t>(20)},
+      {"g", static_cast<int64_t>(-20)},
+      {"h", static_cast<uint64_t>(20)},
+      {"i", 3.1},
+      {"j", "string"}};
 
   auto t9 = tp.GetTracer("name9", "version9", "url9", attr9);
   ASSERT_NE(nullptr, t9);

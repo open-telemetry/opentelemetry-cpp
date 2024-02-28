@@ -56,7 +56,7 @@ public:
                               const MetricAttributes &attributes,
                               const opentelemetry::context::Context &context) override
     {
-      return ReservoirCellIndexFor(cells, (double)value, attributes, context);
+      return ReservoirCellIndexFor(cells, static_cast<double>(value), attributes, context);
     }
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
