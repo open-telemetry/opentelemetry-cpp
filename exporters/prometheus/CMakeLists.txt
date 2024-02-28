@@ -31,6 +31,25 @@ target_link_libraries(
   opentelemetry_exporter_prometheus
   PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core)
 
+# We create a separate target for utils library
+add_library(
+  opentelemetry_exporter_prometheus_utils
+  src/exporter_utils.cc)
+
+set_target_properties(opentelemetry_exporter_prometheus_utils
+                      PROPERTIES EXPORT_NAME prometheus_exporter_utils)
+set_target_version(opentelemetry_exporter_prometheus_utils)
+
+target_include_directories(
+  opentelemetry_exporter_prometheus_utils
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+list(APPEND PROMETHEUS_EXPORTER_TARGETS opentelemetry_exporter_prometheus_utils)
+target_link_libraries(
+  opentelemetry_exporter_prometheus_utils
+  PUBLIC opentelemetry_metrics prometheus-cpp::core)
+
 if(OPENTELEMETRY_INSTALL)
   install(
     TARGETS ${PROMETHEUS_EXPORTER_TARGETS}
