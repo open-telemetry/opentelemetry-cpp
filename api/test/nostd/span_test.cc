@@ -167,10 +167,10 @@ TEST(SpanTest, Iteration)
   std::array<int, 3> array = {1, 2, 3};
 
   span<int> s1{array.data(), array.size()};
-  EXPECT_EQ(std::distance(s1.begin(), s1.end()), (ptrdiff_t)array.size());
+  EXPECT_EQ(std::distance(s1.begin(), s1.end()), static_cast<ptrdiff_t>(array.size()));
   EXPECT_TRUE(std::equal(s1.begin(), s1.end(), array.begin()));
 
   span<int, 3> s2{array.data(), array.size()};
-  EXPECT_EQ(std::distance(s2.begin(), s2.end()), (ptrdiff_t)array.size());
+  EXPECT_EQ(std::distance(s2.begin(), s2.end()), static_cast<ptrdiff_t>(array.size()));
   EXPECT_TRUE(std::equal(s2.begin(), s2.end(), array.begin()));
 }

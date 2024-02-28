@@ -13,6 +13,6 @@ TEST(AlwaysSampleFilter, SampleMeasurement)
   auto filter = opentelemetry::sdk::metrics::ExemplarFilter::GetAlwaysSampleFilter();
   ASSERT_TRUE(
       filter->ShouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
-  ASSERT_TRUE(filter->ShouldSampleMeasurement((int64_t)1, MetricAttributes{},
+  ASSERT_TRUE(filter->ShouldSampleMeasurement(static_cast<int64_t>(1), MetricAttributes{},
                                               opentelemetry::context::Context{}));
 }
