@@ -35,7 +35,7 @@ void BM_HistogramAggregation(benchmark::State &state)
   double measurements[TOTAL_MEASUREMENTS];
   for (size_t i = 0; i < TOTAL_MEASUREMENTS; i++)
   {
-    measurements[i] = (double)distribution(generator);
+    measurements[i] = static_cast<double>(distribution(generator));
   }
   std::vector<HistogramPointData> actuals;
   std::vector<std::thread> collectionThreads;

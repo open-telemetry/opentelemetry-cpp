@@ -54,7 +54,7 @@ TEST(SpanData, Set)
   data.SetStatus(trace_api::StatusCode::kOk, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
-  data.SetAttribute("attr1", (int64_t)314159);
+  data.SetAttribute("attr1", static_cast<int64_t>(314159));
   data.AddEvent("event1", now);
 
   ASSERT_EQ(data.GetTraceId(), trace_id);
