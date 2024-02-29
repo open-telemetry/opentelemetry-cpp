@@ -29,5 +29,6 @@ cc_library(
         "//sdk:headers",
         "//sdk/src/common:random",
         "@curl",
+        "@zlib",
     ],
 )

@@ -240,6 +240,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              // Default empty headers and empty request body
                              const opentelemetry::ext::http::client::Headers &request_headers,
                              const opentelemetry::ext::http::client::Body &request_body,
+                             const opentelemetry::ext::http::client::Compression &compression,
                              // Default connectivity and response size options
                              bool is_raw_response,
                              std::chrono::milliseconds http_conn_timeout,
@@ -262,6 +263,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       request_body_(request_body),
       request_nwrite_(0),
       session_state_(opentelemetry::ext::http::client::SessionState::Created),
+      compression_(compression),
       response_code_(0)
 {
   /* get a curl handle */
@@ -859,6 +861,15 @@ CURLcode HttpOperation::Setup()
     }
 
     rc = SetCurlLongOption(CURLOPT_SSL_VERIFYHOST, 0L);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+  }
+
+  if (compression_ == opentelemetry::ext::http::client::Compression::kGzip)
+  {
+    rc = SetCurlStrOption(CURLOPT_ACCEPT_ENCODING, "gzip");
     if (rc != CURLE_OK)
     {
       return rc;
