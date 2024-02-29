@@ -488,6 +488,8 @@ if(OTELCPP_MAINTAINER_MODE)
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
       add_compile_options(
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wold-style-cast>)
 
       # C and C++
       add_compile_options(-Wcast-qual)
@@ -527,6 +529,7 @@ if(OTELCPP_MAINTAINER_MODE)
       add_compile_options(-Wundef)
       add_compile_options(-Wundefined-reinterpret-cast)
       add_compile_options(-Wvla)
+      add_compile_options(-Wold-style-cast)
     endif()
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     message("Building with msvc in maintainer mode.")

@@ -60,9 +60,9 @@ void do_something()
   EXPECT_NE(component_g, nullptr);
 
 #ifdef _WIN32
-  auto *func_g = (void (*)())GetProcAddress(component_g, "do_something_in_g");
+  auto *func_g = reinterpret_cast<void (*)()>(GetProcAddress(component_g, "do_something_in_g"));
 #else
-  auto *func_g = (void (*)())dlsym(component_g, "do_something_in_g");
+  auto *func_g = reinterpret_cast<void (*)()>(dlsym(component_g, "do_something_in_g"));
 #endif
   EXPECT_NE(func_g, nullptr);
 
@@ -84,9 +84,9 @@ void do_something()
   EXPECT_NE(component_h, nullptr);
 
 #ifdef _WIN32
-  auto *func_h = (void (*)())GetProcAddress(component_h, "do_something_in_h");
+  auto *func_h = reinterpret_cast<void (*)()>(GetProcAddress(component_h, "do_something_in_h"));
 #else
-  auto *func_h = (void (*)())dlsym(component_h, "do_something_in_h");
+  auto *func_h = reinterpret_cast<void (*)()>(dlsym(component_h, "do_something_in_h"));
 #endif
   EXPECT_NE(func_h, nullptr);
 

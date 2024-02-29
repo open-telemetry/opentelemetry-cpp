@@ -30,7 +30,7 @@ public:
   SpanContext(bool sampled_flag, bool is_remote) noexcept
       : trace_id_(),
         span_id_(),
-        trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+        trace_flags_(trace::TraceFlags(static_cast<uint8_t>(sampled_flag))),
         is_remote_(is_remote),
         trace_state_(TraceState::GetDefault())
   {}
