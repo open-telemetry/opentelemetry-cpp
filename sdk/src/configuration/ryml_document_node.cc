@@ -173,9 +173,12 @@ bool RymlDocumentNode::GetRequiredBoolean(const std::string &name)
 
   auto ryml_child = GetRequiredRymlChildNode(name);
 
-  bool value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  return BooleanFromString(value);
 }
 
 bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
@@ -189,9 +192,17 @@ bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
     return default_value;
   }
 
-  bool value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  return BooleanFromString(value);
 }
 
 size_t RymlDocumentNode::GetRequiredInteger(const std::string &name)
@@ -200,9 +211,12 @@ size_t RymlDocumentNode::GetRequiredInteger(const std::string &name)
 
   auto ryml_child = GetRequiredRymlChildNode(name);
 
-  size_t value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  return IntegerFromString(value);
 }
 
 size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_value)
@@ -216,9 +230,17 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
     return default_value;
   }
 
-  size_t value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  return IntegerFromString(value);
 }
 
 double RymlDocumentNode::GetRequiredDouble(const std::string &name)
@@ -227,9 +249,12 @@ double RymlDocumentNode::GetRequiredDouble(const std::string &name)
 
   auto ryml_child = GetRequiredRymlChildNode(name);
 
-  double value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  return DoubleFromString(value);
 }
 
 double RymlDocumentNode::GetDouble(const std::string &name, double default_value)
@@ -243,9 +268,17 @@ double RymlDocumentNode::GetDouble(const std::string &name, double default_value
     return default_value;
   }
 
-  double value;
-  ryml_child >> value;
-  return value;
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  return DoubleFromString(value);
 }
 
 std::string RymlDocumentNode::GetRequiredString(const std::string &name)
@@ -257,6 +290,12 @@ std::string RymlDocumentNode::GetRequiredString(const std::string &name)
   std::string value(view.str, view.len);
 
   DoSubstitution(value);
+
+  if (value.empty())
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml: string value is empty: " << name);
+    throw InvalidSchemaException(name);
+  }
 
   return value;
 }

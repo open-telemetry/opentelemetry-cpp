@@ -13,6 +13,12 @@ namespace sdk
 namespace configuration
 {
 
+/**
+  Perform substitution on a string scalar.
+  Only if the entire scalar string is: ${ENV_NAME},
+  this code does not perform substitution in:
+  "some text with ${ENV_NAME} in it".
+*/
 void DocumentNode::DoSubstitution(std::string &value)
 {
   size_t len = value.length();
@@ -83,18 +89,35 @@ bool DocumentNode::BooleanFromString(const std::string &value)
     return false;
   }
 
+  OTEL_INTERNAL_LOG_ERROR("Illegal integer value: " << value);
   throw InvalidSchemaException("Illegal bool value");
 }
 
 size_t DocumentNode::IntegerFromString(const std::string &value)
 {
-  size_t val = atoll(value.c_str());
+  const char *ptr = value.c_str();
+  char *end       = nullptr;
+  int len         = value.length();
+  size_t val      = strtoll(ptr, &end, 10);
+  if (ptr + len != end)
+  {
+    OTEL_INTERNAL_LOG_ERROR("Illegal integer value: " << value);
+    throw InvalidSchemaException("Illegal integer value");
+  }
   return val;
 }
 
 double DocumentNode::DoubleFromString(const std::string &value)
 {
-  double val = atof(value.c_str());
+  const char *ptr = value.c_str();
+  char *end       = nullptr;
+  int len         = value.length();
+  double val      = strtod(ptr, &end);
+  if (ptr + len != end)
+  {
+    OTEL_INTERNAL_LOG_ERROR("Illegal double value: " << value);
+    throw InvalidSchemaException("Illegal double value");
+  }
   return val;
 }
 

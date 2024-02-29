@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <stdlib.h>
 
+#include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 
 std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(std::string yaml)
@@ -26,8 +27,7 @@ file_format:
 )";
 
   auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "");
+  ASSERT_EQ(config, nullptr);
 }
 
 TEST(Yaml, just_format)
@@ -122,30 +122,109 @@ attribute_limits:
   ASSERT_EQ(config->attribute_limits->attribute_count_limit, 5678);
 }
 
-TEST(Yaml, no_processors)
+TEST(Yaml, no_optional_boolean)
 {
   std::string yaml = R"(
-file_format: xx.yy
-tracer_provider:
+file_format: 0.0
+disabled:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, illegal_boolean)
+{
+  std::string yaml = R"(
+file_format: 0.0
+disabled: illegal
 )";
 
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
 }
 
-TEST(Yaml, empty_processors)
+TEST(Yaml, no_boolean_substitution)
 {
+  unsetenv("ENV_NAME");
+
   std::string yaml = R"(
-file_format: xx.yy
-tracer_provider:
-  processors:
+file_format: 0.0
+disabled: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, empty_boolean_substitution)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, true_boolean_substitution)
+{
+  setenv("ENV_NAME", "true", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, true);
+}
+
+TEST(Yaml, false_boolean_substitution)
+{
+  setenv("ENV_NAME", "false", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, illegal_boolean_substitution)
+{
+  setenv("ENV_NAME", "illegal", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME}
 )";
 
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
 }
 
-TEST(Yaml, no_substitution)
+TEST(Yaml, no_required_string)
+{
+  std::string yaml = R"(
+file_format:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, no_string_substitution)
 {
   unsetenv("ENV_NAME");
 
@@ -154,11 +233,10 @@ file_format: ${ENV_NAME}
 )";
 
   auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "");
+  ASSERT_EQ(config, nullptr);
 }
 
-TEST(Yaml, empty_substitution)
+TEST(Yaml, empty_string_substitution)
 {
   setenv("ENV_NAME", "", 1);
 
@@ -167,11 +245,10 @@ file_format: ${ENV_NAME}
 )";
 
   auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_EQ(config->file_format, "");
+  ASSERT_EQ(config, nullptr);
 }
 
-TEST(Yaml, with_substitution)
+TEST(Yaml, with_string_substitution)
 {
   setenv("ENV_NAME", "foo.bar", 1);
 
@@ -182,4 +259,236 @@ file_format: ${ENV_NAME}
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "foo.bar");
+}
+
+TEST(Yaml, no_optional_integer)
+{
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+}
+
+TEST(Yaml, illegal_integer)
+{
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit: "just enough"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, no_integer_substitution)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+}
+
+TEST(Yaml, empty_integer_substitution)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+}
+
+TEST(Yaml, with_integer_substitution)
+{
+  setenv("ENV_NAME", "7777", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 7777);
+}
+
+TEST(Yaml, with_illegal_integer_substitution)
+{
+  setenv("ENV_NAME", "still not enough", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+attribute_limits:
+  attribute_count_limit: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, no_optional_double)
+{
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+  auto sampler = config->tracer_provider->sampler.get();
+  auto ratio_sampler =
+      static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+}
+
+TEST(Yaml, illegal_double)
+{
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio: something
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, no_double_substitution)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+  auto sampler = config->tracer_provider->sampler.get();
+  auto ratio_sampler =
+      static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+}
+
+TEST(Yaml, empty_double_substitution)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+  auto sampler = config->tracer_provider->sampler.get();
+  auto ratio_sampler =
+      static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+}
+
+TEST(Yaml, with_double_substitution)
+{
+  setenv("ENV_NAME", "3.14", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+  auto sampler = config->tracer_provider->sampler.get();
+  auto ratio_sampler =
+      static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_EQ(ratio_sampler->ratio, 3.14);
+}
+
+TEST(Yaml, with_illegal_double_substitution)
+{
+  setenv("ENV_NAME", "something else", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    trace_id_ratio_based:
+      ratio: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }
