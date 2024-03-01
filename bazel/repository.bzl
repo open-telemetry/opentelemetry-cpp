@@ -5,18 +5,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file"
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def _deps1(mod_ext):
-    # OTLP Protocol definition
-    maybe(
-        http_archive,
-        name = "com_github_opentelemetry_proto",
-        build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "df491a05f3fcbf86cc5ba5c9de81f6a624d74d4773d7009d573e37d6e2b6af64",
-        strip_prefix = "opentelemetry-proto-1.1.0",
-        urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.1.0.tar.gz",
-        ],
-    )
-
     # libcurl (optional)
     maybe(
         http_archive,
