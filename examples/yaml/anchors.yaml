@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # anchors.yaml demonstrates anchor substitution to reuse OTLP exporter configuration across signals.
 
 file_format: "0.1"

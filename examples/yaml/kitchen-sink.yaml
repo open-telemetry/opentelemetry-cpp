@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 # kitchen-sink.yaml demonstrates all configurable surface area, including explanatory comments.
 #
 # It DOES NOT represent expected real world configuration, as it makes strange configuration
