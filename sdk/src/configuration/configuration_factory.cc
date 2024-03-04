@@ -752,15 +752,9 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
 
     OTEL_INTERNAL_LOG_DEBUG(
         "ParseAttributesConfiguration() name = " << name << ", value = " << string_value);
-    if (name == "service.name")
-    {
-      model->service_name = name;
-    }
-    else
-    {
-      std::pair<std::string, std::string> entry(name, string_value);
-      model->kv_map.insert(entry);
-    }
+
+    std::pair<std::string, std::string> entry(name, string_value);
+    model->kv_map.insert(entry);
   }
 
   return model;

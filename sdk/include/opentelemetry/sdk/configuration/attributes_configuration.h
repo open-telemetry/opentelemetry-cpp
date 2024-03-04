@@ -16,7 +16,6 @@ namespace configuration
 class AttributesConfiguration
 {
 public:
-  std::string service_name;
   std::map<std::string, std::string> kv_map;
 };
 
