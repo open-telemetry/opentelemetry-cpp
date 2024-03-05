@@ -15,14 +15,16 @@ namespace resource
 {
 
 const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
-const char *OTEL_SERVICE_NAME = "OTEL_SERVICE_NAME";
+const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
   std::string attributes_str, service_name;
 
-  bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_RESOURCE_ATTRIBUTES, attributes_str);
-  bool service_name_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
+  bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
+      OTEL_RESOURCE_ATTRIBUTES, attributes_str);
+  bool service_name_exists =
+      opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
 
   if (!attributes_exists && !service_name_exists)
   {
