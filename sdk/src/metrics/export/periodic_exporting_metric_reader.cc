@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 
 #include <chrono>
 #if defined(_MSC_VER)
