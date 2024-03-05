@@ -5,22 +5,28 @@
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/console_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/last_value_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_metric_exporter_configuration.h"
@@ -33,6 +39,7 @@
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
@@ -43,6 +50,26 @@ namespace sdk
 {
 namespace configuration
 {
+
+static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    std::string name                    = it.Name();
+    std::unique_ptr<DocumentNode> child = it.Value();
+    std::string string_value            = child->AsString();
+
+    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name
+                                                                  << ", value = " << string_value);
+    std::pair<std::string, std::string> entry(name, string_value);
+    model->kv_map.insert(entry);
+  }
+
+  return model;
+}
 
 static std::unique_ptr<AttributeLimitConfiguration> ParseAttributeLimitConfiguration(
     const std::unique_ptr<DocumentNode> &node)
@@ -65,12 +92,49 @@ static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfigura
   return model;
 }
 
+static enum_default_histogram_aggregation ParseDefaultHistogramAggregation(const std::string &name)
+{
+  if (name == "explicit_bucket_histogram")
+  {
+    return explicit_bucket_histogram;
+  }
+
+  if (name == "base2_exponential_bucket_histogram")
+  {
+    return base2_exponential_bucket_histogram;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("ParseDefaultHistogramAggregation: name = " << name);
+  throw InvalidSchemaException("Illegal default_histogram_aggregation");
+}
+
 static std::unique_ptr<OtlpMetricExporterConfiguration> ParseOtlpMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<OtlpMetricExporterConfiguration> model(new OtlpMetricExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
 
-  OTEL_INTERNAL_LOG_ERROR("ParseOtlpMetricExporterConfiguration: FIXME");
+  model->protocol           = node->GetRequiredString("protocol");
+  model->endpoint           = node->GetRequiredString("endpoint");
+  model->certificate        = node->GetString("certificate", "");
+  model->client_key         = node->GetString("client_key", "");
+  model->client_certificate = node->GetString("client_certificate", "");
+
+  child = node->GetChildNode("headers");
+  if (child)
+  {
+    model->headers = ParseHeadersConfiguration(child);
+  }
+
+  model->compression            = node->GetString("compression", "");
+  model->timeout                = node->GetInteger("timeout", 10000);
+  model->temporality_preference = node->GetString("temporality_preference", "");
+
+  std::string default_histogram_aggregation = node->GetString("default_histogram_aggregation", "");
+  model->default_histogram_aggregation =
+      ParseDefaultHistogramAggregation(default_histogram_aggregation);
+
+  model->insecure = node->GetBoolean("insecure", false);
 
   return model;
 }
@@ -80,18 +144,20 @@ static std::unique_ptr<ConsoleMetricExporterConfiguration> ParseConsoleMetricExp
 {
   std::unique_ptr<ConsoleMetricExporterConfiguration> model(new ConsoleMetricExporterConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParseConsoleMetricExporterConfiguration: FIXME");
-
   return model;
 }
 
 static std::unique_ptr<PrometheusMetricExporterConfiguration>
-ParsePrometheusMetricExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
+ParsePrometheusMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<PrometheusMetricExporterConfiguration> model(
       new PrometheusMetricExporterConfiguration);
 
-  OTEL_INTERNAL_LOG_ERROR("ParsePrometheusMetricExporterConfiguration: FIXME");
+  model->host                = node->GetString("host", "localhost");
+  model->port                = node->GetInteger("port", 9464);
+  model->without_units       = node->GetBoolean("without_units", false);
+  model->without_type_suffix = node->GetBoolean("without_type_suffix", false);
+  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
 
   return model;
 }
@@ -215,12 +281,225 @@ static std::unique_ptr<MetricReaderConfiguration> ParseMetricReaderConfiguration
   return model;
 }
 
+static enum_instrument_type ParseInstrumentType(const std::string &name)
+{
+  if (name == "counter")
+  {
+    return counter;
+  }
+
+  if (name == "histogram")
+  {
+    return histogram;
+  }
+
+  if (name == "observable_counter")
+  {
+    return observable_counter;
+  }
+
+  if (name == "observable_gauge")
+  {
+    return observable_gauge;
+  }
+
+  if (name == "observable_up_down_counter")
+  {
+    return observable_up_down_counter;
+  }
+
+  if (name == "up_down_counter")
+  {
+    return up_down_counter;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("ParseInstrumentType: name = " << name);
+  throw InvalidSchemaException("Illegal instrument_type");
+}
+
+static std::unique_ptr<SelectorConfiguration> ParseSelectorConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SelectorConfiguration> model(new SelectorConfiguration);
+
+  model->instrument_name = node->GetString("instrument_name", "");
+
+  std::string instrument_type = node->GetString("instrument_type", "");
+  model->instrument_type      = ParseInstrumentType(instrument_type);
+
+  model->unit             = node->GetString("unit", "");
+  model->meter_name       = node->GetString("meter_name", "");
+  model->meter_version    = node->GetString("meter_version", "");
+  model->meter_schema_url = node->GetString("meter_schema_url", "");
+
+  return model;
+}
+
+static std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<DefaultAggregationConfiguration> model(new DefaultAggregationConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<DropAggregationConfiguration> ParseDropAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<DropAggregationConfiguration> model(new DropAggregationConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration>
+ParseExplicitBucketHistogramAggregationConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration> model(
+      new ExplicitBucketHistogramAggregationConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("boundaries");
+
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> attribute_key(*it);
+
+      double boundary = attribute_key->AsDouble();
+
+      model->boundaries.push_back(boundary);
+    }
+  }
+
+  model->record_min_max = node->GetBoolean("record_min_max", true);
+
+  return model;
+}
+
+static std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration>
+ParseBase2ExponentialBucketHistogramAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration> model(
+      new Base2ExponentialBucketHistogramAggregationConfiguration);
+
+  model->max_scale      = node->GetInteger("max_scale", 0);  // FIXME: default ?
+  model->max_size       = node->GetInteger("max_size", 0);   // FIXME: default ?
+  model->record_min_max = node->GetBoolean("record_min_max", true);
+
+  return model;
+}
+
+static std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<LastValueAggregationConfiguration> model(new LastValueAggregationConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<SumAggregationConfiguration> ParseSumAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SumAggregationConfiguration> model(new SumAggregationConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<AggregationConfiguration> ParseAggregationConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<AggregationConfiguration> model;
+  std::unique_ptr<DocumentNode> child;
+
+  size_t count = node->num_children();
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseAggregationConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal aggregation");
+  }
+
+  child            = node->GetChild(0);
+  std::string name = child->Key();
+
+  if (name == "default")
+  {
+    model = ParseDefaultAggregationConfiguration(child);
+  }
+  else if (name == "drop")
+  {
+    model = ParseDropAggregationConfiguration(child);
+  }
+  else if (name == "explicit_bucket_histogram")
+  {
+    model = ParseExplicitBucketHistogramAggregationConfiguration(child);
+  }
+  else if (name == "base2_exponential_bucket_histogram")
+  {
+    model = ParseBase2ExponentialBucketHistogramAggregationConfiguration(child);
+  }
+  else if (name == "last_value")
+  {
+    model = ParseLastValueAggregationConfiguration(child);
+  }
+  else if (name == "sum")
+  {
+    model = ParseSumAggregationConfiguration(child);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseAggregationConfiguration: name " << name);
+    throw InvalidSchemaException("Illegal aggregation");
+  }
+
+  return model;
+}
+
+static std::unique_ptr<StreamConfiguration> ParseStreamConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<StreamConfiguration> model(new StreamConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->name        = node->GetString("name", "");
+  model->description = node->GetString("description", "");
+
+  child = node->GetChildNode("aggregation");
+  if (child)
+  {
+    model->aggregation = ParseAggregationConfiguration(child);
+  }
+
+  child = node->GetChildNode("attribute_keys");
+
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> attribute_key(*it);
+
+      std::string name = attribute_key->AsString();
+
+      model->attribute_keys.push_back(name);
+    }
+  }
+
+  return model;
+}
+
 static std::unique_ptr<ViewConfiguration> ParseViewConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<ViewConfiguration> model(new ViewConfiguration);
+  std::unique_ptr<DocumentNode> child;
 
-  OTEL_INTERNAL_LOG_ERROR("ParseViewConfiguration: FIXME");
+  child           = node->GetRequiredChildNode("selector");
+  model->selector = ParseSelectorConfiguration(child);
+
+  child         = node->GetRequiredChildNode("stream");
+  model->stream = ParseStreamConfiguration(child);
 
   return model;
 }
@@ -248,19 +527,7 @@ static std::unique_ptr<MeterProviderConfiguration> ParseMeterProviderConfigurati
   return model;
 }
 
-#ifdef NEVER
-static std::unique_ptr<SimplePropagatorConfiguration> ParseSinglePropagatorConfiguration(
-    const std::string &name)
-{
-  std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
-
-  model->name = name;
-
-  return model;
-}
-#endif
-
-static std::unique_ptr<SimplePropagatorConfiguration> ParseSinglePropagatorConfiguration(
+static std::unique_ptr<SimplePropagatorConfiguration> ParseSimplePropagatorConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<SimplePropagatorConfiguration> model(new SimplePropagatorConfiguration);
@@ -302,43 +569,12 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
   child = node->GetChildNode("simple");
   if (child)
   {
-    return ParseSinglePropagatorConfiguration(child);
+    return ParseSimplePropagatorConfiguration(child);
   }
 
   OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: illegal propagator");
   throw InvalidSchemaException("Illegal propagator");
   return nullptr;
-
-#ifdef NEVER
-  // This is the code that complies with the current model spec
-  std::string name;
-  std::unique_ptr<DocumentNode> child;
-  size_t count = 0;
-
-  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
-  {
-    name  = it.Name();
-    child = it.Value();
-    count++;
-  }
-
-  if (count != 1)
-  {
-    OTEL_INTERNAL_LOG_ERROR("ParsePropagatorConfiguration: count " << count);
-    throw InvalidSchemaException("Illegal propagator");
-  }
-
-  if (name == "composite")
-  {
-    model = ParseCompositePropagatorConfiguration(child);
-  }
-  else
-  {
-    model = ParseSinglePropagatorConfiguration(name);
-  }
-
-  return model;
-#endif
 }
 
 static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
@@ -503,26 +739,6 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
   else
   {
     model = ParseSamplerExtensionConfiguration(name, std::move(child));
-  }
-
-  return model;
-}
-
-static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
-{
-  std::unique_ptr<HeadersConfiguration> model(new HeadersConfiguration);
-
-  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
-  {
-    std::string name                    = it.Name();
-    std::unique_ptr<DocumentNode> child = it.Value();
-    std::string string_value            = child->AsString();
-
-    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name
-                                                                  << ", value = " << string_value);
-    std::pair<std::string, std::string> entry(name, string_value);
-    model->kv_map.insert(entry);
   }
 
   return model;

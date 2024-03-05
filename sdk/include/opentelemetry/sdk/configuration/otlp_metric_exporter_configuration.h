@@ -14,6 +14,12 @@ namespace sdk
 namespace configuration
 {
 
+enum enum_default_histogram_aggregation
+{
+  explicit_bucket_histogram,
+  base2_exponential_bucket_histogram
+};
+
 class OtlpMetricExporterConfiguration : public MetricExporterConfiguration
 {
 public:
@@ -34,7 +40,7 @@ public:
   std::string compression;
   size_t timeout;
   std::string temporality_preference;
-  int default_histogram_aggregation;  // FIXME enum
+  enum_default_histogram_aggregation default_histogram_aggregation;
   bool insecure;
 };
 

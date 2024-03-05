@@ -28,6 +28,8 @@ public:
   DocumentNode()          = default;
   virtual ~DocumentNode() = default;
 
+  virtual std::string Key() const = 0;
+
   virtual bool AsBoolean()       = 0;
   virtual size_t AsInteger()     = 0;
   virtual double AsDouble()      = 0;

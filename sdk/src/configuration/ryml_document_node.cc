@@ -37,6 +37,21 @@ static void DebugNode(std::string_view name, ryml::ConstNodeRef node)
   }
 }
 
+std::string RymlDocumentNode::Key() const
+{
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::Key()");
+
+  if (!m_node.has_key())
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml: no key");
+    throw InvalidSchemaException("");
+  }
+
+  ryml::csubstr k = m_node.key();
+  std::string name(k.str, k.len);
+  return name;
+}
+
 bool RymlDocumentNode::AsBoolean()
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsBoolean()");

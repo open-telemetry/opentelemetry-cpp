@@ -20,6 +20,8 @@ public:
   RymlDocumentNode(ryml::ConstNodeRef node) : m_node(node) {}
   ~RymlDocumentNode() override = default;
 
+  std::string Key() const override;
+
   bool AsBoolean() override;
   size_t AsInteger() override;
   double AsDouble() override;
