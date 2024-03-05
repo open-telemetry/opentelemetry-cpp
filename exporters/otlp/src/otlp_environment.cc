@@ -207,6 +207,78 @@ std::string GetOtlpDefaultHttpLogsEndpoint()
   return kDefault;
 }
 
+std::string GetOtlpDefaultHttpTracesProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
+std::string GetOtlpDefaultHttpMetricsProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
+std::string GetOtlpDefaultHttpLogsProtocol()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_PROTOCOL";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_PROTOCOL";
+  constexpr char kDefault[]    = "http/protobuf";
+
+  std::string value;
+  bool exists;
+
+  exists = sdk_common::GetStringEnvironmentVariable(kSignalEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
 bool GetOtlpDefaultGrpcTracesIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcTracesEndpoint();
@@ -995,6 +1067,57 @@ OtlpHeaders GetOtlpDefaultLogsHeaders()
   constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_HEADERS";
 
   return GetHeaders(kSignalEnv, kGenericEnv);
+}
+
+std::string GetOtlpDefaultTracesCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
+std::string GetOtlpDefaultMetricsCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
+std::string GetOtlpDefaultLogsCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
 }
 
 }  // namespace otlp

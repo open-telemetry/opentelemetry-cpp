@@ -40,6 +40,7 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.ssl_cipher_suite,
                                                             options.content_type,
                                                             options.json_bytes_mapping,
+                                                            options.compression,
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
