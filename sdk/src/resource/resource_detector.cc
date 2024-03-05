@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <sstream>
 #include <string>
@@ -39,16 +40,19 @@ Resource OTELResourceDetector::Detect() noexcept
     std::string token;
     while (std::getline(iss, token, ','))
     {
-      size_t pos        = token.find('=');
-      std::string key   = token.substr(0, pos);
-      std::string value = token.substr(pos + 1);
-      attributes[key]   = value;
+      size_t pos = token.find('=');
+      if (pos != std::string::npos)
+      {
+        std::string key   = token.substr(0, pos);
+        std::string value = token.substr(pos + 1);
+        attributes[key]   = value;
+      }
     }
   }
 
   if (service_name_exists)
   {
-    attributes["service.name"] = service_name;
+    attributes[SemanticConventions::kServiceName] = service_name;
   }
 
   return Resource(attributes);
