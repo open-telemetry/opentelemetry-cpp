@@ -17,6 +17,8 @@ Increment the:
 
 * [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
+* [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
+  [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
 
 Important changes:
 
