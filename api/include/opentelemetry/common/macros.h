@@ -292,6 +292,7 @@ point.
 #  define OPENTELEMETRY_DLL_STRX(x) #x
 #  define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
 #  if defined(_MSC_VER)
+// TODO: Revisit what's broken here
 #     pragma detect_mismatch("otel_sdk_detect_mismatch", \
         "+dll:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) \
         "+stl:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_STL_VERSION) \
