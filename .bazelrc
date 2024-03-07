@@ -1,3 +1,5 @@
+common --remote_download_minimal
+
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 
@@ -6,7 +8,6 @@ common --noexperimental_merged_skyframe_analysis_execution
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 common --nolegacy_external_runfiles
-common --enable_bzlmod
 common --skip_incompatible_explicit_targets
 common --enable_platform_specific_config
 common --enable_runfiles
