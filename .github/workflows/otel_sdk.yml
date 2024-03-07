@@ -17,26 +17,27 @@ jobs:
     steps:
       - run: choco upgrade llvm
       - uses: actions/checkout@v4
-      - uses: actions/cache/restore@v4
-        with:
-          path: c:/c
-          enableCrossOsArchive: true
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
-          restore-keys: ${{ runner.os }}-bazel-
+      # - uses: actions/cache/restore@v4
+      #   with:
+      #     path: c:/c
+      #     enableCrossOsArchive: true
+      #     key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
+      #     restore-keys: ${{ runner.os }}-bazel-
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/c/d" > ../top.bazelrc
           echo "common --repository_cache=c:/c/r" >> ../top.bazelrc
           echo "startup --output_user_root=c:/b" >> ../top.bazelrc
           ./otel_sdk_build.cmd
+          tar tfv ./otel_sdk.zip
       - name: release otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: ncipollo/release-action@v1
         with:
           artifacts: ./otel_sdk.zip
-      - uses: actions/cache/save@v4
-        with:
-          path: c:/c
-          enableCrossOsArchive: true
-          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
+      # - uses: actions/cache/save@v4
+      #   with:
+      #     path: c:/c
+      #     enableCrossOsArchive: true
+      #     key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
   
