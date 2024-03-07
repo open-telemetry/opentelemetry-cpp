@@ -5,8 +5,6 @@
 
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 namespace http_common = opentelemetry::ext::http::common;
 
 inline const char *BoolToString(bool b)
