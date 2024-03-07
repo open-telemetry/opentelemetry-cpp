@@ -3,22 +3,36 @@
 
 #pragma once
 
-#if !defined(OPENTELEMETRY_LIKELY_IF) && defined(__cplusplus)
+#if !defined(OPENTELEMETRY_LIKELY) && defined(__cplusplus)
+// Only use likely with C++20
+#  if __cplusplus >= 202002L
 // GCC 9 has likely attribute but do not support declare it at the beginning of statement
-#  if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
-#    if __has_cpp_attribute(likely)
-#      define OPENTELEMETRY_LIKELY_IF(...) \
-        if (__VA_ARGS__)                   \
-        [[likely]]
-
+#    if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
+#      if __has_cpp_attribute(likely)
+#        define OPENTELEMETRY_LIKELY [[likely]]
+#      endif
 #    endif
 #  endif
 #endif
-#if !defined(OPENTELEMETRY_LIKELY_IF) && (defined(__clang__) || defined(__GNUC__))
-#  define OPENTELEMETRY_LIKELY_IF(...) if (__builtin_expect(!!(__VA_ARGS__), true))
+
+#ifndef OPENTELEMETRY_LIKELY
+#  define OPENTELEMETRY_LIKELY
 #endif
-#ifndef OPENTELEMETRY_LIKELY_IF
-#  define OPENTELEMETRY_LIKELY_IF(...) if (__VA_ARGS__)
+
+#if !defined(OPENTELEMETRY_UNLIKELY) && defined(__cplusplus)
+// Only use unlikely with C++20
+#  if __cplusplus >= 202002L
+// GCC 9 has unlikely attribute but do not support declare it at the beginning of statement
+#    if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
+#      if __has_cpp_attribute(unlikely)
+#        define OPENTELEMETRY_UNLIKELY [[unlikely]]
+#      endif
+#    endif
+#  endif
+#endif
+
+#ifndef OPENTELEMETRY_UNLIKELY
+#  define OPENTELEMETRY_UNLIKELY
 #endif
 
 /// \brief Declare variable as maybe unused

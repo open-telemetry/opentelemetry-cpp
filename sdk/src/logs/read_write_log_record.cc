@@ -158,7 +158,8 @@ const std::unordered_map<std::string, opentelemetry::common::AttributeValue>
 
 const opentelemetry::sdk::resource::Resource &ReadWriteLogRecord::GetResource() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != resource_) { return *resource_; }
+  if (nullptr != resource_)
+    OPENTELEMETRY_LIKELY { return *resource_; }
 
   return GetDefaultResource();
 }
@@ -172,7 +173,8 @@ void ReadWriteLogRecord::SetResource(
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
 ReadWriteLogRecord::GetInstrumentationScope() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_scope_) { return *instrumentation_scope_; }
+  if (nullptr != instrumentation_scope_)
+    OPENTELEMETRY_LIKELY { return *instrumentation_scope_; }
 
   return GetDefaultInstrumentationScope();
 }

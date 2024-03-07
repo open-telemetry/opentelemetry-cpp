@@ -258,13 +258,15 @@ public:
 
   inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
   {
-    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    if (!Enabled(severity))
+      OPENTELEMETRY_LIKELY { return false; }
     return EnabledImplementation(severity, event_id);
   }
 
   inline bool Enabled(Severity severity, int64_t event_id) const noexcept
   {
-    OPENTELEMETRY_LIKELY_IF(Enabled(severity) == false) { return false; }
+    if (!Enabled(severity))
+      OPENTELEMETRY_LIKELY { return false; }
     return EnabledImplementation(severity, event_id);
   }
 
