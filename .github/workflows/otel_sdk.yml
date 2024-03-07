@@ -23,17 +23,20 @@ jobs:
       #     enableCrossOsArchive: true
       #     key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
       #     restore-keys: ${{ runner.os }}-bazel-
+      - run: pwd
+      - run: dir
+      - run: dir ..
       - name: run otel_sdk_build.cmd
         run: |
           echo "build --disk_cache=c:/c/d" > ../top.bazelrc
           echo "common --repository_cache=c:/c/r" >> ../top.bazelrc
           echo "startup --output_user_root=c:/b" >> ../top.bazelrc
-          pwd
-          dir
-          ./otel_sdk_build.cmd
-          pwd
-          dir
-          tar tfv D:/a/opentelemetry-cpp/opentelemetry-cpp/otel_sdk.zip
+      - run: dir
+      - run: dir ..
+      - run: ./otel_sdk_build.cmd
+      - run: pwd
+      - run: dir
+      - run: tar tfv D:/a/opentelemetry-cpp/opentelemetry-cpp/otel_sdk.zip
       - name: release otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: ncipollo/release-action@v1
