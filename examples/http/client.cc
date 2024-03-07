@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_util.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 

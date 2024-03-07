@@ -4,7 +4,7 @@
 #pragma once
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_util.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

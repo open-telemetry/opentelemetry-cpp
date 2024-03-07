@@ -150,7 +150,7 @@ public:
           return encoded;
         }
 
-        char hex[3] = { 0 };
+        char hex[3] = {0};
         hex[0]      = encoded[++pos];
         hex[1]      = encoded[++pos];
 

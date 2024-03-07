@@ -10,7 +10,7 @@
 #endif
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_util.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 

@@ -6,7 +6,7 @@
 #include <mutex>
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_util.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
 namespace http_client = opentelemetry::ext::http::client;
