@@ -948,7 +948,7 @@ OtlpHttpClient::createSession(
 
   for (auto &header : options_.http_headers)
   {
-    request->AddHeader(header.first, 
+    request->AddHeader(header.first,
                        opentelemetry::ext::http::common::UrlDecoder::Decode(header.second));
   }
   request->SetUri(http_uri_);

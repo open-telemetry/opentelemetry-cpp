@@ -146,20 +146,20 @@ public:
 
         // Invalid input: less than two characters left after '%'
         if (encoded.size() < pos + 3) 
-	{
+        {
           return encoded;
         }
 
         char hex[3] = { 0 };
-        hex[0] = encoded[++pos];
-        hex[1] = encoded[++pos];
+        hex[0]      = encoded[++pos];
+        hex[1]      = encoded[++pos];
 
         char *endptr;
         long value = strtol(hex, &endptr, 16);
 
         // Invalid input: no valid hex characters after '%'
         if (endptr != &hex[2]) 
-	{
+        {
           return encoded;
         }
 

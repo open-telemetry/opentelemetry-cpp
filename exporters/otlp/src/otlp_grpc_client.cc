@@ -342,7 +342,7 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
 
   for (auto &header : options.metadata)
   {
-    context->AddMetadata(header.first, 
+    context->AddMetadata(header.first,
                          opentelemetry::ext::http::common::UrlDecoder::Decode(header.second));
   }
 
