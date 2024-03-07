@@ -134,37 +134,43 @@ public:
 class UrlDecoder
 {
 public:
-  static std::string Decode(const std::string& encoded)
+  static std::string Decode(const std::string &encoded)
   {
     std::string result;
     result.reserve(encoded.size());
-  
-    for (size_t pos = 0; pos < encoded.size(); pos++) {
-      if (encoded[pos] == '%') {
-  
+
+    for (size_t pos = 0; pos < encoded.size(); pos++) 
+    {
+      if (encoded[pos] == '%') 
+      {
+
         // Invalid input: less than two characters left after '%'
-        if (encoded.size() < pos + 3) {
+        if (encoded.size() < pos + 3) 
+	{
           return encoded;
         }
-  
+
         char hex[3] = { 0 };
         hex[0] = encoded[++pos];
         hex[1] = encoded[++pos];
-  
+
         char *endptr;
         long value = strtol(hex, &endptr, 16);
-  
+
         // Invalid input: no valid hex characters after '%'
-        if (endptr != &hex[2]) {
+        if (endptr != &hex[2]) 
+	{
           return encoded;
         }
-  
+
         result.push_back(static_cast<char>(value));
-      } else {
+      } 
+      else 
+      {
         result.push_back(encoded[pos]);
       }
     }
-  
+
     return result;
   }
 };

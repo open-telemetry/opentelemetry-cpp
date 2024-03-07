@@ -140,15 +140,15 @@ TEST(UrlParserTests, BasicTests)
 TEST(UrlDecoderTests, BasicTests)
 {
   std::map<std::string, std::string> testdata{
-    {"Authentication=Basic xxx", "Authentication=Basic xxx"},
-    {"Authentication=Basic%20xxx", "Authentication=Basic xxx"},
-    {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84", "öà§ÖabcdÄ"},
-    {"%2x", "%2x"},
-    {"%20", " "},
-    {"text%2", "text%2"},
+      {"Authentication=Basic xxx", "Authentication=Basic xxx"},
+      {"Authentication=Basic%20xxx", "Authentication=Basic xxx"},
+      {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84", "öà§ÖabcdÄ"},
+      {"%2x", "%2x"},
+      {"%20", " "},
+      {"text%2", "text%2"},
   };
 
-  for (auto &testsample: testdata)
+  for (auto &testsample : testdata)
   {
     ASSERT_EQ(http_common::UrlDecoder::Decode(testsample.first), testsample.second);
     ASSERT_TRUE(http_common::UrlDecoder::Decode(testsample.first) == testsample.second);
