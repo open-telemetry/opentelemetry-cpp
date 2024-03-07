@@ -137,7 +137,7 @@ TEST(UrlParserTests, BasicTests)
   }
 }
 
-TEST(UrlDecodeTests, BasicTests)
+TEST(UrlDecoderTests, BasicTests)
 {
   std::map<std::string, std::string> testdata{
     {"Authentication=Basic xxx", "Authentication=Basic xxx"},
@@ -150,7 +150,7 @@ TEST(UrlDecodeTests, BasicTests)
 
   for (auto &testsample: testdata)
   {
-    ASSERT_EQ(http_common::url_decode(testsample.first), testsample.second);
-    ASSERT_TRUE(http_common::url_decode(testsample.first) == testsample.second);
+    ASSERT_EQ(http_common::UrlDecoder::Decode(testsample.first), testsample.second);
+    ASSERT_TRUE(http_common::UrlDecoder::Decode(testsample.first) == testsample.second);
   }
 }
