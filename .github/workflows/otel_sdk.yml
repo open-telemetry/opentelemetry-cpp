@@ -31,6 +31,7 @@ jobs:
           echo "build --disk_cache=d:/d" > ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
+      - run: $rev = git rev-parse HEAD; echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"$rev`"; }" > version.c
       - run: ./otel_sdk_build.cmd
       - run: dir
       - run: tar tfv ./otel_sdk.zip

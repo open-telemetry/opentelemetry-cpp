@@ -98,6 +98,7 @@ genquery(
     srcs = [
         "all_api_includes.cc",
         "all_sdk_includes.cc",
+        "version.c",
     ],
 
     # Force generation of .pdb file for for opt builds
