@@ -21,7 +21,7 @@
 #include <unordered_set>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_util.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
@@ -342,7 +342,7 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
 
   for (auto &header : options.metadata)
   {
-    context->AddMetadata(header.first, header.second);
+    context->AddMetadata(header.first, opentelemetry::ext::http::common::url_decode(header.second));
   }
 
   return context;

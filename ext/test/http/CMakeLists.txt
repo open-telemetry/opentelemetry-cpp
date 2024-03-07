@@ -22,11 +22,11 @@ if(WITH_HTTP_CLIENT_CURL)
     TEST_LIST ${FILENAME})
 endif()
 
-set(URL_PARSER_FILENAME url_parser_test)
-add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
-target_link_libraries(${URL_PARSER_FILENAME} ${GTEST_BOTH_LIBRARIES}
+set(URL_UTIL_FILENAME url_util_test)
+add_executable(${URL_UTIL_FILENAME} ${URL_UTIL_FILENAME}.cc)
+target_link_libraries(${URL_UTIL_FILENAME} ${GTEST_BOTH_LIBRARIES}
                       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
 gtest_add_tests(
-  TARGET ${URL_PARSER_FILENAME}
+  TARGET ${URL_UTIL_FILENAME}
   TEST_PREFIX ext.http.urlparser.
-  TEST_LIST ${URL_PARSER_FILENAME})
+  TEST_LIST ${URL_UTIL_FILENAME})

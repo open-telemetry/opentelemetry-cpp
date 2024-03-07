@@ -1,9 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_util.h"
 
 #include <gtest/gtest.h>
+
+#include <iostream>
 
 namespace http_common = opentelemetry::ext::http::common;
 
@@ -132,5 +134,23 @@ TEST(UrlParserTests, BasicTests)
     ASSERT_EQ(url.scheme_, url_properties["scheme"]);
     ASSERT_EQ(url.path_, url_properties["path"]);
     ASSERT_EQ(url.query_, url_properties["query"]);
+  }
+}
+
+TEST(UrlDecodeTests, BasicTests)
+{
+  std::map<std::string, std::string> testdata{
+    {"Authentication=Basic xxx", "Authentication=Basic xxx"},
+    {"Authentication=Basic%20xxx", "Authentication=Basic xxx"},
+    {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84", "öà§ÖabcdÄ"},
+    {"%2x", "%2x"},
+    {"%20", " "},
+    {"text%2", "text%2"},
+  };
+
+  for (auto &testsample: testdata)
+  {
+    ASSERT_EQ(http_common::url_decode(testsample.first), testsample.second);
+    ASSERT_TRUE(http_common::url_decode(testsample.first) == testsample.second);
   }
 }

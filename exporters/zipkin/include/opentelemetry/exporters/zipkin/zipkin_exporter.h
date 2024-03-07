@@ -6,7 +6,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_util.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"

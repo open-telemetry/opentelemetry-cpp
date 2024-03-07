@@ -10,7 +10,7 @@
 #endif
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_util.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -948,7 +948,7 @@ OtlpHttpClient::createSession(
 
   for (auto &header : options_.http_headers)
   {
-    request->AddHeader(header.first, header.second);
+    request->AddHeader(header.first, opentelemetry::ext::http::common::url_decode(header.second));
   }
   request->SetUri(http_uri_);
   request->SetSslOptions(options_.ssl_options);

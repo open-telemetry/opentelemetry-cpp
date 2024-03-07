@@ -4,7 +4,7 @@
 #pragma once
 
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_util.h"
 #include "opentelemetry/version.h"
 
 #include <map>
