@@ -3,6 +3,82 @@
 
 #pragma once
 
+/*
+   Expected usage pattern:
+
+   if OPENTELEMETRY_LIKELY_CONDITION (ptr != nullptr)
+   {
+     do_something_likely();
+   } else {
+     do_something_unlikely();
+   }
+
+   This pattern works with gcc/clang and __builtin_expect(),
+   as well as with C++20.
+   It is unclear if __builtin_expect() will be deprecated
+   in favor of C++20 [[likely]] or not.
+
+   OPENTELEMETRY_LIKELY_CONDITION is preferred over OPENTELEMETRY_LIKELY,
+   to be revisited when C++20 is required.
+*/
+
+#if !defined(OPENTELEMETRY_LIKELY_CONDITION) && defined(__cplusplus)
+// Only use likely with C++20
+#  if __cplusplus >= 202002L
+// GCC 9 has likely attribute but do not support declare it at the beginning of statement
+#    if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
+#      if __has_cpp_attribute(likely)
+#        define OPENTELEMETRY_LIKELY_CONDITION(C) (C) [[likely]]
+#      endif
+#    endif
+#  endif
+#endif
+#if !defined(OPENTELEMETRY_LIKELY_CONDITION) && (defined(__clang__) || defined(__GNUC__))
+// Only use if supported by the compiler
+#  define OPENTELEMETRY_LIKELY_CONDITION(C) (__builtin_expect(!!(C), true))
+#endif
+#ifndef OPENTELEMETRY_LIKELY_CONDITION
+// Do not use likely annotations
+#  define OPENTELEMETRY_LIKELY_CONDITION(C) (C)
+#endif
+
+#if !defined(OPENTELEMETRY_UNLIKELY_CONDITION) && defined(__cplusplus)
+// Only use likely with C++20
+#  if __cplusplus >= 202002L
+// GCC 9 has likely attribute but do not support declare it at the beginning of statement
+#    if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
+#      if __has_cpp_attribute(unlikely)
+#        define OPENTELEMETRY_UNLIKELY_CONDITION(C) (C) [[unlikely]]
+#      endif
+#    endif
+#  endif
+#endif
+#if !defined(OPENTELEMETRY_UNLIKELY_CONDITION) && (defined(__clang__) || defined(__GNUC__))
+// Only use if supported by the compiler
+#  define OPENTELEMETRY_UNLIKELY_CONDITION(C) (__builtin_expect(!!(C), false))
+#endif
+#ifndef OPENTELEMETRY_UNLIKELY_CONDITION
+// Do not use unlikely annotations
+#  define OPENTELEMETRY_UNLIKELY_CONDITION(C) (C)
+#endif
+
+/*
+   Expected usage pattern:
+
+   if (ptr != nullptr)
+   OPENTELEMETRY_LIKELY
+   {
+     do_something_likely();
+   } else {
+     do_something_unlikely();
+   }
+
+   This pattern works starting with C++20.
+   See https://en.cppreference.com/w/cpp/language/attributes/likely
+
+   Please use OPENTELEMETRY_LIKELY_CONDITION instead for now.
+*/
+
 #if !defined(OPENTELEMETRY_LIKELY) && defined(__cplusplus)
 // Only use likely with C++20
 #  if __cplusplus >= 202002L

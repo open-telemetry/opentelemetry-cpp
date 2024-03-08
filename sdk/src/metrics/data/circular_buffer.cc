@@ -21,12 +21,11 @@ struct AdaptingIntegerArrayIncrement
   uint64_t operator()(std::vector<T> &backing)
   {
     const uint64_t result = backing[index] + count;
-    if (result <= uint64_t(std::numeric_limits<T>::max()))
-      OPENTELEMETRY_LIKELY
-      {
-        backing[index] = static_cast<T>(result);
-        return 0;
-      }
+    if OPENTELEMETRY_LIKELY_CONDITION (result <= uint64_t(std::numeric_limits<T>::max()))
+    {
+      backing[index] = static_cast<T>(result);
+      return 0;
+    }
     return result;
   }
 };
@@ -77,8 +76,10 @@ struct AdaptingIntegerArrayCopy
 void AdaptingIntegerArray::Increment(size_t index, uint64_t count)
 {
   const uint64_t result = nostd::visit(AdaptingIntegerArrayIncrement{index, count}, backing_);
-  if (result == 0)
-    OPENTELEMETRY_LIKELY { return; }
+  if OPENTELEMETRY_LIKELY_CONDITION (result == 0)
+  {
+    return;
+  }
   EnlargeToFit(result);
   Increment(index, count);
 }
