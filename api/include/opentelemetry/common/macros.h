@@ -43,9 +43,9 @@
 #endif
 
 #if !defined(OPENTELEMETRY_UNLIKELY_CONDITION) && defined(__cplusplus)
-// Only use likely with C++20
+// Only use unlikely with C++20
 #  if __cplusplus >= 202002L
-// GCC 9 has likely attribute but do not support declare it at the beginning of statement
+// GCC 9 has unlikely attribute but do not support declare it at the beginning of statement
 #    if defined(__has_cpp_attribute) && (defined(__clang__) || !defined(__GNUC__) || __GNUC__ > 9)
 #      if __has_cpp_attribute(unlikely)
 #        define OPENTELEMETRY_UNLIKELY_CONDITION(C) (C) [[unlikely]]
