@@ -27,14 +27,14 @@ TEST(AttributesHashMap, BasicTests)
   std::unique_ptr<Aggregation> aggregation1(
       new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
   hash_map.Set(m1, std::move(aggregation1), hash);
-  EXPECT_NO_THROW(hash_map.Get(hash)->Aggregate((int64_t)1));
+  EXPECT_NO_THROW(hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1)));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(hash), true);
 
   // Set same key again
   auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
   hash_map.Set(m1, std::move(aggregation2), hash);
-  EXPECT_NO_THROW(hash_map.Get(hash)->Aggregate((int64_t)1));
+  EXPECT_NO_THROW(hash_map.Get(hash)->Aggregate(static_cast<int64_t>(1)));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(hash), true);
 
@@ -45,7 +45,7 @@ TEST(AttributesHashMap, BasicTests)
   hash_map.Set(m3, std::move(aggregation3), hash3);
   EXPECT_EQ(hash_map.Has(hash), true);
   EXPECT_EQ(hash_map.Has(hash3), true);
-  EXPECT_NO_THROW(hash_map.Get(hash3)->Aggregate((int64_t)1));
+  EXPECT_NO_THROW(hash_map.Get(hash3)->Aggregate(static_cast<int64_t>(1)));
   EXPECT_EQ(hash_map.Size(), 2);
 
   // GetOrSetDefault
@@ -55,8 +55,8 @@ TEST(AttributesHashMap, BasicTests)
   };
   MetricAttributes m4 = {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
   auto hash4          = opentelemetry::sdk::common::GetHashForAttributeMap(m4);
-  EXPECT_NO_THROW(
-      hash_map.GetOrSetDefault(m4, create_default_aggregation, hash4)->Aggregate((int64_t)1));
+  EXPECT_NO_THROW(hash_map.GetOrSetDefault(m4, create_default_aggregation, hash4)
+                      ->Aggregate(static_cast<int64_t>(1)));
   EXPECT_EQ(hash_map.Size(), 3);
 
   // Set attributes with different order - shouldn't create a new entry.

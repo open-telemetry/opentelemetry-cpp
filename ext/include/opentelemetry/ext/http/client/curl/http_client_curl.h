@@ -89,6 +89,12 @@ public:
     timeout_ms_ = timeout_ms;
   }
 
+  void SetCompression(
+      const opentelemetry::ext::http::client::Compression &compression) noexcept override
+  {
+    compression_ = compression;
+  }
+
 public:
   opentelemetry::ext::http::client::Method method_;
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -96,6 +102,8 @@ public:
   opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
+  opentelemetry::ext::http::client::Compression compression_{
+      opentelemetry::ext::http::client::Compression::kNone};
 };
 
 class Response : public opentelemetry::ext::http::client::Response
@@ -220,12 +228,13 @@ public:
   opentelemetry::ext::http::client::Result Get(
       const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+      const opentelemetry::ext::http::client::Headers &headers,
+      const opentelemetry::ext::http::client::Compression &compression) noexcept override
   {
     opentelemetry::ext::http::client::Body body;
 
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
-                                 ssl_options, nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body, compression);
 
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
@@ -249,10 +258,11 @@ public:
       const nostd::string_view &url,
       const opentelemetry::ext::http::client::HttpSslOptions &ssl_options,
       const Body &body,
-      const opentelemetry::ext::http::client::Headers &headers) noexcept override
+      const opentelemetry::ext::http::client::Headers &headers,
+      const opentelemetry::ext::http::client::Compression &compression) noexcept override
   {
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
-                                 ssl_options, nullptr, headers, body);
+                                 ssl_options, nullptr, headers, body, compression);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())

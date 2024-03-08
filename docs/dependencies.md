@@ -63,6 +63,12 @@ Both these dependencies are listed here:
     - protobuf serialized otlp messages are encoded in JSON format using this
       library.
     - License: `MIT License`
+  - [zlib](https://www.zlib.net/): A Massively Spiffy Yet Delicately
+    Unobtrusive Compression Library.
+    - The `http_client` utilizes zlib to compress the message body and send
+      it in gzip format.
+    - License: The library is licensed
+      [here](https://www.zlib.net/zlib_license.html)
 
 - [OTLP/gRPC](/exporters/otlp)
   exporter:

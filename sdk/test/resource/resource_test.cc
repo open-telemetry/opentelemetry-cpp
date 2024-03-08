@@ -34,7 +34,7 @@ TEST(ResourceTest, create_without_servicename)
 {
   ResourceAttributes expected_attributes = {
       {"service", "backend"},
-      {"version", (uint32_t)1},
+      {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
       {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
       {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
@@ -42,7 +42,7 @@ TEST(ResourceTest, create_without_servicename)
       {SemanticConventions::kServiceName, "unknown_service"}};
 
   ResourceAttributes attributes = {
-      {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
   auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -67,7 +67,7 @@ TEST(ResourceTest, create_without_servicename)
 TEST(ResourceTest, create_with_servicename)
 {
   ResourceAttributes expected_attributes = {
-      {"version", (uint32_t)1},
+      {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
       {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
       {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
@@ -75,7 +75,7 @@ TEST(ResourceTest, create_with_servicename)
       {SemanticConventions::kServiceName, "backend"},
   };
   ResourceAttributes attributes = {
-      {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service.name", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
   auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -217,6 +217,30 @@ TEST(ResourceTest, OtelResourceDetector)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
+}
+
+TEST(ResourceTest, OtelResourceDetectorServiceNameOverride)
+{
+  std::map<std::string, std::string> expected_attributes = {{"service.name", "new_name"}};
+
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "service.name=old_name", 1);
+  setenv("OTEL_SERVICE_NAME", "new_name", 1);
+
+  OTELResourceDetector detector;
+  auto resource            = detector.Detect();
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+
+  unsetenv("OTEL_SERVICE_NAME");
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
 }
 

@@ -109,7 +109,7 @@ TEST(OStreamMetricsExporter, ExportHistogramPointData)
   histogram_point_data2.boundaries_ = std::vector<double>{10.0, 20.0, 30.0};
   histogram_point_data2.count_      = 3;
   histogram_point_data2.counts_     = {200, 300, 400, 500};
-  histogram_point_data2.sum_        = (int64_t)900;
+  histogram_point_data2.sum_        = static_cast<int64_t>(900);
   metric_sdk::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       opentelemetry::sdk::resource::ResourceAttributes{});
@@ -191,7 +191,7 @@ TEST(OStreamMetricsExporter, ExportLastValuePointData)
   last_value_point_data.is_lastvalue_valid_ = true;
   last_value_point_data.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::LastValuePointData last_value_point_data2{};
-  last_value_point_data2.value_              = (int64_t)20;
+  last_value_point_data2.value_              = static_cast<int64_t>(20);
   last_value_point_data2.is_lastvalue_valid_ = true;
   last_value_point_data2.sample_ts_          = opentelemetry::common::SystemTimestamp{};
   metric_sdk::MetricData metric_data{
