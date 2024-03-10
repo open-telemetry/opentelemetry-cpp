@@ -168,8 +168,8 @@ void BatchLogRecordProcessor::Export()
   {
     std::vector<std::unique_ptr<Recordable>> records_arr;
     size_t num_records_to_export;
-    std::uint64_t notify_force_flush = synchronization_data_->force_flush_pending_sequence.exchange(
-        false, std::memory_order_acq_rel);
+    std::uint64_t notify_force_flush =
+        synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
     if (notify_force_flush)
     {
       num_records_to_export = buffer_.size();
