@@ -76,23 +76,27 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   // Now wait for the worker thread to signal back from the Export method
   std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
 
-  synchronization_data_->is_force_flush_pending.store(true, std::memory_order_release);
+  std::uint64_t current_sequence =
+      synchronization_data_->force_flush_pending_sequence.fetch_add(1, std::memory_order_release) +
+      1;
   synchronization_data_->force_flush_timeout_us.store(timeout.count(), std::memory_order_release);
-  auto break_condition = [this]() {
+  auto break_condition = [this, current_sequence]() {
     if (synchronization_data_->is_shutdown.load() == true)
     {
       return true;
     }
 
     // Wake up the worker thread once.
-    if (synchronization_data_->is_force_flush_pending.load(std::memory_order_acquire))
+    if (synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) >
+        synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
       synchronization_data_->is_force_wakeup_background_worker.store(true,
                                                                      std::memory_order_release);
       synchronization_data_->cv.notify_one();
     }
 
-    return synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
+    return synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) >=
+           current_sequence;
   };
 
   // Fix timeout to meet requirement of wait_for
@@ -108,34 +112,17 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
   bool result = false;
   while (!result && timeout_steady > std::chrono::steady_clock::duration::zero())
   {
-    // When is_force_flush_notified.store(true) and force_flush_cv.notify_all() is called
-    // between is_force_flush_pending.load() and force_flush_cv.wait(). We must not wait
-    // for ever
+    // When force_flush_notified_sequence.compare_exchange_strong(...) and
+    // force_flush_cv.notify_all() is called between force_flush_pending_sequence.load(...) and
+    // force_flush_cv.wait(). We must not wait for ever
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
     result = synchronization_data_->force_flush_cv.wait_for(lk_cv, schedule_delay_millis_,
                                                             break_condition);
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  // If it will be already signaled, we must wait util notified.
-  // We use a spin lock here
-  if (false ==
-      synchronization_data_->is_force_flush_pending.exchange(false, std::memory_order_acq_rel))
-  {
-    for (int retry_waiting_times = 0;
-         false == synchronization_data_->is_force_flush_notified.load(std::memory_order_acquire);
-         ++retry_waiting_times)
-    {
-      opentelemetry::common::SpinLockMutex::fast_yield();
-      if ((retry_waiting_times & 127) == 127)
-      {
-        std::this_thread::yield();
-      }
-    }
-  }
-  synchronization_data_->is_force_flush_notified.store(false, std::memory_order_release);
-
-  return result;
+  return synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) >=
+         current_sequence;
 }
 
 void BatchSpanProcessor::DoBackgroundWork()
@@ -179,8 +166,8 @@ void BatchSpanProcessor::Export()
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
     size_t num_records_to_export;
-    bool notify_force_flush =
-        synchronization_data_->is_force_flush_pending.exchange(false, std::memory_order_acq_rel);
+    std::uint64_t notify_force_flush =
+        synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
     if (notify_force_flush)
     {
       num_records_to_export = buffer_.size();
@@ -212,7 +199,7 @@ void BatchSpanProcessor::Export()
 }
 
 void BatchSpanProcessor::NotifyCompletion(
-    bool notify_force_flush,
+    std::uint64_t notify_force_flush,
     const std::unique_ptr<SpanExporter> &exporter,
     const std::shared_ptr<SynchronizationData> &synchronization_data)
 {
@@ -221,7 +208,8 @@ void BatchSpanProcessor::NotifyCompletion(
     return;
   }
 
-  if (notify_force_flush)
+  if (notify_force_flush >
+      synchronization_data->force_flush_notified_sequence.load(std::memory_order_acquire))
   {
     if (exporter)
     {
@@ -232,8 +220,14 @@ void BatchSpanProcessor::NotifyCompletion(
       exporter->ForceFlush(timeout);
     }
 
-    synchronization_data->is_force_flush_notified.store(true, std::memory_order_release);
-    synchronization_data->force_flush_cv.notify_one();
+    std::uint64_t notified_sequence =
+        synchronization_data->force_flush_notified_sequence.load(std::memory_order_acquire);
+    while (notify_force_flush > notified_sequence)
+    {
+      synchronization_data->force_flush_notified_sequence.compare_exchange_strong(
+          notified_sequence, notify_force_flush, std::memory_order_acq_rel);
+      synchronization_data->force_flush_cv.notify_all();
+    }
   }
 }
 
@@ -242,7 +236,8 @@ void BatchSpanProcessor::DrainQueue()
   while (true)
   {
     if (buffer_.empty() &&
-        false == synchronization_data_->is_force_flush_pending.load(std::memory_order_acquire))
+        synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) <=
+            synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
       break;
     }
