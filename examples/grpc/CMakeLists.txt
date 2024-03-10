@@ -5,7 +5,7 @@
 get_filename_component(proto_file "./protos/messages.proto" ABSOLUTE)
 get_filename_component(proto_file_path "${proto_file}" PATH)
 
-message("PATH:${proto_file_path}:${proto_file}")
+message(STATUS "PATH:${proto_file_path}:${proto_file}")
 # Generated sources
 set(example_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/messages.pb.cc")
 set(example_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/messages.pb.h")
