@@ -220,6 +220,30 @@ TEST(ResourceTest, OtelResourceDetector)
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
 }
 
+TEST(ResourceTest, OtelResourceDetectorServiceNameOverride)
+{
+  std::map<std::string, std::string> expected_attributes = {{"service.name", "new_name"}};
+
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "service.name=old_name", 1);
+  setenv("OTEL_SERVICE_NAME", "new_name", 1);
+
+  OTELResourceDetector detector;
+  auto resource            = detector.Detect();
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+
+  unsetenv("OTEL_SERVICE_NAME");
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
+}
+
 TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 {
   std::map<std::string, std::string> expected_attributes = {};
