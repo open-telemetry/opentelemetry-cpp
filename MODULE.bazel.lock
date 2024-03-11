@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "25ea974ba3cfa14b5f22e01a0f528b44d6f3f8e179e502a52d5b067d42eeee49",
+  "moduleFileHash": "8d454242bd7ea74b206382ec1eaac414b7f727d8f4aa0f56a7f35fc15864b104",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -30,18 +30,18 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 52,
+            "line": 59,
             "column": 18
           },
           "imports": {
             "curl": "curl",
-            "sentry_cli_windows_amd64": "sentry_cli_windows_amd64",
+            "ftxui": "ftxui",
+            "graf_w64": "graf_w64",
             "loki_w64": "loki_w64",
-            "tempo_w64": "tempo_w64",
             "otel_w64": "otel_w64",
             "prom_w64": "prom_w64",
-            "graf_w64": "graf_w64",
-            "ftxui": "ftxui"
+            "sentry_cli_windows_amd64": "sentry_cli_windows_amd64",
+            "tempo_w64": "tempo_w64"
           },
           "devImports": [],
           "tags": [],
@@ -2844,6 +2844,31 @@
             "bzlFile": "@@bazel_tools//tools/sh:sh_configure.bzl",
             "ruleClassName": "sh_config",
             "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
+    "@@buildozer~//:buildozer_binary.bzl%buildozer_binary": {
+      "general": {
+        "bzlTransitiveDigest": "EleDU/FQ1+e/RgkW3aIDmdaxZEthvoWQhsqFTxiSgMI=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "buildozer_binary": {
+            "bzlFile": "@@buildozer~//private:buildozer_binary.bzl",
+            "ruleClassName": "_buildozer_binary_repo",
+            "attributes": {
+              "sha256": {
+                "darwin-amd64": "d29e347ecd6b5673d72cb1a8de05bf1b06178dd229ff5eb67fad5100c840cc8e",
+                "darwin-arm64": "9b9e71bdbec5e7223871e913b65d12f6d8fa026684daf991f00e52ed36a6978d",
+                "linux-amd64": "8dfd6345da4e9042daa738d7fdf34f699c5dfce4632f7207956fceedd8494119",
+                "linux-arm64": "6559558fded658c8fa7432a9d011f7c4dcbac6b738feae73d2d5c352e5f605fa",
+                "windows-amd64": "e7f05bf847f7c3689dd28926460ce6e1097ae97380ac8e6ae7147b7b706ba19b"
+              },
+              "version": "6.4.0"
+            }
           }
         },
         "recordedRepoMappingEntries": []
