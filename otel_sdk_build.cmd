@@ -18,16 +18,16 @@ set PATH=%__COMSPEC_DIR__%;%__PYTHON_DIR__%
 pushd "%~dp0"
 
 REM singleton_test does not work when linked as static under Windows
-"%__BAZEL__%" test --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
+"%__BAZEL__%" test --//:with_dll=false %* -- ... -//api/test/singleton:singleton_test || goto:error
 
 REM Exclude building otel_sdk_zip right now, do it later. This warms up the tests bellow
-"%__BAZEL__%" build --//:with_dll=true -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" build %* --//:with_dll=true -- ... -otel_sdk_zip || goto:error
 
-"%__BAZEL__%" test --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test %* --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test %* --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
+"%__BAZEL__%" test %* --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
 
-"%__BAZEL__%" build --//:with_dll=true otel_sdk_zip || goto:error
+"%__BAZEL__%" build %* --//:with_dll=true otel_sdk_zip || goto:error
 
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
