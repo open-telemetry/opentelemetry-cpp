@@ -132,8 +132,9 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     return force_flush_notified_sequence_.load(std::memory_order_acquire) >= current_sequence;
   };
 
-  auto wait_timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
-      timeout, std::chrono::microseconds::zero());
+  std::chrono::microseconds wait_timeout =
+      opentelemetry::common::DurationUtil::AdjustWaitForTimeout(timeout,
+                                                                std::chrono::microseconds::zero());
   std::chrono::steady_clock::duration timeout_steady =
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(wait_timeout);
   if (timeout_steady <= std::chrono::steady_clock::duration::zero())
@@ -148,7 +149,13 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     // force_flush_cv_.notify_all() is called between force_flush_pending_sequence_.load(...) and
     // force_flush_cv_.wait(). We must not wait for ever
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
-    result = force_flush_cv_.wait_for(lk_cv, export_interval_millis_, break_condition);
+
+    wait_timeout = export_interval_millis_;
+    if (wait_timeout > timeout_steady)
+    {
+      wait_timeout = std::chrono::duration_cast<std::chrono::microseconds>(timeout_steady);
+    }
+    result = force_flush_cv_.wait_for(lk_cv, wait_timeout, break_condition);
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 

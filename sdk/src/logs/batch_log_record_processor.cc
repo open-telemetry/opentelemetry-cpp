@@ -118,8 +118,13 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
     // force_flush_cv.notify_all() is called between force_flush_pending_sequence.load(...) and
     // force_flush_cv.wait(). We must not wait for ever
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
-    result = synchronization_data_->force_flush_cv.wait_for(lk_cv, scheduled_delay_millis_,
-                                                            break_condition);
+    std::chrono::microseconds wait_timeout                = scheduled_delay_millis_;
+
+    if (wait_timeout > timeout_steady)
+    {
+      wait_timeout = std::chrono::duration_cast<std::chrono::microseconds>(timeout_steady);
+    }
+    result = synchronization_data_->force_flush_cv.wait_for(lk_cv, wait_timeout, break_condition);
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
