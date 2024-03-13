@@ -1,1 +1,0 @@
-# Dummy WORKSPACE so that CLion's IntelliJ plugin can work

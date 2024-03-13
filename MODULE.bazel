@@ -32,17 +32,13 @@ archive_override(
     ],
 )
 
-bazel_dep(name = "prometheus-cpp", version = "1.2.3", repo_name = "com_github_jupp0r_prometheus_cpp")
+bazel_dep(name = "prometheus-cpp", version = "1.2.4", repo_name = "com_github_jupp0r_prometheus_cpp")
 archive_override(
     module_name = "prometheus-cpp",
-    integrity = "sha256-VeIKdR/CWf7WpDjoz1o8vOvjqpP4OqTqjYgKdQgQyu4=",
-    patch_strip = 1,
-    patches = [
-        "bazel/prometheus.patch",
-    ],
+    integrity = "sha256-DWhSKRBjw1hT6IgFxztS9zwMCLeMHnvE1Yj89ypxcus=",
     strip_prefix = "prometheus-cpp-with-submodules",
     urls = [
-        "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.3/prometheus-cpp-with-submodules.tar.gz",
+        "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.4/prometheus-cpp-with-submodules.tar.gz",
     ],
 )
 
@@ -65,4 +61,15 @@ use_repo(
     "prom_w64",
     "sentry_cli_windows_amd64",
     "tempo_w64",
+)
+
+cc_configure = use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension")
+use_repo(cc_configure, "local_config_cc")
+
+register_execution_platforms(
+    "@//:x64_windows-clang-cl",
+)
+
+register_toolchains(
+    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
 )
