@@ -16,8 +16,8 @@ jobs:
       contents: write
     steps:
       - run: ls env:* | Format-Table -AutoSize
-      - run: choco upgrade llvm --version 18.1.0
       - run: choco install bazelisk
+      - run: choco upgrade llvm --version 18.1.0
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
