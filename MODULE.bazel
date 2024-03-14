@@ -68,6 +68,7 @@ use_repo(cc_configure, "local_config_cc", "local_config_cc_toolchains")
 
 register_execution_platforms(
     "@//:x64_windows-clang-cl",
+    "@local_config_platform//:host",
 )
 
 register_toolchains(
