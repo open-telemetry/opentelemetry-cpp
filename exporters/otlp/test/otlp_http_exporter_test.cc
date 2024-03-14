@@ -70,7 +70,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       "",                                 /* ssl_max_tls */
       "",                                 /* ssl_cipher */
       "",                                 /* ssl_cipher_suite */
-      options.content_type, options.json_bytes_mapping, options.use_json_name,
+      options.content_type, options.json_bytes_mapping, options.compression, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
   if (!async_mode)
   {
@@ -522,6 +522,12 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
+TEST(OtlpHttpExporterTest, ConfigDefaultProtocolTest)
+{
+  OtlpHttpExporterOptions opts;
+  EXPECT_EQ(opts.content_type, HttpRequestContentType::kBinary);
+}
+
 #  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
@@ -531,6 +537,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
+  setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/json", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -557,11 +564,13 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
+  EXPECT_EQ(GetOptions(exporter).content_type, HttpRequestContentType::kJson);
 
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_PROTOCOL");
 }
 
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
@@ -571,6 +580,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   setenv("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT", "1eternity", 1);
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "http/json", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -597,11 +607,13 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
+  EXPECT_EQ(GetOptions(exporter).content_type, HttpRequestContentType::kJson);
 
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL");
 }
 #  endif
 

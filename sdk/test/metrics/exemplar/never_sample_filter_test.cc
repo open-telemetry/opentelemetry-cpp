@@ -12,6 +12,6 @@ TEST(NeverSampleFilter, SampleMeasurement)
   auto filter = opentelemetry::sdk::metrics::ExemplarFilter::GetNeverSampleFilter();
   ASSERT_FALSE(
       filter->ShouldSampleMeasurement(1.0, MetricAttributes{}, opentelemetry::context::Context{}));
-  ASSERT_FALSE(filter->ShouldSampleMeasurement((int64_t)1, MetricAttributes{},
+  ASSERT_FALSE(filter->ShouldSampleMeasurement(static_cast<int64_t>(1), MetricAttributes{},
                                                opentelemetry::context::Context{}));
 }

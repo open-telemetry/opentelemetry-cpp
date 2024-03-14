@@ -18,7 +18,10 @@ namespace otlp
 
 const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != resource_) { return *resource_; }
+  if OPENTELEMETRY_LIKELY_CONDITION (nullptr != resource_)
+  {
+    return *resource_;
+  }
 
   return opentelemetry::sdk::logs::ReadableLogRecord::GetDefaultResource();
 }
@@ -26,7 +29,10 @@ const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() c
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
 OtlpLogRecordable::GetInstrumentationScope() const noexcept
 {
-  OPENTELEMETRY_LIKELY_IF(nullptr != instrumentation_scope_) { return *instrumentation_scope_; }
+  if OPENTELEMETRY_LIKELY_CONDITION (nullptr != instrumentation_scope_)
+  {
+    return *instrumentation_scope_;
+  }
 
   return opentelemetry::sdk::logs::ReadableLogRecord::GetDefaultInstrumentationScope();
 }

@@ -55,7 +55,7 @@ void do_something()
   void *component_g = dlopen("libcomponent_g.so", RTLD_NOW);
   EXPECT_NE(component_g, nullptr);
 
-  auto *func_g = (void (*)())dlsym(component_g, "do_something_in_g");
+  auto *func_g = reinterpret_cast<void (*)()>(dlsym(component_g, "do_something_in_g"));
   EXPECT_NE(func_g, nullptr);
 
   (*func_g)();
@@ -67,7 +67,7 @@ void do_something()
   void *component_h = dlopen("libcomponent_h.so", RTLD_NOW);
   EXPECT_NE(component_h, nullptr);
 
-  auto *func_h = (void (*)())dlsym(component_h, "do_something_in_h");
+  auto *func_h = reinterpret_cast<void (*)()>(dlsym(component_h, "do_something_in_h"));
   EXPECT_NE(func_h, nullptr);
 
   (*func_h)();

@@ -40,9 +40,10 @@ public:
     {
       double random_incr = (rand() % 5) + 1.1;
       value_ += random_incr;
+      std::map<std::string, std::string> labels = get_random_attr();
       nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
           observer_result)
-          ->Observe(value_ /*, labelkv */);
+          ->Observe(value_, labels);
     }
   }
   static double value_;

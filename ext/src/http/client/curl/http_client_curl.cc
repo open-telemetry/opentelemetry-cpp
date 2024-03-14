@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+#  include <zlib.h>
+#endif
 
 #include <list>
 
@@ -48,10 +53,53 @@ void Session::SendRequest(
     reuse_connection = session_id_ % http_client_.GetMaxSessionsPerConnection() != 0;
   }
 
+  if (http_request_->compression_ == opentelemetry::ext::http::client::Compression::kGzip)
+  {
+#ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+    http_request_->AddHeader("Content-Encoding", "gzip");
+
+    opentelemetry::ext::http::client::Body compressed_body(http_request_->body_.size());
+    z_stream zs;
+    zs.zalloc    = Z_NULL;
+    zs.zfree     = Z_NULL;
+    zs.opaque    = Z_NULL;
+    zs.avail_in  = static_cast<uInt>(http_request_->body_.size());
+    zs.next_in   = http_request_->body_.data();
+    zs.avail_out = static_cast<uInt>(compressed_body.size());
+    zs.next_out  = compressed_body.data();
+
+    // ZLIB: Have to maually specify 16 bits for the Gzip headers
+    const int window_bits = 15 + 16;
+
+    int stream =
+        deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, window_bits, 8, Z_DEFAULT_STRATEGY);
+
+    if (stream == Z_OK)
+    {
+      deflate(&zs, Z_FINISH);
+      deflateEnd(&zs);
+      compressed_body.resize(zs.total_out);
+      http_request_->SetBody(compressed_body);
+    }
+    else
+    {
+      if (callback)
+      {
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+      }
+      is_session_active_.store(false, std::memory_order_release);
+    }
+#else
+    OTEL_INTERNAL_LOG_ERROR(
+        "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
+        "OTLP HTTP Exporter");
+#endif
+  }
+
   curl_operation_.reset(new HttpOperation(http_request_->method_, url, http_request_->ssl_options_,
                                           callback_ptr, http_request_->headers_,
-                                          http_request_->body_, false, http_request_->timeout_ms_,
-                                          reuse_connection));
+                                          http_request_->body_, http_request_->compression_, false,
+                                          http_request_->timeout_ms_, reuse_connection));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         if (operation.WasAborted())

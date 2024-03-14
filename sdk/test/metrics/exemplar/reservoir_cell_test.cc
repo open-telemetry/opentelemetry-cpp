@@ -41,7 +41,7 @@ public:
 TEST_F(ReservoirCellTestPeer, recordMeasurement)
 {
   opentelemetry::sdk::metrics::ReservoirCell reservoir_cell;
-  reservoir_cell.RecordLongMeasurement((int64_t)1, MetricAttributes{},
+  reservoir_cell.RecordLongMeasurement(static_cast<int64_t>(1), MetricAttributes{},
                                        opentelemetry::context::Context{});
   ASSERT_TRUE(GetLongVal(reservoir_cell) == 1);
 

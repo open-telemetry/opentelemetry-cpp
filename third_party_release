@@ -22,4 +22,4 @@ nlohmann-json=v3.11.2
 opentelemetry-proto=v1.1.0
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.1.0
-vcpkg=2023.10.19
+vcpkg=2024.02.14

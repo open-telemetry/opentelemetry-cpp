@@ -261,21 +261,21 @@ static int Base64UnescapeInternal(unsigned char *dst,
     if (++n == 4)
     {
       n    = 0;
-      *p++ = (unsigned char)(x >> 16);
-      *p++ = (unsigned char)(x >> 8);
-      *p++ = (unsigned char)(x);
+      *p++ = static_cast<unsigned char>(x >> 16);
+      *p++ = static_cast<unsigned char>(x >> 8);
+      *p++ = static_cast<unsigned char>(x);
     }
   }
 
   // no padding, the tail code
   if (n == 2)
   {
-    *p++ = (unsigned char)(x >> 4);
+    *p++ = static_cast<unsigned char>(x >> 4);
   }
   else if (n == 3)
   {
-    *p++ = (unsigned char)(x >> 10);
-    *p++ = (unsigned char)(x >> 2);
+    *p++ = static_cast<unsigned char>(x >> 10);
+    *p++ = static_cast<unsigned char>(x >> 2);
   }
 
   *olen = static_cast<std::size_t>(p - dst);

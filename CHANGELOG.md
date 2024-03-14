@@ -17,6 +17,28 @@ Increment the:
 
 * [EXPORTER] Add OTLP File exporters
   [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
+* [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
+  [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
+* [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
+  [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
+
+Important changes:
+
+* [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
+  [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
+  * In the `OtlpHttpExporterOptions` and `OtlpGrpcExporterOptions`, a new
+    field called compression has been introduced. This field can be set
+    to "gzip” to enable gzip compression.
+  * The CMake option `WITH_OTLP_HTTP_COMPRESSION` is introduced to enable
+    gzip compression support for the OTLP HTTP Exporter and includes a
+    dependency on zlib.
+* [SDK] Change OTLP HTTP content_type default to binary
+  [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+
+## [1.14.2] 2024-02-27
+
+* [SDK] Fix observable attributes drop
+   [#2557](https://github.com/open-telemetry/opentelemetry-cpp/pull/2557)
 
 ## [1.14.1] 2024-02-23
 

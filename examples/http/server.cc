@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    server_port = (uint16_t)atoi(argv[1]);
+    server_port = static_cast<uint16_t>(atoi(argv[1]));
   }
 
   HttpServer http_server(server_name, server_port);

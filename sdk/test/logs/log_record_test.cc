@@ -52,7 +52,7 @@ TEST(ReadWriteLogRecord, SetAndGet)
   record.SetSeverity(logs_api::Severity::kInvalid);
   record.SetBody("Message");
   record.SetResource(resource);
-  record.SetAttribute("attr1", (int64_t)314159);
+  record.SetAttribute("attr1", static_cast<int64_t>(314159));
   record.SetTraceId(trace_id);
   record.SetSpanId(span_id);
   record.SetTraceFlags(trace_flags);

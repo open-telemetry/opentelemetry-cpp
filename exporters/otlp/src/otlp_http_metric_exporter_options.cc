@@ -17,7 +17,7 @@ namespace otlp
 OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
 {
   url                     = GetOtlpDefaultMetricsEndpoint();
-  content_type            = HttpRequestContentType::kJson;
+  content_type            = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpMetricsProtocol());
   json_bytes_mapping      = JsonBytesMappingKind::kHexId;
   use_json_name           = false;
   console_debug           = false;
@@ -42,6 +42,8 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
   ssl_max_tls      = GetOtlpDefaultMetricsSslTlsMaxVersion();
   ssl_cipher       = GetOtlpDefaultMetricsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultMetricsSslTlsCipherSuite();
+
+  compression = GetOtlpDefaultMetricsCompression();
 }
 
 OtlpHttpMetricExporterOptions::~OtlpHttpMetricExporterOptions() {}
