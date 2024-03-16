@@ -65,14 +65,14 @@ public:
   bool record_min_max_            = true;
 };
 
-class ExponentialHistogramPointData
+class Base2ExponentialHistogramPointData
 {
 public:
   // TODO: remove ctors and initializers when GCC<5 stops shipping on Ubuntu
-  ExponentialHistogramPointData(ExponentialHistogramPointData &&) = default;
-  ExponentialHistogramPointData &operator=(ExponentialHistogramPointData &&) = default;
-  ExponentialHistogramPointData(const ExponentialHistogramPointData &)       = default;
-  ExponentialHistogramPointData()                                            = default;
+  Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&) = default;
+  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) = default;
+  Base2ExponentialHistogramPointData(const Base2ExponentialHistogramPointData &)       = default;
+  Base2ExponentialHistogramPointData()                                            = default;
 
   uint64_t count_      = {};
   double sum_          = {};

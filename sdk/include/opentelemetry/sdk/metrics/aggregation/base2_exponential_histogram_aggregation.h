@@ -21,6 +21,7 @@ class Base2ExponentialHistogramAggregation : public Aggregation
 {
 public:
   Base2ExponentialHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
+  Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData point_data);
 
   void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
@@ -39,13 +40,11 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  Base2ExponentialHistogramAggregation(ExponentialHistogramPointData point_data);
-
   void AggregateIntoBuckets(AdaptingCircularBufferCounter *buckets, double value) noexcept;
   void Downscale(uint32_t by) noexcept;
 
   mutable opentelemetry::common::SpinLockMutex lock_;
-  ExponentialHistogramPointData point_data_;
+  Base2ExponentialHistogramPointData point_data_;
   Base2ExponentialHistogramIndexer indexer_;
 };
 

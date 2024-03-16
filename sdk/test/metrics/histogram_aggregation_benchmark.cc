@@ -109,7 +109,7 @@ void BM_Base2ExponentialHistogramAggregation(benchmark::State &state)
   std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
   views->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                  std::move(histogram_view));
-  HistogramAggregation<ExponentialHistogramPointData>(state, std::move(views));
+  HistogramAggregation<Base2ExponentialHistogramPointData>(state, std::move(views));
 }
 
 BENCHMARK(BM_Base2ExponentialHistogramAggregation);
@@ -129,7 +129,7 @@ void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state)
   std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
   views->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                  std::move(histogram_view));
-  HistogramAggregation<ExponentialHistogramPointData>(state, std::move(views));
+  HistogramAggregation<Base2ExponentialHistogramPointData>(state, std::move(views));
 }
 
 BENCHMARK(BM_Base2ExponentialHistogramAggregationZeroScale);

@@ -144,6 +144,9 @@ public:
           return std::unique_ptr<Aggregation>(
               new DoubleHistogramAggregation(nostd::get<HistogramPointData>(point_data)));
         }
+      case AggregationType::kBase2ExponentialHistogram:
+        return std::unique_ptr<Aggregation>(new Base2ExponentialHistogramAggregation(
+            nostd::get<Base2ExponentialHistogramPointData>(point_data)));
       case AggregationType::kLastValue:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
