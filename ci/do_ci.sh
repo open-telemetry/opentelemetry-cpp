@@ -120,6 +120,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -140,6 +141,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -161,6 +163,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
   make test
@@ -182,6 +185,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -229,6 +233,19 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cmake ${CMAKE_OPTIONS[@]}  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX20 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++23.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX23 \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"
@@ -267,7 +284,20 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=ON \
+        -DWITH_STL=CXX20 \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake ${CMAKE_OPTIONS[@]}  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_STL=CXX23 \
         ${IWYU} \
         "${SRC_DIR}"
   eval "$MAKE_COMMAND"

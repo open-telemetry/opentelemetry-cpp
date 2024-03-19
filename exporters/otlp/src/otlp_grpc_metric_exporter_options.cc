@@ -29,6 +29,13 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   user_agent = GetOtlpDefaultUserAgent();
 
   aggregation_temporality = PreferredAggregationTemporality::kCumulative;
+
+  max_threads = 0;
+
+  compression = GetOtlpDefaultMetricsCompression();
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = 64;
+#endif
 }
 
 OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}

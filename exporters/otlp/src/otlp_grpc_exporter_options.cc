@@ -29,6 +29,13 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
   timeout    = GetOtlpDefaultTracesTimeout();
   metadata   = GetOtlpDefaultTracesHeaders();
   user_agent = GetOtlpDefaultUserAgent();
+
+  max_threads = 0;
+
+  compression = GetOtlpDefaultTracesCompression();
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = 64;
+#endif
 }
 
 OtlpGrpcExporterOptions::~OtlpGrpcExporterOptions() {}

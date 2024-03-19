@@ -100,6 +100,9 @@ struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
 
   /** TLS cipher suite. */
   std::string ssl_cipher_suite;
+
+  /** Compression type. */
+  std::string compression;
 };
 
 }  // namespace otlp

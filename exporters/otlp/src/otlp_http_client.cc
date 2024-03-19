@@ -948,7 +948,8 @@ OtlpHttpClient::createSession(
 
   for (auto &header : options_.http_headers)
   {
-    request->AddHeader(header.first, header.second);
+    request->AddHeader(header.first,
+                       opentelemetry::ext::http::common::UrlDecoder::Decode(header.second));
   }
   request->SetUri(http_uri_);
   request->SetSslOptions(options_.ssl_options);
@@ -957,6 +958,11 @@ OtlpHttpClient::createSession(
   request->SetBody(body_vec);
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
+
+  if (options_.compression == "gzip")
+  {
+    request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  }
 
   // Returns the created session data
   return HttpSessionData{

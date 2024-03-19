@@ -348,6 +348,8 @@ int test_range_tls_13_10();
 int test_range_tls_13_11();
 int test_range_tls_13_12();
 
+int test_gzip_compression();
+
 static const test_case all_tests[] = {{"basic", test_basic},
                                       {"cert-not-found", test_cert_not_found},
                                       {"cert-invalid", test_cert_invalid},
@@ -387,6 +389,7 @@ static const test_case all_tests[] = {{"basic", test_basic},
                                       {"range-tls-13-10", test_range_tls_13_10},
                                       {"range-tls-13-11", test_range_tls_13_11},
                                       {"range-tls-13-12", test_range_tls_13_12},
+                                      {"gzip-compression", test_gzip_compression},
                                       {"", nullptr}};
 
 void list_test_cases()
@@ -1789,6 +1792,39 @@ int test_range_tls_13_12()
   if (!opt_secure && (opt_mode == MODE_HTTPS))
   {
     return expect_export_failed();
+  }
+
+  // Impossible
+  return expect_connection_failed();
+}
+
+int test_gzip_compression()
+{
+  otlp::OtlpHttpExporterOptions opts;
+
+  set_common_opts(opts);
+  opts.compression = "gzip";
+
+  instrumented_payload(opts);
+
+  if (opt_mode == MODE_NONE)
+  {
+    return expect_connection_failed();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_success();
+  }
+
+  if (!opt_secure && (opt_mode == MODE_HTTPS))
+  {
+    return expect_export_failed();
+  }
+
+  if (opt_secure && (opt_mode == MODE_HTTP))
+  {
+    return expect_connection_failed();
   }
 
   // Impossible

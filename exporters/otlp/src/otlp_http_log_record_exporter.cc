@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -42,6 +43,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(
                                                             options.ssl_cipher_suite,
                                                             options.content_type,
                                                             options.json_bytes_mapping,
+                                                            options.compression,
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
@@ -85,7 +87,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   if (http_client_->IsShutdown())
   {
     std::size_t log_count = logs.size();
-    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+    OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
                             << log_count << " log(s) failed, exporter is shutdown");
     return opentelemetry::sdk::common::ExportResult::kFailure;
   }
@@ -94,34 +96,44 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
-  proto::collector::logs::v1::ExportLogsServiceRequest service_request;
-  OtlpRecordableUtils::PopulateRequest(logs, &service_request);
+
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
+
+  proto::collector::logs::v1::ExportLogsServiceRequest *service_request =
+      google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(&arena);
+  OtlpRecordableUtils::PopulateRequest(logs, service_request);
   std::size_t log_count = logs.size();
 #ifdef ENABLE_ASYNC_EXPORT
-  http_client_->Export(
-      service_request, [log_count](opentelemetry::sdk::common::ExportResult result) {
-        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-        {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
-                                  << log_count << " log(s) error: " << static_cast<int>(result));
-        }
-        else
-        {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << log_count << " log(s) success");
-        }
-        return true;
-      });
+  http_client_->Export(*service_request, [log_count](
+                                             opentelemetry::sdk::common::ExportResult result) {
+    if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
+                              << log_count << " log(s) error: " << static_cast<int>(result));
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG HTTP Exporter] Export " << log_count << " log(s) success");
+    }
+    return true;
+  });
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  opentelemetry::sdk::common::ExportResult result = http_client_->Export(service_request);
+  opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
   if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] ERROR: Export "
+    OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
                             << log_count << " log(s) error: " << static_cast<int>(result));
   }
   else
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export " << log_count << " log(s) success");
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG HTTP Exporter] Export " << log_count << " log(s) success");
   }
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #endif
