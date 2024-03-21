@@ -25,7 +25,7 @@ function run_benchmarks
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   mkdir -p $BENCHMARK_DIR
-  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -70,7 +70,7 @@ echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
-BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
+BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
@@ -493,7 +493,7 @@ elif [[ "$1" == "bazel.e2e" ]]; then
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
-  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
