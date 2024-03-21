@@ -32,7 +32,8 @@ if(TARGET util)
 endif()
 target_link_libraries(
   opentelemetry_exporter_prometheus
-  PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core prometheus-cpp::util)
+  PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core
+         prometheus-cpp::util)
 
 if(OPENTELEMETRY_INSTALL)
   install(
