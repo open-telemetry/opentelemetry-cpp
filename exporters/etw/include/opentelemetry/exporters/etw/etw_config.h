@@ -10,10 +10,10 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 
-#include "opentelemetry//sdk/trace/sampler.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_tail_sampler.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
