@@ -14,7 +14,7 @@
 
 #if !defined(OPENTELEMETRY_HAVE_STD_VARIANT)
 
-#  ifndef HAVE_ABSEIL
+#  ifndef OPENTELEMETRY_HAVE_ABSEIL
 // We use a LOCAL snapshot of Abseil that is known to compile with Visual Studio 2015.
 // Header-only. Without compiling the actual Abseil binary. As Abseil moves on to new
 // toolchains, it may drop support for Visual Studio 2015 in future versions.
@@ -51,7 +51,7 @@ OPENTELEMETRY_END_NAMESPACE
 #    pragma warning(disable : 4127)  // conditional expression is constant
 #  endif
 
-#  ifdef HAVE_ABSEIL
+#  ifdef OPENTELEMETRY_HAVE_ABSEIL
 #    include "absl/types/variant.h"
 #  else
 #    include "./internal/absl/types/variant.h"
@@ -64,7 +64,7 @@ OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
-#  ifdef HAVE_ABSEIL
+#  ifdef OPENTELEMETRY_HAVE_ABSEIL
 using absl::bad_variant_access;
 #  endif
 using absl::get;

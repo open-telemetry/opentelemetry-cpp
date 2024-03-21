@@ -29,7 +29,7 @@ cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = select({
-        ":with_external_abseil": ["HAVE_ABSEIL"],
+        ":with_external_abseil": ["OPENTELEMETRY_HAVE_ABSEIL"],
         "//conditions:default": [],
     }) + select({
         ":set_cxx_stdlib_none": [],

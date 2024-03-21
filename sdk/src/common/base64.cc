@@ -12,7 +12,7 @@
 #include <iostream>
 #include <limits>
 
-#if defined(HAVE_ABSEIL)
+#if defined(OPENTELEMETRY_HAVE_ABSEIL)
 #  include "absl/strings/escaping.h"
 #endif
 
@@ -21,7 +21,7 @@ namespace sdk
 {
 namespace common
 {
-#if !defined(HAVE_ABSEIL)
+#if !defined(OPENTELEMETRY_HAVE_ABSEIL)
 namespace
 {
 using Base64EscapeChars   = const unsigned char[64];
@@ -298,7 +298,7 @@ OPENTELEMETRY_EXPORT void Base64Escape(opentelemetry::nostd::string_view src, st
     return;
   }
 
-#if defined(HAVE_ABSEIL)
+#if defined(OPENTELEMETRY_HAVE_ABSEIL)
   absl::Base64Escape(absl::string_view{src.data(), src.size()}, dest);
 #else
   Base64EscapeInternal(*dest, reinterpret_cast<const unsigned char *>(src.data()), src.size(),
@@ -321,7 +321,7 @@ OPENTELEMETRY_EXPORT bool Base64Unescape(opentelemetry::nostd::string_view src, 
     return false;
   }
 
-#if defined(HAVE_ABSEIL)
+#if defined(OPENTELEMETRY_HAVE_ABSEIL)
   return absl::Base64Unescape(absl::string_view{src.data(), src.size()}, dest);
 #else
   if (src.empty())
