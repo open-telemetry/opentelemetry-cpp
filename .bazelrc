@@ -7,6 +7,9 @@
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
+# Set minimum supported C++ version
+build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
+
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
 common:asan --copt -fsanitize=address,bool,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
@@ -25,4 +28,3 @@ common:tsan --cc_output_directory_tag=tsan
 # This is needed to address false positive problem with abseil.The same setting as gRPC
 # https://github.com/google/sanitizers/issues/953
 common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
-
