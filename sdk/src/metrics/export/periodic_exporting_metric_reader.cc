@@ -122,12 +122,12 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
       return true;
     }
 
-    // Wake up the worker thread once.
+    // Wake up the worker thread.
     if (force_flush_pending_sequence_.load(std::memory_order_acquire) >
         force_flush_notified_sequence_.load(std::memory_order_acquire))
     {
       is_force_wakeup_background_worker_.store(true, std::memory_order_release);
-      cv_.notify_one();
+      cv_.notify_all();
     }
     return force_flush_notified_sequence_.load(std::memory_order_acquire) >= current_sequence;
   };
@@ -188,7 +188,7 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
 {
   if (worker_thread_.joinable())
   {
-    cv_.notify_one();
+    cv_.notify_all();
     worker_thread_.join();
   }
   return exporter_->Shutdown(timeout);

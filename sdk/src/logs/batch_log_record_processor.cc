@@ -65,7 +65,7 @@ void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
   {
     // signal the worker thread
     synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
-    synchronization_data_->cv.notify_one();
+    synchronization_data_->cv.notify_all();
   }
 }
 
@@ -93,7 +93,7 @@ bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noex
     if (synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) >
         synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
-      synchronization_data_->cv.notify_one();
+      synchronization_data_->cv.notify_all();
     }
 
     return synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) >=
@@ -285,7 +285,7 @@ bool BatchLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   if (worker_thread_.joinable())
   {
     synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
-    synchronization_data_->cv.notify_one();
+    synchronization_data_->cv.notify_all();
     worker_thread_.join();
   }
 

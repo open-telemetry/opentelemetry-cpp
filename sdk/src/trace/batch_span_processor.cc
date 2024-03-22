@@ -62,7 +62,7 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   if (buffer_size >= max_queue_size_ / 2 || buffer_size >= max_export_batch_size_)
   {
     // signal the worker thread
-    synchronization_data_->cv.notify_one();
+    synchronization_data_->cv.notify_all();
   }
 }
 
@@ -86,13 +86,13 @@ bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
       return true;
     }
 
-    // Wake up the worker thread once.
+    // Wake up the worker thread.
     if (synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire) >
         synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire))
     {
       synchronization_data_->is_force_wakeup_background_worker.store(true,
                                                                      std::memory_order_release);
-      synchronization_data_->cv.notify_one();
+      synchronization_data_->cv.notify_all();
     }
 
     return synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) >=
@@ -281,7 +281,7 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   if (worker_thread_.joinable())
   {
     synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
-    synchronization_data_->cv.notify_one();
+    synchronization_data_->cv.notify_all();
     worker_thread_.join();
   }
 
