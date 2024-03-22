@@ -4,11 +4,16 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
+# Enable automatic configs based on platform
+common --enable_platform_specific_config
+
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
 # Set minimum supported C++ version
-build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
+build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
+build:linux --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
+build:windows --host_cxxopt=/std:c++14 --cxxopt=/std:c++14
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
