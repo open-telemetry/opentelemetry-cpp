@@ -951,22 +951,19 @@ public:
     file_->flushed_record_count.store(0);
   }
 
-  ~OtlpFileSystemBackend()
+  ~OtlpFileSystemBackend() override
   {
     if (file_)
     {
       file_->background_thread_waker_cv.notify_all();
-      if (file_->background_flush_thread)
+      std::unique_ptr<std::thread> background_flush_thread;
       {
-        std::unique_ptr<std::thread> background_flush_thread;
-        {
-          std::lock_guard<std::mutex> lock_guard{file_->background_thread_lock};
-          file_->background_flush_thread.swap(background_flush_thread);
-        }
-        if (background_flush_thread->joinable())
-        {
-          background_flush_thread->join();
-        }
+        std::lock_guard<std::mutex> lock_guard{file_->background_thread_lock};
+        file_->background_flush_thread.swap(background_flush_thread);
+      }
+      if (background_flush_thread && background_flush_thread->joinable())
+      {
+        background_flush_thread->join();
       }
     }
   }
@@ -1200,7 +1197,16 @@ private:
     std::string directory_name = FileSystemUtil::DirName(file_path);
     if (!directory_name.empty() && !FileSystemUtil::IsExist(directory_name.c_str()))
     {
-      FileSystemUtil::MkDir(directory_name.c_str(), true, 0);
+      if (FileSystemUtil::MkDir(directory_name.c_str(), true, 0))
+      {
+        OTEL_INTERNAL_LOG_DEBUG("[OTLP FILE Client] Create directory \"" << directory_name
+                                                                         << "\" successed.");
+      }
+      else
+      {
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \"" << directory_name
+                                                                         << "\" failed.");
+      }
     }
 
     if (destroy_content && FileSystemUtil::IsExist(file_path))
@@ -1469,7 +1475,7 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppende
 public:
   explicit OtlpFileOstreamBackend(const std::reference_wrapper<std::ostream> &os) : os_(os) {}
 
-  ~OtlpFileOstreamBackend() {}
+  ~OtlpFileOstreamBackend() override {}
 
   void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
