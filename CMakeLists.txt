@@ -204,9 +204,8 @@ option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
-option(WITH_OTLP_FILE_PREVIOUS
-       "Whether to include the OTLP file exporter in the SDK" OFF)
-set(WITH_OTLP_FILE ${WITH_OTLP_FILE_PREVIOUS})
+option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
+       OFF)
 option(
   WITH_OTLP_HTTP_COMPRESSION
   "Whether to include gzip compression for the OTLP http exporter in the SDK"

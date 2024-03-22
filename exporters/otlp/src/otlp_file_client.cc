@@ -1062,7 +1062,7 @@ public:
         {
           break;
         }
-        file_->background_thread_waker_cv.notify_one();
+        file_->background_thread_waker_cv.notify_all();
       }
 
       // Wait result
@@ -1259,24 +1259,18 @@ private:
                                static_cast<int32_t>(FileSystemUtil::LinkOption::kForceRewrite));
       if (res != 0)
       {
+#  if !defined(__CYGWIN__) && defined(_WIN32)
+        // We can use FormatMessage to get error message.But it may be unicode and may not be
+        // printed correctly. See
+        // https://learn.microsoft.com/en-us/windows/win32/debug/retrieving-the-last-error-code for
+        // more details
         OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link " << file_->file_path << " to "
                                                            << alias_file_path
                                                            << " failed, errno: " << res);
-#  if !defined(__CYGWIN__) && defined(_WIN32)
-        OTEL_INTERNAL_LOG_ERROR(
-            "[OTLP FILE Client]     you can use FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | "
-            "FORMAT_MESSAGE_FROM_SYSTEM"
-            << " | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, " << res
-            << ", MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), "
-            << "(LPTSTR) &lpMsgBuf, 0, nullptr) to get the error message, see "
-            << "https://docs.microsoft.com/en-us/windows/desktop/api/WinBase/"
-               "nf-winbase-formatmessage and "
-            << "https://docs.microsoft.com/en-us/windows/desktop/Debug/"
-               "retrieving-the-last-error-code for more "
-               "details");
 #  else
-        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client]     you can use strerror("
-                                << res << ") to get the error message");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link "
+                                << file_->file_path << " to " << alias_file_path
+                                << " failed, errno: " << res << ", message: " << strerror(res));
 #  endif
         return file_->current_file;
       }
