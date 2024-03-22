@@ -34,10 +34,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "6430e4092653380d9dc4ccb45a1e2dc9259d581f4866dc0759713126056bc1d7",
-        strip_prefix = "benchmark-1.7.1",
+        sha256 = "6bc180a57d23d4d9515519f92b0c83d61b05b5bab188961f36ac7b06b0d9e9ce",
+        strip_prefix = "benchmark-1.8.3",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.7.1.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.8.3.tar.gz",
         ],
     )
 
@@ -46,10 +46,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_google_googletest",
-        sha256 = "ad7fdba11ea011c1d925b3289cf4af2c66a352e18d4c7264392fead75e919363",
-        strip_prefix = "googletest-1.13.0",
+        sha256 = "8ad598c73ad796e0d8280b082cebd82a630d73e73cd3c70057938a6501bba5d7",
+        strip_prefix = "googletest-1.14.0",
         urls = [
-            "https://github.com/google/googletest/archive/v1.13.0.tar.gz",
+            "https://github.com/google/googletest/archive/v1.14.0.tar.gz",
         ],
     )
 
@@ -112,9 +112,9 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "github_nlohmann_json",
         build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
-        sha256 = "e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed",
+        sha256 = "a22461d13119ac5c78f205d3df1db13403e58ce1bb1794edc9313677313f4a9d",
         urls = [
-            "https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip",
+            "https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip",
         ],
     )
 
@@ -122,10 +122,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        sha256 = "397544fe91e183029120b4eebcfab24ed9ec833d15850aae78fd5db19062d13a",
-        strip_prefix = "prometheus-cpp-1.1.0",
+        sha256 = "48dbad454d314b836cc667ec4def93ec4a6e4255fc8387c20cacb3b8b6faee30",
+        strip_prefix = "prometheus-cpp-1.2.4",
         urls = [
-            "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.1.0.tar.gz",
+            "https://github.com/jupp0r/prometheus-cpp/archive/refs/tags/v1.2.4.tar.gz",
         ],
     )
 
