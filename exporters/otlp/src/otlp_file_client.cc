@@ -489,6 +489,7 @@ public:
     {
       if ('/' == file_path[sz] || '\\' == file_path[sz])
       {
+        // DirName(a//\b) -> a
         while (sz > 0 && ('/' == file_path[sz] || '\\' == file_path[sz]))
         {
           --sz;
@@ -497,6 +498,7 @@ public:
         --depth;
         if (depth <= 0)
         {
+          ++sz;
           break;
         }
       }
