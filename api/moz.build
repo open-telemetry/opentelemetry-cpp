@@ -1,0 +1,201 @@
+# -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+EXPORTS.opentelemetry += [
+  "include/opentelemetry/config.h",
+  "include/opentelemetry/version.h",
+]
+
+EXPORTS.opentelemetry.baggage += [
+  "include/opentelemetry/baggage/baggage.h",
+  "include/opentelemetry/baggage/baggage_context.h",
+]
+
+EXPORTS.opentelemetry.baggage.propagation += [
+  "include/opentelemetry/baggage/propagation/baggage_propagator.h",
+]
+
+EXPORTS.opentelemetry.common += [
+  "include/opentelemetry/common/attribute_value.h",
+  "include/opentelemetry/common/key_value_iterable.h",
+  "include/opentelemetry/common/key_value_iterable_view.h",
+  "include/opentelemetry/common/kv_properties.h",
+  "include/opentelemetry/common/macros.h",
+  "include/opentelemetry/common/spin_lock_mutex.h",
+  "include/opentelemetry/common/string_util.h",
+  "include/opentelemetry/common/timestamp.h",
+]
+
+EXPORTS.opentelemetry.context += [
+  "include/opentelemetry/context/context.h",
+  "include/opentelemetry/context/context_value.h",
+  "include/opentelemetry/context/runtime_context.h",
+]
+
+EXPORTS.opentelemetry.context.propagation += [
+  "include/opentelemetry/context/propagation/composite_propagator.h",
+  "include/opentelemetry/context/propagation/global_propagator.h",
+  "include/opentelemetry/context/propagation/noop_propagator.h",
+  "include/opentelemetry/context/propagation/text_map_propagator.h",
+]
+
+EXPORTS.opentelemetry.detail += [
+  "include/opentelemetry/detail/preprocessor.h",
+]
+
+EXPORTS.opentelemetry.logs += [
+  "include/opentelemetry/logs/event_id.h",
+  "include/opentelemetry/logs/event_logger.h",
+  "include/opentelemetry/logs/event_logger_provider.h",
+  "include/opentelemetry/logs/log_record.h",
+  "include/opentelemetry/logs/logger.h",
+  "include/opentelemetry/logs/logger_provider.h",
+  "include/opentelemetry/logs/logger_type_traits.h",
+  "include/opentelemetry/logs/noop.h",
+  "include/opentelemetry/logs/provider.h",
+  "include/opentelemetry/logs/severity.h",
+]
+
+EXPORTS.opentelemetry.metrics += [
+  "include/opentelemetry/metrics/async_instruments.h",
+  "include/opentelemetry/metrics/meter.h",
+  "include/opentelemetry/metrics/meter_provider.h",
+  "include/opentelemetry/metrics/noop.h",
+  "include/opentelemetry/metrics/observer_result.h",
+  "include/opentelemetry/metrics/provider.h",
+  "include/opentelemetry/metrics/sync_instruments.h",
+]
+
+# Probably this is where we can bind to custom mozilla types.
+EXPORTS.opentelemetry.nostd += [
+  "include/opentelemetry/nostd/function_ref.h",
+  "include/opentelemetry/nostd/shared_ptr.h",
+  "include/opentelemetry/nostd/span.h",
+  "include/opentelemetry/nostd/string_view.h",
+  "include/opentelemetry/nostd/type_traits.h",
+  "include/opentelemetry/nostd/unique_ptr.h",
+  "include/opentelemetry/nostd/utility.h",
+  "include/opentelemetry/nostd/variant.h",
+]
+
+EXPORTS.opentelemetry.nostd.detail += [
+  "include/opentelemetry/nostd/detail/all.h",
+  "include/opentelemetry/nostd/detail/decay.h",
+  "include/opentelemetry/nostd/detail/dependent_type.h",
+  "include/opentelemetry/nostd/detail/functional.h",
+  "include/opentelemetry/nostd/detail/invoke.h",
+  "include/opentelemetry/nostd/detail/trait.h",
+  "include/opentelemetry/nostd/detail/type_pack_element.h",
+  "include/opentelemetry/nostd/detail/valueless.h",
+  "include/opentelemetry/nostd/detail/variant_alternative.h",
+  "include/opentelemetry/nostd/detail/variant_fwd.h",
+  "include/opentelemetry/nostd/detail/variant_size.h",
+  "include/opentelemetry/nostd/detail/void.h",
+]
+
+# Do we even need absl?
+EXPORTS.opentelemetry.nostd.internal.absl += [
+  "include/opentelemetry/nostd/internal/absl/.clang-format",
+  "include/opentelemetry/nostd/internal/absl/README.md",
+]
+
+# Do we even need absl?
+EXPORTS.opentelemetry.nostd.internal.absl.base += [
+  "include/opentelemetry/nostd/internal/absl/base/attributes.h",
+  "include/opentelemetry/nostd/internal/absl/base/config.h",
+  "include/opentelemetry/nostd/internal/absl/base/macros.h",
+  "include/opentelemetry/nostd/internal/absl/base/optimization.h",
+  "include/opentelemetry/nostd/internal/absl/base/options.h",
+  "include/opentelemetry/nostd/internal/absl/base/policy_checks.h",
+  "include/opentelemetry/nostd/internal/absl/base/port.h",
+]
+
+EXPORTS.opentelemetry.nostd.internal.absl.base.internal += [
+  "include/opentelemetry/nostd/internal/absl/base/internal/identity.h",
+  "include/opentelemetry/nostd/internal/absl/base/internal/inline_variable.h",
+  "include/opentelemetry/nostd/internal/absl/base/internal/invoke.h",
+]
+
+# Do we even need absl?
+EXPORTS.opentelemetry.nostd.internal.absl.meta += [
+  "include/opentelemetry/nostd/internal/absl/meta/type_traits.h",
+]
+
+# Do we even need absl?
+EXPORTS.opentelemetry.nostd.internal.absl.types += [
+  "include/opentelemetry/nostd/internal/absl/types/bad_variant_access.h",
+  "include/opentelemetry/nostd/internal/absl/types/variant.h",
+]
+
+EXPORTS.opentelemetry.nostd.internal.absl.types.internal += [
+  "include/opentelemetry/nostd/internal/absl/types/internal/variant.h",
+]
+
+# Do we even need absl?
+EXPORTS.opentelemetry.nostd.internal.absl.utility += [
+  "include/opentelemetry/nostd/internal/absl/utility/utility.h",
+]
+
+# Do we even need plugin?
+EXPORTS.opentelemetry.plugin += [
+  "include/opentelemetry/plugin/dynamic_load.h",
+  "include/opentelemetry/plugin/factory.h",
+  "include/opentelemetry/plugin/hook.h",
+  "include/opentelemetry/plugin/tracer.h",
+]
+
+# Do we even need plugin?
+EXPORTS.opentelemetry.plugin.detail += [
+  "include/opentelemetry/plugin/detail/dynamic_library_handle.h",
+  "include/opentelemetry/plugin/detail/dynamic_load_unix.h",
+  "include/opentelemetry/plugin/detail/dynamic_load_windows.h",
+  "include/opentelemetry/plugin/detail/loader_info.h",
+  "include/opentelemetry/plugin/detail/tracer_handle.h",
+  "include/opentelemetry/plugin/detail/utility.h",
+]
+
+# Probably we would rather bind to mozilla types.
+EXPORTS.opentelemetry.std += [
+  "include/opentelemetry/std/shared_ptr.h",
+  "include/opentelemetry/std/span.h",
+  "include/opentelemetry/std/string_view.h",
+  "include/opentelemetry/std/type_traits.h",
+  "include/opentelemetry/std/unique_ptr.h",
+  "include/opentelemetry/std/utility.h",
+  "include/opentelemetry/std/variant.h",
+]
+
+EXPORTS.opentelemetry.trace += [
+  "include/opentelemetry/trace/context.h",
+  "include/opentelemetry/trace/default_span.h",
+  "include/opentelemetry/trace/noop.h",
+  "include/opentelemetry/trace/provider.h",
+  "include/opentelemetry/trace/scope.h",
+  "include/opentelemetry/trace/semantic_conventions.h",
+  "include/opentelemetry/trace/span.h",
+  "include/opentelemetry/trace/span_context.h",
+  "include/opentelemetry/trace/span_context_kv_iterable.h",
+  "include/opentelemetry/trace/span_context_kv_iterable_view.h",
+  "include/opentelemetry/trace/span_id.h",
+  "include/opentelemetry/trace/span_metadata.h",
+  "include/opentelemetry/trace/span_startoptions.h",
+  "include/opentelemetry/trace/trace_flags.h",
+  "include/opentelemetry/trace/trace_id.h",
+  "include/opentelemetry/trace/trace_state.h",
+  "include/opentelemetry/trace/tracer.h",
+  "include/opentelemetry/trace/tracer_provider.h",
+]
+
+EXPORTS.opentelemetry.trace.propagation += [
+  "include/opentelemetry/trace/propagation/b3_propagator.h",
+  "include/opentelemetry/trace/propagation/http_trace_context.h",
+  "include/opentelemetry/trace/propagation/jaeger.h",
+]
+
+EXPORTS.opentelemetry.trace.propagation.detail += [
+  "include/opentelemetry/trace/propagation/detail/hex.h",
+  "include/opentelemetry/trace/propagation/detail/string.h",
+]
