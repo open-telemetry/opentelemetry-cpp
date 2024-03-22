@@ -489,14 +489,21 @@ public:
     {
       if ('/' == file_path[sz] || '\\' == file_path[sz])
       {
-        --depth;
-      }
+        while (sz > 0 && ('/' == file_path[sz] || '\\' == file_path[sz]))
+        {
+          --sz;
+        }
 
-      if (depth <= 0)
-      {
-        break;
+        --depth;
+        if (depth <= 0)
+        {
+          break;
+        }
       }
-      --sz;
+      else
+      {
+        --sz;
+      }
     }
 
     return static_cast<std::string>(file_path.substr(0, sz));
@@ -1199,8 +1206,8 @@ private:
     {
       if (FileSystemUtil::MkDir(directory_name.c_str(), true, 0))
       {
-        OTEL_INTERNAL_LOG_DEBUG("[OTLP FILE Client] Create directory \"" << directory_name
-                                                                         << "\" successed.");
+        OTEL_INTERNAL_LOG_INFO("[OTLP FILE Client] Create directory \"" << directory_name
+                                                                        << "\" successed.");
       }
       else
       {
@@ -1214,8 +1221,9 @@ private:
       of->open(file_path, std::ios::binary | std::ios::out | std::ios::trunc);
       if (!of->is_open())
       {
-        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open " << static_cast<const char *>(file_path)
-                                                           << " failed: " << options_.file_pattern);
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
+                                << static_cast<const char *>(file_path)
+                                << " failed with pattern: " << options_.file_pattern);
         return std::shared_ptr<std::ofstream>();
       }
       of->close();
@@ -1224,8 +1232,15 @@ private:
     of->open(file_path, std::ios::binary | std::ios::out | std::ios::app);
     if (!of->is_open())
     {
-      OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open " << static_cast<const char *>(file_path)
-                                                         << " failed: " << options_.file_pattern);
+      std::string hint;
+      if (!directory_name.empty())
+      {
+        hint = std::string(".Maybe the directory \"") + directory_name +
+               "\" is not existed or not writable.";
+      }
+      OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
+                              << static_cast<const char *>(file_path)
+                              << " failed with pattern: " << options_.file_pattern << hint);
       return std::shared_ptr<std::ofstream>();
     }
 
