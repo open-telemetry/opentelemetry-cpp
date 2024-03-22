@@ -955,6 +955,7 @@ public:
   {
     if (file_)
     {
+      file_->background_thread_waker_cv.notify_all();
       if (file_->background_flush_thread)
       {
         std::unique_ptr<std::thread> background_flush_thread;
@@ -1046,7 +1047,6 @@ public:
     {
       // No more data to flush
       {
-        std::lock_guard<std::mutex> lock_guard{file_->file_lock};
         if (file_->flushed_record_count.load(std::memory_order_acquire) >=
             current_wait_for_flush_count)
         {
