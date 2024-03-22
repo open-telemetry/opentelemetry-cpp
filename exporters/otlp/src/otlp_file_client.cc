@@ -971,7 +971,7 @@ public:
     }
   }
 
-  void Export(nostd::string_view data, std::size_t record_count)
+  void Export(nostd::string_view data, std::size_t record_count) override
   {
     if (!is_initialized_.load(std::memory_order_acquire))
     {
@@ -1027,7 +1027,7 @@ public:
     SpawnBackgroundWorkThread();
   }
 
-  bool ForceFlush(std::chrono::microseconds timeout) noexcept
+  bool ForceFlush(std::chrono::microseconds timeout) noexcept override
   {
     std::chrono::microseconds wait_interval = timeout / 256;
     if (wait_interval <= std::chrono::microseconds{0})
@@ -1085,7 +1085,7 @@ public:
     return timeout >= std::chrono::microseconds::zero();
   }
 
-  bool Shutdown(std::chrono::microseconds timeout) noexcept
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
     file_->is_shutdown.store(true, std::memory_order_release);
 
@@ -1203,7 +1203,7 @@ private:
       FileSystemUtil::MkDir(directory_name.c_str(), true, 0);
     }
 
-    if (destroy_content)
+    if (destroy_content && FileSystemUtil::IsExist(file_path))
     {
       of->open(file_path, std::ios::binary | std::ios::out | std::ios::trunc);
       if (!of->is_open())
@@ -1471,20 +1471,20 @@ public:
 
   ~OtlpFileOstreamBackend() {}
 
-  void Export(nostd::string_view data, std::size_t record_count)
+  void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
     os_.get().write(data.data(), data.size());
     os_.get().write("\n", 1);
   }
 
-  bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept
+  bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
   {
     os_.get().flush();
 
     return true;
   }
 
-  bool Shutdown(std::chrono::microseconds timeout) noexcept { return ForceFlush(timeout); }
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override { return ForceFlush(timeout); }
 
 private:
   std::reference_wrapper<std::ostream> os_;
