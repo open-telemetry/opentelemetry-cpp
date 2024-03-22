@@ -1,0 +1,35 @@
+# -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+Library("opentelemetry_logs")
+
+LOCAL_INCLUDES += [
+  "/third_party/opentelemetry-cpp/api/include",
+  "/third_party/opentelemetry-cpp/sdk/include",
+]
+
+SOURCES += [
+  "batch_log_record_processor.cc",
+  "batch_log_record_processor_factory.cc",
+  "event_logger.cc",
+  "event_logger_provider.cc",
+  "event_logger_provider_factory.cc",
+  "exporter.cc",
+  "logger.cc",
+  "logger_context.cc",
+  "logger_context_factory.cc",
+  "logger_provider.cc",
+  "logger_provider_factory.cc",
+  "multi_log_record_processor.cc",
+  "multi_log_record_processor_factory.cc",
+  "multi_recordable.cc",
+  "read_write_log_record.cc",
+  "readable_log_record.cc",
+  "simple_log_record_processor.cc",
+  "simple_log_record_processor_factory.cc",
+]
+
+FINAL_LIBRARY = "gkopentelemetry"

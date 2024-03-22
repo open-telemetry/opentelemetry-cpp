@@ -1,0 +1,44 @@
+# -*- Mode: python; indent-tabs-mode: nil; tab-width: 40 -*-
+# vim: set filetype=python:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+Library("opentelemetry_metrics")
+
+LOCAL_INCLUDES += [
+  "/third_party/opentelemetry-cpp/api/include",
+  "/third_party/opentelemetry-cpp/sdk/include",
+]
+
+SOURCES += [
+  "aggregation/base2_exponential_histogram_indexer.cc",
+  "aggregation/histogram_aggregation.cc",
+  "aggregation/lastvalue_aggregation.cc",
+  "aggregation/sum_aggregation.cc",
+  "async_instruments.cc",
+  "data/circular_buffer.cc",
+  "exemplar/filter.cc",
+  "exemplar/reservoir.cc",
+  "export/periodic_exporting_metric_reader.cc",
+  "export/periodic_exporting_metric_reader_factory.cc",
+  "instrument_metadata_validator.cc",
+  "meter.cc",
+  "meter_context.cc",
+  "meter_context_factory.cc",
+  "meter_provider.cc",
+  "meter_provider_factory.cc",
+  "metric_reader.cc",
+  "state/filtered_ordered_attribute_map.cc",
+  "state/metric_collector.cc",
+  "state/observable_registry.cc",
+  "state/sync_metric_storage.cc",
+  "state/temporal_metric_storage.cc",
+  "sync_instruments.cc",
+  "view/instrument_selector_factory.cc",
+  "view/meter_selector_factory.cc",
+  "view/view_factory.cc",
+  "view/view_registry_factory.cc",
+]
+
+FINAL_LIBRARY = "gkopentelemetry"
