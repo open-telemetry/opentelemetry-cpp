@@ -37,6 +37,7 @@
 *.app
 
 # Bazel files
+MODULE.bazel.lock
 /bazel-*
 
 # Mac
