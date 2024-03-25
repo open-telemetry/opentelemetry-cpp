@@ -16,6 +16,10 @@ build --copt -DGRPC_BAZEL_BUILD
 # Workaround abseil libraries missing symbols
 build:windows --dynamic_mode=off
 
+# Avoid conflicting boringssl/protobuf system brew install
+# https://github.com/bazelbuild/bazel/issues/10472
+build:macos --copt=-isystem/usr/local/include
+
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
 build:linux --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
