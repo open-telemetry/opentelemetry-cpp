@@ -12,7 +12,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -108,8 +108,7 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
-  void SetExemplarFilter(
-      std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept;
+  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept;
 
   /**
    * NOTE - INTERNAL method, can change in future.
@@ -139,9 +138,9 @@ private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
-  std::unique_ptr<metrics::ExemplarFilter> exemplar_filter_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
   std::vector<std::shared_ptr<Meter>> meters_;
+  metrics::ExemplarFilterType exemplar_filter_type_;
 
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L

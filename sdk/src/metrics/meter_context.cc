@@ -74,10 +74,9 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
   views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
-void MeterContext::SetExemplarFilter(
-    std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept
+void MeterContext::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
 {
-  exemplar_filter_ = std::move(exemplar_filter);
+  exemplar_filter_type_ = exemplar_filter_type;
 }
 
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)

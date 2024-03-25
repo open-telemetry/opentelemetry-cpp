@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <vector>
+
 #include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 #include <gtest/gtest.h>
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -18,7 +19,7 @@ public:
 TEST_F(HistogramExemplarReservoirTestPeer, OfferMeasurement)
 {
   std::vector<double> boundaries{1, 5.0, 10, 15, 20};
-  auto histogram_exemplar_reservoir = ExemplarReservoir::GetHistogramExemplarReservoir(
+  auto histogram_exemplar_reservoir = ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
       boundaries.size(), HistogramExemplarReservoir::GetHistogramCellSelector(boundaries), nullptr);
   histogram_exemplar_reservoir->OfferMeasurement(
       1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());

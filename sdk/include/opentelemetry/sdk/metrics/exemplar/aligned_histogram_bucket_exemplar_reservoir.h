@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
@@ -29,7 +29,7 @@ namespace sdk
 namespace metrics
 {
 
-class HistogramExemplarReservoir : public FixedSizeExemplarReservoir
+class AlignedHistogramBucketExemplarReservoir : public FixedSizeExemplarReservoir
 {
 
 public:
@@ -39,7 +39,7 @@ public:
     return std::shared_ptr<ReservoirCellSelector>{new HistogramCellSelector(boundaries)};
   }
 
-  HistogramExemplarReservoir(size_t size,
+  AlignedHistogramBucketExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
                              std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
                                  const opentelemetry::sdk::common::OrderedAttributeMap &attributes))

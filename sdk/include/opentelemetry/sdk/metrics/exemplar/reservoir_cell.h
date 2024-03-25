@@ -9,7 +9,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/version.h"
 

@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 #include "opentelemetry/version.h"
 
@@ -64,11 +64,11 @@ public:
   virtual std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes &pointAttributes) noexcept = 0;
 
-  static nostd::shared_ptr<ExemplarReservoir> GetFilteredExemplarReservoir(
-      std::shared_ptr<ExemplarFilter> filter,
+  static nostd::shared_ptr<ExemplarReservoir> GetSimpleFilteredExemplarReservoir(
+      ExemplarFilterType filter_type,
       std::shared_ptr<ExemplarReservoir> reservoir);
 
-  static nostd::shared_ptr<ExemplarReservoir> GetHistogramExemplarReservoir(
+  static nostd::shared_ptr<ExemplarReservoir> GetAlignedHistogramBucketExemplarReservoir(
       size_t size,
       std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
       std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(

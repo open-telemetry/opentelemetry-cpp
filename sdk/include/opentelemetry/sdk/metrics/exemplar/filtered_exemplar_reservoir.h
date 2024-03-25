@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/version.h"
 
@@ -29,9 +29,9 @@ class FilteredExemplarReservoir final : public ExemplarReservoir
 {
 
 public:
-  FilteredExemplarReservoir(std::shared_ptr<ExemplarFilter> filter,
+  FilteredExemplarReservoir(ExemplarFilterType filter_type,
                             std::shared_ptr<ExemplarReservoir> reservoir)
-      : filter_(filter), reservoir_(reservoir)
+      : filter_type_(filter_type), reservoir_(reservoir)
   {}
 
   void OfferMeasurement(int64_t value,
@@ -39,9 +39,10 @@ public:
                         const opentelemetry::context::Context &context,
                         const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
   {
-    if (filter_->ShouldSampleMeasurement(value, attributes, context))
+    if (filter_type_ == ExemplarFilterType::kAlwaysOn || filter_type_ == ExemplarFilterType::kTraceBased && hasSampledTrace(context)
     {
       reservoir_->OfferMeasurement(value, attributes, context, timestamp);
+      return;
     }
   }
 
@@ -50,7 +51,7 @@ public:
                         const opentelemetry::context::Context &context,
                         const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
   {
-    if (filter_->ShouldSampleMeasurement(value, attributes, context))
+    if (filter_type_ == ExemplarFilterType::kAlwaysOn || filter_type_ == ExemplarFilterType::kTraceBased && hasSampledTrace(context)
     {
       reservoir_->OfferMeasurement(value, attributes, context, timestamp);
     }
@@ -63,8 +64,14 @@ public:
   }
 
 private:
+  static bool hasSampledTrace(const opentelemetry::context::Context &context)
+  {
+    return opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
+           opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
+  }
+
   explicit FilteredExemplarReservoir() = default;
-  std::shared_ptr<ExemplarFilter> filter_;
+  ExemplarFilterType filter_type;
   std::shared_ptr<ExemplarReservoir> reservoir_;
 };
 

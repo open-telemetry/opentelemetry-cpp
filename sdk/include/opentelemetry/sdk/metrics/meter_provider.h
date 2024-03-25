@@ -10,7 +10,7 @@
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -101,8 +101,7 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
-  void SetExemplarFilter(
-      std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept;
+  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept;
 
   /**
    * Shutdown the meter provider.

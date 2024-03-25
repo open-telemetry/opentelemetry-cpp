@@ -99,21 +99,21 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
 
 void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
 {
-  return context_->AddMetricReader(reader);
+  context_->AddMetricReader(reader);
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                             std::unique_ptr<MeterSelector> meter_selector,
                             std::unique_ptr<View> view) noexcept
 {
-  return context_->AddView(std::move(instrument_selector), std::move(meter_selector),
+  context_->AddView(std::move(instrument_selector), std::move(meter_selector),
                            std::move(view));
 }
 
 void MeterProvider::SetExemplarFilter(
-    std::unique_ptr<metrics::ExemplarFilter> exemplar_filter) noexcept
+    metrics::ExemplarFilterType exemplar_filter_type) noexcept
 {
-  return context_->SetExemplarFilter(std::move(exemplar_filter));
+  context_->SetExemplarFilter(exemplar_filter_type);
 }
 
 /**
