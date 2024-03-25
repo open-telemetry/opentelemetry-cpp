@@ -1231,15 +1231,16 @@ private:
 
     if (destroy_content && FileSystemUtil::IsExist(file_path))
     {
-      of->open(file_path, std::ios::binary | std::ios::out | std::ios::trunc);
-      if (!of->is_open())
+      std::fstream trunc_file;
+      trunc_file.open(file_path, std::ios::binary | std::ios::out | std::ios::trunc);
+      if (!trunc_file.is_open())
       {
         OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
                                 << static_cast<const char *>(file_path)
                                 << " failed with pattern: " << options_.file_pattern);
         return std::shared_ptr<std::ofstream>();
       }
-      of->close();
+      trunc_file.close();
     }
 
     of->open(file_path, std::ios::binary | std::ios::out | std::ios::app);

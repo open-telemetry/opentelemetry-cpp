@@ -276,6 +276,7 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
     client->Export(request, 1);
   }
   request.mutable_resource_spans(0)->set_schema_url("https://opentelemetry.io/schemas/1.12.0");
+  client->Export(request, 1);
   client->ForceFlush();
 
   std::unique_ptr<std::ifstream> input_file[5] = {
