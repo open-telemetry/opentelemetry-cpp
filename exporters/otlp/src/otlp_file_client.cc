@@ -30,6 +30,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <mutex>
@@ -1204,17 +1205,27 @@ private:
     std::shared_ptr<std::ofstream> of = std::make_shared<std::ofstream>();
 
     std::string directory_name = FileSystemUtil::DirName(file_path);
-    if (!directory_name.empty() && !FileSystemUtil::IsExist(directory_name.c_str()))
+    if (!directory_name.empty())
     {
-      if (FileSystemUtil::MkDir(directory_name.c_str(), true, 0))
+      int error_code = 0;
+      if (!FileSystemUtil::IsExist(directory_name.c_str()))
       {
-        OTEL_INTERNAL_LOG_INFO("[OTLP FILE Client] Create directory \"" << directory_name
-                                                                        << "\" successed.");
+        FileSystemUtil::MkDir(directory_name.c_str(), true, 0);
+        error_code = errno;
       }
-      else
+
+      if (!FileSystemUtil::IsExist(directory_name.c_str()))
       {
-        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \"" << directory_name
-                                                                         << "\" failed.");
+#if !defined(__CYGWIN__) && defined(_WIN32)
+        char error_message[256] = {0};
+        strerror_s(error_message, sizeof(error_message) - 1, error_code);
+#else
+        char error_message[256] = {0};
+        strerror_r(error_code, error_message, sizeof(error_message) - 1);
+#endif
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Create directory \""
+                                << directory_name << "\" failed.errno: " << error_code
+                                << ", message: " << error_message);
       }
     }
 
@@ -1237,8 +1248,8 @@ private:
       std::string hint;
       if (!directory_name.empty())
       {
-        hint = std::string(".Maybe the directory \"") + directory_name +
-               "\" is not existed or not writable.";
+        hint = std::string(".The directory \"") + directory_name +
+               "\" may not exist or may not be writable.";
       }
       OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
                               << static_cast<const char *>(file_path)
