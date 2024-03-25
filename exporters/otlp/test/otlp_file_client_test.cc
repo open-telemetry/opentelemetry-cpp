@@ -247,19 +247,19 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
 
   // Clear old files
   {
-    std::fstream clear_file1("otlp_file_client_test/trace-1.jsonl",
+    std::fstream clear_file1("otlp_file_client_test_dir/trace-1.jsonl",
                              std::ios::out | std::ios::trunc);
-    std::fstream clear_file2("otlp_file_client_test/trace-2.jsonl",
+    std::fstream clear_file2("otlp_file_client_test_dir/trace-2.jsonl",
                              std::ios::out | std::ios::trunc);
-    std::fstream clear_file3("otlp_file_client_test/trace-3.jsonl",
+    std::fstream clear_file3("otlp_file_client_test_dir/trace-3.jsonl",
                              std::ios::out | std::ios::trunc);
-    std::fstream clear_file4("otlp_file_client_test/trace-latest.jsonl",
+    std::fstream clear_file4("otlp_file_client_test_dir/trace-latest.jsonl",
                              std::ios::out | std::ios::trunc);
   }
 
   opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions backend_opts;
-  backend_opts.file_pattern  = "otlp_file_client_test/trace-%n.jsonl";
-  backend_opts.alias_pattern = "otlp_file_client_test/trace-latest.jsonl";
+  backend_opts.file_pattern  = "otlp_file_client_test_dir/trace-%n.jsonl";
+  backend_opts.alias_pattern = "otlp_file_client_test_dir/trace-latest.jsonl";
   // Smaller than the size of one record, so it will rotate after each record.
   backend_opts.file_size   = 1500;
   backend_opts.rotate_size = 3;
@@ -281,15 +281,15 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
 
   std::unique_ptr<std::ifstream> input_file[5] = {
       std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test/trace-1.jsonl", std::ios::in)),
+          new std::ifstream("otlp_file_client_test_dir/trace-1.jsonl", std::ios::in)),
       std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test/trace-2.jsonl", std::ios::in)),
+          new std::ifstream("otlp_file_client_test_dir/trace-2.jsonl", std::ios::in)),
       std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test/trace-3.jsonl", std::ios::in)),
+          new std::ifstream("otlp_file_client_test_dir/trace-3.jsonl", std::ios::in)),
       std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test/trace-4.jsonl", std::ios::in)),
+          new std::ifstream("otlp_file_client_test_dir/trace-4.jsonl", std::ios::in)),
       std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test/trace-latest.jsonl", std::ios::in))};
+          new std::ifstream("otlp_file_client_test_dir/trace-latest.jsonl", std::ios::in))};
 
   EXPECT_TRUE(input_file[0]->is_open());
   EXPECT_TRUE(input_file[1]->is_open());
@@ -380,7 +380,7 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
   std::stringstream output_stream;
 
   opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions backend_opts;
-  backend_opts.file_pattern  = "otlp_file_client_test/trace-%Y-%m-%d-%H-%M-%S.jsonl";
+  backend_opts.file_pattern  = "otlp_file_client_test_dir/trace-%Y-%m-%d-%H-%M-%S.jsonl";
   backend_opts.alias_pattern = "";
   // Smaller than the size of one record, so it will rotate after each record.
   backend_opts.file_size = 1500;
@@ -405,7 +405,7 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
     char file_path_buf[256] = {0};
     std::tm local_tm        = GetLocalTime(start_time);
     std::strftime(file_path_buf, sizeof(file_path_buf) - 1,
-                  "otlp_file_client_test/trace-%Y-%m-%d-%H-%M-%S.jsonl", &local_tm);
+                  "otlp_file_client_test_dir/trace-%Y-%m-%d-%H-%M-%S.jsonl", &local_tm);
     start_time += std::chrono::seconds{1};
 
     input_file[found_file_index] =
