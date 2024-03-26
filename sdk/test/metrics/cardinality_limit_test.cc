@@ -4,7 +4,9 @@
 #include "common.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#endif
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -68,8 +70,11 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                             ExemplarFilterType::kAlwaysOff,
-                            ExemplarReservoir::GetNoExemplarReservoir(), nullptr, attributes_limit);
+                            ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+                            nullptr, attributes_limit);
 
   long record_value = 100;
   // add 9 unique metric points, and 6 more above limit.

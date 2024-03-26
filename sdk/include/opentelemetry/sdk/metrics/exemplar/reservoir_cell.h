@@ -3,6 +3,8 @@
 
 #pragma once
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 #include <cstddef>
 #include <memory>
 
@@ -157,3 +159,5 @@ typedef std::shared_ptr<ExemplarData> (ReservoirCell::*MapAndResetCellType)(
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

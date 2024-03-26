@@ -3,6 +3,8 @@
 
 #pragma once
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 #include <memory>
 #include <vector>
 
@@ -100,3 +102,5 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

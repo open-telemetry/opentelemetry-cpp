@@ -17,8 +17,12 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -34,6 +38,8 @@ namespace metrics
 class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW 
+
 static inline bool EnableExamplarFilter(ExemplarFilterType filter_type, const opentelemetry::context::Context &context)
 {
   return filter_type == ExemplarFilterType::kAlwaysOn || 
@@ -42,13 +48,16 @@ static inline bool EnableExamplarFilter(ExemplarFilterType filter_type, const op
            opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
 }
 
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW                
                     ExemplarFilterType exempler_filter_type,
-                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
-                        OPENTELEMETRY_MAYBE_UNUSED,
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
                     const AggregationConfig *aggregation_config,
                     size_t attributes_limit = kAggregationCardinalityLimit)
       : instrument_descriptor_(instrument_descriptor),

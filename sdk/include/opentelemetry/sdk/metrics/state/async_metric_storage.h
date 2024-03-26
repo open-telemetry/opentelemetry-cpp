@@ -10,8 +10,12 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
@@ -31,9 +35,10 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      ExemplarFilterType exempler_filter_type,
-                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
-                         OPENTELEMETRY_MAYBE_UNUSED,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},

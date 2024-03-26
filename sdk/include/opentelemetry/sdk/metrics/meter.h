@@ -153,6 +153,8 @@ private:
            instrument_validator.ValidateDescription(description);
   }
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
   static MapAndResetCellType GetMapAndResetCellMethod(const InstrumentDescriptor &instrument_descriptor)
   {
     if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
@@ -184,6 +186,9 @@ private:
       SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
       GetMapAndResetCellMethod(instrument_descriptor)));
   }
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 };
 }  // namespace metrics
 }  // namespace sdk

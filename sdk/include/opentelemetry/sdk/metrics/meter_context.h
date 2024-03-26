@@ -12,7 +12,11 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -108,9 +112,13 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
   void SetExemplarFilter(ExemplarFilterType exemplar_filter_type) noexcept;
 
   ExemplarFilterType GetExemplarFilter() const noexcept;
+
+#endif
 
   /**
    * NOTE - INTERNAL method, can change in future.

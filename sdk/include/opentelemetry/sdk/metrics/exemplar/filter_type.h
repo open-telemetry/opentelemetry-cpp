@@ -3,6 +3,8 @@
 
 #pragma once
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 #include <memory>
 
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
@@ -40,3 +42,5 @@ enum class ExemplarFilterType : uint8_t
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

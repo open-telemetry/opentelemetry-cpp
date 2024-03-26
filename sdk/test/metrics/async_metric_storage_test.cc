@@ -5,8 +5,12 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+
+#ifdef ENABLE_METRICS_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -57,8 +61,11 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
+      ExemplarReservoir::GetNoExemplarReservoir(),
+#endif      
+      nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -150,8 +157,10 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kDefault,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff,
       ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
       nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
@@ -243,8 +252,10 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff,
       ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
       nullptr);
   int64_t freq_cpu0                                                                   = 3;
   int64_t freq_cpu1                                                                   = 5;
