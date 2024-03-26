@@ -108,7 +108,9 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
-  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept;
+  void SetExemplarFilter(ExemplarFilterType exemplar_filter_type) noexcept;
+
+  ExemplarFilterType GetExemplarFilter() const noexcept;
 
   /**
    * NOTE - INTERNAL method, can change in future.

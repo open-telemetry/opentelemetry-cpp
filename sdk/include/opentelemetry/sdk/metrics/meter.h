@@ -179,9 +179,10 @@ private:
       }
     }
 
-    return nostd::shared_ptr<ExemplarReservoir>(new SimpleFixedSizeExemplarReservoir(1,
-                                                                                     std::shared_ptr<ReservoirCellSelector>(nullptr),
-                                                                                     GetMapAndResetCellMethod(instrument_descriptor)));
+    return nostd::shared_ptr<ExemplarReservoir>(new SimpleFixedSizeExemplarReservoir(
+      SimpleFixedSizeExemplarReservoir::kDefaultSimpleReservoirSize,
+      SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
+      GetMapAndResetCellMethod(instrument_descriptor)));
   }
 };
 }  // namespace metrics

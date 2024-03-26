@@ -79,6 +79,11 @@ void MeterContext::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter
   exemplar_filter_type_ = exemplar_filter_type;
 }
 
+ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
+{
+  return exemplar_filter_type_;
+}
+
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);

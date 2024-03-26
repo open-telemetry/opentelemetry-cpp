@@ -31,9 +31,11 @@ namespace metrics
 
 class SimpleFixedSizeExemplarReservoir : public FixedSizeExemplarReservoir
 {
-
 public:
-  static std::shared_ptr<ReservoirCellSelector> GetSimpleFixedSizeCellSelector(size_t size)
+
+  static const size_t kDefaultSimpleReservoirSize = 1;
+
+  static std::shared_ptr<ReservoirCellSelector> GetSimpleFixedSizeCellSelector(size_t size = kDefaultSimpleReservoirSize)
   {
     return std::shared_ptr<ReservoirCellSelector>{
         new SimpleFixedSizeCellSelector{size}};

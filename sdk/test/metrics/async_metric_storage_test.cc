@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -55,7 +56,9 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum, ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
+      instr_desc, AggregationType::kSum,
+      ExemplarFilterType::kAlwaysOff,
+      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -146,7 +149,10 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kDefault, ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
+      instr_desc, AggregationType::kDefault,
+      ExemplarFilterType::kAlwaysOff,
+      ExemplarReservoir::GetNoExemplarReservoir(),
+      nullptr);
   int64_t get_count1                                                                  = 20;
   int64_t put_count1                                                                  = 10;
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
@@ -236,7 +242,9 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue, ExemplarReservoir::GetNoExemplarReservoir(),
+      instr_desc, AggregationType::kLastValue,
+      ExemplarFilterType::kAlwaysOff,
+      ExemplarReservoir::GetNoExemplarReservoir(),
       nullptr);
   int64_t freq_cpu0                                                                   = 3;
   int64_t freq_cpu1                                                                   = 5;

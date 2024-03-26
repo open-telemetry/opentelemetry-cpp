@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
@@ -42,7 +43,7 @@ public:
   AlignedHistogramBucketExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
                              MapAndResetCellType map_and_reset_cell)
-      : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
+      : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
   {}
 
   void OfferMeasurement(
@@ -51,7 +52,7 @@ public:
       const opentelemetry::context::Context &context,
       const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
-    // AlignedHistogramBucketExemplarReservoir shouldn't be used with long values
+    OTEL_INTERNAL_LOG_ERROR("AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
   }
 
   class HistogramCellSelector : public ReservoirCellSelector
@@ -64,7 +65,8 @@ public:
                               const MetricAttributes &attributes,
                               const opentelemetry::context::Context &context) override
     {
-      return ReservoirCellIndexFor(cells, static_cast<double>(value), attributes, context);
+      OTEL_INTERNAL_LOG_ERROR("AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
+      return -1;
     }
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
@@ -80,7 +82,9 @@ public:
           return static_cast<int>(i);
         }
       }
-      return -1;
+
+      // the bucket at max_size is for values greater than the last boundary
+      return static_cast<int>(max_size);
     }
 
   private:

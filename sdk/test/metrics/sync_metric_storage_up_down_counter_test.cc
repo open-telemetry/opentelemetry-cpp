@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -37,6 +38,7 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+      ExemplarFilterType::kAlwaysOff,
       ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   int64_t val1 = 10, val2 = 30, val3 = -5, val4 = -10;
@@ -184,6 +186,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
+      ExemplarFilterType::kAlwaysOff,
       ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordDouble(10.0,

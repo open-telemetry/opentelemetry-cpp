@@ -5,6 +5,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -38,6 +39,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
+      ExemplarFilterType::kAlwaysOff,
       NoExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -176,6 +178,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
+      ExemplarFilterType::kAlwaysOff,
       NoExemplarReservoir::GetNoExemplarReservoir(), nullptr);
 
   storage.RecordDouble(10.0,

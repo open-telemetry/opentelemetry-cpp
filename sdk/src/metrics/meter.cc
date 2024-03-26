@@ -310,10 +310,11 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
     return nullptr;
   }
   auto view_registry = ctx->GetViewRegistry();
+  auto exemplar_filter_type = ctx->GetExemplarFilter();
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
   auto success = view_registry->FindViews(
-      instrument_descriptor, *scope_, [this, &instrument_descriptor, &storages](const View &view) {
+      instrument_descriptor, *scope_, [this, &instrument_descriptor, &storages, exemplar_filter_type](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -327,6 +328,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
+            exemplar_filter_type,
             GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(), instrument_descriptor),
             view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
@@ -356,10 +358,11 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
     return nullptr;
   }
   auto view_registry = ctx->GetViewRegistry();
+  auto exemplar_filter_type = ctx->GetExemplarFilter();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),
-      [this, &instrument_descriptor, &storages](const View &view) {
+      [this, &instrument_descriptor, &storages, exemplar_filter_type](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -371,6 +374,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         }
         auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
             view_instr_desc, view.GetAggregationType(),
+            exemplar_filter_type,
             GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                  instrument_descriptor),
             view.GetAggregationConfig()));

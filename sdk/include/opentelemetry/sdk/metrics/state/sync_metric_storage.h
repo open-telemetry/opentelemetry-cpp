@@ -17,6 +17,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
@@ -38,6 +39,7 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
+                    ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
                         OPENTELEMETRY_MAYBE_UNUSED,
                     const AggregationConfig *aggregation_config,
@@ -46,6 +48,7 @@ public:
         attributes_hashmap_(new AttributesHashMap(attributes_limit)),
         attributes_processor_(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+        exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
@@ -167,6 +170,7 @@ private:
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   const AttributesProcessor *attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
