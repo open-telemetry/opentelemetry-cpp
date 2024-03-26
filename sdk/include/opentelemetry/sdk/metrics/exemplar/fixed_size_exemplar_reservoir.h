@@ -26,8 +26,7 @@ class FixedSizeExemplarReservoir : public ExemplarReservoir
 public:
   FixedSizeExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                             std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                 const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
+                             MapAndResetCellType map_and_reset_cell)
       : storage_(size),
         reservoir_cell_selector_(reservoir_cell_selector),
         map_and_reset_cell_(map_and_reset_cell)
@@ -95,8 +94,7 @@ private:
   explicit FixedSizeExemplarReservoir() = default;
   std::vector<ReservoirCell> storage_;
   std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector_;
-  std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell_)(
-      const opentelemetry::sdk::common::OrderedAttributeMap &attributes);
+  MapAndResetCellType map_and_reset_cell_;
 };
 
 }  // namespace metrics

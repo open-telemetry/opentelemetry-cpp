@@ -151,6 +151,9 @@ private:
   friend class ReservoirCellTestPeer;
 };
 
+typedef std::shared_ptr<ExemplarData> (ReservoirCell::*MapAndResetCellType)(
+    const MetricAttributes &);
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

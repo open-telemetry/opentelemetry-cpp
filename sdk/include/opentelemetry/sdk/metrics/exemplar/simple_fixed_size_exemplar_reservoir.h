@@ -35,8 +35,7 @@ class SimpleFixedSizeExemplarReservoir : public FixedSizeExemplarReservoir
 public:
   SimpleFixedSizeExemplarReservoir(size_t size,
                                    std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                                   std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                   const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
+                                   MapAndResetCellType map_and_reset_cell)
       : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
   {}
 };

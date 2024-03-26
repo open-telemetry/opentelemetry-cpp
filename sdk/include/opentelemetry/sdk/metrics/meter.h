@@ -15,7 +15,12 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -138,6 +143,7 @@ private:
         new opentelemetry::metrics::NoopObservableInstrument("", "", ""));
     return noop_instrument;
   }
+
   static bool ValidateInstrument(nostd::string_view name,
                                  nostd::string_view description,
                                  nostd::string_view unit)
@@ -145,6 +151,35 @@ private:
     const static InstrumentMetaDataValidator instrument_validator;
     return instrument_validator.ValidateName(name) && instrument_validator.ValidateUnit(unit) &&
            instrument_validator.ValidateDescription(description);
+  }
+
+  static MapAndResetCellType GetMapAndResetCellMethod(const InstrumentDescriptor &instrument_descriptor)
+  {
+    if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+    {
+      return &ReservoirCell::GetAndResetLong;
+    }
+
+    return &ReservoirCell::GetAndResetDouble;
+  }
+
+  static nostd::shared_ptr<ExemplarReservoir> GetExemplarReservoir(const AggregationType agg_type, const AggregationConfig *agg_config, const InstrumentDescriptor &instrument_descriptor)
+  {
+    if (agg_type == AggregationType::kHistogram)
+    {
+      const auto *histogram_agg_config = static_cast<const HistogramAggregationConfig *>(agg_config);
+      if (histogram_agg_config && histogram_agg_config->boundaries_.size() > 0)
+      {
+        return nostd::shared_ptr<ExemplarReservoir>(new AlignedHistogramBucketExemplarReservoir(
+            histogram_agg_config->boundaries_.size(),
+            AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(histogram_agg_config->boundaries_),
+            GetMapAndResetCellMethod(instrument_descriptor)));
+      }
+    }
+
+    return nostd::shared_ptr<ExemplarReservoir>(new SimpleFixedSizeExemplarReservoir(1,
+                                                                                     std::shared_ptr<ReservoirCellSelector>(nullptr),
+                                                                                     GetMapAndResetCellMethod(instrument_descriptor)));
   }
 };
 }  // namespace metrics

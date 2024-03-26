@@ -41,10 +41,18 @@ public:
 
   AlignedHistogramBucketExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                             std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                 const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
+                             MapAndResetCellType map_and_reset_cell)
       : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
   {}
+
+  void OfferMeasurement(
+      int64_t value,
+      const MetricAttributes &attributes,
+      const opentelemetry::context::Context &context,
+      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
+  {
+    // AlignedHistogramBucketExemplarReservoir shouldn't be used with long values
+  }
 
   class HistogramCellSelector : public ReservoirCellSelector
   {
