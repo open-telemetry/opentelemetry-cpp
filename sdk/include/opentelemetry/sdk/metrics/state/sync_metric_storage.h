@@ -69,7 +69,11 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    // TODO: fixme
+    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    {
+      exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    }
 #endif
     static size_t hash = opentelemetry::sdk::common::GetHash("");
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -86,8 +90,11 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                          std::chrono::system_clock::now());
+    // TODO: fixme
+    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    {
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context, std::chrono::system_clock::now());
+    }
 #endif
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
         attributes, [this](nostd::string_view key) {
@@ -116,7 +123,10 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    {
+      exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    }
 #endif
     static size_t hash = opentelemetry::sdk::common::GetHash("");
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -129,16 +139,22 @@ public:
                         OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                          std::chrono::system_clock::now());
+    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    {
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                            std::chrono::system_clock::now());
+    }
 #endif
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                          std::chrono::system_clock::now());
+    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    {
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                            std::chrono::system_clock::now());
+    }
 #endif
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(
         attributes, [this](nostd::string_view key) {
