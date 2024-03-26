@@ -7,8 +7,8 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
 #ifdef ENABLE_METRICS_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -35,7 +35,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   int64_t expected_total_get_requests = 0;
   int64_t expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kHistogram,
-                                     InstrumentValueType::kLong};
+                                         InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -44,8 +44,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -177,7 +176,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kHistogram,
-                                     InstrumentValueType::kDouble};
+                                        InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -186,8 +185,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

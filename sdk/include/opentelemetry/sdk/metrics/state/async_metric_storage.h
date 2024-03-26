@@ -12,8 +12,8 @@
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -65,7 +65,7 @@ public:
       if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn)
       {
         exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
-                                            std::chrono::system_clock::now());
+                                              std::chrono::system_clock::now());
       }
 #endif
 

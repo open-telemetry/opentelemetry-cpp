@@ -19,8 +19,8 @@
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
@@ -38,15 +38,16 @@ namespace metrics
 class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-static inline bool EnableExamplarFilter(ExemplarFilterType filter_type, const opentelemetry::context::Context &context)
-{
-  return filter_type == ExemplarFilterType::kAlwaysOn || 
-         filter_type == ExemplarFilterType::kTraceBased &&
-           opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
-           opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
-}
+  static inline bool EnableExamplarFilter(ExemplarFilterType filter_type,
+                                          const opentelemetry::context::Context &context)
+  {
+    return filter_type == ExemplarFilterType::kAlwaysOn ||
+           filter_type == ExemplarFilterType::kTraceBased &&
+               opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
+               opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
+  }
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
@@ -54,7 +55,7 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     const AttributesProcessor *attributes_processor,
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW                
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
@@ -107,7 +108,8 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, attributes, context, std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
+                                            std::chrono::system_clock::now());
     }
 #endif
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(

@@ -5,7 +5,7 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"

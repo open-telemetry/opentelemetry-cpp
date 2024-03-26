@@ -3,10 +3,10 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <vector>
+#  include <vector>
 
-#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#include <gtest/gtest.h>
+#  include <gtest/gtest.h>
+#  include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -19,10 +19,10 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 #if ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
@@ -159,7 +159,8 @@ private:
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-  static MapAndResetCellType GetMapAndResetCellMethod(const InstrumentDescriptor &instrument_descriptor)
+  static MapAndResetCellType GetMapAndResetCellMethod(
+      const InstrumentDescriptor &instrument_descriptor)
   {
     if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
     {
@@ -169,30 +170,35 @@ private:
     return &ReservoirCell::GetAndResetDouble;
   }
 
-  static nostd::shared_ptr<ExemplarReservoir> GetExemplarReservoir(const AggregationType agg_type, const AggregationConfig *agg_config, const InstrumentDescriptor &instrument_descriptor)
+  static nostd::shared_ptr<ExemplarReservoir> GetExemplarReservoir(
+      const AggregationType agg_type,
+      const AggregationConfig *agg_config,
+      const InstrumentDescriptor &instrument_descriptor)
   {
     if (agg_type == AggregationType::kHistogram)
     {
-      const auto *histogram_agg_config = static_cast<const HistogramAggregationConfig *>(agg_config);
-      // Explicit bucket histogram aggregation with more than 1 bucket will use AlignedHistogramBucketExemplarReservoir.
+      const auto *histogram_agg_config =
+          static_cast<const HistogramAggregationConfig *>(agg_config);
+      // Explicit bucket histogram aggregation with more than 1 bucket will use
+      // AlignedHistogramBucketExemplarReservoir.
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#exemplar-defaults
       if (histogram_agg_config != nullptr && histogram_agg_config->boundaries_.size() > 1)
       {
         return nostd::shared_ptr<ExemplarReservoir>(new AlignedHistogramBucketExemplarReservoir(
             histogram_agg_config->boundaries_.size(),
-            AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(histogram_agg_config->boundaries_),
+            AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(
+                histogram_agg_config->boundaries_),
             GetMapAndResetCellMethod(instrument_descriptor)));
       }
     }
 
     return nostd::shared_ptr<ExemplarReservoir>(new SimpleFixedSizeExemplarReservoir(
-      SimpleFixedSizeExemplarReservoir::kDefaultSimpleReservoirSize,
-      SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
-      GetMapAndResetCellMethod(instrument_descriptor)));
+        SimpleFixedSizeExemplarReservoir::kDefaultSimpleReservoirSize,
+        SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
+        GetMapAndResetCellMethod(instrument_descriptor)));
   }
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
-
 };
 }  // namespace metrics
 }  // namespace sdk

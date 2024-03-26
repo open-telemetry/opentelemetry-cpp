@@ -5,16 +5,16 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <memory>
-#include <vector>
+#  include <memory>
+#  include <vector>
 
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -42,9 +42,10 @@ public:
     return std::shared_ptr<ReservoirCellSelector>{new HistogramCellSelector(boundaries)};
   }
 
-  AlignedHistogramBucketExemplarReservoir(size_t size,
-                             std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                             MapAndResetCellType map_and_reset_cell)
+  AlignedHistogramBucketExemplarReservoir(
+      size_t size,
+      std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
+      MapAndResetCellType map_and_reset_cell)
       : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
   {}
 
@@ -54,7 +55,8 @@ public:
       const opentelemetry::context::Context &context,
       const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
   {
-    OTEL_INTERNAL_LOG_ERROR("AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
+    OTEL_INTERNAL_LOG_ERROR(
+        "AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
   }
 
   class HistogramCellSelector : public ReservoirCellSelector
@@ -67,7 +69,8 @@ public:
                               const MetricAttributes &attributes,
                               const opentelemetry::context::Context &context) override
     {
-      OTEL_INTERNAL_LOG_ERROR("AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
+      OTEL_INTERNAL_LOG_ERROR(
+          "AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
       return -1;
     }
 

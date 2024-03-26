@@ -5,10 +5,10 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <memory>
+#  include <memory>
 
-#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context

@@ -5,15 +5,15 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <cstddef>
-#include <memory>
+#  include <cstddef>
+#  include <memory>
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/trace/context.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/trace/context.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context

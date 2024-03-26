@@ -106,12 +106,10 @@ void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selec
                             std::unique_ptr<MeterSelector> meter_selector,
                             std::unique_ptr<View> view) noexcept
 {
-  context_->AddView(std::move(instrument_selector), std::move(meter_selector),
-                           std::move(view));
+  context_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
-void MeterProvider::SetExemplarFilter(
-    metrics::ExemplarFilterType exemplar_filter_type) noexcept
+void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
 {
   context_->SetExemplarFilter(exemplar_filter_type);
 }

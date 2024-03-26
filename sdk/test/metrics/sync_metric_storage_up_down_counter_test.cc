@@ -7,7 +7,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -42,8 +42,7 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -193,8 +192,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

@@ -8,8 +8,8 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
 #if ENABLE_METRICS_EXEMPLAR_PREVIEW
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -34,7 +34,7 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   int64_t expected_total_get_requests = 0;
   int64_t expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                     InstrumentValueType::kLong};
+                                         InstrumentValueType::kLong};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -43,8 +43,7 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -175,7 +174,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   double expected_total_get_requests = 0;
   double expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                     InstrumentValueType::kDouble};
+                                        InstrumentValueType::kDouble};
   std::map<std::string, std::string> attributes_get = {{"RequestType", "GET"}};
   std::map<std::string, std::string> attributes_put = {{"RequestType", "PUT"}};
 
@@ -184,8 +183,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

@@ -5,12 +5,12 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <memory>
-#include <vector>
+#  include <memory>
+#  include <vector>
 
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -71,9 +71,9 @@ public:
       std::shared_ptr<ExemplarReservoir> reservoir);
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFixedSizeExemplarReservoir(
-    size_t size,
-    std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-    MapAndResetCellType map_and_reset_cell);
+      size_t size,
+      std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
+      MapAndResetCellType map_and_reset_cell);
 
   static nostd::shared_ptr<ExemplarReservoir> GetAlignedHistogramBucketExemplarReservoir(
       size_t size,
