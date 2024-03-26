@@ -22,7 +22,6 @@
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
-
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/version.h"
@@ -34,6 +33,23 @@ namespace metrics
 {
 class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
+
+static inline bool EnableExamplarFilter(ExemplarFilterType filter_type, const opentelemetry::context::Context &context)
+{
+  if (filter_type == ExemplarFilterType::kAlwaysOn)
+  {
+    return true;
+  }
+  else if (filter_type == ExemplarFilterType::kTraceBased)
+  {
+    auto active_span = context.GetValue(opentelemetry::trace::kSpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(active_span))
+    {
+      return nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(active_span)->GetContext().IsSampled();
+    }
+  }
+  return false;
+}
 
 public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
@@ -69,8 +85,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    // TODO: fixme
-    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
@@ -90,8 +105,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    // TODO: fixme
-    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
       exemplar_reservoir_->OfferMeasurement(value, attributes, context, std::chrono::system_clock::now());
     }
@@ -123,7 +137,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
       exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
     }
@@ -139,7 +153,7 @@ public:
                         OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
       exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                             std::chrono::system_clock::now());
@@ -150,7 +164,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn || exemplar_filter_type_ == ExemplarFilterType::kTraceBased)
+    if (EnableExamplarFilter(exemplar_filter_type_, context))
     {
       exemplar_reservoir_->OfferMeasurement(value, attributes, context,
                                             std::chrono::system_clock::now());

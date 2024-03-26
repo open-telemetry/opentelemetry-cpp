@@ -57,8 +57,11 @@ public:
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
+      if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn)
+      {
+        exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
                                             std::chrono::system_clock::now());
+      }
 #endif
 
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
