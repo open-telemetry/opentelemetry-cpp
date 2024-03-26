@@ -28,7 +28,7 @@ const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
 const bool kAttributesLimitOverflowValue      = true;
 const size_t kOverflowAttributesHash          = opentelemetry::sdk::common::GetHashForAttributeMap(
     {{kAttributesLimitOverflowKey,
-               kAttributesLimitOverflowValue}});  // precalculated for optimization
+      kAttributesLimitOverflowValue}});  // precalculated for optimization
 
 class AttributeHashGenerator
 {

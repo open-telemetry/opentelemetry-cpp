@@ -1,10 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-foreach(
-  testname
-  no_exemplar_reservoir_test 
-  aligned_histogram_bucket_exemplar_reservoir_test reservoir_cell_test
+foreach(testname
+        no_exemplar_reservoir_test 
+        aligned_histogram_bucket_exemplar_reservoir_test reservoir_cell_test
   )
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
