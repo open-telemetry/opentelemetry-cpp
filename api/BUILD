@@ -5,10 +5,29 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
-bool_flag(
-    name = "with_abseil",
-    build_setting_default = False,
-)
+#
+# Important note
+# the boolean flag "with_abseil" is no longer supported,
+# because with_abseil is no longer optional.
+#
+# Unlike CMake, the bazel build has no option to only select a few exporters,
+# so it builds all the exporters available.
+#
+# The OTLP exporter depends on protobuf,
+# and protobuf has a mandatory dependency on abseil starting
+# with protobuf 3.22
+#
+# See in CMake:
+#   "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
+#
+# Since building with abseil is mandatory with bazel,
+# the bazel option "with_abseil" is now removed.
+#
+
+## bool_flag(
+##     name = "with_abseil",
+##     build_setting_default = False,
+## )
 
 CPP_STDLIBS = [
     "none",
@@ -46,20 +65,25 @@ cc_library(
     }),
     strip_include_prefix = "include",
     tags = ["api"],
-    deps = select({
-        ":with_external_abseil": [
-            "@com_google_absl//absl/base",
-            "@com_google_absl//absl/strings",
-            "@com_google_absl//absl/types:variant",
-        ],
-        "//conditions:default": [],
-    }),
+    deps = [
+      "@com_google_absl//absl/base",
+      "@com_google_absl//absl/strings",
+      "@com_google_absl//absl/types:variant",
+      ],
+##    deps = select({
+##        ":with_external_abseil": [
+##            "@com_google_absl//absl/base",
+##            "@com_google_absl//absl/strings",
+##            "@com_google_absl//absl/types:variant",
+##        ],
+##        "//conditions:default": [],
+##    }),
 )
 
-config_setting(
-    name = "with_external_abseil",
-    flag_values = {":with_abseil": "true"},
-)
+## config_setting(
+##     name = "with_external_abseil",
+##     flag_values = {":with_abseil": "true"},
+## )
 
 [config_setting(
     name = "set_cxx_stdlib_%s" % v,
