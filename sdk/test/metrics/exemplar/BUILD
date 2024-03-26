@@ -70,9 +70,9 @@ cc_test(
 )
 
 cc_test(
-    name = "histogram_exemplar_reservoir_test",
+    name = "aligned_histogram_bucket_exemplar_reservoir_test",
     srcs = [
-        "histogram_exemplar_reservoir_test.cc",
+        "aligned_histogram_bucket_exemplar_reservoir_test.cc",
     ],
     tags = [
         "metrics",

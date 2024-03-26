@@ -4,7 +4,7 @@
 foreach(
   testname
   no_exemplar_reservoir_test 
-  histogram_exemplar_reservoir_test reservoir_cell_test
+  aligned_histogram_bucket_exemplar_reservoir_test reservoir_cell_test
   )
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
