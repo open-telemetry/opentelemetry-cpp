@@ -18,9 +18,13 @@
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+
+#if ENABLE_METRICS_EXEMPLAR_PREVIEW
 #include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
 #include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
