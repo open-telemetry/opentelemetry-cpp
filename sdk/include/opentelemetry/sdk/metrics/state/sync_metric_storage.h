@@ -36,19 +36,10 @@ class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 
 static inline bool EnableExamplarFilter(ExemplarFilterType filter_type, const opentelemetry::context::Context &context)
 {
-  if (filter_type == ExemplarFilterType::kAlwaysOn)
-  {
-    return true;
-  }
-  else if (filter_type == ExemplarFilterType::kTraceBased)
-  {
-    auto active_span = context.GetValue(opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(active_span))
-    {
-      return nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(active_span)->GetContext().IsSampled();
-    }
-  }
-  return false;
+  return filter_type == ExemplarFilterType::kAlwaysOn || 
+         filter_type == ExemplarFilterType::kTraceBased &&
+           opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
+           opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
 }
 
 public:
