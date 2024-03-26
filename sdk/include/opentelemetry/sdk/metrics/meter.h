@@ -168,7 +168,9 @@ private:
     if (agg_type == AggregationType::kHistogram)
     {
       const auto *histogram_agg_config = static_cast<const HistogramAggregationConfig *>(agg_config);
-      if (histogram_agg_config && histogram_agg_config->boundaries_.size() > 0)
+      // Explicit bucket histogram aggregation with more than 1 bucket will use AlignedHistogramBucketExemplarReservoir.
+      // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#exemplar-defaults
+      if (histogram_agg_config != nullptr && histogram_agg_config->boundaries_.size() > 1)
       {
         return nostd::shared_ptr<ExemplarReservoir>(new AlignedHistogramBucketExemplarReservoir(
             histogram_agg_config->boundaries_.size(),
