@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 #include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #include <gtest/gtest.h>
 
@@ -16,3 +18,5 @@ TEST(NoExemplarReservoir, OfferMeasurement)
   auto exemplar_data = reservoir->CollectAndReset(MetricAttributes{});
   ASSERT_TRUE(exemplar_data.empty());
 }
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
