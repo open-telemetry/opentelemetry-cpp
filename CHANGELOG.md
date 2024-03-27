@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add OTLP File exporters
+  [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
 * [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
 * [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
