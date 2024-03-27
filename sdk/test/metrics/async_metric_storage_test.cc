@@ -6,7 +6,7 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 
-#ifdef ENABLE_METRICS_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
