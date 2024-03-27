@@ -66,6 +66,11 @@ public:
                               const MetricAttributes & /* attributes */,
                               const opentelemetry::context::Context & /* context */) override
     {
+      //
+      // The simple reservoir sampling algorithm from the spec below is used.
+      // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#simplefixedsizeexemplarreservoir
+      //
+
       size_t measurement_num = measurements_seen_++;
       size_t index           = static_cast<size_t>(-1);
 
@@ -76,7 +81,12 @@ public:
       else
       {
         // return random index between 0 and measurement_num
-        index = rand() % (measurement_num + 1);
+        size_t random_index = rand() % (measurement_num + 1);
+
+        if (random_index < size_)
+        {
+          index = random_index;
+        }
       }
 
       return static_cast<int>(index);
