@@ -5,6 +5,7 @@
 
 #include <memory>
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 
 #if ENABLE_METRICS_EXEMPLAR_PREVIEW
