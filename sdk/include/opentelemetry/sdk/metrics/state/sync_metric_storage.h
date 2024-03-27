@@ -154,13 +154,6 @@ public:
                     const opentelemetry::context::Context &context
                         OPENTELEMETRY_MAYBE_UNUSED) noexcept override
   {
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (EnableExamplarFilter(exemplar_filter_type_, context))
-    {
-      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                            std::chrono::system_clock::now());
-    }
-#endif
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
