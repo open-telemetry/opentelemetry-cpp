@@ -152,7 +152,7 @@ private:
   std::vector<std::shared_ptr<Meter>> meters_;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  metrics::ExemplarFilterType exemplar_filter_type_;
+  metrics::ExemplarFilterType exemplar_filter_type_ = metrics::ExemplarFilterType::kAlwaysOff;
 #endif
 
 #if defined(__cpp_lib_atomic_value_initialization) && \
