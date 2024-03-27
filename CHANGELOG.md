@@ -36,7 +36,11 @@ Important changes:
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
 
 Notes on experimental features:
-* []
+
+* [#2327](https://github.com/open-telemetry/opentelemetry-cpp/issues/2327)
+  introduced `MeterProvider::SetExemplar()` which accepts en
+  `ExemplarFilterType` enumeration with `kAlwaysOff`, `kAlwaysOn` and
+  `kTraceBased`.
 
 ## [1.14.2] 2024-02-27
 
