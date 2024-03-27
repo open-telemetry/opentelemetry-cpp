@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -50,9 +51,9 @@ private:
   std::thread worker_thread_;
 
   /* Synchronization primitives */
-  std::atomic<bool> is_force_flush_pending_{false};
   std::atomic<bool> is_force_wakeup_background_worker_{false};
-  std::atomic<bool> is_force_flush_notified_{false};
+  std::atomic<std::uint64_t> force_flush_pending_sequence_{0};
+  std::atomic<std::uint64_t> force_flush_notified_sequence_{0};
   std::condition_variable cv_, force_flush_cv_;
   std::mutex cv_m_, force_flush_m_;
 };
