@@ -64,10 +64,10 @@ public:
   public:
     HistogramCellSelector(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
 
-    int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
-                              int64_t value,
-                              const MetricAttributes &attributes,
-                              const opentelemetry::context::Context &context) override
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              int64_t /* value  */,
+                              const MetricAttributes & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
     {
       OTEL_INTERNAL_LOG_ERROR(
           "AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
