@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
-#include <gtest/gtest.h>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include <gtest/gtest.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -70,3 +72,5 @@ TEST_F(ReservoirCellTestPeer, Filtered)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
