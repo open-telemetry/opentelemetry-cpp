@@ -14,6 +14,7 @@
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 #  include "opentelemetry/version.h"
+#  include "src/common/random.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -80,8 +81,7 @@ public:
       }
       else
       {
-        // return random index between 0 and measurement_num
-        size_t random_index = rand() % (measurement_num + 1);
+        size_t random_index = sdk::common::Random::GenerateRandom64() % measurement_num;
 
         if (random_index < size_)
         {
