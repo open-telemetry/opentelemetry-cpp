@@ -109,10 +109,14 @@ void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selec
   context_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
 {
   context_->SetExemplarFilter(exemplar_filter_type);
 }
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 /**
  * Shutdown the meter provider.
