@@ -107,7 +107,8 @@ public:
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept;
+  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type =
+                             metrics::ExemplarFilterType::kTraceBased) noexcept;
 
 #endif
 
