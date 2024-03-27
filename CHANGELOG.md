@@ -19,6 +19,8 @@ Increment the:
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
 * [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
+* [SDK] Update ExemplarFilter and ExemplarReservoir for spec
+  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 
 Important changes:
 
@@ -32,6 +34,9 @@ Important changes:
     dependency on zlib.
 * [SDK] Change OTLP HTTP content_type default to binary
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+
+Notes on experimental features:
+* []
 
 ## [1.14.2] 2024-02-27
 
