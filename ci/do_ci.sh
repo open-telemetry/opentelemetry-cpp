@@ -403,10 +403,6 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   make -j $(nproc)
   sudo make install
   exit 0
-elif [[ "$1" == "bazel.with_abseil" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...
-  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -529,7 +525,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
-  echo "abseil=20220623.1" >> third_party_release
+  echo "abseil=20240116.1" >> third_party_release
   git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi
