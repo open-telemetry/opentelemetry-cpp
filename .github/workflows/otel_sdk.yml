@@ -1,7 +1,7 @@
 name: otel_sdk
 
 # Example:
-#  git tag -a v1.13.0-dll-0.3 -m "Tagged. You are it!" && git push --tags
+#  git tag -a v1.14.2.dll.x -m "Release 1.14.2.dll.x" && git push --tags
 on:
   push:
     tags:
@@ -16,8 +16,7 @@ jobs:
       contents: write
     steps:
       - run: ls env:* | Format-Table -AutoSize
-      - run: choco install bazelisk
-      - run: choco upgrade llvm --version 18.1.0
+      - run: winget install -h --verbose --disable-interactivity bazelisk llvm
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
