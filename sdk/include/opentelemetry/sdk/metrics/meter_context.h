@@ -150,7 +150,10 @@ private:
   std::unique_ptr<ViewRegistry> views_;
   opentelemetry::common::SystemTimestamp sdk_start_ts_;
   std::vector<std::shared_ptr<Meter>> meters_;
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   metrics::ExemplarFilterType exemplar_filter_type_;
+#endif
 
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L
