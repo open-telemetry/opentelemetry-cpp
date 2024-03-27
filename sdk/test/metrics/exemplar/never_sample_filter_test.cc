@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 #include <gtest/gtest.h>
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 using namespace opentelemetry::sdk::metrics;
 
