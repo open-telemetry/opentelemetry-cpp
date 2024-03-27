@@ -5,7 +5,7 @@ module(
 )
 
 bazel_dep(name = "abseil-cpp", version = "20230802.1", repo_name = "com_google_absl")
-bazel_dep(name = "aspect_bazel_lib", version = "2.5.3")
+bazel_dep(name = "aspect_bazel_lib", version = "2.6.0")
 
 bazel_dep(name = "rules_pkg", version = "0.10.1", dev_dependency = True)
 
@@ -19,28 +19,16 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1", dev_dependency = True, 
 bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name = "github_nlohmann_json")
 bazel_dep(name = "grpc", version = "1.56.3.bcr.1", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "opentelemetry-proto", version = "1.1.0", repo_name = "com_github_opentelemetry_proto")
-archive_override(
-    module_name = "opentelemetry-proto",
-    integrity = "sha256-30kaBfP8v4bMW6XJ3oH2piTXTUdz1wCdVz431uK2r2Q=",
-    patch_strip = 1,
-    patches = [
-        "bazel/opentelemetry-proto.patch",
-    ],
-    strip_prefix = "opentelemetry-proto-1.1.0",
-    urls = [
-        "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.1.0.tar.gz",
-    ],
-)
 
 bazel_dep(name = "prometheus-cpp", version = "1.2.4", repo_name = "com_github_jupp0r_prometheus_cpp")
-archive_override(
-    module_name = "prometheus-cpp",
-    integrity = "sha256-DWhSKRBjw1hT6IgFxztS9zwMCLeMHnvE1Yj89ypxcus=",
-    strip_prefix = "prometheus-cpp-with-submodules",
-    urls = [
-        "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.4/prometheus-cpp-with-submodules.tar.gz",
-    ],
-)
+# archive_override(
+#     module_name = "prometheus-cpp",
+#     integrity = "sha256-DWhSKRBjw1hT6IgFxztS9zwMCLeMHnvE1Yj89ypxcus=",
+#     strip_prefix = "prometheus-cpp-with-submodules",
+#     urls = [
+#         "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.4/prometheus-cpp-with-submodules.tar.gz",
+#     ],
+# )
 
 # local_path_override(
 #     module_name = "prometheus-cpp",

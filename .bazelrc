@@ -22,7 +22,7 @@ test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 build:windows --experimental_convenience_symlinks=clean
 build --experimental_cc_implementation_deps
 
-build:windows    --copt="/Brepro"    --copt="/guard:cf" --copt="/Z7" --copt="/JMC-" --cxxopt="/std:c++17" --copt="/sdl" --copt="-D_CRT_NONSTDC_NO_DEPRECATE"
+build:windows    --copt="/Brepro"    --copt="/guard:cf" --copt="/Z7" --copt="/JMC-" --copt="/sdl" --copt="-D_CRT_NONSTDC_NO_DEPRECATE"
 build:windows --linkopt="/Brepro" --linkopt="/guard:cf" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP"
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
@@ -40,6 +40,11 @@ build:windows --copt="-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS"
 # external/com_github_grpc_grpc/src/core/lib/iomgr/tcp_server_windows.cc(502): error C4996: 'WSASocketA': Use WSASocketW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
 # Use this define, instead of disabling 4996 - /wd4996
 build:windows --copt="-D_WINSOCK_DEPRECATED_NO_WARNINGS"
+
+# Set minimum supported C++ version
+build:macos --host_cxxopt=-std=c++17 --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17 --cxxopt=-std=c++17
+build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER

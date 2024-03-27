@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "8399baf923e02ed278583b062710987a8c9f3bc3354c7186df7e3f29f83de2c6",
+  "moduleFileHash": "7707249c93d2ae22119f4a5b77a83a17899f1670d48a5441850a3045f95cf789",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -36,7 +36,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 55,
+            "line": 43,
             "column": 18
           },
           "imports": {
@@ -60,7 +60,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 66,
+            "line": 54,
             "column": 29
           },
           "imports": {
@@ -75,7 +75,7 @@
       ],
       "deps": {
         "com_google_absl": "abseil-cpp@20230802.1",
-        "aspect_bazel_lib": "aspect_bazel_lib@2.5.3",
+        "aspect_bazel_lib": "aspect_bazel_lib@2.6.0",
         "rules_pkg": "rules_pkg@0.10.1",
         "rules_cc": "rules_cc@0.0.9",
         "bazel_skylib": "bazel_skylib@1.5.0",
@@ -84,8 +84,8 @@
         "com_google_googletest": "googletest@1.14.0.bcr.1",
         "github_nlohmann_json": "nlohmann_json@3.11.3",
         "com_github_grpc_grpc": "grpc@1.56.3.bcr.1",
-        "com_github_opentelemetry_proto": "opentelemetry-proto@_",
-        "com_github_jupp0r_prometheus_cpp": "prometheus-cpp@_",
+        "com_github_opentelemetry_proto": "opentelemetry-proto@1.1.0",
+        "com_github_jupp0r_prometheus_cpp": "prometheus-cpp@1.2.4",
         "boringssl": "boringssl@0.0.0-20240126-22d349c",
         "zlib": "zlib@1.3.1.bcr.1",
         "rules_proto": "rules_proto@6.0.0-rc2",
@@ -125,10 +125,10 @@
         }
       }
     },
-    "aspect_bazel_lib@2.5.3": {
+    "aspect_bazel_lib@2.6.0": {
       "name": "aspect_bazel_lib",
-      "version": "2.5.3",
-      "key": "aspect_bazel_lib@2.5.3",
+      "version": "2.6.0",
+      "key": "aspect_bazel_lib@2.6.0",
       "repoName": "aspect_bazel_lib",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [
@@ -148,9 +148,9 @@
         {
           "extensionBzlFile": "@aspect_bazel_lib//lib:extensions.bzl",
           "extensionName": "toolchains",
-          "usingModule": "aspect_bazel_lib@2.5.3",
+          "usingModule": "aspect_bazel_lib@2.6.0",
           "location": {
-            "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+            "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
             "line": 17,
             "column": 37
           },
@@ -171,7 +171,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 18,
                 "column": 36
               }
@@ -181,7 +181,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 19,
                 "column": 39
               }
@@ -191,7 +191,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 20,
                 "column": 24
               }
@@ -201,7 +201,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 21,
                 "column": 24
               }
@@ -211,7 +211,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 22,
                 "column": 31
               }
@@ -221,7 +221,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 23,
                 "column": 25
               }
@@ -231,7 +231,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 24,
                 "column": 37
               }
@@ -241,7 +241,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/MODULE.bazel",
                 "line": 25,
                 "column": 26
               }
@@ -263,13 +263,13 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/aspect-build/bazel-lib/releases/download/v2.5.3/bazel-lib-v2.5.3.tar.gz"
+            "https://github.com/aspect-build/bazel-lib/releases/download/v2.6.0/bazel-lib-v2.6.0.tar.gz"
           ],
-          "integrity": "sha256-bCXFlYEEHt4x4RdpMEf5csxHAMiaz5E2WNyJ0Ewzj40=",
-          "strip_prefix": "bazel-lib-2.5.3",
+          "integrity": "sha256-PgpDCtqbjw+EV2eiZ89YS8lLjsZC1gk/Mdyjk4sY9qE=",
+          "strip_prefix": "bazel-lib-2.6.0",
           "remote_patches": {
-            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/patches/go_dev_dep.patch": "sha256-KgABwDzOT+DugUHn9tHLOz05osnk2FLsS10d5zqG/M0=",
-            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.5.3/patches/module_dot_bazel_version.patch": "sha256-lJcPl3qi//Az5K9CO6WnDIL8gtJVzpOWhyailCiKeVY="
+            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/patches/go_dev_dep.patch": "sha256-KgABwDzOT+DugUHn9tHLOz05osnk2FLsS10d5zqG/M0=",
+            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.6.0/patches/module_dot_bazel_version.patch": "sha256-qSIbSBOVaz8zZVOmdy/KRrQfVeqMnziGnF1aoJomWx4="
           },
           "remote_patch_strip": 1
         }
@@ -770,10 +770,10 @@
         }
       }
     },
-    "opentelemetry-proto@_": {
+    "opentelemetry-proto@1.1.0": {
       "name": "opentelemetry-proto",
       "version": "1.1.0",
-      "key": "opentelemetry-proto@_",
+      "key": "opentelemetry-proto@1.1.0",
       "repoName": "opentelemetry-proto",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [],
@@ -783,12 +783,27 @@
         "rules_proto": "rules_proto@6.0.0-rc2",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
+      },
+      "repoSpec": {
+        "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+        "ruleClassName": "http_archive",
+        "attributes": {
+          "urls": [
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.1.0.tar.gz"
+          ],
+          "integrity": "sha256-30kaBfP8v4bMW6XJ3oH2piTXTUdz1wCdVz431uK2r2Q=",
+          "strip_prefix": "opentelemetry-proto-1.1.0",
+          "remote_patches": {
+            "https://bcr.bazel.build/modules/opentelemetry-proto/1.1.0/patches/0001-Add-MODULE.bazel.patch": "sha256-RrO6zvMf7Z36RlhKw/7d3/6RnyTbMpQfOp8kq2bqWJw="
+          },
+          "remote_patch_strip": 1
+        }
       }
     },
-    "prometheus-cpp@_": {
+    "prometheus-cpp@1.2.4": {
       "name": "prometheus-cpp",
       "version": "1.2.4",
-      "key": "prometheus-cpp@_",
+      "key": "prometheus-cpp@1.2.4",
       "repoName": "com_github_jupp0r_prometheus_cpp",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [],
@@ -796,9 +811,9 @@
         {
           "extensionBzlFile": "@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl",
           "extensionName": "data_deps_ext",
-          "usingModule": "prometheus-cpp@_",
+          "usingModule": "prometheus-cpp@1.2.4",
           "location": {
-            "file": "@@prometheus-cpp~//:MODULE.bazel",
+            "file": "https://bcr.bazel.build/modules/prometheus-cpp/1.2.4/MODULE.bazel",
             "line": 7,
             "column": 30
           },
@@ -819,6 +834,19 @@
         "zlib": "zlib@1.3.1.bcr.1",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
+      },
+      "repoSpec": {
+        "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+        "ruleClassName": "http_archive",
+        "attributes": {
+          "urls": [
+            "https://github.com/jupp0r/prometheus-cpp/releases/download/v1.2.4/prometheus-cpp-with-submodules.tar.gz"
+          ],
+          "integrity": "sha256-DWhSKRBjw1hT6IgFxztS9zwMCLeMHnvE1Yj89ypxcus=",
+          "strip_prefix": "prometheus-cpp-with-submodules",
+          "remote_patches": {},
+          "remote_patch_strip": 0
+        }
       }
     },
     "boringssl@0.0.0-20240126-22d349c": {
@@ -2381,7 +2409,7 @@
     },
     "@@aspect_bazel_lib~//lib:extensions.bzl%toolchains": {
       "general": {
-        "bzlTransitiveDigest": "H6ezdphBae7pq8EW1mSupf+FjMuk8mtYNgMZ8pclWPc=",
+        "bzlTransitiveDigest": "3DMe+xbwSbNxqwKAlnUgn08hF/9FBfMa6nhVI3l+6sE=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
