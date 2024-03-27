@@ -3,9 +3,9 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include <gtest/gtest.h>
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include <gtest/gtest.h>
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 
 using namespace opentelemetry::sdk::metrics;
 
