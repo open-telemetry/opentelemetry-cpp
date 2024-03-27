@@ -44,9 +44,9 @@ class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
                                           const opentelemetry::context::Context &context)
   {
     return filter_type == ExemplarFilterType::kAlwaysOn ||
-           filter_type == ExemplarFilterType::kTraceBased &&
-               opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
-               opentelemetry::trace::GetSpan(context)->GetContext().IsSampled();
+           (filter_type == ExemplarFilterType::kTraceBased &&
+            opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
+            opentelemetry::trace::GetSpan(context)->GetContext().IsSampled());
   }
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
