@@ -49,6 +49,8 @@ public:
       : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
   {}
 
+  using FixedSizeExemplarReservoir::OfferMeasurement;
+
   void OfferMeasurement(
       int64_t /* value */,
       const MetricAttributes & /* attributes */,

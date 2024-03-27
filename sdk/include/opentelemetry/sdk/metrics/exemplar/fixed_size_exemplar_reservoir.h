@@ -34,6 +34,8 @@ public:
         map_and_reset_cell_(map_and_reset_cell)
   {}
 
+  using ExemplarReservoir::OfferMeasurement;
+
   void OfferMeasurement(
       int64_t value,
       const MetricAttributes &attributes,
