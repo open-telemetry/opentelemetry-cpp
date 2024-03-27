@@ -5,6 +5,8 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter.h"
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 using namespace opentelemetry::sdk::metrics;
 
 TEST(NeverSampleFilter, SampleMeasurement)
@@ -15,3 +17,5 @@ TEST(NeverSampleFilter, SampleMeasurement)
   ASSERT_FALSE(filter->ShouldSampleMeasurement(static_cast<int64_t>(1), MetricAttributes{},
                                                opentelemetry::context::Context{}));
 }
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
