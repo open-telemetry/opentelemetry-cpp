@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "7707249c93d2ae22119f4a5b77a83a17899f1670d48a5441850a3045f95cf789",
+  "moduleFileHash": "bc4118348eb9b88278c9bfc8c7b53f9cfa4a5bfc91962be32c7492aa558d46f3",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -18,7 +18,7 @@
   "moduleDepGraph": {
     "<root>": {
       "name": "opentelemetry-cpp",
-      "version": "1.14.1",
+      "version": "1.14.2.dll.1",
       "key": "<root>",
       "repoName": "io_opentelemetry_cpp",
       "executionPlatformsToRegister": [
@@ -36,7 +36,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 43,
+            "line": 30,
             "column": 18
           },
           "imports": {
@@ -60,7 +60,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 54,
+            "line": 41,
             "column": 29
           },
           "imports": {
