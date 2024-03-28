@@ -10,7 +10,12 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
@@ -30,14 +35,17 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                      const AggregationType aggregation_type,
-                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir
-                         OPENTELEMETRY_MAYBE_UNUSED,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                     ExemplarFilterType exempler_filter_type,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         cumulative_hash_map_(new AttributesHashMap()),
         delta_hash_map_(new AttributesHashMap()),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+        exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(exemplar_reservoir),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
@@ -54,8 +62,11 @@ public:
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
-                                            std::chrono::system_clock::now());
+      if (exemplar_filter_type_ == ExemplarFilterType::kAlwaysOn)
+      {
+        exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
+                                              std::chrono::system_clock::now());
+      }
 #endif
 
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
@@ -131,6 +142,7 @@ private:
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;

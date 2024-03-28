@@ -5,8 +5,14 @@
 
 #include <memory>
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+
+#if ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -37,7 +43,10 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
 
   storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -174,7 +183,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor.get(),
-      ExemplarReservoir::GetNoExemplarReservoir(), nullptr);
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),

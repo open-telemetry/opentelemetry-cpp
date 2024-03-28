@@ -3,15 +3,18 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
-#include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
-#include "opentelemetry/version.h"
+#  include <memory>
+#  include <vector>
+
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
@@ -29,7 +32,7 @@ namespace sdk
 namespace metrics
 {
 
-class HistogramExemplarReservoir : public FixedSizeExemplarReservoir
+class AlignedHistogramBucketExemplarReservoir : public FixedSizeExemplarReservoir
 {
 
 public:
@@ -39,11 +42,11 @@ public:
     return std::shared_ptr<ReservoirCellSelector>{new HistogramCellSelector(boundaries)};
   }
 
-  HistogramExemplarReservoir(size_t size,
-                             std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                             std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                 const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
-      : FixedSizeExemplarReservoir(size, reservoir_cell_selector, map_and_reset_cell)
+  AlignedHistogramBucketExemplarReservoir(
+      size_t size,
+      std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
+      MapAndResetCellType map_and_reset_cell)
+      : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
   {}
 
   class HistogramCellSelector : public ReservoirCellSelector
@@ -72,7 +75,9 @@ public:
           return static_cast<int>(i);
         }
       }
-      return -1;
+
+      // The bucket at max_size is for values greater than the last boundary
+      return static_cast<int>(max_size);
     }
 
   private:
@@ -87,3 +92,5 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

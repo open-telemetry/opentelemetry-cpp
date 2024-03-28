@@ -70,9 +70,9 @@ public:
                            reinterpret_cast<uint32_t *>(state_.data() + state_.size()));
   }
 
-  static constexpr uint64_t min() noexcept { return 0; }
+  static constexpr uint64_t(min)() noexcept { return 0; }
 
-  static constexpr uint64_t max() noexcept { return std::numeric_limits<uint64_t>::max(); }
+  static constexpr uint64_t(max)() noexcept { return (std::numeric_limits<uint64_t>::max)(); }
 
 private:
   std::array<uint64_t, 2> state_{};

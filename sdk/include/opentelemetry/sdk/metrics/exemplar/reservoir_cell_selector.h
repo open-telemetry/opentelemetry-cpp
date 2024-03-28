@@ -3,12 +3,14 @@
 
 #pragma once
 
-#include <cstddef>
-#include <vector>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
-#include "opentelemetry/version.h"
+#  include <cstddef>
+#  include <vector>
+
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -45,3 +47,5 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

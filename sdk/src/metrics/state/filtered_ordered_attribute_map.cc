@@ -16,7 +16,7 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
 {
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-        if (processor && processor->isPresent(key))
+        if (!processor || processor->isPresent(key))
         {
           SetAttribute(key, value);
         }
@@ -32,7 +32,7 @@ FilteredOrderedAttributeMap::FilteredOrderedAttributeMap(
 {
   for (auto &kv : attributes)
   {
-    if (processor && processor->isPresent(kv.first))
+    if (!processor || processor->isPresent(kv.first))
     {
       SetAttribute(kv.first, kv.second);
     }
