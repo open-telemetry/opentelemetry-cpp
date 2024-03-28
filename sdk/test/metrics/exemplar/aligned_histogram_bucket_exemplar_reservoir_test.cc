@@ -35,7 +35,6 @@ TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement)
 
 TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement1)
 {
-  __debugbreak();
   std::vector<double> boundaries{1, 5.0, 10, 15, 20};
   auto histogram_exemplar_reservoir = ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
       boundaries.size(),
