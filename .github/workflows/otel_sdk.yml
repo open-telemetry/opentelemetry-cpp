@@ -34,7 +34,11 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: $rev = git rev-parse HEAD; echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"$rev`"; }" > version.c
       - run: ./otel_sdk_build.cmd
-      - run: tar tfv ./otel_sdk.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tracing-profiles
+          path: ./*.tracing.json
+          if-no-files-found: warn
       - name: release otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: ncipollo/release-action@v1
