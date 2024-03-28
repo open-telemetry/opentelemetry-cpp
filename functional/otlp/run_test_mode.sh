@@ -16,7 +16,7 @@
 # Https collector listening on endpoint.
 #
 
-# set -e
+set -e
 
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 

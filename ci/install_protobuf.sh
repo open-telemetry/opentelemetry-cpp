@@ -61,9 +61,9 @@ tar zxf ${CPP_PROTOBUF_PACKAGE_NAME}.tar.gz --no-same-owner
 
 mkdir protobuf-${CPP_PROTOBUF_VERSION}/build && pushd protobuf-${CPP_PROTOBUF_VERSION}/build
 if [ -e "../CMakeLists.txt" ]; then
-  cmake .. ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+  cmake .. "${CPP_PROTOBUF_BUILD_OPTIONS[@]}"
 else
-  cmake ../cmake ${CPP_PROTOBUF_BUILD_OPTIONS[@]}
+  cmake ../cmake "${CPP_PROTOBUF_BUILD_OPTIONS[@]}"
 fi
 cmake --build . -j $(nproc)
 cmake --install .

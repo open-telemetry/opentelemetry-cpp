@@ -8,6 +8,7 @@
 # opentelemetry-java/buildscripts/semantic-convention/generate.sh
 # for opentelemetry-cpp
 #
+set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"

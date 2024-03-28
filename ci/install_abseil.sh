@@ -23,7 +23,7 @@ if [ ! -z "${CXX_STANDARD}" ]; then
 fi
 
 mkdir build && pushd build
-cmake ${ABSEIL_CPP_BUILD_OPTIONS[@]} ..
+cmake "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
 make -j $(nproc)
 make install
 popd
