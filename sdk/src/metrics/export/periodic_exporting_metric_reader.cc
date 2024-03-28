@@ -196,7 +196,7 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
     {
       // ensure that `cv_` is awaiting, and the update doesn't get lost
       std::unique_lock<std::mutex> lk(cv_m_);
-      cv_.notify_one();
+      cv_.notify_all();
     }
     worker_thread_.join();
   }
