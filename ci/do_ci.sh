@@ -43,6 +43,10 @@ function run_benchmarks
   do
     out=$component-benchmark_result.json
     find ./$component -type f -name "*_result.json" -exec cat {} \; > $component_tmp_bench.json
+    # Print each result in CI logs, so it can be inspected.
+    echo "BENCHMARK result (begin)"
+    cat $component_tmp_bench.json
+    echo "BENCHMARK result (end)"
     cat $component_tmp_bench.json | docker run -i --rm itchyny/gojq:0.12.6 -s \
       '.[0].benchmarks = ([.[].benchmarks] | add) |
       if .[0].benchmarks == null then null else .[0] end' > $BENCHMARK_DIR/$out
