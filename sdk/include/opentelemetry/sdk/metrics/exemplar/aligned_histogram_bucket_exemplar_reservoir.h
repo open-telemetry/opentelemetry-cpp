@@ -90,7 +90,7 @@ public:
         }
       }
 
-      // the bucket at max_size is for values greater than the last boundary
+      // The bucket at max_size is for values greater than the last boundary
       return static_cast<int>(max_size);
     }
 
