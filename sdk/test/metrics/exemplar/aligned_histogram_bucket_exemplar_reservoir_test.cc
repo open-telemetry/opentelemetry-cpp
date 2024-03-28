@@ -46,7 +46,7 @@ TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement1)
                                                  opentelemetry::context::Context{},
                                                  std::chrono::system_clock::now());
   auto exemplar_data = histogram_exemplar_reservoir->CollectAndReset(MetricAttributes{});
-  ASSERT_TRUE(exemplar_data.empty());
+  ASSERT_FALSE(exemplar_data.empty());
 }
 
 }  // namespace metrics
