@@ -19,6 +19,8 @@ Increment the:
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
 * [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
+* [SDK] DefaultLogHandler to print to std::cerr, add LogLevel::None
+  [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
 
 Important changes:
 
@@ -32,6 +34,22 @@ Important changes:
     dependency on zlib.
 * [SDK] Change OTLP HTTP content_type default to binary
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+* [SDK] DefaultLogHandler to print to std::cerr, add LogLevel::None
+  [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
+  * Change DefaultLogHandler output
+    * Before, the default internal logger, DefaultLogHandler,
+      used to print to std::cout, interferring with the user application.
+    * Now, DefaultLogHandler prints to std::cerr, as expected.
+    * Applications that expected to find the opentelemetry-cpp internal
+      error log in std::cout may need adjustments, either by looking
+      at std::cerr instead, or by using a custom log handler.
+  * Additional LogLevel:None
+    * LogLevel:None is a new supported log level, which does not print
+      any message.
+    * Custom log handlers may need to implement a new case, to avoid
+      compiler warnings.
+    * Numbering of log levels like OTEL_INTERNAL_LOG_LEVEL_ERROR
+      has changed, which requires to rebuild, as the SDK ABI differs.
 
 ## [1.14.2] 2024-02-27
 
