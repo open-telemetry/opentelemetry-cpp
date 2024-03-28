@@ -49,31 +49,17 @@ public:
       : FixedSizeExemplarReservoir(size + 1, reservoir_cell_selector, map_and_reset_cell)
   {}
 
-  using FixedSizeExemplarReservoir::OfferMeasurement;
-
-  void OfferMeasurement(
-      int64_t /* value */,
-      const MetricAttributes & /* attributes */,
-      const opentelemetry::context::Context & /* context */,
-      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
-  {
-    OTEL_INTERNAL_LOG_ERROR(
-        "AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
-  }
-
   class HistogramCellSelector : public ReservoirCellSelector
   {
   public:
     HistogramCellSelector(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
 
-    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
-                              int64_t /* value  */,
-                              const MetricAttributes & /* attributes */,
-                              const opentelemetry::context::Context & /* context */) override
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+                              int64_t value,
+                              const MetricAttributes &attributes,
+                              const opentelemetry::context::Context &context) override
     {
-      OTEL_INTERNAL_LOG_ERROR(
-          "AlignedHistogramBucketExemplarReservoir shouldn't be used with int64_t values");
-      return -1;
+      return ReservoirCellIndexFor(cells, static_cast<double>(value), attributes, context);
     }
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
