@@ -43,8 +43,8 @@ Important changes:
     * Applications that expected to find the opentelemetry-cpp internal
       error log in std::cout may need adjustments, either by looking
       at std::cerr instead, or by using a custom log handler.
-  * Additional LogLevel:None
-    * LogLevel:None is a new supported log level, which does not print
+  * Additional LogLevel::None
+    * LogLevel::None is a new supported log level, which does not print
       any message.
     * Custom log handlers may need to implement a new case, to avoid
       compiler warnings.
