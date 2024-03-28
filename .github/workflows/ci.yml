@@ -871,6 +871,16 @@ jobs:
     - name: run markdownlint
       run: markdownlint .
 
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v4
+    - name: install shellcheck
+      run: sudo apt install --assume-yes shellcheck
+    - name: run shellcheck
+      run: find . -name \*.sh | xargs shellcheck --severity=error
+
   misspell:
     runs-on: ubuntu-latest
     steps:
