@@ -33,7 +33,7 @@ void DefaultLogHandler::Handle(LogLevel level,
   }
   output_s << std::endl;
   // TBD - print attributes
-  std::cout << output_s.str();  // thread safe.
+  std::cerr << output_s.str();  // thread safe.
 }
 
 void NoopLogHandler::Handle(LogLevel,
