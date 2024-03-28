@@ -38,8 +38,14 @@ jobs:
       - name: release otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: ncipollo/release-action@v1
-        with:
-          artifacts: ./otel_sdk.zip
+        with: # skipping as test nodll ./0.nodll.tracing.json
+          artifacts: |
+            ./otel_sdk.zip
+            ./1.all.tracing.json
+            ./2.dbg.tracing.json
+            ./3.fastbuild.tracing.json
+            ./4.opt.tracing.json
+            ./5.pkg.tracing.json
       - uses: actions/cache/save@v4
         with:
           path: d:/d
