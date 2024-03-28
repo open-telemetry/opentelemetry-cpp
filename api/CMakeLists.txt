@@ -36,8 +36,7 @@ if(WITH_NO_DEPRECATED_CODE)
 endif()
 
 if(WITH_ABSEIL)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE OPENTELEMETRY_HAVE_ABSEIL)
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
     opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
                                 absl::bits absl::city)
