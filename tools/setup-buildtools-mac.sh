@@ -2,6 +2,7 @@
 
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+set -e
 
 
 # TODO: it's not ideal experience, but we use have to use brew-provided deps.
