@@ -35,10 +35,12 @@ TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement)
 
 TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement1)
 {
+  __debugbreak();
   std::vector<double> boundaries{1, 5.0, 10, 15, 20};
   auto histogram_exemplar_reservoir = ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
       boundaries.size(),
-      AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(boundaries), nullptr);
+      AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(boundaries),
+      &ReservoirCell::GetAndResetDouble);
   histogram_exemplar_reservoir->OfferMeasurement(
       1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
   histogram_exemplar_reservoir->OfferMeasurement(static_cast<int64_t>(1), MetricAttributes{},

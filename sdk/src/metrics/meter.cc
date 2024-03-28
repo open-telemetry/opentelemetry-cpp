@@ -5,7 +5,13 @@
 
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
+#endif
+
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
