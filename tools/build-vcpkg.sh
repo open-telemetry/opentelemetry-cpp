@@ -2,6 +2,7 @@
 
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+set -e
 
 export PATH=/usr/local/bin:$PATH
 DIR="$(
