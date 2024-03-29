@@ -38,7 +38,7 @@ Important changes:
   [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
   * Change DefaultLogHandler output
     * Before, the default internal logger, DefaultLogHandler,
-      used to print to std::cout, interferring with the user application.
+      used to print to std::cout, interfering with the user application.
     * Now, DefaultLogHandler prints to std::cerr, as expected.
     * Applications that expected to find the opentelemetry-cpp internal
       error log in std::cout may need adjustments, either by looking
