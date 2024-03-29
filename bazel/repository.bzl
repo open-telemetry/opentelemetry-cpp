@@ -55,6 +55,13 @@ def opentelemetry_cpp_deps():
 
     # Load abseil dependency(optional)
     maybe(
+        #
+        # Important note:
+        #
+        # The bazel build still uses abseil-cpp-20220623.1 here.
+        #
+        # Upgrading to abseil-cpp-20240116.1 breaks the OTLP build, reason unknown.
+        #
         http_archive,
         name = "com_google_absl",
         sha256 = "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",
