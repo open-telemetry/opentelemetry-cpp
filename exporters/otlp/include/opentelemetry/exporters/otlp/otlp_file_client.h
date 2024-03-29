@@ -9,8 +9,6 @@
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 
 #include <chrono>
-#include <cstddef>
-#include <memory>
 
 // forward declare google::protobuf::Message
 namespace google
