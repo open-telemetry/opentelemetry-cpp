@@ -2,6 +2,7 @@
 
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+set -e
 
 usage() { echo "Usage: $0 -t <tag>" 1>&2; exit 1; }
 
@@ -25,13 +26,13 @@ if [[ ${tag} =~ ${semver_regex} ]]; then
     echo "${tag} is valid semver tag"
 else
     echo "Error: ${tag} is not a valid semver tag. Exiting"
-    exit -1
+    exit 1
 fi
 
 #ensure tag doesn't exits
 if [[ $(git tag --list ${tag}) ]]; then
    echo "Error: Tag ${tag} already exists. Exiting"
-   exit -1
+   exit 1
 fi
 
 if ! git diff --quiet; then \

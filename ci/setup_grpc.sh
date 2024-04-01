@@ -107,7 +107,7 @@ if [[ $build_internal_abseil_cpp -ne 0 ]]; then
     if [ ! -z "$build_shared_libs" ]; then
         ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
     fi
-    cmake  ${ABSEIL_CPP_BUILD_OPTIONS[@]} ..
+    cmake  "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
     cmake --build . -j${nproc} --target install && popd
 fi
 mkdir -p build && pushd build
@@ -124,7 +124,7 @@ if [ ! -z "$build_shared_libs" ]; then
     GRPC_BUILD_OPTIONS=(${GRPC_BUILD_OPTIONS[@]} "-DBUILD_SHARED_LIBS=$build_shared_libs")
 fi
 
-cmake ${GRPC_BUILD_OPTIONS[@]} ..
+cmake "${GRPC_BUILD_OPTIONS[@]}" ..
 cmake --build . -j$(nproc)
 cmake --install .
 popd
