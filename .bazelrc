@@ -100,5 +100,6 @@ common --incompatible_struct_has_no_methods
 common --incompatible_config_setting_private_default_visibility
 
 # https://www.buildbuddy.io/blog/debugging-slow-bazel-builds/
-common --bes_results_url=https://app.buildbuddy.io/invocation/
-common --bes_backend=grpcs://remote.buildbuddy.io
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
+build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr
