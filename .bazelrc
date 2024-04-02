@@ -103,3 +103,4 @@ common --incompatible_config_setting_private_default_visibility
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr
+build --nolegacy_important_outputs
