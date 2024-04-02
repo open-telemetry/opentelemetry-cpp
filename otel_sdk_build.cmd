@@ -18,7 +18,6 @@ set PATH=%__COMSPEC_DIR__%;%__PYTHON_DIR__%
 pushd "%~dp0"
 
 if "%1"=="test" (
-    SHIFT
     REM singleton_test does not work when linked as static under Windows
     REM "%__BAZEL__%" test --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
 
