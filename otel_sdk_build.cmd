@@ -17,24 +17,26 @@ if "%__BAZEL__%"=="" goto:no-bazel
 set PATH=%__COMSPEC_DIR__%;%__PYTHON_DIR__%
 pushd "%~dp0"
 
-REM singleton_test does not work when linked as static under Windows
-REM "%__BAZEL__%" test %* --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
+if "%1"=="test" (
+    REM singleton_test does not work when linked as static under Windows
+    REM "%__BAZEL__%" test %* --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
 
-REM Exclude building otel_sdk_zip right now, do it later. This warms up the tests bellow
-"%__BAZEL__%" build %* --profile=1.all.tracing.json --//:with_dll=true -- ... -otel_sdk_zip || goto:error
+    REM Exclude building otel_sdk_zip right now, do it later. This warms up the tests bellow
+    "%__BAZEL__%" build %* --profile=1.all.tracing.json --//:with_dll=true -- ... -otel_sdk_zip || goto:error
 
-"%__BAZEL__%" test %* --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test %* --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
-"%__BAZEL__%" test %* --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
+    "%__BAZEL__%" test %* --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
+    "%__BAZEL__%" test %* --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
+    "%__BAZEL__%" test %* --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
+) ELSE (
+    "%__BAZEL__%" build %* --profile=5.pkg.tracing.json --//:with_dll=true otel_sdk_zip || goto:error
 
-"%__BAZEL__%" build %* --profile=5.pkg.tracing.json --//:with_dll=true otel_sdk_zip || goto:error
+    for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
+    for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
 
-for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
-for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
+    if "%__ZIP__%"=="" goto:broken-build-zip-file
 
-if "%__ZIP__%"=="" goto:broken-build-zip-file
-
-for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /V || goto:error
+    for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /V || goto:error
+)
 
 echo. ALL GOOD!
 popd
