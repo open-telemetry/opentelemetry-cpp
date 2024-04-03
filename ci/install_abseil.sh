@@ -5,7 +5,7 @@
 
 set -ex
 export DEBIAN_FRONTEND=noninteractive
-[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20220623.1"
+[ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20240116.1"
 
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
@@ -23,7 +23,7 @@ if [ ! -z "${CXX_STANDARD}" ]; then
 fi
 
 mkdir build && pushd build
-cmake ${ABSEIL_CPP_BUILD_OPTIONS[@]} ..
+cmake "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
 make -j $(nproc)
 make install
 popd

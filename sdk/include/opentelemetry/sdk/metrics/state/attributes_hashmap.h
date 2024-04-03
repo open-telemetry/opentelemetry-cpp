@@ -24,8 +24,6 @@ namespace metrics
 using opentelemetry::sdk::common::OrderedAttributeMap;
 
 constexpr size_t kAggregationCardinalityLimit = 2000;
-const std::string kAggregationCardinalityLimitOverflowError =
-    "Maximum data points for metric stream exceeded. Entry added to overflow";
 const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
 const bool kAttributesLimitOverflowValue      = true;
 const size_t kOverflowAttributesHash          = opentelemetry::sdk::common::GetHashForAttributeMap(
