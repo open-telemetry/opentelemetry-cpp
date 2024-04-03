@@ -197,7 +197,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -211,7 +210,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -753,7 +751,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -770,7 +767,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -789,7 +785,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -819,7 +814,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
