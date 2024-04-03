@@ -277,8 +277,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -295,8 +293,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -313,8 +309,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -339,7 +333,6 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -366,8 +359,6 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
@@ -392,7 +383,6 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_cmake.sh
