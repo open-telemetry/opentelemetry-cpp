@@ -114,6 +114,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -135,6 +136,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -157,6 +159,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -177,6 +180,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -327,6 +331,7 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -344,6 +349,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -358,6 +364,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -372,6 +379,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -386,6 +394,7 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOPENTELEMETRY_INSTALL=OFF \
         "${SRC_DIR}"
