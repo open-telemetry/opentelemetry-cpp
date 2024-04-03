@@ -6,6 +6,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
@@ -28,6 +29,7 @@ public:
   // FIXME: should be sdk::trace::TracerProvider
   std::shared_ptr<opentelemetry::trace::TracerProvider> m_tracer_provider;
   std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> m_propagator;
+  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> m_meter_provider;
 };
 
 }  // namespace init

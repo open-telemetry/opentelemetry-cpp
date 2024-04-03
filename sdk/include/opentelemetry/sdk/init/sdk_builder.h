@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/registry.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -98,6 +99,14 @@ public:
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreatePropagator(
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)
+      const;
+
+  void AddView(
+      opentelemetry::sdk::metrics::ViewRegistry *registry,
+      const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
+      const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model)
       const;
 
   std::unique_ptr<ConfiguredSdk> CreateConfiguredSdk(

@@ -20,6 +20,7 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/selector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
@@ -37,6 +38,10 @@
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/init/unsupported_exception.h"
 #include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -545,6 +550,93 @@ SdkBuilder::CreatePropagator(
   return sdk;
 }
 
+static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
+    enum opentelemetry::sdk::configuration::enum_instrument_type config)
+{
+  opentelemetry::sdk::metrics::InstrumentType sdk;
+
+  switch (config)
+  {
+    case opentelemetry::sdk::configuration::counter:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
+      break;
+    case opentelemetry::sdk::configuration::histogram:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kHistogram;
+      break;
+    case opentelemetry::sdk::configuration::observable_counter:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableCounter;
+      break;
+    case opentelemetry::sdk::configuration::observable_gauge:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableGauge;
+      break;
+    case opentelemetry::sdk::configuration::observable_up_down_counter:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter;
+      break;
+    case opentelemetry::sdk::configuration::up_down_counter:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter;
+      break;
+  }
+
+  return sdk;
+}
+
+void SdkBuilder::AddView(
+    opentelemetry::sdk::metrics::ViewRegistry *registry,
+    const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
+{
+  auto *selector = model->selector.get();
+
+  auto sdk_instrument_type = ConvertInstrumentType(selector->instrument_type);
+
+  std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> sdk_instrument_selector(
+      new opentelemetry::sdk::metrics::InstrumentSelector(
+          sdk_instrument_type, selector->instrument_name, selector->unit));
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MeterSelector> sdk_meter_selector(
+      new opentelemetry::sdk::metrics::MeterSelector(selector->meter_name, selector->meter_version,
+                                                     selector->meter_schema_url));
+
+  auto *stream = model->stream.get();
+
+  std::string unit("FIXME");
+
+  opentelemetry::sdk::metrics::AggregationType sdk_aggregation_type =
+      opentelemetry::sdk::metrics::AggregationType::kDefault;  // FIXME
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config =
+      nullptr;  // FIXME
+
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
+      sdk_attribute_processor;  // FIXME
+
+  std::unique_ptr<opentelemetry::sdk::metrics::View> sdk_view(new opentelemetry::sdk::metrics::View(
+      stream->name, stream->description, unit, sdk_aggregation_type, sdk_aggregation_config,
+      std::move(sdk_attribute_processor)));
+
+  registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
+                    std::move(sdk_view));
+
+  OTEL_INTERNAL_LOG_ERROR("AddView() FIXME");
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMeterProvider(
+    const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model)
+    const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> sdk;
+
+  auto view_registry = opentelemetry::sdk::metrics::ViewRegistryFactory::Create();
+
+  for (const auto &view_configuration : model->views)
+  {
+    AddView(view_registry.get(), view_configuration);
+  }
+
+  OTEL_INTERNAL_LOG_ERROR("CreateMeterProvider() FIXME");
+
+  return sdk;
+}
+
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
@@ -560,6 +652,11 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     if (model->propagator)
     {
       sdk->m_propagator = CreatePropagator(model->propagator);
+    }
+
+    if (model->meter_provider)
+    {
+      sdk->m_meter_provider = CreateMeterProvider(model->meter_provider);
     }
   }
 
