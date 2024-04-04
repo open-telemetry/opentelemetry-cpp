@@ -23,7 +23,7 @@ Increment the:
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
 * [CI] Use platform CMake
   [#2627](https://github.com/open-telemetry/opentelemetry-cpp/pull/2627)
-* [SDK] DefaultLogHandler to print to std::cerr, add LogLevel::None
+* [SDK] DefaultLogHandler to print errors to std::cerr, add LogLevel::None
   [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
 
 Important changes:
@@ -49,8 +49,9 @@ Important changes:
   [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
   * Change DefaultLogHandler output
     * Before, the default internal logger, DefaultLogHandler,
-      used to print to std::cout, interfering with the user application.
-    * Now, DefaultLogHandler prints to std::cerr, as expected.
+      used to print to std::cout.
+    * Now, DefaultLogHandler prints errors and warnings to std::cerr,
+      as expected, while printing info and debug messages to std::cout.
     * Applications that expected to find the opentelemetry-cpp internal
       error log in std::cout may need adjustments, either by looking
       at std::cerr instead, or by using a custom log handler.
