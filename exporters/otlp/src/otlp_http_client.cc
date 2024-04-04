@@ -12,14 +12,18 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format on
 
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
 #include "nlohmann/json.hpp"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
