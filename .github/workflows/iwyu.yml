@@ -15,6 +15,21 @@ jobs:
         with:
           submodules: 'recursive'
 
+      - name: setup dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y --no-install-recommends --no-install-suggests \
+            build-essential \
+            cmake \
+            ninja-build \
+            libssl-dev \
+            libcurl4-openssl-dev \
+            libprotobuf-dev \
+            protobuf-compiler \
+            libgmock-dev \
+            libgtest-dev \
+            libbenchmark-dev
+
       - name: Prepare CMake
         run: |
           cmake -S . -B cmake.output -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
