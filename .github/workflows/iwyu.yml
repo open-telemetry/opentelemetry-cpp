@@ -1,0 +1,39 @@
+
+name: include-what-you-use
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  iwyu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: 'recursive'
+
+      - name: Prepare CMake
+        run: |
+          cmake -S . -B cmake.output -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+
+      - name: iwyu_tool
+        run: |
+          PWD=$(pwd)
+          # -isystem/usr/lib/clang/17/include
+          iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -Xiwyu > iwyu.log
+
+      - uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: Compilation Database
+          path: ./cmake.output/compile_commands.json
+
+      - uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: Logs (include-what-you-use)
+          path: ./*.log
+
