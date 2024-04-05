@@ -20,6 +20,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
             build-essential \
+            iwyu \
             cmake \
             ninja-build \
             libssl-dev \
