@@ -24,7 +24,7 @@ jobs:
         CXX: /usr/bin/g++-10
         GOOGLETEST_VERSION: 1.12.1
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
