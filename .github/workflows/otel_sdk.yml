@@ -25,15 +25,12 @@ jobs:
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: ${{ runner.os }}-bazel-
-      - name: run otel_sdk_build.cmd
+      - name: test otel_sdk
         run: |
           echo "build --disk_cache=d:/d" > ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
-      - name: stamp version
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: $rev = git rev-parse HEAD; echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"$rev`"; }" > version.c
-      - run: ./otel_sdk_build.cmd test
+          ./otel_sdk_build.cmd test
       - uses: actions/upload-artifact@v4
         with:
           name: tracing-profiles
@@ -46,7 +43,9 @@ jobs:
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
       - name: build otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: ./otel_sdk_build.cmd
+        run: |
+          echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"${GITHUB_REF_NAME}`"; }" > version.c
+          ./otel_sdk_build.cmd
       - name: release otel_sdk.zip
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: ncipollo/release-action@v1
