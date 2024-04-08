@@ -40,8 +40,14 @@ if(WITH_ABSEIL)
   target_link_libraries(
     opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
                                 absl::bits absl::city)
-  list(APPEND TARGET_DEPS "absl_bad_variant_access" "absl_any absl_base"
-       "absl_bits" "absl_city")
+  list(
+    APPEND
+    TARGET_DEPS
+    "absl_bad_variant_access"
+    "absl_any"
+    "absl_base"
+    "absl_bits"
+    "absl_city")
 endif()
 
 if(WITH_STL STREQUAL "OFF")
@@ -118,6 +124,11 @@ endif()
 if(WITH_METRICS_EXEMPLAR_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_METRICS_EXEMPLAR_PREVIEW)
+endif()
+
+if(WITH_OTLP_HTTP_COMPRESSION)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_OTLP_COMPRESSION_PREVIEW)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)

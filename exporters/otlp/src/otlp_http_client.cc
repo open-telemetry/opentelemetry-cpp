@@ -12,14 +12,18 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format on
 
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
 #include "nlohmann/json.hpp"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -948,7 +952,8 @@ OtlpHttpClient::createSession(
 
   for (auto &header : options_.http_headers)
   {
-    request->AddHeader(header.first, header.second);
+    request->AddHeader(header.first,
+                       opentelemetry::ext::http::common::UrlDecoder::Decode(header.second));
   }
   request->SetUri(http_uri_);
   request->SetSslOptions(options_.ssl_options);
@@ -957,6 +962,11 @@ OtlpHttpClient::createSession(
   request->SetBody(body_vec);
   request->ReplaceHeader("Content-Type", content_type);
   request->ReplaceHeader("User-Agent", options_.user_agent);
+
+  if (options_.compression == "gzip")
+  {
+    request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+  }
 
   // Returns the created session data
   return HttpSessionData{

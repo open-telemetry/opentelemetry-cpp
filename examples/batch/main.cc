@@ -38,7 +38,8 @@ void InitTracer()
   // We export `kNumSpans` after every `schedule_delay_millis` milliseconds.
   options.max_export_batch_size = kNumSpans;
 
-  resource::ResourceAttributes attributes = {{"service", "test_service"}, {"version", (uint32_t)1}};
+  resource::ResourceAttributes attributes = {{"service", "test_service"},
+                                             {"version", static_cast<uint32_t>(1)}};
   auto resource                           = resource::Resource::Create(attributes);
 
   auto processor = trace_sdk::BatchSpanProcessorFactory::Create(std::move(exporter), options);

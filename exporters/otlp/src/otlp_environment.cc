@@ -1069,6 +1069,57 @@ OtlpHeaders GetOtlpDefaultLogsHeaders()
   return GetHeaders(kSignalEnv, kGenericEnv);
 }
 
+std::string GetOtlpDefaultTracesCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
+std::string GetOtlpDefaultMetricsCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
+std::string GetOtlpDefaultLogsCompression()
+{
+  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION";
+  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+
+  std::string value;
+  bool exists;
+
+  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  if (exists)
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.9)
 
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
@@ -204,6 +204,14 @@ option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
 option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
        OFF)
 
+option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
+       OFF)
+
+option(
+  WITH_OTLP_HTTP_COMPRESSION
+  "Whether to include gzip compression for the OTLP http exporter in the SDK"
+  OFF)
+
 option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
@@ -296,7 +304,7 @@ function(install_windows_deps)
   set(VCPKG_TARGET_ARCHITECTURE
       ${ARCH}
       PARENT_SCOPE)
-  message("Installing build tools and dependencies...")
+  message(STATUS "Installing build tools and dependencies...")
   set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
@@ -304,7 +312,8 @@ function(install_windows_deps)
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
       CACHE FILEPATH "")
   message(
-    "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
+    STATUS
+      "Make sure that vcpkg.cmake is set as the CMAKE_TOOLCHAIN_FILE at the START of the cmake build process!
     Can be command-line arg (cmake -DCMAKE_TOOLCHAIN_FILE=...) or set in your editor of choice."
   )
 
@@ -342,7 +351,7 @@ include(GNUInstallDirs)
 if(WITH_PROMETHEUS)
   find_package(prometheus-cpp CONFIG QUIET)
   if(NOT prometheus-cpp_FOUND)
-    message("Trying to use local prometheus-cpp from submodule")
+    message(STATUS "Trying to use local prometheus-cpp from submodule")
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
       set(ENABLE_TESTING OFF)
@@ -356,7 +365,7 @@ if(WITH_PROMETHEUS)
           "git submodule update --init --recursive")
     endif()
   else()
-    message("Using external prometheus-cpp")
+    message(STATUS "Using external prometheus-cpp")
   endif()
 endif()
 
@@ -364,7 +373,9 @@ if(WITH_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 endif()
 
-if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
+if(WITH_OTLP_GRPC
+   OR WITH_OTLP_HTTP
+   OR WITH_OTLP_FILE)
   find_package(Protobuf)
   if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
     if(NOT WITH_ABSEIL)
@@ -384,7 +395,7 @@ if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
     endif()
 
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
-      message(STATUS_FATAL "Windows dependency installation failed!")
+      message(FATAL_ERROR "Windows dependency installation failed!")
     endif()
     if(WIN32)
       include(${CMAKE_TOOLCHAIN_FILE})
@@ -449,12 +460,25 @@ if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
 endif()
 
 #
+# Do we need ZLIB ?
+#
+
+if((NOT WITH_API_ONLY)
+   AND WITH_HTTP_CLIENT_CURL
+   AND WITH_OTLP_HTTP_COMPRESSION)
+  # No specific version required.
+  find_package(ZLIB REQUIRED)
+  message(STATUS "Found ZLIB: ${ZLIB_LIBRARIES}, version ${ZLIB_VERSION}")
+endif()
+
+#
 # Do we need NLOHMANN_JSON ?
 #
 
 if(WITH_ELASTICSEARCH
    OR WITH_ZIPKIN
    OR WITH_OTLP_HTTP
+   OR WITH_OTLP_FILE
    OR BUILD_W3CTRACECONTEXT_TEST
    OR WITH_ETW)
   set(USE_NLOHMANN_JSON ON)
@@ -468,7 +492,7 @@ endif()
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    message("Building with gcc in maintainer mode.")
+    message(STATUS "Building with gcc in maintainer mode.")
 
     add_compile_options(-Wall)
     add_compile_options(-Werror)
@@ -476,7 +500,7 @@ if(OTELCPP_MAINTAINER_MODE)
 
     # Tested with GCC 9.4 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.4)
-      message("Building with additional warnings for gcc.")
+      message(STATUS "Building with additional warnings for gcc.")
 
       # Relaxed warnings
 
@@ -488,6 +512,8 @@ if(OTELCPP_MAINTAINER_MODE)
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Woverloaded-virtual>)
       add_compile_options(
         $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wsuggest-override>)
+      add_compile_options(
+        $<$<STREQUAL:$<COMPILE_LANGUAGE>,CXX>:-Wold-style-cast>)
 
       # C and C++
       add_compile_options(-Wcast-qual)
@@ -499,7 +525,7 @@ if(OTELCPP_MAINTAINER_MODE)
       add_compile_options(-Wvla)
     endif()
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message("Building with clang in maintainer mode.")
+    message(STATUS "Building with clang in maintainer mode.")
 
     add_compile_options(-Wall)
     add_compile_options(-Werror)
@@ -507,7 +533,7 @@ if(OTELCPP_MAINTAINER_MODE)
 
     # Tested with Clang 11.0 on github.
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
-      message("Building with additional warnings for clang.")
+      message(STATUS "Building with additional warnings for clang.")
 
       # Relaxed warnings
       add_compile_options(-Wno-error=unused-private-field)
@@ -527,9 +553,10 @@ if(OTELCPP_MAINTAINER_MODE)
       add_compile_options(-Wundef)
       add_compile_options(-Wundefined-reinterpret-cast)
       add_compile_options(-Wvla)
+      add_compile_options(-Wold-style-cast)
     endif()
   elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    message("Building with msvc in maintainer mode.")
+    message(STATUS "Building with msvc in maintainer mode.")
 
     add_compile_options(/WX)
     add_compile_options(/W4)
@@ -599,8 +626,8 @@ if(BUILD_TESTING)
   if(GTEST_INCLUDE_DIRS)
     include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
   endif()
-  message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
-  message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+  message(STATUS "GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
+  message(STATUS "GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
   if(WITH_BENCHMARK)
     # Benchmark respects the CMAKE_PREFIX_PATH
@@ -632,7 +659,7 @@ if(WITH_OPENTRACING)
   find_package(OpenTracing CONFIG QUIET)
   if(NOT OpenTracing_FOUND)
     set(OPENTRACING_DIR "third_party/opentracing-cpp")
-    message("Trying to use local ${OPENTRACING_DIR} from submodule")
+    message(STATUS "Trying to use local ${OPENTRACING_DIR} from submodule")
     if(EXISTS "${PROJECT_SOURCE_DIR}/${OPENTRACING_DIR}/.git")
       set(SAVED_BUILD_TESTING ${BUILD_TESTING})
       set(BUILD_TESTING OFF)
@@ -646,7 +673,7 @@ if(WITH_OPENTRACING)
           "git submodule update --init --recursive")
     endif()
   else()
-    message("Using external opentracing-cpp")
+    message(STATUS "Using external opentracing-cpp")
   endif()
   add_subdirectory(opentracing-shim)
 endif()

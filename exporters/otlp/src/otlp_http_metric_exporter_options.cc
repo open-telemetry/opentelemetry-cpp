@@ -42,6 +42,8 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
   ssl_max_tls      = GetOtlpDefaultMetricsSslTlsMaxVersion();
   ssl_cipher       = GetOtlpDefaultMetricsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultMetricsSslTlsCipherSuite();
+
+  compression = GetOtlpDefaultMetricsCompression();
 }
 
 OtlpHttpMetricExporterOptions::~OtlpHttpMetricExporterOptions() {}

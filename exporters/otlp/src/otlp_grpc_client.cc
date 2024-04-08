@@ -297,6 +297,11 @@ std::shared_ptr<grpc::Channel> OtlpGrpcClient::MakeChannel(const OtlpGrpcClientO
     grpc_arguments.SetResourceQuota(quota);
   }
 
+  if (options.compression == "gzip")
+  {
+    grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
+  }
+
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
@@ -337,7 +342,8 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
 
   for (auto &header : options.metadata)
   {
-    context->AddMetadata(header.first, header.second);
+    context->AddMetadata(header.first,
+                         opentelemetry::ext::http::common::UrlDecoder::Decode(header.second));
   }
 
   return context;

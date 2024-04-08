@@ -152,6 +152,10 @@ inline OtlpHeaders GetOtlpDefaultHeaders()
   return GetOtlpDefaultTracesHeaders();
 }
 
+std::string GetOtlpDefaultTracesCompression();
+std::string GetOtlpDefaultMetricsCompression();
+std::string GetOtlpDefaultLogsCompression();
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

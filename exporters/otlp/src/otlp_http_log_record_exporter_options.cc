@@ -41,6 +41,8 @@ OtlpHttpLogRecordExporterOptions::OtlpHttpLogRecordExporterOptions()
   ssl_max_tls      = GetOtlpDefaultLogsSslTlsMaxVersion();
   ssl_cipher       = GetOtlpDefaultLogsSslTlsCipher();
   ssl_cipher_suite = GetOtlpDefaultLogsSslTlsCipherSuite();
+
+  compression = GetOtlpDefaultLogsCompression();
 }
 
 OtlpHttpLogRecordExporterOptions::~OtlpHttpLogRecordExporterOptions() {}
