@@ -41,14 +41,14 @@ goto:eof
 "%__BAZEL__%" info
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
 echo __ROOT__=[%__ROOT__%]
-pushd [%__ROOT__%]
+pushd %__ROOT__%
 dir /od
 popd
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
 echo __ZIP__=[%__ZIP__%]
 for %%i in ("%__ZIP__%") do set __ZIPDIR__=%%~dpi
 echo __ZIPDIR__=[%__ZIPDIR__%]
-pushd [%__ZIPDIR__%]
+pushd %__ZIPDIR__%
 dir /od
 popd
 if "%__ZIP__%"=="" goto:broken-build-zip-file
