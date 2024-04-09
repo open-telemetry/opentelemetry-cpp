@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "__declspec(dllexport) const char* otelsdk_gitref(){ return `"$env:GITHUB_REF_NAME`"; }" >> version.c
           echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"$env:GITHUB_SHA`"; }" >> version.c
-          cat version.cc
+          cat version.c
           ./otel_sdk_build.cmd
       - uses: actions/upload-artifact@v4
         with:
