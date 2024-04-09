@@ -42,7 +42,6 @@ jobs:
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
       - name: build otel_sdk.zip
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo "__declspec(dllexport) const char* otelsdk_gitref(){ return `"$env:GITHUB_REF_NAME`"; }" >> version.c
           echo "__declspec(dllexport) const char* otelsdk_gitsha(){ return `"$env:GITHUB_SHA`"; }" >> version.c
