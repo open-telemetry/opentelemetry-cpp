@@ -52,7 +52,7 @@ pushd %__ZIPDIR__%
 dir /od
 popd
 if "%__ZIP__%"=="" goto:broken-build-zip-file
-for %%i in ("%__ROOT__%\%__ZIP__%") do xcopy "%%~dpnxi" ".\%%~nxi" /Y /F /V || goto:error
+for %%i in ("%__ROOT__%\%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /V || goto:error
 goto:eof
 
 :no-bazel
