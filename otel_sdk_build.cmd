@@ -36,11 +36,23 @@ REM Exclude building otel_sdk_zip right now, do it later. This warms up the test
 goto:eof
 
 :package
+"%__BAZEL__%" info
 "%__BAZEL__%" build --profile=5.pkg.tracing.json --//:with_dll=true otel_sdk_zip || goto:error
+"%__BAZEL__%" info
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%i
+echo __ROOT__=[%__ROOT__%]
+pushd [%__ROOT__%]
+dir /od
+popd
 for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
+echo __ZIP__=[%__ZIP__%]
+for %%i in ("%__ZIP__%") do set __ZIPDIR__=%%~dpi
+echo __ZIPDIR__=[%__ZIPDIR__%]
+pushd [%__ZIPDIR__%]
+dir /od
+popd
 if "%__ZIP__%"=="" goto:broken-build-zip-file
-for %%i in ("%__ROOT__%/%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /V || goto:error
+for %%i in ("%__ROOT__%\%__ZIP__%") do xcopy "%%~dpnxi" ".\%%~nxi" /Y /F /V || goto:error
 goto:eof
 
 :no-bazel
