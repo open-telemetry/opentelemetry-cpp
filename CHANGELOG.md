@@ -23,6 +23,8 @@ Increment the:
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
 * [CI] Use platform CMake
   [#2627](https://github.com/open-telemetry/opentelemetry-cpp/pull/2627)
+* [PROTO] Upgrade to opentelemetry-proto v1.2.0
+  [#2631](https://github.com/open-telemetry/opentelemetry-cpp/pull/2631)
 
 Important changes:
 
