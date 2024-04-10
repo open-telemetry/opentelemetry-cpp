@@ -47,6 +47,7 @@ jobs:
       - name: build otel_sdk.zip
         run: ./otel_sdk_build.cmd
       - uses: actions/upload-artifact@v4
+        if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
           name: sdk
           path: ./otel_sdk.zip
