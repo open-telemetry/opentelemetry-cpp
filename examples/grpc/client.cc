@@ -50,11 +50,11 @@ public:
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(
         span_name,
-        {{trace::SemanticConventions::kRpcSystem, "grpc"},
-         {trace::SemanticConventions::kRpcService, "grpc-example.GreetService"},
-         {trace::SemanticConventions::kRpcMethod, "Greet"},
-         {trace::SemanticConventions::kNetworkPeerAddress, ip},
-         {trace::SemanticConventions::kNetworkPeerPort, port}},
+        {{opentelemetry::trace::SemanticConventions::kRpcSystem, "grpc"},
+         {opentelemetry::trace::SemanticConventions::kRpcService, "grpc-example.GreetService"},
+         {opentelemetry::trace::SemanticConventions::kRpcMethod, "Greet"},
+         {opentelemetry::trace::SemanticConventions::kNetworkPeerAddress, ip},
+         {opentelemetry::trace::SemanticConventions::kNetworkPeerPort, port}},
         options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
@@ -70,7 +70,8 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(trace::SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(opentelemetry::trace::SemanticConventions::kRpcGrpcStatusCode,
+                         status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -79,7 +80,8 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(trace::SemanticConventions::kRpcGrpcStatusCode, status.error_code());
+      span->SetAttribute(opentelemetry::trace::SemanticConventions::kRpcGrpcStatusCode,
+                         status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";

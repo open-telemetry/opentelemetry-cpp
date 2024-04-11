@@ -38,16 +38,18 @@ public:
     options.parent   = GetSpan(new_context)->GetContext();
 
     // start span with parent context extracted from http header
-    auto span = get_tracer("http-server")
-                    ->StartSpan(span_name,
-                                {{trace::SemanticConventions::kServerAddress, server_name},
-                                 {trace::SemanticConventions::kServerPort, server_port},
-                                 {trace::SemanticConventions::kHttpRequestMethod, request.method},
-                                 {trace::SemanticConventions::kUrlScheme, "http"},
-                                 {trace::SemanticConventions::kHttpRequestBodySize,
-                                  static_cast<uint64_t>(request.content.length())},
-                                 {trace::SemanticConventions::kClientAddress, request.client}},
-                                options);
+    auto span =
+        get_tracer("http-server")
+            ->StartSpan(
+                span_name,
+                {{opentelemetry::trace::SemanticConventions::kServerAddress, server_name},
+                 {opentelemetry::trace::SemanticConventions::kServerPort, server_port},
+                 {opentelemetry::trace::SemanticConventions::kHttpRequestMethod, request.method},
+                 {opentelemetry::trace::SemanticConventions::kUrlScheme, "http"},
+                 {opentelemetry::trace::SemanticConventions::kHttpRequestBodySize,
+                  static_cast<uint64_t>(request.content.length())},
+                 {opentelemetry::trace::SemanticConventions::kClientAddress, request.client}},
+                options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
 
