@@ -1,8 +1,5 @@
 @echo off
 setlocal
-set BAZEL_SH=
-set BAZEL_VC=
-set BAZEL_VC_FULL_VERSION=
 
 for /F "delims=" %%i in ("%ComSpec%") do set __COMSPEC_DIR__=%%~dpi
 if "%__COMSPEC_DIR__%"=="" goto:no-comspec
@@ -15,67 +12,60 @@ for /F "usebackq delims=" %%i in (`where bazelisk bazel`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
 set PATH=%__COMSPEC_DIR__%;%__PYTHON_DIR__%
+
+set __COMSPEC_DIR__=
+set __PYTHON_DIR__=
+
 pushd "%~dp0"
 
-if "%1"=="test" call:test
-if "%1"=="" call:package
+if "%1"=="" goto:all
+if "%1"=="test" goto:test
+if "%1"=="zip" goto:zip
+if "%1"=="shutdown" goto:shutdown
 
-echo. ALL GOOD!
 popd
 endlocal
 goto:eof
 
+:all
+call:test
+call:zip
+call:shutdown
+goto:eof
+
 :test
 REM singleton_test does not work when linked as static under Windows
-REM "%__BAZEL__%" test --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
-REM Exclude building otel_sdk_zip right now, do it later. This warms up the tests bellow
+"%__BAZEL__%" test --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || goto:error
 "%__BAZEL__%" build --profile=1.all.tracing.json --//:with_dll=true -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || goto:error
 "%__BAZEL__%" test --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || goto:error
 goto:eof
 
-:package
-"%__BAZEL__%" info
-"%__BAZEL__%" build --profile=5.pkg.tracing.json --//:with_dll=true otel_sdk_zip || goto:error
-"%__BAZEL__%" info
-for /F "usebackq delims=" %%i in (`"%__BAZEL__%" info execution_root 2^>nul`) do set __ROOT__=%%~dpnxi
-echo __ROOT__=[%__ROOT__%]
-pushd %__ROOT__%
-dir /od
-popd
-for /F "usebackq delims=" %%i in (`"%__BAZEL__%" cquery --//:with_dll^=true otel_sdk_zip --output^=files 2^>nul`) do set __ZIP__=%%i
-echo __ZIP__=[%__ZIP__%]
-for %%i in ("%__ROOT__%\%__ZIP__%") do set __ZIPDIR__=%%~dpi
-echo __ZIPDIR__=[%__ZIPDIR__%]
-pushd %__ZIPDIR__%
-dir /od
-popd
-if "%__ZIP__%"=="" goto:broken-build-zip-file
-for %%i in ("%__ROOT__%\%__ZIP__%") do xcopy "%%~dpnxi" . /Y /F /V || goto:error
+:zip
+"%__BAZEL__%" run --profile=5.pkg.tracing.json --//:with_dll=true make_otel_sdk || goto:error
+goto:eof
+
+:shutdown
+"%__BAZEL__%" shutdown || goto:error
 goto:eof
 
 :no-bazel
 echo FAILED: No bazelisk or bazel found!
-exit /b 1
+exit 1
 goto:eof
 
 :no-python
 echo FAILED: No python found!
-exit /b 1
+exit 1
 goto:eof
 
 :no-comspec
 echo FAILED: No ComSpec env var set!
-exit /b 1
+exit 1
 goto:eof
 
 :error
 echo FAILED!
-exit /b 1
-goto:eof
-
-:broken-build-zip-file
-echo The BUILD has broken otel_sdk.zip that can't be build for all compilation_modes
-exit /b 1
+exit 1
 goto:eof

@@ -98,7 +98,6 @@ genquery(
     srcs = [
         "all_api_includes.cc",
         "all_sdk_includes.cc",
-        "version.c",
     ],
 
     # Force generation of .pdb file for for opt builds
@@ -355,6 +354,14 @@ pkg_zip(
     out = "otel_sdk.zip",
 )
 
+# This would copy the file from the output build folder to the source folder (this directory)
+write_source_file(
+    name = "make_otel_sdk",
+    in_file = "otel_sdk.zip",
+    out_file = "otel_sdk.zip",
+    tags = ["manual"],
+)
+
 cc_binary(
     name = "dll_deps_update_binary",
     srcs = ["dll_deps_update.cc"],
@@ -387,3 +394,4 @@ platform(
         "@bazel_tools//tools/cpp:clang-cl",
     ],
 )
+

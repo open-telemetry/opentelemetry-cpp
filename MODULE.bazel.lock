@@ -3864,6 +3864,22 @@
         ]
       }
     },
+    "@@platforms//host:extension.bzl%host_platform": {
+      "general": {
+        "bzlTransitiveDigest": "xelQcPZH8+tmuOHVjL9vDxMnnQNMlwj0SlvgoqBkm4U=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "host_platform": {
+            "bzlFile": "@@platforms//host:extension.bzl",
+            "ruleClassName": "host_platform_repo",
+            "attributes": {}
+          }
+        },
+        "recordedRepoMappingEntries": []
+      }
+    },
     "@@prometheus-cpp~//bazel:repositories.bzl%data_deps_ext": {
       "general": {
         "bzlTransitiveDigest": "YaCXibg0sbd+DEGq4i16LHhjOpCSglIuR6FBX+vTsMU=",
@@ -3928,6 +3944,41 @@
         "recordedRepoMappingEntries": [
           [
             "protobuf~",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
+    "@@pybind11_bazel~//:python_configure.bzl%extension": {
+      "general": {
+        "bzlTransitiveDigest": "DJPCeiYqQS2i13szWN5NSI6sC6eaWgvECEyY/oNXWms=",
+        "recordedFileInputs": {
+          "@@pybind11_bazel~//MODULE.bazel": "88af1c246226d87e65be78ed49ecd1e6f5e98648558c14ce99176da041dc378e"
+        },
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_config_python": {
+            "bzlFile": "@@pybind11_bazel~//:python_configure.bzl",
+            "ruleClassName": "python_configure",
+            "attributes": {}
+          },
+          "pybind11": {
+            "bzlFile": "@@bazel_tools//tools/build_defs/repo:http.bzl",
+            "ruleClassName": "http_archive",
+            "attributes": {
+              "build_file": "@@pybind11_bazel~//:pybind11.BUILD",
+              "strip_prefix": "pybind11-2.11.1",
+              "urls": [
+                "https://github.com/pybind/pybind11/archive/v2.11.1.zip"
+              ]
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "pybind11_bazel~",
             "bazel_tools",
             "bazel_tools"
           ]
@@ -6035,7 +6086,7 @@
     },
     "@@rules_python~//python/extensions:pip.bzl%pip": {
       "os:windows,arch:amd64": {
-        "bzlTransitiveDigest": "GQJHB3P1SKCHAFSoaFpjvrYrImSlj/wttkpTp8vznzs=",
+        "bzlTransitiveDigest": "fJw8sj89T3rSXQpPwYUGrtVL67C6q9icrJ46IHLOsEk=",
         "recordedFileInputs": {
           "@@grpc~//requirements.bazel.txt": "95a27c3f9a46b8114d464c70ba93cda18cfe8c02004db81028f9306b2691701e"
         },

@@ -30,7 +30,6 @@ jobs:
           echo "build --disk_cache=d:/d" > ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
-          echo "__declspec(dllexport) const char* otelsdk_gitref(){ return `"$env:GITHUB_REF_NAME`"; }" >> version.c
           ./otel_sdk_build.cmd test
       - uses: actions/upload-artifact@v4
         with:
@@ -45,7 +44,9 @@ jobs:
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
       - name: build otel_sdk.zip
-        run: ./otel_sdk_build.cmd
+        run: |
+          ./otel_sdk_build.cmd zip
+          ./otel_sdk_build.cmd shutdown
       - uses: actions/upload-artifact@v4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
@@ -63,4 +64,3 @@ jobs:
             ./3.fastbuild.tracing.json
             ./4.opt.tracing.json
             ./5.pkg.tracing.json
-  
