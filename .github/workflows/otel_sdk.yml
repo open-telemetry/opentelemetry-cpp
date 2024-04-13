@@ -27,19 +27,22 @@ jobs:
           restore-keys: ${{ runner.os }}-bazel-
       - name: mount cache disk
         run: |
-          $mount = "d:/d"
-          $vhd = New-VHD -Path "d:/d.vhdx" -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 512 -PhysicalSectorSizeBytes 512 -Verbose
-          $vhd
-          Mount-VHD -Path $vhd.path -Verbose
-          $disk = Get-VHD -Path $vhd.path -Verbose
-          $disk
-          Initialize-Disk $disk.Number -Verbose
-          $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
-          $part
-          $vol = Format-Volume -FileSystem REFS -Partition $part -Verbose
-          $vol
-          New-Item -Path $mount -ItemType "directory" -Force -Verbose
-          $part | Add-PartitionAccessPath -AccessPath $mount -Verbose
+          If (Test-Path d:/d.vhdx) {
+            Mount-VHD -Path d:/d.vhdx -Verbose
+          } else {
+            $vhd = New-VHD -Path d:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 512 -PhysicalSectorSizeBytes 512 -Verbose
+            $vhd
+            Mount-VHD -Path $vhd.path -Verbose
+            $disk = Get-VHD -Path $vhd.path -Verbose
+            $disk
+            Initialize-Disk $disk.Number -Verbose
+            $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
+            $part
+            $vol = Format-Volume -FileSystem REFS -Partition $part -Verbose
+            $vol
+            New-Item -Path d:/d -ItemType "directory" -Force -Verbose
+            $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
+          }
       - name: test otel_sdk
         run: |
           echo "build --disk_cache=d:/d" > ../top.bazelrc
@@ -55,9 +58,7 @@ jobs:
           path: d:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
-      - run: |
-          $mnt = Mount-VHD -Path "d:/d.vhdx" -Verbose
-          $mnt
+      - run: Mount-VHD -Path "d:/d.vhdx" -Verbose
       - uses: actions/upload-artifact@v4
         with:
           name: tracing-profiles
