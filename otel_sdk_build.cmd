@@ -1,20 +1,10 @@
 @echo off
 setlocal
 
-for /F "delims=" %%i in ("%ComSpec%") do set __COMSPEC_DIR__=%%~dpi
-if "%__COMSPEC_DIR__%"=="" goto:no-comspec
-
-for /F "usebackq delims=" %%i in (`where python`) do set __PYTHON_DIR__=%%~dpi
-if "%__PYTHON_DIR__%"=="" goto:no-python
-
-rem Look first for bazelisk, then bazel
 for /F "usebackq delims=" %%i in (`where bazelisk bazel`) do set __BAZEL__=%%i
 if "%__BAZEL__%"=="" goto:no-bazel
 
-set PATH=%__COMSPEC_DIR__%;%__PYTHON_DIR__%
-
-set __COMSPEC_DIR__=
-set __PYTHON_DIR__=
+set PATH=
 
 pushd "%~dp0"
 
@@ -52,16 +42,6 @@ goto:eof
 
 :no-bazel
 echo FAILED: No bazelisk or bazel found!
-exit 1
-goto:eof
-
-:no-python
-echo FAILED: No python found!
-exit 1
-goto:eof
-
-:no-comspec
-echo FAILED: No ComSpec env var set!
 exit 1
 goto:eof
 
