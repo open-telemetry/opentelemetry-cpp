@@ -27,8 +27,11 @@ jobs:
           restore-keys: ${{ runner.os }}-bazel-
       - name: mount cache disk
         run: |
+          New-Item -Path d:/d -ItemType "directory" -Force -Verbose
+          $part = ""
           If (Test-Path d:/d.vhdx) {
-            Mount-VHD -Path d:/d.vhdx -Verbose
+            $part = Mount-VHD -Path d:/d.vhdx -NoDriveLetter -PassThru -Verbose | Get-Disk | Get-Partition
+            $part
           } else {
             $vhd = New-VHD -Path d:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 512 -PhysicalSectorSizeBytes 512 -Verbose
             $vhd
@@ -40,9 +43,8 @@ jobs:
             $part
             $vol = Format-Volume -FileSystem REFS -Partition $part -Verbose
             $vol
-            New-Item -Path d:/d -ItemType "directory" -Force -Verbose
-            $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
           }
+          $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
       - name: test otel_sdk
         run: |
           echo "build --disk_cache=d:/d" > ../top.bazelrc
