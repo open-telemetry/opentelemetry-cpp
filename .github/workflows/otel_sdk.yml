@@ -21,16 +21,29 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
-          path: d:/d
+          path: d:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: ${{ runner.os }}-bazel-
+      - name: mount cache disk
+        run: |
+          $mount = "d:/d"
+          $vhd = New-VHD -Path "d:/d.vhdx" -SizeBytes 10737418240 -Dynamic -LogicalSectorSizeBytes 512 -PhysicalSectorSizeBytes 512 -Verbose
+          Mount-VHD -Path $vhd.path -Verbose
+          $disk = Get-VHD -Path $vhd.path -Verbose
+          Initialize-Disk $disk.Number -Verbose
+          $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
+          $vol = Format-Volume -FileSystem REFS -Partition $part -Verbose
+          New-Item -Path $mount -ItemType "directory" -Force -Verbose
+          $part | Add-PartitionAccessPath -AccessPath $mount -Verbose
       - name: test otel_sdk
         run: |
           echo "build --disk_cache=d:/d" > ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
           ./otel_sdk_build.cmd test
+          ./otel_sdk_build.cmd shutdown
+      - run: Dismount-VHD -Path "d:/d.vhdx" -Verbose
       - uses: actions/upload-artifact@v4
         with:
           name: tracing-profiles
@@ -40,9 +53,10 @@ jobs:
         # Don't update cache on releases
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
-          path: d:/d
+          path: d:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
+      - run: Mount-VHD -Path "d:/d.vhdx" -Verbose
       - name: build otel_sdk.zip
         run: |
           ./otel_sdk_build.cmd zip
