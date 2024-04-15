@@ -128,6 +128,8 @@ public:
 
     switch (level)
     {
+      case opentelemetry::sdk::common::internal_log::LogLevel::None:
+        break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Error:
         std::cout << " - [E] " << msg << std::endl;
         parse_error_msg(&g_test_result, msg);
