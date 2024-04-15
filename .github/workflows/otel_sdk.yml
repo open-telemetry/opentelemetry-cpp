@@ -43,7 +43,9 @@ jobs:
           }
           $part = Mount-VHD -Path d:/d.vhdx -Verbose -PassThru | Get-Disk | Get-Partition
           $part
-          $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
+          $goodPart = part | Where-Object -Not IsHidden
+          $goodPart
+          $goodPart | Add-PartitionAccessPath -AccessPath d:/d -Verbose
       - name: test otel_sdk
         run: |
           echo "build --disk_cache=d:/d" > ../top.bazelrc
