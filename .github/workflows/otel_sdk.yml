@@ -53,8 +53,8 @@ jobs:
           ./otel_sdk_build.cmd test
           ./otel_sdk_build.cmd shutdown
       - run: |
-        Dismount-VHD -Path "d:/d.vhdx" -Verbose
-        ls d:/d.vhdx
+          Dismount-VHD -Path "d:/d.vhdx" -Verbose
+          ls d:/d.vhdx
       - uses: actions/cache/save@v4
         # Don't update cache on releases
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
