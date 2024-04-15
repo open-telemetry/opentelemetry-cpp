@@ -29,9 +29,10 @@ jobs:
         run: |
           New-Item -Path d:/d -ItemType "directory" -Force -Verbose
           If (-not(Test-Path d:/d.vhdx)) {
-            $vhd = New-VHD -Path d:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 512 -PhysicalSectorSizeBytes 512 -Verbose
+            $vhd = New-VHD -Path d:/d.vhdx -SizeBytes 137438953472 -Dynamic -LogicalSectorSizeBytes 4096 -PhysicalSectorSizeBytes 4096 -Verbose
             $vhd
-            Mount-VHD -Path $vhd.path -Verbose
+            $mnt = Mount-VHD -Path $vhd.path -NoDriveLetter -Verbose -PassThru | Out-Host
+            $mnt
             $disk = Get-VHD -Path $vhd.path -Verbose
             $disk
             Initialize-Disk $disk.Number -Verbose
@@ -41,9 +42,7 @@ jobs:
             $vol
             Dismount-VHD -Path d:/d.vhdx -Verbose
           }
-          $part = Mount-VHD -Path d:/d.vhdx -Verbose -PassThru | Get-Disk | Get-Partition
-          $part
-          $part = $part | Where-Object -Not IsHidden
+          $part = Mount-VHD -Path d:/d.vhdx -NoDriveLetter -Verbose -PassThru | Get-Disk | Get-Partition | Where-Object -Not IsHidden
           $part
           $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
       - name: test otel_sdk
@@ -53,7 +52,9 @@ jobs:
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
           ./otel_sdk_build.cmd test
           ./otel_sdk_build.cmd shutdown
-      - run: Dismount-VHD -Path "d:/d.vhdx" -Verbose
+      - run: |
+        Dismount-VHD -Path "d:/d.vhdx" -Verbose
+        ls d:/d.vhdx
       - uses: actions/cache/save@v4
         # Don't update cache on releases
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
@@ -61,7 +62,7 @@ jobs:
           path: d:/d.vhdx
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
-      - run: Mount-VHD -Path "d:/d.vhdx" -Verbose
+      - run: Mount-VHD -Path "d:/d.vhdx" -NoDriveLetter -Verbose -PassThru | Out-Host
       - uses: actions/upload-artifact@v4
         with:
           name: tracing-profiles
@@ -71,6 +72,7 @@ jobs:
         run: |
           ./otel_sdk_build.cmd zip
           ./otel_sdk_build.cmd shutdown
+          ls d:/d.vhdx
       - uses: actions/upload-artifact@v4
         if: ${{ ! startsWith(github.ref, 'refs/tags/') }}
         with:
