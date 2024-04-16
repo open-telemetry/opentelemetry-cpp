@@ -35,9 +35,9 @@ cc_library(
         "//sdk/src/logs",
         "//sdk/src/resource",
         "//sdk/src/trace",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@opentelemetry-proto//:logs_service_proto_cc",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
+        "@opentelemetry-proto//:trace_service_proto_cc",
     ],
 )
 
@@ -63,11 +63,11 @@ cc_library(
     deps = [
         "//ext:headers",
         "//sdk/src/common:global_log_handler",
-        "@com_github_grpc_grpc//:grpc++",
-        "@com_github_opentelemetry_proto//:common_proto_cc",
-        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
-        "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
-        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@@grpc~//:grpc++",
+        "@opentelemetry-proto//:common_proto_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ],
 )
 
@@ -100,7 +100,7 @@ cc_library(
         "//sdk/src/trace",
 
         # For gRPC
-        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ],
 )
 
@@ -138,7 +138,7 @@ cc_library(
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk:headers",
         "//sdk/src/common:base64",
-        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@opentelemetry-proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
         "@github_nlohmann_json//:json",
     ],
@@ -168,7 +168,7 @@ cc_library(
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/trace",
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@opentelemetry-proto//:trace_service_proto_cc",
     ],
 )
 
@@ -193,7 +193,7 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:base64",
-        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@opentelemetry-proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
         "@github_nlohmann_json//:json",
     ],
@@ -223,7 +223,7 @@ cc_library(
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/trace",
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@opentelemetry-proto//:trace_service_proto_cc",
     ],
 )
 
@@ -255,7 +255,7 @@ cc_library(
         "//sdk/src/metrics",
 
         # For gRPC
-        "@com_github_opentelemetry_proto//:metrics_service_grpc_cc",
+        "@opentelemetry-proto//:metrics_service_grpc_cc",
     ],
 )
 
@@ -283,7 +283,7 @@ cc_library(
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/metrics",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
     ],
 )
 
@@ -311,7 +311,7 @@ cc_library(
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/metrics",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
     ],
 )
 
@@ -339,7 +339,7 @@ cc_library(
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/logs",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@opentelemetry-proto//:logs_service_proto_cc",
     ],
 )
 
@@ -367,7 +367,7 @@ cc_library(
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/logs",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@opentelemetry-proto//:logs_service_proto_cc",
     ],
 )
 
@@ -398,7 +398,7 @@ cc_library(
         "//ext:headers",
         "//sdk/src/logs",
         # For gRPC
-        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
     ],
 )
 
@@ -413,9 +413,9 @@ cc_test(
         ":otlp_recordable",
         ":otlp_grpc_client",
         "@com_google_googletest//:gtest_main",
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@opentelemetry-proto//:trace_service_proto_cc",
         # For gRPC
-        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
     ]),
 )
 
@@ -428,7 +428,7 @@ cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
         "@com_google_googletest//:gtest_main",
     ]),
 )
@@ -444,7 +444,7 @@ cc_test(
     ],
     deps = dll_deps([
         ":otlp_recordable",
-        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@opentelemetry-proto//:logs_service_proto_cc",
         "@com_google_googletest//:gtest_main",
     ]),
 )
@@ -634,9 +634,9 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
-        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
-        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
-        "@com_github_grpc_grpc//:grpc++",
+        "@opentelemetry-proto//:logs_service_grpc_cc",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@@grpc~//:grpc++",
     ]),
 )
 
@@ -700,7 +700,7 @@ cc_test(
         "//api",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
-        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@opentelemetry-proto//:metrics_service_proto_cc",
         "@github_nlohmann_json//:json",
     ]),
 )
@@ -763,8 +763,8 @@ otel_cc_benchmark(
     deps = dll_deps([
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
-        "@com_github_grpc_grpc//:grpc++",
-        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@@grpc~//:grpc++",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
     ]),
 )
 

@@ -19,7 +19,7 @@ cc_binary(
         "//sdk/src/metrics",
         # These are not exported in the "dll" version, hence they need to be linked in statically
         # In the non-dll version, these are just duplicate deps, and would be ignored
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ]),
 )

@@ -4,7 +4,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
-load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("@@grpc~//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
 
 avoid_dll_lock()
@@ -55,7 +55,7 @@ cc_binary(
         ":tracer_common",
         "//api",
         "//sdk/src/trace",
-        "@com_github_grpc_grpc//:grpc++",
+        "@@grpc~//:grpc++",
     ]),
 )
 
@@ -70,6 +70,6 @@ cc_binary(
         ":tracer_common",
         "//api",
         "//sdk/src/trace",
-        "@com_github_grpc_grpc//:grpc++",
+        "@@grpc~//:grpc++",
     ]),
 )

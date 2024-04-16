@@ -26,8 +26,8 @@ cc_library(
         ":prometheus_exporter_utils",
         "//api",
         "//sdk:headers",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ],
 )
 
@@ -44,8 +44,8 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ],
 )
 
@@ -63,8 +63,8 @@ cc_library(
         ":prometheus_exporter_utils",
         "//api",
         "//sdk:headers",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ],
 )
 
@@ -96,8 +96,8 @@ cc_test(
         ":prometheus_test_helper",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ]),
 )
 
@@ -115,8 +115,8 @@ cc_test(
         ":prometheus_test_helper",
         "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",
     ]),
 )
 
@@ -133,8 +133,8 @@ cc_test(
         ":prometheus_exporter_utils",
         ":prometheus_test_helper",
         "@com_google_googletest//:gtest_main",
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//pull",        
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//pull",        
     ]),
 )
 
@@ -152,8 +152,8 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["prometheus"],
     deps = [
-        "@com_github_jupp0r_prometheus_cpp//core",
-        "@com_github_jupp0r_prometheus_cpp//push",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//push",
         "//api",
         "//exporters/prometheus:prometheus_collector",
         "//exporters/prometheus:prometheus_exporter_utils",
