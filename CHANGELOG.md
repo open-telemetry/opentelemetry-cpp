@@ -21,6 +21,12 @@ Increment the:
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
 * [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
+* [CI] Use platform CMake
+  [#2627](https://github.com/open-telemetry/opentelemetry-cpp/pull/2627)
+* [PROTO] Upgrade to opentelemetry-proto v1.2.0
+  [#2631](https://github.com/open-telemetry/opentelemetry-cpp/pull/2631)
+* [SDK] DefaultLogHandler to print errors to std::cerr, add LogLevel::None
+  [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
 * [SDK] Update ExemplarFilter and ExemplarReservoir for spec
   [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 
@@ -36,6 +42,30 @@ Important changes:
     dependency on zlib.
 * [SDK] Change OTLP HTTP content_type default to binary
   [#2558](https://github.com/open-telemetry/opentelemetry-cpp/pull/2558)
+* [CI] Use platform CMake
+  [#2627](https://github.com/open-telemetry/opentelemetry-cpp/pull/2627)
+  * The `CI` in github no longer install a different version of `cmake`.
+  * It now always use the `cmake` provided by the platform.
+  * As part of this change, the script `ci/setup_cmake.sh` was renamed
+    to `ci/setup_googletest.sh`, for clarity, now that this script
+    only installs googletest.
+* [SDK] DefaultLogHandler to print to std::cerr, add LogLevel::None
+  [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
+  * Change DefaultLogHandler output
+    * Before, the default internal logger, DefaultLogHandler,
+      used to print to std::cout.
+    * Now, DefaultLogHandler prints errors and warnings to std::cerr,
+      as expected, while printing info and debug messages to std::cout.
+    * Applications that expected to find the opentelemetry-cpp internal
+      error log in std::cout may need adjustments, either by looking
+      at std::cerr instead, or by using a custom log handler.
+  * Additional LogLevel::None
+    * LogLevel::None is a new supported log level, which does not print
+      any message.
+    * Custom log handlers may need to implement a new case, to avoid
+      compiler warnings.
+    * Numbering of log levels like OTEL_INTERNAL_LOG_LEVEL_ERROR
+      has changed, which requires to rebuild, as the SDK ABI differs.
 
 Notes on experimental features:
 

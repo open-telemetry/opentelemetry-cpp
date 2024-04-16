@@ -6,6 +6,7 @@
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 
 #include <cstdlib>
 #include <map>
@@ -36,10 +37,10 @@ TEST(ResourceTest, create_without_servicename)
       {"service", "backend"},
       {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
-      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
-      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
-      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::kServiceName, "unknown_service"}};
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {opentelemetry::trace::SemanticConventions::kServiceName, "unknown_service"}};
 
   ResourceAttributes attributes = {
       {"service", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
@@ -69,10 +70,10 @@ TEST(ResourceTest, create_with_servicename)
   ResourceAttributes expected_attributes = {
       {"version", static_cast<uint32_t>(1)},
       {"cost", 234.23},
-      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
-      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
-      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::kServiceName, "backend"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {opentelemetry::trace::SemanticConventions::kServiceName, "backend"},
   };
   ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", static_cast<uint32_t>(1)}, {"cost", 234.23}};
@@ -100,10 +101,10 @@ TEST(ResourceTest, create_with_servicename)
 TEST(ResourceTest, create_with_emptyatrributes)
 {
   ResourceAttributes expected_attributes = {
-      {SemanticConventions::kTelemetrySdkLanguage, "cpp"},
-      {SemanticConventions::kTelemetrySdkName, "opentelemetry"},
-      {SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
-      {SemanticConventions::kServiceName, "unknown_service"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkLanguage, "cpp"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkName, "opentelemetry"},
+      {opentelemetry::trace::SemanticConventions::kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION},
+      {opentelemetry::trace::SemanticConventions::kServiceName, "unknown_service"},
   };
   ResourceAttributes attributes = {};
   auto resource                 = Resource::Create(attributes);
