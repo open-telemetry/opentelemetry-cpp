@@ -1,0 +1,12 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index d3fe21b..5055556 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -206,6 +206,7 @@ cc_library(
+             "-DEFAULTLIB:advapi32.lib",
+             "-DEFAULTLIB:crypt32.lib",
+             "-DEFAULTLIB:Normaliz.lib",
++            "-DEFAULTLIB:Wldap32.lib",
+         ],
+         "@platforms//os:macos": [
+             "-Wl,-framework,SystemConfiguration",

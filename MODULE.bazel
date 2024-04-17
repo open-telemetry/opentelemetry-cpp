@@ -4,6 +4,13 @@ module(
     repo_name = "io_opentelemetry_cpp",
 )
 
+bazel_dep(name = "curl", version = "8.4.0")
+single_version_override(
+    module_name = "curl",
+    patch_strip = 1,
+    patches = ["bazel/curl_missing_windows_ldap.patch"],
+)
+
 bazel_dep(name = "abseil-cpp", version = "20240116.2", repo_name = "com_google_absl")
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.0")
 
@@ -17,9 +24,12 @@ bazel_dep(name = "google_benchmark", version = "1.8.3", dev_dependency = True, r
 bazel_dep(name = "googletest", version = "1.14.0.bcr.1", dev_dependency = True, repo_name = "com_google_googletest")
 
 bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name = "github_nlohmann_json")
-
 bazel_dep(name = "grpc", version = "1.62.1", repo_name = "com_github_grpc_grpc")
-single_version_override( module_name = "grpc", patch_strip = 1, patches = ["bazel/grpc_deps_remove_googleapis.patch"] )
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    patches = ["bazel/grpc_deps_remove_googleapis.patch"],
+)
 
 bazel_dep(name = "opentelemetry-proto", version = "1.1.0")
 bazel_dep(name = "prometheus-cpp", version = "1.2.4")
@@ -29,7 +39,6 @@ bazel_dep(name = "rules_proto", version = "6.0.0-rc2")
 
 use_repo(
     use_extension("//bazel:repository.bzl", "deps1"),
-    "curl",
     "ftxui",
     "graf_w64",
     "loki_w64",
