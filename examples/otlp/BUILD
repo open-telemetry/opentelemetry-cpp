@@ -42,6 +42,24 @@ cc_binary(
 )
 
 cc_binary(
+    name = "example_otlp_file",
+    srcs = [
+        "file_main.cc",
+    ],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_file",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/foo_library:common_foo_library",
+        "//exporters/otlp:otlp_file_exporter",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_binary(
     name = "example_otlp_http_log",
     srcs = [
         "http_log_main.cc",
@@ -80,6 +98,25 @@ cc_binary(
 )
 
 cc_binary(
+    name = "example_otlp_file_log",
+    srcs = [
+        "file_log_main.cc",
+    ],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_file_log",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//exporters/otlp:otlp_file_exporter",
+        "//exporters/otlp:otlp_file_log_record_exporter",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_binary(
     name = "example_otlp_grpc_metric",
     srcs = [
         "grpc_metric_main.cc",
@@ -115,4 +152,23 @@ cc_binary(
         "//exporters/otlp:otlp_http_metric_exporter",
         "//sdk/src/metrics",
     ]),
+)
+
+cc_binary(
+    name = "example_otlp_file_metric",
+    srcs = [
+        "file_metric_main.cc",
+    ],
+    tags = [
+        "examples",
+        "metrics",
+        "otlp",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
+        "//exporters/otlp:otlp_file_exporter",
+        "//exporters/otlp:otlp_file_metric_exporter",
+        "//sdk/src/metrics",
+    ],
 )
