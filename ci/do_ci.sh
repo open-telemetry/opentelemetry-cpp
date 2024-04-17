@@ -25,7 +25,7 @@ function run_benchmarks
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   mkdir -p $BENCHMARK_DIR
-  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -43,6 +43,10 @@ function run_benchmarks
   do
     out=$component-benchmark_result.json
     find ./$component -type f -name "*_result.json" -exec cat {} \; > $component_tmp_bench.json
+    # Print each result in CI logs, so it can be inspected.
+    echo "BENCHMARK result (begin)"
+    cat $component_tmp_bench.json
+    echo "BENCHMARK result (end)"
     cat $component_tmp_bench.json | docker run -i --rm itchyny/gojq:0.12.6 -s \
       '.[0].benchmarks = ([.[].benchmarks] | add) |
       if .[0].benchmarks == null then null else .[0] end' > $BENCHMARK_DIR/$out
@@ -70,7 +74,7 @@ echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
-BAZEL_OPTIONS="--cxxopt=-std=c++14 $BAZEL_OPTIONS_DEFAULT"
+BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
@@ -95,7 +99,7 @@ export CTEST_OUTPUT_ON_FAILURE=1
 if [[ "$1" == "cmake.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
@@ -108,8 +112,9 @@ if [[ "$1" == "cmake.test" ]]; then
 elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -129,8 +134,9 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
 elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -150,9 +156,10 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
 elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -171,8 +178,9 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
 elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_PROMETHEUS=ON \
         -DWITH_EXAMPLES=ON \
         -DWITH_EXAMPLES_HTTP=ON \
@@ -194,7 +202,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
@@ -208,7 +216,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
 elif [[ "$1" == "cmake.abseil.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -220,7 +228,7 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
 elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]} \
+  cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
         -DWITH_OPENTRACING=ON \
         "${SRC_DIR}"
@@ -230,7 +238,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
 elif [[ "$1" == "cmake.c++20.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX20 \
@@ -242,7 +250,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
 elif [[ "$1" == "cmake.c++23.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DWITH_STL=CXX23 \
@@ -254,7 +262,7 @@ elif [[ "$1" == "cmake.c++23.test" ]]; then
 elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -267,7 +275,7 @@ elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
 elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -280,7 +288,7 @@ elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -293,7 +301,7 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
 elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -308,7 +316,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
   ${SRC_DIR}/tools/build-benchmark.sh
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make -j $(nproc)
@@ -319,10 +327,11 @@ elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
   ${SRC_DIR}/tools/build-benchmark.sh
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -337,9 +346,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   if [[ ! -z "${WITH_ABSEIL}" ]]; then
     CMAKE_OPTIONS=(${CMAKE_OPTIONS[@]} "-DWITH_ABSEIL=${WITH_ABSEIL}")
   fi
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -351,9 +361,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -365,9 +376,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
 elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
@@ -379,9 +391,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
 elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOPENTELEMETRY_INSTALL=OFF \
         "${SRC_DIR}"
@@ -394,7 +407,7 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
 elif [[ "$1" == "cmake.install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
@@ -424,7 +437,7 @@ EOF
     -static-libgcc \
     -Wl,--version-script=${PWD}/export.map \
   "
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
         -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
@@ -435,7 +448,7 @@ EOF
   # Verify we can load the plugin
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   make load_plugin_example
@@ -493,7 +506,7 @@ elif [[ "$1" == "bazel.e2e" ]]; then
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
-  bazel $BAZEL_STARTUP_OPTIONS build --host_cxxopt=-std=c++14 --cxxopt=-std=c++14 $BAZEL_OPTIONS_ASYNC -c opt -- \
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -c opt -- \
     $(bazel query 'attr("tags", "benchmark_result", ...)')
   echo ""
   echo "Benchmark results in $BENCHMARK_DIR:"
@@ -517,7 +530,7 @@ elif [[ "$1" == "format" ]]; then
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
-  cmake ${CMAKE_OPTIONS[@]}  \
+  cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror --coverage $CXXFLAGS" \
         "${SRC_DIR}"
   make
@@ -529,7 +542,7 @@ elif [[ "$1" == "code.coverage" ]]; then
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
   echo "gRPC=v1.49.2" > third_party_release
-  echo "abseil=20220623.1" >> third_party_release
+  echo "abseil=20240116.1" >> third_party_release
   git submodule foreach --quiet 'echo "$name=$(git describe --tags HEAD)"' | sed 's:.*/::' >> third_party_release
   exit 0
 fi

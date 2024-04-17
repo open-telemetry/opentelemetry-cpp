@@ -10,10 +10,11 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
-#define OTEL_INTERNAL_LOG_LEVEL_ERROR 0
-#define OTEL_INTERNAL_LOG_LEVEL_WARN 1
-#define OTEL_INTERNAL_LOG_LEVEL_INFO 2
-#define OTEL_INTERNAL_LOG_LEVEL_DEBUG 3
+#define OTEL_INTERNAL_LOG_LEVEL_NONE 0
+#define OTEL_INTERNAL_LOG_LEVEL_ERROR 1
+#define OTEL_INTERNAL_LOG_LEVEL_WARN 2
+#define OTEL_INTERNAL_LOG_LEVEL_INFO 3
+#define OTEL_INTERNAL_LOG_LEVEL_DEBUG 4
 #ifndef OTEL_INTERNAL_LOG_LEVEL
 // DEBUG by default, we can change log level on runtime
 #  define OTEL_INTERNAL_LOG_LEVEL OTEL_INTERNAL_LOG_LEVEL_DEBUG
@@ -29,16 +30,19 @@ namespace internal_log
 
 enum class LogLevel
 {
-  Error = 0,
-  Warning,
-  Info,
-  Debug
+  None    = OTEL_INTERNAL_LOG_LEVEL_NONE,
+  Error   = OTEL_INTERNAL_LOG_LEVEL_ERROR,
+  Warning = OTEL_INTERNAL_LOG_LEVEL_WARN,
+  Info    = OTEL_INTERNAL_LOG_LEVEL_INFO,
+  Debug   = OTEL_INTERNAL_LOG_LEVEL_DEBUG
 };
 
 inline std::string LevelToString(LogLevel level)
 {
   switch (level)
   {
+    case LogLevel::None:
+      return "None";
     case LogLevel::Error:
       return "Error";
     case LogLevel::Warning:

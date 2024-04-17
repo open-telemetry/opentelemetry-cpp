@@ -8,14 +8,9 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
-if [ "x$CMAKE_VERSION" = "x" ]; then
-  # By default, CMake version set the following version.
-  export CMAKE_VERSION=3.16.3
-fi
-
 if [ -z "${GOOGLETEST_VERSION}" ]; then
   # Version by default. Requires C++14.
-  export GOOGLETEST_VERSION=1.13.0
+  export GOOGLETEST_VERSION=1.14.0
 fi
 
 OLD_GOOGLETEST_VERSION_REGEXP="^1\.([0-9]|10|11|12)(\..*)?$"
@@ -29,17 +24,6 @@ else
   GOOGLETEST_VERSION_PATH="v${GOOGLETEST_VERSION}"
   GOOGLETEST_FOLDER_PATH="googletest-${GOOGLETEST_VERSION}"
 fi
-
-cmake_install()
-{
-  tmp_dir=$(mktemp -d)
-  pushd $tmp_dir
-  wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh
-  chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh
-  ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --prefix=/usr/local --skip-license
-  rm cmake-${CMAKE_VERSION}-Linux-x86_64.sh
-  popd
-}
 
 googletest_install()
 {
@@ -57,8 +41,6 @@ googletest_install()
   ldconfig
   popd
 }
-
-cmake_install
 
 set +e
 echo	\

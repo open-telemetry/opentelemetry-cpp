@@ -92,7 +92,7 @@ public:
       nostd::string_view unit        = "") noexcept = 0;
 
   /**
-   * Creates a Asynchronouse (Observable) Gauge with the passed characteristics and returns a
+   * Creates a Asynchronous (Observable) Gauge with the passed characteristics and returns a
    * shared_ptr to that Observable Gauge
    *
    * @param name the name of the new Observable Gauge.
@@ -129,7 +129,7 @@ public:
       nostd::string_view unit        = "") noexcept = 0;
 
   /**
-   * Creates a Asynchronouse (Observable) UpDownCounter with the passed characteristics and returns
+   * Creates a Asynchronous (Observable) UpDownCounter with the passed characteristics and returns
    * a shared_ptr to that Observable UpDownCounter
    *
    * @param name the name of the new Observable UpDownCounter.
