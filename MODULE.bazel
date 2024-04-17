@@ -4,12 +4,7 @@ module(
     repo_name = "io_opentelemetry_cpp",
 )
 
-bazel_dep(name = "curl", version = "8.4.0")
-single_version_override(
-    module_name = "curl",
-    patch_strip = 1,
-    patches = ["bazel/curl_missing_windows_ldap.patch"],
-)
+bazel_dep(name = "curl", version = "8.4.0.bcr.1")
 
 bazel_dep(name = "abseil-cpp", version = "20240116.2", repo_name = "com_google_absl")
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.0")
@@ -33,6 +28,16 @@ single_version_override(
 
 bazel_dep(name = "opentelemetry-proto", version = "1.1.0")
 bazel_dep(name = "prometheus-cpp", version = "1.2.4")
+#single_version_override(
+    #module_name = "prometheus-cpp",
+    #version = "1.2.4",
+    #patch_strip = 1,
+    #patches = [
+        #"bazel/prometheus_cpp_curl_bzlmod.patch",
+        #"bazel/prometheus_cpp_rm_bzlmod_lock.patch",
+    #],
+#)
+
 bazel_dep(name = "boringssl", version = "0.0.0-20240126-22d349c")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.1")
 bazel_dep(name = "rules_proto", version = "6.0.0-rc2")

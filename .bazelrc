@@ -106,3 +106,8 @@ build --bes_backend=grpcs://remote.buildbuddy.io
 build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr
 build --nolegacy_important_outputs
 
+
+build --@curl//:use_mbedtls=true 
+# build --@curl//:http_only=true
+
+mod --lockfile_mode=off
