@@ -51,12 +51,12 @@ cc_binary(
         "otlp",
         "otlp_file",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_file_exporter",
         "//sdk/src/trace",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -107,13 +107,13 @@ cc_binary(
         "otlp",
         "otlp_file_log",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//examples/common/logs_foo_library:common_logs_foo_library",
         "//exporters/otlp:otlp_file_exporter",
         "//exporters/otlp:otlp_file_log_record_exporter",
         "//sdk/src/trace",
-    ],
+    ]),
 )
 
 cc_binary(
@@ -164,11 +164,11 @@ cc_binary(
         "metrics",
         "otlp",
     ],
-    deps = [
+    deps = dll_deps([
         "//api",
         "//examples/common/metrics_foo_library:common_metrics_foo_library",
         "//exporters/otlp:otlp_file_exporter",
         "//exporters/otlp:otlp_file_metric_exporter",
         "//sdk/src/metrics",
-    ],
+    ]),
 )

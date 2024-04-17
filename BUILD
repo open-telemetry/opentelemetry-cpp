@@ -52,18 +52,21 @@ cc_library(
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
         "//exporters/etw:etw_exporter",
-        "//exporters/memory:in_memory_span_exporter",  # traces
+        "//exporters/memory:in_memory_span_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
-        "//exporters/ostream:ostream_span_exporter",  # traces
-        "//exporters/otlp:otlp_grpc_exporter",  # traces
+        "//exporters/ostream:ostream_span_exporter",
+        "//exporters/otlp:otlp_grpc_exporter", 
         "//exporters/otlp:otlp_grpc_log_record_exporter",
         "//exporters/otlp:otlp_grpc_metric_exporter",
-        "//exporters/otlp:otlp_http_exporter",  # traces
+        "//exporters/otlp:otlp_http_exporter", 
         "//exporters/otlp:otlp_http_log_record_exporter",
         "//exporters/otlp:otlp_http_metric_exporter",
-        "//exporters/prometheus:prometheus_exporter",  # metrics
-        "//exporters/zipkin:zipkin_exporter",  # traces
+        "//exporters/otlp:otlp_file_exporter", 
+        "//exporters/otlp:otlp_file_log_record_exporter",
+        "//exporters/otlp:otlp_file_metric_exporter",
+        "//exporters/prometheus:prometheus_exporter",
+        "//exporters/zipkin:zipkin_exporter",
     ],
 )
 
