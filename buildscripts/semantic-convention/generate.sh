@@ -80,7 +80,7 @@ docker run --rm \
   -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
   -v ${ROOT_DIR}/sdk/include/opentelemetry/sdk/resource/:/output${USE_MOUNT_OPTION} \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only resource \
+  --only resource,attribute_group \
   -f /source code \
   --template /templates/SemanticAttributes.h.j2 \
   --output /output/semantic_conventions.h \

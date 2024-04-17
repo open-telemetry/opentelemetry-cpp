@@ -4,7 +4,6 @@
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 
 #include <map>
 #include <string>
@@ -224,9 +223,9 @@ void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(trace::SemanticConventions::kServiceName) != attributes.end())
+  if (attributes.find(SemanticConventions::kServiceName) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes[trace::SemanticConventions::kServiceName]);
+    service_name_ = nostd::get<std::string>(attributes[SemanticConventions::kServiceName]);
   }
 }
 
