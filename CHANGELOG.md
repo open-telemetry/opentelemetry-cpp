@@ -82,6 +82,8 @@ Increment the:
   [#2633](https://github.com/open-telemetry/opentelemetry-cpp/pull/2633)
 * [DOC] Add readme and examples for OTLP FILE exporters.
   [#2638](https://github.com/open-telemetry/opentelemetry-cpp/pull/2638)
+* [SEMANTIC CONVENTIONS] Rework on semantic conventions 1.25.0
+  [#2640](https://github.com/open-telemetry/opentelemetry-cpp/pull/2640)
 
 Important changes:
 
@@ -119,14 +121,6 @@ Important changes:
       compiler warnings.
     * Numbering of log levels like OTEL_INTERNAL_LOG_LEVEL_ERROR
       has changed, which requires to rebuild, as the SDK ABI differs.
-* [SEMANTIC CONVENTIONS] Upgrade to semantic convention 1.25.0
-  [#2633](https://github.com/open-telemetry/opentelemetry-cpp/pull/2633)
-  * Some declarations, for example `SemanticConventions::kServiceName`,
-    moved from header `opentelemetry/sdk/resource/semantic_conventions.h`
-    to header `opentelemetry/trace/semantic_conventions.h`,
-    and moved from namespace `opentelemetry::sdk::resource`
-    to namespace `opentelemetry::trace`.
-  * Application code may need to be adjusted accordingly.
 
 ## [1.14.2] 2024-02-27
 
