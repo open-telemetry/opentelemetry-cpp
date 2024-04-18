@@ -87,7 +87,6 @@ Increment the:
 * [DOC] Update INSTALL.md
   [#2592](https://github.com/open-telemetry/opentelemetry-cpp/pull/2592)
 
-
 Important changes:
 
 * [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
