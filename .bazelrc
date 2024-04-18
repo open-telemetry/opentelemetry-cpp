@@ -110,4 +110,4 @@ build --nolegacy_important_outputs
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
 
-mod --lockfile_mode=off
+mod --lockfile_mode=update
