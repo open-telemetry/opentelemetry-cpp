@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.15.0] 2024-04-17
+## [1.15.0] 2024-04-18
 
 * [EXPORTER] Change OTLP HTTP content_type default to binary
   [#2564](https://github.com/open-telemetry/opentelemetry-cpp/pull/2564)
@@ -84,6 +84,9 @@ Increment the:
   [#2638](https://github.com/open-telemetry/opentelemetry-cpp/pull/2638)
 * [SEMANTIC CONVENTIONS] Rework on semantic conventions 1.25.0
   [#2640](https://github.com/open-telemetry/opentelemetry-cpp/pull/2640)
+* [DOC] Update INSTALL.md
+  [#2592](https://github.com/open-telemetry/opentelemetry-cpp/pull/2592)
+
 
 Important changes:
 
