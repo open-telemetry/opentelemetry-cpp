@@ -19,7 +19,7 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
@@ -41,7 +41,7 @@ jobs:
         CXX: /usr/bin/g++-13
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, sync)
@@ -73,7 +73,7 @@ jobs:
         CXX: /usr/bin/g++-13
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, async)
@@ -105,7 +105,7 @@ jobs:
         CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, sync)
@@ -170,7 +170,7 @@ jobs:
         CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, async)
@@ -202,7 +202,7 @@ jobs:
         CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, abiv2)
@@ -230,7 +230,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.maintainer.test
@@ -244,7 +243,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       env:
@@ -263,7 +261,7 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       env:
@@ -281,7 +279,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable abseil-cpp)
       run: |
@@ -297,7 +295,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake tests (enable opentracing-shim)
       run: ./ci/do_ci.sh cmake.opentracing_shim.test
@@ -310,11 +308,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '14'
@@ -328,11 +324,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests (enable stl)
       env:
         CXX_STANDARD: '17'
@@ -346,11 +340,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CXX_STANDARD: '20'
@@ -372,10 +364,9 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -399,11 +390,9 @@ jobs:
       with:
         submodules: 'recursive'
     - name: setup
-      env:
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CXX_STANDARD: '23'
@@ -425,10 +414,9 @@ jobs:
         CC: /usr/bin/clang
         CXX: /usr/bin/clang++
         CXXFLAGS: "-stdlib=libc++"
-        CMAKE_VERSION: 3.20.6
       run: |
         sudo -E ./ci/setup_ci_environment.sh
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run tests
       env:
         CC: /usr/bin/clang
@@ -453,7 +441,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
@@ -473,7 +461,7 @@ jobs:
         ABSEIL_CPP_VERSION: '20230125.3'
         CXX_STANDARD: '14'
       run: |
-        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_googletest.sh
         sudo ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_abseil.sh
         sudo -E ./ci/install_protobuf.sh
@@ -494,7 +482,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
@@ -510,7 +498,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
@@ -526,7 +514,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run cmake install (with abseil)
       run: |
@@ -548,7 +536,7 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests
       env:
@@ -796,7 +784,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -813,7 +800,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test (DLL build)
@@ -832,7 +818,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: run cmake test
@@ -862,7 +847,6 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
@@ -879,7 +863,7 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
     - name: run tests and generate report
       env:
