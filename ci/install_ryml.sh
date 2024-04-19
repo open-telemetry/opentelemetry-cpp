@@ -23,7 +23,7 @@ if [ ! -z "${CXX_STANDARD}" ]; then
 fi
 
 mkdir build && pushd build
-cmake ${RYML_BUILD_OPTIONS[@]} ..
+cmake "${RYML_BUILD_OPTIONS[@]}" ..
 make -j $(nproc)
 make install
 popd
