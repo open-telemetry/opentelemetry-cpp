@@ -137,7 +137,7 @@ jobs:
         CXX: /usr/bin/clang++-15
         PROTOBUF_VERSION: 21.12
       run: |
-        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
         sudo -E ./ci/install_ryml.sh
