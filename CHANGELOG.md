@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.15.0] 2024-04-18
+## [1.15.0] 2024-04-21
 
 * [EXPORTER] Change OTLP HTTP content_type default to binary
   [#2564](https://github.com/open-telemetry/opentelemetry-cpp/pull/2564)
