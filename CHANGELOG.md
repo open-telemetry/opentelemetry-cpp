@@ -15,20 +15,79 @@ Increment the:
 
 ## [Unreleased]
 
-* [EXPORTER] Add OTLP File exporters
-  [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
+## [1.15.0] 2024-04-21
+
+* [EXPORTER] Change OTLP HTTP content_type default to binary
+  [#2564](https://github.com/open-telemetry/opentelemetry-cpp/pull/2564)
+* [DOC] Fix OTLP documentation: Default endpoint is wrong for OTLP/HTTP
+  [#2560](https://github.com/open-telemetry/opentelemetry-cpp/pull/2560)
+* [BUILD] Fix old style cast warning
+  [#2567](https://github.com/open-telemetry/opentelemetry-cpp/pull/2567)
 * [EXPORTER] Gzip compression support for OTLP/HTTP and OTLP/gRPC exporter
   [#2530](https://github.com/open-telemetry/opentelemetry-cpp/pull/2530)
+* [BUILD] update vcpkg submodule to 2024.02.14
+  [#2575](https://github.com/open-telemetry/opentelemetry-cpp/pull/2575)
+* [SDK] Support for OTEL_SERVICE_NAME
+  [#2577](https://github.com/open-telemetry/opentelemetry-cpp/pull/2577)
 * [EXPORTER] Support URL-encoded values for `OTEL_EXPORTER_OTLP_HEADERS`
   [#2579](https://github.com/open-telemetry/opentelemetry-cpp/pull/2579)
+* [BUILD] CMake cleanup for message()
+  [#2582](https://github.com/open-telemetry/opentelemetry-cpp/pull/2582)
+* [BUILD] Bump CMake minimum required version to 3.9
+  [#2581](https://github.com/open-telemetry/opentelemetry-cpp/pull/2581)
+* [BUILD] Provide LIKELY / UNLIKELY macros
+  [#2580](https://github.com/open-telemetry/opentelemetry-cpp/pull/2580)
+* [EXPORTER] OTLP: Fix missing ResourceMetrics SchemaURL
+  [#2587](https://github.com/open-telemetry/opentelemetry-cpp/pull/2587)
+* [ETW] cleanup include path
+  [#2594](https://github.com/open-telemetry/opentelemetry-cpp/pull/2594)
+* Upgrade to googletest 1.14.0
+  [#2596](https://github.com/open-telemetry/opentelemetry-cpp/pull/2596)
+* Upgrade to nlohmann_json 3.11.3
+  [#2595](https://github.com/open-telemetry/opentelemetry-cpp/pull/2595)
+* [BAZEL] Move -std=c++14 to .bazelrc
+  [#2600](https://github.com/open-telemetry/opentelemetry-cpp/pull/2600)
+* [BAZEL] Fix -std=c++14 warning on Windows
+  [#2601](https://github.com/open-telemetry/opentelemetry-cpp/pull/2601)
+* Upgrade to benchmark 1.8.3
+  [#2597](https://github.com/open-telemetry/opentelemetry-cpp/pull/2597)
+* Upgrade to prometheus 1.2.4
+  [#2598](https://github.com/open-telemetry/opentelemetry-cpp/pull/2598)
+* [DOC] Fix typo: Asynchronouse -> Asynchronous in meter.h
+  [#2604](https://github.com/open-telemetry/opentelemetry-cpp/pull/2604)
+* [BUILD] Do not link prometheus-cpp::util when it doesn't exist
+  [#2606](https://github.com/open-telemetry/opentelemetry-cpp/pull/2606)
+* [SDK] Remove unused variable
+  [#2609](https://github.com/open-telemetry/opentelemetry-cpp/pull/2609)
+* [METRICS SDK] Remove extra OfferMeasurement call
+  in SyncMetricsStorage::OfferMeasurement
+  [#2610](https://github.com/open-telemetry/opentelemetry-cpp/pull/2610)
+* [MISC] Use set -e on all shell scripts and pass shellcheck --severity=error
+  [#2616](https://github.com/open-telemetry/opentelemetry-cpp/pull/2616)
+* [CI] Add shellcheck --severity=error as a CI step
+  [#2618](https://github.com/open-telemetry/opentelemetry-cpp/pull/2618)
+* [CI] Upgrade to abseil 20240116.1 (CMake only)
+  [#2599](https://github.com/open-telemetry/opentelemetry-cpp/pull/2599)
+* [CI] Benchmark, provide units with --benchmark_min_time
+  [#2621](https://github.com/open-telemetry/opentelemetry-cpp/pull/2621)
+* [EXPORTER] OTLP file exporter
+  [#2540](https://github.com/open-telemetry/opentelemetry-cpp/pull/2540)
 * [CI] Use platform CMake
   [#2627](https://github.com/open-telemetry/opentelemetry-cpp/pull/2627)
-* [PROTO] Upgrade to opentelemetry-proto v1.2.0
+* [PROTO] Upgrade to opentelemetry-proto 1.2.0
   [#2631](https://github.com/open-telemetry/opentelemetry-cpp/pull/2631)
 * [SDK] DefaultLogHandler to print errors to std::cerr, add LogLevel::None
   [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
 * [SDK] Update ExemplarFilter and ExemplarReservoir for spec
   [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
+* [SEMANTIC CONVENTIONS] Upgrade to semantic convention 1.25.0
+  [#2633](https://github.com/open-telemetry/opentelemetry-cpp/pull/2633)
+* [DOC] Add readme and examples for OTLP FILE exporters.
+  [#2638](https://github.com/open-telemetry/opentelemetry-cpp/pull/2638)
+* [SEMANTIC CONVENTIONS] Rework on semantic conventions 1.25.0
+  [#2640](https://github.com/open-telemetry/opentelemetry-cpp/pull/2640)
+* [DOC] Update INSTALL.md
+  [#2592](https://github.com/open-telemetry/opentelemetry-cpp/pull/2592)
 
 Important changes:
 
