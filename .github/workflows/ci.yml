@@ -424,7 +424,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       env:
-        PROTOBUF_VERSION: '23.3'
+        PROTOBUF_VERSION: '26.1'
         ABSEIL_CPP_VERSION: '20230125.3'
         CXX_STANDARD: '14'
       run: |
