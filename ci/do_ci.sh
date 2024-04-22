@@ -472,12 +472,12 @@ elif [[ "$1" == "bazel.nortti" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_OPTIONS_ASYNC
+  bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
 # TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
 # https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_OPTIONS_ASYNC
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_OPTIONS_ASYNC //...
