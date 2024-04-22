@@ -74,17 +74,7 @@ echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW"
-BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
-
-BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
-
-BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS --copt=-DENABLE_ASYNC_EXPORT"
-BAZEL_TEST_OPTIONS_ASYNC="$BAZEL_OPTIONS_ASYNC --test_output=errors"
-
-# https://github.com/bazelbuild/bazel/issues/4341
-BAZEL_MACOS_OPTIONS="$BAZEL_OPTIONS_ASYNC --features=-supports_dynamic_linker"
-BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
-
+BAZEL_OPTIONS_ASYNC="$BAZEL_OPTIONS_DEFAULT --copt=-DENABLE_ASYNC_EXPORT"
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
 CMAKE_OPTIONS=(-DCMAKE_BUILD_TYPE=Debug)
@@ -417,8 +407,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   sudo make install
   exit 0
 elif [[ "$1" == "bazel.with_abseil" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
@@ -455,50 +444,43 @@ EOF
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_OPTIONS_DEFAULT //...
   exit 0
 elif [[ "$1" == "bazel.with_async_export.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.benchmark" ]]; then
   run_benchmarks
   exit 0
 elif [[ "$1" == "bazel.macos.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_MACOS_OPTIONS -- //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_MACOS_TEST_OPTIONS -- //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_OPTIONS_ASYNC -- //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then
   # we uses C++ future and async() function to test the Prometheus Exporter functionality,
   # that make this test always fail. ignore Prometheus exporter here.
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC -- //... -//exporters/otlp/... -//exporters/prometheus/...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/otlp/... -//exporters/prometheus/...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_OPTIONS_ASYNC -- //... -//exporters/otlp/... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # that make this test always fail. Ignore these packages in the nortti test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --cxxopt=-fno-rtti $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/...
-  bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/...
+  bazel $BAZEL_STARTUP_OPTIONS test --cxxopt=-fno-rtti $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_OPTIONS_ASYNC
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
 # TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
 # https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_OPTIONS_ASYNC
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.e2e" ]]; then
   cd examples/e2e

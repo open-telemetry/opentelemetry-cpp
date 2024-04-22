@@ -10,6 +10,9 @@ common --enable_platform_specific_config
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
+# Reduce output from bazel test
+build --test_output=errors
+
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
 build:linux --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
