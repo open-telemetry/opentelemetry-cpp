@@ -5,7 +5,7 @@
 
 set -e
 
-[ -z "${PROTOBUF_VERSION}" ] && export PROTOBUF_VERSION="21.12"
+[ -z "${PROTOBUF_VERSION}" ] && export PROTOBUF_VERSION="26.1"
 
 #
 # Note
