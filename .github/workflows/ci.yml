@@ -425,7 +425,7 @@ jobs:
     - name: setup
       env:
         PROTOBUF_VERSION: '26.1'
-        ABSEIL_CPP_VERSION: '20230125.3'
+        ABSEIL_CPP_VERSION: '20240116.0'
         CXX_STANDARD: '14'
       run: |
         sudo ./ci/setup_googletest.sh
