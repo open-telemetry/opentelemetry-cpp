@@ -4,6 +4,9 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
+# TODO: Remove once support is added, avoid MODULE.bazel creation for now
+common --enable_bzlmod=false
+
 # Enable automatic configs based on platform
 common --enable_platform_specific_config
 
