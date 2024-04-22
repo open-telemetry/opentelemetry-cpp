@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Update ExemplarFilter and ExemplarReservoir for spec
+  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
+
+Notes on experimental features:
+
+* [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)
+  introduced `MeterProvider::SetExemplar()` which accepts en
+  `ExemplarFilterType` enumeration with `kAlwaysOff`, `kAlwaysOn` and
+  `kTraceBased`.
+
 ## [1.15.0] 2024-04-21
 
 * [EXPORTER] Change OTLP HTTP content_type default to binary
@@ -78,8 +88,6 @@ Increment the:
   [#2631](https://github.com/open-telemetry/opentelemetry-cpp/pull/2631)
 * [SDK] DefaultLogHandler to print errors to std::cerr, add LogLevel::None
   [#2622](https://github.com/open-telemetry/opentelemetry-cpp/pull/2622)
-* [SDK] Update ExemplarFilter and ExemplarReservoir for spec
-  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 * [SEMANTIC CONVENTIONS] Upgrade to semantic convention 1.25.0
   [#2633](https://github.com/open-telemetry/opentelemetry-cpp/pull/2633)
 * [DOC] Add readme and examples for OTLP FILE exporters.
@@ -125,13 +133,6 @@ Important changes:
       compiler warnings.
     * Numbering of log levels like OTEL_INTERNAL_LOG_LEVEL_ERROR
       has changed, which requires to rebuild, as the SDK ABI differs.
-
-Notes on experimental features:
-
-* [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)
-  introduced `MeterProvider::SetExemplar()` which accepts en
-  `ExemplarFilterType` enumeration with `kAlwaysOff`, `kAlwaysOn` and
-  `kTraceBased`.
 
 ## [1.14.2] 2024-02-27
 
