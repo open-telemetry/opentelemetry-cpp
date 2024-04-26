@@ -100,3 +100,47 @@ if(WITH_OTLP_HTTP)
   endif()
 
 endif()
+
+if(WITH_OTLP_FILE)
+  # TRACE
+
+  add_executable(example_otlp_file file_main.cc)
+
+  target_link_libraries(example_otlp_file ${CMAKE_THREAD_LIBS_INIT}
+                        common_foo_library)
+
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_file opentelemetry_cpp)
+  else()
+    target_link_libraries(example_otlp_file opentelemetry_trace
+                          opentelemetry_exporter_otlp_file)
+  endif()
+
+  # METRIC
+
+  add_executable(example_otlp_file_metric file_metric_main.cc)
+
+  target_link_libraries(example_otlp_file_metric ${CMAKE_THREAD_LIBS_INIT}
+                        common_metrics_foo_library)
+
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_file_metric opentelemetry_cpp)
+  else()
+    target_link_libraries(example_otlp_file_metric opentelemetry_metrics
+                          opentelemetry_exporter_otlp_file_metric)
+  endif()
+
+  # LOG
+
+  add_executable(example_otlp_file_log file_log_main.cc)
+
+  target_link_libraries(example_otlp_file_log ${CMAKE_THREAD_LIBS_INIT}
+                        common_logs_foo_library)
+  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+    target_link_libraries(example_otlp_file_log opentelemetry_cpp)
+  else()
+    target_link_libraries(
+      example_otlp_file_log opentelemetry_trace opentelemetry_logs
+      opentelemetry_exporter_otlp_file opentelemetry_exporter_otlp_file_log)
+  endif()
+endif()
