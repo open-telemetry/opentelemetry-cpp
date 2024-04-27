@@ -22,6 +22,7 @@ cc_library(
         "//api",
         "//sdk/src/trace",
         "@github_nlohmann_json//:json",
+        "//:windows_only",
     ],
 )
 
@@ -39,6 +40,7 @@ cc_test(
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
+        "//:windows_only",
     ]),
 )
 
@@ -56,6 +58,7 @@ cc_test(
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
+        "//:windows_only",
     ]),
 )
 
@@ -73,6 +76,7 @@ cc_test(
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
         "@github_nlohmann_json//:json",
+        "//:windows_only",
     ]),
 )
 
@@ -87,6 +91,7 @@ otel_cc_benchmark(
     deps = dll_deps([
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
+        "//:windows_only",
     ]),
 )
 
@@ -96,6 +101,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//sdk:headers",
+        "//:windows_only",
     ],
 )
 

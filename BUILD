@@ -22,8 +22,17 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "windows_only",
+    visibility = ["//visibility:public"],
+    target_compatible_with = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
+)
+
 # TODO: Version needs to be updated better here.
-otel_sdk_prefix = "otel_sdk/" + "1.14.2" + "/"
+otel_sdk_prefix = "otel_sdk/" + "1.15.0" + "/"
 
 # Build configuration settings mimicking MSVC: debug=dbg, release=opt, reldeb=fastbuild
 config_setting(

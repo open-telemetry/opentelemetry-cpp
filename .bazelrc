@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 common --noenable_workspace
-
 common --remote_download_minimal
 
 # Avoid using c:\windows\system32\bash.exe
@@ -15,6 +14,10 @@ common --skip_incompatible_explicit_targets
 common --enable_platform_specific_config
 common --enable_runfiles
 
+# Put `clang-cl` specific options here, they are still used in conjuction with `windows` ones
+build:clang-cl --per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
+build:clang-cl --host_per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
+
 build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
@@ -22,25 +25,13 @@ test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 build:windows --experimental_convenience_symlinks=clean
 build --experimental_cc_implementation_deps
 
-build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl"      --copt="-Wno-invalid-offsetof" --copt="-D_CRT_NONSTDC_NO_DEPRECATE"
-build:windows --host_copt="/Brepro" --host_copt="/guard:cf" --host_copt="/Z7" --host_copt="/JMC-" --host_copt="/sdl" --host_copt="-Wno-invalid-offsetof"
-build:windows --linkopt="/Brepro" --linkopt="/guard:cf" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" --host_linkopt="shell32.lib"
+build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
+build:windows --host_copt="/Brepro" --host_copt="/guard:cf" --host_copt="/guard:ehcont" --host_copt="/Z7" --host_copt="/JMC-" --host_copt="/sdl" 
+build:windows --config=clang-cl
+build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
+build:windows --host_linkopt="/Brepro" --host_linkopt="/guard:cf" --host_linkopt="/guard:ehcont" --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows --action_env=BAZEL_VC_FULL_VERSION=14.29.30133
-
-# Disable some warnings that were made into errors by /sdl
-# com_github_grpc_grpc\src/core/lib/gprpp/time.h(254): error C4146: unary minus operator applied to unsigned type, result still unsigned
-# upb\upb\def.c(617) : error C4700: uninitialized local variable 'ret' used
-# upb\upb\msg.c(366) : error C4703: potentially uninitialized local pointer variable 'compar' used
-# api/test/trace/propagation/jaeger_propagation_test.cc(34): error C4996: 'opentelemetry::v1::trace::propagation::JaegerPropagator': was declared deprecated 
-build:windows --copt="/wd4146"  --copt="/wd4700" --copt="/wd4703"
-
-# extra silence of C++17 msvc warnings (these happen only with abseil so far)
-build:windows --copt="-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS"
-
-# external/com_github_grpc_grpc/src/core/lib/iomgr/tcp_server_windows.cc(502): error C4996: 'WSASocketA': Use WSASocketW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
-# Use this define, instead of disabling 4996 - /wd4996
-build:windows --copt="-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++17 --cxxopt=-std=c++17
@@ -71,8 +62,6 @@ common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
 # common --repository_cache=f:/b/r
 # startup --output_user_root=f:/b/u
 try-import %workspace%/../top.bazelrc
-
-common:windows --cxxopt=-Wno-deprecated-builtins
 
 test --test_size_filters=small,medium,large,enormous
 test --test_timeout_filters=short,moderate,long,eternal
@@ -105,7 +94,6 @@ build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
 build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr
 build --nolegacy_important_outputs
-
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
