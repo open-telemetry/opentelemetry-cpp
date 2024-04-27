@@ -192,5 +192,6 @@ cc_test(
         "component_f",
         "//api",
         "@com_google_googletest//:gtest_main",
+        "//:windows_only",
     ]),
 )

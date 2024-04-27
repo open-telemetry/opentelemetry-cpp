@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "4033da2e9111fd10a0dad37327701d06cd2d86933b08516bcc9f5520e05aca49",
+  "moduleFileHash": "eff28ef85f6811d5c19b15c4a8e51981517ef0b6bfa854912c9a85f7ab078a72",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -3175,7 +3175,7 @@
   "moduleExtensions": {
     "//bazel:repository.bzl%deps1": {
       "general": {
-        "bzlTransitiveDigest": "Ni/YmuZV5Jcj1xWOv2hFzKox64i4xYlSmXicMenD2y0=",
+        "bzlTransitiveDigest": "l/sgGZNufk3pnkgsGuMylfONU1Jphb9E4MRwwXdJLWU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -3224,7 +3224,7 @@
                 "https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip"
               ],
               "strip_prefix": "grafana-v10.2.3",
-              "build_file_content": "\r\nexports_files(glob([\"**/*\"]),visibility=[\"//visibility:public\"])\r\nfilegroup(name=\"files\",srcs=glob([\"**/*\"]),visibility=[\"//visibility:public\"])\r\n"
+              "build_file_content": "\nexports_files(glob([\"**/*\"]),visibility=[\"//visibility:public\"])\nfilegroup(name=\"files\",srcs=glob([\"**/*\"]),visibility=[\"//visibility:public\"])\n"
             }
           },
           "loki_w64": {
@@ -3792,6 +3792,25 @@
             "bazel_tools"
           ]
         ]
+      }
+    },
+    "@@bazel_tools//tools/osx:xcode_configure.bzl%xcode_configure_extension": {
+      "general": {
+        "bzlTransitiveDigest": "Qh2bWTU6QW6wkrd87qrU4YeY+SG37Nvw3A0PR4Y0L2Y=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "local_config_xcode": {
+            "bzlFile": "@@bazel_tools//tools/osx:xcode_configure.bzl",
+            "ruleClassName": "xcode_autoconf",
+            "attributes": {
+              "xcode_locator": "@bazel_tools//tools/osx:xcode_locator.m",
+              "remote_xcode": ""
+            }
+          }
+        },
+        "recordedRepoMappingEntries": []
       }
     },
     "@@bazel_tools//tools/sh:sh_configure.bzl%sh_configure_extension": {
@@ -4446,7 +4465,7 @@
       }
     },
     "@@rules_go~//go:extensions.bzl%go_sdk": {
-      "os:windows,arch:amd64": {
+      "os:linux,arch:amd64": {
         "bzlTransitiveDigest": "yyZoFvCHCStaXPaH0qPIc4CPQVy6V0qA2hLWwV6LPeY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -4526,19 +4545,6 @@
               "toolchain": "@go_default_sdk//:ROOT"
             }
           },
-          "rules_go__download_0_linux_amd64": {
-            "bzlFile": "@@rules_go~//go/private:sdk.bzl",
-            "ruleClassName": "go_download_sdk_rule",
-            "attributes": {
-              "goos": "",
-              "goarch": "",
-              "sdks": {},
-              "urls": [
-                "https://dl.google.com/go/{}"
-              ],
-              "version": "1.21.1"
-            }
-          },
           "rules_go__download_0_darwin_amd64": {
             "bzlFile": "@@rules_go~//go/private:sdk.bzl",
             "ruleClassName": "go_download_sdk_rule",
@@ -4560,8 +4566,8 @@
                 "_0000_go_default_sdk_",
                 "_0001_rules_go__download_0_darwin_amd64_",
                 "_0002_rules_go__download_0_darwin_arm64_",
-                "_0003_rules_go__download_0_linux_amd64_",
-                "_0004_rules_go__download_0_linux_arm64_",
+                "_0003_rules_go__download_0_linux_arm64_",
+                "_0004_rules_go__download_0_windows_amd64_",
                 "_0005_rules_go__download_0_windows_arm64_"
               ],
               "geese": [
@@ -4569,23 +4575,23 @@
                 "darwin",
                 "darwin",
                 "linux",
-                "linux",
+                "windows",
                 "windows"
               ],
               "goarchs": [
                 "",
                 "amd64",
                 "arm64",
-                "amd64",
                 "arm64",
+                "amd64",
                 "arm64"
               ],
               "sdk_repos": [
                 "go_default_sdk",
                 "rules_go__download_0_darwin_amd64",
                 "rules_go__download_0_darwin_arm64",
-                "rules_go__download_0_linux_amd64",
                 "rules_go__download_0_linux_arm64",
+                "rules_go__download_0_windows_amd64",
                 "rules_go__download_0_windows_arm64"
               ],
               "sdk_types": [
@@ -4604,6 +4610,19 @@
                 "1.21.1",
                 "1.21.1"
               ]
+            }
+          },
+          "rules_go__download_0_windows_amd64": {
+            "bzlFile": "@@rules_go~//go/private:sdk.bzl",
+            "ruleClassName": "go_download_sdk_rule",
+            "attributes": {
+              "goos": "",
+              "goarch": "",
+              "sdks": {},
+              "urls": [
+                "https://dl.google.com/go/{}"
+              ],
+              "version": "1.21.1"
             }
           }
         },

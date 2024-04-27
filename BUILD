@@ -84,7 +84,7 @@ genquery(
     name = "otel_sdk_all_project_deps",
     # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps except //sdk/src/common:random except //sdk/src/common/platform:fork))",
+    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps except //sdk/src/common:random except //sdk/src/common/platform:fork except //:windows_only))",
     scope = ["//:otel_sdk_deps"],
 )
 

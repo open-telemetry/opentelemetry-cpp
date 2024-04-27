@@ -84,10 +84,6 @@ common --incompatible_struct_has_no_methods
 # common --incompatible_disable_starlark_host_transitions
 common --incompatible_config_setting_private_default_visibility
 
-# https://www.buildbuddy.io/blog/debugging-slow-bazel-builds/
-build --bes_results_url=https://app.buildbuddy.io/invocation/
-build --bes_backend=grpcs://remote.buildbuddy.io
-build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr
 build --nolegacy_important_outputs
 
 build --@curl//:use_mbedtls=true 
