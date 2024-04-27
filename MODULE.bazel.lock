@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "a5c12618329127104446e1a1814083b02ce37df545effce8d07a378e47e898d2",
+  "moduleFileHash": "4033da2e9111fd10a0dad37327701d06cd2d86933b08516bcc9f5520e05aca49",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -21,14 +21,8 @@
       "version": "1.15.0-dll.0",
       "key": "<root>",
       "repoName": "io_opentelemetry_cpp",
-      "executionPlatformsToRegister": [
-        "@//:x64_windows-clang-cl",
-        "@local_config_platform//:host"
-      ],
-      "toolchainsToRegister": [
-        "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
-        "@local_config_cc_toolchains//:all"
-      ],
+      "executionPlatformsToRegister": [],
+      "toolchainsToRegister": [],
       "extensionUsages": [
         {
           "extensionBzlFile": "@io_opentelemetry_cpp//bazel:repository.bzl",
@@ -63,8 +57,7 @@
             "column": 29
           },
           "imports": {
-            "local_config_cc": "local_config_cc",
-            "local_config_cc_toolchains": "local_config_cc_toolchains"
+            "local_config_cc": "local_config_cc"
           },
           "devImports": [],
           "tags": [],

@@ -14,10 +14,6 @@ common --skip_incompatible_explicit_targets
 common --enable_platform_specific_config
 common --enable_runfiles
 
-# Put `clang-cl` specific options here, they are still used in conjuction with `windows` ones
-build:clang-cl --per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
-build:clang-cl --host_per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
-
 build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
@@ -27,7 +23,6 @@ build --experimental_cc_implementation_deps
 
 build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
 build:windows --host_copt="/Brepro" --host_copt="/guard:cf" --host_copt="/guard:ehcont" --host_copt="/Z7" --host_copt="/JMC-" --host_copt="/sdl" 
-build:windows --config=clang-cl
 build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
 build:windows --host_linkopt="/Brepro" --host_linkopt="/guard:cf" --host_linkopt="/guard:ehcont" --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
@@ -99,3 +94,14 @@ build --@curl//:use_mbedtls=true
 # build --@curl//:http_only=true
 
 mod --lockfile_mode=update
+
+# Select clang-cl to be the default compiler on Windows
+build:windows --config=clang-cl
+
+# See MODULE.bazel where we've disabled the platform/toolchain setup, but made it back here
+build:clang-cl --host_platform=//:x64_windows-clang-cl
+build:clang-cl --extra_toolchains=@local_config_cc//:cc-toolchain-x64_windows-clang-cl
+build:clang-cl --per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
+build:clang-cl --host_per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
+build:clang-cl --per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"
+build:clang-cl --host_per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"

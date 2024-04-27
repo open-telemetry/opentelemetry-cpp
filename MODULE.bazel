@@ -54,14 +54,14 @@ use_repo(
 )
 
 cc_configure = use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension")
-use_repo(cc_configure, "local_config_cc", "local_config_cc_toolchains")
+use_repo(cc_configure, "local_config_cc")
 
-register_execution_platforms(
-    "@//:x64_windows-clang-cl",
-    "@local_config_platform//:host",
-)
+# check .bazelrc for --host_platform (this also sets --platforms)
+#register_execution_platforms(
+#    "@//:x64_windows-clang-cl",
+#)
 
-register_toolchains(
-    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
-    "@local_config_cc_toolchains//:all",
-)
+# check .bazelrc for --extra_toolchains
+#register_toolchains(
+#    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
+#)
