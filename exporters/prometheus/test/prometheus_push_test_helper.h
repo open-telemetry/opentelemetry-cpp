@@ -15,9 +15,6 @@ namespace exportermetrics = opentelemetry::exporter::metrics;
 namespace
 {  // NOLINT
 
-  auto instrumentation_scope =
-      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("library_name", "1.9.1");
-
 inline opentelemetry::sdk::resource::Resource &GetEmptyResource()
 {
   static auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -28,7 +25,8 @@ inline opentelemetry::sdk::resource::Resource &GetEmptyResource()
 /**
  * Helper function to create ResourceMetrics
  */
-inline metric_sdk::ResourceMetrics CreateSumPointData()
+inline metric_sdk::ResourceMetrics CreateSumPointData(
+    opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
 {
   metric_sdk::SumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
@@ -36,6 +34,7 @@ inline metric_sdk::ResourceMetrics CreateSumPointData()
   sum_point_data2.value_ = 20.0;
   metric_sdk::ResourceMetrics data;
   data.resource_ = &GetEmptyResource();
+
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kCounter,
@@ -46,11 +45,12 @@ inline metric_sdk::ResourceMetrics CreateSumPointData()
           {metric_sdk::PointAttributes{{"a1", "b1"}}, sum_point_data},
           {metric_sdk::PointAttributes{{"a2", "b2"}}, sum_point_data2}}};
   data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
-      {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+      {scope, std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-inline metric_sdk::ResourceMetrics CreateHistogramPointData()
+inline metric_sdk::ResourceMetrics CreateHistogramPointData(
+    opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
 {
   metric_sdk::HistogramPointData histogram_point_data{};
   histogram_point_data.boundaries_ = std::vector<double>{10.1, 20.2, 30.2};
@@ -65,6 +65,7 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
 
   metric_sdk::ResourceMetrics data;
   data.resource_ = &GetEmptyResource();
+
   metric_sdk::MetricData metric_data{
       metric_sdk::InstrumentDescriptor{"library_name", "description", "unit",
                                        metric_sdk::InstrumentType::kHistogram,
@@ -75,14 +76,16 @@ inline metric_sdk::ResourceMetrics CreateHistogramPointData()
           {metric_sdk::PointAttributes{{"a1", "b1"}}, histogram_point_data},
           {metric_sdk::PointAttributes{{"a2", "b2"}}, histogram_point_data2}}};
   data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
-      {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+      {scope, std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-inline metric_sdk::ResourceMetrics CreateLastValuePointData()
+inline metric_sdk::ResourceMetrics CreateLastValuePointData(
+    opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
 {
   metric_sdk::ResourceMetrics data;
   data.resource_ = &GetEmptyResource();
+
   metric_sdk::LastValuePointData last_value_point_data{};
   last_value_point_data.value_              = 10.0;
   last_value_point_data.is_lastvalue_valid_ = true;
@@ -101,14 +104,16 @@ inline metric_sdk::ResourceMetrics CreateLastValuePointData()
           {metric_sdk::PointAttributes{{"a1", "b1"}}, last_value_point_data},
           {metric_sdk::PointAttributes{{"a2", "b2"}}, last_value_point_data2}}};
   data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
-      {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+      {scope, std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 
-inline metric_sdk::ResourceMetrics CreateDropPointData()
+inline metric_sdk::ResourceMetrics CreateDropPointData(
+    opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope)
 {
   metric_sdk::ResourceMetrics data;
   data.resource_ = &GetEmptyResource();
+
   metric_sdk::DropPointData drop_point_data{};
   metric_sdk::DropPointData drop_point_data2{};
   metric_sdk::MetricData metric_data{
@@ -121,7 +126,7 @@ inline metric_sdk::ResourceMetrics CreateDropPointData()
           {metric_sdk::PointAttributes{{"a1", "b1"}}, drop_point_data},
           {metric_sdk::PointAttributes{{"a2", "b2"}}, drop_point_data2}}};
   data.scope_metric_data_ = std::vector<metric_sdk::ScopeMetrics>{
-      {instrumentation_scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}};
+      {scope, std::vector<metric_sdk::MetricData>{metric_data}}};
   return data;
 }
 }  // namespace

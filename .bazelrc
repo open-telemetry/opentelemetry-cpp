@@ -101,3 +101,5 @@ build:clang-cl --per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
 build:clang-cl --host_per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
 build:clang-cl --per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"
 build:clang-cl --host_per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"
+
+build --incompatible_strict_action_env
