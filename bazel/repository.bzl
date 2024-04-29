@@ -62,12 +62,14 @@ def opentelemetry_cpp_deps():
         #
         # Upgrading to abseil-cpp-20240116.1 breaks the OTLP build, reason unknown.
         #
+        # abseil-cpp-20240116.2 : massive build failure in CI
+        #
         http_archive,
         name = "com_google_absl",
-        sha256 = "733726b8c3a6d39a4120d7e45ea8b41a434cdacde401cba500f14236c49b39dc",
-        strip_prefix = "abseil-cpp-20240116.2",
+        sha256 = "3c743204df78366ad2eaf236d6631d83f6bc928d1705dd0000b872e53b73dc6a",
+        strip_prefix = "abseil-cpp-20240116.1",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.2.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.1.tar.gz",
         ],
     )
 
