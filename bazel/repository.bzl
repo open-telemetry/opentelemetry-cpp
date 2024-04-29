@@ -58,12 +58,13 @@ def opentelemetry_cpp_deps():
         #
         # Important note:
         #
-        # The bazel build still uses abseil-cpp-20220623.1 here.
+        # The bazel build uses abseil-cpp-20230802.2 here,
+        # while CMake uses more recent versions.
         #
-        # Upgrading to abseil-cpp-20240116.1 breaks the OTLP build, reason unknown.
+        # bazel with abseil-cpp-20240116.2 : build failures in CI
+        # bazel with abseil-cpp-20240116.1 : build failures in CI
         #
-        # abseil-cpp-20240116.2 : massive build failure in CI
-        # abseil-cpp-20240116.1 : massive build failure in CI
+        # TODO: Fix issue #2619
         #
         http_archive,
         name = "com_google_absl",
