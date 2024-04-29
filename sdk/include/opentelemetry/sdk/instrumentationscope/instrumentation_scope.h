@@ -8,6 +8,7 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -73,7 +74,7 @@ public:
    */
   template <
       class ArgumentType,
-      std::enable_if_t<opentelemetry::common::detail::is_key_value_iterable<ArgumentType>::value>
+      nostd::enable_if_t<opentelemetry::common::detail::is_key_value_iterable<ArgumentType>::value>
           * = nullptr>
   static nostd::unique_ptr<InstrumentationScope> Create(nostd::string_view name,
                                                         nostd::string_view version,
