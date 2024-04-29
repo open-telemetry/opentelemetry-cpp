@@ -7,6 +7,7 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 
 #include <opentelemetry/nostd/span.h>
+#include <opentelemetry/nostd/type_traits.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -106,7 +107,7 @@ class PropertyValue : public PropertyVariant
    * @param vec Vector of integral type primitives to convert to span.
    * @return Span of integral type primitives.
    */
-  template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+  template <typename T, nostd::enable_if_t<std::is_integral<T>::value, bool> = true>
   static nostd::span<const T> to_span(const std::vector<T> &vec)
   {
     nostd::span<const T> result(vec.data(), vec.size());
@@ -119,7 +120,7 @@ class PropertyValue : public PropertyVariant
    * @param vec Vector of float type primitives to convert to span.
    * @return Span of float type primitives.
    */
-  template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+  template <typename T, nostd::enable_if_t<std::is_floating_point<T>::value, bool> = true>
   static nostd::span<const T> to_span(const std::vector<T> &vec)
   {
     nostd::span<const T> result(vec.data(), vec.size());
@@ -139,7 +140,7 @@ public:
    * @param v
    * @return
    */
-  template <typename TInteger, std::enable_if_t<std::is_integral<TInteger>::value, bool> = true>
+  template <typename TInteger, nostd::enable_if_t<std::is_integral<TInteger>::value, bool> = true>
   PropertyValue(TInteger number) : PropertyVariant(number)
   {}
 
@@ -148,7 +149,7 @@ public:
    * @param v
    * @return
    */
-  template <typename TFloat, std::enable_if_t<std::is_floating_point<TFloat>::value, bool> = true>
+  template <typename TFloat, nostd::enable_if_t<std::is_floating_point<TFloat>::value, bool> = true>
   PropertyValue(TFloat number) : PropertyVariant(double(number))
   {}
 
