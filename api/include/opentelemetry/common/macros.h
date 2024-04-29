@@ -351,6 +351,9 @@ point.
 #   if !defined(OPENTELEMETRY_RTTI_ENABLED)
 #      error OPENTELEMETRY_DLL: RTTI must be enabled (/GR)
 #   endif
+//  We ensure that this is defined to a value of, as its gets encoded down in the detect_mismatch
+#   undef OPENTELEMETRY_RTTI_ENABLED
+#   define OPENTELEMETRY_RTTI_ENABLED 1
 #   if defined(OPENTELEMETRY_STL_VERSION)
 #      if OPENTELEMETRY_STL_VERSION != 2017
 #         error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION must be 2017

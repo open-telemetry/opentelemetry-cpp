@@ -1,13 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #include <vector>
-#include "opentelemetry/sdk/metrics/exemplar/filtered_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+
+#include "opentelemetry/version.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
+#  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -15,21 +19,22 @@ namespace sdk
 namespace metrics
 {
 
-nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetFilteredExemplarReservoir(
-    std::shared_ptr<ExemplarFilter> filter,
-    std::shared_ptr<ExemplarReservoir> reservoir)
-{
-  return nostd::shared_ptr<ExemplarReservoir>{new FilteredExemplarReservoir{filter, reservoir}};
-}
-
-nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetHistogramExemplarReservoir(
+nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetSimpleFixedSizeExemplarReservoir(
     size_t size,
     std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-    std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-        const common::OrderedAttributeMap &attributes))
+    MapAndResetCellType map_and_reset_cell)
 {
   return nostd::shared_ptr<ExemplarReservoir>{
-      new HistogramExemplarReservoir{size, reservoir_cell_selector, map_and_reset_cell}};
+      new SimpleFixedSizeExemplarReservoir{size, reservoir_cell_selector, map_and_reset_cell}};
+}
+
+nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
+    size_t size,
+    std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
+    MapAndResetCellType map_and_reset_cell)
+{
+  return nostd::shared_ptr<ExemplarReservoir>{new AlignedHistogramBucketExemplarReservoir{
+      size, reservoir_cell_selector, map_and_reset_cell}};
 }
 
 nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetNoExemplarReservoir()
@@ -40,3 +45,5 @@ nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetNoExemplarReservoir()
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
