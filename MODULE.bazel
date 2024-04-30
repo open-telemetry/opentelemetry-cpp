@@ -4,7 +4,7 @@ module(
     repo_name = "io_opentelemetry_cpp",
 )
 
-bazel_dep(name = "curl", version = "8.4.0.bcr.1")
+bazel_dep(name = "curl", version = "8.7.1")
 
 bazel_dep(name = "abseil-cpp", version = "20240116.2", repo_name = "com_google_absl")
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.1")
@@ -40,7 +40,7 @@ bazel_dep(name = "prometheus-cpp", version = "1.2.4")
 
 bazel_dep(name = "boringssl", version = "0.0.0-20240126-22d349c")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.1")
-bazel_dep(name = "rules_proto", version = "6.0.0-rc3")
+bazel_dep(name = "rules_proto", version = "6.0.0")
 
 use_repo(
     use_extension("//bazel:repository.bzl", "deps1"),
@@ -55,13 +55,3 @@ use_repo(
 
 cc_configure = use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension")
 use_repo(cc_configure, "local_config_cc")
-
-#register_execution_platforms(
-#    "@//:x64_windows-clang-cl",
-#    "@local_config_platform//:host",
-#)
-
-#register_toolchains(
-#    "@local_config_cc//:cc-toolchain-x64_windows-clang-cl",
-#    "@local_config_cc_toolchains//:all",
-#)

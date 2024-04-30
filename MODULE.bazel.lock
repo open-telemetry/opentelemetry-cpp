@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "6436339a70ed3e4c936efb502e32371efd93cd06b769a877ad7a4321443a51c7",
+  "moduleFileHash": "141fbf7884be58b8c2f241fe6e8351dc8759184bd68c1ff05b02d29a1441f386",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -66,7 +66,7 @@
         }
       ],
       "deps": {
-        "curl": "curl@8.4.0.bcr.1",
+        "curl": "curl@8.7.1",
         "com_google_absl": "abseil-cpp@20240116.2",
         "aspect_bazel_lib": "aspect_bazel_lib@2.7.1",
         "rules_pkg": "rules_pkg@0.10.1",
@@ -81,15 +81,15 @@
         "prometheus-cpp": "prometheus-cpp@1.2.4",
         "boringssl": "boringssl@0.0.0-20240126-22d349c",
         "zlib": "zlib@1.3.1.bcr.1",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       }
     },
-    "curl@8.4.0.bcr.1": {
+    "curl@8.7.1": {
       "name": "curl",
-      "version": "8.4.0.bcr.1",
-      "key": "curl@8.4.0.bcr.1",
+      "version": "8.7.1",
+      "key": "curl@8.7.1",
       "repoName": "curl",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [],
@@ -106,13 +106,13 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/curl/curl/releases/download/curl-8_4_0/curl-8.4.0.tar.gz"
+            "https://github.com/curl/curl/releases/download/curl-8_7_1/curl-8.7.1.tar.gz"
           ],
-          "integrity": "sha256-gW5BgJwEP/KF6MDwanWh+iUCEbv7LcCgN+7vOfGp5Cc=",
-          "strip_prefix": "curl-8.4.0",
+          "integrity": "sha256-+RJJyH9o6gDPJ8RP36WnhCPkHnG31AjlkBqYltkFxJU=",
+          "strip_prefix": "curl-8.7.1",
           "remote_patches": {
-            "https://bcr.bazel.build/modules/curl/8.4.0.bcr.1/patches/add_build_file.patch": "sha256-Eqbknnda+T42hM6qKkOrLx75JYoL6xF5p0st+VOPxRw=",
-            "https://bcr.bazel.build/modules/curl/8.4.0.bcr.1/patches/module_dot_bazel.patch": "sha256-XECK+DvtF14j3g/pf3k8o5fNakHyxII/dMSu9susBLo="
+            "https://bcr.bazel.build/modules/curl/8.7.1/patches/add_build_file.patch": "sha256-v72CABzBMc2lrA1Oy/QLsxd8x0bv/zkPjxTPGfArI8I=",
+            "https://bcr.bazel.build/modules/curl/8.7.1/patches/module_dot_bazel.patch": "sha256-6PKX5v/ZJiXvuIQOOqMHBOJNcgtiXbNVEecwtXgUPa8="
           },
           "remote_patch_strip": 1
         }
@@ -795,7 +795,7 @@
         "com_google_absl": "abseil-cpp@20240116.2",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
         "com_googlesource_code_re2": "re2@2023-09-01",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "zlib": "zlib@1.3.1.bcr.1",
         "io_opentelemetry_cpp": "<root>",
         "rules_java": "rules_java@7.4.0",
@@ -841,7 +841,7 @@
       "extensionUsages": [],
       "deps": {
         "com_github_grpc_grpc": "grpc@1.62.1",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -971,10 +971,10 @@
         }
       }
     },
-    "rules_proto@6.0.0-rc3": {
+    "rules_proto@6.0.0": {
       "name": "rules_proto",
-      "version": "6.0.0-rc3",
-      "key": "rules_proto@6.0.0-rc3",
+      "version": "6.0.0",
+      "key": "rules_proto@6.0.0",
       "repoName": "rules_proto",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [],
@@ -991,12 +991,12 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/bazelbuild/rules_proto/releases/download/6.0.0-rc3/rules_proto-6.0.0-rc3.tar.gz"
+            "https://github.com/bazelbuild/rules_proto/releases/download/6.0.0/rules_proto-6.0.0.tar.gz"
           ],
-          "integrity": "sha256-qI0Bi9y43xzoGFRw60tImdd4+aw6Zss21RS+uB40UoI=",
-          "strip_prefix": "rules_proto-6.0.0-rc3",
+          "integrity": "sha256-MD6G5yKlIPbzJqULQc/Ba5j+bRlVzkZkKlt6Z8EcD10=",
+          "strip_prefix": "rules_proto-6.0.0",
           "remote_patches": {
-            "https://bcr.bazel.build/modules/rules_proto/6.0.0-rc3/patches/module_dot_bazel_version.patch": "sha256-KOBarlVXU5DWrHKCt1u4lbRYpLOoAbmJ/h2FxugwKgA="
+            "https://bcr.bazel.build/modules/rules_proto/6.0.0/patches/module_dot_bazel_version.patch": "sha256-fjQjxMdkMeumhvx9JdFSYeHH+Ex4TaTXNFMi554NF8E="
           },
           "remote_patch_strip": 1
         }
@@ -1144,7 +1144,7 @@
         "rules_cc": "rules_cc@0.0.9",
         "rules_java": "rules_java@7.4.0",
         "rules_license": "rules_license@0.0.7",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "rules_python": "rules_python@0.31.0",
         "buildozer": "buildozer@6.4.0.2",
         "platforms": "platforms@0.0.10",
@@ -1341,7 +1341,7 @@
         "bazel_features": "bazel_features@1.4.1",
         "bazel_skylib": "bazel_skylib@1.6.1",
         "platforms": "platforms@0.0.10",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -1578,7 +1578,7 @@
         "rules_python": "rules_python@0.31.0",
         "platforms": "platforms@0.0.10",
         "zlib": "zlib@1.3.1.bcr.1",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -1680,7 +1680,7 @@
         "platforms": "platforms@0.0.10",
         "rules_cc": "rules_cc@0.0.9",
         "bazel_skylib": "bazel_skylib@1.6.1",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "rules_license": "rules_license@0.0.7",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -1784,7 +1784,7 @@
         "io_bazel_rules_go_bazel_features": "bazel_features@1.4.1",
         "bazel_skylib": "bazel_skylib@1.6.1",
         "platforms": "platforms@0.0.10",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
         "gazelle": "gazelle@0.34.0",
         "bazel_tools": "bazel_tools@_",
@@ -1852,7 +1852,7 @@
         "io_grpc_grpc_java": "grpc-java@1.62.2",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
         "io_bazel_rules_go": "rules_go@0.46.0",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "rules_python": "rules_python@0.31.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
@@ -2516,7 +2516,7 @@
         "bazel_skylib": "bazel_skylib@1.6.1",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
         "io_bazel_rules_go": "rules_go@0.46.0",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -3013,7 +3013,7 @@
         "rules_cc": "rules_cc@0.0.9",
         "io_bazel_rules_go": "rules_go@0.46.0",
         "rules_jvm_external": "rules_jvm_external@6.0",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -3151,7 +3151,7 @@
         "rules_jvm_external": "rules_jvm_external@6.0",
         "rules_pkg": "rules_pkg@0.10.1",
         "io_bazel_stardoc": "stardoc@0.5.6",
-        "rules_proto": "rules_proto@6.0.0-rc3",
+        "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
