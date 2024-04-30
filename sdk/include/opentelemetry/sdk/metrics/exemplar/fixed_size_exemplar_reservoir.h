@@ -3,16 +3,18 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
-#include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
+#  include <memory>
+#  include <vector>
+
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/attribute_utils.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,12 +28,13 @@ class FixedSizeExemplarReservoir : public ExemplarReservoir
 public:
   FixedSizeExemplarReservoir(size_t size,
                              std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector,
-                             std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell)(
-                                 const opentelemetry::sdk::common::OrderedAttributeMap &attributes))
+                             MapAndResetCellType map_and_reset_cell)
       : storage_(size),
         reservoir_cell_selector_(reservoir_cell_selector),
         map_and_reset_cell_(map_and_reset_cell)
   {}
+
+  using ExemplarReservoir::OfferMeasurement;
 
   void OfferMeasurement(
       int64_t value,
@@ -95,10 +98,11 @@ private:
   explicit FixedSizeExemplarReservoir() = default;
   std::vector<ReservoirCell> storage_;
   std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector_;
-  std::shared_ptr<ExemplarData> (ReservoirCell::*map_and_reset_cell_)(
-      const opentelemetry::sdk::common::OrderedAttributeMap &attributes);
+  MapAndResetCellType map_and_reset_cell_;
 };
 
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

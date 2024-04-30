@@ -74,6 +74,20 @@ void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_select
   views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+
+void MeterContext::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
+{
+  exemplar_filter_type_ = exemplar_filter_type;
+}
+
+ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
+{
+  return exemplar_filter_type_;
+}
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
+
 void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
