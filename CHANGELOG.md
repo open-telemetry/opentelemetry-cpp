@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Update ExemplarFilter and ExemplarReservoir for spec
+  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
+
+Notes on experimental features:
+
+* [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)
+  introduced `MeterProvider::SetExemplar()` which accepts en
+  `ExemplarFilterType` enumeration with `kAlwaysOff`, `kAlwaysOn` and
+  `kTraceBased`.
+
 ## [1.15.0] 2024-04-21
 
 * [EXPORTER] Change OTLP HTTP content_type default to binary

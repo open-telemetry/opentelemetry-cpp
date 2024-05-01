@@ -12,6 +12,7 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:global_log_handler",
+        "//sdk/src/common:random",
         "//sdk/src/resource",
     ],
 )
