@@ -131,6 +131,10 @@ if(WITH_OTLP_HTTP_COMPRESSION)
                              INTERFACE ENABLE_OTLP_COMPRESSION_PREVIEW)
 endif()
 
+if(APPLE)
+  target_link_libraries(opentelemetry_api INTERFACE "-framework CoreFoundation")
+endif()
+
 include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
 
 if(OPENTELEMETRY_INSTALL)
