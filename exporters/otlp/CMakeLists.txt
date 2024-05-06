@@ -491,7 +491,8 @@ if(BUILD_TESTING)
     target_link_libraries(
       otlp_file_client_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
       ${GMOCK_LIB} opentelemetry_exporter_otlp_file
-      opentelemetry_otlp_recordable)
+      opentelemetry_otlp_recordable
+      nlohmann_json::nlohmann_json)
     gtest_add_tests(
       TARGET otlp_file_client_test
       TEST_PREFIX exporter.otlp.
