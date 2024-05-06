@@ -1,12 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter.h"
 #include <cstdint>
+
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
-#include "opentelemetry/sdk/metrics/exemplar/histogram_exemplar_reservoir.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
+#endif
+
+#include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -309,11 +315,22 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         << "The metric context is invalid");
     return nullptr;
   }
+
   auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  auto exemplar_filter_type = ctx->GetExemplarFilter();
+#endif
+
   auto success = view_registry->FindViews(
-      instrument_descriptor, *scope_, [this, &instrument_descriptor, &storages](const View &view) {
+      instrument_descriptor, *scope_,
+      [this, &instrument_descriptor, &storages
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+       ,
+       exemplar_filter_type
+#endif
+  ](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -327,7 +344,12 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 
         auto storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
             view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor(),
-            ExemplarReservoir::GetNoExemplarReservoir(), view.GetAggregationConfig()));
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+            exemplar_filter_type,
+            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                 instrument_descriptor),
+#endif
+            view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         multi_storage->AddStorage(storage);
         return true;
@@ -356,9 +378,19 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
   }
   auto view_registry = ctx->GetViewRegistry();
   std::unique_ptr<AsyncWritableMetricStorage> storages(new AsyncMultiMetricStorage());
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  auto exemplar_filter_type = ctx->GetExemplarFilter();
+#endif
+
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),
-      [this, &instrument_descriptor, &storages](const View &view) {
+      [this, &instrument_descriptor, &storages
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+       ,
+       exemplar_filter_type
+#endif
+  ](const View &view) {
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -369,7 +401,12 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
           view_instr_desc.description_ = view.GetDescription();
         }
         auto storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-            view_instr_desc, view.GetAggregationType(), ExemplarReservoir::GetNoExemplarReservoir(),
+            view_instr_desc, view.GetAggregationType(),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+            exemplar_filter_type,
+            GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
+                                 instrument_descriptor),
+#endif
             view.GetAggregationConfig()));
         storage_registry_[instrument_descriptor.name_] = storage;
         static_cast<AsyncMultiMetricStorage *>(storages.get())->AddStorage(storage);
