@@ -45,16 +45,16 @@ public:
 private:
   class NoopLogRecord : public LogRecord {
   public:
-    void SetTimestamp(common::SystemTimestamp timestamp) noexcept override {};
-    void SetObservedTimestamp(common::SystemTimestamp timestamp) noexcept override {};
-    void SetSeverity(logs::Severity severity) noexcept override {};
-    void SetBody(const common::AttributeValue &message) noexcept override {};
-    void SetAttribute(nostd::string_view key,
-                              const common::AttributeValue &value) noexcept override {};
-    void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override {};
-    void SetTraceId(const trace::TraceId &trace_id) noexcept override {};
-    void SetSpanId(const trace::SpanId &span_id) noexcept override {};
-    void SetTraceFlags(const trace::TraceFlags &trace_flags) noexcept override {};
+    void SetTimestamp(common::SystemTimestamp /* timestamp */) noexcept override {}
+    void SetObservedTimestamp(common::SystemTimestamp /* timestamp */) noexcept override {}
+    void SetSeverity(logs::Severity /* severity */) noexcept override {}
+    void SetBody(const common::AttributeValue & /* message */) noexcept override {}
+    void SetAttribute(nostd::string_view /* key */,
+                              const common::AttributeValue & /* value */) noexcept override {}
+    void SetEventId(int64_t id, nostd::string_view /* name */) noexcept override {}
+    void SetTraceId(const trace::TraceId & /* trace_id */) noexcept override {}
+    void SetSpanId(const trace::SpanId & /* span_id */) noexcept override {}
+    void SetTraceFlags(const trace::TraceFlags & /* trace_flags */) noexcept override {}
 
     // In CreateLogRecord we return unique_ptr to the same record_ object,
     // so we do not want to delete it when the unique_ptr is destroyed.
