@@ -163,6 +163,13 @@ public:
     }
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
+  /*
+   * The following is removed from the API in ABI version 2.
+   * It belongs to the SDK.
+   */
+
   /**
    * Force any buffered spans to flush.
    * @param timeout to complete the flush
@@ -188,6 +195,8 @@ public:
   }
 
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

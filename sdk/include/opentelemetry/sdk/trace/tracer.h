@@ -44,9 +44,38 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Force any buffered spans to flush.
+   * @param timeout to complete the flush
+   */
+  template <class Rep, class Period>
+  void ForceFlush(std::chrono::duration<Rep, Period> timeout) noexcept
+  {
+    this->ForceFlushWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
+  }
+
+  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept;
+
+  /**
+   * ForceFlush any buffered spans and stop reporting spans.
+   * @param timeout to complete the flush
+   */
+  template <class Rep, class Period>
+  void Close(std::chrono::duration<Rep, Period> timeout) noexcept
+  {
+    this->CloseWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
+  }
+
+  void CloseWithMicroseconds(uint64_t timeout) noexcept;
+#else
+  /* Exposed in the API in ABI version 1, but does not belong to the API */
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;
 
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
+#endif
 
   /** Returns the configured span processor. */
   SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }

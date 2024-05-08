@@ -5,7 +5,10 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 // sdk::TracerProvider is just used to call ForceFlush and prevent to cancel running exportings when
 // destroy and shutdown exporters.It's optional to users.
@@ -24,25 +27,29 @@ namespace otlp      = opentelemetry::exporter::otlp;
 namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
+
+std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider;
+
 void InitTracer()
 {
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpGrpcExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
+  sdk_provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor));
+
+  std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider ( sdk_provider );
   // Set the global trace provider
-  trace::Provider::SetTracerProvider(provider);
+  trace::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider> provider =
-      trace::Provider::GetTracerProvider();
-  if (provider)
+  if (sdk_provider)
   {
-    static_cast<trace_sdk::TracerProvider *>(provider.get())->ForceFlush();
+    sdk_provider->ForceFlush();
+    sdk_provider = nullptr;
   }
 
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
