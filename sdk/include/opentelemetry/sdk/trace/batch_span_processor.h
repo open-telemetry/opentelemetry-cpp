@@ -117,8 +117,8 @@ protected:
     /* Important boolean flags to handle the workflow of the processor */
     std::atomic<bool> is_force_wakeup_background_worker{false};
     std::atomic<bool> is_shutdown{false};
-    std::atomic<std::uint64_t> force_flush_pending_sequence{0};
-    std::atomic<std::uint64_t> force_flush_notified_sequence{0};
+    std::atomic<uint64_t> force_flush_pending_sequence{0};
+    std::atomic<uint64_t> force_flush_notified_sequence{0};
     std::atomic<std::chrono::microseconds::rep> force_flush_timeout_us{0};
 
     // Do not use SynchronizationData() = default; here, some versions of GCC&Clang have BUGs
@@ -134,7 +134,7 @@ protected:
    * @param notify_force_flush Sequence to indicate whether to notify force flush completion.
    * @param synchronization_data Synchronization data to be notified.
    */
-  static void NotifyCompletion(std::uint64_t notify_force_flush,
+  static void NotifyCompletion(uint64_t notify_force_flush,
                                const std::unique_ptr<SpanExporter> &exporter,
                                const std::shared_ptr<SynchronizationData> &synchronization_data);
 
