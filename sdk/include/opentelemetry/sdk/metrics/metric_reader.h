@@ -72,7 +72,7 @@ private:
 protected:
 private:
   MetricProducer *metric_producer_;
-  std::atomic<bool> shutdown_;
+  std::atomic<bool> shutdown_{false};
 };
 }  // namespace metrics
 }  // namespace sdk
