@@ -26,7 +26,7 @@ class SpanProcessor;
 class Tracer;
 class TracerContext;
 
-class TracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**
