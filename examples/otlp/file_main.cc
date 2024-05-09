@@ -29,26 +29,29 @@ namespace
 {
 opentelemetry::exporter::otlp::OtlpFileExporterOptions opts;
 
-std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider;
+std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider;
 
 void InitTracer()
 {
   // Create OTLP exporter instance
   auto exporter  = otlp::OtlpFileExporterFactory::Create(opts);
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
-  sdk_provider = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+  provider       = trace_sdk::TracerProviderFactory::Create(std::move(processor));
+
   // Set the global trace provider
-  trace::Provider::SetTracerProvider(sdk_provider);
+  std::shared_ptr<opentelemetry::trace::TracerProvider> api_provider = provider;
+  trace::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
-  if (sdk_provider)
+  if (provider)
   {
-    sdk_provider->ForceFlush(std::chrono::milliseconds(10000));
+    provider->ForceFlush(std::chrono::milliseconds(10000));
   }
 
+  provider.reset();
   std::shared_ptr<opentelemetry::trace::TracerProvider> none;
   trace::Provider::SetTracerProvider(none);
 }

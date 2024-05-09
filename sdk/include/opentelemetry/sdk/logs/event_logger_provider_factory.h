@@ -4,14 +4,11 @@
 #pragma once
 
 #include <memory>
+
+#include "opentelemetry/sdk/logs/event_logger_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace logs
-{
-class EventLoggerProvider;
-}  // namespace logs
-
 namespace sdk
 {
 namespace logs
@@ -26,7 +23,7 @@ public:
   /**
    * Create a EventLoggerProvider.
    */
-  static std::unique_ptr<opentelemetry::logs::EventLoggerProvider> Create();
+  static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider> Create();
 };
 
 }  // namespace logs

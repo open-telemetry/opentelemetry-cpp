@@ -13,43 +13,39 @@
 
 #include <vector>
 
-namespace resource    = opentelemetry::sdk::resource;
-namespace metrics_api = opentelemetry::metrics;
-namespace metrics_sdk = opentelemetry::sdk::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
 
-std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create()
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create()
 {
   auto views = ViewRegistryFactory::Create();
   return Create(std::move(views));
 }
 
-std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create(
     std::unique_ptr<ViewRegistry> views)
 {
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   return Create(std::move(views), resource);
 }
 
-std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create(
     std::unique_ptr<ViewRegistry> views,
     const opentelemetry::sdk::resource::Resource &resource)
 {
-  std::unique_ptr<opentelemetry::metrics::MeterProvider> provider(
-      new metrics_sdk::MeterProvider(std::move(views), resource));
+  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> provider(
+      new opentelemetry::sdk::metrics::MeterProvider(std::move(views), resource));
   return provider;
 }
 
-std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create(
     std::unique_ptr<sdk::metrics::MeterContext> context)
 {
-  std::unique_ptr<opentelemetry::metrics::MeterProvider> provider(
-      new metrics_sdk::MeterProvider(std::move(context)));
+  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> provider(
+      new opentelemetry::sdk::metrics::MeterProvider(std::move(context)));
   return provider;
 }
 
