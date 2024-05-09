@@ -129,7 +129,7 @@ void OStreamMetricExporter::printInstrumentationInfoMetricData(
     const sdk::metrics::ResourceMetrics &data)
 {
   // sout_ is shared
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> serialize(serialize_lock_);
   sout_ << "{";
   sout_ << "\n  scope name\t: " << info_metric.scope_->GetName()
         << "\n  schema url\t: " << info_metric.scope_->GetSchemaURL()
@@ -246,20 +246,19 @@ void OStreamMetricExporter::printPointAttributes(
 
 bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> serialize(serialize_lock_);
+  sout_.flush();
   return true;
 }
 
 bool OStreamMetricExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
 bool OStreamMetricExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 
