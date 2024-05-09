@@ -42,7 +42,7 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
                                              std::move(id_generator));
 }
 
-TracerProvider::~TracerProvider()
+OPENTELEMETRY_EXPORT TracerProvider::~TracerProvider()
 {
   // Tracer hold the shared pointer to the context. So we can not use destructor of TracerContext to
   // Shutdown and flush all pending recordables when we have more than one tracers.These recordables

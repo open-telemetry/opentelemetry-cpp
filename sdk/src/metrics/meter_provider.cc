@@ -138,7 +138,7 @@ bool MeterProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
  * Shutdown MeterContext when MeterProvider is destroyed.
  *
  */
-MeterProvider::~MeterProvider()
+OPENTELEMETRY_EXPORT MeterProvider::~MeterProvider()
 {
   if (context_)
   {

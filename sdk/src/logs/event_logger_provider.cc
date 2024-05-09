@@ -23,7 +23,7 @@ EventLoggerProvider::EventLoggerProvider() noexcept
   OTEL_INTERNAL_LOG_DEBUG("[EventLoggerProvider] EventLoggerProvider created.");
 }
 
-EventLoggerProvider::~EventLoggerProvider() {}
+OPENTELEMETRY_EXPORT EventLoggerProvider::~EventLoggerProvider() {}
 
 nostd::shared_ptr<opentelemetry::logs::EventLogger> EventLoggerProvider::CreateEventLogger(
     nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
