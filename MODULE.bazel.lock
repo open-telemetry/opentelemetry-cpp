@@ -1,6 +1,6 @@
 {
   "lockFileVersion": 6,
-  "moduleFileHash": "1668668089fbaa387e3ab1c091455939f067fec64793c8f7f64238611d2a5270",
+  "moduleFileHash": "2a66064b2206487f95302039af42209eef24166819822c6063fecc98fa35fefc",
   "flags": {
     "cmdRegistries": [
       "https://bcr.bazel.build/"
@@ -70,7 +70,7 @@
           "usingModule": "<root>",
           "location": {
             "file": "@@//:MODULE.bazel",
-            "line": 61,
+            "line": 60,
             "column": 23
           },
           "imports": {},
@@ -86,7 +86,7 @@
               "devDependency": false,
               "location": {
                 "file": "@@//:MODULE.bazel",
-                "line": 62,
+                "line": 61,
                 "column": 17
               }
             }
@@ -98,7 +98,7 @@
       "deps": {
         "curl": "curl@8.7.1",
         "com_google_absl": "abseil-cpp@20240116.2",
-        "aspect_bazel_lib": "aspect_bazel_lib@2.7.1",
+        "aspect_bazel_lib": "aspect_bazel_lib@2.7.3",
         "rules_pkg": "rules_pkg@0.10.1",
         "rules_python": "rules_python@0.31.0",
         "rules_cc": "rules_cc@0.0.9",
@@ -110,7 +110,7 @@
         "com_github_grpc_grpc": "grpc@1.62.1",
         "opentelemetry-proto": "opentelemetry-proto@1.1.0",
         "prometheus-cpp": "prometheus-cpp@1.2.4",
-        "boringssl": "boringssl@0.0.0-20240126-22d349c",
+        "boringssl": "boringssl@0.0.0-20240530-2db0eb3",
         "zlib": "zlib@1.3.1.bcr.1",
         "rules_proto": "rules_proto@6.0.0",
         "bazel_tools": "bazel_tools@_",
@@ -178,10 +178,10 @@
         }
       }
     },
-    "aspect_bazel_lib@2.7.1": {
+    "aspect_bazel_lib@2.7.3": {
       "name": "aspect_bazel_lib",
-      "version": "2.7.1",
-      "key": "aspect_bazel_lib@2.7.1",
+      "version": "2.7.3",
+      "key": "aspect_bazel_lib@2.7.3",
       "repoName": "aspect_bazel_lib",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [
@@ -192,15 +192,16 @@
         "@coreutils_toolchains//:all",
         "@expand_template_toolchains//:all",
         "@bats_toolchains//:all",
-        "@bsd_tar_toolchains//:all"
+        "@bsd_tar_toolchains//:all",
+        "@zstd_toolchains//:all"
       ],
       "extensionUsages": [
         {
           "extensionBzlFile": "@aspect_bazel_lib//lib:extensions.bzl",
           "extensionName": "toolchains",
-          "usingModule": "aspect_bazel_lib@2.7.1",
+          "usingModule": "aspect_bazel_lib@2.7.3",
           "location": {
-            "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+            "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
             "line": 17,
             "column": 37
           },
@@ -212,7 +213,8 @@
             "coreutils_toolchains": "coreutils_toolchains",
             "expand_template_toolchains": "expand_template_toolchains",
             "jq_toolchains": "jq_toolchains",
-            "yq_toolchains": "yq_toolchains"
+            "yq_toolchains": "yq_toolchains",
+            "zstd_toolchains": "zstd_toolchains"
           },
           "devImports": [],
           "tags": [
@@ -221,7 +223,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 18,
                 "column": 36
               }
@@ -231,7 +233,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 19,
                 "column": 39
               }
@@ -241,7 +243,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 20,
                 "column": 24
               }
@@ -251,7 +253,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 21,
                 "column": 24
               }
@@ -261,7 +263,7 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 22,
                 "column": 31
               }
@@ -271,9 +273,19 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
                 "line": 23,
                 "column": 25
+              }
+            },
+            {
+              "tagName": "zstd",
+              "attributeValues": {},
+              "devDependency": false,
+              "location": {
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
+                "line": 24,
+                "column": 26
               }
             },
             {
@@ -281,8 +293,8 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
-                "line": 24,
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
+                "line": 25,
                 "column": 37
               }
             },
@@ -291,8 +303,8 @@
               "attributeValues": {},
               "devDependency": false,
               "location": {
-                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/MODULE.bazel",
-                "line": 25,
+                "file": "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/MODULE.bazel",
+                "line": 26,
                 "column": 26
               }
             }
@@ -313,13 +325,13 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/aspect-build/bazel-lib/releases/download/v2.7.1/bazel-lib-v2.7.1.tar.gz"
+            "https://github.com/aspect-build/bazel-lib/releases/download/v2.7.3/bazel-lib-v2.7.3.tar.gz"
           ],
-          "integrity": "sha256-tVTreUKlq0TJAHffagx2/GfFh0yURqAH6bpovoK9R5Y=",
-          "strip_prefix": "bazel-lib-2.7.1",
+          "integrity": "sha256-h6tOxHnr6wDShiZqyiBoyu7xuwsXZej3HHts/uavQiY=",
+          "strip_prefix": "bazel-lib-2.7.3",
           "remote_patches": {
-            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/patches/go_dev_dep.patch": "sha256-KgABwDzOT+DugUHn9tHLOz05osnk2FLsS10d5zqG/M0=",
-            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.1/patches/module_dot_bazel_version.patch": "sha256-mNWVPqhb9ui6YgnmU3Xe7yM9KnvSY0QWLo/ETqjYR2U="
+            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/patches/go_dev_dep.patch": "sha256-KgABwDzOT+DugUHn9tHLOz05osnk2FLsS10d5zqG/M0=",
+            "https://bcr.bazel.build/modules/aspect_bazel_lib/2.7.3/patches/module_dot_bazel_version.patch": "sha256-GeLYuH+8gdY7Oj0F8cKIZBbav1gRNSwY72SzFIQymw8="
           },
           "remote_patch_strip": 1
         }
@@ -931,7 +943,7 @@
       "deps": {
         "bazel_skylib": "bazel_skylib@1.6.1",
         "platforms": "platforms@0.0.10",
-        "boringssl": "boringssl@0.0.0-20240126-22d349c",
+        "boringssl": "boringssl@0.0.0-20240530-2db0eb3",
         "com_github_cares_cares": "c-ares@1.15.0",
         "com_google_absl": "abseil-cpp@20240116.2",
         "com_google_protobuf": "protobuf@26.0.bcr.1",
@@ -1030,7 +1042,7 @@
         }
       ],
       "deps": {
-        "boringssl": "boringssl@0.0.0-20240126-22d349c",
+        "boringssl": "boringssl@0.0.0-20240530-2db0eb3",
         "platforms": "platforms@0.0.10",
         "rules_cc": "rules_cc@0.0.9",
         "zlib": "zlib@1.3.1.bcr.1",
@@ -1051,17 +1063,18 @@
         }
       }
     },
-    "boringssl@0.0.0-20240126-22d349c": {
+    "boringssl@0.0.0-20240530-2db0eb3": {
       "name": "boringssl",
-      "version": "0.0.0-20240126-22d349c",
-      "key": "boringssl@0.0.0-20240126-22d349c",
+      "version": "0.0.0-20240530-2db0eb3",
+      "key": "boringssl@0.0.0-20240530-2db0eb3",
       "repoName": "boringssl",
       "executionPlatformsToRegister": [],
       "toolchainsToRegister": [],
       "extensionUsages": [],
       "deps": {
-        "rules_cc": "rules_cc@0.0.9",
+        "googletest": "googletest@1.14.0.bcr.1",
         "platforms": "platforms@0.0.10",
+        "rules_cc": "rules_cc@0.0.9",
         "bazel_tools": "bazel_tools@_",
         "local_config_platform": "local_config_platform@_"
       },
@@ -1070,12 +1083,12 @@
         "ruleClassName": "http_archive",
         "attributes": {
           "urls": [
-            "https://github.com/google/boringssl/archive/22d349c4596e81425ec88f82fab47063a9a2bac6.tar.gz"
+            "https://github.com/google/boringssl/archive/2db0eb3f96a5756298dcd7f9319e56a98585bd10.tar.gz"
           ],
-          "integrity": "sha256-rMEdcuN6QX90hSzHXUCE7HEhcnwBvR6bVSUjHJsDwnc=",
-          "strip_prefix": "boringssl-22d349c4596e81425ec88f82fab47063a9a2bac6",
+          "integrity": "sha256-zSQL8nRQ91zV9BxRKgYpfABkbNusn4e2BOkxJ3HbFaY=",
+          "strip_prefix": "boringssl-2db0eb3f96a5756298dcd7f9319e56a98585bd10",
           "remote_patches": {
-            "https://bcr.bazel.build/modules/boringssl/0.0.0-20240126-22d349c/patches/module_dot_bazel.patch": "sha256-vLc6oUB/XI3PtPUx1z0U5e+l6BEuz3IeRW7wR8Omp14="
+            "https://bcr.bazel.build/modules/boringssl/0.0.0-20240530-2db0eb3/patches/module_dot_bazel.patch": "sha256-ROmpGIa6bWfDTV1c02V7xp0uScaKaRWYJKoz0uAhaoA="
           },
           "remote_patch_strip": 0
         }
@@ -3342,7 +3355,7 @@
     },
     "@@aspect_bazel_lib~//lib:extensions.bzl%toolchains": {
       "general": {
-        "bzlTransitiveDigest": "zXhHRq6cXXW6Ho5L7fLm7z8Fwx6wFyDtkB+XWOYjrpk=",
+        "bzlTransitiveDigest": "agEDrzWPQxlinO3X7YGF4vbOAfJ2gnS/f1YDWUgdIL0=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -3396,7 +3409,7 @@
             "ruleClassName": "coreutils_platform_repo",
             "attributes": {
               "platform": "darwin_arm64",
-              "version": "0.0.23"
+              "version": "0.0.26"
             }
           },
           "copy_to_directory_linux_arm64": {
@@ -3425,7 +3438,7 @@
             "ruleClassName": "coreutils_platform_repo",
             "attributes": {
               "platform": "darwin_amd64",
-              "version": "0.0.23"
+              "version": "0.0.26"
             }
           },
           "coreutils_linux_arm64": {
@@ -3433,7 +3446,14 @@
             "ruleClassName": "coreutils_platform_repo",
             "attributes": {
               "platform": "linux_arm64",
-              "version": "0.0.23"
+              "version": "0.0.26"
+            }
+          },
+          "zstd_linux_arm64": {
+            "bzlFile": "@@aspect_bazel_lib~//lib/private:zstd_toolchain.bzl",
+            "ruleClassName": "zstd_binary_repo",
+            "attributes": {
+              "platform": "linux_arm64"
             }
           },
           "yq_linux_s390x": {
@@ -3512,6 +3532,13 @@
               "platform": "darwin_amd64"
             }
           },
+          "zstd_darwin_arm64": {
+            "bzlFile": "@@aspect_bazel_lib~//lib/private:zstd_toolchain.bzl",
+            "ruleClassName": "zstd_binary_repo",
+            "attributes": {
+              "platform": "darwin_arm64"
+            }
+          },
           "bsd_tar_linux_amd64": {
             "bzlFile": "@@aspect_bazel_lib~//lib/private:tar_toolchain.bzl",
             "ruleClassName": "bsdtar_binary_repo",
@@ -3524,6 +3551,13 @@
             "ruleClassName": "yq_toolchains_repo",
             "attributes": {
               "user_repository_name": "yq"
+            }
+          },
+          "zstd_linux_amd64": {
+            "bzlFile": "@@aspect_bazel_lib~//lib/private:zstd_toolchain.bzl",
+            "ruleClassName": "zstd_binary_repo",
+            "attributes": {
+              "platform": "linux_amd64"
             }
           },
           "bats_support": {
@@ -3576,7 +3610,7 @@
             "ruleClassName": "coreutils_platform_repo",
             "attributes": {
               "platform": "linux_amd64",
-              "version": "0.0.23"
+              "version": "0.0.26"
             }
           },
           "copy_directory_toolchains": {
@@ -3613,6 +3647,20 @@
             "ruleClassName": "copy_directory_platform_repo",
             "attributes": {
               "platform": "freebsd_amd64"
+            }
+          },
+          "zstd_darwin_amd64": {
+            "bzlFile": "@@aspect_bazel_lib~//lib/private:zstd_toolchain.bzl",
+            "ruleClassName": "zstd_binary_repo",
+            "attributes": {
+              "platform": "darwin_amd64"
+            }
+          },
+          "zstd_toolchains": {
+            "bzlFile": "@@aspect_bazel_lib~//lib/private:zstd_toolchain.bzl",
+            "ruleClassName": "zstd_toolchains_repo",
+            "attributes": {
+              "user_repository_name": "zstd"
             }
           },
           "bats_file": {
@@ -3740,7 +3788,7 @@
             "ruleClassName": "coreutils_platform_repo",
             "attributes": {
               "platform": "windows_amd64",
-              "version": "0.0.23"
+              "version": "0.0.26"
             }
           },
           "yq_linux_arm64": {
