@@ -56,7 +56,7 @@ Breaking changes:
   * After this fix, these methods return an SDK level object
     (opentelemetry::sdk::trace::TracerProvider) to the caller.
   * Returning an SDK object is necessary for the application to
-    cleanup invoke SDK level methods, such as ForceFlush(),
+    cleanup and invoke SDK level methods, such as ForceFlush(),
     on a provider.
   * The application code that configures the SDK, by calling
     the various provider factories, may need adjustment.
