@@ -18,6 +18,52 @@ Increment the:
 * [SDK] Update ExemplarFilter and ExemplarReservoir for spec
   [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+
+Important changes:
+
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+  * Before this fix:
+    * The API class `opentelemetry::trace::Tracer` exposed methods such
+      as `ForceFlush()`, `ForceFlushWithMicroseconds()`, `Close()`
+      and `CloseWithMicroseconds()`.
+    * These methods are meant to be used when configuring the SDK,
+      and should not be part of the API. Exposing them was an oversight.
+    * Two of these methods are virtual, and therefore part of the ABI.
+  * After this fix:
+    * In `OPENTELEMETRY_ABI_VERSION_NO 1`, nothing is changed,
+      because removing this code would break the ABI.
+    * In `OPENTELEMETRY_ABI_VERSION_NO 2`, these methods are moved
+      from the API to the SDK. This is a breaking change for ABI version 2,
+      which is still experimental.
+  * In all cases, instrumenting an application should not
+    invoke flush or close on a tracer, do not use these methods.
+
+Breaking changes:
+
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+  * Before this fix:
+    * SDK factory methods such as:
+      * opentelemetry::sdk::trace::TracerProviderFactory::Create()
+      * opentelemetry::sdk::metrics::MeterProviderFactory::Create()
+      * opentelemetry::sdk::logs::LoggerProviderFactory::Create()
+      * opentelemetry::sdk::logs::EventLoggerProviderFactory::Create()
+      returned an API object (opentelemetry::trace::TracerProvider)
+      to the caller.
+  * After this fix, these methods return an SDK level object
+    (opentelemetry::sdk::trace::TracerProvider) to the caller.
+  * Returning an SDK object is necessary for the application to
+    cleanup invoke SDK level methods, such as ForceFlush(),
+    on a provider.
+  * The application code that configures the SDK, by calling
+    the various provider factories, may need adjustment.
+  * All the examples have been updated, and in particular no
+    longer perform static_cast do convert an API object to an SDK object.
+    Please refers to examples for guidance on how to adjust.
+
 Notes on experimental features:
 
 * [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)
