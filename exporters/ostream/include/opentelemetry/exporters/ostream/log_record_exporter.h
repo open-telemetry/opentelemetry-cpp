@@ -4,13 +4,12 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-
 #include "opentelemetry/version.h"
 
+#include <atomic>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -59,8 +58,7 @@ private:
   // The OStream to send the logs to
   std::ostream &sout_;
   // Whether this exporter has been shut down
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,

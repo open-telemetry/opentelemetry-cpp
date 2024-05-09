@@ -460,7 +460,6 @@ bool ElasticsearchLogRecordExporter::ForceFlush(
 
 bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
 
   // Shutdown the session manager
@@ -472,7 +471,6 @@ bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeo
 
 bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 }  // namespace logs

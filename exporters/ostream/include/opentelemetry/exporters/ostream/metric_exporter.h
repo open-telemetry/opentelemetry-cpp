@@ -3,10 +3,11 @@
 
 #pragma once
 
+#include <atomic>
 #include <iostream>
+#include <mutex>
 #include <string>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -72,8 +73,8 @@ public:
 
 private:
   std::ostream &sout_;
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  std::atomic<bool> is_shutdown_{false};
+  std::mutex serialize_lock_;
   sdk::metrics::AggregationTemporality aggregation_temporality_;
   bool isShutdown() const noexcept;
   void printInstrumentationInfoMetricData(const sdk::metrics::ScopeMetrics &info_metrics,

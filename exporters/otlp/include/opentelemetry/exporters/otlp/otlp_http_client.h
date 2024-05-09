@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"

@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
 
+#include <atomic>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -51,8 +51,7 @@ public:
 
 private:
   std::ostream &sout_;
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/span_metadata.h

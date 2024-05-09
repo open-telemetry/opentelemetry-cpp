@@ -4,7 +4,6 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -110,14 +109,13 @@ public:
 
 private:
   // Stores if this exporter had its Shutdown() method called
-  bool is_shutdown_ = false;
+  std::atomic<bool> is_shutdown_{false};
 
   // Configuration options for the exporter
   ElasticsearchExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
-  mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
 
 #ifdef ENABLE_ASYNC_EXPORT

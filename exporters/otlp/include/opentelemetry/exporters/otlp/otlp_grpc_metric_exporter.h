@@ -7,7 +7,6 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
@@ -15,6 +14,8 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+
+#include <atomic>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -82,8 +83,7 @@ private:
    */
   OtlpGrpcMetricExporter(
       std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub);
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
 };
 }  // namespace otlp

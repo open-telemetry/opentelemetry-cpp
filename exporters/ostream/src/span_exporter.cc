@@ -106,16 +106,15 @@ bool OStreamSpanExporter::ForceFlush(std::chrono::microseconds /* timeout */) no
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
 bool OStreamSpanExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
+
 void OStreamSpanExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
     const std::string prefix)
