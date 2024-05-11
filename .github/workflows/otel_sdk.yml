@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - run: ls env:* | Format-Table -AutoSize
+      - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize
       - run: choco install bazelisk
       - run: choco upgrade llvm --version 18.1.5
       - uses: actions/checkout@v4
