@@ -20,6 +20,7 @@ Create@ViewFactory@metrics@sdk@v1@opentelemetry
 Create@MeterSelectorFactory@metrics@sdk@v1@opentelemetry
 Create@InstrumentSelectorFactory@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry
+AddMetricReader@MeterProvider@metrics@sdk@v1@opentelemetry
 MeterProvider@metrics@sdk@v1@opentelemetry
 AddView@MeterProvider@metrics@sdk@v1@opentelemetry
 
