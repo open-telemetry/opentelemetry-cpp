@@ -117,14 +117,12 @@ bool ZipkinExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcep
 
 bool ZipkinExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
 bool ZipkinExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 

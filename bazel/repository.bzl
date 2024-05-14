@@ -55,12 +55,23 @@ def opentelemetry_cpp_deps():
 
     # Load abseil dependency(optional)
     maybe(
+        #
+        # Important note:
+        #
+        # The bazel build uses abseil-cpp-20230802.2 here,
+        # while CMake uses more recent versions.
+        #
+        # bazel with abseil-cpp-20240116.2 : build failures in CI
+        # bazel with abseil-cpp-20240116.1 : build failures in CI
+        #
+        # TODO: Fix issue #2619
+        #
         http_archive,
         name = "com_google_absl",
-        sha256 = "91ac87d30cc6d79f9ab974c51874a704de9c2647c40f6932597329a282217ba8",
-        strip_prefix = "abseil-cpp-20220623.1",
+        sha256 = "7c11539617af1f332f0854a6fb21e296a1b29c27d03f23c7b49d4adefcd102cc",
+        strip_prefix = "abseil-cpp-20230802.2",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20220623.1.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.2.tar.gz",
         ],
     )
 
@@ -100,10 +111,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "df491a05f3fcbf86cc5ba5c9de81f6a624d74d4773d7009d573e37d6e2b6af64",
-        strip_prefix = "opentelemetry-proto-1.1.0",
+        sha256 = "516dc94685dbaa14fb792788f31d2ef2b0c3ad08dfa8a9a8164e3cf60c1ab6f7",
+        strip_prefix = "opentelemetry-proto-1.2.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.1.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.2.0.tar.gz",
         ],
     )
 
