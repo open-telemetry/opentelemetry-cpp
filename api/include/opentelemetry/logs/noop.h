@@ -51,7 +51,7 @@ private:
     void SetBody(const common::AttributeValue & /* message */) noexcept override {}
     void SetAttribute(nostd::string_view /* key */,
                               const common::AttributeValue & /* value */) noexcept override {}
-    void SetEventId(int64_t id, nostd::string_view /* name */) noexcept override {}
+    void SetEventId(int64_t /* id */, nostd::string_view /* name */) noexcept override {}
     void SetTraceId(const trace::TraceId & /* trace_id */) noexcept override {}
     void SetSpanId(const trace::SpanId & /* span_id */) noexcept override {}
     void SetTraceFlags(const trace::TraceFlags & /* trace_flags */) noexcept override {}
