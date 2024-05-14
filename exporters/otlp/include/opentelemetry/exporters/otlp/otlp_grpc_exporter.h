@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -92,8 +92,7 @@ private:
    * @param stub the service stub to be used for exporting
    */
   OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
 };
 }  // namespace otlp

@@ -126,14 +126,12 @@ bool OStreamLogRecordExporter::ForceFlush(std::chrono::microseconds /* timeout *
 
 bool OStreamLogRecordExporter::Shutdown(std::chrono::microseconds) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
 bool OStreamLogRecordExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 

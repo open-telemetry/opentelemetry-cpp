@@ -3,15 +3,17 @@
 
 #pragma once
 
-#include <cstddef>
-#include <memory>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter.h"
-#include "opentelemetry/trace/context.h"
-#include "opentelemetry/version.h"
+#  include <cstddef>
+#  include <memory>
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/trace/context.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -151,6 +153,11 @@ private:
   friend class ReservoirCellTestPeer;
 };
 
+typedef std::shared_ptr<ExemplarData> (ReservoirCell::*MapAndResetCellType)(
+    const MetricAttributes &);
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW

@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
+#include <atomic>
 #include <mutex>
-#include "opentelemetry/common/spin_lock_mutex.h"
+
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -72,7 +75,6 @@ public:
    */
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
   {
-    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     is_shutdown_ = true;
     return true;
   }
@@ -84,13 +86,8 @@ public:
 
 private:
   std::shared_ptr<InMemorySpanData> data_;
-  bool is_shutdown_ = false;
-  mutable opentelemetry::common::SpinLockMutex lock_;
-  bool isShutdown() const noexcept
-  {
-    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    return is_shutdown_;
-  }
+  std::atomic<bool> is_shutdown_{false};
+  bool isShutdown() const noexcept { return is_shutdown_; }
 };
 }  // namespace memory
 }  // namespace exporter
