@@ -5,7 +5,7 @@
 
 set -ex
 export DEBIAN_FRONTEND=noninteractive
-[ -z "${RYML_VERSION}" ] && export RYML_VERSION="v0.5.0"
+[ -z "${RYML_VERSION}" ] && export RYML_VERSION="v0.6.0"
 
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/

@@ -498,14 +498,12 @@ endif()
 
 if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
   # No specific version required.
-  find_package(ryml REQUIRED)
+  find_package(ryml 0.6.0 REQUIRED)
   message(
     STATUS
       "Found ryml: include ${RYML_INCLUDE_DIR}, lib ${RYML_LIB_DIR}, version ${ryml_VERSION}"
   )
 endif()
-
-# DEAD find_package(yaml-cpp REQUIRED)
 
 if(OTELCPP_MAINTAINER_MODE)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
