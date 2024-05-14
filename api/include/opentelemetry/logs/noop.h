@@ -35,7 +35,7 @@ public:
   const nostd::string_view GetName() noexcept override { return "noop logger"; }
 
   nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept override {
-    return nostd::unique_ptr<LogRecord>(&record_);
+    return nostd::unique_ptr<LogRecord>(new NoopLogRecord());
   }
 
   using Logger::EmitLogRecord;
@@ -60,8 +60,6 @@ private:
     // so we do not want to delete it when the unique_ptr is destroyed.
     void operator delete(void*) noexcept {}
   };
-
-  NoopLogRecord record_;
 };
 
 /**
