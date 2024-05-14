@@ -28,9 +28,11 @@ TEST(Logger, GetLoggerDefault)
   auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
-  auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
+  auto name   = logger->GetName();
+  auto record = logger->CreateLogRecord();
   EXPECT_EQ(name, "noop logger");
+  EXPECT_NE(nullptr, record);
 }
 
 // Test the two additional overloads for GetLogger()
