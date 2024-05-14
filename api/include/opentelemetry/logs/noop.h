@@ -55,10 +55,6 @@ private:
     void SetTraceId(const trace::TraceId & /* trace_id */) noexcept override {}
     void SetSpanId(const trace::SpanId & /* span_id */) noexcept override {}
     void SetTraceFlags(const trace::TraceFlags & /* trace_flags */) noexcept override {}
-
-    // In CreateLogRecord we return unique_ptr to the same record_ object,
-    // so we do not want to delete it when the unique_ptr is destroyed.
-    void operator delete(void*) noexcept {}
   };
 };
 
