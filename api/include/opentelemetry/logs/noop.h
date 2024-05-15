@@ -38,7 +38,7 @@ public:
   {
     /*
      * Do not return memory shared between threads,
-     * a new + delete for each noop record can not be avoided,
+     * a `new` + `delete` for each noop record can not be avoided,
      * due to the semantic of unique_ptr.
      */
     return nostd::unique_ptr<LogRecord>(new NoopLogRecord());
