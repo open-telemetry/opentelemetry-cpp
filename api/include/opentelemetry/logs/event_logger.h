@@ -64,10 +64,6 @@ public:
       return;
     }
     nostd::unique_ptr<LogRecord> log_record = delegate_logger->CreateLogRecord();
-    if (!log_record)
-    {
-      return;
-    }
 
     IgnoreTraitResult(
         detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(

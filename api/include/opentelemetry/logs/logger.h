@@ -100,10 +100,6 @@ public:
   void EmitLogRecord(ArgumentType &&... args)
   {
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
-    if (!log_record)
-    {
-      return;
-    }
 
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
