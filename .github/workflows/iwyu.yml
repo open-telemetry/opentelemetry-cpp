@@ -34,19 +34,12 @@ jobs:
       - name: Prepare CMake
         run: |
           mkdir build && cd build
-          CC="clang" CXX="clang++" cmake -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--verbose=7" ..
+          CC="clang" CXX="clang++" cmake -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--verbose=1" ..
 
       - name: iwyu_tool
         run: |
           cd build
-          make -k 2> iwyu.log
-          cat iwyu.log
-
-#      - uses: actions/upload-artifact@v3
-#        if: success() || failure()
-#        with:
-#          name: Compilation Database
-#          path: ./cmake.output/compile_commands.json
+          make -k | tee -a iwyu.log 2>&1
 
       - uses: actions/upload-artifact@v3
         if: success() || failure()
