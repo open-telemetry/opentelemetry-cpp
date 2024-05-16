@@ -34,12 +34,12 @@ jobs:
       - name: Prepare CMake
         run: |
           mkdir build && cd build
-          CC="clang" CXX="clang++" cmake ..
+          CC="clang" CXX="clang++" cmake -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--verbose=7" ..
 
       - name: iwyu_tool
         run: |
           cd build
-          make CXX=include-what-you-use CXXFLAGS="-Xiwyu --error_always" 2> iwyu.log
+          make -k 2> iwyu.log
           cat iwyu.log
 
 #      - uses: actions/upload-artifact@v3
@@ -52,5 +52,5 @@ jobs:
         if: success() || failure()
         with:
           name: Logs (include-what-you-use)
-          path: ./*.log
+          path: ./build/*.log
 
