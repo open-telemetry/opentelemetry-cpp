@@ -141,7 +141,6 @@ bool OtlpGrpcMetricExporter::ForceFlush(
 bool OtlpGrpcMetricExporter::Shutdown(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
 #ifdef ENABLE_ASYNC_EXPORT
   return client_->Shutdown(timeout);
@@ -152,7 +151,6 @@ bool OtlpGrpcMetricExporter::Shutdown(
 
 bool OtlpGrpcMetricExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 

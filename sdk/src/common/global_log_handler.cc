@@ -33,7 +33,21 @@ void DefaultLogHandler::Handle(LogLevel level,
   }
   output_s << std::endl;
   // TBD - print attributes
-  std::cout << output_s.str();  // thread safe.
+
+  switch (level)
+  {
+    case LogLevel::Error:
+    case LogLevel::Warning:
+      std::cerr << output_s.str();  // thread safe.
+      break;
+    case LogLevel::Info:
+    case LogLevel::Debug:
+      std::cout << output_s.str();  // thread safe.
+      break;
+    case LogLevel::None:
+    default:
+      break;
+  }
 }
 
 void NoopLogHandler::Handle(LogLevel,

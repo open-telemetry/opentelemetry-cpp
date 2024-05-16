@@ -49,12 +49,12 @@ TEST(OStreamLogRecordExporter, Shutdown)
   auto exporter =
       std::unique_ptr<sdklogs::LogRecordExporter>(new exporterlogs::OStreamLogRecordExporter);
 
-  // Save cout's original buffer here
-  std::streambuf *original = std::cout.rdbuf();
+  // Save cerr original buffer here
+  std::streambuf *original = std::cerr.rdbuf();
 
-  // Redirect cout to our stringstream buffer
+  // Redirect cerr to our stringstream buffer
   std::stringstream output;
-  std::cout.rdbuf(output.rdbuf());
+  std::cerr.rdbuf(output.rdbuf());
 
   EXPECT_TRUE(exporter->Shutdown());
 
@@ -64,7 +64,7 @@ TEST(OStreamLogRecordExporter, Shutdown)
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Restore original stringstream buffer
-  std::cout.rdbuf(original);
+  std::cerr.rdbuf(original);
   std::string err_message =
       "[Ostream Log Exporter] Exporting 1 log(s) failed, exporter is shutdown";
   EXPECT_TRUE(output.str().find(err_message) != std::string::npos);
