@@ -33,13 +33,11 @@ jobs:
 
       - name: Prepare CMake
         run: |
-          pwd
           mkdir build && cd build
-          CC="clang" CXX="clang++" cmake ../opentelemetry-cpp/opentelemetry-cpp
+          CC="clang" CXX="clang++" cmake ..
 
       - name: iwyu_tool
         run: |
-          pwd
           cd build
           make CXX=include-what-you-use CXXFLAGS="-Xiwyu --error_always" 2> iwyu.log
           cat iwyu.log
