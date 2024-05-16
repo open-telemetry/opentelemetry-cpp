@@ -65,10 +65,15 @@ mkdir -p "${PLUGIN_DIR}"
 
 IWYU=""
 MAKE_COMMAND="make -k -j \$(nproc)"
-if [[ "${CXX}" == *clang* ]]; then
-  MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
-  IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
-fi
+
+# Temporarily disable the IWYU build.
+# It fails in Ubuntu 24-04 CI with:
+#    Error running 'iwyu': Segmentation fault
+#
+# if [[ "${CXX}" == *clang* ]]; then
+#   MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
+#   IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
+# fi
 
 echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
