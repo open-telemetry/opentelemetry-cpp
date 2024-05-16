@@ -41,7 +41,7 @@ jobs:
           # -isystem/usr/lib/clang/17/include
           # iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -Xiwyu > iwyu.log
           which iwyu_tool
-          RC=iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu | tee -a iwyu.log
+          RC=`iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu | tee -a iwyu.log`
           echo "IWYU Status= ${RC}"
 
       - uses: actions/upload-artifact@v3
