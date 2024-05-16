@@ -139,14 +139,6 @@ set(PROFILES_SERVICE_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.pb.cc")
 
 if(WITH_OTLP_GRPC)
-  set(PROFILES_GRPC_CPP_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.grpc.pb.cc")
-  set(PROFILES_GRPC_H_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.grpc.pb.h")
-  set(PROFILES_EXT_GRPC_CPP_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.grpc.pb.cc")
-  set(PROFILES_EXT_GRPC_H_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.grpc.pb.h")
   set(PROFILES_SERVICE_GRPC_PB_H_FILE
       "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.grpc.pb.h")
   set(PROFILES_SERVICE_GRPC_PB_CPP_FILE
@@ -229,7 +221,9 @@ set(PROTOBUF_GENERATED_FILES
     ${LOGS_PB_CPP_FILE}
     ${METRICS_PB_H_FILE}
     ${METRICS_PB_CPP_FILE}
+    ${PROFILES_H_FILE}
     ${PROFILES_CPP_FILE}
+    ${PROFILES_EXT_H_FILE}
     ${PROFILES_EXT_CPP_FILE}
     ${TRACE_SERVICE_PB_H_FILE}
     ${TRACE_SERVICE_PB_CPP_FILE}
@@ -237,6 +231,7 @@ set(PROTOBUF_GENERATED_FILES
     ${LOGS_SERVICE_PB_CPP_FILE}
     ${METRICS_SERVICE_PB_H_FILE}
     ${METRICS_SERVICE_PB_CPP_FILE}
+    ${PROFILES_SERVICE_PB_H_FILE}
     ${PROFILES_SERVICE_PB_CPP_FILE})
 
 if(WITH_OTLP_GRPC)
@@ -253,10 +248,6 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE}
     ${METRICS_SERVICE_GRPC_PB_H_FILE}
     ${METRICS_SERVICE_GRPC_PB_CPP_FILE}
-    ${PROFILES_GRPC_CPP_FILE}
-    ${PROFILES_GRPC_H_FILE}
-    ${PROFILES_EXT_GRPC_CPP_FILE}
-    ${PROFILES_EXT_GRPC_H_FILE}
     ${PROFILES_SERVICE_GRPC_PB_H_FILE}
     ${PROFILES_SERVICE_GRPC_PB_CPP_FILE})
 endif()
