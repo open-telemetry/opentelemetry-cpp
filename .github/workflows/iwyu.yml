@@ -33,22 +33,22 @@ jobs:
 
       - name: Prepare CMake
         run: |
-          cmake -S . -B cmake.output -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          pwd
+          mkdir build && cd build
+          CC="clang" CXX="clang++" cmake ../opentelemetry-cpp/opentelemetry-cpp
 
       - name: iwyu_tool
         run: |
-          PWD=$(pwd)
-          # -isystem/usr/lib/clang/17/include
-          # iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu --comment_style=long -Xiwyu --quoted_includes_first -Xiwyu --update_comments -Xiwyu > iwyu.log
-          which iwyu_tool
-          RC=`iwyu_tool -p cmake.output -j $(nproc) -- -w -Xiwyu --max_line_length=1024 -Xiwyu | tee -a iwyu.log`
-          echo "IWYU Status= ${RC}"
+          pwd
+          cd build
+          make CXX=include-what-you-use CXXFLAGS="-Xiwyu --error_always" 2> iwyu.log
+          cat iwyu.log
 
-      - uses: actions/upload-artifact@v3
-        if: success() || failure()
-        with:
-          name: Compilation Database
-          path: ./cmake.output/compile_commands.json
+#      - uses: actions/upload-artifact@v3
+#        if: success() || failure()
+#        with:
+#          name: Compilation Database
+#          path: ./cmake.output/compile_commands.json
 
       - uses: actions/upload-artifact@v3
         if: success() || failure()
