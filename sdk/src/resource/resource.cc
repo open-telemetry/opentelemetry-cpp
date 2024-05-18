@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <utility>
+#include <string>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/resource.h"

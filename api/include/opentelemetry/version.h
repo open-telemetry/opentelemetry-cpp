@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/macros.h" // IWYU pragma: export
 #include "opentelemetry/detail/preprocessor.h"
 
 #ifndef OPENTELEMETRY_ABI_VERSION_NO

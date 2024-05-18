@@ -26,15 +26,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace resource
-{
-class Resource;
-}  // namespace resource
-
 namespace trace
 {
-class IdGenerator;
-class SpanProcessor;
 
 using namespace opentelemetry::sdk::instrumentationscope;
 
