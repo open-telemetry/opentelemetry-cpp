@@ -10,7 +10,6 @@
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"

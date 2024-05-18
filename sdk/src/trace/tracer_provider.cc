@@ -21,6 +21,7 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
