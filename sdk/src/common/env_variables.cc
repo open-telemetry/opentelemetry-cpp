@@ -11,7 +11,6 @@
 #endif
 
 #include <cstdlib>
-#include <memory>
 #include <ostream>
 
 #include "opentelemetry/nostd/string_view.h"

@@ -1,10 +1,22 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/tracer.h"
+#include <chrono>
+#include <map>
+#include <new>
+#include <utility>
+
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 #include "src/trace/span.h"
 
