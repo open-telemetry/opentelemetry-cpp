@@ -3,14 +3,20 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <thread>
 
 #include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,8 +24,6 @@ namespace sdk
 {
 namespace trace
 {
-class SpanExporter;
-struct BatchSpanProcessorOptions;
 
 /**
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes

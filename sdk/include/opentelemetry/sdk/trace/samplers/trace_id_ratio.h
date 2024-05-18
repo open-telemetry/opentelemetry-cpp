@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <string>
 
 #include "opentelemetry/nostd/string_view.h"
