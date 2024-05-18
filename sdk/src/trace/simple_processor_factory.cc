@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include <utility>
+
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

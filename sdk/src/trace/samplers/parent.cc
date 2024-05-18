@@ -1,8 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <map>
+
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/version.h"
 
 namespace trace_api = opentelemetry::trace;
 
