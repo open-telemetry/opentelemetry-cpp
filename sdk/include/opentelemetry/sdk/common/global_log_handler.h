@@ -4,6 +4,7 @@
 #pragma once
 
 #include <sstream>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/nostd/shared_ptr.h"

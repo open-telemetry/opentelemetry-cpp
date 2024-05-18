@@ -3,14 +3,23 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <memory>
 
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
