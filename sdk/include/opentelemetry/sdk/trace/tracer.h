@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"

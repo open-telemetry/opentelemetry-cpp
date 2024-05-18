@@ -10,8 +10,11 @@
 #  include <strings.h>
 #endif
 
+#include <cstdlib>
 #include <memory>
+#include <ostream>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 

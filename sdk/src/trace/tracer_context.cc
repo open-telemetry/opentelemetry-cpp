@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/tracer_context.h"
+#include <utility>
+
 #include "opentelemetry/sdk/trace/multi_span_processor.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
