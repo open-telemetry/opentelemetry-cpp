@@ -13,18 +13,6 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace common
-{
-class KeyValueIterable;
-}  // namespace common
-
-namespace trace
-{
-class SpanContext;
-class SpanContextKeyValueIterable;
-class TraceState;
-}  // namespace trace
-
 namespace sdk
 {
 namespace trace

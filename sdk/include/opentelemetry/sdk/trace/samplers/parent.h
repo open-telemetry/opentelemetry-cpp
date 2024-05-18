@@ -15,22 +15,11 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace common
-{
-class KeyValueIterable;
-}  // namespace common
-
-namespace trace
-{
-class SpanContext;
-class SpanContextKeyValueIterable;
-class TraceState;
-}  // namespace trace
-
 namespace sdk
 {
 namespace trace
 {
+
 /**
  * The ParentBased sampler is a composite sampler. ParentBased(delegateSampler) either respects
  * the parent span's sampling decision or delegates to delegateSampler for root spans.

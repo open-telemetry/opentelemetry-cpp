@@ -14,8 +14,6 @@ namespace sdk
 {
 namespace trace
 {
-class SpanExporter;
-class SpanProcessor;
 
 /**
  * Factory class for SimpleSpanProcessor.

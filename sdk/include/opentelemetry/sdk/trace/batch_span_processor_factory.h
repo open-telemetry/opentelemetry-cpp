@@ -15,7 +15,6 @@ namespace sdk
 {
 namespace trace
 {
-class SpanExporter;
 
 /**
  * Factory class for BatchSpanProcessor.
