@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <type_traits>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -145,6 +146,10 @@ struct LogRecordSetterTrait<common::KeyValueIterable>
 template <class ValueType>
 struct LogRecordSetterTrait
 {
+  static_assert(!std::is_same<nostd::unique_ptr<LogRecord>, ValueType>::value &&
+                    !std::is_same<std::unique_ptr<LogRecord>, ValueType>::value,
+                "unique_ptr<LogRecord> is not allowed");
+
   template <class ArgumentType,
             nostd::enable_if_t<std::is_convertible<ArgumentType, nostd::string_view>::value ||
                                    std::is_convertible<ArgumentType, common::AttributeValue>::value,
