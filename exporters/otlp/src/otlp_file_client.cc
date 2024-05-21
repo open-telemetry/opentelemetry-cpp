@@ -22,6 +22,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 // clang-format on
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
@@ -30,6 +31,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -104,6 +106,14 @@
 #else
 #  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
     snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
+#endif
+
+#if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
+    (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
+#  define OTLP_FILE_OPEN(f, path, mode) fopen_s(&f, path, mode)
+#else
+#  include <errno.h>
+#  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -991,14 +1001,14 @@ public:
     }
     CheckUpdate();
 
-    std::shared_ptr<std::ofstream> out = OpenLogFile(true);
+    std::shared_ptr<FILE> out = OpenLogFile(true);
     if (!out)
     {
       return;
     }
 
-    out->write(data.data(), data.size());
-    out->write("\n", 1);
+    fwrite(data.data(), 1, data.size(), out.get());
+    fputc('\n', out.get());
 
     {
       std::lock_guard<std::mutex> lock_guard{file_->file_lock};
@@ -1006,7 +1016,7 @@ public:
       file_->record_count += record_count;
 
       // Pipe file size always returns 0, we ignore the size limit of it.
-      auto written_size = out->tellp();
+      auto written_size = ftell(out.get());
       if (written_size >= 0)
       {
         file_->written_size = static_cast<std::size_t>(written_size);
@@ -1018,7 +1028,7 @@ public:
         {
           file_->left_flush_record_count = options_.flush_count;
 
-          out->flush();
+          fflush(out.get());
 
           file_->flushed_record_count.store(file_->record_count.load(std::memory_order_acquire),
                                             std::memory_order_release);
@@ -1030,7 +1040,7 @@ public:
       }
     }
 
-    // Maybe need spawn a background thread to flush ostream
+    // Maybe need spawn a background thread to flush FILE
     SpawnBackgroundWorkThread();
   }
 
@@ -1180,11 +1190,11 @@ private:
     OpenLogFile(false);
   }
 
-  std::shared_ptr<std::ofstream> OpenLogFile(bool destroy_content)
+  std::shared_ptr<FILE> OpenLogFile(bool destroy_content)
   {
     std::lock_guard<std::mutex> lock_guard{file_->file_lock};
 
-    if (file_->current_file && file_->current_file->good())
+    if (file_->current_file)
     {
       return file_->current_file;
     }
@@ -1198,11 +1208,11 @@ private:
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Generate file path from pattern "
                               << options_.file_pattern << " failed");
-      return std::shared_ptr<std::ofstream>();
+      return nullptr;
     }
     file_path[file_path_size] = 0;
 
-    std::shared_ptr<std::ofstream> of = std::make_shared<std::ofstream>();
+    std::shared_ptr<FILE> of = std::make_shared<FILE>();
 
     std::string directory_name = FileSystemUtil::DirName(file_path);
     if (!directory_name.empty())
@@ -1231,20 +1241,21 @@ private:
 
     if (destroy_content && FileSystemUtil::IsExist(file_path))
     {
-      std::fstream trunc_file;
-      trunc_file.open(file_path, std::ios::binary | std::ios::out | std::ios::trunc);
-      if (!trunc_file.is_open())
+      FILE *trunc_file = nullptr;
+      OTLP_FILE_OPEN(trunc_file, file_path, "wb");
+      if (nullptr == trunc_file)
       {
         OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
                                 << static_cast<const char *>(file_path)
                                 << " failed with pattern: " << options_.file_pattern);
-        return std::shared_ptr<std::ofstream>();
+        return nullptr;
       }
-      trunc_file.close();
+      fclose(trunc_file);
     }
 
-    of->open(file_path, std::ios::binary | std::ios::out | std::ios::app);
-    if (!of->is_open())
+    std::FILE *new_file = nullptr;
+    OTLP_FILE_OPEN(new_file, file_path, "ab");
+    if (nullptr == new_file)
     {
       std::string hint;
       if (!directory_name.empty())
@@ -1255,11 +1266,12 @@ private:
       OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Open "
                               << static_cast<const char *>(file_path)
                               << " failed with pattern: " << options_.file_pattern << hint);
-      return std::shared_ptr<std::ofstream>();
+      return nullptr;
     }
+    of = std::shared_ptr<std::FILE>(new_file, fclose);
 
-    of->seekp(0, std::ios_base::end);
-    file_->written_size = static_cast<size_t>(of->tellp());
+    fseek(of.get(), 0, SEEK_END);
+    file_->written_size = static_cast<size_t>(ftell(of.get()));
 
     file_->current_file    = of;
     file_->last_checkpoint = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -1447,7 +1459,7 @@ private:
 
           if (concurrency_file->current_file)
           {
-            concurrency_file->current_file->flush();
+            fflush(concurrency_file->current_file.get());
           }
 
           concurrency_file->flushed_record_count.store(current_record_count,
@@ -1479,7 +1491,7 @@ private:
     std::size_t rotate_index;
     std::size_t written_size;
     std::size_t left_flush_record_count;
-    std::shared_ptr<std::ofstream> current_file;
+    std::shared_ptr<FILE> current_file;
     std::mutex file_lock;
     std::time_t last_checkpoint;
     std::string file_path;
