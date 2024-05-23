@@ -13,6 +13,9 @@ common --enable_platform_specific_config
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
+# Workaround abseil libraries missing symbols
+build:windows --linkopt=/FORCE:UNDEFINED
+
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
 build:linux --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
