@@ -4,6 +4,73 @@
 #pragma once
 
 /*
+   OPENTELEMETRY_HAVE_BUILTIN&OPENTELEMETRY_HAVE_FEATURE
+
+   Checks whether the compiler supports a Clang Feature Checking Macro, and if
+   so, checks whether it supports the provided builtin function "x" where x
+   is one of the functions noted in
+   https://clang.llvm.org/docs/LanguageExtensions.html
+
+   Note: Use this macro to avoid an extra level of #ifdef __has_builtin check.
+   http://releases.llvm.org/3.3/tools/clang/docs/LanguageExtensions.html
+*/
+#if !defined(OPENTELEMETRY_HAVE_BUILTIN)
+#  ifdef __has_builtin
+#    define OPENTELEMETRY_HAVE_BUILTIN(x) __has_builtin(x)
+#  else
+#    define OPENTELEMETRY_HAVE_BUILTIN(x) 0
+#  endif
+#endif
+
+#if !defined(OPENTELEMETRY_HAVE_FEATURE)
+#  ifdef __has_feature
+#    define OPENTELEMETRY_HAVE_FEATURE(f) __has_feature(f)
+#  else
+#    define OPENTELEMETRY_HAVE_FEATURE(f) 0
+#  endif
+#endif
+
+/*
+   has feature
+
+   OPENTELEMETRY_HAVE_ATTRIBUTE
+
+   A function-like feature checking macro that is a wrapper around
+   `__has_attribute`, which is defined by GCC 5+ and Clang and evaluates to a
+   nonzero constant integer if the attribute is supported or 0 if not.
+
+   It evaluates to zero if `__has_attribute` is not defined by the compiler.
+
+   GCC: https://gcc.gnu.org/gcc-5/changes.html
+   Clang: https://clang.llvm.org/docs/LanguageExtensions.html
+*/
+#if !defined(OPENTELEMETRY_HAVE_ATTRIBUTE)
+#  ifdef __has_attribute
+#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) __has_attribute(x)
+#  else
+#    define OPENTELEMETRY_HAVE_ATTRIBUTE(x) 0
+#  endif
+#endif
+
+/*
+   OPENTELEMETRY_HAVE_CPP_ATTRIBUTE
+
+   A function-like feature checking macro that accepts C++11 style attributes.
+   It's a wrapper around `__has_cpp_attribute`, defined by ISO C++ SD-6
+   (https://en.cppreference.com/w/cpp/experimental/feature_test). If we don't
+   find `__has_cpp_attribute`, will evaluate to 0.
+*/
+#if !defined(OPENTELEMETRY_HAVE_CPP_ATTRIBUTE)
+#  if defined(__cplusplus) && defined(__has_cpp_attribute)
+// NOTE: requiring __cplusplus above should not be necessary, but
+// works around https://bugs.llvm.org/show_bug.cgi?id=23435.
+#    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) __has_cpp_attribute(x)
+#  else
+#    define OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(x) 0
+#  endif
+#endif
+
+/*
    Expected usage pattern:
 
    if OPENTELEMETRY_LIKELY_CONDITION (ptr != nullptr)
@@ -318,4 +385,108 @@ point.
 //
 #  define OPENTELEMETRY_EXPORT
 
+#endif
+
+/*
+   OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
+   parameter or implicit object parameter is retained by the return value of the
+   annotated function (or, for a parameter of a constructor, in the value of the
+   constructed object). This attribute causes warnings to be produced if a
+   temporary object does not live long enough.
+
+   When applied to a reference parameter, the referenced object is assumed to be
+   retained by the return value of the function. When applied to a non-reference
+   parameter (for example, a pointer or a class type), all temporaries
+   referenced by the parameter are assumed to be retained by the return value of
+   the function.
+
+   See also the upstream documentation:
+   https://clang.llvm.org/docs/AttributeReference.html#lifetimebound
+*/
+#ifndef OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
+#  if OPENTELEMETRY_HAVE_CPP_ATTRIBUTE(clang::lifetimebound)
+#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND [[clang::lifetimebound]]
+#  elif OPENTELEMETRY_HAVE_ATTRIBUTE(lifetimebound)
+#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND __attribute__((lifetimebound))
+#  else
+#    define OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND
+#  endif
+#endif
+
+// OPENTELEMETRY_HAVE_MEMORY_SANITIZER
+//
+// MemorySanitizer (MSan) is a detector of uninitialized reads. It consists of
+// a compiler instrumentation module and a run-time library.
+#ifndef OPENTELEMETRY_HAVE_MEMORY_SANITIZER
+#  if !defined(__native_client__) && OPENTELEMETRY_HAVE_FEATURE(memory_sanitizer)
+#    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 1
+#  else
+#    define OPENTELEMETRY_HAVE_MEMORY_SANITIZER 0
+#  endif
+#endif
+
+#if OPENTELEMETRY_HAVE_MEMORY_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_memory)
+#  define OPENTELEMETRY_SANITIZER_NO_MEMORY \
+    __attribute__((no_sanitize_memory))  // __attribute__((no_sanitize("memory")))
+#else
+#  define OPENTELEMETRY_SANITIZER_NO_MEMORY
+#endif
+
+// OPENTELEMETRY_HAVE_THREAD_SANITIZER
+//
+// ThreadSanitizer (TSan) is a fast data race detector.
+#ifndef OPENTELEMETRY_HAVE_THREAD_SANITIZER
+#  if defined(__SANITIZE_THREAD__)
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+#  elif OPENTELEMETRY_HAVE_FEATURE(thread_sanitizer)
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 1
+#  else
+#    define OPENTELEMETRY_HAVE_THREAD_SANITIZER 0
+#  endif
+#endif
+
+#if OPENTELEMETRY_HAVE_THREAD_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_thread)
+#  define OPENTELEMETRY_SANITIZER_NO_THREAD \
+    __attribute__((no_sanitize_thread))  // __attribute__((no_sanitize("thread")))
+#else
+#  define OPENTELEMETRY_SANITIZER_NO_THREAD
+#endif
+
+// OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
+//
+// AddressSanitizer (ASan) is a fast memory error detector.
+#ifndef OPENTELEMETRY_HAVE_ADDRESS_SANITIZER
+#  if defined(__SANITIZE_ADDRESS__)
+#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
+#  elif OPENTELEMETRY_HAVE_FEATURE(address_sanitizer)
+#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 1
+#  else
+#    define OPENTELEMETRY_HAVE_ADDRESS_SANITIZER 0
+#  endif
+#endif
+
+// OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER
+//
+// Hardware-Assisted AddressSanitizer (or HWASAN) is even faster than asan
+// memory error detector which can use CPU features like ARM TBI, Intel LAM or
+// AMD UAI.
+#ifndef OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER
+#  if defined(__SANITIZE_HWADDRESS__)
+#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
+#  elif OPENTELEMETRY_HAVE_FEATURE(hwaddress_sanitizer)
+#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 1
+#  else
+#    define OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER 0
+#  endif
+#endif
+
+#if OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize_address)
+#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS \
+    __attribute__((no_sanitize_address))  // __attribute__((no_sanitize("address")))
+#elif OPENTELEMETRY_HAVE_ADDRESS_SANITIZER && defined(_MSC_VER) && _MSC_VER >= 1928
+#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __declspec(no_sanitize_address)
+#elif OPENTELEMETRY_HAVE_HWADDRESS_SANITIZER && OPENTELEMETRY_HAVE_ATTRIBUTE(no_sanitize)
+#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS __attribute__((no_sanitize("hwaddress")))
+#else
+#  define OPENTELEMETRY_SANITIZER_NO_ADDRESS
 #endif

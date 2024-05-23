@@ -988,6 +988,16 @@ public:
     }
   }
 
+  // Written size is not required to be precise, we can just ignore tsan report here.
+  OPENTELEMETRY_SANITIZER_NO_THREAD void MaybeRotateLog(std::size_t data_size)
+  {
+    if (file_->written_size > 0 && file_->written_size + data_size > options_.file_size)
+    {
+      RotateLog();
+    }
+    CheckUpdate();
+  }
+
   void Export(nostd::string_view data, std::size_t record_count) override
   {
     if (!is_initialized_.load(std::memory_order_acquire))
@@ -995,11 +1005,7 @@ public:
       Initialize();
     }
 
-    if (file_->written_size > 0 && file_->written_size + data.size() > options_.file_size)
-    {
-      RotateLog();
-    }
-    CheckUpdate();
+    MaybeRotateLog(data.size());
 
     std::shared_ptr<FILE> out = OpenLogFile(true);
     if (!out)
