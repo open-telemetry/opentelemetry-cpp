@@ -33,9 +33,9 @@ static void f2()
 
 #if defined(_MSC_VER)
 __declspec(dllexport)
-#  endif
+#endif
 
-void do_something_in_c()
+    void do_something_in_c()
 {
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("C::library"));
 
