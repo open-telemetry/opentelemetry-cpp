@@ -13,9 +13,6 @@ common --enable_platform_specific_config
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
-# Fix issues with abseil dependencies
-build:windows --dynamic_mode=off
-
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
 build:linux --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
