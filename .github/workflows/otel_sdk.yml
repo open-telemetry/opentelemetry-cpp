@@ -38,7 +38,7 @@ jobs:
             Initialize-Disk $disk.Number -Verbose
             $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
             $part
-            $vol = Format-Volume -FileSystem NTFS -Partition $part -Verbose
+            $vol = Format-Volume -FileSystem ReFS -Partition $part -Verbose
             $vol
             Dismount-VHD -Path d:/d.vhdx -Verbose
           }
