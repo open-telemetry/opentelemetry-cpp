@@ -16,8 +16,8 @@ jobs:
       contents: write
     steps:
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize
-      - run: choco install bazelisk
-      - run: choco upgrade llvm --version 18.1.5
+#     - run: choco install bazelisk
+      - run: choco upgrade llvm --version 18.1.6
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
@@ -25,10 +25,6 @@ jobs:
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: ${{ runner.os }}-bazel-
-      - name: install-module StorageDsc
-        run: |
-          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-          Find-Module -Name StorageDsc -Repository PSGallery | Install-Module
       - name: mount cache disk
         run: |
           New-Item -Path d:/d -ItemType "directory" -Force -Verbose
@@ -42,7 +38,7 @@ jobs:
             Initialize-Disk $disk.Number -Verbose
             $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
             $part
-            $vol = Format-Volume -DevDrive -FileSystem ReFS -Partition $part -Verbose
+            $vol = Format-Volume -FileSystem ReFS -Partition $part -Verbose
             $vol
             Dismount-VHD -Path d:/d.vhdx -Verbose
           }
