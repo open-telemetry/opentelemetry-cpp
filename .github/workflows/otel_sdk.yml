@@ -46,6 +46,7 @@ jobs:
           $part
           $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
           ls d:/d.vhdx
+          echo empty > d:\d\empty.txt
           cmd /c dir d:\d || echo "swallowing errors"
       - name: test otel_sdk
         run: |
