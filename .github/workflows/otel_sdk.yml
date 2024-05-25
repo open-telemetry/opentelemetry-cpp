@@ -38,13 +38,15 @@ jobs:
             Initialize-Disk $disk.Number -Verbose
             $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
             $part
-            $vol = Format-Volume -FileSystem ReFS -Partition $part -Verbose
+            $vol = Format-Volume -DevDrive -FileSystem ReFS -Partition $part -Verbose
             $vol
             Dismount-VHD -Path d:/d.vhdx -Verbose
           }
           $part = Mount-VHD -Path d:/d.vhdx -NoDriveLetter -Verbose -PassThru | Get-Disk | Get-Partition | Where-Object -Not IsHidden
           $part
           $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
+          ls d:/d.vhdx
+          cmd /c dir d:\d
       - name: test otel_sdk
         run: |
           echo "build --bes_results_url=https://app.buildbuddy.io/invocation/" > ../top.bazelrc
@@ -56,7 +58,10 @@ jobs:
           ./otel_sdk_build.cmd test
           ./otel_sdk_build.cmd shutdown
       - run: |
+          cmd /c dir d:\d
           Dismount-VHD -Path "d:/d.vhdx" -Verbose
+          ls d:/d.vhdx
+          Resize-VHD -Path "d:/d.vhdx" -ToMinimumSize -Verbose
           ls d:/d.vhdx
       - uses: actions/cache/save@v4
         # Don't update cache on releases
