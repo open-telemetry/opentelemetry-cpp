@@ -25,6 +25,10 @@ jobs:
           enableCrossOsArchive: true
           key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', '.bazelrc', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: ${{ runner.os }}-bazel-
+      - name: install-module StorageDsc
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Find-Module -Name StorageDsc -Repository PSGallery | Install-Module
       - name: mount cache disk
         run: |
           New-Item -Path d:/d -ItemType "directory" -Force -Verbose
