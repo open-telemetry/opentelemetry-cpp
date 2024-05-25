@@ -46,7 +46,7 @@ jobs:
           $part
           $part | Add-PartitionAccessPath -AccessPath d:/d -Verbose
           ls d:/d.vhdx
-          cmd /c dir d:\d
+          cmd /c dir d:\d || echo "swallowing errors"
       - name: test otel_sdk
         run: |
           echo "build --bes_results_url=https://app.buildbuddy.io/invocation/" > ../top.bazelrc
@@ -58,7 +58,7 @@ jobs:
           ./otel_sdk_build.cmd test
           ./otel_sdk_build.cmd shutdown
       - run: |
-          cmd /c dir d:\d
+          cmd /c dir d:\d || echo "swallowing errors"
           Dismount-VHD -Path "d:/d.vhdx" -Verbose
           ls d:/d.vhdx
           Resize-VHD -Path "d:/d.vhdx" -ToMinimumSize -Verbose
