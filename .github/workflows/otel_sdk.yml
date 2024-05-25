@@ -15,8 +15,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize
-#     - run: choco install bazelisk
       - run: choco upgrade llvm --version 18.1.6
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
@@ -38,7 +38,7 @@ jobs:
             Initialize-Disk $disk.Number -Verbose
             $part = New-Partition -DiskNumber $disk.Number -UseMaximumSize -Verbose
             $part
-            $vol = Format-Volume -FileSystem Ntfs -Compress -Partition $part -Verbose
+            $vol = Format-Volume -FileSystem ReFS -Partition $part -Verbose
             $vol
             Dismount-VHD -Path d:/d.vhdx -Verbose
           }
