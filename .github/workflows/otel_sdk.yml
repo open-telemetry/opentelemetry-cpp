@@ -48,6 +48,7 @@ jobs:
           ls d:/d.vhdx
           echo empty > d:\d\empty.txt
           cmd /c dir d:\d || echo "swallowing errors"
+          refsutil dedup d:\d /s
       - name: test otel_sdk
         run: |
           echo "build --bes_results_url=https://app.buildbuddy.io/invocation/" > ../top.bazelrc
