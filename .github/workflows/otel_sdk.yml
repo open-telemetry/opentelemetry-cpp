@@ -63,7 +63,7 @@ jobs:
           cmd /c dir d:\d || echo "swallowing errors"
           Dismount-VHD -Path "d:/d.vhdx" -Verbose
           ls d:/d.vhdx
-          Resize-VHD -Path "d:/d.vhdx" -ToMinimumSize -Verbose
+          Resize-VHD -Path "d:/d.vhdx" -ToMinimumSize -Verbose -ErrorAction SilentlyContinue
           ls d:/d.vhdx
       - uses: actions/cache/save@v4
         # Don't update cache on releases
