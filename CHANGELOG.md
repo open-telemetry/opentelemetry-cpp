@@ -62,7 +62,7 @@ Breaking changes:
     the various provider factories, may need adjustment.
   * All the examples have been updated, and in particular no
     longer perform static_cast do convert an API object to an SDK object.
-    Please refers to examples for guidance on how to adjust.
+    Please refer to examples for guidance on how to adjust.
 
 Notes on experimental features:
 
