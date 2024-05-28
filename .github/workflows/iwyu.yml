@@ -52,3 +52,9 @@ jobs:
           name: Logs (include-what-you-use)
           path: ./build/*.log
 
+      - name: count warnings
+        run: |
+          cd build
+          COUNT=`grep -c "Warning:" iwyu.log`
+          echo "include-what-you-use reported ${COUNT} warning(s)"
+
