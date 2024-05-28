@@ -148,7 +148,7 @@ struct LogRecordSetterTrait
 {
   static_assert(!std::is_same<nostd::unique_ptr<LogRecord>, ValueType>::value &&
                     !std::is_same<std::unique_ptr<LogRecord>, ValueType>::value,
-                "unique_ptr<LogRecord> is not allowed");
+                "unique_ptr<LogRecord> is not allowed, please use std::move()");
 
   template <class ArgumentType,
             nostd::enable_if_t<std::is_convertible<ArgumentType, nostd::string_view>::value ||
