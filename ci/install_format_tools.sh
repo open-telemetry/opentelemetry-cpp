@@ -25,13 +25,3 @@ pip3 install --break-system-packages cmake_format==${CMAKE_FORMAT_VERSION}
 # Install buildifier
 curl -L -o /usr/local/bin/buildifier https://github.com/bazelbuild/buildtools/releases/download/${BUILDIFIER_VERSION}/buildifier
 chmod +x /usr/local/bin/buildifier
-
-which clang-format
-clang-format --version
-
-which cmake_format
-cmake_format --version
-
-which buildifier
-buildifier --version
-
