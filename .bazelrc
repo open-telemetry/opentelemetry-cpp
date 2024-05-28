@@ -14,7 +14,7 @@ common --enable_platform_specific_config
 build --copt -DGRPC_BAZEL_BUILD
 
 # Workaround abseil libraries missing symbols
-build:windows --linkopt=/FORCE
+build:windows --dynamic_mode=off
 
 # Set minimum supported C++ version
 build:macos --host_cxxopt=-std=c++14 --cxxopt=-std=c++14
