@@ -257,15 +257,15 @@ struct UUID
   void to_bytes(uint8_t (&guid_bytes)[16]) const
   {
     // Part 1
-    guid_bytes[0] = (uint8_t)((Data1)&0xFF);
+    guid_bytes[0] = (uint8_t)((Data1) & 0xFF);
     guid_bytes[1] = (uint8_t)((Data1 >> 8) & 0xFF);
     guid_bytes[2] = (uint8_t)((Data1 >> 16) & 0xFF);
     guid_bytes[3] = (uint8_t)((Data1 >> 24) & 0xFF);
     // Part 2
-    guid_bytes[4] = (uint8_t)((Data2)&0xFF);
+    guid_bytes[4] = (uint8_t)((Data2) & 0xFF);
     guid_bytes[5] = (uint8_t)((Data2 >> 8) & 0xFF);
     // Part 3
-    guid_bytes[6] = (uint8_t)((Data3)&0xFF);
+    guid_bytes[6] = (uint8_t)((Data3) & 0xFF);
     guid_bytes[7] = (uint8_t)((Data3 >> 8) & 0xFF);
     // Part 4
     for (size_t i = 0; i < 8; i++)
