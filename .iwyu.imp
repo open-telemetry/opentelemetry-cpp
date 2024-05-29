@@ -1,0 +1,13 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# include-what-you-use mapping file
+
+[
+  # Work around for C++ STL
+  { "include": ["<bits/chrono.h>", "private", "<chrono>", "public"] },
+
+  # Local opentelemetry-cpp
+
+]
+

@@ -33,12 +33,6 @@ const nostd::string_view Logger::GetName() noexcept
 
 nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
-  // If this logger does not have a processor, no need to create a log recordable
-  if (!context_)
-  {
-    return nullptr;
-  }
-
   auto recordable = context_->GetProcessor().MakeRecordable();
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());

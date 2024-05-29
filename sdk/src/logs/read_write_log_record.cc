@@ -150,8 +150,8 @@ void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
   attributes_map_[static_cast<std::string>(key)] = value;
 }
 
-const std::unordered_map<std::string, opentelemetry::common::AttributeValue>
-    &ReadWriteLogRecord::GetAttributes() const noexcept
+const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+ReadWriteLogRecord::GetAttributes() const noexcept
 {
   return attributes_map_;
 }
