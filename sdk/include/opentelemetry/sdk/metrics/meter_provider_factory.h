@@ -4,13 +4,10 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
-#include <vector>
-#include "opentelemetry/metrics/meter.h"
+
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
