@@ -1,9 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/logger_provider_factory.h"
+#include <utility>
+
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

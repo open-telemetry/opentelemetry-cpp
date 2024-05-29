@@ -6,21 +6,17 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace resource
-{
-class Resource;
-}  // namespace resource
-
 namespace logs
 {
-class LoggerContext;
-class LogRecordProcessor;
 
 /**
  * Factory class for LoggerProvider.
