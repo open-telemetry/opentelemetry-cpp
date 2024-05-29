@@ -56,8 +56,7 @@ public:
 // nostd::get<...> for Apple Clang
 //
 template <typename T, class... Types>
-constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto)
-{
+constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto) {
   auto v      = t;
   auto result = std::get_if<T>(&v);  // TODO: optimize with std::forward(t) if t is not rvalue
   if (result)
@@ -69,8 +68,7 @@ constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto)
 };
 
 template <std::size_t I, class... Types>
-constexpr auto get_index = [](auto &&t) constexpr -> decltype(auto)
-{
+constexpr auto get_index = [](auto &&t) constexpr -> decltype(auto) {
   auto v      = t;
   auto result = std::get_if<I>(&v);  // TODO: optimize with std::forward(t) if t is not rvalue
   if (result)
@@ -132,7 +130,7 @@ constexpr const T &&get(const std::variant<Types...> &&v)
 };
 
 template <class _Callable, class... _Variants>
-constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
+constexpr auto visit(_Callable &&_Obj, _Variants &&..._Args)
 {
   // Ref:
   // https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit
@@ -193,7 +191,7 @@ constexpr const T &&get(const std::variant<Types...> &&v)
 }
 
 template <class _Callable, class... _Variants>
-constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
+constexpr auto visit(_Callable &&_Obj, _Variants &&..._Args)
 {
   return std::visit<_Callable, _Variants...>(static_cast<_Callable &&>(_Obj),
                                              static_cast<_Variants &&>(_Args)...);
