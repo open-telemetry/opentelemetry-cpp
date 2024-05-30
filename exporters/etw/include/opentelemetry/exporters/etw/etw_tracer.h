@@ -485,10 +485,9 @@ public:
     auto spanContext =
         std::unique_ptr<opentelemetry::trace::SpanContext>(new opentelemetry::trace::SpanContext(
             traceId, GetIdGenerator(tracerProvider_).GenerateSpanId(), traceFlags, false,
-            sampling_result.trace_state
-                ? sampling_result.trace_state
-                : parentContext.IsValid() ? parentContext.trace_state()
-                                          : opentelemetry::trace::TraceState::GetDefault()));
+            sampling_result.trace_state ? sampling_result.trace_state
+            : parentContext.IsValid()   ? parentContext.trace_state()
+                                        : opentelemetry::trace::TraceState::GetDefault()));
 
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
