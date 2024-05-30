@@ -41,6 +41,7 @@ jobs:
         CXX: /usr/bin/g++-14
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -73,6 +74,7 @@ jobs:
         CXX: /usr/bin/g++-14
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -105,6 +107,7 @@ jobs:
         CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -137,6 +140,7 @@ jobs:
         CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -169,6 +173,7 @@ jobs:
         CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -709,7 +714,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: setup
-      run: sudo ./ci/install_format_tools.sh
+      run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
     - name: run tests
       run: ./ci/do_ci.sh format
 
