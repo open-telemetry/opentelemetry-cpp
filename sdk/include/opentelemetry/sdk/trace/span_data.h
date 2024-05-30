@@ -55,8 +55,8 @@ public:
    * Get the attributes for this event
    * @return the attributes for this event
    */
-  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
-      &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+  GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -82,8 +82,8 @@ public:
    * Get the attributes for this link
    * @return the attributes for this link
    */
-  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
-      &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+  GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -218,8 +218,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
-      &GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
+  GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }

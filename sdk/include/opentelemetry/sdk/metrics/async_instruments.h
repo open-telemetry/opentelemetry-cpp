@@ -6,8 +6,9 @@
 #include <memory>
 
 #include "opentelemetry/metrics/async_instruments.h"
-#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,10 +16,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-class AsyncWritableMetricStorage;
-class ObservableRegistry;
-
 class OPENTELEMETRY_EXPORT ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:

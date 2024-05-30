@@ -107,8 +107,8 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-  virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue>
-      &GetAttributes() const noexcept = 0;
+  virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+  GetAttributes() const noexcept = 0;
 
   /**
    * Get resource of this log

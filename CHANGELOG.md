@@ -18,6 +18,9 @@ Increment the:
 * [SDK] Update ExemplarFilter and ExemplarReservoir for spec
   [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 
+* [CI] Upgrade to clang-format 18
+  [#2684](https://github.com/open-telemetry/opentelemetry-cpp/pull/2684)
+
 Notes on experimental features:
 
 * [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)
