@@ -30,6 +30,7 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev
+          sudo ./ci/install_ryml.sh
 
       - name: Prepare CMake
         run: |
