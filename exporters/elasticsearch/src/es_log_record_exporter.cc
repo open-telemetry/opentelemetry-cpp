@@ -288,12 +288,11 @@ private:
 #endif
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
-    : options_{ElasticsearchExporterOptions()}, http_client_
-{
-  ext::http::client::HttpClientFactory::Create()
-}
+    : options_{ElasticsearchExporterOptions()},
+      http_client_{ext::http::client::HttpClientFactory::Create()}
 #ifdef ENABLE_ASYNC_EXPORT
-, synchronization_data_(new SynchronizationData())
+      ,
+      synchronization_data_(new SynchronizationData())
 #endif
 {
 #ifdef ENABLE_ASYNC_EXPORT
@@ -360,13 +359,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
           OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
-                                  << span_count
-                                  << " trace span(s) error: " << static_cast<int>(result));
+                                               << span_count
+                                               << " trace span(s) error: " << static_cast<int>(result));
         }
         else
         {
           OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
-                                                              << " trace span(s) success");
+                                                                           << " trace span(s) success");
         }
 
         synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
@@ -460,7 +459,6 @@ bool ElasticsearchLogRecordExporter::ForceFlush(
 
 bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
 
   // Shutdown the session manager
@@ -472,7 +470,6 @@ bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeo
 
 bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
 }  // namespace logs

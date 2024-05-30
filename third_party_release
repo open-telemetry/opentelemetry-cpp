@@ -14,12 +14,12 @@
 #
 
 gRPC=v1.49.2
-abseil=20220623.1
+abseil=20240116.1
 benchmark=v1.8.3
 googletest=1.14.0
 ms-gsl=v3.1.0-67-g6f45293
 nlohmann-json=v3.11.3
-opentelemetry-proto=v1.1.0
+opentelemetry-proto=v1.3.1
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.2.4
 vcpkg=2024.02.14

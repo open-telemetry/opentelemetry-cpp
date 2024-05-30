@@ -30,10 +30,12 @@ endif()
 if(TARGET util)
   list(APPEND PROMETHEUS_EXPORTER_TARGETS util)
 endif()
-target_link_libraries(
-  opentelemetry_exporter_prometheus
-  PUBLIC opentelemetry_metrics prometheus-cpp::pull prometheus-cpp::core
-         prometheus-cpp::util)
+set(PROMETHEUS_CPP_TARGETS prometheus-cpp::pull prometheus-cpp::core)
+if(TARGET prometheus-cpp::util)
+  list(APPEND PROMETHEUS_CPP_TARGETS prometheus-cpp::util)
+endif()
+target_link_libraries(opentelemetry_exporter_prometheus
+                      PUBLIC opentelemetry_metrics ${PROMETHEUS_CPP_TARGETS})
 
 if(OPENTELEMETRY_INSTALL)
   install(

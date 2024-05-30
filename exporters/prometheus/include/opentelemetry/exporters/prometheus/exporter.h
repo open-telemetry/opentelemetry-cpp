@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <prometheus/exposer.h>
-#include "opentelemetry/common/spin_lock_mutex.h"
+
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/nostd/span.h"
