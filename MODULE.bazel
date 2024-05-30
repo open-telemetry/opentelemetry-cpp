@@ -65,3 +65,5 @@ python.toolchain(
     ignore_root_user_error = True,
     python_version = "3.12",
 )
+
+bazel_dep(name = "depend_on_what_you_use", version = "0.3.0")
