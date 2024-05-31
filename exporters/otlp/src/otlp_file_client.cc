@@ -1014,7 +1014,6 @@ public:
     }
 
     fwrite(data.data(), 1, data.size(), out.get());
-    fputc('\n', out.get());
 
     {
       std::lock_guard<std::mutex> lock_guard{file_->file_lock};
@@ -1527,7 +1526,6 @@ public:
   void Export(nostd::string_view data, std::size_t /*record_count*/) override
   {
     os_.get().write(data.data(), data.size());
-    os_.get().write("\n", 1);
   }
 
   bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override
@@ -1595,6 +1593,7 @@ opentelemetry::sdk::common::ExportResult OtlpFileClient::Export(
 
   if (backend_)
   {
+    post_body_json += '\n';
     backend_->Export(post_body_json, record_count);
     return ::opentelemetry::sdk::common::ExportResult::kSuccess;
   }
