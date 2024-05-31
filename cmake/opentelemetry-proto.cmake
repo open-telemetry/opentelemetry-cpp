@@ -43,7 +43,15 @@ else()
     message(
       STATUS "opentelemetry-proto dependency satisfied by: github download")
     if("${opentelemetry-proto}" STREQUAL "")
-      set(opentelemetry-proto "v1.0.0")
+      file(READ "${CMAKE_CURRENT_LIST_DIR}/../third_party_release"
+           OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
+      if(OTELCPP_THIRD_PARTY_RELEASE_CONTENT MATCHES
+         "opentelemetry-proto=[ \\t]*([A-Za-z0-9_\\.\\-]+)")
+        set(opentelemetry-proto "${CMAKE_MATCH_1}")
+      else()
+        set(opentelemetry-proto "v1.3.1")
+      endif()
+      unset(OTELCPP_THIRD_PARTY_RELEASE_CONTENT)
     endif()
     include(ExternalProject)
     ExternalProject_Add(
@@ -72,18 +80,23 @@ set(TRACE_PROTO "${PROTO_PATH}/opentelemetry/proto/trace/v1/trace.proto")
 set(LOGS_PROTO "${PROTO_PATH}/opentelemetry/proto/logs/v1/logs.proto")
 set(METRICS_PROTO "${PROTO_PATH}/opentelemetry/proto/metrics/v1/metrics.proto")
 
-set(PROFILES_PROTO "${PROTO_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.proto")
-set(PROFILES_EXT_PROTO "${PROTO_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.proto")
+set(PROFILES_PROTO
+    "${PROTO_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.proto")
+set(PROFILES_EXT_PROTO
+    "${PROTO_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.proto"
+)
 
 set(TRACE_SERVICE_PROTO
     "${PROTO_PATH}/opentelemetry/proto/collector/trace/v1/trace_service.proto")
 set(LOGS_SERVICE_PROTO
     "${PROTO_PATH}/opentelemetry/proto/collector/logs/v1/logs_service.proto")
 set(METRICS_SERVICE_PROTO
-    "${PROTO_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.proto")
+    "${PROTO_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.proto"
+)
 
 set(PROFILES_SERVICE_PROTO
-    "${PROTO_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.proto")
+    "${PROTO_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.proto"
+)
 
 set(GENERATED_PROTOBUF_PATH
     "${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto")
@@ -119,30 +132,37 @@ set(TRACE_SERVICE_PB_H_FILE
 )
 
 #
-# Notes about the PROFILES signal:
-# - *.proto files added in opentelemetry-proto 1.3.0
-# - C++ code is generated from proto files
-# - The generated code is not used yet.
+# Notes about the PROFILES signal: - *.proto files added in opentelemetry-proto
+# 1.3.0 - C++ code is generated from proto files - The generated code is not
+# used yet.
 #
 
 set(PROFILES_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.pb.cc")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.pb.cc"
+)
 set(PROFILES_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.pb.h")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/profiles.pb.h"
+)
 set(PROFILES_EXT_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.pb.cc")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.pb.cc"
+)
 set(PROFILES_EXT_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.pb.h")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/profiles/v1experimental/pprofextended.pb.h"
+)
 set(PROFILES_SERVICE_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.pb.h")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.pb.h"
+)
 set(PROFILES_SERVICE_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.pb.cc")
+    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.pb.cc"
+)
 
 if(WITH_OTLP_GRPC)
   set(PROFILES_SERVICE_GRPC_PB_H_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.grpc.pb.h")
+      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.grpc.pb.h"
+  )
   set(PROFILES_SERVICE_GRPC_PB_CPP_FILE
-      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.grpc.pb.cc")
+      "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1experimental/profiles_service.grpc.pb.cc"
+  )
 endif()
 
 if(WITH_OTLP_GRPC)
@@ -278,8 +298,8 @@ add_custom_command(
     ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTOBUF_COMMON_FLAGS}
     ${PROTOBUF_INCLUDE_FLAGS} ${COMMON_PROTO} ${RESOURCE_PROTO} ${TRACE_PROTO}
     ${LOGS_PROTO} ${METRICS_PROTO} ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO}
-    ${METRICS_SERVICE_PROTO}
-    ${PROFILES_PROTO} ${PROFILES_EXT_PROTO} ${PROFILES_SERVICE_PROTO}
+    ${METRICS_SERVICE_PROTO} ${PROFILES_PROTO} ${PROFILES_EXT_PROTO}
+    ${PROFILES_SERVICE_PROTO}
   COMMENT "[Run]: ${PROTOBUF_RUN_PROTOC_COMMAND}")
 
 include_directories("${GENERATED_PROTOBUF_PATH}")
@@ -317,13 +337,11 @@ if(WITH_OTLP_GRPC)
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
-  target_link_libraries(opentelemetry_proto_grpc
-    PUBLIC opentelemetry_proto)
+  target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
 
   get_target_property(grpc_lib_type gRPC::grpc++ TYPE)
-  if (grpc_lib_type STREQUAL "SHARED_LIBRARY")
-    target_link_libraries(opentelemetry_proto_grpc
-      PUBLIC gRPC::grpc++)
+  if(grpc_lib_type STREQUAL "SHARED_LIBRARY")
+    target_link_libraries(opentelemetry_proto_grpc PUBLIC gRPC::grpc++)
   endif()
   set_target_properties(opentelemetry_proto_grpc PROPERTIES EXPORT_NAME
                                                             proto_grpc)

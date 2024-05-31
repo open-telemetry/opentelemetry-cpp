@@ -6,27 +6,19 @@
 #include <memory>
 #include <vector>
 
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
-{
-class TracerProvider;
-}  // namespace trace
-
 namespace sdk
 {
-namespace resource
-{
-class Resource;
-}  // namespace resource
-
 namespace trace
 {
-class IdGenerator;
-class Sampler;
-class SpanProcessor;
-class TracerContext;
 
 /**
  * Factory class for TracerProvider.
