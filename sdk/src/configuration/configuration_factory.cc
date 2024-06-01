@@ -4,15 +4,16 @@
 #include <fstream>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
-
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
+#include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
@@ -20,6 +21,8 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
@@ -27,8 +30,12 @@
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/last_value_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
@@ -37,6 +44,7 @@
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
@@ -82,12 +90,205 @@ static std::unique_ptr<AttributeLimitConfiguration> ParseAttributeLimitConfigura
   return model;
 }
 
+static std::unique_ptr<OtlpLogRecordExporterConfiguration> ParseOtlpLogRecordExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<OtlpLogRecordExporterConfiguration> model(new OtlpLogRecordExporterConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->protocol           = node->GetRequiredString("protocol");
+  model->endpoint           = node->GetRequiredString("endpoint");
+  model->certificate        = node->GetString("certificate", "");
+  model->client_key         = node->GetString("client_key", "");
+  model->client_certificate = node->GetString("client_certificate", "");
+
+  child = node->GetChildNode("headers");
+  if (child)
+  {
+    model->headers = ParseHeadersConfiguration(child);
+  }
+
+  model->compression = node->GetString("compression", "");
+  model->timeout     = node->GetInteger("timeout", 10000);
+  model->insecure    = node->GetBoolean("insecure", false);
+
+  return model;
+}
+
+static std::unique_ptr<ConsoleLogRecordExporterConfiguration>
+ParseConsoleLogRecordExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
+{
+  std::unique_ptr<ConsoleLogRecordExporterConfiguration> model(
+      new ConsoleLogRecordExporterConfiguration);
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionLogRecordExporterConfiguration>
+ParseExtensionLogRecordExporterConfiguration(const std::string &name,
+                                             std::unique_ptr<DocumentNode> node)
+{
+  auto extension  = new ExtensionLogRecordExporterConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<ExtensionLogRecordExporterConfiguration> model(extension);
+  return model;
+}
+
+static std::unique_ptr<LogRecordExporterConfiguration> ParseLogRecordExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<LogRecordExporterConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseLogRecordExporterConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal span exporter");
+  }
+
+  if (name == "otlp")
+  {
+    model = ParseOtlpLogRecordExporterConfiguration(child);
+  }
+  else if (name == "console")
+  {
+    model = ParseConsoleLogRecordExporterConfiguration(child);
+  }
+  else
+  {
+    model = ParseExtensionLogRecordExporterConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+static std::unique_ptr<BatchLogRecordProcessorConfiguration>
+ParseBatchLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<BatchLogRecordProcessorConfiguration> model(
+      new BatchLogRecordProcessorConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  model->schedule_delay        = node->GetInteger("schedule_delay", 5000);
+  model->export_timeout        = node->GetInteger("export_timeout", 30000);
+  model->max_queue_size        = node->GetInteger("max_queue_size", 2048);
+  model->max_export_batch_size = node->GetInteger("max_export_batch_size", 512);
+
+  child           = node->GetRequiredChildNode("exporter");
+  model->exporter = ParseLogRecordExporterConfiguration(child);
+
+  return model;
+}
+
+static std::unique_ptr<SimpleLogRecordProcessorConfiguration>
+ParseSimpleLogRecordProcessorConfiguration(const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<SimpleLogRecordProcessorConfiguration> model(
+      new SimpleLogRecordProcessorConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child           = node->GetRequiredChildNode("exporter");
+  model->exporter = ParseLogRecordExporterConfiguration(child);
+
+  return model;
+}
+
+static std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
+ParseExtensionLogRecordProcessorConfiguration(const std::string &name,
+                                              std::unique_ptr<DocumentNode> node)
+{
+  auto extension  = new ExtensionLogRecordProcessorConfiguration;
+  extension->name = name;
+  extension->node = std::move(node);
+  std::unique_ptr<ExtensionLogRecordProcessorConfiguration> model(extension);
+  return model;
+}
+
+static std::unique_ptr<LogRecordProcessorConfiguration> ParseLogRecordProcessorConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<LogRecordProcessorConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseLogRecordProcessorConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal log record processor");
+  }
+
+  if (name == "batch")
+  {
+    model = ParseBatchLogRecordProcessorConfiguration(child);
+  }
+  else if (name == "simple")
+  {
+    model = ParseSimpleLogRecordProcessorConfiguration(child);
+  }
+  else
+  {
+    model = ParseExtensionLogRecordProcessorConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+static std::unique_ptr<LogRecordLimitsConfiguration> ParseLogRecordLimitsConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<LogRecordLimitsConfiguration> model(new LogRecordLimitsConfiguration);
+
+  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
+  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
+
+  return model;
+}
+
 static std::unique_ptr<LoggerProviderConfiguration> ParseLoggerProviderConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+    const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<LoggerProviderConfiguration> model(new LoggerProviderConfiguration);
+  std::unique_ptr<DocumentNode> child;
 
-  OTEL_INTERNAL_LOG_ERROR("ParseLoggerProviderConfiguration: FIXME");
+  child = node->GetRequiredChildNode("processors");
+
+  for (auto it = child->begin(); it != child->end(); ++it)
+  {
+    model->processors.push_back(ParseLogRecordProcessorConfiguration(*it));
+  }
+
+  size_t count = model->processors.size();
+  if (count == 0)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseLoggerProviderConfiguration: 0 processors ");
+    throw InvalidSchemaException("Illegal processors");
+  }
+
+  child = node->GetChildNode("limits");
+  if (child)
+  {
+    model->limits = ParseLogRecordLimitsConfiguration(child);
+  }
 
   return model;
 }

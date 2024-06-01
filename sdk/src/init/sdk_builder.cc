@@ -637,6 +637,17 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
+    const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
+    const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("CreateLoggerProvider() FIXME");
+
+  return sdk;
+}
+
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const
 {
@@ -657,6 +668,11 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
     if (model->meter_provider)
     {
       sdk->m_meter_provider = CreateMeterProvider(model->meter_provider);
+    }
+
+    if (model->logger_provider)
+    {
+      sdk->m_logger_provider = CreateLoggerProvider(model->logger_provider);
     }
   }
 
