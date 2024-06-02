@@ -48,7 +48,7 @@ void InitMetrics(const std::string &name)
 
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
   auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-  auto *provider = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
+  auto *provider  = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
 #else
   auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
 #endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */

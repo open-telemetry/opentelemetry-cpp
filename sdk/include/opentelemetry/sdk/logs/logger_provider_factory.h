@@ -24,10 +24,9 @@ namespace logs
 class OPENTELEMETRY_EXPORT LoggerProviderFactory
 {
 public:
-
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
 
-#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
 
   OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
@@ -51,7 +50,7 @@ public:
   static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
       std::unique_ptr<LoggerContext> context);
 
-#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
+#  endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 
 #else
 
@@ -88,7 +87,6 @@ public:
       std::unique_ptr<LoggerContext> context);
 
 #endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
-
 };
 
 }  // namespace logs

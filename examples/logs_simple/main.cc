@@ -45,7 +45,6 @@ void InitTracer()
       opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
 #endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
-
   // Set the global trace provider
   std::shared_ptr<trace_api::TracerProvider> api_provider = provider;
   trace_api::Provider::SetTracerProvider(api_provider);

@@ -66,6 +66,14 @@ Breaking changes:
   * All the examples have been updated, and in particular no
     longer perform static_cast do convert an API object to an SDK object.
     Please refer to examples for guidance on how to adjust.
+  * If adjusting application code is impractical,
+    an alternate and temporary solution is to build with option
+    WITH_DEPRECATED_SDK_FACTORY=ON in CMake.
+  * Option WITH_DEPRECATED_SDK_FACTORY=ON will allow to build code
+    without application changes, posponing changes for later.
+  * WITH_DEPRECATED_SDK_FACTORY=ON is temporary, only to provide
+    an easier migration path. Expect this flag to be removed,
+    as early as by the next release.
 
 Notes on experimental features:
 

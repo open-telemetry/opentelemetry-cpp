@@ -28,10 +28,9 @@ namespace trace
 class OPENTELEMETRY_EXPORT TracerProviderFactory
 {
 public:
-
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
 
-#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
 
   /* Serie of builders with a single processor. */
 
@@ -87,7 +86,7 @@ public:
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<TracerContext> context);
 
-#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
+#  endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 
 #else
 
