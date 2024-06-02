@@ -24,7 +24,11 @@ namespace
 {
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+std::shared_ptr<opentelemetry::trace::TracerProvider> provider;
+#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider;
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -43,7 +47,11 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (provider)
   {
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+    static_cast<opentelemetry::sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+#else
     provider->ForceFlush();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   provider.reset();

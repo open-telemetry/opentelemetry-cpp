@@ -23,7 +23,18 @@ public:
   /**
    * Create a EventLoggerProvider.
    */
+
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::EventLoggerProvider> Create();
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
+
+#else
   static std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider> Create();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
+
 };
 
 }  // namespace logs

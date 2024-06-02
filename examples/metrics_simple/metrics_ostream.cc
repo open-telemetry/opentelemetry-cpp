@@ -46,7 +46,12 @@ void InitMetrics(const std::string &name)
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
 
-  auto provider = metrics_sdk::MeterProviderFactory::Create();
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+  auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+  auto *provider = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
+#else
+  auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   provider->AddMetricReader(std::move(reader));
 

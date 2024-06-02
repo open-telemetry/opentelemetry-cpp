@@ -154,6 +154,8 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
+option(WITH_DEPRECATED_SDK_FACTORY "Use deprecated SDK provider factory" OFF)
+
 set(WITH_STL
     "OFF"
     CACHE STRING "Which version of the Standard Library for C++ to use")

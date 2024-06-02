@@ -7,19 +7,16 @@
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-
-// sdk::TracerProvider and sdk::LoggerProvider is just used to call ForceFlush and prevent to cancel
-// running exportings when destroy and shutdown exporters.It's optional to users.
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include <string>
 
@@ -41,8 +38,13 @@ namespace
 opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
 opentelemetry::exporter::otlp::OtlpGrpcLogRecordExporterOptions log_opts;
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+std::shared_ptr<opentelemetry::trace::TracerProvider> tracer_provider;
+std::shared_ptr<opentelemetry::logs::LoggerProvider> logger_provider;
+#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -61,7 +63,11 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (tracer_provider)
   {
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+    static_cast<opentelemetry::sdk::trace::TracerProvider *>(tracer_provider.get())->ForceFlush();
+#else
     tracer_provider->ForceFlush();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   tracer_provider.reset();
@@ -86,7 +92,11 @@ void CleanupLogger()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (logger_provider)
   {
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+    static_cast<opentelemetry::sdk::logs::LoggerProvider *>(logger_provider.get())->ForceFlush();
+#else
     logger_provider->ForceFlush();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   logger_provider.reset();

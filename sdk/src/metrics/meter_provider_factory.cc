@@ -18,6 +18,40 @@ namespace sdk
 namespace metrics
 {
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+
+std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create()
+{
+  auto views = ViewRegistryFactory::Create();
+  return Create(std::move(views));
+}
+
+std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+    std::unique_ptr<ViewRegistry> views)
+{
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  return Create(std::move(views), resource);
+}
+
+std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+    std::unique_ptr<ViewRegistry> views,
+    const opentelemetry::sdk::resource::Resource &resource)
+{
+  std::unique_ptr<opentelemetry::metrics::MeterProvider> provider(
+      new opentelemetry::sdk::metrics::MeterProvider(std::move(views), resource));
+  return provider;
+}
+
+std::unique_ptr<opentelemetry::metrics::MeterProvider> MeterProviderFactory::Create(
+    std::unique_ptr<sdk::metrics::MeterContext> context)
+{
+  std::unique_ptr<opentelemetry::metrics::MeterProvider> provider(
+      new opentelemetry::sdk::metrics::MeterProvider(std::move(context)));
+  return provider;
+}
+
+#else
+
 std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory::Create()
 {
   auto views = ViewRegistryFactory::Create();
@@ -47,6 +81,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> MeterProviderFactory
       new opentelemetry::sdk::metrics::MeterProvider(std::move(context)));
   return provider;
 }
+
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 }  // namespace metrics
 }  // namespace sdk

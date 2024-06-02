@@ -24,6 +24,37 @@ namespace logs
 class OPENTELEMETRY_EXPORT LoggerProviderFactory
 {
 public:
+
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
+      std::unique_ptr<LogRecordProcessor> &&processor);
+
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
+      std::unique_ptr<LogRecordProcessor> &&processor,
+      const opentelemetry::sdk::resource::Resource &resource);
+
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors);
+
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
+      std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource);
+
+  OPENTELEMETRY_DEPRECATED
+  static std::unique_ptr<opentelemetry::logs::LoggerProvider> Create(
+      std::unique_ptr<LoggerContext> context);
+
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
+
+#else
+
   /**
    * Create a LoggerProvider.
    */
@@ -55,6 +86,9 @@ public:
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> Create(
       std::unique_ptr<LoggerContext> context);
+
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
+
 };
 
 }  // namespace logs

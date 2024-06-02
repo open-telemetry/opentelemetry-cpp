@@ -22,6 +22,90 @@ namespace sdk
 namespace trace
 {
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::unique_ptr<SpanProcessor> processor)
+{
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  return Create(std::move(processor), resource);
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::unique_ptr<SpanProcessor> processor,
+    const opentelemetry::sdk::resource::Resource &resource)
+{
+  auto sampler = AlwaysOnSamplerFactory::Create();
+  return Create(std::move(processor), resource, std::move(sampler));
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::unique_ptr<SpanProcessor> processor,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler)
+{
+  auto id_generator = RandomIdGeneratorFactory::Create();
+  return Create(std::move(processor), resource, std::move(sampler), std::move(id_generator));
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::unique_ptr<SpanProcessor> processor,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator)
+{
+  std::unique_ptr<opentelemetry::trace::TracerProvider> provider(
+      new opentelemetry::sdk::trace::TracerProvider(std::move(processor), resource,
+                                                    std::move(sampler), std::move(id_generator)));
+  return provider;
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors)
+{
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  return Create(std::move(processors), resource);
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource)
+{
+  auto sampler = AlwaysOnSamplerFactory::Create();
+  return Create(std::move(processors), resource, std::move(sampler));
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler)
+{
+  auto id_generator = RandomIdGeneratorFactory::Create();
+  return Create(std::move(processors), resource, std::move(sampler), std::move(id_generator));
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator)
+{
+  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> provider(
+      new opentelemetry::sdk::trace::TracerProvider(std::move(processors), resource,
+                                                    std::move(sampler), std::move(id_generator)));
+  return provider;
+}
+
+std::unique_ptr<opentelemetry::trace::TracerProvider> TracerProviderFactory::Create(
+    std::unique_ptr<TracerContext> context)
+{
+  std::unique_ptr<opentelemetry::trace::TracerProvider> provider(
+      new opentelemetry::sdk::trace::TracerProvider(std::move(context)));
+  return provider;
+}
+
+#else
+
 std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory::Create(
     std::unique_ptr<SpanProcessor> processor)
 {
@@ -101,6 +185,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
       new opentelemetry::sdk::trace::TracerProvider(std::move(context)));
   return provider;
 }
+
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 }  // namespace trace
 }  // namespace sdk
