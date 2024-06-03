@@ -5,10 +5,8 @@
 
 #include <atomic>
 #include <chrono>
-#include <memory>
 
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
@@ -18,7 +16,6 @@ namespace sdk
 {
 namespace metrics
 {
-class MetricProducer;
 struct ResourceMetrics;
 
 /**

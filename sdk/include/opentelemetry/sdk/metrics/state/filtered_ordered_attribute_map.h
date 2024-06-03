@@ -3,9 +3,13 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include <initializer_list>
+#include <utility>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
