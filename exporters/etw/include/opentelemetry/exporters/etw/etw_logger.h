@@ -145,6 +145,8 @@ class Logger : public opentelemetry::logs::Logger
    */
   std::string provId;
 
+  std::string eventName_;
+
   /**
    * @brief Encoding (Manifest, MessagePack or XML)
    */
@@ -179,10 +181,12 @@ public:
    * @param encoding ETW encoding format to use.
    */
   Logger(etw::LoggerProvider &parent,
+         nostd::string_view eventName,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
       : opentelemetry::logs::Logger(),
         loggerProvider_(parent),
+        eventName_(eventName),
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
         provHandle(initProvHandle())
@@ -271,7 +275,7 @@ public:
 #endif  // defined(ENABLE_ENV_PROPERTIES)
 
     // Populate Etw.EventName attribute at envelope level
-    evt[ETW_FIELD_NAME] = ETW_VALUE_LOG;
+    evt[ETW_FIELD_NAME] = eventName_.data();
 
 #ifdef HAVE_FIELD_TIME
     {
@@ -347,6 +351,8 @@ public:
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
     GetOption(options, "enableSpanId", config_.enableSpanId, true);
     GetOption(options, "enableActivityId", config_.enableActivityId, false);
+    GetOption(options, "enableTableNameMappings", config_.enableTableNameMappings, false);
+    GetOption(options, "tableNameMappings", config_.tableNameMappings, {});
 
     // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
     config_.encoding = GetEncoding(options);
@@ -359,19 +365,29 @@ public:
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       opentelemetry::nostd::string_view logger_name,
-      opentelemetry::nostd::string_view library_name,
+      opentelemetry::nostd::string_view library_name = "",
       opentelemetry::nostd::string_view version    = "",
       opentelemetry::nostd::string_view schema_url = "",
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::NoopKeyValueIterable()) override
   {
-    UNREFERENCED_PARAMETER(library_name);
     UNREFERENCED_PARAMETER(version);
     UNREFERENCED_PARAMETER(schema_url);
     UNREFERENCED_PARAMETER(attributes);
+
+    std::string event_name{ETW_VALUE_LOG};
+    if (config_.enableTableNameMappings)
+    {
+      auto it = config_.tableNameMappings.find(std::string(library_name.data(), library_name.size()));
+      if (it != config_.tableNameMappings.end())
+      {
+        event_name = it->second;
+      }
+    }
+
     ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<opentelemetry::logs::Logger>{
-        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
+        new (std::nothrow) etw::Logger(*this, event_name, logger_name, evtFmt)};
   }
 };
 
