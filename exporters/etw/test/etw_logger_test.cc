@@ -133,15 +133,17 @@ TEST(ETWLogger, LoggerCheckWithTableNameMappings)
 {
   std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
   std::map<std::string, std::string> tableNameMappings = {{"name1", "table1"}, {"name2", "table2"}};
-  exporter::etw::TelemetryProviderOptions options = {{"enableTableNameMappings", true}, {"tableNameMappings", tableNameMappings}};
-  exporter::etw::LoggerProvider lp {options};
+  exporter::etw::TelemetryProviderOptions options      = {{"enableTableNameMappings", true},
+                                                          {"tableNameMappings", tableNameMappings}};
+  exporter::etw::LoggerProvider lp{options};
 
   auto logger = lp.GetLogger(providerName, "name1");
 
   // Log attributes
   Properties attribs = {{"attrib1", 1}, {"attrib2", "value2"}};
 
-  EXPECT_NO_THROW(logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
+  EXPECT_NO_THROW(
+      logger->Debug("This is a debug log body", opentelemetry::common::MakeAttributes(attribs)));
 }
 
 #endif  // _WIN32

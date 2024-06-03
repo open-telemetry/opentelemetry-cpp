@@ -23,8 +23,9 @@ namespace etw
 /**
  * @brief TelemetryProvider Options passed via SDK API.
  */
-using TelemetryProviderOptions =
-    std::map<std::string, nostd::variant<std::string, uint64_t, float, bool, std::map<std::string, std::string>>>;
+using TelemetryProviderOptions = std::map<
+    std::string,
+    nostd::variant<std::string, uint64_t, float, bool, std::map<std::string, std::string>>>;
 
 /**
  * @brief TelemetryProvider runtime configuration class. Internal representation
@@ -38,10 +39,11 @@ typedef struct
   bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop Not used
                                  // for Logs
   bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;         // Start new spans as children of current active span, Not used for Logs
+  bool enableAutoParent;  // Start new spans as children of current active span, Not used for Logs
   ETWProvider::EventFormat
-    encoding;                    // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
-  bool enableTableNameMappings;  // Map instrumentation scope name to table name with `tableNameMappings`
+      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
+  bool enableTableNameMappings;  // Map instrumentation scope name to table name with
+                                 // `tableNameMappings`
   std::map<std::string, std::string> tableNameMappings;
 } TelemetryProviderConfiguration;
 
