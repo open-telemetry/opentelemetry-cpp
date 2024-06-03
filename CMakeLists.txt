@@ -154,8 +154,8 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-# This option is temporary, and will be removed.
-# Set WITH_DEPRECATED_SDK_FACTORY=OFF to migrate to the new SDK code.
+# This option is temporary, and will be removed. Set
+# WITH_DEPRECATED_SDK_FACTORY=OFF to migrate to the new SDK code.
 option(WITH_DEPRECATED_SDK_FACTORY "Use deprecated SDK provider factory" ON)
 
 if(WITH_DEPRECATED_SDK_FACTORY)
