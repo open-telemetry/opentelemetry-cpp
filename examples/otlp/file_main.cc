@@ -4,12 +4,9 @@
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-
-// sdk::TracerProvider is just used to call ForceFlush and prevent to cancel running exportings when
-// destroy and shutdown exporters.It's optional to users.
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include <iostream>
 #include <string>
@@ -29,7 +26,11 @@ namespace
 {
 opentelemetry::exporter::otlp::OtlpFileExporterOptions opts;
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+std::shared_ptr<opentelemetry::trace::TracerProvider> provider;
+#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider;
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -48,7 +49,11 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (provider)
   {
-    provider->ForceFlush(std::chrono::milliseconds(10000));
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+    static_cast<opentelemetry::sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+#else
+    provider->ForceFlush();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   provider.reset();
