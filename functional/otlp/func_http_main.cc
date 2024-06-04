@@ -173,8 +173,6 @@ void payload()
   auto span = tracer->StartSpan(k_span_name);
   span->SetAttribute(k_attr_test_name, opt_test_name);
   span->End();
-
-  tracer->ForceFlushWithMicroseconds(1000000);
 }
 
 void cleanup()

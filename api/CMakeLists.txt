@@ -35,6 +35,11 @@ if(WITH_NO_DEPRECATED_CODE)
                              INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
 endif()
 
+if(WITH_DEPRECATED_SDK_FACTORY)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_DEPRECATED_SDK_FACTORY)
+endif()
+
 if(WITH_ABSEIL)
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
