@@ -288,10 +288,17 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_stub_interface(
       trace_mock_stub);
 
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
   auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       opentelemetry::sdk::trace::TracerProviderFactory::Create(
           opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(
               GetExporter(trace_stub_interface))));
+#else
+  auto trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>(
+      opentelemetry::sdk::trace::TracerProviderFactory::Create(
+          opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(
+              GetExporter(trace_stub_interface))));
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   // Trace and Logs should both receive datas when links static gRPC on ELF ABI.
   EXPECT_CALL(*trace_mock_stub, Export(_, _, _))
@@ -331,7 +338,7 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::trace::Provider::SetTracerProvider(
       opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
           new opentelemetry::trace::NoopTracerProvider()));
-  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>();
+  trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
 }
 
 }  // namespace otlp

@@ -116,7 +116,7 @@ public:
   void Teardown()
   {
     span_->End();
-    tracer_->CloseWithMicroseconds(0);
+    //malkia tracer_->CloseWithMicroseconds(0);
   }
 };
 

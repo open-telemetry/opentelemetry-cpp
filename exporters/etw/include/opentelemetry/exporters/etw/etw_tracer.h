@@ -575,7 +575,7 @@ public:
    * @param timeout Allow Tracer to drop data if timeout is reached
    * @return
    */
-  void ForceFlushWithMicroseconds(uint64_t) noexcept override {}
+  void ForceFlushWithMicroseconds(uint64_t) noexcept {}
 
   /**
    * @brief Close tracer, spending up to given amount of microseconds to flush and close.
@@ -585,7 +585,7 @@ public:
    * @param  timeout Allow Tracer to drop data if timeout is reached.
    * @return
    */
-  void CloseWithMicroseconds(uint64_t) noexcept override
+  void CloseWithMicroseconds(uint64_t) noexcept
   {
     // Close once only
     if (!isClosed_.exchange(true))

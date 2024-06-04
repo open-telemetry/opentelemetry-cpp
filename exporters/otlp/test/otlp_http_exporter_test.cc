@@ -137,7 +137,7 @@ public:
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+    auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
@@ -192,7 +192,7 @@ public:
     child_span->End();
     parent_span->End();
 
-    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+    provider->ForceFlush();
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -228,7 +228,7 @@ public:
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+    auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
@@ -287,7 +287,7 @@ public:
     child_span->End();
     parent_span->End();
 
-    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+    provider->ForceFlush();
   }
 #  endif
 
@@ -323,7 +323,7 @@ public:
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+    auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
@@ -368,7 +368,7 @@ public:
     child_span->End();
     parent_span->End();
 
-    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+    provider->ForceFlush();
   }
 
 #  ifdef ENABLE_ASYNC_EXPORT
@@ -404,7 +404,7 @@ public:
 
     auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
         new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
-    auto provider = nostd::shared_ptr<trace::TracerProvider>(
+    auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
     std::string report_trace_id;
@@ -454,7 +454,7 @@ public:
     child_span->End();
     parent_span->End();
 
-    static_cast<sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
+    provider->ForceFlush();
   }
 #  endif
 };
