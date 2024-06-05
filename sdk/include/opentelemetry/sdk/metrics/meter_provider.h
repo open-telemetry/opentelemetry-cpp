@@ -7,33 +7,28 @@
 #include <memory>
 #include <mutex>
 
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics
-{
-class Meter;
-}  // namespace metrics
-
 namespace sdk
 {
 namespace metrics
 {
-
-// forward declaration
-class MeterContext;
-class MetricCollector;
-class MetricReader;
 
 class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::MeterProvider
 {

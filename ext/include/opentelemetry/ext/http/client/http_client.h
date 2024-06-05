@@ -379,13 +379,13 @@ public:
 
   virtual Result Get(const nostd::string_view &url,
                      const HttpSslOptions &ssl_options,
-                     const Headers &                = {{}},
+                     const Headers                & = {{}},
                      const Compression &compression = Compression::kNone) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
                       const HttpSslOptions &ssl_options,
                       const Body &body,
-                      const Headers &                = {{"content-type", "application/json"}},
+                      const Headers                & = {{"content-type", "application/json"}},
                       const Compression &compression = Compression::kNone) noexcept = 0;
 
   virtual ~HttpClientSync() = default;

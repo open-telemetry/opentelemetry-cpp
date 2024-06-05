@@ -31,10 +31,10 @@ class AdaptingIntegerArray
 public:
   // Construct an adapting integer array of a given size.
   explicit AdaptingIntegerArray(size_t size) : backing_(std::vector<uint8_t>(size, 0)) {}
-  AdaptingIntegerArray(const AdaptingIntegerArray &other) = default;
-  AdaptingIntegerArray(AdaptingIntegerArray &&other)      = default;
+  AdaptingIntegerArray(const AdaptingIntegerArray &other)            = default;
+  AdaptingIntegerArray(AdaptingIntegerArray &&other)                 = default;
   AdaptingIntegerArray &operator=(const AdaptingIntegerArray &other) = default;
-  AdaptingIntegerArray &operator=(AdaptingIntegerArray &&other) = default;
+  AdaptingIntegerArray &operator=(AdaptingIntegerArray &&other)      = default;
 
   /**
    * Increments the value at the specified index by the given count in the array.
@@ -87,10 +87,10 @@ class AdaptingCircularBufferCounter
 {
 public:
   explicit AdaptingCircularBufferCounter(size_t max_size) : backing_(max_size) {}
-  AdaptingCircularBufferCounter(const AdaptingCircularBufferCounter &other) = default;
-  AdaptingCircularBufferCounter(AdaptingCircularBufferCounter &&other)      = default;
+  AdaptingCircularBufferCounter(const AdaptingCircularBufferCounter &other)            = default;
+  AdaptingCircularBufferCounter(AdaptingCircularBufferCounter &&other)                 = default;
   AdaptingCircularBufferCounter &operator=(const AdaptingCircularBufferCounter &other) = default;
-  AdaptingCircularBufferCounter &operator=(AdaptingCircularBufferCounter &&other) = default;
+  AdaptingCircularBufferCounter &operator=(AdaptingCircularBufferCounter &&other)      = default;
 
   /**
    * The first index with a recording. May be negative.

@@ -35,6 +35,11 @@ if(WITH_NO_DEPRECATED_CODE)
                              INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
 endif()
 
+if(WITH_DEPRECATED_SDK_FACTORY)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE OPENTELEMETRY_DEPRECATED_SDK_FACTORY)
+endif()
+
 if(WITH_ABSEIL)
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
@@ -129,6 +134,10 @@ endif()
 if(WITH_OTLP_HTTP_COMPRESSION)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_COMPRESSION_PREVIEW)
+endif()
+
+if(APPLE)
+  target_link_libraries(opentelemetry_api INTERFACE "-framework CoreFoundation")
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
