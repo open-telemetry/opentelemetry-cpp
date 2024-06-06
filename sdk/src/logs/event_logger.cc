@@ -1,11 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <string>
 #include <utility>
 
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/logs/event_logger.h"
-#include "opentelemetry/sdk_config.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -13,14 +17,14 @@ namespace sdk
 {
 namespace logs
 {
-namespace nostd = opentelemetry::nostd;
 
-EventLogger::EventLogger(nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
-                         nostd::string_view event_domain) noexcept
+EventLogger::EventLogger(
+    opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
+    opentelemetry::nostd::string_view event_domain) noexcept
     : delegate_logger_(delegate_logger), event_domain_(event_domain)
 {}
 
-const nostd::string_view EventLogger::GetName() noexcept
+const opentelemetry::nostd::string_view EventLogger::GetName() noexcept
 {
   if (delegate_logger_)
   {
@@ -30,13 +34,15 @@ const nostd::string_view EventLogger::GetName() noexcept
   return {};
 }
 
-nostd::shared_ptr<opentelemetry::logs::Logger> EventLogger::GetDelegateLogger() noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>
+EventLogger::GetDelegateLogger() noexcept
 {
   return delegate_logger_;
 }
 
-void EventLogger::EmitEvent(nostd::string_view event_name,
-                            nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
+void EventLogger::EmitEvent(
+    opentelemetry::nostd::string_view event_name,
+    opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!delegate_logger_ || !log_record)
   {

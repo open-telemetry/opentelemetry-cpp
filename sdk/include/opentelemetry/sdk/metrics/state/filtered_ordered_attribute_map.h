@@ -17,7 +17,8 @@ namespace sdk
 {
 namespace metrics
 {
-class AttributesProcessor;
+class AttributesProcessor; // IWYU pragma: keep
+
 class FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
 {
 public:

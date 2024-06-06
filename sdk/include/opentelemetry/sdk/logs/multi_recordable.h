@@ -3,11 +3,17 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <cstddef>
 #include <memory>
 #include <unordered_map>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -17,8 +23,6 @@ namespace sdk
 {
 namespace logs
 {
-class LogRecordProcessor;
-
 class MultiRecordable final : public Recordable
 {
 public:
