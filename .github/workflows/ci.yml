@@ -30,7 +30,7 @@ jobs:
 
   cmake_gcc_maintainer_sync_test:
     name: CMake gcc 14 (maintainer mode, sync)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -63,7 +63,7 @@ jobs:
 
   cmake_gcc_maintainer_async_test:
     name: CMake gcc 14 (maintainer mode, async)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -96,7 +96,7 @@ jobs:
 
   cmake_clang_maintainer_sync_test:
     name: CMake clang 18 (maintainer mode, sync)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -129,7 +129,7 @@ jobs:
 
   cmake_clang_maintainer_async_test:
     name: CMake clang 18 (maintainer mode, async)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -162,7 +162,7 @@ jobs:
 
   cmake_clang_maintainer_abiv2_test:
     name: CMake clang 18 (maintainer mode, abiv2)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -244,7 +244,7 @@ jobs:
 
   cmake_abseil_stl_test:
     name: CMake test (with abseil)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -274,7 +274,7 @@ jobs:
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -290,7 +290,7 @@ jobs:
 
   cmake_test_cxx17_gcc:
     name: CMake C++17 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -306,7 +306,7 @@ jobs:
 
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -406,7 +406,7 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -447,7 +447,7 @@ jobs:
 
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -463,7 +463,7 @@ jobs:
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -479,7 +479,7 @@ jobs:
 
   cmake_install_test:
     name: CMake install test (with abseil)
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -731,7 +731,7 @@ jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: setup
@@ -741,7 +741,7 @@ jobs:
 
   copyright:
     name: Copyright
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: check copyright
