@@ -7,7 +7,6 @@
 #include <memory>
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

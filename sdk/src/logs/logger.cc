@@ -31,11 +31,10 @@ namespace sdk
 namespace logs
 {
 namespace trace_api = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
 Logger::Logger(
-    nostd::string_view name,
+    opentelemetry::nostd::string_view name,
     std::shared_ptr<LoggerContext> context,
     std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
@@ -43,12 +42,12 @@ Logger::Logger(
       context_(context)
 {}
 
-const nostd::string_view Logger::GetName() noexcept
+const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
   return logger_name_;
 }
 
-nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
+opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
   auto recordable = context_->GetProcessor().MakeRecordable();
 
@@ -59,10 +58,12 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
             opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
+    if (opentelemetry::nostd::holds_alternative<
+            opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
     {
-      nostd::shared_ptr<opentelemetry::trace::Span> &data =
-          nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value);
+      opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> &data =
+          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(
+              context_value);
       if (data)
       {
         recordable->SetTraceId(data->GetContext().trace_id());
@@ -70,10 +71,12 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
         recordable->SetSpanId(data->GetContext().span_id());
       }
     }
-    else if (nostd::holds_alternative<nostd::shared_ptr<trace::SpanContext>>(context_value))
+    else if (opentelemetry::nostd::holds_alternative<
+                 opentelemetry::nostd::shared_ptr<trace::SpanContext>>(context_value))
     {
-      nostd::shared_ptr<trace::SpanContext> &data =
-          nostd::get<nostd::shared_ptr<trace::SpanContext>>(context_value);
+      opentelemetry::nostd::shared_ptr<trace::SpanContext> &data =
+          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<trace::SpanContext>>(
+              context_value);
       if (data)
       {
         recordable->SetTraceId(data->trace_id());
@@ -83,10 +86,11 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     }
   }
 
-  return nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+  return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
 
-void Logger::EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
+void Logger::EmitLogRecord(
+    opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!log_record)
   {

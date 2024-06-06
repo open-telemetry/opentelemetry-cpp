@@ -3,11 +3,14 @@
 
 #include <stdint.h>
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <ctime>
 #include <iterator>
 #include <map>
 #include <mutex>
+#include <ostream>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -17,9 +20,14 @@
 #include "opentelemetry/exporters/ostream/common_utils.h"
 #include "opentelemetry/exporters/ostream/metric_exporter.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 

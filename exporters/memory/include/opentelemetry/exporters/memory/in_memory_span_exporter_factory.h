@@ -3,8 +3,12 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <memory>
+
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
