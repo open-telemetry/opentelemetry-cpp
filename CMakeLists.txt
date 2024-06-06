@@ -343,12 +343,6 @@ if(MSVC)
     # __cplusplus flag is not supported by Visual Studio 2015
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
   endif()
-  # When using vcpkg, all targets build with the same runtime
-  if(VCPKG_TOOLCHAIN)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY
-        "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<STREQUAL:${VCPKG_CRT_LINKAGE},dynamic>:DLL>"
-        CACHE STRING "")
-  endif()
 endif()
 
 # include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
