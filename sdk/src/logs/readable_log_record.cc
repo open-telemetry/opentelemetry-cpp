@@ -5,11 +5,14 @@
 #include <memory>
 #include <type_traits>
 
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

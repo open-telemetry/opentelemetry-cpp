@@ -1,12 +1,20 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdint.h>
 #include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <utility>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/multi_recordable.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -29,9 +29,6 @@ namespace sdk
 namespace logs
 {
 
-namespace nostd    = opentelemetry::nostd;
-namespace logs_api = opentelemetry::logs;
-
 LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                                opentelemetry::sdk::resource::Resource resource) noexcept
 {
@@ -65,11 +62,11 @@ LoggerProvider::~LoggerProvider()
   }
 }
 
-nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
-    nostd::string_view logger_name,
-    nostd::string_view library_name,
-    nostd::string_view library_version,
-    nostd::string_view schema_url,
+opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    opentelemetry::nostd::string_view logger_name,
+    opentelemetry::nostd::string_view library_name,
+    opentelemetry::nostd::string_view library_version,
+    opentelemetry::nostd::string_view schema_url,
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
@@ -88,7 +85,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     if (logger->GetName() == logger_name &&
         logger_lib.equal(library_name, library_version, schema_url))
     {
-      return nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+      return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
     }
   }
 
@@ -111,7 +108,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));
-  return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
+  return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept

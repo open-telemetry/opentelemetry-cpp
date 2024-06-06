@@ -17,7 +17,6 @@
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/nostd/detail/decay.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"

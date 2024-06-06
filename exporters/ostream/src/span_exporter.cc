@@ -1,14 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/span_exporter.h"
-#include "opentelemetry/exporters/ostream/common_utils.h"
-
 #include <iostream>
-#include <mutex>
-#include "opentelemetry/sdk_config.h"
+#include <utility>
 
-namespace nostd     = opentelemetry::nostd;
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
+
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace trace_api = opentelemetry::trace;
 namespace sdkcommon = opentelemetry::sdk::common;
@@ -45,7 +52,7 @@ std::unique_ptr<trace_sdk::Recordable> OStreamSpanExporter::MakeRecordable() noe
 }
 
 sdk::common::ExportResult OStreamSpanExporter::Export(
-    const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept
 {
   if (isShutdown())
   {

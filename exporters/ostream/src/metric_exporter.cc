@@ -1,19 +1,27 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/metric_exporter.h"
-#include "opentelemetry/exporters/ostream/common_utils.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk_config.h"
-
+#include <stdint.h>
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+#include <iterator>
 #include <map>
 #include <mutex>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/exporters/ostream/metric_exporter.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 namespace
 {
