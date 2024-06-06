@@ -6,6 +6,8 @@
 #include <string>
 
 #include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -16,9 +18,6 @@ namespace sdk
 {
 namespace logs
 {
-class Logger;
-class LogRecord;
-
 class EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:

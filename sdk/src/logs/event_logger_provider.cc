@@ -2,14 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/event_logger.h"
-
-#include <memory>
-#include <mutex>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
