@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/version.h"
-
+#include <chrono>
 #include <mutex>
+#include <utility>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -16,8 +16,6 @@ namespace sdk
 {
 namespace metrics
 {
-struct ResourceMetrics;
-
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */

@@ -2,12 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
+#include <chrono>
+#include <memory>
 #include <ostream>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"

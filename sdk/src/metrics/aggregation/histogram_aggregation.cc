@@ -1,15 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/version.h"
-
 #include <algorithm>
-#include <iomanip>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <mutex>
+#include <utility>
+
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

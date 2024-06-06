@@ -4,10 +4,15 @@
 #include <algorithm>
 #include <cstdint>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <ostream>
 #include <string>
 #include <utility>
+#include <vector>
 
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
