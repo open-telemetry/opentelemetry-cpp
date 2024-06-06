@@ -1,9 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
+#include <cstdint>
+#include <limits>
 #include <utility>
+#include <vector>
 
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

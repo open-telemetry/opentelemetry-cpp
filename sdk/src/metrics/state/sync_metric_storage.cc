@@ -1,9 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
+#include <mutex>
 #include <utility>
 
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
