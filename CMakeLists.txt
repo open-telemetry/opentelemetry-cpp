@@ -13,6 +13,11 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
+# Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
@@ -342,12 +347,6 @@ if(MSVC)
   if(MSVC_VERSION GREATER 1900)
     # __cplusplus flag is not supported by Visual Studio 2015
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
-  endif()
-  # When using vcpkg, all targets build with the same runtime
-  if(VCPKG_TOOLCHAIN)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY
-        "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<STREQUAL:${VCPKG_CRT_LINKAGE},dynamic>:DLL>"
-        CACHE STRING "")
   endif()
 endif()
 
