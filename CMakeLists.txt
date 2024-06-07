@@ -13,6 +13,11 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
+# Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
