@@ -9,6 +9,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/plugin/hook.h"
+#include "opentelemetry/plugin/tracer.h"
 #include "tracer.h"
 
 namespace nostd  = opentelemetry::nostd;
