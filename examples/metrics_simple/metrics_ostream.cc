@@ -11,7 +11,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
