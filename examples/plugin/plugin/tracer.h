@@ -20,7 +20,11 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/,
       const opentelemetry::trace::StartSpanOptions & /*options */) noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
   void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 };

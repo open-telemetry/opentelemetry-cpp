@@ -9,8 +9,8 @@ Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry
 Create@BatchLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
 Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
 Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
-ForceFlush@TracerProvider@trace@sdk@v1@opentelemetry
-ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry
+TracerProvider@trace@sdk@v1@opentelemetry
+LoggerProvider@logs@sdk@v1@opentelemetry
 OStreamLogRecordExporter@logs@exporter@v1@opentelemetry
 Create@OStreamMetricExporterFactory@metrics@exporter@v1@opentelemetry
 Create@PeriodicExportingMetricReaderFactory@metrics@sdk@v1@opentelemetry
@@ -21,6 +21,7 @@ Create@MeterSelectorFactory@metrics@sdk@v1@opentelemetry
 Create@InstrumentSelectorFactory@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterProvider@metrics@sdk@v1@opentelemetry
+MeterProvider@metrics@sdk@v1@opentelemetry
 AddView@MeterProvider@metrics@sdk@v1@opentelemetry
 
 #if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)

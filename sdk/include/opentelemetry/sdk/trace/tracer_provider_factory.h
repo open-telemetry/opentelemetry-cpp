@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
@@ -27,20 +28,28 @@ namespace trace
 class OPENTELEMETRY_EXPORT TracerProviderFactory
 {
 public:
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+
+#  ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+
   /* Serie of builders with a single processor. */
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       const opentelemetry::sdk::resource::Resource &resource);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<SpanProcessor> processor,
       const opentelemetry::sdk::resource::Resource &resource,
@@ -49,18 +58,22 @@ public:
 
   /* Serie of builders with a vector of processor. */
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource,
       std::unique_ptr<Sampler> sampler);
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       const opentelemetry::sdk::resource::Resource &resource,
@@ -69,8 +82,60 @@ public:
 
   /* Create with a tracer context. */
 
+  OPENTELEMETRY_DEPRECATED
   static std::unique_ptr<opentelemetry::trace::TracerProvider> Create(
       std::unique_ptr<TracerContext> context);
+
+#  endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
+
+#else
+
+  /* Serie of builders with a single processor. */
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::unique_ptr<SpanProcessor> processor);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::unique_ptr<SpanProcessor> processor,
+      const opentelemetry::sdk::resource::Resource &resource);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::unique_ptr<SpanProcessor> processor,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<Sampler> sampler);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::unique_ptr<SpanProcessor> processor,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<Sampler> sampler,
+      std::unique_ptr<IdGenerator> id_generator);
+
+  /* Serie of builders with a vector of processor. */
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::vector<std::unique_ptr<SpanProcessor>> &&processors);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<Sampler> sampler);
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+      const opentelemetry::sdk::resource::Resource &resource,
+      std::unique_ptr<Sampler> sampler,
+      std::unique_ptr<IdGenerator> id_generator);
+
+  /* Create with a tracer context. */
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> Create(
+      std::unique_ptr<TracerContext> context);
+
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 };
 
 }  // namespace trace
