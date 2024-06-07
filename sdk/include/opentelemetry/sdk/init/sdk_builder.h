@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
@@ -15,12 +16,13 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/registry.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/trace/tracer_provider.h"
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -81,7 +83,7 @@ public:
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateExtensionSpanProcessor(
       const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) const;
 
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateProcessor(
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSpanProcessor(
       const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
       const;
 
@@ -110,7 +112,21 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model)
       const;
 
-  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateBatchLogRecordProcessor(
+      const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateSimpleLogRecordProcessor(
+      const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateExtensionLogRecordProcessor(
+      const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateLogRecordProcessor(
+      const std::unique_ptr<opentelemetry::sdk::configuration::LogRecordProcessorConfiguration>
+          &model) const;
+
+  std::unique_ptr<opentelemetry::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
       const;
 
