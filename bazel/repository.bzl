@@ -55,7 +55,9 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # Load this before grpc to pull a newer version
+    # gRPC transitively depends on apple_support and rules_apple at older
+    # versions. Bazel 7.x requires newer versions of these rules. By loading
+    # them before grpc, these newer versions are preferrred.
     maybe(
         http_archive,
         name = "build_bazel_apple_support",
