@@ -20,6 +20,7 @@
 #  include <stdexcept>
 #  include <string>
 
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -45,7 +46,7 @@ public:
 
   string_view(const char *str) noexcept : length_(std::strlen(str)), data_(str) {}
 
-  string_view(const std::basic_string<char> &str) noexcept
+  string_view(const std::basic_string<char> &str OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND) noexcept
       : length_(str.length()), data_(str.c_str())
   {}
 
