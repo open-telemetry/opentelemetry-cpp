@@ -51,9 +51,6 @@ jobs:
           refsutil dedup d:\d /s
       - name: test otel_sdk
         run: |
-          echo "build --bes_results_url=https://app.buildbuddy.io/invocation/" > ../top.bazelrc
-          echo "build --bes_backend=grpcs://remote.buildbuddy.io" >> ../top.bazelrc
-          echo "build --remote_header=x-buildbuddy-api-key=IBmejTnDhjBp4H9xO5Vr" >> ../top.bazelrc
           echo "build --disk_cache=d:/d" >> ../top.bazelrc
           echo "common --repository_cache=d:/r" >> ../top.bazelrc
           echo "startup --output_user_root=d:/b" >> ../top.bazelrc
