@@ -208,6 +208,30 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   eval "$MAKE_COMMAND"
   make test
   exit 0
+elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DWITH_ZIPKIN=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_MAINTAINER_MODE=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_CONFIGURATION=ON \
+        ${IWYU} \
+        "${SRC_DIR}"
+  eval "$MAKE_COMMAND"
+  make test
+  exit 0
 elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *

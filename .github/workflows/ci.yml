@@ -128,18 +128,19 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_yaml_config:
-    name: CMake clang 15 (maintainer mode, yaml, sync)
-    runs-on: ubuntu-latest
+    name: CMake clang 18 (maintainer mode, yaml config)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
@@ -149,7 +150,7 @@ jobs:
         CC: /usr/bin/clang-15
         CXX: /usr/bin/clang++-15
       run: |
-        ./ci/do_ci.sh cmake.maintainer.sync.test
+        ./ci/do_ci.sh cmake.maintainer.yaml.test
     - name: generate test cert
       env:
         CFSSL_VERSION: 1.6.3
