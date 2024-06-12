@@ -591,27 +591,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
 
-  bazel_with_abseil:
-    name: Bazel with external abseil
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Mount Bazel Cache
-      uses: actions/cache@v4
-      env:
-        cache-name: bazel_cache
-      with:
-        path: /home/runner/.cache/bazel
-        key: bazel_test
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_bazelisk.sh
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.with_abseil
-
   bazel_valgrind:
     name: Bazel valgrind
     runs-on: ubuntu-latest

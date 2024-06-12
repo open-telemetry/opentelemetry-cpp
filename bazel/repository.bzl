@@ -1,17 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-_ALL_CONTENT = """
-filegroup(
-    name = "all_srcs",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
-"""
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 #
 # MAINTAINER
@@ -55,54 +46,40 @@ def opentelemetry_cpp_deps():
 
     # Load abseil dependency(optional)
     maybe(
-        #
-        # Important note:
-        #
-        # The bazel build uses abseil-cpp-20230802.2 here,
-        # while CMake uses more recent versions.
-        #
-        # bazel with abseil-cpp-20240116.2 : build failures in CI
-        # bazel with abseil-cpp-20240116.1 : build failures in CI
-        #
-        # TODO: Fix issue #2619
-        #
         http_archive,
         name = "com_google_absl",
-        sha256 = "7c11539617af1f332f0854a6fb21e296a1b29c27d03f23c7b49d4adefcd102cc",
-        strip_prefix = "abseil-cpp-20230802.2",
+        sha256 = "733726b8c3a6d39a4120d7e45ea8b41a434cdacde401cba500f14236c49b39dc",
+        strip_prefix = "abseil-cpp-20240116.2",
         urls = [
-            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20230802.2.tar.gz",
+            "https://github.com/abseil/abseil-cpp/archive/refs/tags/20240116.2.tar.gz",
         ],
+    )
+
+    # gRPC transitively depends on apple_support and rules_apple at older
+    # versions. Bazel 7.x requires newer versions of these rules. By loading
+    # them before grpc, these newer versions are preferrred.
+    maybe(
+        http_archive,
+        name = "build_bazel_apple_support",
+        sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
+        url = "https://github.com/bazelbuild/apple_support/releases/download/1.15.1/apple_support.1.15.1.tar.gz",
+    )
+
+    maybe(
+        http_archive,
+        name = "build_bazel_rules_apple",
+        sha256 = "b4df908ec14868369021182ab191dbd1f40830c9b300650d5dc389e0b9266c8d",
+        url = "https://github.com/bazelbuild/rules_apple/releases/download/3.5.1/rules_apple.3.5.1.tar.gz",
     )
 
     # Load gRPC dependency
     maybe(
         http_archive,
-        name = "com_github_grpc_grpc_legacy",
-        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
-        strip_prefix = "grpc-1.39.1",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "com_github_grpc_grpc_latest11",
-        sha256 = "e266aa0d9d9cddb876484a370b94f468248594a96ca0b6f87c21f969db2b8c5b",
-        strip_prefix = "grpc-1.46.4",
-        urls = [
-            "https://github.com/grpc/grpc/archive/v1.46.4.tar.gz",
-        ],
-    )
-
-    maybe(
-        http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
-        strip_prefix = "grpc-1.49.2",
+        sha256 = "f40bde4ce2f31760f65dc49a2f50876f59077026494e67dccf23992548b1b04f",
+        strip_prefix = "grpc-1.62.0",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
+            "https://github.com/grpc/grpc/archive/refs/tags/v1.62.0.tar.gz",
         ],
     )
 
@@ -144,10 +121,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "platforms",
-        sha256 = "5308fc1d8865406a49427ba24a9ab53087f17f5266a7aabbfc28823f3916e1ca",
+        sha256 = "218efe8ee736d26a3572663b374a253c012b716d8af0c07e842e82f238a0a7ee",
         urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
-            "https://github.com/bazelbuild/platforms/releases/download/0.0.6/platforms-0.0.6.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/platforms/releases/download/0.0.10/platforms-0.0.10.tar.gz",
+            "https://github.com/bazelbuild/platforms/releases/download/0.0.10/platforms-0.0.10.tar.gz",
         ],
     )
 

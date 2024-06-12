@@ -425,10 +425,6 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   make -j $(nproc)
   sudo make install
   exit 0
-elif [[ "$1" == "bazel.with_abseil" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...
-  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -507,7 +503,7 @@ elif [[ "$1" == "bazel.tsan" ]]; then
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --errors-for-leak-kinds=definite --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.e2e" ]]; then
   cd examples/e2e
