@@ -538,7 +538,7 @@ jobs:
       run: ./ci/do_ci.sh bazel.test
 
   bazel_no_bzlmod_test:
-    name: Bazel
+    name: Bazel without bzlmod
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
