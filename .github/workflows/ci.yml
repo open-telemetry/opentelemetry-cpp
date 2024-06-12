@@ -147,8 +147,8 @@ jobs:
         sudo -E ./ci/install_ryml.sh
     - name: run cmake clang (maintainer mode, sync)
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.yaml.test
     - name: generate test cert
