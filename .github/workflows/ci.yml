@@ -7,6 +7,26 @@ on:
     branches: [ main ]
 
 jobs:
+  arm_test:
+    name: CMake test on ARM (without otlp-exporter)
+    runs-on: actuated-arm64-4cpu-16gb
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_googletest.sh
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: run cmake tests (without otlp-exporter)
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        ./ci/do_ci.sh cmake.test
   cmake_test:
     name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
