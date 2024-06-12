@@ -65,7 +65,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&... args)
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
   {
     if (!log_record)
     {
@@ -97,13 +97,9 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(ArgumentType &&... args)
+  void EmitLogRecord(ArgumentType &&...args)
   {
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
-    if (!log_record)
-    {
-      return;
-    }
 
     EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
@@ -124,7 +120,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Trace(ArgumentType &&... args) noexcept
+  void Trace(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -148,7 +144,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Debug(ArgumentType &&... args) noexcept
+  void Debug(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -172,7 +168,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Info(ArgumentType &&... args) noexcept
+  void Info(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -196,7 +192,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Warn(ArgumentType &&... args) noexcept
+  void Warn(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -220,7 +216,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Error(ArgumentType &&... args) noexcept
+  void Error(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -244,7 +240,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Fatal(ArgumentType &&... args) noexcept
+  void Fatal(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,

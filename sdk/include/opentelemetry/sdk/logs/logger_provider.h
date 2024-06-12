@@ -26,7 +26,7 @@ class Logger;
 class LoggerContext;
 class LogRecordProcessor;
 
-class LoggerProvider final : public opentelemetry::logs::LoggerProvider
+class OPENTELEMETRY_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

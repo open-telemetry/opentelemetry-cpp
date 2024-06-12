@@ -29,25 +29,26 @@ jobs:
         ./ci/do_ci.sh cmake.test
 
   cmake_gcc_maintainer_sync_test:
-    name: CMake gcc 13 (maintainer mode, sync)
-    runs-on: ubuntu-latest
+    name: CMake gcc 14 (maintainer mode, sync)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-13
-        CXX: /usr/bin/g++-13
+        CC: /usr/bin/gcc-14
+        CXX: /usr/bin/g++-14
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, sync)
       env:
-        CC: /usr/bin/gcc-13
-        CXX: /usr/bin/g++-13
+        CC: /usr/bin/gcc-14
+        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -61,25 +62,26 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_gcc_maintainer_async_test:
-    name: CMake gcc 13 (maintainer mode, async)
-    runs-on: ubuntu-latest
+    name: CMake gcc 14 (maintainer mode, async)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/gcc-13
-        CXX: /usr/bin/g++-13
+        CC: /usr/bin/gcc-14
+        CXX: /usr/bin/g++-14
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake gcc (maintainer mode, async)
       env:
-        CC: /usr/bin/gcc-13
-        CXX: /usr/bin/g++-13
+        CC: /usr/bin/gcc-14
+        CXX: /usr/bin/g++-14
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -93,25 +95,26 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_sync_test:
-    name: CMake clang 15 (maintainer mode, sync)
-    runs-on: ubuntu-latest
+    name: CMake clang 18 (maintainer mode, sync)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, sync)
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.sync.test
     - name: generate test cert
@@ -125,25 +128,26 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_async_test:
-    name: CMake clang 15 (maintainer mode, async)
-    runs-on: ubuntu-latest
+    name: CMake clang 18 (maintainer mode, async)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, async)
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.async.test
     - name: generate test cert
@@ -157,25 +161,26 @@ jobs:
         (cd ./functional/otlp; ./run_test.sh)
 
   cmake_clang_maintainer_abiv2_test:
-    name: CMake clang 15 (maintainer mode, abiv2)
-    runs-on: ubuntu-latest
+    name: CMake clang 18 (maintainer mode, abiv2)
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
     - name: setup
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
         PROTOBUF_VERSION: 21.12
       run: |
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/install_protobuf.sh
     - name: run cmake clang (maintainer mode, abiv2)
       env:
-        CC: /usr/bin/clang-15
-        CXX: /usr/bin/clang++-15
+        CC: /usr/bin/clang-18
+        CXX: /usr/bin/clang++-18
       run: |
         ./ci/do_ci.sh cmake.maintainer.abiv2.test
     - name: generate test cert
@@ -553,27 +558,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.with_async_export.test
 
-  bazel_with_abseil:
-    name: Bazel with external abseil
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-    - name: Mount Bazel Cache
-      uses: actions/cache@v4
-      env:
-        cache-name: bazel_cache
-      with:
-        path: /home/runner/.cache/bazel
-        key: bazel_test
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_bazelisk.sh
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.with_abseil
-
   bazel_valgrind:
     name: Bazel valgrind
     runs-on: ubuntu-latest
@@ -726,11 +710,11 @@ jobs:
 
   format:
     name: Format
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: setup
-      run: sudo ./ci/install_format_tools.sh
+      run: sudo apt remove needrestart && sudo ./ci/install_format_tools.sh #refer: https://github.com/actions/runner-images/issues/9937
     - name: run tests
       run: ./ci/do_ci.sh format
 

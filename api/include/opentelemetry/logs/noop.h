@@ -34,11 +34,39 @@ class NoopLogger final : public Logger
 public:
   const nostd::string_view GetName() noexcept override { return "noop logger"; }
 
-  nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept override { return nullptr; }
+  nostd::unique_ptr<LogRecord> CreateLogRecord() noexcept override
+  {
+    /*
+     * Do not return memory shared between threads,
+     * a `new` + `delete` for each noop record can not be avoided,
+     * due to the semantic of unique_ptr.
+     */
+    return nostd::unique_ptr<LogRecord>(new NoopLogRecord());
+  }
 
   using Logger::EmitLogRecord;
 
   void EmitLogRecord(nostd::unique_ptr<LogRecord> &&) noexcept override {}
+
+private:
+  class NoopLogRecord : public LogRecord
+  {
+  public:
+    NoopLogRecord()           = default;
+    ~NoopLogRecord() override = default;
+
+    void SetTimestamp(common::SystemTimestamp /* timestamp */) noexcept override {}
+    void SetObservedTimestamp(common::SystemTimestamp /* timestamp */) noexcept override {}
+    void SetSeverity(logs::Severity /* severity */) noexcept override {}
+    void SetBody(const common::AttributeValue & /* message */) noexcept override {}
+    void SetAttribute(nostd::string_view /* key */,
+                      const common::AttributeValue & /* value */) noexcept override
+    {}
+    void SetEventId(int64_t /* id */, nostd::string_view /* name */) noexcept override {}
+    void SetTraceId(const trace::TraceId & /* trace_id */) noexcept override {}
+    void SetSpanId(const trace::SpanId & /* span_id */) noexcept override {}
+    void SetTraceFlags(const trace::TraceFlags & /* trace_flags */) noexcept override {}
+  };
 };
 
 /**

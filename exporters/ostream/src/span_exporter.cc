@@ -70,8 +70,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
       span->GetSpanId().ToLowerBase16(span_id);
       span->GetParentSpanId().ToLowerBase16(parent_span_id);
 
-      sout_ << "{"
-            << "\n  name          : " << span->GetName()
+      sout_ << "{" << "\n  name          : " << span->GetName()
             << "\n  trace_id      : " << std::string(trace_id, 32)
             << "\n  span_id       : " << std::string(span_id, 16)
             << "\n  tracestate    : " << span->GetSpanContext().trace_state()->ToHeader()
@@ -106,16 +105,15 @@ bool OStreamSpanExporter::ForceFlush(std::chrono::microseconds /* timeout */) no
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
 }
 
 bool OStreamSpanExporter::isShutdown() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;
 }
+
 void OStreamSpanExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
     const std::string prefix)
@@ -131,8 +129,7 @@ void OStreamSpanExporter::printEvents(const std::vector<trace_sdk::SpanDataEvent
 {
   for (const auto &event : events)
   {
-    sout_ << "\n\t{"
-          << "\n\t  name          : " << event.GetName()
+    sout_ << "\n\t{" << "\n\t  name          : " << event.GetName()
           << "\n\t  timestamp     : " << event.GetTimestamp().time_since_epoch().count()
           << "\n\t  attributes    : ";
     printAttributes(event.GetAttributes(), "\n\t\t");
@@ -148,8 +145,7 @@ void OStreamSpanExporter::printLinks(const std::vector<trace_sdk::SpanDataLink> 
     char span_id[16]  = {0};
     link.GetSpanContext().trace_id().ToLowerBase16(trace_id);
     link.GetSpanContext().span_id().ToLowerBase16(span_id);
-    sout_ << "\n\t{"
-          << "\n\t  trace_id      : " << std::string(trace_id, 32)
+    sout_ << "\n\t{" << "\n\t  trace_id      : " << std::string(trace_id, 32)
           << "\n\t  span_id       : " << std::string(span_id, 16)
           << "\n\t  tracestate    : " << link.GetSpanContext().trace_state()->ToHeader()
           << "\n\t  attributes    : ";
