@@ -17,7 +17,6 @@ config_setting(
     name = "with_dll_enabled",
     flag_values = {
         "with_dll": "true",
-        "//api:with_abseil": "false",
     },
     visibility = ["//visibility:public"],
 )
