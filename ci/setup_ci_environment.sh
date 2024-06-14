@@ -8,6 +8,8 @@ apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y \
                 build-essential \
                 cmake \
+                g++-10 \
+                gcc-10 \
                 ca-certificates \
                 wget \
                 git \
