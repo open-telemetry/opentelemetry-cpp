@@ -19,8 +19,8 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
-        sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_googletest.sh
     - name: run cmake tests (without otlp-exporter)
       env:
         CC: /usr/bin/gcc-10
