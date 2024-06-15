@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -13,8 +14,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-class MeterSelector;
 
 class OPENTELEMETRY_EXPORT MeterSelectorFactory
 {

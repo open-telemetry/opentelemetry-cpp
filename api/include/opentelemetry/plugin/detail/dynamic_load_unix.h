@@ -3,10 +3,9 @@
 
 #pragma once
 
+#include <dlfcn.h>
 #include <algorithm>
 #include <memory>
-
-#include <dlfcn.h>
 
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/loader_info.h"

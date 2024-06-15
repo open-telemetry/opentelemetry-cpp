@@ -24,6 +24,9 @@ Increment the:
 * [API/SDK] Provider cleanup
   [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
 
+* [Code health] include-what-you-use cleanup
+  [#2692](https://github.com/open-telemetry/opentelemetry-cpp/pull/2692)
+
 Important changes:
 
 * [API/SDK] Provider cleanup

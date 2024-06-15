@@ -1,27 +1,46 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <cstdint>
+#include <memory>
+#include <mutex>
+#include <ostream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/observable_registry.h"
+#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"
 #endif
-
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-#include "opentelemetry/sdk/metrics/state/observable_registry.h"
-#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
-
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
-#include "opentelemetry/sdk_config.h"
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -30,7 +49,6 @@ namespace metrics
 {
 
 namespace metrics = opentelemetry::metrics;
-namespace nostd   = opentelemetry::nostd;
 
 Meter::Meter(
     std::weak_ptr<MeterContext> meter_context,
@@ -40,38 +58,38 @@ Meter::Meter(
       observable_registry_(new ObservableRegistry())
 {}
 
-nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Counter - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::Counter<uint64_t>>(
+    return opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>>(
         new metrics::NoopCounter<uint64_t>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::Counter<uint64_t>>(
+  return opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>>(
       new LongCounter(instrument_descriptor, std::move(storage)));
 }
 
-nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleCounter - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::Counter<double>>(
+    return opentelemetry::nostd::unique_ptr<metrics::Counter<double>>(
         new metrics::NoopCounter<double>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -79,14 +97,14 @@ nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter,
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::Counter<double>>{
+  return opentelemetry::nostd::unique_ptr<metrics::Counter<double>>{
       new DoubleCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt64ObservableCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateInt64ObservableCounter(opentelemetry::nostd::string_view name,
+                                    opentelemetry::nostd::string_view description,
+                                    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -100,14 +118,14 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
-Meter::CreateDoubleObservableCounter(nostd::string_view name,
-                                     nostd::string_view description,
-                                     nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateDoubleObservableCounter(opentelemetry::nostd::string_view name,
+                                     opentelemetry::nostd::string_view description,
+                                     opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -121,21 +139,21 @@ Meter::CreateDoubleObservableCounter(nostd::string_view name,
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableCounter,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Histogram - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::Histogram<uint64_t>>(
+    return opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>>(
         new metrics::NoopHistogram<uint64_t>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -143,21 +161,21 @@ nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt64Histogram(
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::Histogram<uint64_t>>{
+  return opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>>{
       new LongHistogram(instrument_descriptor, std::move(storage))};
 }
 
-nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleHistogram - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::Histogram<double>>(
+    return opentelemetry::nostd::unique_ptr<metrics::Histogram<double>>(
         new metrics::NoopHistogram<double>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -165,14 +183,14 @@ nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::Histogram<double>>{
+  return opentelemetry::nostd::unique_ptr<metrics::Histogram<double>>{
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt64ObservableGauge(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateInt64ObservableGauge(opentelemetry::nostd::string_view name,
+                                  opentelemetry::nostd::string_view description,
+                                  opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -186,14 +204,14 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateInt
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDoubleObservableGauge(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateDoubleObservableGauge(opentelemetry::nostd::string_view name,
+                                   opentelemetry::nostd::string_view description,
+                                   opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -207,21 +225,21 @@ nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> Meter::CreateDou
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableGauge,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateInt64UpDownCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateInt64UpDownCounter(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64UpDownCounter - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::UpDownCounter<int64_t>>(
+    return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>>(
         new metrics::NoopUpDownCounter<int64_t>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -229,21 +247,21 @@ nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateInt64UpDownCount
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::UpDownCounter<int64_t>>{
+  return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>>{
       new LongUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit) noexcept
+opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
+    opentelemetry::nostd::string_view name,
+    opentelemetry::nostd::string_view description,
+    opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleUpDownCounter - failed. Invalid parameters."
                             << name << " " << description << " " << unit
                             << ". Measurements won't be recorded.");
-    return nostd::unique_ptr<metrics::UpDownCounter<double>>(
+    return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>>(
         new metrics::NoopUpDownCounter<double>(name, description, unit));
   }
   InstrumentDescriptor instrument_descriptor = {
@@ -251,14 +269,14 @@ nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
-  return nostd::unique_ptr<metrics::UpDownCounter<double>>{
+  return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>>{
       new DoubleUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
-Meter::CreateInt64ObservableUpDownCounter(nostd::string_view name,
-                                          nostd::string_view description,
-                                          nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateInt64ObservableUpDownCounter(opentelemetry::nostd::string_view name,
+                                          opentelemetry::nostd::string_view description,
+                                          opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -272,14 +290,14 @@ Meter::CreateInt64ObservableUpDownCounter(nostd::string_view name,
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kLong};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
-nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
-Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
-                                           nostd::string_view description,
-                                           nostd::string_view unit) noexcept
+opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+Meter::CreateDoubleObservableUpDownCounter(opentelemetry::nostd::string_view name,
+                                           opentelemetry::nostd::string_view description,
+                                           opentelemetry::nostd::string_view unit) noexcept
 {
   if (!ValidateInstrument(name, description, unit))
   {
@@ -293,7 +311,7 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
       std::string{unit.data(), unit.size()}, InstrumentType::kObservableUpDownCounter,
       InstrumentValueType::kDouble};
   auto storage = RegisterAsyncMetricStorage(instrument_descriptor);
-  return nostd::shared_ptr<metrics::ObservableInstrument>{
+  return opentelemetry::nostd::shared_ptr<metrics::ObservableInstrument>{
       new ObservableInstrument(instrument_descriptor, std::move(storage), observable_registry_)};
 }
 
