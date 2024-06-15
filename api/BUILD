@@ -59,5 +59,5 @@ config_setting(
 bool_flag(
     name = "with_abseil",
     build_setting_default = False,
-    deprecation = "The value of this flag is ignored. Bazel builds always depend on Abseil for its pre-adopted `std::` types. You should remove this flag from your build command."
+    deprecation = "The value of this flag is ignored. Bazel builds always depend on Abseil for its pre-adopted `std::` types. You should remove this flag from your build command.",
 )
