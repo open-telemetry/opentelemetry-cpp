@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,8 +16,6 @@ namespace sdk
 {
 namespace logs
 {
-class Recordable;
-
 /**
  * Log processor allow hooks for receive method invocations.
  *

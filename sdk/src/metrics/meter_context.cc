@@ -1,14 +1,33 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter_context.h"
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <mutex>
+#include <ostream>
+#include <ratio>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#include "opentelemetry/sdk_config.h"
-
-#include <mutex>
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

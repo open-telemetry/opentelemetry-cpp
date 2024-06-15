@@ -1,13 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter_factory.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"

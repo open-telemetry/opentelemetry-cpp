@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -13,7 +14,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
