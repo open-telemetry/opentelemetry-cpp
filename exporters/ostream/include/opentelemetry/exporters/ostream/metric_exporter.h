@@ -4,25 +4,22 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <iostream>
+#include <map>
 #include <mutex>
 #include <string>
 
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace resource
-{
-class Resource;
-}  // namespace resource
-}  // namespace sdk
-
 namespace exporter
 {
 namespace metrics

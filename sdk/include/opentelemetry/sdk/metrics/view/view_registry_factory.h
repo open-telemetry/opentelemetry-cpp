@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,9 +13,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-class ViewRegistry;
-
 class ViewRegistryFactory
 {
 public:

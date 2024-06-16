@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/plugin/detail/utility.h"
+#include "opentelemetry/plugin/detail/utility.h"  // IWYU pragma: export
 #include "opentelemetry/plugin/tracer.h"
 #include "opentelemetry/version.h"
 

@@ -1,8 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
+#include <new>
+#include <utility>
+
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/plugin/hook.h"
+#include "opentelemetry/plugin/tracer.h"
 #include "tracer.h"
 #include "opentelemetry/plugin/dynamic_load.h"
 

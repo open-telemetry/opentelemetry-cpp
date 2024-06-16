@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -72,4 +72,10 @@ config_setting(
     name = "set_cxx_stdlib_best_and_msvc",
     constraint_values = ["@bazel_tools//tools/cpp:msvc"],
     flag_values = {":with_cxx_stdlib": "best"},
+)
+
+bool_flag(
+    name = "with_abseil",
+    build_setting_default = False,
+    deprecation = "The value of this flag is ignored. Bazel builds always depend on Abseil for its pre-adopted `std::` types. You should remove this flag from your build command.",
 )

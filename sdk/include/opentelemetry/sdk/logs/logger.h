@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/common/macros.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -19,7 +19,6 @@ namespace sdk
 {
 namespace logs
 {
-class LoggerProvider;
 
 class OPENTELEMETRY_EXPORT Logger final : public opentelemetry::logs::Logger
 {

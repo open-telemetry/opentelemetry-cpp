@@ -5,20 +5,19 @@
 
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
-class Logger;
-class LogRecord;
-
 class OPENTELEMETRY_EXPORT EventLogger final : public opentelemetry::logs::EventLogger
 {
 public:
@@ -46,7 +45,6 @@ private:
   nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger_;
   std::string event_domain_;
 };
-
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

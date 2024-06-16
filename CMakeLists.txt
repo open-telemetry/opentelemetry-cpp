@@ -377,7 +377,9 @@ if(WITH_PROMETHEUS)
 endif()
 
 if(WITH_ABSEIL)
-  find_package(absl CONFIG REQUIRED)
+  if(NOT TARGET absl::strings)
+    find_package(absl CONFIG REQUIRED)
+  endif()
 endif()
 
 if(WITH_OTLP_GRPC

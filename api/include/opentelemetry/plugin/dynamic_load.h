@@ -7,9 +7,9 @@
 #include <string>
 
 #ifdef _WIN32
-#  include "opentelemetry/plugin/detail/dynamic_load_windows.h"
+#  include "opentelemetry/plugin/detail/dynamic_load_windows.h"  // IWYU pragma: export
 #else
-#  include "opentelemetry/plugin/detail/dynamic_load_unix.h"
+#  include "opentelemetry/plugin/detail/dynamic_load_unix.h"  // IWYU pragma: export
 #endif
 #include "opentelemetry/version.h"
 

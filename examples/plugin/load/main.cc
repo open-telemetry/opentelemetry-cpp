@@ -1,14 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/plugin/dynamic_load.h"
-
-#include <cstring>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <string>
+
+#include "opentelemetry/plugin/dynamic_load.h"
+#include "opentelemetry/plugin/factory.h"
+#include "opentelemetry/trace/tracer.h"
 
 int main(int argc, char *argv[])
 {

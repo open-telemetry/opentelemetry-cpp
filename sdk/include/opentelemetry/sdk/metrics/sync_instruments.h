@@ -3,8 +3,12 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <memory>
+#include <utility>
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -16,9 +20,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-// forward declaration
-class SyncWritableMetricStorage;
 
 class Synchronous
 {
