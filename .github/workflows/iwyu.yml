@@ -27,6 +27,7 @@ jobs:
             libcurl4-openssl-dev \
             libprotobuf-dev \
             libgrpc-dev \
+            libgrpc++-dev \
             protobuf-compiler \
             libgmock-dev \
             libgtest-dev \
