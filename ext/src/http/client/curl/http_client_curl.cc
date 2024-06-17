@@ -1,12 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include <zconf.h>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <list>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 

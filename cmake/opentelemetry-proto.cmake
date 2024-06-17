@@ -329,7 +329,7 @@ add_library(
 # Disable include-what-you-use on generated code.
 set_target_properties(
   opentelemetry_proto
-  PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE ""
+  PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
 )
 
 if(WITH_ABSEIL)

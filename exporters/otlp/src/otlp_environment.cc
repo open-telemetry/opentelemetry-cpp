@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
+#include <map>
+#include <string>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
@@ -12,6 +15,7 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
 
 namespace nostd      = opentelemetry::nostd;
 namespace sdk_common = opentelemetry::sdk::common;
