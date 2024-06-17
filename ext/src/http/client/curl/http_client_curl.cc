@@ -23,11 +23,12 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zlib.h>
+#else
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE

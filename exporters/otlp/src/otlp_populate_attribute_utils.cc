@@ -1,7 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdint.h>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 namespace nostd = opentelemetry::nostd;
 
