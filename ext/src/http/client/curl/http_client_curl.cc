@@ -1,14 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curlver.h>
+#include <zconf.h>
+#include <list>
+
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <zlib.h>
 #endif
-
-#include <list>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

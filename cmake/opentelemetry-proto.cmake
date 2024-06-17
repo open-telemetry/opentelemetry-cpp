@@ -326,6 +326,12 @@ add_library(
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
 
+# Disable include-what-you-use on generated code.
+set_target_properties(
+  opentelemetry_proto
+  PROPERTIES CMAKE_CXX_INCLUDE_WHAT_YOU_USE ""
+)
+
 if(WITH_ABSEIL)
   target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
 endif()
