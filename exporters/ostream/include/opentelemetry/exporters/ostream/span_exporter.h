@@ -3,15 +3,24 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/version.h"
-
 #include <atomic>
+#include <chrono>
 #include <iostream>
 #include <map>
-#include <sstream>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

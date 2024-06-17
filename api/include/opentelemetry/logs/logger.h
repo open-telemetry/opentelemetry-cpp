@@ -54,9 +54,9 @@ public:
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -86,9 +86,9 @@ public:
    *  Severity                                -> severity, severity_text
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -109,9 +109,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -133,9 +133,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -157,9 +157,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -181,9 +181,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -205,9 +205,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
@@ -229,9 +229,9 @@ public:
    * @tparam args Arguments which can be used to set data of log record by type.
    *  string_view                             -> body
    *  AttributeValue                          -> body
-   *  SpanContext                             -> span_id,tace_id and trace_flags
+   *  SpanContext                             -> span_id,trace_id and trace_flags
    *  SpanId                                  -> span_id
-   *  TraceId                                 -> tace_id
+   *  TraceId                                 -> trace_id
    *  TraceFlags                              -> trace_flags
    *  SystemTimestamp                         -> timestamp
    *  system_clock::time_point                -> timestamp
