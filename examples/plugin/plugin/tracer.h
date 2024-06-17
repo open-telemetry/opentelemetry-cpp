@@ -3,8 +3,15 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <memory>
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"
 
 class Tracer final : public opentelemetry::trace::Tracer,
@@ -20,7 +27,11 @@ public:
       const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/,
       const opentelemetry::trace::StartSpanOptions & /*options */) noexcept override;
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
   void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 };

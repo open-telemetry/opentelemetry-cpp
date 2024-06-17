@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include "opentelemetry/logs/event_logger.h"
 #include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
@@ -17,10 +19,8 @@ namespace sdk
 {
 namespace logs
 {
-class EventLogger;
-class Logger;
-
-class EventLoggerProvider final : public opentelemetry::logs::EventLoggerProvider
+class OPENTELEMETRY_EXPORT EventLoggerProvider final
+    : public opentelemetry::logs::EventLoggerProvider
 {
 public:
   EventLoggerProvider() noexcept;

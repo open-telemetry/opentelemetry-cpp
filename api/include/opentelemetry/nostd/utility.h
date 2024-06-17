@@ -15,8 +15,8 @@
 #  include <initializer_list>
 #  include <type_traits>
 
-#  include "opentelemetry/nostd/detail/decay.h"
-#  include "opentelemetry/nostd/detail/invoke.h"
+#  include "opentelemetry/nostd/detail/decay.h"   // IWYU pragma: export
+#  include "opentelemetry/nostd/detail/invoke.h"  // IWYU pragma: export
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -63,7 +63,7 @@ auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
 }
 
 template <class T, size_t N>
-size_t size(T (&/* array */)[N]) noexcept
+size_t size(T (& /* array */)[N]) noexcept
 {
   return N;
 }

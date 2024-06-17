@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/plugin/detail/tracer_handle.h"
+#include "opentelemetry/plugin/detail/tracer_handle.h"  // IWYU pragma: export
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
@@ -104,6 +104,8 @@ public:
     return nostd::shared_ptr<trace::Span>{new (std::nothrow) Span{this->shared_from_this(), span}};
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO == 1
+
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
   {
     tracer_handle_->tracer().ForceFlushWithMicroseconds(timeout);
@@ -113,6 +115,8 @@ public:
   {
     tracer_handle_->tracer().CloseWithMicroseconds(timeout);
   }
+
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 private:
   // Note: The order is important here.

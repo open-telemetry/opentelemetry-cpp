@@ -1,20 +1,38 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include <stdint.h>
+#include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
-#include <iostream>
-#include <mutex>
-#include <type_traits>
-
-namespace nostd     = opentelemetry::nostd;
 namespace sdklogs   = opentelemetry::sdk::logs;
 namespace sdkcommon = opentelemetry::sdk::common;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -33,7 +51,7 @@ std::unique_ptr<sdklogs::Recordable> OStreamLogRecordExporter::MakeRecordable() 
 }
 
 sdk::common::ExportResult OStreamLogRecordExporter::Export(
-    const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   if (isShutdown())
   {

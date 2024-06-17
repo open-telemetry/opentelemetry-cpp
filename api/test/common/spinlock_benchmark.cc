@@ -56,8 +56,7 @@ inline void SpinThrash(benchmark::State &s, SpinLockType &spinlock, LockF lock, 
 static void BM_SpinLockThrashing(benchmark::State &s)
 {
   SpinLockMutex spinlock;
-  SpinThrash(
-      s, spinlock, [](SpinLockMutex &m) { m.lock(); }, [](SpinLockMutex &m) { m.unlock(); });
+  SpinThrash(s, spinlock, [](SpinLockMutex &m) { m.lock(); }, [](SpinLockMutex &m) { m.unlock(); });
 }
 
 // Naive `while(try_lock()) {}` implementation of lock.

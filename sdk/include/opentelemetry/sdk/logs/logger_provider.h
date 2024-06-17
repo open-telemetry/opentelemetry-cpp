@@ -3,13 +3,19 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <vector>
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
@@ -22,11 +28,7 @@ namespace sdk
 {
 namespace logs
 {
-class Logger;
-class LoggerContext;
-class LogRecordProcessor;
-
-class LoggerProvider final : public opentelemetry::logs::LoggerProvider
+class OPENTELEMETRY_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

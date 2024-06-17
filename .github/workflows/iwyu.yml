@@ -1,0 +1,61 @@
+
+name: include-what-you-use
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  iwyu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: setup dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y --no-install-recommends --no-install-suggests \
+            build-essential \
+            iwyu \
+            cmake \
+            ninja-build \
+            libssl-dev \
+            libcurl4-openssl-dev \
+            libprotobuf-dev \
+            protobuf-compiler \
+            libgmock-dev \
+            libgtest-dev \
+            libbenchmark-dev
+
+      - name: Prepare CMake
+        run: |
+          TOPDIR=`pwd`
+          mkdir build && cd build
+          CC="clang" CXX="clang++" cmake \
+            -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
+            -DBUILD_TESTING=OFF \
+            -DWITH_DEPRECATED_SDK_FACTORY=OFF \
+            -DBUILD_W3CTRACECONTEXT_TEST=OFF \
+            ..
+
+      - name: iwyu_tool
+        run: |
+          cd build
+          make -k 2>&1 | tee -a iwyu.log
+
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: Logs (include-what-you-use)
+          path: ./build/*.log
+
+      - name: count warnings
+        run: |
+          cd build
+          COUNT=`grep -c "Warning:" iwyu.log`
+          echo "include-what-you-use reported ${COUNT} warning(s)"
+

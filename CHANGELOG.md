@@ -18,6 +18,66 @@ Increment the:
 * [SDK] Update ExemplarFilter and ExemplarReservoir for spec
   [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
 
+* [CI] Upgrade to clang-format 18
+  [#2684](https://github.com/open-telemetry/opentelemetry-cpp/pull/2684)
+
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+
+* [Code health] include-what-you-use cleanup
+  [#2692](https://github.com/open-telemetry/opentelemetry-cpp/pull/2692)
+
+Important changes:
+
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+  * Before this fix:
+    * The API class `opentelemetry::trace::Tracer` exposed methods such
+      as `ForceFlush()`, `ForceFlushWithMicroseconds()`, `Close()`
+      and `CloseWithMicroseconds()`.
+    * These methods are meant to be used when configuring the SDK,
+      and should not be part of the API. Exposing them was an oversight.
+    * Two of these methods are virtual, and therefore part of the ABI.
+  * After this fix:
+    * In `OPENTELEMETRY_ABI_VERSION_NO 1`, nothing is changed,
+      because removing this code would break the ABI.
+    * In `OPENTELEMETRY_ABI_VERSION_NO 2`, these methods are moved
+      from the API to the SDK. This is a breaking change for ABI version 2,
+      which is still experimental.
+  * In all cases, instrumenting an application should not
+    invoke flush or close on a tracer, do not use these methods.
+
+Breaking changes:
+
+* [API/SDK] Provider cleanup
+  [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+  * Before this fix:
+    * SDK factory methods such as:
+      * opentelemetry::sdk::trace::TracerProviderFactory::Create()
+      * opentelemetry::sdk::metrics::MeterProviderFactory::Create()
+      * opentelemetry::sdk::logs::LoggerProviderFactory::Create()
+      * opentelemetry::sdk::logs::EventLoggerProviderFactory::Create()
+      returned an API object (opentelemetry::trace::TracerProvider)
+      to the caller.
+  * After this fix, these methods return an SDK level object
+    (opentelemetry::sdk::trace::TracerProvider) to the caller.
+  * Returning an SDK object is necessary for the application to
+    cleanup and invoke SDK level methods, such as ForceFlush(),
+    on a provider.
+  * The application code that configures the SDK, by calling
+    the various provider factories, may need adjustment.
+  * All the examples have been updated, and in particular no
+    longer perform static_cast do convert an API object to an SDK object.
+    Please refer to examples for guidance on how to adjust.
+  * If adjusting application code is impractical,
+    an alternate and temporary solution is to build with option
+    WITH_DEPRECATED_SDK_FACTORY=ON in CMake.
+  * Option WITH_DEPRECATED_SDK_FACTORY=ON will allow to build code
+    without application changes, posponing changes for later.
+  * WITH_DEPRECATED_SDK_FACTORY=ON is temporary, only to provide
+    an easier migration path. Expect this flag to be removed,
+    as early as by the next release.
+
 Notes on experimental features:
 
 * [#2372](https://github.com/open-telemetry/opentelemetry-cpp/issues/2372)

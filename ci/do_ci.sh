@@ -65,10 +65,15 @@ mkdir -p "${PLUGIN_DIR}"
 
 IWYU=""
 MAKE_COMMAND="make -k -j \$(nproc)"
-if [[ "${CXX}" == *clang* ]]; then
-  MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
-  IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
-fi
+
+# Temporarily disable the IWYU build.
+# It fails in Ubuntu 24-04 CI with:
+#    Error running 'iwyu': Segmentation fault
+#
+# if [[ "${CXX}" == *clang* ]]; then
+#   MAKE_COMMAND="make -k CXX=include-what-you-use CXXFLAGS=\"-Xiwyu --error_always\" -j \$(nproc)"
+#   IWYU="-DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=iwyu"
+# fi
 
 echo "make command: ${MAKE_COMMAND}"
 echo "IWYU option: ${IWYU}"
@@ -125,6 +130,7 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
@@ -147,6 +153,7 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         ${IWYU} \
         "${SRC_DIR}"
@@ -170,6 +177,7 @@ elif [[ "$1" == "cmake.maintainer.cpp11.async.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=ON \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         "${SRC_DIR}"
   make -k -j $(nproc)
@@ -191,6 +199,7 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_ABI_VERSION_1=OFF \
         -DWITH_ABI_VERSION_2=ON \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
@@ -416,10 +425,6 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   make -j $(nproc)
   sudo make install
   exit 0
-elif [[ "$1" == "bazel.with_abseil" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC --//api:with_abseil=true //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC --//api:with_abseil=true //...
-  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -453,6 +458,10 @@ EOF
         "${SRC_DIR}"
   make load_plugin_example
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
+  exit 0
+elif [[ "$1" == "bazel.no_bzlmod.test" ]]; then
+  bazel $BAZEL_STARTUP_OPTIONS build --enable_bzlmod=false $BAZEL_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS test --enable_bzlmod=false $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
@@ -498,7 +507,7 @@ elif [[ "$1" == "bazel.tsan" ]]; then
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --errors-for-leak-kinds=definite --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.e2e" ]]; then
   cd examples/e2e

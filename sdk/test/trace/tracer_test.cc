@@ -109,8 +109,8 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   processors.push_back(std::move(processor));
   auto resource = Resource::Create({});
   auto context  = std::make_shared<TracerContext>(std::move(processors), resource,
-                                                 std::unique_ptr<Sampler>(sampler),
-                                                 std::unique_ptr<IdGenerator>(id_generator));
+                                                  std::unique_ptr<Sampler>(sampler),
+                                                  std::unique_ptr<IdGenerator>(id_generator));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
 

@@ -13,6 +13,11 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
   cmake_policy(SET CMP0074 NEW)
 endif()
 
+# Prefer CMAKE_MSVC_RUNTIME_LIBRARY if possible
+if(POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
@@ -153,6 +158,14 @@ endif()
 message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
+
+# This option is temporary, and will be removed. Set
+# WITH_DEPRECATED_SDK_FACTORY=OFF to migrate to the new SDK code.
+option(WITH_DEPRECATED_SDK_FACTORY "Use deprecated SDK provider factory" ON)
+
+if(WITH_DEPRECATED_SDK_FACTORY)
+  message(WARNING "WITH_DEPRECATED_SDK_FACTORY=ON is temporary and deprecated")
+endif()
 
 set(WITH_STL
     "OFF"
@@ -335,12 +348,6 @@ if(MSVC)
     # __cplusplus flag is not supported by Visual Studio 2015
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
   endif()
-  # When using vcpkg, all targets build with the same runtime
-  if(VCPKG_TOOLCHAIN)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY
-        "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<STREQUAL:${VCPKG_CRT_LINKAGE},dynamic>:DLL>"
-        CACHE STRING "")
-  endif()
 endif()
 
 # include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
@@ -370,7 +377,9 @@ if(WITH_PROMETHEUS)
 endif()
 
 if(WITH_ABSEIL)
-  find_package(absl CONFIG REQUIRED)
+  if(NOT TARGET absl::strings)
+    find_package(absl CONFIG REQUIRED)
+  endif()
 endif()
 
 if(WITH_OTLP_GRPC

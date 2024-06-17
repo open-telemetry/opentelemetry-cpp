@@ -3,17 +3,22 @@
 
 #pragma once
 
-#include <map>
+#include <chrono>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
@@ -22,11 +27,8 @@ namespace sdk
 {
 namespace trace
 {
-class SpanProcessor;
-class Tracer;
-class TracerContext;
 
-class TracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**

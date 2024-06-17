@@ -6,7 +6,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "random",
     srcs = [
-        "core.cc",
         "random.cc",
     ],
     hdrs = [

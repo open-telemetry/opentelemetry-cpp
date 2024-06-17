@@ -1,20 +1,31 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"
+#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector_factory.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_factory.h"
 
 #ifdef BAZEL_BUILD
@@ -46,10 +57,14 @@ void InitMetrics(const std::string &name)
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
 
-  auto u_provider = metrics_sdk::MeterProviderFactory::Create();
-  auto *p         = static_cast<metrics_sdk::MeterProvider *>(u_provider.get());
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+  auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+  auto *provider  = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
+#else
+  auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
-  p->AddMetricReader(std::move(reader));
+  provider->AddMetricReader(std::move(reader));
 
   // counter view
   std::string counter_name = name + "_counter";
@@ -63,7 +78,7 @@ void InitMetrics(const std::string &name)
   auto sum_view = metrics_sdk::ViewFactory::Create(name, "description", unit,
                                                    metrics_sdk::AggregationType::kSum);
 
-  p->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
+  provider->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
 
   // observable counter view
   std::string observable_counter_name = name + "_observable_counter";
@@ -76,8 +91,8 @@ void InitMetrics(const std::string &name)
   auto observable_sum_view = metrics_sdk::ViewFactory::Create(name, "test_description", unit,
                                                               metrics_sdk::AggregationType::kSum);
 
-  p->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
-             std::move(observable_sum_view));
+  provider->AddView(std::move(observable_instrument_selector), std::move(observable_meter_selector),
+                    std::move(observable_sum_view));
 
   // histogram view
   std::string histogram_name = name + "_histogram";
@@ -100,11 +115,16 @@ void InitMetrics(const std::string &name)
   auto histogram_view = metrics_sdk::ViewFactory::Create(
       name, "description", unit, metrics_sdk::AggregationType::kHistogram, aggregation_config);
 
-  p->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
-             std::move(histogram_view));
+  provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
+                    std::move(histogram_view));
 
-  std::shared_ptr<opentelemetry::metrics::MeterProvider> provider(std::move(u_provider));
-  metrics_api::Provider::SetMeterProvider(provider);
+#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(u_provider));
+#else
+  std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
+#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
+
+  metrics_api::Provider::SetMeterProvider(api_provider);
 }
 
 void CleanupMetrics()
