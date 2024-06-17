@@ -40,6 +40,12 @@ jobs:
             -DBUILD_TESTING=OFF \
             -DWITH_DEPRECATED_SDK_FACTORY=OFF \
             -DBUILD_W3CTRACECONTEXT_TEST=OFF \
+            -DWITH_OTLP_GRPC=ON \
+            -DWITH_OTLP_HTTP=ON \
+            -DWITH_OTLP_FILE=ON \
+            -DWITH_OTLP_HTTP_COMPRESSION=ON \
+            -DWITH_ZIPKIN=ON \
+            -DWITH_PROMETHEUS=ON \
             ..
 
       - name: iwyu_tool
