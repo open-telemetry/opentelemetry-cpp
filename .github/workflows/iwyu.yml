@@ -26,8 +26,6 @@ jobs:
             libssl-dev \
             libcurl4-openssl-dev \
             libprotobuf-dev \
-            libgrpc-dev \
-            libgrpc++-dev \
             protobuf-compiler \
             libgmock-dev \
             libgtest-dev \
@@ -43,12 +41,12 @@ jobs:
             -DBUILD_TESTING=OFF \
             -DWITH_DEPRECATED_SDK_FACTORY=OFF \
             -DBUILD_W3CTRACECONTEXT_TEST=OFF \
-            -DWITH_OTLP_GRPC=ON \
+            -DWITH_OTLP_GRPC=OFF \
             -DWITH_OTLP_HTTP=ON \
             -DWITH_OTLP_FILE=ON \
             -DWITH_OTLP_HTTP_COMPRESSION=ON \
             -DWITH_ZIPKIN=ON \
-            -DWITH_PROMETHEUS=ON \
+            -DWITH_PROMETHEUS=OFF \
             ..
 
       - name: iwyu_tool
