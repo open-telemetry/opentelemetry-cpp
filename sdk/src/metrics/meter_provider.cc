@@ -4,7 +4,6 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
-#include <type_traits>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"
