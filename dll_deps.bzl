@@ -22,7 +22,7 @@ def _filter_libs(deps):
 def dll_deps(deps):
     """ When building with --//:with_dll=true replaces the references to the api/sdk/exporters/ext static libraries with the single //:dll shared library """
     return select({
-        "//:with_dll_enabled": [":avoid_dll_lock"] + _filter_libs(deps),
+        "//:with_dll_enabled": ["//:dll"] + _filter_libs(deps),
         "//conditions:default": deps
     })
 
@@ -62,7 +62,8 @@ def avoid_dll_lock():
 
       avoid_dll_lock()
     """
-    native.cc_library(
-        name = "avoid_dll_lock",
-        deps = ["//:dll"]
-    )
+    pass
+    #native.cc_library(
+    #    name = "avoid_dll_lock",
+    #    deps = ["//:dll"]
+    #)
