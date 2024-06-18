@@ -22,6 +22,8 @@ jobs:
         CC: /usr/bin/gcc-10
         CXX: /usr/bin/g++-10
       run: |
+        sudo -E ./ci/setup_gcc10.sh
+        sudo -E ./ci/setup_cmake.sh
         sudo -E ./ci/setup_ci_environment.sh
         sudo -E ./ci/setup_googletest.sh
         sudo -E ./ci/install_abseil.sh
