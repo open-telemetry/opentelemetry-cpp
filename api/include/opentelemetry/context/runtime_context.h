@@ -1,4 +1,4 @@
-﻿// Copyright The OpenTelemetry Authors
+// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -333,3 +333,4 @@ static RuntimeContextStorage *GetDefaultStorage() noexcept
 }
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
+
