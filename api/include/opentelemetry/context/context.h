@@ -160,4 +160,3 @@ private:
 };
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
-

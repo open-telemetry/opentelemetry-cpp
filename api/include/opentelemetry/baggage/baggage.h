@@ -297,4 +297,3 @@ private:
 }  // namespace baggage
 
 OPENTELEMETRY_END_NAMESPACE
-

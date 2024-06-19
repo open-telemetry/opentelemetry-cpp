@@ -333,4 +333,3 @@ static RuntimeContextStorage *GetDefaultStorage() noexcept
 }
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
-
