@@ -140,7 +140,7 @@ TEST(UrlDecoderTests, BasicTests)
   std::map<std::string, std::string> testdata{
       {"Authentication=Basic xxx", "Authentication=Basic xxx"},
       {"Authentication=Basic%20xxx", "Authentication=Basic xxx"},
-      {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84", "öà§ÖabcdÄ"},
+      {"%C3%B6%C3%A0%C2%A7%C3%96abcd%C3%84", "\u00F6\u00E0\u00A7\u00D6abcd\u00C4"},
       {"%2x", "%2x"},
       {"%20", " "},
       {"text%2", "text%2"},

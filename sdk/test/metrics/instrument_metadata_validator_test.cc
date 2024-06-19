@@ -21,7 +21,7 @@ TEST(InstrumentMetadataValidator, TestName)
   std::vector<std::string> invalid_names = {
       "",                               // empty string
       "1sdf",                           // string starting with number
-      "123€AAA€BBB",                    // unicode characters
+      "123\u20ACAAA\u20ACBBB"           // unicode characters
       "/\\sdsd",                        // string starting with special character
       "***sSSs",                        // string starting with special character
       "a\\broken\\path",                // contains backward slash
@@ -56,7 +56,7 @@ TEST(InstrumentMetadataValidator, TestUnit)
   std::vector<std::string> invalid_units = {
       CreateVeryLargeString(5) + "ABCERTYGJ",  // total 64 charactes
       CreateVeryLargeString(7),                // string bigger than 63 chars
-      "123€AAA€BBB",                           // unicode string
+      "123\u20ACAAA\u20ACBBB",                 // unicode string
   };
   for (auto const &str : invalid_units)
   {
