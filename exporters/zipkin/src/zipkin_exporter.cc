@@ -3,8 +3,12 @@
 
 #define _WINSOCKAPI_  // stops including winsock.h
 
-#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#include <stdint.h>
+#include <ostream>
+#include <string>
+
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"

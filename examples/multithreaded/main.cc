@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-#include "opentelemetry/nostd/detail/decay.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -25,7 +24,6 @@
 
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
-namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
@@ -46,7 +44,7 @@ void CleanupTracer()
   trace_api::Provider::SetTracerProvider(none);
 }
 
-nostd::shared_ptr<trace_api::Tracer> get_tracer()
+opentelemetry::nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
   auto provider = trace_api::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library");
