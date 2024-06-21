@@ -25,7 +25,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
     native.cc_binary(
         name = name,
         srcs = srcs,
-        deps = deps + ["@com_github_google_benchmark//:benchmark"],
+        deps = deps + ["@google_benchmark//:benchmark"],
         tags = tags + ["manual"],
     )
 
@@ -44,7 +44,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
     native.cc_test(
         name = name + "_smoketest",
         srcs = srcs,
-        deps = deps + ["@com_github_google_benchmark//:benchmark"],
+        deps = deps + ["@google_benchmark//:benchmark"],
         args = ["--benchmark_min_time=1x"],
         tags = tags + ["benchmark"],
     )
