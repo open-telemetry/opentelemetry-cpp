@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.16.0] 2024-06-20
+## [1.16.0] 2024-06-21
 
 * [BUILD] Upgrade bazel abseil from 20220623.1 to 20230802.2
   [#2650](https://github.com/open-telemetry/opentelemetry-cpp/pull/2650)
@@ -83,6 +83,10 @@ Increment the:
   [#2699](https://github.com/open-telemetry/opentelemetry-cpp/pull/2699)
 * [Code health] Remove Unicode Text from Source files
   [#2707](https://github.com/open-telemetry/opentelemetry-cpp/pull/2707)
+* [BUILD] Add option WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#2714](https://github.com/open-telemetry/opentelemetry-cpp/pull/2714)
+* [EXPORTER] All 2xx return codes should be considered successful.
+  [#2712](https://github.com/open-telemetry/opentelemetry-cpp/pull/2712)
 
 Important changes:
 
