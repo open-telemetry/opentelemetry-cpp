@@ -78,7 +78,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   http_client::Body body_v(body_s.begin(), body_s.end());
   auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
   if (result &&
-      (result.GetResponse().GetStatusCode() == 200 || result.GetResponse().GetStatusCode() == 202))
+      (result.GetResponse().GetStatusCode() >= 200 && result.GetResponse().GetStatusCode() <= 299))
   {
     return sdk::common::ExportResult::kSuccess;
   }

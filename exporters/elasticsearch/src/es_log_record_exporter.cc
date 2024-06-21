@@ -59,7 +59,7 @@ public:
       // Store the body of the request
       body_ = std::string(response.GetBody().begin(), response.GetBody().end());
 
-      if (response.GetStatusCode() != 200 && response.GetStatusCode() != 202)
+      if (!(response.GetStatusCode() >= 200 && response.GetStatusCode() <= 299))
       {
         log_message = BuildResponseLogMessage(response, body_);
 
