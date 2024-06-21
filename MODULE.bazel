@@ -1,6 +1,6 @@
 module(
     name = "opentelemetry-cpp",
-    version = "1.15.0-dll.0",
+    version = "1.16.0-dll",
     repo_name = "io_opentelemetry_cpp",
 )
 
@@ -10,7 +10,7 @@ bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
 
 bazel_dep(name = "rules_pkg", version = "0.10.1", dev_dependency = True)
 
-bazel_dep(name = "rules_python", version = "0.33.1")
+bazel_dep(name = "rules_python", version = "0.33.2")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
