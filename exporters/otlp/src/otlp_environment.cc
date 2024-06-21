@@ -10,7 +10,6 @@
 
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/nostd/detail/decay.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"

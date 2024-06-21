@@ -3,15 +3,16 @@
 
 #pragma once
 
-// We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
-#include "opentelemetry/sdk/trace/exporter.h"
-
-#include "opentelemetry/exporters/otlp/otlp_file_client.h"
-
-#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
-
 #include <chrono>
 #include <memory>
+
+#include "opentelemetry/exporters/otlp/otlp_file_client.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

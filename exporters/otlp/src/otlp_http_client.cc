@@ -1,7 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include <algorithm>
+#include <atomic>
+#include <condition_variable>
+#include <iostream>
+#include <map>
+#include <mutex>
+#include <ratio>
+#include <string>
+#include <utility>
+#include <vector>
 
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
@@ -9,36 +18,21 @@
 #  include <assert.h>
 #endif
 
+#include "nlohmann/json.hpp"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-// clang-format on
-
-#include "google/protobuf/message.h"
-#include "google/protobuf/reflection.h"
-#include "google/protobuf/stubs/common.h"
-#include "nlohmann/json.hpp"
-
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-// clang-format on
-
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
-#include <atomic>
-#include <condition_variable>
-#include <cstring>
-#include <fstream>
-#include <mutex>
-#include <sstream>
-#include <string>
-#include <vector>
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "google/protobuf/message.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 #ifdef GetMessage
 #  undef GetMessage

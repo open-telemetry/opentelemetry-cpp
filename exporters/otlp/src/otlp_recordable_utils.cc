@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <list>
+#include <memory>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -12,10 +13,13 @@
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"  // IWYU pragma: keep
@@ -27,8 +31,6 @@
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"  // IWYU pragma: keep
 // clang-format on
-
-namespace nostd = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -59,7 +61,7 @@ struct InstrumentationScopePointerEqual
 }  // namespace
 
 void OtlpRecordableUtils::PopulateRequest(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
+    const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
     proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept
 {
   if (nullptr == request)
@@ -119,7 +121,7 @@ void OtlpRecordableUtils::PopulateRequest(
 }
 
 void OtlpRecordableUtils::PopulateRequest(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
+    const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
 {
   if (nullptr == request)

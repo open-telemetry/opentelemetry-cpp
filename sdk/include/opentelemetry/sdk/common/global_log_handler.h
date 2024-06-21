@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <memory>
 #include <sstream>  // IWYU pragma: keep
 #include <string>
 #include <utility>

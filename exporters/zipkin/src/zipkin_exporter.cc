@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #define _WINSOCKAPI_  // stops including winsock.h
+
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
-#include <mutex>
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 

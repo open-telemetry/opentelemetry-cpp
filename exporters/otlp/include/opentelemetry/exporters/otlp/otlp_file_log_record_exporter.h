@@ -3,16 +3,16 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/logs/exporter.h"
+#include <chrono>
+#include <memory>
 
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
-
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
-
-#include <chrono>
-#include <cstddef>
-#include <memory>
-#include <string>
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

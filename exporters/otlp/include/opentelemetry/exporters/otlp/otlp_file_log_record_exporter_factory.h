@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
