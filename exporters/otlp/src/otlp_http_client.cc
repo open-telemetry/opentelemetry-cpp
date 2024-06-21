@@ -3,12 +3,18 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <cstddef>
+#include <functional>
 #include <iostream>
+#include <list>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <ratio>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -20,25 +26,29 @@
 
 #include "nlohmann/json.hpp"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "google/protobuf/message.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
 #ifdef GetMessage
 #  undef GetMessage
 #endif
 
-namespace nostd       = opentelemetry::nostd;
 namespace http_client = opentelemetry::ext::http::client;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
