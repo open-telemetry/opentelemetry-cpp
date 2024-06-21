@@ -8,7 +8,6 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/logs/severity.h"
-#include "opentelemetry/nostd/detail/decay.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"

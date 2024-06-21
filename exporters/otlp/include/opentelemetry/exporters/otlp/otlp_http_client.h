@@ -3,14 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
-
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_http.h"
-
-#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
@@ -20,6 +12,14 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/version.h"
 
 // forward declare google::protobuf::Message
 namespace google

@@ -5,18 +5,36 @@
 
 #include <memory>
 
-#include "opentelemetry/nostd/unique_ptr.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
-#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#include "opentelemetry/sdk/trace/recordable.h"
-
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
+
+namespace opentelemetry
+{
+namespace proto
+{
+namespace collector
+{
+
+namespace logs
+{
+namespace v1
+{
+class ExportLogsServiceRequest;
+}
+}  // namespace logs
+namespace trace
+{
+namespace v1
+{
+class ExportTraceServiceRequest;
+}
+}  // namespace trace
+
+}  // namespace collector
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

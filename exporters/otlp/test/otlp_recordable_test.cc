@@ -13,6 +13,12 @@
 
 #include <gtest/gtest.h>
 
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

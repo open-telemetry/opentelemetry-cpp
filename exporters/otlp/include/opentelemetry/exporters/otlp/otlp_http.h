@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

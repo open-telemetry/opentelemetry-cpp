@@ -2,14 +2,36 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdint.h>
+#include <chrono>
+#include <memory>
+#include <string>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
+#include "opentelemetry/proto/trace/v1/trace.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 namespace nostd = opentelemetry::nostd;
 

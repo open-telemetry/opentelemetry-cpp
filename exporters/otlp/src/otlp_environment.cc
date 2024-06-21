@@ -16,7 +16,6 @@
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
 
-namespace nostd      = opentelemetry::nostd;
 namespace sdk_common = opentelemetry::sdk::common;
 
 /*
