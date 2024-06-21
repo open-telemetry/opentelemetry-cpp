@@ -15,17 +15,78 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Update ExemplarFilter and ExemplarReservoir for spec
-  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
+## [1.16.0] 2024-06-21
 
+* [BUILD] Upgrade bazel abseil from 20220623.1 to 20230802.2
+  [#2650](https://github.com/open-telemetry/opentelemetry-cpp/pull/2650)
+* [BUILD] Use nostd::enable_if_t instead of std::enable_if_t
+  [#2648](https://github.com/open-telemetry/opentelemetry-cpp/pull/2648)
+* [EXEMPLAR] Update ExemplarFilter and ExemplarReservoir for spec
+  [#2372](https://github.com/open-telemetry/opentelemetry-cpp/pull/2372)
+* [BUILD] Link CoreFoundation on apple systems
+  [#2655](https://github.com/open-telemetry/opentelemetry-cpp/pull/2655)
+* [SDK] Avoid missing conditional variable update and simplify atomic bool
+  [#2553](https://github.com/open-telemetry/opentelemetry-cpp/pull/2553)
+* [BUILD] Build break in OLTP_FILE tests
+  [#2659](https://github.com/open-telemetry/opentelemetry-cpp/pull/2659)
+* [EXPORTER] General cleanup for is_shutdown flags in exporters.
+  [#2663](https://github.com/open-telemetry/opentelemetry-cpp/pull/2663)
+* [CI] Upgrade Maintainers CI to ubuntu-24.04
+  [#2670](https://github.com/open-telemetry/opentelemetry-cpp/pull/2670)
+* [BUILD] Upgrade to opentelemetry-proto 1.3.1
+  [#2669](https://github.com/open-telemetry/opentelemetry-cpp/pull/2669)
+* [API] Return NoopLogRecord from NoopLogger
+  [#2668](https://github.com/open-telemetry/opentelemetry-cpp/pull/2668)
+* [BUILD] Remove the hard-coded separator in tracestate
+  [#2672](https://github.com/open-telemetry/opentelemetry-cpp/pull/2672)
+* [SDK] Fix forceflush may wait for ever
+  [#2584](https://github.com/open-telemetry/opentelemetry-cpp/pull/2584)
+* [API] DO not allow unsafe Logger::EmitLogRecord
+  [#2673](https://github.com/open-telemetry/opentelemetry-cpp/pull/2673)
+* [BUILD] Read default proto version from third_party_release
+  [#2677](https://github.com/open-telemetry/opentelemetry-cpp/pull/2677)
+* [CI] include-what-you-use
+  [#2629](https://github.com/open-telemetry/opentelemetry-cpp/pull/2629)
 * [CI] Upgrade to clang-format 18
   [#2684](https://github.com/open-telemetry/opentelemetry-cpp/pull/2684)
-
+* [CI] Fix CI failures on Ubuntu 24.04
+  [#2686](https://github.com/open-telemetry/opentelemetry-cpp/pull/2686)
+* [SEMANTIC CONVENTIONS] Upgrade to version 1.26.0
+  [#2687](https://github.com/open-telemetry/opentelemetry-cpp/pull/2687)
 * [API/SDK] Provider cleanup
   [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
-
+* [ETW] Add table name mapping for Logs other than the default Log table
+  [#2691](https://github.com/open-telemetry/opentelemetry-cpp/pull/2691)
+* [CI] Remove benchmark overlay for vcpkg
+  [#2695](https://github.com/open-telemetry/opentelemetry-cpp/pull/2695)
+* [BUILD] Remove the incorrect set of CMAKE_MSVC_RUNTIME_LIBRARY for vcpkg
+  [#2696](https://github.com/open-telemetry/opentelemetry-cpp/pull/2696)
+* [BUILD] CMakeLists.txt: Enable CMAKE_MSVC_RUNTIME_LIBRARY support
+  [#2652](https://github.com/open-telemetry/opentelemetry-cpp/pull/2652)
+* [EXPORTER] OTLP file: use thread-safe file/io
+  [#2675](https://github.com/open-telemetry/opentelemetry-cpp/pull/2675)
+* [bazel] Bump version and deps
+  [#2679](https://github.com/open-telemetry/opentelemetry-cpp/pull/2679)
+* [BUILD] Add support for bzlmod
+  [#2608](https://github.com/open-telemetry/opentelemetry-cpp/pull/2608)
+* [BUILD] Fix Import Abseil-cpp
+  [#2701](https://github.com/open-telemetry/opentelemetry-cpp/pull/2701)
 * [Code health] include-what-you-use cleanup
   [#2692](https://github.com/open-telemetry/opentelemetry-cpp/pull/2692)
+* [BUILD] Restore Bazel flag removed from public API
+  [#2702](https://github.com/open-telemetry/opentelemetry-cpp/pull/2702)
+* [DOC] Fix typo tace_id -> trace_id in logger.h
+  [#2703](https://github.com/open-telemetry/opentelemetry-cpp/pull/2703)
+* Bump docker/build-push-action from 5 to 6
+  [#2705](https://github.com/open-telemetry/opentelemetry-cpp/pull/2705)
+* [CI] Enable ARM64 build in CI
+  [#2699](https://github.com/open-telemetry/opentelemetry-cpp/pull/2699)
+* [Code health] Remove Unicode Text from Source files
+  [#2707](https://github.com/open-telemetry/opentelemetry-cpp/pull/2707)
+* [BUILD] Add option WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#2714](https://github.com/open-telemetry/opentelemetry-cpp/pull/2714)
+* [EXPORTER] All 2xx return codes should be considered successful.
+  [#2712](https://github.com/open-telemetry/opentelemetry-cpp/pull/2712)
 
 Important changes:
 
