@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <chrono>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"

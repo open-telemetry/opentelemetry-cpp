@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>

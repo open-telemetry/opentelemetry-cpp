@@ -5,7 +5,7 @@
 
 // IWYU pragma: private, include "opentelemetry/nostd/unique_ptr.h"
 
-#include <memory>
+#include <memory>  // IWYU pragma: export
 
 #include "opentelemetry/version.h"
 

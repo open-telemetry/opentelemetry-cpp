@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <memory>
 #include <mutex>
 #include <ostream>
 #include <string>

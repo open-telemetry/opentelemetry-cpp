@@ -16,17 +16,16 @@
 
 namespace logs  = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
-namespace nostd = opentelemetry::nostd;
 
 namespace
 {
-nostd::shared_ptr<trace::Tracer> get_tracer()
+opentelemetry::nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   auto provider = trace::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library", OPENTELEMETRY_SDK_VERSION);
 }
 
-nostd::shared_ptr<logs::Logger> get_logger()
+opentelemetry::nostd::shared_ptr<logs::Logger> get_logger()
 {
   auto provider = logs::Provider::GetLoggerProvider();
   return provider->GetLogger("foo_library_logger", "foo_library");

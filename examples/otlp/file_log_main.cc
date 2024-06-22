@@ -3,7 +3,6 @@
 
 #include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <utility>
 
@@ -28,7 +27,6 @@
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentelemetry/version.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/logs_foo_library/foo_library.h"
