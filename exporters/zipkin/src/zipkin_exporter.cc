@@ -4,7 +4,6 @@
 #define _WINSOCKAPI_  // stops including winsock.h
 
 #include <stdint.h>
-#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <memory>
