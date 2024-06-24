@@ -57,6 +57,11 @@ config_setting(
 cc_library(
     name = "otel_sdk_deps",
     visibility = ["//visibility:private"],
+    target_compatible_with = select({
+        # To compile you need `--//:with_dll=true` on the command line
+        "with_dll_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
         "//exporters/etw:etw_exporter",
@@ -101,16 +106,25 @@ genquery(
     ("otel_sdk_rd", ":reldeb"),
 ]]
 
-# Conveniently place all Open Telemetry C++ dependencies required to build otel_sdk
-[cc_binary(
-    name = otel_sdk_binary,
-
+cc_library(
+    name = "api_sdk_includes",
     # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
+    visibility = ["//visibility:private"],
+    target_compatible_with = select({
+        # To compile you need `--//:with_dll=true` on the command line
+        "with_dll_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     srcs = [
         "all_api_includes.cc",
         "all_sdk_includes.cc",
     ],
+    deps = ["otel_sdk_deps"],
+)
 
+# Conveniently place all Open Telemetry C++ dependencies required to build otel_sdk
+[cc_shared_library(
+    name = otel_sdk_binary,
     # Force generation of .pdb file for for opt builds
     features = [
         "generate_pdb_file",
@@ -118,20 +132,20 @@ genquery(
         # LINK : fatal error LNK1189: library limit of 65535 objects exceeded
         # "windows_export_all_symbols"
     ],
-
-    # https://learn.microsoft.com/en-us/cpp/build/reference/wholearchive-include-all-library-object-files?view=msvc-170
-    linkopts = ["/WHOLEARCHIVE"],
-
-    # Make a .dll
-    linkshared = True,
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
         "with_dll_enabled": [],
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    # TODO: Add more missing headers to api_sdk_includes above and we'll no longer need /WHOLEARCHIVE
+    user_link_flags = select({
+        "@@platforms//os:windows": ["/WHOLEARCHIVE"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:private"],
     deps = [
         otel_sdk_binary + "_restrict_compilation_mode",
+        "api_sdk_includes",
         "otel_sdk_deps",
     ],
 ) for (otel_sdk_binary, otel_sdk_config_name) in [

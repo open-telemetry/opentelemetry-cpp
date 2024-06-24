@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+build --experimental_cc_shared_library
+
 common --noenable_workspace
 common --remote_download_minimal
 
