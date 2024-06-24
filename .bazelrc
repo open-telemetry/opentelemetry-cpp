@@ -3,6 +3,8 @@
 
 build --experimental_cc_shared_library
 
+common --incompatible_disable_native_repo_rules 
+
 common --noenable_workspace
 common --remote_download_minimal
 
