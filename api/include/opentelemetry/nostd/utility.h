@@ -15,8 +15,8 @@
 #  include <initializer_list>
 #  include <type_traits>
 
-#  include "opentelemetry/nostd/detail/decay.h"
-#  include "opentelemetry/nostd/detail/invoke.h"
+#  include "opentelemetry/nostd/detail/decay.h"   // IWYU pragma: export
+#  include "opentelemetry/nostd/detail/invoke.h"  // IWYU pragma: export
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

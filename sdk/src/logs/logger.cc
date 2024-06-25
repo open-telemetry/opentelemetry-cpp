@@ -1,12 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/logger.h"
+#include <chrono>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
-#include "opentelemetry/sdk_config.h"
-#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -14,11 +31,10 @@ namespace sdk
 namespace logs
 {
 namespace trace_api = opentelemetry::trace;
-namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
 Logger::Logger(
-    nostd::string_view name,
+    opentelemetry::nostd::string_view name,
     std::shared_ptr<LoggerContext> context,
     std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
@@ -26,12 +42,12 @@ Logger::Logger(
       context_(context)
 {}
 
-const nostd::string_view Logger::GetName() noexcept
+const opentelemetry::nostd::string_view Logger::GetName() noexcept
 {
   return logger_name_;
 }
 
-nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
+opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
   auto recordable = context_->GetProcessor().MakeRecordable();
 
@@ -42,10 +58,12 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     opentelemetry::context::ContextValue context_value =
         opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
             opentelemetry::trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
+    if (opentelemetry::nostd::holds_alternative<
+            opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
     {
-      nostd::shared_ptr<opentelemetry::trace::Span> &data =
-          nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(context_value);
+      opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> &data =
+          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(
+              context_value);
       if (data)
       {
         recordable->SetTraceId(data->GetContext().trace_id());
@@ -53,10 +71,12 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
         recordable->SetSpanId(data->GetContext().span_id());
       }
     }
-    else if (nostd::holds_alternative<nostd::shared_ptr<trace::SpanContext>>(context_value))
+    else if (opentelemetry::nostd::holds_alternative<
+                 opentelemetry::nostd::shared_ptr<trace::SpanContext>>(context_value))
     {
-      nostd::shared_ptr<trace::SpanContext> &data =
-          nostd::get<nostd::shared_ptr<trace::SpanContext>>(context_value);
+      opentelemetry::nostd::shared_ptr<trace::SpanContext> &data =
+          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<trace::SpanContext>>(
+              context_value);
       if (data)
       {
         recordable->SetTraceId(data->trace_id());
@@ -66,10 +86,11 @@ nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noex
     }
   }
 
-  return nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+  return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
 
-void Logger::EmitLogRecord(nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
+void Logger::EmitLogRecord(
+    opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!log_record)
   {

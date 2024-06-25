@@ -7,6 +7,37 @@ on:
     branches: [ main ]
 
 jobs:
+  arm64_test:
+    name: CMake test arm64 (with modern protobuf,grpc and abseil)
+    runs-on: actuated-arm64-4cpu-16gb
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: setup
+      env:
+        PROTOBUF_VERSION: '23.3'
+        ABSEIL_CPP_VERSION: '20230125.3'
+        CXX_STANDARD: '14'
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+      run: |
+        sudo -E ./ci/setup_gcc10.sh
+        sudo -E ./ci/setup_cmake.sh
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/setup_googletest.sh
+        sudo -E ./ci/install_abseil.sh
+        sudo -E ./ci/install_protobuf.sh
+    - name: run otlp exporter tests
+      env:
+        CC: /usr/bin/gcc-10
+        CXX: /usr/bin/g++-10
+        WITH_ABSEIL: 'ON'
+        CXX_STANDARD: '14'
+      run: |
+        sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
   cmake_test:
     name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
@@ -570,6 +601,27 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
+
+  bazel_no_bzlmod_test:
+    name: Bazel without bzlmod
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v4
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.no_bzlmod.test
 
   bazel_test_async:
     name: Bazel with async export

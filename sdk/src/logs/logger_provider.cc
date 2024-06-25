@@ -1,21 +1,32 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/logger_provider.h"
+#include <algorithm>
+#include <chrono>
+#include <memory>
+#include <mutex>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
-
-namespace nostd    = opentelemetry::nostd;
-namespace logs_api = opentelemetry::logs;
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                                opentelemetry::sdk::resource::Resource resource) noexcept
@@ -50,11 +61,11 @@ LoggerProvider::~LoggerProvider()
   }
 }
 
-nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
-    nostd::string_view logger_name,
-    nostd::string_view library_name,
-    nostd::string_view library_version,
-    nostd::string_view schema_url,
+opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    opentelemetry::nostd::string_view logger_name,
+    opentelemetry::nostd::string_view library_name,
+    opentelemetry::nostd::string_view library_version,
+    opentelemetry::nostd::string_view schema_url,
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-instrumentationscope
@@ -73,7 +84,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     if (logger->GetName() == logger_name &&
         logger_lib.equal(library_name, library_version, schema_url))
     {
-      return nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+      return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
     }
   }
 
@@ -96,7 +107,7 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
 
   loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
       new Logger(logger_name, context_, std::move(lib))));
-  return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
+  return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept

@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/detail/preprocessor.h"
-
-#define OPENTELEMETRY_SDK_VERSION "1.15.0"
+#define OPENTELEMETRY_SDK_VERSION "1.16.0"
 
 #include "opentelemetry/version.h"
 

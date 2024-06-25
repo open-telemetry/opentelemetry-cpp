@@ -40,6 +40,7 @@ jobs:
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
             -DWITH_CONFIGURATION=ON \
             -DBUILD_TESTING=OFF \
+            -DWITH_DEPRECATED_SDK_FACTORY=OFF \
             -DBUILD_W3CTRACECONTEXT_TEST=OFF \
             ..
 

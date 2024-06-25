@@ -3,32 +3,36 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
 #include <functional>
-#include <list>
 #include <memory>
 #include <mutex>
-#include <unordered_map>
-#include <utility>
 
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#endif
-
+#include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

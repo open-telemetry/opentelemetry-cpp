@@ -213,6 +213,9 @@ if(DEFINED WITH_OTLP)
   )
 endif()
 
+option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+       "Whether to enable mTLS support fro gRPC" OFF)
+
 option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
        OFF)
 
@@ -379,7 +382,9 @@ if(WITH_PROMETHEUS)
 endif()
 
 if(WITH_ABSEIL)
-  find_package(absl CONFIG REQUIRED)
+  if(NOT TARGET absl::strings)
+    find_package(absl CONFIG REQUIRED)
+  endif()
 endif()
 
 if(WITH_OTLP_GRPC
