@@ -15,6 +15,44 @@ Increment the:
 
 ## [Unreleased]
 
+* [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
+  [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
+
+Breaking changes:
+
+* [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
+  [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
+
+  * As announced in opentelemetry-cpp previous release 1.16.0,
+    CMake option `WITH_DEPRECATED_SDK_FACTORY` was temporary,
+    and to be removed by the next release.
+  * This option is now removed.
+  * Code configuring the SDK must be adjusted, as previously described:
+
+    * [API/SDK] Provider cleanup
+      [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+
+    * Before this fix:
+      * SDK factory methods such as:
+        * opentelemetry::sdk::trace::TracerProviderFactory::Create()
+        * opentelemetry::sdk::metrics::MeterProviderFactory::Create()
+        * opentelemetry::sdk::logs::LoggerProviderFactory::Create()
+        * opentelemetry::sdk::logs::EventLoggerProviderFactory::Create()
+
+        returned an API object (opentelemetry::trace::TracerProvider)
+          to the caller.
+
+    * After this fix, these methods return an SDK level object
+      (opentelemetry::sdk::trace::TracerProvider) to the caller.
+    * Returning an SDK object is necessary for the application to
+      cleanup and invoke SDK level methods, such as ForceFlush(),
+      on a provider.
+    * The application code that configures the SDK, by calling
+      the various provider factories, may need adjustment.
+    * All the examples have been updated, and in particular no
+      longer perform static_cast do convert an API object to an SDK object.
+      Please refer to examples for guidance on how to adjust.
+
 ## [1.16.0] 2024-06-21
 
 * [BUILD] Upgrade bazel abseil from 20220623.1 to 20230802.2
