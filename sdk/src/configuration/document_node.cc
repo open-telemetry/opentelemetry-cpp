@@ -53,7 +53,7 @@ void DocumentNode::DoSubstitution(std::string &value)
     return;
   }
 
-  for (int i = 3; i <= len - 2; i++)
+  for (size_t i = 3; i + 2 <= len; i++)
   {
     c = value[i];
     if (!std::isalnum(c) && c != '_')

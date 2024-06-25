@@ -537,7 +537,7 @@ static std::unique_ptr<SelectorConfiguration> ParseSelectorConfiguration(
 }
 
 static std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<DefaultAggregationConfiguration> model(new DefaultAggregationConfiguration);
 
@@ -545,7 +545,7 @@ static std::unique_ptr<DefaultAggregationConfiguration> ParseDefaultAggregationC
 }
 
 static std::unique_ptr<DropAggregationConfiguration> ParseDropAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<DropAggregationConfiguration> model(new DropAggregationConfiguration);
 
@@ -593,7 +593,7 @@ ParseBase2ExponentialBucketHistogramAggregationConfiguration(
 }
 
 static std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<LastValueAggregationConfiguration> model(new LastValueAggregationConfiguration);
 
@@ -601,7 +601,7 @@ static std::unique_ptr<LastValueAggregationConfiguration> ParseLastValueAggregat
 }
 
 static std::unique_ptr<SumAggregationConfiguration> ParseSumAggregationConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> & /* node */)
 {
   std::unique_ptr<SumAggregationConfiguration> model(new SumAggregationConfiguration);
 
