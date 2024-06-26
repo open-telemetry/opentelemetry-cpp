@@ -64,7 +64,7 @@ using namespace opentelemetry::exporter::etw;
 // - Specify "OpenTelemetry-ETW-TLD" in the list of providers.
 //
 // Event view shows event flow in realtime.
-const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
+const char *kGlobalProviderName = "NRTLoggingSdk";
 
 std::string providerName = kGlobalProviderName;
 
@@ -92,6 +92,8 @@ void bop()
   auto span = tracer->StartSpan("bop");
   span->AddEvent("BopEvent", {{"tid", gettid()}});
   span->SetAttribute("attrib", 2);
+  span->SetAttribute("sdkSource", "etw_cpp_app");
+  span->SetAttribute("comment", "attr from bop");
   span->End();
 }
 
@@ -103,6 +105,8 @@ void beep()
   auto span = tracer->StartSpan("beep");
   span->AddEvent("BeepEvent", {{"tid", gettid()}});
   span->SetAttribute("attrib", 1);
+  span->SetAttribute("sdkSource", "etw_cpp_app");
+  span->SetAttribute("cmnt", "attr from beep");
   {
     auto bopScope = tracer->WithActiveSpan(span);
     bop();
@@ -120,6 +124,7 @@ int main(int arc, char **argv)
   // Main dispatcher span: parent of all child thread spans.
   auto mainSpan = tracer->StartSpan("beep_bop");
   mainSpan->SetAttribute("attrib", 0);
+  mainSpan->SetAttribute("sdkSource", "etw_cpp_app");
 
   // Start several threads to perform beep-bop actions.
   LOG_TRACE("beep-boop dispatcher tid=%u", gettid());
