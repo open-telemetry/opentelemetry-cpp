@@ -190,6 +190,7 @@ cc_test(
         ":prometheus_push_exporter",
         ":prometheus_push_test_helper",
         "@com_google_googletest//:gtest_main",
+        "@prometheus-cpp//push",
         "//api",
         "//exporters/prometheus:prometheus_collector",
         "//exporters/prometheus:prometheus_exporter_utils",
