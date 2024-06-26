@@ -6,7 +6,7 @@ module(
 
 bazel_dep(name = "curl", version = "8.7.1")
 bazel_dep(name = "abseil-cpp", version = "20240116.2", repo_name = "com_google_absl")
-bazel_dep(name = "aspect_bazel_lib", version = "2.7.7")
+bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
 
 bazel_dep(name = "rules_pkg", version = "0.10.1", dev_dependency = True)
 
@@ -27,16 +27,13 @@ single_version_override(
 )
 
 bazel_dep(name = "opentelemetry-proto", version = "1.3.1")
-bazel_dep(name = "prometheus-cpp", version = "1.2.4")
-#single_version_override(
-#module_name = "prometheus-cpp",
-#version = "1.2.4",
-#patch_strip = 1,
-#patches = [
-#"bazel/prometheus_cpp_curl_bzlmod.patch",
-#"bazel/prometheus_cpp_rm_bzlmod_lock.patch",
-#],
-#)
+bazel_dep(name = "prometheus-cpp", version = "1.3.0")
+archive_override(
+    module_name = "prometheus-cpp",
+    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
+    integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
+    urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
+)
 
 bazel_dep(name = "boringssl", version = "0.0.0-20240530-2db0eb3")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.1")

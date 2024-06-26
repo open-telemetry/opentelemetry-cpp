@@ -64,7 +64,6 @@ cc_library(
     }),
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
-        "//exporters/etw:etw_exporter",
         "//exporters/memory:in_memory_span_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
@@ -79,8 +78,14 @@ cc_library(
         "//exporters/otlp:otlp_file_log_record_exporter",
         "//exporters/otlp:otlp_file_metric_exporter",
         "//exporters/prometheus:prometheus_exporter",
+        "//exporters/prometheus:prometheus_push_exporter",
         "//exporters/zipkin:zipkin_exporter",
-    ],
+    ] + select({
+        "@platforms//os:windows": [
+            "//exporters/etw:etw_exporter",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 # Expands to all transitive project dependencies, excluding external projects (repos)
@@ -211,7 +216,6 @@ alias(
     deps = [
         "//api:headers",
         "//exporters/elasticsearch:headers",
-        "//exporters/etw:headers",
         "//exporters/memory:headers",
         "//exporters/ostream:headers",
         "//exporters/otlp:headers",
@@ -219,7 +223,12 @@ alias(
         "//exporters/zipkin:headers",
         "//ext:headers",
         "//sdk:headers",
-    ],
+    ] + select({
+        "@platforms//os:windows": [
+            "//exporters/etw:headers",
+        ],
+        "//conditions:default": [],
+    }),
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
@@ -247,7 +256,6 @@ pkg_files(
     srcs = [
         "//api:header_files",
         "//exporters/elasticsearch:header_files",
-        "//exporters/etw:header_files",
         "//exporters/memory:header_files",
         "//exporters/ostream:header_files",
         "//exporters/otlp:header_files",
@@ -255,7 +263,12 @@ pkg_files(
         "//exporters/zipkin:header_files",
         "//ext:header_files",
         "//sdk:header_files",
-    ],
+    ] + select({
+        "@platforms//os:windows": [
+            "//exporters/etw:header_files",
+        ],
+        "//conditions:default": [],
+    }),    
     prefix = otel_sdk_prefix,  # + "include",
     strip_prefix = pkg_strip_prefix.from_pkg(),
 )
@@ -395,21 +408,21 @@ cc_binary(
     deps = ["@bazel_tools//tools/cpp/runfiles"],
 )
 
-run_binary(
-    name = "dll_deps_update_run",
+[run_binary(
+    name = "dll_deps_update_run_" + os,
     srcs = [":otel_sdk_all_project_deps"],
-    outs = ["dll_deps_generated_internally.bzl"],
-    args = ["$(location dll_deps_generated_internally.bzl)"],
+    outs = ["dll_deps_generated_internally_" + os + ".bzl"],
+    args = ["$(location dll_deps_generated_internally_" + os + ".bzl)"],
     tool = "dll_deps_update_binary",
-)
+) for os in ["non_windows", "windows"]]
 
 # To update the dll_deps_generated.bzl files, do this:
 #    bazel run dll_deps_update
-write_source_file(
-    name = "dll_deps_update",
-    in_file = "dll_deps_generated_internally.bzl",
-    out_file = "dll_deps_generated.bzl",
-)
+[write_source_file(
+    name = "dll_deps_update_" + os,
+    in_file = "dll_deps_generated_internally_" + os + ".bzl",
+    out_file = "dll_deps_generated_" + os + ".bzl",
+) for os in ["non_windows", "windows"]]
 
 platform(
     name = "x64_windows-clang-cl",

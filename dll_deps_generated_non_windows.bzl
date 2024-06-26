@@ -2,7 +2,6 @@
 DLL_DEPS = {
   Label("@//api:api"): None,
   Label("@//exporters/elasticsearch:es_log_record_exporter"): None,
-  Label("@//exporters/etw:etw_exporter"): None,
   Label("@//exporters/memory:in_memory_span_data"): None,
   Label("@//exporters/memory:in_memory_span_exporter"): None,
   Label("@//exporters/ostream:ostream_log_record_exporter"): None,
@@ -24,6 +23,7 @@ DLL_DEPS = {
   Label("@//exporters/prometheus:prometheus_collector"): None,
   Label("@//exporters/prometheus:prometheus_exporter"): None,
   Label("@//exporters/prometheus:prometheus_exporter_utils"): None,
+  Label("@//exporters/prometheus:prometheus_push_exporter"): None,
   Label("@//exporters/zipkin:zipkin_exporter"): None,
   Label("@//exporters/zipkin:zipkin_recordable"): None,
   Label("@//ext:headers"): None,
