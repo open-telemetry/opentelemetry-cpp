@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <string_view>
+
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
@@ -17,7 +19,7 @@ namespace configuration
 static void DebugNode(std::string_view name, ryml::ConstNodeRef node)
 {
   OTEL_INTERNAL_LOG_DEBUG("Processing: " << name);
-  OTEL_INTERNAL_LOG_DEBUG(" - valid() : " << node.valid());
+  OTEL_INTERNAL_LOG_DEBUG(" - readable() : " << node.readable());
   OTEL_INTERNAL_LOG_DEBUG(" - empty() : " << node.empty());
   OTEL_INTERNAL_LOG_DEBUG(" - is_container() : " << node.is_container());
   OTEL_INTERNAL_LOG_DEBUG(" - is_map() : " << node.is_map());
@@ -202,7 +204,7 @@ bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
 
   auto ryml_child = GetRymlChildNode(name);
 
-  if (!ryml_child.valid())
+  if (ryml_child.invalid())
   {
     return default_value;
   }
@@ -240,7 +242,7 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
 
   auto ryml_child = GetRymlChildNode(name);
 
-  if (!ryml_child.valid())
+  if (ryml_child.invalid())
   {
     return default_value;
   }
@@ -278,7 +280,7 @@ double RymlDocumentNode::GetDouble(const std::string &name, double default_value
 
   auto ryml_child = GetRymlChildNode(name);
 
-  if (!ryml_child.valid())
+  if (ryml_child.invalid())
   {
     return default_value;
   }
@@ -321,7 +323,7 @@ std::string RymlDocumentNode::GetString(const std::string &name, const std::stri
 
   ryml::ConstNodeRef ryml_child = GetRymlChildNode(name);
 
-  if (!ryml_child.valid())
+  if (ryml_child.invalid())
   {
     return default_value;
   }
@@ -416,7 +418,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNodeConstIteratorImpl::Item() const
 {
   std::unique_ptr<DocumentNode> item;
   ryml::ConstNodeRef ryml_item = m_parent[m_index];
-  if (!ryml_item.valid())
+  if (ryml_item.invalid())
   {
     OTEL_INTERNAL_LOG_ERROR("iterator is lost ");
     // Throw
