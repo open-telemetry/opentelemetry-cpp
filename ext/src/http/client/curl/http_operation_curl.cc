@@ -710,7 +710,12 @@ CURLcode HttpOperation::Setup()
 
     /* 4 - TLS */
 
+#ifdef HAVE_TLS_VERSION
+    /* By default, TLSv1.2 or better is required (if we have TLS). */
+    long min_ssl_version = CURL_SSLVERSION_TLSv1_2;
+#else
     long min_ssl_version = 0;
+#endif
 
     if (!ssl_options_.ssl_min_tls.empty())
     {
@@ -728,6 +733,11 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
+    /*
+     * Do not set a max TLS version by default.
+     * The CURL + openssl library may be more recent than this code,
+     * and support a version we do not know about.
+     */
     long max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
