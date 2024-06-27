@@ -9,8 +9,11 @@
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/jaeger.h"
 #include "opentelemetry/version.h"
+
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
+#  include "opentelemetry/trace/propagation/jaeger.h"
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -70,6 +73,7 @@ public:
   }
 };
 
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
 class JaegerBuilder : public TextMapPropagatorBuilder
 {
 public:
@@ -82,12 +86,16 @@ public:
         new opentelemetry::trace::propagation::JaegerPropagator());
   }
 };
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 
 static TraceContextBuilder trace_context_builder;
 static BaggageBuilder baggage_builder;
 static B3Builder b3_builder;
 static B3MultiBuilder b3_multi_builder;
+
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
 static JaegerBuilder jaeger_builder;
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 
 Registry::Registry()
 {
@@ -105,8 +113,10 @@ Registry::Registry()
   entry = {"b3multi", &b3_multi_builder};
   m_propagator_builders.insert(entry);
 
+#ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
   entry = {"jaeger", &jaeger_builder};
   m_propagator_builders.insert(entry);
+#endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
 }
 
 const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name)
