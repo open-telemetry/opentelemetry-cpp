@@ -1134,7 +1134,7 @@ int test_max_tls_unknown()
     return expect_export_failed();
   }
 
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_10()
@@ -1170,7 +1170,7 @@ int test_max_tls_10()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_11()
@@ -1206,7 +1206,7 @@ int test_max_tls_11()
   }
 
   // No support for TLS 1.1
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_12()
@@ -1313,7 +1313,7 @@ int test_range_tls_10()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11()
@@ -1350,7 +1350,7 @@ int test_range_tls_11()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_12()
@@ -1459,7 +1459,7 @@ int test_range_tls_10_11()
   }
 
   // No support for TLS 1.0, TLS 1.1
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_10_12()
@@ -1495,7 +1495,7 @@ int test_range_tls_10_12()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_10_13()
@@ -1531,7 +1531,7 @@ int test_range_tls_10_13()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11_10()
@@ -1599,7 +1599,7 @@ int test_range_tls_11_12()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11_13()
@@ -1635,7 +1635,7 @@ int test_range_tls_11_13()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_12_10()
