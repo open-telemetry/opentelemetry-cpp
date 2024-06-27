@@ -1,13 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <string_view>
+#include "opentelemetry/sdk/configuration/ryml_document_node.h"
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
-#include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,7 +15,7 @@ namespace sdk
 namespace configuration
 {
 
-static void DebugNode(std::string_view name, ryml::ConstNodeRef node)
+static void DebugNode(opentelemetry::nostd::string_view name, ryml::ConstNodeRef node)
 {
   OTEL_INTERNAL_LOG_DEBUG("Processing: " << name);
   OTEL_INTERNAL_LOG_DEBUG(" - readable() : " << node.readable());
