@@ -42,7 +42,8 @@ void ConfiguredSdk::Install()
 {
   if (m_tracer_provider)
   {
-    opentelemetry::trace::Provider::SetTracerProvider(m_tracer_provider);
+    std::shared_ptr<opentelemetry::trace::TracerProvider> api_tracer_provider = m_tracer_provider;
+    opentelemetry::trace::Provider::SetTracerProvider(api_tracer_provider);
   }
 }
 

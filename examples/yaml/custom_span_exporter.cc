@@ -17,19 +17,19 @@ std::unique_ptr<opentelemetry::sdk::trace::Recordable> CustomSpanExporter::MakeR
 
 opentelemetry::sdk::common::ExportResult CustomSpanExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
-        &spans) noexcept
+        & /* spans */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::Export(): FIXME");
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
-bool CustomSpanExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool CustomSpanExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::ForceFlush(): FIXME");
   return false;
 }
 
-bool CustomSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool CustomSpanExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::Shutdown(): FIXME");
   return false;

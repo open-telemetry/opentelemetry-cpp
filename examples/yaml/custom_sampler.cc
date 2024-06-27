@@ -11,11 +11,11 @@
 
 opentelemetry::sdk::trace::SamplingResult CustomSampler::ShouldSample(
     const opentelemetry::trace::SpanContext &parent_context,
-    opentelemetry::trace::TraceId trace_id,
-    opentelemetry::nostd::string_view name,
-    opentelemetry::trace::SpanKind span_kind,
-    const opentelemetry::common::KeyValueIterable &attributes,
-    const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept
+    opentelemetry::trace::TraceId /* trace_id */,
+    opentelemetry::nostd::string_view /* name */,
+    opentelemetry::trace::SpanKind /* span_kind */,
+    const opentelemetry::common::KeyValueIterable & /* attributes */,
+    const opentelemetry::trace::SpanContextKeyValueIterable & /* links */) noexcept
 {
   if (!parent_context.IsValid())
   {

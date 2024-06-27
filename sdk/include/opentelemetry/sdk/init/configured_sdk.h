@@ -8,7 +8,7 @@
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,12 +27,10 @@ public:
   void Install();
   void UnInstall();
 
-  // FIXME: should be sdk::trace::TracerProvider
-  std::shared_ptr<opentelemetry::trace::TracerProvider> m_tracer_provider;
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> m_tracer_provider;
   std::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> m_propagator;
   std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> m_meter_provider;
-  // FIXME: should be sdk::logs::LoggerProvider
-  std::shared_ptr<opentelemetry::logs::LoggerProvider> m_logger_provider;
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> m_logger_provider;
 };
 
 }  // namespace init

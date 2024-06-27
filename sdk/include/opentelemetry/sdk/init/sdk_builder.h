@@ -87,7 +87,7 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
       const;
 
-  std::unique_ptr<opentelemetry::trace::TracerProvider> CreateTracerProvider(
+  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model)
       const;
 
@@ -126,7 +126,7 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::LogRecordProcessorConfiguration>
           &model) const;
 
-  std::unique_ptr<opentelemetry::logs::LoggerProvider> CreateLoggerProvider(
+  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
       const;
 

@@ -9,7 +9,7 @@
 class CustomSampler : public opentelemetry::sdk::trace::Sampler
 {
 public:
-  CustomSampler(std::string comment) {}
+  CustomSampler(const std::string & /* comment */) {}
   ~CustomSampler() override = default;
 
   opentelemetry::sdk::trace::SamplingResult ShouldSample(

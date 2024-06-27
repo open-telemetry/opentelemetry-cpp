@@ -15,25 +15,26 @@ CustomSpanProcessor::MakeRecordable() noexcept
       new opentelemetry::sdk::trace::SpanData);
 }
 
-void CustomSpanProcessor::OnStart(opentelemetry::sdk::trace::Recordable &span,
-                                  const opentelemetry::trace::SpanContext &parent_context) noexcept
+void CustomSpanProcessor::OnStart(
+    opentelemetry::sdk::trace::Recordable & /* span */,
+    const opentelemetry::trace::SpanContext & /* parent_context */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnStart(): FIXME");
 }
 
 void CustomSpanProcessor::OnEnd(
-    std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept
+    std::unique_ptr<opentelemetry::sdk::trace::Recordable> && /* span */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::OnEnd(): FIXME");
 }
 
-bool CustomSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool CustomSpanProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::ForceFlush(): FIXME");
   return false;
 }
 
-bool CustomSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool CustomSpanProcessor::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomSpanProcessor::Shutdown(): FIXME");
   return false;

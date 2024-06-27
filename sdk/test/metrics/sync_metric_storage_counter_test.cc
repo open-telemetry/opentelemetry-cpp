@@ -8,7 +8,7 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 
-#if ENABLE_METRICS_EXEMPLAR_PREVIEW
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif

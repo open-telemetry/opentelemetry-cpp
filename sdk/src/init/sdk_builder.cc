@@ -58,7 +58,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/jaeger.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -71,7 +70,7 @@ class PropagatorBuilder : public opentelemetry::sdk::configuration::PropagatorCo
 {
 public:
   PropagatorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  virtual ~PropagatorBuilder() = default;
+  ~PropagatorBuilder() override = default;
 
   void VisitSimple(
       const opentelemetry::sdk::configuration::SimplePropagatorConfiguration *model) override
@@ -95,7 +94,7 @@ class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigur
 {
 public:
   SamplerBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  virtual ~SamplerBuilder() = default;
+  ~SamplerBuilder() override = default;
 
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) override
@@ -145,7 +144,7 @@ class SpanProcessorBuilder
 {
 public:
   SpanProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  virtual ~SpanProcessorBuilder() = default;
+  ~SpanProcessorBuilder() override = default;
 
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) override
@@ -176,7 +175,7 @@ class SpanExporterBuilder
 {
 public:
   SpanExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  virtual ~SpanExporterBuilder() = default;
+  ~SpanExporterBuilder() override = default;
 
   void VisitOtlp(
       const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
@@ -213,7 +212,7 @@ class LogRecordProcessorBuilder
 {
 public:
   LogRecordProcessorBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  virtual ~LogRecordProcessorBuilder() = default;
+  ~LogRecordProcessorBuilder() override = default;
 
   void VisitBatch(
       const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) override
@@ -494,11 +493,11 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSpan
   return sdk;
 }
 
-std::unique_ptr<opentelemetry::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
+std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model)
     const
 {
-  std::unique_ptr<opentelemetry::trace::TracerProvider> sdk;
+  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
   // https://github.com/open-telemetry/opentelemetry-configuration/issues/70
   OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME (IdGenerator)");
@@ -675,7 +674,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
 SdkBuilder::CreateBatchLogRecordProcessor(
-    const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) const
+    const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration * /* model */)
+    const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
 
@@ -686,7 +686,8 @@ SdkBuilder::CreateBatchLogRecordProcessor(
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
 SdkBuilder::CreateSimpleLogRecordProcessor(
-    const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *model) const
+    const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration * /* model */)
+    const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
 
@@ -697,7 +698,8 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
 SdkBuilder::CreateExtensionLogRecordProcessor(
-    const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model) const
+    const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration * /* model */)
+    const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
 
@@ -719,11 +721,11 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> SdkBuilder::Create
   return sdk;
 }
 
-std::unique_ptr<opentelemetry::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
+std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
     const
 {
-  std::unique_ptr<opentelemetry::logs::LoggerProvider> sdk;
+  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk;
 
   std::vector<std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>> sdk_processors;
 
