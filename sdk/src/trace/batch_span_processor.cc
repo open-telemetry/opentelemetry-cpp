@@ -207,7 +207,7 @@ void BatchSpanProcessor::Export()
       break;
     }
 
-    // reserves the space for the number of records to be exported
+    // Reserve space for the number of records
     spans_arr.reserve(num_records_to_export);
 
     buffer_.Consume(num_records_to_export,
