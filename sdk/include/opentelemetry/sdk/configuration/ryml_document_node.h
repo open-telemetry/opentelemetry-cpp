@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <ryml.hpp>
 #include <string>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
