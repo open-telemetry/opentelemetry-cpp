@@ -15,6 +15,7 @@ namespace sdk
 namespace configuration
 {
 
+#if 0
 static void DebugNode(opentelemetry::nostd::string_view name, ryml::ConstNodeRef node)
 {
   OTEL_INTERNAL_LOG_DEBUG("Processing: " << name);
@@ -37,6 +38,7 @@ static void DebugNode(opentelemetry::nostd::string_view name, ryml::ConstNodeRef
     OTEL_INTERNAL_LOG_DEBUG(" - val() : " << node.val());
   }
 }
+#endif
 
 std::string RymlDocumentNode::Key() const
 {
