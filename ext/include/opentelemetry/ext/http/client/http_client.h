@@ -192,7 +192,7 @@ struct HttpSslOptions
   /**
     Minimum SSL version to use.
     Valid values are:
-    - empty (no minimum version required)
+    - empty (defaults to TLSv1.2)
     - "1.2" (TLSv1.2)
     - "1.3" (TLSv1.3)
   */
