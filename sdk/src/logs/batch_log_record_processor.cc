@@ -208,7 +208,7 @@ void BatchLogRecordProcessor::Export()
       break;
     }
 
-    // Reserve space for number of records and avoid reallocation of vector.
+    // Reserve space for the number of records
     records_arr.reserve(num_records_to_export); 
     buffer_.Consume(num_records_to_export,
                     [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
