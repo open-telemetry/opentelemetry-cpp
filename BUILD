@@ -65,6 +65,7 @@ cc_library(
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
         "//exporters/memory:in_memory_span_exporter",
+        "//exporters/etw:etw_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
         "//exporters/ostream:ostream_span_exporter",
@@ -80,22 +81,20 @@ cc_library(
         "//exporters/prometheus:prometheus_exporter",
         "//exporters/prometheus:prometheus_push_exporter",
         "//exporters/zipkin:zipkin_exporter",
-    ] + select({
-        "@platforms//os:windows": [
-            "//exporters/etw:etw_exporter",
-        ],
-        "//conditions:default": [],
-    }),
+    ],
 )
 
 # Expands to all transitive project dependencies, excluding external projects (repos)
-genquery(
-    name = "otel_sdk_all_project_deps",
+[genquery(
+    name = "otel_sdk_all_deps_" + os,
     # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except //:otel_sdk_deps except //sdk/src/common:random except //sdk/src/common/platform:fork except //:windows_only))",
+    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
     scope = ["//:otel_sdk_deps"],
-)
+) for (os, exceptions) in [
+    ("non_windows", ""),
+    ("windows", "//exporters/etw:etw_exporter"),
+]]
 
 [cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
@@ -145,7 +144,7 @@ cc_library(
     # TODO: Add more missing headers to api_sdk_includes above and we'll no longer need /WHOLEARCHIVE
     user_link_flags = select({
         "@@platforms//os:windows": ["/WHOLEARCHIVE"],
-        "//conditions:default": [],
+        "//conditions:default": ["--whole-archive"],
     }),
     visibility = ["//visibility:private"],
     deps = [
@@ -400,24 +399,25 @@ write_source_file(
     tags = ["manual"],
 )
 
-cc_binary(
-    name = "dll_deps_update_binary",
+[cc_binary(
+    name = "dll_deps_update_binary_" + os,
     srcs = ["dll_deps_update.cc"],
-    data = ["otel_sdk_all_project_deps"],
-    local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_project_deps)\\"'],
+    data = ["otel_sdk_all_deps_" + os],
+    local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_deps_' + os + ')\\"'],
     deps = ["@bazel_tools//tools/cpp/runfiles"],
-)
+) for os in ["non_windows", "windows"]]
 
 [run_binary(
     name = "dll_deps_update_run_" + os,
-    srcs = [":otel_sdk_all_project_deps"],
+    srcs = [":otel_sdk_all_deps_" + os],
     outs = ["dll_deps_generated_internally_" + os + ".bzl"],
     args = ["$(location dll_deps_generated_internally_" + os + ".bzl)"],
-    tool = "dll_deps_update_binary",
+    tool = "dll_deps_update_binary_" + os,
 ) for os in ["non_windows", "windows"]]
 
 # To update the dll_deps_generated.bzl files, do this:
-#    bazel run dll_deps_update
+#    bazel run dll_deps_update_windows
+#    bazel run dll_deps_update_non_windows
 [write_source_file(
     name = "dll_deps_update_" + os,
     in_file = "dll_deps_generated_internally_" + os + ".bzl",
