@@ -414,16 +414,16 @@ void HttpOperation::Cleanup()
   To represent versions, the following symbols are needed:
 
   Added in CURL 7.34.0:
-  - CURL_SSLVERSION_TLSv1_0
-  - CURL_SSLVERSION_TLSv1_1
+  - CURL_SSLVERSION_TLSv1_0 (do not use)
+  - CURL_SSLVERSION_TLSv1_1 (do not use)
   - CURL_SSLVERSION_TLSv1_2
 
   Added in CURL 7.52.0:
   - CURL_SSLVERSION_TLSv1_3
 
   Added in CURL 7.54.0:
-  - CURL_SSLVERSION_MAX_TLSv1_0
-  - CURL_SSLVERSION_MAX_TLSv1_1
+  - CURL_SSLVERSION_MAX_TLSv1_0 (do not use)
+  - CURL_SSLVERSION_MAX_TLSv1_1 (do not use)
   - CURL_SSLVERSION_MAX_TLSv1_2
   - CURL_SSLVERSION_MAX_TLSv1_3
 
@@ -439,16 +439,6 @@ void HttpOperation::Cleanup()
 static long parse_min_ssl_version(std::string version)
 {
 #ifdef HAVE_TLS_VERSION
-  if (version == "1.0")
-  {
-    return CURL_SSLVERSION_TLSv1_0;
-  }
-
-  if (version == "1.1")
-  {
-    return CURL_SSLVERSION_TLSv1_1;
-  }
-
   if (version == "1.2")
   {
     return CURL_SSLVERSION_TLSv1_2;
@@ -466,16 +456,6 @@ static long parse_min_ssl_version(std::string version)
 static long parse_max_ssl_version(std::string version)
 {
 #ifdef HAVE_TLS_VERSION
-  if (version == "1.0")
-  {
-    return CURL_SSLVERSION_MAX_TLSv1_0;
-  }
-
-  if (version == "1.1")
-  {
-    return CURL_SSLVERSION_MAX_TLSv1_1;
-  }
-
   if (version == "1.2")
   {
     return CURL_SSLVERSION_MAX_TLSv1_2;
@@ -780,7 +760,7 @@ CURLcode HttpOperation::Setup()
 
     if (!ssl_options_.ssl_cipher.empty())
     {
-      /* TLS 1.0, 1.1, 1.2 */
+      /* TLS 1.2 */
       const char *cipher_list = ssl_options_.ssl_cipher.c_str();
 
       rc = SetCurlStrOption(CURLOPT_SSL_CIPHER_LIST, cipher_list);
