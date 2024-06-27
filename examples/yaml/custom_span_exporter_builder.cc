@@ -25,4 +25,4 @@ static CustomSpanExporterBuilder singleton;
 void CustomSpanExporterBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 {
   registry->AddExtensionSpanExporterBuilder("my_custom_span_exporter", &singleton);
-};
+}

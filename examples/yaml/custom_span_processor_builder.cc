@@ -25,4 +25,4 @@ static CustomSpanProcessorBuilder singleton;
 void CustomSpanProcessorBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 {
   registry->AddExtensionSpanProcessorBuilder("my_custom_span_processor", &singleton);
-};
+}
