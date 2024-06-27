@@ -207,9 +207,9 @@ void BatchSpanProcessor::Export()
       break;
     }
 
-    //reserves the space for the number of records to be exported
+    // reserves the space for the number of records to be exported
     spans_arr.reserve(num_records_to_export);
-    
+
     buffer_.Consume(num_records_to_export,
                     [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
                       range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
