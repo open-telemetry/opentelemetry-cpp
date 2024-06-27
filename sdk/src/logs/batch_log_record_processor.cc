@@ -209,7 +209,7 @@ void BatchLogRecordProcessor::Export()
     }
 
     // Reserve space for the number of records
-    records_arr.reserve(num_records_to_export); 
+    records_arr.reserve(num_records_to_export);
     buffer_.Consume(num_records_to_export,
                     [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
                       range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
