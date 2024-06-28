@@ -1466,7 +1466,7 @@
     },
     "@@rules_go~//go:extensions.bzl%go_sdk": {
       "os:windows,arch:amd64": {
-        "bzlTransitiveDigest": "ngSfLTe8hQiidDeEb6YUqr77yNHrYln0spUfoRZ8O5I=",
+        "bzlTransitiveDigest": "JFrCnX1tTDAqjKVGYDdGNiwf4OvEAFVF170rNP7HQPw=",
         "usagesDigest": "eBPCRLKeBr4iU55b1S2aLCYk6yMHyuLgphY9KhjbwDU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
