@@ -67,12 +67,12 @@ logs in case if you encounter package installation failures.
 
 In order to enable custom build flags - vcpkg triplets and custom environment
 variables may be used. Please see [triplets instruction
-here](https://vcpkg.readthedocs.io/en/latest/users/triplets/). Response file for
+here](https://learn.microsoft.com/en-us/vcpkg/users/triplets). Response file for
 a custom build, e.g. `response_file_linux_PRODUCTNAME.txt` may specify a custom
 triplet. For example, custom triplet controls if the library is built as static
-or dynamic. Default triplets may also be overridden with [custom
-triplets](https://vcpkg.readthedocs.io/en/latest/examples/overlay-triplets-linux-dynamic/#overlay-triplets-example).
-Custom triplets specific to various products must be maintained by product
+or dynamic. Default triplets may also be overridden with [overlays
+triplets](https://learn.microsoft.com/en-us/vcpkg/users/examples/overlay-triplets-linux-dynamic).
+Overlay triplets specific to various products must be maintained by product
 teams. Product teams may optionally decide to integrate their triplets in the
 mainline OpenTelemetry C++ SDK repo as-needed.
 
