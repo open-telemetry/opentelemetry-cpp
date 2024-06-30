@@ -70,7 +70,7 @@ variables may be used. Please see [triplets instruction
 here](https://learn.microsoft.com/en-us/vcpkg/users/triplets). Response file for
 a custom build, e.g. `response_file_linux_PRODUCTNAME.txt` may specify a custom
 triplet. For example, custom triplet controls if the library is built as static
-or dynamic. Default triplets may also be overridden with [overlays
+or dynamic. Default triplets may also be overridden with [overlay
 triplets](https://learn.microsoft.com/en-us/vcpkg/users/examples/overlay-triplets-linux-dynamic).
 Overlay triplets specific to various products must be maintained by product
 teams. Product teams may optionally decide to integrate their triplets in the
