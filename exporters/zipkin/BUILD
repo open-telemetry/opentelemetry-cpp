@@ -8,7 +8,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "zipkin_recordable",
     srcs = [
         "src/recordable.cc",
@@ -25,7 +25,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "zipkin_exporter",
     srcs = [
         "src/zipkin_exporter.cc",
@@ -75,7 +75,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

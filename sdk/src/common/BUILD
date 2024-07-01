@@ -5,7 +5,7 @@ load("//bazel:otel_cc_library.bzl", "otel_cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "random",
     srcs = [
         "random.cc",
@@ -22,7 +22,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "base64",
     srcs = [
         "base64.cc",
@@ -35,7 +35,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "env_variables",
     srcs = [
         "env_variables.cc",
@@ -47,7 +47,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "global_log_handler",
     srcs = [
         "global_log_handler.cc",

@@ -9,7 +9,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "otlp_recordable",
     srcs = [
         "src/otlp_environment.cc",
@@ -42,7 +42,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_grpc_client",
     srcs = [
         "src/otlp_grpc_client.cc",
@@ -72,7 +72,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_grpc_exporter",
     srcs = [
         "src/otlp_grpc_exporter.cc",
@@ -105,7 +105,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_http_client",
     srcs = [
         "src/otlp_http.cc",
@@ -145,7 +145,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_http_exporter",
     srcs = [
         "src/otlp_http_exporter.cc",
@@ -173,7 +173,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_file_client",
     srcs = [
         "src/otlp_file_client.cc",
@@ -200,7 +200,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_file_exporter",
     srcs = [
         "src/otlp_file_exporter.cc",
@@ -228,7 +228,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_grpc_metric_exporter",
     srcs = [
         "src/otlp_grpc_metric_exporter.cc",
@@ -260,7 +260,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_http_metric_exporter",
     srcs = [
         "src/otlp_http_metric_exporter.cc",
@@ -288,7 +288,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_file_metric_exporter",
     srcs = [
         "src/otlp_file_metric_exporter.cc",
@@ -316,7 +316,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_http_log_record_exporter",
     srcs = [
         "src/otlp_http_log_record_exporter.cc",
@@ -344,7 +344,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_file_log_record_exporter",
     srcs = [
         "src/otlp_file_log_record_exporter.cc",
@@ -372,7 +372,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "otlp_grpc_log_record_exporter",
     srcs = [
         "src/otlp_grpc_log_record_exporter.cc",
@@ -769,7 +769,7 @@ otel_cc_benchmark(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

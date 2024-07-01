@@ -21,7 +21,7 @@ string_flag(
     values = CPP_STDLIBS,
 )
 
-cc_library(
+otel_cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     defines = ["HAVE_ABSEIL"] + select({
@@ -49,7 +49,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

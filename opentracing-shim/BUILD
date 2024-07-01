@@ -8,7 +8,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "opentracing_shim",
     srcs = [
         "src/shim_utils.cc",

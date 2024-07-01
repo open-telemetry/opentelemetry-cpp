@@ -22,7 +22,7 @@ config_setting(
     visibility = ["//visibility:public"],
 )
 
-cc_library(
+otel_cc_library(
     name = "windows_only",
     visibility = ["//visibility:public"],
     target_compatible_with = select({
@@ -55,7 +55,7 @@ config_setting(
 # Which is then used to exclude (through dll_deps([])) the libs already linked in here.
 # There are some gotchas, as ideally only libs that have dllexport symbols should be in there
 # But it's impossible to know this in advance.
-cc_library(
+otel_cc_library(
     name = "otel_sdk_deps",
     visibility = ["//visibility:private"],
     target_compatible_with = select({
@@ -90,14 +90,14 @@ cc_library(
     name = "otel_sdk_all_deps_" + os,
     # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
+    expression = "kind('otel_cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
     scope = ["//:otel_sdk_deps"],
 ) for (os, exceptions) in [
     ("non_windows", ""),
     ("windows", "//exporters/etw:etw_exporter"),
 ]]
 
-[cc_library(
+[otel_cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
     target_compatible_with = select({
         # Makes the build target compatible only with specific compilation mode, for example:
@@ -111,7 +111,7 @@ cc_library(
     ("otel_sdk_rd", ":reldeb"),
 ]]
 
-cc_library(
+otel_cc_library(
     name = "api_sdk_includes",
     # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
     visibility = ["//visibility:private"],
@@ -206,8 +206,8 @@ alias(
     "otel_sdk_rd",
 ]]
 
-# Present the import library above as cc_library so we can add headers to it, force defines, and make it public.
-[cc_library(
+# Present the import library above as otel_cc_library so we can add headers to it, force defines, and make it public.
+[otel_cc_library(
     name = otel_sdk_binary + "_dll",
     implementation_deps = [
         otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files

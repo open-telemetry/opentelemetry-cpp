@@ -27,16 +27,16 @@ cc_grpc_library(
     deps = [":messages_cc_proto"],
 )
 
-# Ideally we should not need this proxy cc_library
+# Ideally we should not need this proxy otel_cc_library
 # But neither cc_proto_library nor cc_grpc_library allow for
 # include_prefix, includes or strip_include_prefix right now.
-cc_library(
+otel_cc_library(
     name = "messages_cc_grpc",
     deps = [ "_messages_cc_grpc" ],
     includes = ["protos"],
 )
 
-cc_library(
+otel_cc_library(
     name = "tracer_common",
     srcs = ["tracer_common.h"],
     tags = ["ostream"],

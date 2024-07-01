@@ -100,7 +100,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "baseline_circular_buffer",
     testonly = 1,
     hdrs = [

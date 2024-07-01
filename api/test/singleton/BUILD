@@ -22,7 +22,7 @@ HIDDEN_NOWIN_COPTS = [
     "-fvisibility=hidden",
 ]
 
-cc_library(
+otel_cc_library(
     name = "component_a",
     srcs = [
         "component_a.cc",
@@ -36,7 +36,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_b",
     srcs = [
         "component_b.cc",
@@ -50,7 +50,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_c",
     srcs = [
         "component_c.cc",
@@ -68,7 +68,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_d",
     srcs = [
         "component_d.cc",
@@ -86,7 +86,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_e",
     srcs = [
         "component_e.cc",
@@ -104,7 +104,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_f",
     srcs = [
         "component_f.cc",

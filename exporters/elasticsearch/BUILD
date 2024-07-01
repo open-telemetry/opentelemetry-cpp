@@ -8,7 +8,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "es_log_record_exporter",
     srcs = [
         "src/es_log_record_exporter.cc",
@@ -54,7 +54,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

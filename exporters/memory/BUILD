@@ -8,7 +8,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "in_memory_span_data",
     hdrs = [
         "include/opentelemetry/exporters/memory/in_memory_data.h",
@@ -36,7 +36,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "in_memory_span_exporter",
     srcs = [
         "src/in_memory_span_exporter_factory.cc",
@@ -69,7 +69,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

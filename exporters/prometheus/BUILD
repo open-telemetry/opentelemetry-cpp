@@ -9,7 +9,7 @@ avoid_dll_lock()
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+otel_cc_library(
     name = "prometheus_exporter",
     srcs = [
         "src/exporter.cc",
@@ -33,7 +33,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "prometheus_exporter_utils",
     srcs = [
         "src/exporter_utils.cc",
@@ -51,7 +51,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "prometheus_collector",
     srcs = [
         "src/collector.cc",
@@ -70,7 +70,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "prometheus_test_helper",
     testonly = 1,
     hdrs = [
@@ -140,7 +140,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "prometheus_push_exporter",
     srcs = [
         "src/push_exporter.cc",
@@ -164,7 +164,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "prometheus_push_test_helper",
     testonly = 1,
     hdrs = [
@@ -200,7 +200,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",

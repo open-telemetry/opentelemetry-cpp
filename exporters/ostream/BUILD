@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 
 avoid_dll_lock()
 
-cc_library(
+otel_cc_library(
     name = "ostream_log_record_exporter",
     srcs = [
         "src/log_record_exporter.cc",
@@ -39,7 +39,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "ostream_metric_exporter",
     srcs = [
         "src/metric_exporter.cc",
@@ -73,7 +73,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "ostream_span_exporter",
     srcs = [
         "src/span_exporter.cc",
@@ -91,7 +91,7 @@ cc_library(
     ],
 )
 
-cc_library(
+otel_cc_library(
     name = "ostream_capture",
     testonly = 1,
     hdrs = [
@@ -117,7 +117,7 @@ cc_test(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "headers",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
