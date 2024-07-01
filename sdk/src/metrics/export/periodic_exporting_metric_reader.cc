@@ -89,19 +89,26 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
 {
-  std::atomic<bool> cancel_export_for_timeout{false};
-  auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
-    Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-      if (cancel_export_for_timeout)
-      {
-        OTEL_INTERNAL_LOG_ERROR(
-            "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-            << export_timeout_millis_.count() << " ms, and timed out");
-        return false;
-      }
-      this->exporter_->Export(metric_data);
-      return true;
-    });
+  std::shared_ptr<std::atomic<bool>> cancel_export_for_timeout =
+      std::make_shared<std::atomic<bool>>(false);
+  auto keep_lifetime = shared_from_this();
+
+  auto future_receive = std::async(std::launch::async, [keep_lifetime, cancel_export_for_timeout] {
+    static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
+        ->Collect([keep_lifetime, cancel_export_for_timeout](ResourceMetrics &metric_data) {
+          if (*cancel_export_for_timeout)
+          {
+            OTEL_INTERNAL_LOG_ERROR(
+                "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+                << static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
+                       ->export_timeout_millis_.count()
+                << " ms, and timed out");
+            return false;
+          }
+          static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
+              ->exporter_->Export(metric_data);
+          return true;
+        });
   });
 
   std::future_status status;
@@ -111,7 +118,7 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     status = future_receive.wait_for(std::chrono::milliseconds(export_timeout_millis_));
     if (status == std::future_status::timeout)
     {
-      cancel_export_for_timeout = true;
+      *cancel_export_for_timeout = true;
       break;
     }
   } while (status != std::future_status::ready);

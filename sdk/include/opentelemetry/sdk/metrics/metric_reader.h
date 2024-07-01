@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <memory>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -19,7 +20,7 @@ namespace metrics
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
-class MetricReader
+class MetricReader : public std::enable_shared_from_this<MetricReader>
 {
 public:
   MetricReader();
