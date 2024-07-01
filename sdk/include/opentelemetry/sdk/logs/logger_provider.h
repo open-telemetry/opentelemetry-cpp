@@ -36,10 +36,6 @@ public:
    * @param processor The span processor for this logger provider. This must
    * not be a nullptr.
    * @param resource  The resources for this logger provider.
-   * @param sampler The sampler for this logger provider. This must
-   * not be a nullptr.
-   * @param id_generator The custom id generator for this logger provider. This must
-   * not be a nullptr
    */
   explicit LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
                           opentelemetry::sdk::resource::Resource resource =
