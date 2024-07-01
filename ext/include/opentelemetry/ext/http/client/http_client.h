@@ -192,9 +192,7 @@ struct HttpSslOptions
   /**
     Minimum SSL version to use.
     Valid values are:
-    - empty (no minimum version required)
-    - "1.0" (TLSv1.0)
-    - "1.1" (TLSv1.1)
+    - empty (defaults to TLSv1.2)
     - "1.2" (TLSv1.2)
     - "1.3" (TLSv1.3)
   */
@@ -204,8 +202,6 @@ struct HttpSslOptions
     Maximum SSL version to use.
     Valid values are:
     - empty (no maximum version required)
-    - "1.0" (TLSv1.0)
-    - "1.1" (TLSv1.1)
     - "1.2" (TLSv1.2)
     - "1.3" (TLSv1.3)
   */
@@ -213,7 +209,7 @@ struct HttpSslOptions
 
   /**
     TLS Cipher.
-    This is for TLS 1.0, 1.1 and 1.2.
+    This is for TLS 1.2.
     The list is delimited by colons (":").
     Cipher names depends on the underlying CURL implementation.
   */
