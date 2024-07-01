@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include <chrono>
 
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
@@ -819,19 +820,23 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  is_shutdown_.store(true, std::memory_order_release);
+
+  ForceFlush(timeout);
+
   {
     std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    is_shutdown_ = true;
 
     // Shutdown the session manager
     http_client_->CancelAllSessions();
     http_client_->FinishAllSessions();
   }
 
-  ForceFlush(timeout);
-
+  // Wait util all sessions are canceled.
   while (cleanupGCSessions())
-    ;
+  {
+    ForceFlush(std::chrono::milliseconds{1});
+  }
   return true;
 }
 
@@ -1017,7 +1022,7 @@ bool OtlpHttpClient::cleanupGCSessions() noexcept
 
 bool OtlpHttpClient::IsShutdown() const noexcept
 {
-  return is_shutdown_;
+  return is_shutdown_.load(std::memory_order_acquire);
 }
 
 }  // namespace otlp

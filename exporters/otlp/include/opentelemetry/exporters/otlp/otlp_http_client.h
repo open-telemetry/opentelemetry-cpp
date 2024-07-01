@@ -275,7 +275,7 @@ private:
                  std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   // Stores if this HTTP client had its Shutdown() method called
-  bool is_shutdown_;
+  std::atomic<bool> is_shutdown_;
 
   // The configuration options associated with this HTTP client.
   const OtlpHttpClientOptions options_;

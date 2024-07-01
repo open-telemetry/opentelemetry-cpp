@@ -567,14 +567,21 @@ bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
     return true;
   }
 
+  bool force_flush_result;
   if (false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
     is_shutdown_ = true;
 
+    force_flush_result = ForceFlush(timeout);
+
     async_data_->cq.Shutdown();
   }
+  else
+  {
+    force_flush_result = ForceFlush(timeout);
+  }
 
-  return ForceFlush(timeout);
+  return force_flush_result;
 }
 
 #endif
