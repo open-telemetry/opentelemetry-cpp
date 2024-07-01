@@ -1,9 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-package(default_visibility = ["//visibility:public"])
-
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+
+package(default_visibility = ["//visibility:public"])
 
 avoid_dll_lock()
 

@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(

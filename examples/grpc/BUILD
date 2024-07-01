@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@@grpc~//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc_library.bzl", "otel_cc_library")
 
 avoid_dll_lock()
 

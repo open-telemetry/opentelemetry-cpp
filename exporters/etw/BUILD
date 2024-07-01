@@ -3,6 +3,7 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc_library.bzl", "otel_cc_library")
 
 avoid_dll_lock()
 

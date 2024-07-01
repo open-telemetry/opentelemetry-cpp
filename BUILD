@@ -6,6 +6,7 @@ load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
+load("//bazel:otel_cc_library.bzl", "otel_cc_library")
 
 bool_flag(
     name = "with_dll",
