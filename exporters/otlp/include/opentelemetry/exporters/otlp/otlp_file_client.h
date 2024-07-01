@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
@@ -28,7 +29,7 @@ namespace otlp
 /**
  * The OTLP File client exports data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpFileClient
+class OPENTELEMETRY_EXPORT OtlpFileClient
 {
 public:
   /**

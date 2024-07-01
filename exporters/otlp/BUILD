@@ -415,7 +415,6 @@ cc_test(
         ":otlp_grpc_client",
         "@com_google_googletest//:gtest_main",
         "@opentelemetry-proto//:trace_service_proto_cc",
-        # For gRPC
         "@opentelemetry-proto//:logs_service_grpc_cc",
     ]),
 )
@@ -458,13 +457,16 @@ cc_test(
         "otlp_file",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_file_client",
         ":otlp_file_exporter",
         ":otlp_recordable",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@opentelemetry-proto//:trace_service_proto_cc",
+        "@opentelemetry-proto//:logs_service_proto_cc",
+        "@github_nlohmann_json//:json",
+    ]),
 )
 
 cc_test(
@@ -537,11 +539,14 @@ cc_test(
         "otlp_file",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_file_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@github_nlohmann_json//:json",
+        "@opentelemetry-proto//:trace_service_grpc_cc",
+        "@@grpc~//:grpc++",
+    ]),
 )
 
 cc_test(
@@ -552,11 +557,11 @@ cc_test(
         "otlp_file",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_file_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
@@ -599,11 +604,13 @@ cc_test(
         "otlp_file_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_file_log_record_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+        "@opentelemetry-proto//:logs_service_proto_cc",
+        "@github_nlohmann_json//:json",
+    ]),
 )
 
 cc_test(
@@ -614,11 +621,11 @@ cc_test(
         "otlp_file_log",
         "test",
     ],
-    deps = [
+    deps = dll_deps([
         ":otlp_file_log_record_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
-    ],
+    ]),
 )
 
 cc_test(
