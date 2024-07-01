@@ -4,7 +4,10 @@
 #include "src/common/random.h"
 
 #include <algorithm>
+#include <atomic>
 #include <iterator>
+#include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 using opentelemetry::sdk::common::Random;
@@ -33,4 +36,28 @@ TEST(RandomTest, GenerateRandomBuffer)
     EXPECT_FALSE(
         std::equal(std::begin(buf1_vector), std::end(buf1_vector), std::begin(buf2_vector)));
   }
+}
+
+void doSomethingOnce(std::atomic_uint *count)
+{
+  static std::atomic_flag flag;
+  if (!flag.test_and_set())
+  {
+    (*count)++;
+  }
+}
+
+TEST(RandomTest, AtomicFlagMultiThreadTest)
+{
+  std::vector<std::thread> threads;
+  std::atomic_uint count(0);
+  for (int i = 0; i < 10; ++i)
+  {
+    threads.push_back(std::thread(doSomethingOnce, &count));
+  }
+  for (auto &t : threads)
+  {
+    t.join();
+  }
+  EXPECT_EQ(1, count.load());
 }
