@@ -3,6 +3,8 @@
 
 #pragma once
 
+// IWYU pragma: private, include "opentelemetry/nostd/type_traits.h"
+
 #include <type_traits>
 
 #include "opentelemetry/version.h"

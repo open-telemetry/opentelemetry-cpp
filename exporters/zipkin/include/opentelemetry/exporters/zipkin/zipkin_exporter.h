@@ -3,16 +3,20 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
+#include <atomic>
+#include <chrono>
+#include <memory>
 
 #include "nlohmann/json.hpp"
 
-#include <atomic>
+#include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

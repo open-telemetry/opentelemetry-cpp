@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <iostream>
-#include <memory>
 #include <new>
 #include <string>
 #include <utility>
@@ -10,7 +9,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context_value.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "tracer.h"

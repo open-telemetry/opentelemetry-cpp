@@ -3,17 +3,36 @@
 
 #pragma once
 
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-#include "opentelemetry/proto/resource/v1/resource.pb.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-// clang-format on
-
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
+
+namespace opentelemetry
+{
+namespace proto
+{
+
+namespace common
+{
+namespace v1
+{
+class AnyValue;
+class KeyValue;
+}  // namespace v1
+}  // namespace common
+
+namespace resource
+{
+namespace v1
+{
+class Resource;
+}
+}  // namespace resource
+
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

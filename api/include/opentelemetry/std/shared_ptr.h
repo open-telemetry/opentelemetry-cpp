@@ -3,7 +3,9 @@
 
 #pragma once
 
-#include <memory>
+// IWYU pragma: private, include "opentelemetry/nostd/shared_ptr.h"
+
+#include <memory>  // IWYU pragma: export
 
 #include "opentelemetry/version.h"
 

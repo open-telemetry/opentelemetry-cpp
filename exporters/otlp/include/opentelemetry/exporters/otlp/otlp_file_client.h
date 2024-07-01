@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
+#include <chrono>
+#include <cstddef>
 
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
-
-#include <chrono>
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/version.h"
 
 // forward declare google::protobuf::Message
 namespace google
