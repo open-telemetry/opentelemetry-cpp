@@ -44,13 +44,8 @@ void InitTracer()
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  std::shared_ptr<opentelemetry::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
-#else
   std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider =
       opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   // Set the global trace provider
   std::shared_ptr<trace_api::TracerProvider> api_provider = provider;
@@ -70,13 +65,8 @@ void InitLogger()
       std::unique_ptr<logs_sdk::LogRecordExporter>(new logs_exporter::OStreamLogRecordExporter);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  std::shared_ptr<opentelemetry::logs::LoggerProvider> provider(
-      opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
-#else
   std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> provider(
       opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   // Set the global logger provider
   std::shared_ptr<logs_api::LoggerProvider> api_provider = provider;

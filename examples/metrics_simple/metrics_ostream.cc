@@ -57,12 +57,7 @@ void InitMetrics(const std::string &name)
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  auto u_provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-  auto *provider  = static_cast<opentelemetry::sdk::metrics::MeterProvider *>(u_provider.get());
-#else
   auto provider = opentelemetry::sdk::metrics::MeterProviderFactory::Create();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   provider->AddMetricReader(std::move(reader));
 
@@ -118,11 +113,7 @@ void InitMetrics(const std::string &name)
   provider->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                     std::move(histogram_view));
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-  std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(u_provider));
-#else
   std::shared_ptr<opentelemetry::metrics::MeterProvider> api_provider(std::move(provider));
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
   metrics_api::Provider::SetMeterProvider(api_provider);
 }

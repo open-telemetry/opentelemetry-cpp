@@ -41,13 +41,8 @@ namespace
 opentelemetry::exporter::otlp::OtlpFileExporterOptions opts;
 opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions log_opts;
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-std::shared_ptr<opentelemetry::trace::TracerProvider> tracer_provider;
-std::shared_ptr<opentelemetry::logs::LoggerProvider> logger_provider;
-#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -66,11 +61,7 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (tracer_provider)
   {
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-    static_cast<opentelemetry::sdk::trace::TracerProvider *>(tracer_provider.get())->ForceFlush();
-#else
     tracer_provider->ForceFlush();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   tracer_provider.reset();
@@ -94,11 +85,7 @@ void CleanupLogger()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (logger_provider)
   {
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-    static_cast<opentelemetry::sdk::logs::LoggerProvider *>(logger_provider.get())->ForceFlush();
-#else
     logger_provider->ForceFlush();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   logger_provider.reset();
