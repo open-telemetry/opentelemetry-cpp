@@ -30,6 +30,7 @@ jobs:
             libgmock-dev \
             libgtest-dev \
             libbenchmark-dev
+          sudo ./ci/install_ryml.sh
 
       - name: Prepare CMake
         run: |
@@ -37,6 +38,7 @@ jobs:
           mkdir build && cd build
           CC="clang" CXX="clang++" cmake \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
+            -DWITH_CONFIGURATION=ON \
             -DBUILD_TESTING=OFF \
             -DWITH_DEPRECATED_SDK_FACTORY=OFF \
             -DBUILD_W3CTRACECONTEXT_TEST=OFF \

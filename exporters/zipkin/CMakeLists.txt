@@ -5,7 +5,8 @@ include_directories(include)
 add_definitions(-DWITH_CURL)
 add_library(
   opentelemetry_exporter_zipkin_trace
-  src/zipkin_exporter.cc src/zipkin_exporter_factory.cc src/recordable.cc)
+  src/zipkin_exporter.cc src/zipkin_exporter_factory.cc src/recordable.cc
+  src/zipkin_builder.cc)
 
 target_include_directories(
   opentelemetry_exporter_zipkin_trace
