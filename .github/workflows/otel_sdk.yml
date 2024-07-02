@@ -17,7 +17,8 @@ jobs:
     steps:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize
-      - run: winget upgrade LLVM.LLVM --version 18.1.8 --silent
+      - uses: Cyberboss/install-winget@v1
+      - run: winget install LLVM.LLVM --version 18.1.8 --silent
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
