@@ -87,7 +87,7 @@ public:
     print_value(arg, sout_);
   }
 
-  void operator()(const nostd::string_view &arg) { sout_.write(arg.data(), arg.size()); }
+  void operator()(nostd::string_view &&arg) { sout_.write(arg.data(), arg.size()); }
 
 private:
   std::ostream &sout_;
