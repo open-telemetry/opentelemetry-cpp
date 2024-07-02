@@ -111,7 +111,7 @@ std::string OPENTELEMETRY_EXPORT GetOtlpDefaultTracesSslTlsMaxVersion();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultMetricsSslTlsMaxVersion();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultLogsSslTlsMaxVersion();
 
-// For TLS 1.0, 1.1, 1.2
+// For TLS 1.2
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultTracesSslTlsCipher();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultMetricsSslTlsCipher();
 std::string OPENTELEMETRY_EXPORT GetOtlpDefaultLogsSslTlsCipher();
