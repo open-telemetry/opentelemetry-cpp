@@ -17,7 +17,7 @@ jobs:
     steps:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize
-      - run: choco upgrade llvm --version 18.1.6
+      - run: winget upgrade LLVM.LLVM --version 18.1.8 --silent
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:

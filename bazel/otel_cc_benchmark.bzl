@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+load("otel_cc.bzl", "otel_cc_binary", "otel_cc_test")
+
 def otel_cc_benchmark(name, srcs, deps, tags = [""]):
     """
     Creates targets for the benchmark and related targets.
@@ -22,7 +24,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
 
     # This is the benchmark as a binary, it can be run manually, and is used
     # to generate the _result below.
-    native.cc_binary(
+    otel_cc_binary(
         name = name,
         srcs = srcs,
         deps = deps + ["@google_benchmark//:benchmark"],
@@ -41,7 +43,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
 
     # This is run as part of "bazel test ..." to smoke-test benchmarks. It's
     # meant to complete quickly rather than get accurate results.
-    native.cc_test(
+    otel_cc_test(
         name = name + "_smoketest",
         srcs = srcs,
         deps = deps + ["@google_benchmark//:benchmark"],

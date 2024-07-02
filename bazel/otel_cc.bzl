@@ -9,6 +9,13 @@ load("@rules_cc//cc:defs.bzl",
 )
 
 def otel_cc_library(**kwargs):
+    # dump = kwargs["name"] + ": "
+    # dump = dump + " mod=" + native.module_name() 
+    # dump = dump + " ver=" + native.module_version()
+    # dump = dump + " pkg=" + native.package_name()
+    # dump = dump + " repo=" + native.repo_name()
+    # print(dump)
+
     # Link as .o (.obj) files, not .a (.lib)
     kwargs["alwayslink"] = kwargs.get("alwayslink", True)
 
