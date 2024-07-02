@@ -111,7 +111,7 @@ std::string GetOtlpDefaultTracesSslTlsMaxVersion();
 std::string GetOtlpDefaultMetricsSslTlsMaxVersion();
 std::string GetOtlpDefaultLogsSslTlsMaxVersion();
 
-// For TLS 1.0, 1.1, 1.2
+// For TLS 1.2
 std::string GetOtlpDefaultTracesSslTlsCipher();
 std::string GetOtlpDefaultMetricsSslTlsCipher();
 std::string GetOtlpDefaultLogsSslTlsCipher();

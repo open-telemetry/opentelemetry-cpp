@@ -15,6 +15,25 @@ Increment the:
 
 ## [Unreleased]
 
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+
+Breaking changes:
+
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  * The OTLP HTTP exporter no longer accept options like:
+    * min_TLS = 1.0
+    * min_TLS = 1.1
+    * max_TLS = 1.0
+    * max_TLS = 1.1
+  * When connecting to an OTLP HTTP endpoint, using `https`,
+    the connection will require TLS 1.2 by default,
+    unless min_TLS is set to 1.3
+  * Plain `http` connections (insecure) are not affected.
+
 ## [1.16.0] 2024-06-21
 
 * [BUILD] Upgrade bazel abseil from 20220623.1 to 20230802.2
