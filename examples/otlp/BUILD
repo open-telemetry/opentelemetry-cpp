@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_grpc",
     srcs = [
         "grpc_main.cc",
@@ -23,7 +24,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_http",
     srcs = [
         "http_main.cc",
@@ -41,7 +42,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_file",
     srcs = [
         "file_main.cc",
@@ -59,7 +60,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_http_log",
     srcs = [
         "http_log_main.cc",
@@ -78,7 +79,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_grpc_log",
     srcs = [
         "grpc_log_main.cc",
@@ -97,7 +98,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_file_log",
     srcs = [
         "file_log_main.cc",
@@ -116,7 +117,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_grpc_metric",
     srcs = [
         "grpc_metric_main.cc",
@@ -135,7 +136,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_http_metric",
     srcs = [
         "http_metric_main.cc",
@@ -154,7 +155,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "example_otlp_file_metric",
     srcs = [
         "file_metric_main.cc",

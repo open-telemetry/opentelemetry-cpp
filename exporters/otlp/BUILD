@@ -3,7 +3,7 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -403,7 +403,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_recordable_test",
     srcs = ["test/otlp_recordable_test.cc"],
     tags = [
@@ -419,7 +419,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_metrics_serialization_test",
     srcs = ["test/otlp_metrics_serialization_test.cc"],
     tags = [
@@ -433,7 +433,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_log_recordable_test",
     srcs = [
         "test/otlp_log_recordable_test.cc",
@@ -449,7 +449,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_client_test",
     srcs = ["test/otlp_file_client_test.cc"],
     tags = [
@@ -469,7 +469,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_exporter_test",
     srcs = ["test/otlp_grpc_exporter_test.cc"],
     tags = [
@@ -484,7 +484,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_exporter_factory_test",
     srcs = ["test/otlp_grpc_exporter_factory_test.cc"],
     tags = [
@@ -499,7 +499,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_exporter_test",
     srcs = ["test/otlp_http_exporter_test.cc"],
     tags = [
@@ -515,7 +515,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_exporter_factory_test",
     srcs = ["test/otlp_http_exporter_factory_test.cc"],
     tags = [
@@ -531,7 +531,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_exporter_test",
     srcs = ["test/otlp_file_exporter_test.cc"],
     tags = [
@@ -549,7 +549,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_exporter_factory_test",
     srcs = ["test/otlp_file_exporter_factory_test.cc"],
     tags = [
@@ -564,7 +564,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_log_record_exporter_test",
     srcs = ["test/otlp_http_log_record_exporter_test.cc"],
     tags = [
@@ -580,7 +580,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_log_record_exporter_factory_test",
     srcs = ["test/otlp_http_log_record_exporter_factory_test.cc"],
     tags = [
@@ -596,7 +596,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_log_record_exporter_test",
     srcs = ["test/otlp_file_log_record_exporter_test.cc"],
     tags = [
@@ -613,7 +613,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_log_record_exporter_factory_test",
     srcs = ["test/otlp_file_log_record_exporter_factory_test.cc"],
     tags = [
@@ -628,7 +628,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_log_record_exporter_test",
     srcs = ["test/otlp_grpc_log_record_exporter_test.cc"],
     tags = [
@@ -648,7 +648,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_log_record_exporter_factory_test",
     srcs = ["test/otlp_grpc_log_record_exporter_factory_test.cc"],
     tags = [
@@ -664,7 +664,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_metric_exporter_test",
     srcs = ["test/otlp_grpc_metric_exporter_test.cc"],
     tags = [
@@ -680,7 +680,7 @@ cc_test(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_grpc_metric_exporter_factory_test",
     srcs = ["test/otlp_grpc_metric_exporter_factory_test.cc"],
     tags = [
@@ -695,7 +695,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_metric_exporter_test",
     srcs = ["test/otlp_http_metric_exporter_test.cc"],
     tags = [
@@ -713,7 +713,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_http_metric_exporter_factory_test",
     srcs = ["test/otlp_http_metric_exporter_factory_test.cc"],
     tags = [
@@ -729,7 +729,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_metric_exporter_test",
     srcs = ["test/otlp_file_metric_exporter_test.cc"],
     tags = [
@@ -744,7 +744,7 @@ cc_test(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "otlp_file_metric_exporter_factory_test",
     srcs = ["test/otlp_file_metric_exporter_factory_test.cc"],
     tags = [

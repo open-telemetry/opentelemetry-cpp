@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_test(
+otel_cc_test(
     name = "logger_provider_sdk_test",
     srcs = [
         "logger_provider_sdk_test.cc",
@@ -21,7 +22,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "logger_sdk_test",
     srcs = [
         "logger_sdk_test.cc",
@@ -37,7 +38,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "simple_log_record_processor_test",
     srcs = [
         "simple_log_record_processor_test.cc",
@@ -52,7 +53,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "log_record_test",
     srcs = [
         "log_record_test.cc",
@@ -67,7 +68,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "batch_log_record_processor_test",
     srcs = [
         "batch_log_record_processor_test.cc",

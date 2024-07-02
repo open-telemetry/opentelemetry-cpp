@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_test(
+otel_cc_test(
     name = "noop_sync_instrument_test",
     srcs = [
         "noop_sync_instrument_test.cc",
@@ -20,7 +21,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "meter_provider_test",
     srcs = [
         "meter_provider_test.cc",

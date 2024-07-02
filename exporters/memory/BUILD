@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -23,7 +23,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "in_memory_span_data_test",
     srcs = ["test/in_memory_span_data_test.cc"],
     tags = [
@@ -56,7 +56,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "in_memory_span_exporter_test",
     srcs = ["test/in_memory_span_exporter_test.cc"],
     tags = [

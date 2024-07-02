@@ -6,7 +6,7 @@ load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 bool_flag(
     name = "with_dll",
@@ -128,7 +128,7 @@ otel_cc_library(
 )
 
 # Conveniently place all Open Telemetry C++ dependencies required to build otel_sdk
-[cc_shared_library(
+[otel_cc_shared_library(
     name = otel_sdk_binary,
     # Force generation of .pdb file for for opt builds
     features = [
@@ -143,10 +143,10 @@ otel_cc_library(
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     # TODO: Add more missing headers to api_sdk_includes above and we'll no longer need /WHOLEARCHIVE
-    user_link_flags = select({
-        "@@platforms//os:windows": ["/WHOLEARCHIVE"],
-        "//conditions:default": ["--whole-archive"],
-    }),
+    # user_link_flags = select({
+    #     "@@platforms//os:windows": ["/WHOLEARCHIVE"],
+    #     "//conditions:default": ["--whole-archive"],
+    # }),
     visibility = ["//visibility:private"],
     deps = [
         otel_sdk_binary + "_restrict_compilation_mode",
@@ -194,7 +194,7 @@ alias(
 ]]
 
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
-[cc_import(
+[otel_cc_import(
     name = otel_sdk_binary + "_import",
     data = [otel_sdk_binary + "_pdb_file"],
     interface_library = otel_sdk_binary + "_lib_file",
@@ -245,7 +245,7 @@ alias(
     visibility = ["//visibility:public"],
 )
 
-cc_test(
+otel_cc_test(
     name = "dll_test",
     srcs = ["dll_test.cc"],
     deps = ["dll"],
@@ -400,7 +400,7 @@ write_source_file(
     tags = ["manual"],
 )
 
-[cc_binary(
+[otel_cc_binary(
     name = "dll_deps_update_binary_" + os,
     srcs = ["dll_deps_update.cc"],
     data = ["otel_sdk_all_deps_" + os],

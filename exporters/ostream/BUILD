@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,7 +26,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "ostream_log_test",
     srcs = ["test/ostream_log_test.cc"],
     tags = [
@@ -60,7 +60,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "ostream_metric_test",
     srcs = ["test/ostream_metric_test.cc"],
     tags = [
@@ -103,7 +103,7 @@ otel_cc_library(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "ostream_span_test",
     srcs = ["test/ostream_span_test.cc"],
     tags = [

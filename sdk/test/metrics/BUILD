@@ -3,7 +3,7 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -23,7 +23,7 @@ otel_cc_library(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "meter_test",
     srcs = [
         "meter_test.cc",
@@ -38,7 +38,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "meter_provider_sdk_test",
     srcs = [
         "meter_provider_sdk_test.cc",
@@ -54,7 +54,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "metric_reader_test",
     srcs = [
         "metric_reader_test.cc",
@@ -70,7 +70,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "histogram_test",
     srcs = [
         "histogram_test.cc",
@@ -86,7 +86,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "view_registry_test",
     srcs = [
         "view_registry_test.cc",
@@ -102,7 +102,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "aggregation_test",
     srcs = [
         "aggregation_test.cc",
@@ -118,7 +118,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "sync_metric_storage_counter_test",
     srcs = [
         "sync_metric_storage_counter_test.cc",
@@ -134,7 +134,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "sync_metric_storage_up_down_counter_test",
     srcs = [
         "sync_metric_storage_up_down_counter_test.cc",
@@ -150,7 +150,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "sync_metric_storage_histogram_test",
     srcs = [
         "sync_metric_storage_histogram_test.cc",
@@ -166,7 +166,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "sync_instruments_test",
     srcs = [
         "sync_instruments_test.cc",
@@ -182,7 +182,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "async_instruments_test",
     srcs = [
         "async_instruments_test.cc",
@@ -197,7 +197,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "async_metric_storage_test",
     srcs = [
         "async_metric_storage_test.cc",
@@ -213,7 +213,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "observer_result_test",
     srcs = [
         "observer_result_test.cc",
@@ -229,7 +229,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "multi_metric_storage_test",
     srcs = [
         "multi_metric_storage_test.cc",
@@ -245,7 +245,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "attributes_processor_test",
     srcs = [
         "attributes_processor_test.cc",
@@ -260,7 +260,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "attributes_hashmap_test",
     srcs = [
         "attributes_hashmap_test.cc",
@@ -275,7 +275,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "circular_buffer_counter_test",
     srcs = [
         "circular_buffer_counter_test.cc",
@@ -290,7 +290,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     #name = "base2_exponential_histogram_indexer_test",
     name = "b2exphist_idx_test",
     srcs = [
@@ -306,7 +306,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "histogram_aggregation_test",
     srcs = [
         "histogram_aggregation_test.cc",
@@ -321,7 +321,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "sum_aggregation_test",
     srcs = [
         "sum_aggregation_test.cc",

@@ -3,11 +3,11 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_test(
+otel_cc_test(
     name = "random_test",
     srcs = [
         "random_test.cc",
@@ -19,7 +19,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "base64_test",
     srcs = [
         "base64_test.cc",
@@ -31,7 +31,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "fast_random_number_generator_test",
     srcs = [
         "fast_random_number_generator_test.cc",
@@ -63,7 +63,7 @@ otel_cc_benchmark(
     deps = dll_deps(["//sdk/src/common:random"]),
 )
 
-cc_test(
+otel_cc_test(
     name = "atomic_unique_ptr_test",
     srcs = [
         "atomic_unique_ptr_test.cc",
@@ -76,7 +76,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "circular_buffer_range_test",
     srcs = [
         "circular_buffer_range_test.cc",
@@ -89,7 +89,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "random_fork_test",
     srcs = [
         "random_fork_test.cc",
@@ -125,7 +125,7 @@ otel_cc_benchmark(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "empty_attributes_test",
     srcs = [
         "empty_attributes_test.cc",
@@ -138,7 +138,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "attribute_utils_test",
     srcs = [
         "attribute_utils_test.cc",
@@ -151,7 +151,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "global_log_handle_test",
     srcs = [
         "global_log_handle_test.cc",
@@ -165,7 +165,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "attributemap_hash_test",
     srcs = [
         "attributemap_hash_test.cc",
@@ -191,7 +191,7 @@ otel_cc_benchmark(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "env_var_test",
     srcs = [
         "env_var_test.cc",

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -31,7 +31,7 @@ otel_cc_library(
     ],
 )
 
-cc_test(
+otel_cc_test(
     name = "propagation_test",
     srcs = [
         "test/propagation_test.cc",
@@ -47,7 +47,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "shim_utils_test",
     srcs = [
         "test/shim_mocks.h",
@@ -63,7 +63,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "span_shim_test",
     srcs = [
         "test/shim_mocks.h",
@@ -79,7 +79,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "span_context_shim_test",
     srcs = [
         "test/span_context_shim_test.cc",
@@ -94,7 +94,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "tracer_shim_test",
     srcs = [
         "test/shim_mocks.h",

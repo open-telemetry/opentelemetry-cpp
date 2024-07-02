@@ -6,7 +6,7 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@@grpc~//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -45,7 +45,7 @@ otel_cc_library(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "client_grpc",
     srcs = [
         "client.cc",
@@ -60,7 +60,7 @@ cc_binary(
     ]),
 )
 
-cc_binary(
+otel_cc_binary(
     name = "server_grpc",
     srcs = [
         "server.cc",

@@ -3,10 +3,11 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_test(
+otel_cc_test(
     name = "tracer_provider_test",
     srcs = [
         "tracer_provider_test.cc",
@@ -22,7 +23,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "span_data_test",
     srcs = [
         "span_data_test.cc",
@@ -37,7 +38,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "simple_processor_test",
     srcs = [
         "simple_processor_test.cc",
@@ -53,7 +54,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "batch_span_processor_test",
     srcs = [
         "batch_span_processor_test.cc",
@@ -68,7 +69,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "tracer_test",
     srcs = [
         "tracer_test.cc",
@@ -85,7 +86,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "always_on_sampler_test",
     srcs = [
         "always_on_sampler_test.cc",
@@ -100,7 +101,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "always_off_sampler_test",
     srcs = [
         "always_off_sampler_test.cc",
@@ -115,7 +116,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "parent_sampler_test",
     srcs = [
         "parent_sampler_test.cc",
@@ -130,7 +131,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "trace_id_ratio_sampler_test",
     srcs = [
         "trace_id_ratio_sampler_test.cc",

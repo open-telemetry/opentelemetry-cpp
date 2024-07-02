@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//:dll_deps.bzl", "avoid_dll_lock", "dll_deps")
-# load("//bazel:otel_cc_library.bzl", "otel_cc_library")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -22,7 +22,7 @@ HIDDEN_NOWIN_COPTS = [
     "-fvisibility=hidden",
 ]
 
-cc_library(
+otel_cc_library(
     name = "component_a",
     srcs = [
         "component_a.cc",
@@ -36,7 +36,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_b",
     srcs = [
         "component_b.cc",
@@ -50,7 +50,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_c",
     srcs = [
         "component_c.cc",
@@ -68,7 +68,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_d",
     srcs = [
         "component_d.cc",
@@ -86,7 +86,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_e",
     srcs = [
         "component_e.cc",
@@ -104,7 +104,7 @@ cc_library(
     ]),
 )
 
-cc_library(
+otel_cc_library(
     name = "component_f",
     srcs = [
         "component_f.cc",
@@ -122,8 +122,8 @@ cc_library(
     ]),
 )
 
-# no cc_shared_library in bazel 4.2
-cc_binary(
+# no otel_cc_shared_library in bazel 4.2
+otel_cc_binary(
     name = "component_g",
     srcs = [
         "component_g.cc",
@@ -138,8 +138,8 @@ cc_binary(
     ]),
 )
 
-# no cc_shared_library in bazel 4.2
-cc_binary(
+# no otel_cc_shared_library in bazel 4.2
+otel_cc_binary(
     name = "component_h",
     srcs = [
         "component_h.cc",
@@ -167,7 +167,7 @@ cc_binary(
 # bazel test //api/test/singleton:singleton_test
 #
 
-cc_test(
+otel_cc_test(
     name = "singleton_test",
     srcs = [
         "singleton_test.cc",

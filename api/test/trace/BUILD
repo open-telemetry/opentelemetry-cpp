@@ -3,10 +3,11 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
-cc_test(
+otel_cc_test(
     name = "default_span_test",
     srcs = [
         "default_span_test.cc",
@@ -22,7 +23,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "noop_test",
     srcs = [
         "noop_test.cc",
@@ -38,7 +39,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "key_value_iterable_view_test",
     srcs = [
         "key_value_iterable_view_test.cc",
@@ -82,7 +83,7 @@ otel_cc_benchmark(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "provider_test",
     srcs = [
         "provider_test.cc",
@@ -98,7 +99,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "span_id_test",
     srcs = [
         "span_id_test.cc",
@@ -114,7 +115,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "trace_flags_test",
     srcs = [
         "trace_flags_test.cc",
@@ -130,7 +131,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "trace_id_test",
     srcs = [
         "trace_id_test.cc",
@@ -146,7 +147,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "span_context_test",
     srcs = [
         "span_context_test.cc",
@@ -162,7 +163,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "trace_state_test",
     srcs = [
         "trace_state_test.cc",
@@ -178,7 +179,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "scope_test",
     srcs = [
         "scope_test.cc",
@@ -194,7 +195,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "tracer_test",
     srcs = [
         "tracer_test.cc",

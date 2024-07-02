@@ -3,6 +3,7 @@
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
+load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
 
 avoid_dll_lock()
 
@@ -17,7 +18,7 @@ otel_cc_benchmark(
     deps = dll_deps(["//api"]),
 )
 
-cc_test(
+otel_cc_test(
     name = "kv_properties_test",
     srcs = [
         "kv_properties_test.cc",
@@ -32,7 +33,7 @@ cc_test(
     ]),
 )
 
-cc_test(
+otel_cc_test(
     name = "string_util_test",
     srcs = [
         "string_util_test.cc",
