@@ -34,7 +34,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -50,7 +50,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -66,7 +66,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -82,7 +82,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -98,7 +98,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -114,7 +114,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -130,7 +130,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -146,7 +146,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -162,7 +162,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -178,7 +178,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -193,7 +193,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -209,7 +209,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -225,7 +225,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -241,7 +241,7 @@ otel_cc_test(
     deps = dll_deps([
         "metrics_common_test_utils",
         "//sdk/src/resource",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -256,7 +256,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -271,7 +271,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -286,7 +286,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/metrics",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -302,7 +302,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -317,7 +317,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -332,7 +332,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "metrics_common_test_utils",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 

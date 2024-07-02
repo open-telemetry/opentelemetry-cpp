@@ -18,7 +18,7 @@ otel_cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -35,7 +35,7 @@ otel_cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -52,6 +52,6 @@ otel_cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/metrics",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )

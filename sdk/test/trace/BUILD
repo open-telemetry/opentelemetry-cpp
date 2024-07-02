@@ -19,7 +19,7 @@ otel_cc_test(
     deps = dll_deps([
         "//sdk/src/resource",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -34,7 +34,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -50,7 +50,7 @@ otel_cc_test(
     deps = dll_deps([
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -65,7 +65,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -82,7 +82,7 @@ otel_cc_test(
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -97,7 +97,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -112,7 +112,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -127,7 +127,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -143,7 +143,7 @@ otel_cc_test(
     deps = dll_deps([
         "//sdk/src/common:random",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 

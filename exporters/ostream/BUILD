@@ -35,7 +35,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":ostream_log_record_exporter",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -69,7 +69,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":ostream_metric_exporter",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -113,7 +113,7 @@ otel_cc_test(
     deps = dll_deps([
         ":ostream_capture",
         ":ostream_span_exporter",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 

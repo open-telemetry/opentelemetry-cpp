@@ -15,7 +15,7 @@ otel_cc_test(
     tags = ["test"],
     deps = dll_deps([
         "//sdk/src/common:random",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -27,7 +27,7 @@ otel_cc_test(
     tags = ["test"],
     deps = dll_deps([
         "//sdk/src/common:base64",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -39,7 +39,7 @@ otel_cc_test(
     tags = ["test"],
     deps = dll_deps([
         "//sdk/src/common:random",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -72,7 +72,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk:headers",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -85,7 +85,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk:headers",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -134,7 +134,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk:headers",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -147,7 +147,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk:headers",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -161,7 +161,7 @@ otel_cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:global_log_handler",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -174,7 +174,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk:headers",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -199,6 +199,6 @@ otel_cc_test(
     tags = ["test"],
     deps = dll_deps([
         "//sdk/src/common:env_variables",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )

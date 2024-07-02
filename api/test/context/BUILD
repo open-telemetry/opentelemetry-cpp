@@ -18,7 +18,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//api",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
@@ -33,6 +33,6 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//api",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )

@@ -5,7 +5,7 @@ module(
 )
 
 bazel_dep(name = "curl", version = "8.7.1")
-bazel_dep(name = "abseil-cpp", version = "20240116.2", repo_name = "com_google_absl")
+bazel_dep(name = "abseil-cpp", version = "20240116.2")
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
 
 bazel_dep(name = "rules_pkg", version = "0.10.1", dev_dependency = True)
@@ -16,9 +16,16 @@ bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
 
 bazel_dep(name = "google_benchmark", version = "1.8.4", dev_dependency = True)
-bazel_dep(name = "googletest", version = "1.14.0.bcr.1", dev_dependency = True, repo_name = "com_google_googletest")
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1", dev_dependency = True)
 
-bazel_dep(name = "nlohmann_json", version = "3.11.3", repo_name = "github_nlohmann_json")
+bazel_dep(name = "nlohmann_json", version = "3.11.3")
+
+# Still needs repo_name="com_github_grpc_grpc" due to 
+#
+#   ERROR: no such package '@@[unknown repo 'com_github_grpc_grpc' requested from @@]//src/compiler': 
+#           The repository '@@[unknown repo 'com_github_grpc_grpc' requested from @@]' could not be resolved: 
+#                 No repository visible as '@com_github_grpc_grpc' from main repository
+#
 bazel_dep(name = "grpc", version = "1.63.1", repo_name = "com_github_grpc_grpc")
 single_version_override(
     module_name = "grpc",

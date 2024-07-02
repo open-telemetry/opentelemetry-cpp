@@ -21,7 +21,7 @@ otel_cc_library(
     deps = [
         "//sdk/src/resource",
         "//sdk/src/trace",
-        "@github_nlohmann_json//:json",
+        "@@nlohmann_json~//:json",
     ],
 )
 
@@ -56,8 +56,8 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":zipkin_recordable",
-        "@com_google_googletest//:gtest_main",
-        "@github_nlohmann_json//:json",
+        "@@googletest~//:gtest_main",
+        "@@nlohmann_json~//:json",
     ]),
 )
 
@@ -71,7 +71,7 @@ otel_cc_test(
     deps = dll_deps([
         ":zipkin_exporter",
         ":zipkin_recordable",
-        "@com_google_googletest//:gtest_main",
+        "@@googletest~//:gtest_main",
     ]),
 )
 
