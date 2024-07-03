@@ -193,10 +193,7 @@ alias(
         "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
         "//conditions:default": None
     }),
-    interface_library = select({
-        "@platforms//os:windows": otel_sdk_binary + "_lib_file",
-        "//conditions:default": None
-    }),
+    interface_library = otel_sdk_binary + "_lib_file",
     shared_library = otel_sdk_binary,
     visibility = ["//visibility:private"],
 ) for otel_sdk_binary in [
