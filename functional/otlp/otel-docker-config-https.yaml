@@ -9,6 +9,7 @@ receivers:
   otlp:
     protocols:
       http:
+        endpoint: 0.0.0.0:4318
         tls:
           ca_file: /otel-cpp/ca.pem
           cert_file: /otel-cpp/server_cert.pem
