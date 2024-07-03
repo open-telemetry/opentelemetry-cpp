@@ -15,10 +15,26 @@ Increment the:
 
 ## [Unreleased]
 
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
 
 Breaking changes:
+
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  * The OTLP HTTP exporter no longer accept options like:
+    * min_TLS = 1.0
+    * min_TLS = 1.1
+    * max_TLS = 1.0
+    * max_TLS = 1.1
+  * When connecting to an OTLP HTTP endpoint, using `https`,
+    the connection will require TLS 1.2 by default,
+    unless min_TLS is set to 1.3
+  * Plain `http` connections (insecure) are not affected.
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
