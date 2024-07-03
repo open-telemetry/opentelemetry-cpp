@@ -369,17 +369,21 @@ pkg_files(
 pkg_filegroup(
     name = "otel_sdk_files",
     srcs = [
+        "otel_sdk_header_files",
         "otel_sdk_d_bin_files",
         "otel_sdk_d_lib_files",
-        "otel_sdk_d_src_bundle",
-        "otel_sdk_header_files",
         "otel_sdk_r_bin_files",
         "otel_sdk_r_lib_files",
-        "otel_sdk_r_src_bundle",
         "otel_sdk_rd_bin_files",
         "otel_sdk_rd_lib_files",
-        "otel_sdk_rd_src_bundle",
-    ],
+    ] + select({
+        "@platforms//os:windows": [
+            "otel_sdk_d_src_bundle",
+            "otel_sdk_r_src_bundle",
+            "otel_sdk_rd_src_bundle",
+        ],
+        "//conditions:default": []
+    }),
 )
 
 pkg_zip(
