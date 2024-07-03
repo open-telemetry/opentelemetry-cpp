@@ -26,6 +26,6 @@ otel_cc_binary(
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
         "@curl",
-        "@@nlohmann_json~//:json",
+        "@nlohmann_json//:json",
     ]),
 )

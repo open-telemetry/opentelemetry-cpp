@@ -15,6 +15,6 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk/src/resource",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )

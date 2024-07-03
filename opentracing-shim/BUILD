@@ -43,7 +43,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":opentracing_shim",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -59,7 +59,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":opentracing_shim",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -75,7 +75,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":opentracing_shim",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -90,7 +90,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":opentracing_shim",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -106,6 +106,6 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":opentracing_shim",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )

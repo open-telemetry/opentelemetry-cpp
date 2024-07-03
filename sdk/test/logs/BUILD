@@ -18,7 +18,7 @@ otel_cc_test(
     deps = dll_deps([
         "//api",
         "//sdk/src/logs",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -34,7 +34,7 @@ otel_cc_test(
     deps = dll_deps([
         "//sdk/src/logs",
         "//sdk/src/trace",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -49,7 +49,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/logs",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -64,7 +64,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/logs",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -79,6 +79,6 @@ otel_cc_test(
     ],
     deps = dll_deps([
         "//sdk/src/logs",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )

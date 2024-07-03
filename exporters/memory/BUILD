@@ -32,7 +32,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":in_memory_span_data",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 
@@ -65,7 +65,7 @@ otel_cc_test(
     ],
     deps = dll_deps([
         ":in_memory_span_exporter",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
 

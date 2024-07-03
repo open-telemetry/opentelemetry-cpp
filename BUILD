@@ -26,7 +26,7 @@ otel_cc_library(
     name = "windows_only",
     visibility = ["//visibility:public"],
     target_compatible_with = select({
-        "@platforms//os:windows": [],
+        "@platforms//os:windows": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
 )
@@ -60,7 +60,7 @@ otel_cc_library(
     visibility = ["//visibility:private"],
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
-        "with_dll_enabled": [],
+        "with_dll_enabled": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     deps = [
@@ -101,7 +101,7 @@ otel_cc_library(
     name = otel_sdk_binary + "_restrict_compilation_mode",
     target_compatible_with = select({
         # Makes the build target compatible only with specific compilation mode, for example:
-        otel_sdk_config_name: [],  # otel_sdk_r needs "-c opt", and otel_sdk_d "-c dbg" (otel_sdk_rd the default "-c fastbuild")
+        otel_sdk_config_name: None,  # otel_sdk_r needs "-c opt", and otel_sdk_d "-c dbg" (otel_sdk_rd the default "-c fastbuild")
         "//conditions:default": ["@platforms//:incompatible"],  # This would error out if say "bazel build -c dbg otel_sdk_r" is used.
     }),
     visibility = ["//visibility:private"],
@@ -117,7 +117,7 @@ otel_cc_library(
     visibility = ["//visibility:private"],
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
-        "with_dll_enabled": [],
+        "with_dll_enabled": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
     srcs = [
@@ -131,22 +131,15 @@ otel_cc_library(
 [otel_cc_shared_library(
     name = otel_sdk_binary,
     # Force generation of .pdb file for for opt builds
-    features = [
-        "generate_pdb_file",
-        # Below was an attempt to use the export all symbols feature, but it failed with:
-        # LINK : fatal error LNK1189: library limit of 65535 objects exceeded
-        # "windows_export_all_symbols"
-    ],
+    features = select({
+        "@platforms//os:windows": [ "generate_pdb_file" ],
+        "//conditions:default": None,
+    }),
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
-        "with_dll_enabled": [],
+        "with_dll_enabled": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    # TODO: Add more missing headers to api_sdk_includes above and we'll no longer need /WHOLEARCHIVE
-    # user_link_flags = select({
-    #     "@@platforms//os:windows": ["/WHOLEARCHIVE"],
-    #     "//conditions:default": ["--whole-archive"],
-    # }),
     visibility = ["//visibility:private"],
     deps = [
         otel_sdk_binary + "_restrict_compilation_mode",
@@ -196,8 +189,14 @@ alias(
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
 [otel_cc_import(
     name = otel_sdk_binary + "_import",
-    data = [otel_sdk_binary + "_pdb_file"],
-    interface_library = otel_sdk_binary + "_lib_file",
+    data = select({
+        "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
+        "//conditions:default": None
+    }),
+    interface_library = select({
+        "@platforms//os:windows": otel_sdk_binary + "_lib_file",
+        "//conditions:default": None
+    }),
     shared_library = otel_sdk_binary,
     visibility = ["//visibility:private"],
 ) for otel_sdk_binary in [
@@ -433,4 +432,3 @@ platform(
         "@bazel_tools//tools/cpp:clang-cl",
     ],
 )
-

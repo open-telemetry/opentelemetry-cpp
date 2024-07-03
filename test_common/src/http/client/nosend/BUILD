@@ -20,6 +20,6 @@ otel_cc_library(
         "//ext:headers",
         "//sdk:headers",
         "//test_common:headers",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ],
 )

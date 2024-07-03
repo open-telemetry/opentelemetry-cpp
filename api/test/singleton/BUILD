@@ -192,7 +192,7 @@ otel_cc_test(
         "component_e",
         "component_f",
         "//api",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
         "//:windows_only",
     ]),
 )

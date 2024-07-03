@@ -16,7 +16,7 @@ otel_cc_test(
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
         "@curl",
     ]),
 )
@@ -30,6 +30,6 @@ otel_cc_test(
     deps = dll_deps([
         "//ext:headers",
         "//sdk/src/trace",
-        "@@googletest~//:gtest_main",
+        "@googletest//:gtest_main",
     ]),
 )
