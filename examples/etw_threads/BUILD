@@ -18,4 +18,8 @@ otel_cc_binary(
     deps = dll_deps([
         "//exporters/etw:etw_exporter",
     ]),
+    target_compatible_with = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["@platforms//:incompatible"],    
+    }),
 )

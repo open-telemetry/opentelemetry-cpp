@@ -497,65 +497,62 @@ point.
 // In all other cases (CMake, or bazel with_dll=false), then OPENTELEMETRY is set explicitly to 0.
 #if !defined(OPENTELEMETRY_DLL)
 #define OPENTELEMETRY_DLL 1
-#elif OPENTELEMETRY_DLL == 1
-#error OPENTELEMETRY_DLL: Users should not pre-define OPENTELEMETRY_DLL
+#elif (OPENTELEMETRY_DLL != -1) && (OPENTELEMETRY_DLL != 0)
+#error OPENTELEMETRY_DLL: Can be set only to -1 (build), or 0 (disabled).
 #endif
 
 // bazel --//:with_dll=true build only cares if OPENTELEMETRY_DLL is 1 (dllimport) or -1 (dllexport)
 #if OPENTELEMETRY_DLL != 0
-//  Build settings are hard-coded here, instead of the build files, in order to minimize ODR violations.
+#   ifdef OPENTELEMETRY_BUILD_IMPORT_DLL
+#      error OPENTELEMETRY_DLL: Found CMakes build OPENTELEMETRY_BUILD_IMPORT_DLL
+#   endif
+#   ifdef OPENTELEMETRY_BUILD_EXPORT_DLL
+#      error OPENTELEMETRY_DLL: Found CMakes build OPENTELEMETRY_BUILD_EXPORT_DLL. This is not expected!
+#   endif
+#   if defined(_MSC_VER)
+#     if _MSVC_LANG < 201703L
+#        error OPENTELEMETRY_DLL: Enable at least c++17 using /std:c++17 or larger
+#     endif
+#   endif
+#   if !defined(OPENTELEMETRY_RTTI_ENABLED)
+#      error OPENTELEMETRY_DLL: RTTI must be enabled.
+#   endif
+//  Build settings for otel_sdk are hard-coded in this file, so users don't have to define them.
 #   define OPENTELEMETRY_STL_VERSION 2017
-#   define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, we don't want surprises.
+#   define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, std::span is in C++2020
 #   define OPENTELEMETRY_ABI_VERSION_NO 2 // Use the new api
 #   define ENABLE_METRICS_EXEMPLAR_PREVIEW 1
 #   define ENABLE_ASYNC_EXPORT 1
 #   define ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW 1
-#   if defined(OPENTELEMETRY_BUILD_IMPORT_DLL) || defined(OPENTELEMETRY_BUILD_EXPORT_DLL)
-#      error OPENTELEMETRY_DLL: Somehow CMake specific defines OPENTELEMETRY_BUILD_IMPORT_DLL and/or OPENTELEMETRY_BUILD_EXPORT_DLL got in. This is not expected!
-#   endif
-#   if !defined(_MSC_VER)
-#      error OPENTELEMETRY_DLL: Only MSVC compiler is supported.
-#   endif
-#   if _MSVC_LANG < 201703L
-#      error OPENTELEMETRY_DLL: Enable at least c++17 using /std:c++17 or larger
-#   endif
-#   if !defined(OPENTELEMETRY_RTTI_ENABLED)
-#      error OPENTELEMETRY_DLL: RTTI must be enabled (/GR)
-#   endif
 //  We ensure that this is defined to a value of, as its gets encoded down in the detect_mismatch
 #   undef OPENTELEMETRY_RTTI_ENABLED
 #   define OPENTELEMETRY_RTTI_ENABLED 1
-#   if defined(OPENTELEMETRY_STL_VERSION)
-#      if OPENTELEMETRY_STL_VERSION != 2017
-#         error OPENTELEMETRY_DLL: OPENTELEMETRY_STL_VERSION must be 2017
-#      endif
-#   else
-#      define OPENTELEMETRY_STL_VERSION 2017
-#   endif
-#   if defined(OPENTELEMETRY_ABI_VERSION_NO)
-#      if OPENTELEMETRY_ABI_VERSION_NO != 2
-#         error OPENTELEMETRY_DLL: OPENTELEMETRY_ABI_VERSION_NO must be 2
-#      endif
-#   else
-#      define OPENTELEMETRY_ABI_VERSION_NO 2
-#   endif
+//
 #   undef OPENTELEMETRY_EXPORT
-#   if OPENTELEMETRY_DLL==1
-#      define OPENTELEMETRY_EXPORT __declspec(dllimport)
-#   elif OPENTELEMETRY_DLL==-1 // Only used during build
-#      undef OPENTELEMETRY_DLL
-#      define OPENTELEMETRY_DLL 1 // this is for the detect_mismatch down below
-#      define OPENTELEMETRY_EXPORT __declspec(dllexport)
-#   else
-#      error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
-#   endif
+#   undef OPENTELEMETRY_API_SINGLETON
+#   undef OPENTELEMETRY_LOCAL_SYMBOL
+#   if defined(_MSC_VER)
+#     if OPENTELEMETRY_DLL==1
+#        define OPENTELEMETRY_EXPORT __declspec(dllimport)
+#     elif OPENTELEMETRY_DLL==-1 // Only used during build
+#        undef OPENTELEMETRY_DLL
+#        define OPENTELEMETRY_DLL 1 // this is for the detect_mismatch down below
+#        define OPENTELEMETRY_EXPORT __declspec(dllexport)
+#     else
+#        error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
+#     endif
+#     define OPENTELEMETRY_LOCAL_SYMBOL
+#  else
+#     define OPENTELEMETRY_EXPORT __attribute__((visibility("default")))
+#     define OPENTELEMETRY_LOCAL_SYMBOL __attribute__((visibility("hidden")))
+#  endif
 // The rule is that if there is struct/class with one or more OPENTELEMETRY_API_SINGLETON function members,
 // then itself can't be defined OPENTELEMETRY_EXPORT 
-#  undef OPENTELEMETRY_API_SINGLETON
 #  define OPENTELEMETRY_API_SINGLETON OPENTELEMETRY_EXPORT
+//
+#  if defined(_MSC_VER)
 #  define OPENTELEMETRY_DLL_STRX(x) #x
 #  define OPENTELEMETRY_DLL_STR(x) OPENTELEMETRY_DLL_STRX(x)
-#  if defined(_MSC_VER)
 // TODO: Revisit what's broken here
 #     pragma detect_mismatch("otel_sdk_detect_mismatch", \
         "+dll:" OPENTELEMETRY_DLL_STR(OPENTELEMETRY_DLL) \
@@ -567,7 +564,8 @@ point.
         "+async:" OPENTELEMETRY_DLL_STR(ENABLE_ASYNC_EXPORT) \
         "+mtls:" OPENTELEMETRY_DLL_STR(ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW) \
       )
-#  endif
 #  undef OPENTELEMETRY_DLL_STRX
 #  undef OPENTELEMETRY_DLL_STR
+
+#  endif
 #endif // if OPENTELEMETRY_DLL != 0

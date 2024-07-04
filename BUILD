@@ -66,7 +66,6 @@ otel_cc_library(
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
         "//exporters/memory:in_memory_span_exporter",
-        "//exporters/etw:etw_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
         "//exporters/ostream:ostream_span_exporter",
@@ -82,7 +81,10 @@ otel_cc_library(
         "//exporters/prometheus:prometheus_exporter",
         "//exporters/prometheus:prometheus_push_exporter",
         "//exporters/zipkin:zipkin_exporter",
-    ],
+    ] + select({
+        "@platforms//os:windows": ["//exporters/etw:etw_exporter"],
+        "//conditions:default": [],
+    }),
 )
 
 # Expands to all transitive project dependencies, excluding external projects (repos)
@@ -90,11 +92,11 @@ otel_cc_library(
     name = "otel_sdk_all_deps_" + os,
     # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('otel_cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
+    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
     scope = ["//:otel_sdk_deps"],
 ) for (os, exceptions) in [
-    ("non_windows", ""),
-    ("windows", "//exporters/etw:etw_exporter"),
+    ("non_windows", "//exporters/etw:etw_exporter"),
+    ("windows", ""),
 ]]
 
 [otel_cc_library(
@@ -289,8 +291,10 @@ pkg_files(
     compilation_mode = compilation_mode,
     data = [
         otel_sdk_binary,
-        otel_sdk_binary + "_pdb_file",
-    ],
+    ] + select({
+        "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
+        "//conditions:default": [],
+    }),
 ) for (otel_sdk_binary, compilation_mode) in [
     ("otel_sdk_r", "opt"),
     ("otel_sdk_d", "dbg"),
@@ -301,9 +305,10 @@ pkg_files(
 [force_compilation_mode(
     name = otel_sdk_binary + "_src_bundle" + "_force",
     compilation_mode = compilation_mode,
-    data = [
-        otel_sdk_binary + "_make_src_bundle",
-    ],
+    data = select({
+        "@platforms//os:windows": [ otel_sdk_binary + "_make_src_bundle" ],
+        "//conditions:default": [],
+    }),
 ) for (otel_sdk_binary, compilation_mode) in [
     ("otel_sdk_r", "opt"),
     ("otel_sdk_d", "dbg"),
@@ -313,17 +318,20 @@ pkg_files(
 # Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
 [run_binary(
     name = otel_sdk_binary + "_make_src_bundle",
-    srcs = [
-        otel_sdk_binary + "_pdb_file",
-        ".sentryclirc",
-    ],
+    srcs = select({
+        "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
+        "//conditions:default": [otel_sdk_binary + "_lib_file"],
+    }),
     outs = [otel_sdk_binary + ".src.zip"],
     args = [
-        "debug-files",  # Called `difutil` in the online docs, but the tool lists it as `debug-files`
+        "debug-files",
         "bundle-sources",
-        "$(location " + otel_sdk_binary + "_pdb_file" + ")",
-    ],
+    ] + select({
+        "@platforms//os:windows": ["$(location " + otel_sdk_binary + "_pdb_file" + ")"],
+        "//conditions:default": ["$(location " + otel_sdk_binary + "_lib_file" + ")"],
+    }),
     tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
+    tags = ["manual"],
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
@@ -390,6 +398,7 @@ pkg_zip(
     name = "otel_sdk_zip",
     srcs = ["otel_sdk_files"],
     out = "otel_sdk.zip",
+    tags = ["manual"],
 )
 
 # This would copy the file from the output build folder to the source folder (this directory)
