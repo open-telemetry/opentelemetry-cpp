@@ -31,7 +31,7 @@ git log -1
 
 The current submodule show something like:
 
-```
+```shell
 commit b3060d2104df364136d75a35779e6bd48bac449a (HEAD, tag: v1.3.1)
 Author: Damien Mathieu <42@dmathieu.com>
 Date:   Thu Apr 25 17:55:35 2024 +0200
@@ -57,7 +57,7 @@ Check the new state:
 git log -1
 ```
 
-```
+```shell
 commit 40b3c1b746767cbc13c2e39da3eaf1a23e54ffdd (HEAD, tag: v1.3.2)
 Author: jack-berg <34418638+jack-berg@users.noreply.github.com>
 Date:   Fri Jun 28 08:19:11 2024 -0500
@@ -74,7 +74,7 @@ cd ../..
 git status
 ```
 
-```
+```shell
 On branch upgrade_proto_1.3.2
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
@@ -92,7 +92,7 @@ git add third_party/opentelemetry-proto
 
 Update the line pointing to the opentelemetry-proto tag.
 
-```
+```text
 opentelemetry-proto=v1.3.2
 ```
 
@@ -113,14 +113,13 @@ index 0bbf67f3..7362473f 100644
  opentracing-cpp=v1.6.0
  prometheus-cpp=v1.2.4
  vcpkg=2024.02.14
-
 ```
 
 #### file bazel/repository.bzl
 
 Locate the entry for opentelemetry-proto:
 
-```
+```text
     # OTLP Protocol definition
     maybe(
         http_archive,
@@ -136,7 +135,7 @@ Locate the entry for opentelemetry-proto:
 
 Update the URL to the new tag:
 
-```
+```text
         urls = [
             "https://github.com/open-telemetry/opentelemetry-proto/archive/v1.3.2.tar.gz",
         ],
@@ -144,7 +143,7 @@ Update the URL to the new tag:
 
 Update strip_prefix to the new tag:
 
-```
+```text
         strip_prefix = "opentelemetry-proto-1.3.2",
 ```
 
@@ -160,13 +159,13 @@ Run a checksum on the new file:
 sha256sum v1.3.2.tar.gz
 ```
 
-```
+```shell
 c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7  v1.3.2.tar.gz
 ```
 
 Update the checksum in file bazel/repository.bzl:
 
-```
+```text
         sha256 = "c069c0d96137cf005d34411fa67dd3b6f1f8c64af1e7fb2fe0089a41c425acd7",
 ```
 
@@ -197,7 +196,7 @@ index bac1e45b..508b95a3 100644
 
 Update the tag in the CMake logic:
 
-```
+```cmake
         set(opentelemetry-proto "v1.3.2")
 ```
 
@@ -235,7 +234,7 @@ If missing, file a PR to add it, or contact the maintainer:
 
 Update the opentelemetry-proto version to the new tag:
 
-```
+```text
 bazel_dep(name = "opentelemetry-proto", version = "1.3.2", repo_name = "com_github_opentelemetry_proto")
 ```
 
@@ -257,4 +256,3 @@ index 7b84c2b7..3161ffb1 100644
  bazel_dep(name = "platforms", version = "0.0.8")
  bazel_dep(name = "prometheus-cpp", version = "1.2.4", repo_name = "com_github_jupp0r_prometheus_cpp")
 ```
-
