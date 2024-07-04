@@ -63,7 +63,7 @@ Author: jack-berg <34418638+jack-berg@users.noreply.github.com>
 Date:   Fri Jun 28 08:19:11 2024 -0500
 
     Prepare changelog for 1.3.2 release (#563)
-    
+
     Co-authored-by: Armin Ruech <7052238+arminru@users.noreply.github.com>
 ```
 
@@ -204,7 +204,7 @@ Update the tag in the CMake logic:
 Typical change:
 
 ```shell
-[malff@malff-desktop opentelemetry-cpp]$ git diff cmake/opentelemetry-proto.cmake 
+[malff@malff-desktop opentelemetry-cpp]$ git diff cmake/opentelemetry-proto.cmake
 diff --git a/cmake/opentelemetry-proto.cmake b/cmake/opentelemetry-proto.cmake
 index 19516c3b..dd6213c1 100644
 --- a/cmake/opentelemetry-proto.cmake
