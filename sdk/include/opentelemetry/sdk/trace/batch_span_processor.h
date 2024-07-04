@@ -30,7 +30,7 @@ namespace trace
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes
  * the export-friendly span data representations to the configured SpanExporter.
  */
-class OPENTELEMETRY_EXPORT BatchSpanProcessor : public SpanProcessor
+class OPENTELEMETRY_EXPORT_TYPE BatchSpanProcessor : public SpanProcessor
 {
 public:
   /**

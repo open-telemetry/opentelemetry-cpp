@@ -30,7 +30,7 @@ namespace curl
 
 const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
 
-class OPENTELEMETRY_EXPORT HttpCurlGlobalInitializer
+class OPENTELEMETRY_EXPORT_TYPE HttpCurlGlobalInitializer
 {
 private:
   HttpCurlGlobalInitializer(const HttpCurlGlobalInitializer &) = delete;
@@ -152,7 +152,7 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class OPENTELEMETRY_EXPORT HttpClient;
+class OPENTELEMETRY_EXPORT_TYPE HttpClient;
 
 class Session : public opentelemetry::ext::http::client::Session,
                 public std::enable_shared_from_this<Session>
@@ -289,7 +289,7 @@ private:
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
-class OPENTELEMETRY_EXPORT HttpClient : public opentelemetry::ext::http::client::HttpClient
+class OPENTELEMETRY_EXPORT_TYPE HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.

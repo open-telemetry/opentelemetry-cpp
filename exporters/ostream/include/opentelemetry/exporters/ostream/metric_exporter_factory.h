@@ -19,7 +19,7 @@ namespace metrics
 /**
  * Factory class for OStreamMetricExporter.
  */
-class OPENTELEMETRY_EXPORT OStreamMetricExporterFactory
+class OPENTELEMETRY_EXPORT_TYPE OStreamMetricExporterFactory
 {
 public:
   /**

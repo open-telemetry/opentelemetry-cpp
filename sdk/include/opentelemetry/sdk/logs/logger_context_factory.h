@@ -20,7 +20,7 @@ namespace logs
 /**
  * Factory class for LoggerContext.
  */
-class OPENTELEMETRY_EXPORT LoggerContextFactory
+class OPENTELEMETRY_EXPORT_TYPE LoggerContextFactory
 {
 public:
   /**

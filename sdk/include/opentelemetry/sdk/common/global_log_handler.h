@@ -7,9 +7,9 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/version.h"
 
 #define OTEL_INTERNAL_LOG_LEVEL_NONE 0
 #define OTEL_INTERNAL_LOG_LEVEL_ERROR 1
@@ -56,7 +56,7 @@ inline std::string LevelToString(LogLevel level)
   return {};
 }
 
-class OPENTELEMETRY_EXPORT LogHandler
+class OPENTELEMETRY_EXPORT_TYPE LogHandler
 {
 public:
   virtual ~LogHandler();
@@ -68,7 +68,7 @@ public:
                       const opentelemetry::sdk::common::AttributeMap &attributes) noexcept = 0;
 };
 
-class OPENTELEMETRY_EXPORT DefaultLogHandler : public LogHandler
+class OPENTELEMETRY_EXPORT_TYPE DefaultLogHandler : public LogHandler
 {
 public:
   void Handle(LogLevel level,
@@ -78,7 +78,7 @@ public:
               const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT NoopLogHandler : public LogHandler
+class OPENTELEMETRY_EXPORT_TYPE NoopLogHandler : public LogHandler
 {
 public:
   void Handle(LogLevel level,
@@ -91,7 +91,7 @@ public:
 /**
  * Stores the singleton global LogHandler.
  */
-class OPENTELEMETRY_EXPORT GlobalLogHandler
+class OPENTELEMETRY_EXPORT_TYPE GlobalLogHandler
 {
 public:
   /**

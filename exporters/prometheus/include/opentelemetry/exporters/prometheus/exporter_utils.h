@@ -19,7 +19,7 @@ namespace metrics
 /**
  * The Prometheus Utils contains utility functions for Prometheus Exporter
  */
-class OPENTELEMETRY_EXPORT PrometheusExporterUtils
+class OPENTELEMETRY_EXPORT_TYPE PrometheusExporterUtils
 {
 public:
   /**

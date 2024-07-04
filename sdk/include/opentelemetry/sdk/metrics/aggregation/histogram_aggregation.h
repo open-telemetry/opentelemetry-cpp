@@ -24,7 +24,7 @@ namespace metrics
 {
 class AggregationConfig;
 
-class OPENTELEMETRY_EXPORT LongHistogramAggregation : public Aggregation
+class OPENTELEMETRY_EXPORT_TYPE LongHistogramAggregation : public Aggregation
 {
 public:
   LongHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);
@@ -54,7 +54,7 @@ private:
   bool record_min_max_ = true;
 };
 
-class OPENTELEMETRY_EXPORT DoubleHistogramAggregation : public Aggregation
+class OPENTELEMETRY_EXPORT_TYPE DoubleHistogramAggregation : public Aggregation
 {
 public:
   DoubleHistogramAggregation(const AggregationConfig *aggregation_config = nullptr);

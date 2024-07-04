@@ -28,7 +28,7 @@ class OtlpGrpcClient;
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OPENTELEMETRY_EXPORT OtlpGrpcExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**

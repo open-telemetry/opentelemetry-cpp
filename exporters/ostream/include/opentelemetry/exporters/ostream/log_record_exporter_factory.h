@@ -18,7 +18,7 @@ namespace logs
 /**
  * Factory class for OStreamLogRecordExporter.
  */
-class OPENTELEMETRY_EXPORT OStreamLogRecordExporterFactory
+class OPENTELEMETRY_EXPORT_TYPE OStreamLogRecordExporterFactory
 {
 public:
   /**

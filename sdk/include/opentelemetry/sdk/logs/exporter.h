@@ -19,7 +19,7 @@ namespace logs
 /**
  * LogRecordExporter defines the interface that log exporters must implement.
  */
-class OPENTELEMETRY_EXPORT LogRecordExporter
+class OPENTELEMETRY_EXPORT_TYPE LogRecordExporter
 {
 public:
   LogRecordExporter();

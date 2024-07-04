@@ -34,7 +34,7 @@ protected:
   std::unique_ptr<SyncWritableMetricStorage> storage_;
 };
 
-class OPENTELEMETRY_EXPORT LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
+class OPENTELEMETRY_EXPORT_TYPE LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
 {
 public:
   LongCounter(InstrumentDescriptor instrument_descriptor,
@@ -52,7 +52,7 @@ public:
   void Add(uint64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
+class OPENTELEMETRY_EXPORT_TYPE DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter<double>
 {
 
 public:
@@ -69,7 +69,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
+class OPENTELEMETRY_EXPORT_TYPE LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
   LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -85,7 +85,7 @@ public:
   void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
+class OPENTELEMETRY_EXPORT_TYPE DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
   DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -101,7 +101,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
+class OPENTELEMETRY_EXPORT_TYPE LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
 {
 public:
   LongHistogram(InstrumentDescriptor instrument_descriptor,
@@ -121,7 +121,7 @@ public:
   void Record(uint64_t value, const opentelemetry::context::Context &context) noexcept override;
 };
 
-class OPENTELEMETRY_EXPORT DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
+class OPENTELEMETRY_EXPORT_TYPE DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
   DoubleHistogram(InstrumentDescriptor instrument_descriptor,

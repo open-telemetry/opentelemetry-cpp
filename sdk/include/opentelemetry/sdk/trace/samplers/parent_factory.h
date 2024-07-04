@@ -17,7 +17,7 @@ namespace trace
 /**
  * Factory class for ParentBasedSampler.
  */
-class OPENTELEMETRY_EXPORT ParentBasedSamplerFactory
+class OPENTELEMETRY_EXPORT_TYPE ParentBasedSamplerFactory
 {
 public:
   /**

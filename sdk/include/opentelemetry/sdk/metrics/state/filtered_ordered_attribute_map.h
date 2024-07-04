@@ -19,7 +19,7 @@ namespace metrics
 {
 class AttributesProcessor;  // IWYU pragma: keep
 
-class OPENTELEMETRY_EXPORT FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
+class OPENTELEMETRY_EXPORT_TYPE FilteredOrderedAttributeMap : public opentelemetry::sdk::common::OrderedAttributeMap
 {
 public:
   FilteredOrderedAttributeMap() = default;

@@ -28,7 +28,7 @@ namespace sdk
 namespace trace
 {
 
-class OPENTELEMETRY_EXPORT TracerProvider final : public opentelemetry::trace::TracerProvider
+class OPENTELEMETRY_EXPORT_TYPE TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**

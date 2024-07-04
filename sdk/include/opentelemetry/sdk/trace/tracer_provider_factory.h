@@ -25,7 +25,7 @@ namespace trace
  * Factory class for TracerProvider.
  * See @ref TracerProvider.
  */
-class OPENTELEMETRY_EXPORT TracerProviderFactory
+class OPENTELEMETRY_EXPORT_TYPE TracerProviderFactory
 {
 public:
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY

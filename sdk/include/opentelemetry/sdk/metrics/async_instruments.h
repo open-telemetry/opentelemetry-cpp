@@ -16,7 +16,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_EXPORT ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
+class OPENTELEMETRY_EXPORT_TYPE ObservableInstrument : public opentelemetry::metrics::ObservableInstrument
 {
 public:
   ObservableInstrument(InstrumentDescriptor instrument_descriptor,

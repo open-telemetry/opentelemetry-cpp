@@ -28,7 +28,7 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_EXPORT LoggerProvider final : public opentelemetry::logs::LoggerProvider
+class OPENTELEMETRY_EXPORT_TYPE LoggerProvider final : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**

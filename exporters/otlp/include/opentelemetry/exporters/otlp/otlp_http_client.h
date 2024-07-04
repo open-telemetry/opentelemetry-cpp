@@ -133,7 +133,7 @@ struct OtlpHttpClientOptions
 /**
  * The OTLP HTTP client exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OPENTELEMETRY_EXPORT OtlpHttpClient
+class OPENTELEMETRY_EXPORT_TYPE OtlpHttpClient
 {
 public:
   /**

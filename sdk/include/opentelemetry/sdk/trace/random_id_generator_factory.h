@@ -17,7 +17,7 @@ namespace trace
 /**
  * Factory class for RandomIdGenerator.
  */
-class OPENTELEMETRY_EXPORT RandomIdGeneratorFactory
+class OPENTELEMETRY_EXPORT_TYPE RandomIdGeneratorFactory
 {
 public:
   /**

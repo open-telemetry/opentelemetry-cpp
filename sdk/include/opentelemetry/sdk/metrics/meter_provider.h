@@ -30,7 +30,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORT MeterProvider final : public opentelemetry::metrics::MeterProvider
+class OPENTELEMETRY_EXPORT_TYPE MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**

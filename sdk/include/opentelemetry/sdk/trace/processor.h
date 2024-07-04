@@ -26,7 +26,7 @@ class Recordable;
  * Built-in span processors are responsible for batching and conversion of
  * spans to exportable representation and passing batches to exporters.
  */
-class OPENTELEMETRY_EXPORT SpanProcessor
+class OPENTELEMETRY_EXPORT_TYPE SpanProcessor
 {
 public:
   virtual ~SpanProcessor() = default;

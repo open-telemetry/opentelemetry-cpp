@@ -19,7 +19,7 @@ struct PrometheusPushExporterOptions;
 /**
  * Factory class for PrometheusExporter.
  */
-class OPENTELEMETRY_EXPORT PrometheusPushExporterFactory
+class OPENTELEMETRY_EXPORT_TYPE PrometheusPushExporterFactory
 {
 public:
   /**

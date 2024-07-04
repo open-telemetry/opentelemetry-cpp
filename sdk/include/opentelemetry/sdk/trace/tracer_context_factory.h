@@ -22,7 +22,7 @@ namespace trace
 /**
  * Factory class for TracerContext.
  */
-class OPENTELEMETRY_EXPORT TracerContextFactory
+class OPENTELEMETRY_EXPORT_TYPE TracerContextFactory
 {
 public:
   /**

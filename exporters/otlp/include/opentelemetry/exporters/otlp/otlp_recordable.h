@@ -18,7 +18,7 @@ namespace exporter
 {
 namespace otlp
 {
-class OPENTELEMETRY_EXPORT OtlpRecordable final : public opentelemetry::sdk::trace::Recordable
+class OPENTELEMETRY_EXPORT_TYPE OtlpRecordable final : public opentelemetry::sdk::trace::Recordable
 {
 public:
   proto::trace::v1::Span &span() noexcept { return span_; }

@@ -21,7 +21,7 @@ namespace metrics
 /**
  * Factory class for View.
  */
-class OPENTELEMETRY_EXPORT ViewFactory
+class OPENTELEMETRY_EXPORT_TYPE ViewFactory
 {
 public:
   static std::unique_ptr<View> Create(const std::string &name);

@@ -17,7 +17,7 @@ namespace trace
 /**
  * Factory class for TraceIdRatioBasedSampler.
  */
-class OPENTELEMETRY_EXPORT TraceIdRatioBasedSamplerFactory
+class OPENTELEMETRY_EXPORT_TYPE TraceIdRatioBasedSamplerFactory
 {
 public:
   /**

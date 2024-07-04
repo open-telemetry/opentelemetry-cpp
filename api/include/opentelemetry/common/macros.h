@@ -387,6 +387,8 @@ point.
 
 #endif
 
+#define OPENTELEMETRY_EXPORT_TYPE OPENTELEMETRY_EXPORT
+
 /*
    OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
    parameter or implicit object parameter is retained by the return value of the
@@ -504,7 +506,7 @@ point.
 // bazel --//:with_dll=true build only cares if OPENTELEMETRY_DLL is 1 (dllimport) or -1 (dllexport)
 #if OPENTELEMETRY_DLL != 0
 #   ifdef OPENTELEMETRY_BUILD_IMPORT_DLL
-#      error OPENTELEMETRY_DLL: Found CMakes build OPENTELEMETRY_BUILD_IMPORT_DLL
+#      error OPENTELEMETRY_DLL: Found CMakes build OPENTELEMETRY_BUILD_IMPORT_DLL. This is not expected!
 #   endif
 #   ifdef OPENTELEMETRY_BUILD_EXPORT_DLL
 #      error OPENTELEMETRY_DLL: Found CMakes build OPENTELEMETRY_BUILD_EXPORT_DLL. This is not expected!
@@ -529,6 +531,7 @@ point.
 #   define OPENTELEMETRY_RTTI_ENABLED 1
 //
 #   undef OPENTELEMETRY_EXPORT
+#   undef OPENTELEMETRY_EXPORT_TYPE
 #   undef OPENTELEMETRY_API_SINGLETON
 #   undef OPENTELEMETRY_LOCAL_SYMBOL
 #   if defined(_MSC_VER)
@@ -541,9 +544,16 @@ point.
 #     else
 #        error OPENTELEMETRY_DLL: OPENTELEMETRY_DLL must be 1 before including opentelemetry header files
 #     endif
+#     define OPENTELEMETRY_EXPORT_TYPE OPENTELEMETRY_EXPORT
 #     define OPENTELEMETRY_LOCAL_SYMBOL
 #  else
+#    error 1
 #     define OPENTELEMETRY_EXPORT __attribute__((visibility("default")))
+#     if defined(__clang__)
+#        define OPENTELEMETRY_EXPORT_TYPE __attribute__((type_visibility("default")))
+#     else
+#        define OPENTELEMETRY_EXPORT_TYPE __attribute__((visibility("default")))
+#     endif
 #     define OPENTELEMETRY_LOCAL_SYMBOL __attribute__((visibility("hidden")))
 #  endif
 // The rule is that if there is struct/class with one or more OPENTELEMETRY_API_SINGLETON function members,

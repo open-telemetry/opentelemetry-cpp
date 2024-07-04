@@ -36,7 +36,7 @@ class SyncWritableMetricStorage;
 class AsyncWritableMetricsStorge;
 class ObservableRegistry;
 
-class OPENTELEMETRY_EXPORT Meter final : public opentelemetry::metrics::Meter
+class OPENTELEMETRY_EXPORT_TYPE Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */

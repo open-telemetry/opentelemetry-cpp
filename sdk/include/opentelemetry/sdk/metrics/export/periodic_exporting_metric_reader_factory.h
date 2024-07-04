@@ -16,7 +16,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORT PeriodicExportingMetricReaderFactory
+class OPENTELEMETRY_EXPORT_TYPE PeriodicExportingMetricReaderFactory
 {
 public:
   static std::unique_ptr<MetricReader> Create(std::unique_ptr<PushMetricExporter> exporter,

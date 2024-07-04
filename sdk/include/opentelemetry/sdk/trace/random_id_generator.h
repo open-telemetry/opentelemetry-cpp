@@ -14,7 +14,7 @@ namespace sdk
 namespace trace
 {
 
-class OPENTELEMETRY_EXPORT RandomIdGenerator : public IdGenerator
+class OPENTELEMETRY_EXPORT_TYPE RandomIdGenerator : public IdGenerator
 {
 public:
   RandomIdGenerator() : IdGenerator(true) {}

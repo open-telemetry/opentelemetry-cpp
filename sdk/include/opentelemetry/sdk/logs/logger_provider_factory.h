@@ -21,7 +21,7 @@ namespace logs
 /**
  * Factory class for LoggerProvider.
  */
-class OPENTELEMETRY_EXPORT LoggerProviderFactory
+class OPENTELEMETRY_EXPORT_TYPE LoggerProviderFactory
 {
 public:
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY

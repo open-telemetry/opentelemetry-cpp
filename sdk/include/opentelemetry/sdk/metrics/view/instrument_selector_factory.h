@@ -16,7 +16,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORT InstrumentSelectorFactory
+class OPENTELEMETRY_EXPORT_TYPE InstrumentSelectorFactory
 {
 public:
   static std::unique_ptr<InstrumentSelector> Create(

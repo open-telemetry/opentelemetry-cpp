@@ -29,7 +29,7 @@ namespace otlp
 /**
  * The OTLP File client exports data in OpenTelemetry Protocol (OTLP) format.
  */
-class OPENTELEMETRY_EXPORT OtlpFileClient
+class OPENTELEMETRY_EXPORT_TYPE OtlpFileClient
 {
 public:
   /**

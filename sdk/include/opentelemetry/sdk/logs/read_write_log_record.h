@@ -30,7 +30,7 @@ namespace logs
  *
  * This class is thread-compatible.
  */
-class OPENTELEMETRY_EXPORT ReadWriteLogRecord final : public ReadableLogRecord
+class OPENTELEMETRY_EXPORT_TYPE ReadWriteLogRecord final : public ReadableLogRecord
 {
 public:
   ReadWriteLogRecord();

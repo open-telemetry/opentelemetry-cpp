@@ -28,7 +28,7 @@ class OtlpGrpcClient;
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format in gRPC.
  */
-class OPENTELEMETRY_EXPORT OtlpGrpcLogRecordExporter : public opentelemetry::sdk::logs::LogRecordExporter
+class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcLogRecordExporter : public opentelemetry::sdk::logs::LogRecordExporter
 {
 public:
   /**

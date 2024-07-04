@@ -37,7 +37,7 @@ struct OtlpGrpcClientAsyncData;
 /**
  * The OTLP gRPC client contains utility functions of gRPC.
  */
-class OPENTELEMETRY_EXPORT OtlpGrpcClient
+class OPENTELEMETRY_EXPORT_TYPE OtlpGrpcClient
 {
 public:
   OtlpGrpcClient();

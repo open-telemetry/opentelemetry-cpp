@@ -17,7 +17,7 @@ namespace otlp
 /**
  * Factory class for OtlpFileExporter.
  */
-class OPENTELEMETRY_EXPORT OtlpFileLogRecordExporterFactory
+class OPENTELEMETRY_EXPORT_TYPE OtlpFileLogRecordExporterFactory
 {
 public:
   /**

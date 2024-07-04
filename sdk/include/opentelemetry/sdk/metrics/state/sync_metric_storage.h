@@ -39,7 +39,7 @@ namespace sdk
 {
 namespace metrics
 {
-class OPENTELEMETRY_EXPORT SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
+class OPENTELEMETRY_EXPORT_TYPE SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

@@ -19,7 +19,7 @@ namespace metrics
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
-class OPENTELEMETRY_EXPORT MetricReader
+class OPENTELEMETRY_EXPORT_TYPE MetricReader
 {
 public:
   MetricReader();

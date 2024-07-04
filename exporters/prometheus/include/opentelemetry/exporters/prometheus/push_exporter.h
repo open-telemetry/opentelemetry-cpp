@@ -41,7 +41,7 @@ namespace metrics
 
 class PrometheusPushCollector;
 
-class OPENTELEMETRY_EXPORT PrometheusPushExporter : public ::opentelemetry::sdk::metrics::PushMetricExporter
+class OPENTELEMETRY_EXPORT_TYPE PrometheusPushExporter : public ::opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**

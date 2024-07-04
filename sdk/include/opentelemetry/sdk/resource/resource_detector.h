@@ -27,7 +27,7 @@ public:
  * OTelResourceDetector to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
-class OPENTELEMETRY_EXPORT OTELResourceDetector : public ResourceDetector
+class OPENTELEMETRY_EXPORT_TYPE OTELResourceDetector : public ResourceDetector
 {
 public:
   Resource Detect() noexcept override;

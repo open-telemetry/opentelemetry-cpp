@@ -17,7 +17,7 @@ namespace metrics
  * An indexer for base2 exponential histograms. It is used to calculate index for a given value and
  * scale.
  */
-class OPENTELEMETRY_EXPORT Base2ExponentialHistogramIndexer
+class OPENTELEMETRY_EXPORT_TYPE Base2ExponentialHistogramIndexer
 {
 public:
   /*

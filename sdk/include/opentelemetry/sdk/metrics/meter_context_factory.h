@@ -19,7 +19,7 @@ namespace metrics
 /**
  * Factory class for MeterContext.
  */
-class OPENTELEMETRY_EXPORT MeterContextFactory
+class OPENTELEMETRY_EXPORT_TYPE MeterContextFactory
 {
 public:
   /**

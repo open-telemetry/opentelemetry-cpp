@@ -24,7 +24,7 @@ struct ObservableCallbackRecord
   opentelemetry::metrics::ObservableInstrument *instrument;
 };
 
-class OPENTELEMETRY_EXPORT ObservableRegistry
+class OPENTELEMETRY_EXPORT_TYPE ObservableRegistry
 {
 public:
   void AddCallback(opentelemetry::metrics::ObservableCallbackPtr callback,

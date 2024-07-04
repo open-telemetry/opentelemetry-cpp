@@ -37,7 +37,7 @@ public:
  * state for each MetricReader.
  */
 
-class OPENTELEMETRY_EXPORT MetricCollector : public MetricProducer, public CollectorHandle
+class OPENTELEMETRY_EXPORT_TYPE MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
   MetricCollector(MeterContext *context, std::shared_ptr<MetricReader> metric_reader);

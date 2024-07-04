@@ -18,7 +18,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORT MeterProviderFactory
+class OPENTELEMETRY_EXPORT_TYPE MeterProviderFactory
 {
 public:
 #ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY

@@ -43,7 +43,7 @@ class MeterSelector;
  * A class which stores the MeterProvider context.
 
  */
-class OPENTELEMETRY_EXPORT MeterContext : public std::enable_shared_from_this<MeterContext>
+class OPENTELEMETRY_EXPORT_TYPE MeterContext : public std::enable_shared_from_this<MeterContext>
 {
 public:
   /**

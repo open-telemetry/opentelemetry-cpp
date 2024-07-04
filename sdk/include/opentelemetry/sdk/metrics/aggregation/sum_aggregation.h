@@ -18,7 +18,7 @@ namespace sdk
 namespace metrics
 {
 
-class OPENTELEMETRY_EXPORT LongSumAggregation : public Aggregation
+class OPENTELEMETRY_EXPORT_TYPE LongSumAggregation : public Aggregation
 {
 public:
   LongSumAggregation(bool is_monotonic);
@@ -40,7 +40,7 @@ private:
   SumPointData point_data_;
 };
 
-class OPENTELEMETRY_EXPORT DoubleSumAggregation : public Aggregation
+class OPENTELEMETRY_EXPORT_TYPE DoubleSumAggregation : public Aggregation
 {
 public:
   DoubleSumAggregation(bool is_monotonic);

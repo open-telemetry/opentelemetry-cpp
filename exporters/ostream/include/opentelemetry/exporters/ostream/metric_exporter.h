@@ -28,7 +28,7 @@ namespace metrics
 /**
  * The OStreamMetricExporter exports record data through an ostream
  */
-class OPENTELEMETRY_EXPORT OStreamMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
+class OPENTELEMETRY_EXPORT_TYPE OStreamMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**

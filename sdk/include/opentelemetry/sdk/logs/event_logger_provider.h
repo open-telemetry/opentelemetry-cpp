@@ -19,7 +19,7 @@ namespace sdk
 {
 namespace logs
 {
-class OPENTELEMETRY_EXPORT EventLoggerProvider final
+class OPENTELEMETRY_EXPORT_TYPE EventLoggerProvider final
     : public opentelemetry::logs::EventLoggerProvider
 {
 public:

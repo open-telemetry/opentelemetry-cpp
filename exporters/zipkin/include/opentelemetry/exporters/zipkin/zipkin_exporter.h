@@ -23,7 +23,7 @@ namespace zipkin
 /**
  * The Zipkin exporter exports span data in JSON format as expected by Zipkin
  */
-class OPENTELEMETRY_EXPORT ZipkinExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OPENTELEMETRY_EXPORT_TYPE ZipkinExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**

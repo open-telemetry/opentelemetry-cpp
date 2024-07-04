@@ -22,7 +22,7 @@ namespace otlp
 /**
  * The OTLP exporter exports metrics data in OpenTelemetry Protocol (OTLP) format in HTTP.
  */
-class OPENTELEMETRY_EXPORT OtlpHttpMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
+class OPENTELEMETRY_EXPORT_TYPE OtlpHttpMetricExporter final : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
   /**

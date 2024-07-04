@@ -23,7 +23,7 @@ using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMa
  * Exemplars also hold information about the environment when the measurement was recorded, for
  * example the span and trace ID of the active span when the exemplar was recorded.
  */
-class OPENTELEMETRY_EXPORT ExemplarData
+class OPENTELEMETRY_EXPORT_TYPE ExemplarData
 {
 public:
   static ExemplarData Create(std::shared_ptr<opentelemetry::trace::SpanContext> context,

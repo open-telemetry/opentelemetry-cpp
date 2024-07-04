@@ -74,7 +74,7 @@ struct HttpCurlEasyResource
   HttpCurlEasyResource &operator=(const HttpCurlEasyResource &other) = delete;
 };
 
-class OPENTELEMETRY_EXPORT HttpOperation
+class OPENTELEMETRY_EXPORT_TYPE HttpOperation
 {
 private:
   /**

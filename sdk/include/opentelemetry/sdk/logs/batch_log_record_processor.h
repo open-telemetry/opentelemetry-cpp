@@ -30,7 +30,7 @@ namespace logs
  * This is an implementation of the LogRecordProcessor which creates batches of finished logs and
  * passes the export-friendly log data representations to the configured LogRecordExporter.
  */
-class OPENTELEMETRY_EXPORT BatchLogRecordProcessor : public LogRecordProcessor
+class OPENTELEMETRY_EXPORT_TYPE BatchLogRecordProcessor : public LogRecordProcessor
 {
 public:
   /**

@@ -30,7 +30,7 @@ namespace trace
 
 using namespace opentelemetry::sdk::instrumentationscope;
 
-class OPENTELEMETRY_EXPORT Tracer final : public opentelemetry::trace::Tracer,
+class OPENTELEMETRY_EXPORT_TYPE Tracer final : public opentelemetry::trace::Tracer,
                      public std::enable_shared_from_this<Tracer>
 {
 public:
