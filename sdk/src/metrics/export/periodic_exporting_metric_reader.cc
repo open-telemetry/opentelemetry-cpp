@@ -94,9 +94,9 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
   auto keep_lifetime = shared_from_this();
 
   auto future_receive = std::async(std::launch::async, [keep_lifetime, cancel_export_for_timeout] {
-    static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
-        ->Collect([keep_lifetime, cancel_export_for_timeout](ResourceMetrics &metric_data) {
-          if (*cancel_export_for_timeout)
+    keep_lifetime->Collect(
+        [keep_lifetime, cancel_export_for_timeout](ResourceMetrics &metric_data) {
+          if (cancel_export_for_timeout->load(std::memory_order_acquire))
           {
             OTEL_INTERNAL_LOG_ERROR(
                 "[Periodic Exporting Metric Reader] Collect took longer configured time: "
@@ -118,7 +118,7 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     status = future_receive.wait_for(std::chrono::milliseconds(export_timeout_millis_));
     if (status == std::future_status::timeout)
     {
-      *cancel_export_for_timeout = true;
+      cancel_export_for_timeout->store(true, std::memory_order_release);
       break;
     }
   } while (status != std::future_status::ready);
