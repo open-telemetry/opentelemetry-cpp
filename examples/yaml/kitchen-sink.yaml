@@ -94,6 +94,12 @@ logger_provider:
             #
             # Environment variable: OTEL_EXPORTER_OTLP_INSECURE, OTEL_EXPORTER_OTLP_LOGS_INSECURE
             insecure: false
+    # Configure a simple log record processor.
+    - simple:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be console.
+          console: {}
   # Configure log record limits. See also attribute_limits.
   limits:
     # Configure max log record attribute value size. Overrides attribute_limits.attribute_value_length_limit.

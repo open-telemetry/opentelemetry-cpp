@@ -195,6 +195,44 @@ void Registry::AddExtensionSpanProcessorBuilder(const std::string &name,
   m_span_processor_builders.insert(entry);
 }
 
+const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporterBuilder(
+    const std::string &name)
+{
+  ExtensionLogRecordExporterBuilder *builder = nullptr;
+  auto search                                = m_log_record_exporter_builders.find(name);
+  if (search != m_log_record_exporter_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionLogRecordExporterBuilder(const std::string &name,
+                                                    ExtensionLogRecordExporterBuilder *builder)
+{
+  std::pair<std::string, ExtensionLogRecordExporterBuilder *> entry{name, builder};
+  m_log_record_exporter_builders.insert(entry);
+}
+
+const ExtensionLogRecordProcessorBuilder *Registry::GetExtensionLogRecordProcessorBuilder(
+    const std::string &name)
+{
+  ExtensionLogRecordProcessorBuilder *builder = nullptr;
+  auto search                                 = m_log_record_processor_builders.find(name);
+  if (search != m_log_record_processor_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionLogRecordProcessorBuilder(const std::string &name,
+                                                     ExtensionLogRecordProcessorBuilder *builder)
+{
+  std::pair<std::string, ExtensionLogRecordProcessorBuilder *> entry{name, builder};
+  m_log_record_processor_builders.insert(entry);
+}
+
 }  // namespace init
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

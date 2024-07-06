@@ -18,10 +18,14 @@
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
@@ -33,6 +37,7 @@
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
+#include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -45,19 +50,26 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
+#include "opentelemetry/sdk/init/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/console_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_sampler_builder.h"
 #include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_span_processor_builder.h"
+#include "opentelemetry/sdk/init/otlp_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/init/unsupported_exception.h"
 #include "opentelemetry/sdk/init/zipkin_span_exporter_builder.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
@@ -260,6 +272,38 @@ private:
   const SdkBuilder *m_sdk_builder;
 };
 
+class LogRecordExporterBuilder
+    : public opentelemetry::sdk::configuration::LogRecordExporterConfigurationVisitor
+{
+public:
+  LogRecordExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  ~LogRecordExporterBuilder() override = default;
+
+  void VisitOtlp(
+      const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpLogRecordExporter(model);
+  }
+
+  void VisitConsole(const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration
+                        *model) override
+  {
+    exporter = m_sdk_builder->CreateConsoleLogRecordExporter(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionLogRecordExporterConfiguration *model)
+      override
+  {
+    exporter = m_sdk_builder->CreateExtensionLogRecordExporter(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
+
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
     const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) const
 {
@@ -356,7 +400,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
     const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const OtlpSpanExporterBuilder *builder = m_registry->GetOtlpBuilder();
+  const OtlpSpanExporterBuilder *builder = m_registry->GetOtlpSpanBuilder();
 
   if (builder != nullptr)
   {
@@ -376,7 +420,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
     const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ConsoleSpanExporterBuilder *builder = m_registry->GetConsoleBuilder();
+  const ConsoleSpanExporterBuilder *builder = m_registry->GetConsoleSpanBuilder();
 
   if (builder != nullptr)
   {
@@ -396,7 +440,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
     const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
-  const ZipkinSpanExporterBuilder *builder = m_registry->GetZipkinBuilder();
+  const ZipkinSpanExporterBuilder *builder = m_registry->GetZipkinSpanBuilder();
 
   if (builder != nullptr)
   {
@@ -693,26 +737,112 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
   return sdk;
 }
 
-std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
-SdkBuilder::CreateBatchLogRecordProcessor(
-    const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration * /* model */)
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+SdkBuilder::CreateOtlpLogRecordExporter(
+    const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
+  const OtlpLogRecordExporterBuilder *builder = m_registry->GetOtlpLogRecordBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpLogRecordExporter() using registered builder");
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for OtlpLogRecordExporter");
+    throw UnsupportedException("No builder for OtlpLogRecordExporter");
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+SdkBuilder::CreateConsoleLogRecordExporter(
+    const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
+  const ConsoleLogRecordExporterBuilder *builder = m_registry->GetConsoleLogRecordBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateConsoleLogRecordExporter() using registered builder");
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ConsoleLogRecordExporter");
+    throw UnsupportedException("No builder for ConsoleLogRecordExporter");
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
+SdkBuilder::CreateExtensionLogRecordExporter(
+    const opentelemetry::sdk::configuration::ExtensionLogRecordExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
+  std::string name = model->name;
+
+  const ExtensionLogRecordExporterBuilder *builder =
+      m_registry->GetExtensionLogRecordExporterBuilder(name);
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordExporter() using registered builder " << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateExtensionLogRecordExporter() no builder for " << name);
+    throw UnsupportedException("CreateExtensionLogRecordExporter() no builder for " + name);
+  }
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> SdkBuilder::CreateLogRecordExporter(
+    const std::unique_ptr<opentelemetry::sdk::configuration::LogRecordExporterConfiguration> &model)
     const
 {
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateBatchLogRecordProcessor() FIXME");
+  LogRecordExporterBuilder builder(this);
+  model->Accept(&builder);
+  sdk = std::move(builder.exporter);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
+SdkBuilder::CreateBatchLogRecordProcessor(
+    const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
+  opentelemetry::sdk::logs::BatchLogRecordProcessorOptions options;
+
+  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  options.max_queue_size        = model->max_queue_size;
+  options.max_export_batch_size = model->max_export_batch_size;
+
+  auto exporter_sdk = CreateLogRecordExporter(model->exporter);
+
+  sdk = opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create(std::move(exporter_sdk),
+                                                                         options);
 
   return sdk;
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
 SdkBuilder::CreateSimpleLogRecordProcessor(
-    const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateSimpleLogRecordProcessor() FIXME");
+  auto exporter_sdk = CreateLogRecordExporter(model->exporter);
+
+  sdk = opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create(std::move(exporter_sdk));
 
   return sdk;
 }

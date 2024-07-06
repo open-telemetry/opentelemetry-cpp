@@ -6,7 +6,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/exporters/ostream/console_builder.h"
+#include "opentelemetry/exporters/ostream/console_log_record_builder.h"
+#include "opentelemetry/exporters/ostream/console_span_builder.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
@@ -23,7 +24,8 @@
 #endif
 
 #ifdef OTEL_HAVE_OTLP
-#  include "opentelemetry/exporters/otlp/otlp_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_log_record_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_span_builder.h"
 #endif
 
 #ifdef OTEL_HAVE_ZIPKIN
@@ -51,10 +53,12 @@ void InitOtel(const std::string &config_file)
 
   /* 2 - Populate the registry with the core components supported */
 
-  opentelemetry::exporter::trace::ConsoleBuilder::Register(registry.get());
+  opentelemetry::exporter::trace::ConsoleSpanBuilder::Register(registry.get());
+  opentelemetry::exporter::logs::ConsoleLogRecordBuilder::Register(registry.get());
 
 #ifdef OTEL_HAVE_OTLP
-  opentelemetry::exporter::otlp::OtlpBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpSpanBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpLogRecordBuilder::Register(registry.get());
 #endif
 
 #ifdef OTEL_HAVE_ZIPKIN

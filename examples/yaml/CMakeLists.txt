@@ -17,8 +17,9 @@ add_executable(
   custom_span_processor.cc
   custom_span_processor_builder.cc)
 
-target_link_libraries(example_yaml ${CMAKE_THREAD_LIBS_INIT} common_foo_library
-                      opentelemetry_exporter_ostream_span)
+target_link_libraries(
+  example_yaml ${CMAKE_THREAD_LIBS_INIT} common_foo_library
+  opentelemetry_exporter_ostream_span opentelemetry_exporter_ostream_logs)
 
 if(WITH_OTLP_HTTP)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
@@ -37,5 +38,5 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
 else()
   target_link_libraries(
     example_yaml opentelemetry_configuration opentelemetry_init
-    opentelemetry_common opentelemetry_trace)
+    opentelemetry_common opentelemetry_trace opentelemetry_logs)
 endif()

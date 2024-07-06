@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/console_builder.h"
+#include "opentelemetry/exporters/ostream/console_span_builder.h"
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/version.h"
 
@@ -11,14 +11,14 @@ namespace exporter
 namespace trace
 {
 
-static ConsoleBuilder singleton;
+static ConsoleSpanBuilder singleton;
 
-void ConsoleBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void ConsoleSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 {
-  registry->SetConsoleBuilder(&singleton);
+  registry->SetConsoleSpanBuilder(&singleton);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ConsoleBuilder::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> ConsoleSpanBuilder::Build(
     const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration * /* model */) const
 {
   return OStreamSpanExporterFactory::Create();

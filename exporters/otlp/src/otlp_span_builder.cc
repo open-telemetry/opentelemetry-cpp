@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_builder.h"
+#include "opentelemetry/exporters/otlp/otlp_span_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/version.h"
@@ -12,14 +12,14 @@ namespace exporter
 namespace otlp
 {
 
-static OtlpBuilder singleton;
+static OtlpSpanBuilder singleton;
 
-void OtlpBuilder::Register(opentelemetry::sdk::init::Registry *registry)
+void OtlpSpanBuilder::Register(opentelemetry::sdk::init::Registry *registry)
 {
-  registry->SetOtlpBuilder(&singleton);
+  registry->SetOtlpSpanBuilder(&singleton);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpBuilder::Build(
+std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpSpanBuilder::Build(
     const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration * /* model */) const
 {
   // FIXME, use model
