@@ -249,6 +249,26 @@ index 19516c3b..dd6213c1 100644
 If opentelemetry-proto contains new files,
 the makefile needs to be adjusted to build the new code.
 
+Depending on the actual changes in the opentelemetry-proto files,
+the C++ code in opentelemetry-cpp may need adjustments.
+
+Typically, when opentelemetry-proto:
+
+* defines a new message (for example, for profiling)
+* adds new optional fields to an existing message (for example, trace flags)
+
+the existing C++ code should work as is with the new opentelemetry-proto
+format.
+
+In this case, it is better to:
+
+* upgrade the opentelemetry-proto version independently with one PR.
+* upgrade the C++ code later (to use the new message, of provide new fields)
+  in a different PR.
+
+When the C++ code requires a newer minimum version of opentelemetry-proto,
+make sure to document this, including in the release notes.
+
 #### file MODULE.bazel
 
 Make sure the new tag is available in bazel central:
