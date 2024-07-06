@@ -33,7 +33,17 @@ single_version_override(
     patches = ["bazel/grpc_deps_remove_googleapis.patch"],
 )
 
-bazel_dep(name = "opentelemetry-proto", version = "1.3.1")
+bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
+archive_override(
+    module_name = "opentelemetry-proto",
+    strip_prefix = "opentelemetry-proto-1.3.2",
+    integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
+    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
+    # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
+    patches = ["bazel/opentelemetry-proto.patch"],
+    patch_strip = 1,
+)
+
 bazel_dep(name = "prometheus-cpp", version = "1.3.0")
 archive_override(
     module_name = "prometheus-cpp",

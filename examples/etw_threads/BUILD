@@ -17,9 +17,6 @@ otel_cc_binary(
     ],
     deps = dll_deps([
         "//exporters/etw:etw_exporter",
+        "//:windows_only",
     ]),
-    target_compatible_with = select({
-        "@platforms//os:windows": [],
-        "//conditions:default": ["@platforms//:incompatible"],    
-    }),
 )
