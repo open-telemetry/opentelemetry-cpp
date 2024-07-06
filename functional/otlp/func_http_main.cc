@@ -1,16 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
-
+#include <stdio.h>
+#include <string.h>
 #include <iostream>
 #include <string>
+#include <utility>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 namespace trace     = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -54,6 +67,8 @@ struct TestResult
   bool found_request_send_failure = false;
   bool found_export_error         = false;
   bool found_export_success       = false;
+  bool found_unknown_min_tls      = false;
+  bool found_unknown_max_tls      = false;
 
   void reset()
   {
@@ -62,6 +77,8 @@ struct TestResult
     found_request_send_failure = false;
     found_export_error         = false;
     found_export_success       = false;
+    found_unknown_min_tls      = false;
+    found_unknown_max_tls      = false;
   }
 };
 
@@ -95,6 +112,20 @@ void parse_error_msg(TestResult *result, std::string msg)
   if (msg.find(export_failed) != std::string::npos)
   {
     result->found_export_error = true;
+  }
+
+  static std::string unknown_min_tls("Unknown min TLS version");
+
+  if (msg.find(unknown_min_tls) != std::string::npos)
+  {
+    result->found_unknown_min_tls = true;
+  }
+
+  static std::string unknown_max_tls("Unknown max TLS version");
+
+  if (msg.find(unknown_max_tls) != std::string::npos)
+  {
+    result->found_unknown_max_tls = true;
   }
 }
 
@@ -501,6 +532,24 @@ int expect_success()
 int expect_request_send_failed()
 {
   if (g_test_result.found_export_error && g_test_result.found_request_send_failure)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
+int expect_unknown_min_tls()
+{
+  if (g_test_result.found_export_error && g_test_result.found_unknown_min_tls)
+  {
+    return TEST_PASSED;
+  }
+  return TEST_FAILED;
+}
+
+int expect_unknown_max_tls()
+{
+  if (g_test_result.found_export_error && g_test_result.found_unknown_max_tls)
   {
     return TEST_PASSED;
   }
@@ -928,7 +977,7 @@ int test_min_tls_unknown()
     return expect_export_failed();
   }
 
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_min_tls_10()
@@ -963,7 +1012,7 @@ int test_min_tls_10()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_min_tls_11()
@@ -998,7 +1047,7 @@ int test_min_tls_11()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_min_tls_12()
@@ -1098,7 +1147,7 @@ int test_max_tls_unknown()
     return expect_export_failed();
   }
 
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_10()
@@ -1134,7 +1183,7 @@ int test_max_tls_10()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_11()
@@ -1170,7 +1219,7 @@ int test_max_tls_11()
   }
 
   // No support for TLS 1.1
-  return expect_connection_failed();
+  return expect_unknown_max_tls();
 }
 
 int test_max_tls_12()
@@ -1277,7 +1326,7 @@ int test_range_tls_10()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11()
@@ -1314,7 +1363,7 @@ int test_range_tls_11()
   }
 
   // No support for TLS 1.0
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_12()
@@ -1423,7 +1472,7 @@ int test_range_tls_10_11()
   }
 
   // No support for TLS 1.0, TLS 1.1
-  return expect_connection_failed();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_10_12()
@@ -1459,7 +1508,7 @@ int test_range_tls_10_12()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_10_13()
@@ -1495,7 +1544,7 @@ int test_range_tls_10_13()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11_10()
@@ -1563,7 +1612,7 @@ int test_range_tls_11_12()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_11_13()
@@ -1599,7 +1648,7 @@ int test_range_tls_11_13()
     return expect_connection_failed();
   }
 
-  return expect_success();
+  return expect_unknown_min_tls();
 }
 
 int test_range_tls_12_10()
