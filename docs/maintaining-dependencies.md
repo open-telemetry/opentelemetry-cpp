@@ -1,7 +1,28 @@
 
 # Maintaining dependencies
 
+In general, several places in the code base need to be adjusted when
+upgrading a dependency to a new version.
+
+This documentation contains notes about which place to fix,
+to make maintenance easier and less error prone.
+
+This doc is only useful when up to date,
+so make sure to add details about missing parts if any.
+
+Also, another good place to start when upgrading something to N+1
+is to find the commit that upgraded to version N (use `git blame`),
+and inspect the commit for the last upgrade.
+
 ## opentelemetry-proto
+
+### Comments
+
+Unlike other opentelemetry SIGs, opentelemetry-cpp generates code
+from opentelemetry-proto as part of the opentelemetry-cpp build.
+
+Only the source code of opentelemetry-proto is required,
+which is why this repository is used as a git submodule under third_party.
 
 ### Origin
 
@@ -238,6 +259,13 @@ Update the opentelemetry-proto version to the new tag:
 bazel_dep(name = "opentelemetry-proto", version = "1.3.2", repo_name = "com_github_opentelemetry_proto")
 ```
 
+File `MODULE.bazel` is not used in the github CI for repository
+opentelemetry-cpp, so using a tag that does not exist (yet) in bazel central
+will not break the CI build.
+
+See the known issues section.
+
+
 Typical change:
 
 ```shell
@@ -256,3 +284,18 @@ index 7b84c2b7..3161ffb1 100644
  bazel_dep(name = "platforms", version = "0.0.8")
  bazel_dep(name = "prometheus-cpp", version = "1.2.4", repo_name = "com_github_jupp0r_prometheus_cpp")
 ```
+
+### Known issues
+
+For bazel, two different methods to build exists.
+
+First, the code can build using file `bazel/repository.bzl`.
+This option does not depend on bazel central, and is used in CI today.
+
+Secondly, there is also a build using modules, with file `MODULE.bazel`.
+
+Using modules does introduce a dependency on bazel central.
+Users building locally with modules will need the opentelemetry-proto build
+with the new tag to exist in bazel central.
+
+This work with modules is still experimental, and subject to change.
