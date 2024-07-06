@@ -265,7 +265,6 @@ will not break the CI build.
 
 See the known issues section.
 
-
 Typical change:
 
 ```shell
