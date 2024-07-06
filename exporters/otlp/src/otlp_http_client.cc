@@ -696,7 +696,7 @@ OtlpHttpClient::~OtlpHttpClient()
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false), options_(options), http_client_(http_client)
+    : is_shutdown_(false), options_(options), http_client_(std::move(http_client))
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -881,7 +881,7 @@ OtlpHttpClient::createSession(
       std::string error_message = "[OTLP HTTP Client] Export failed, invalid url: " + options_.url;
       if (options_.console_debug)
       {
-        std::cerr << error_message << std::endl;
+        std::cerr << error_message << '\n';
       }
       OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
 
@@ -946,7 +946,7 @@ OtlpHttpClient::createSession(
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
     {
-      std::cerr << error_message << std::endl;
+      std::cerr << error_message << '\n';
     }
     OTEL_INTERNAL_LOG_ERROR(error_message);
 

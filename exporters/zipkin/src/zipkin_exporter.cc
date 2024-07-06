@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
 
 #include <stdint.h>

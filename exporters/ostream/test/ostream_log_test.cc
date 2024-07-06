@@ -97,24 +97,28 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
   std::cout.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
-      "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "    telemetry.sdk.version: ",
+      OPENTELEMETRY_VERSION,
+      "\n",
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
-      "  event_id           : 0\n"
+      "  event_id           : 0\n",
       "  event_name         : \n",
       "  trace_id           : 00000000000000000000000000000000\n",
       "  span_id            : 0000000000000000\n",
       "  trace_flags        : 00\n",
       "  scope              : \n",
       "    name             : otel-cpp\n",
-      "    version          : " OPENTELEMETRY_SDK_VERSION "\n",
+      "    version          : ",
+      OPENTELEMETRY_SDK_VERSION,
+      "\n",
       "    schema_url       : https://opentelemetry.io/schemas/1.15.0\n",
       "    attributes       : \n",
       "      scope.attr.key: scope.attr.value\n",
@@ -126,7 +130,7 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -167,9 +171,8 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
   std::cout.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
-      "  timestamp          : " +
-          std::to_string(now.time_since_epoch().count()) +
+      "{\n",
+      "  timestamp          : " + std::to_string(now.time_since_epoch().count()) +
           "\n"
           "  observed_timestamp : " +
           std::to_string(now.time_since_epoch().count()) +
@@ -201,7 +204,7 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -243,13 +246,15 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
   std::cerr.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
       "  severity_num       : 0\n"
       "  severity_text      : INVALID\n"
       "  body               : \n",
       "  resource           : \n",
-      "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "    telemetry.sdk.version: ",
+      OPENTELEMETRY_VERSION,
+      "\n",
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "    service.name: unknown_service\n",
@@ -263,7 +268,9 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
       "  trace_flags        : 00\n",
       "  scope              : \n",
       "    name             : otel-cpp\n",
-      "    version          : " OPENTELEMETRY_SDK_VERSION "\n",
+      "    version          : ",
+      OPENTELEMETRY_SDK_VERSION,
+      "\n",
       "    schema_url       : https://opentelemetry.io/schemas/1.15.0\n",
       "    attributes       : \n",
       "      scope.attr.key: scope.attr.value\n",
@@ -275,7 +282,7 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -324,7 +331,7 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
   std::clog.rdbuf(original);
 
   std::vector<std::string> expected_output{
-      "{\n"
+      "{\n",
       "  timestamp          : 0\n",
       "  severity_num       : 0\n"
       "  severity_text      : INVALID\n"
@@ -344,7 +351,9 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
       "  trace_flags        : 00\n",
       "  scope              : \n",
       "    name             : otel-cpp\n",
-      "    version          : " OPENTELEMETRY_SDK_VERSION "\n",
+      "    version          : ",
+      OPENTELEMETRY_SDK_VERSION,
+      "\n",
       "    schema_url       : https://opentelemetry.io/schemas/1.15.0\n",
       "    attributes       : \n",
       "      scope.attr.key: scope.attr.value\n",
@@ -356,7 +365,7 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -398,9 +407,8 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
 
   // Compare actual vs expected outputs
   std::vector<std::string> expected_output{
-      "{\n"
-      "  timestamp          : " +
-          std::to_string(now.time_since_epoch().count()) + "\n",
+      "{\n",
+      "  timestamp          : " + std::to_string(now.time_since_epoch().count()) + "\n",
       "  severity_num       : 5\n"
       "  severity_text      : DEBUG\n"
       "  body               : Hello\n",
@@ -417,7 +425,9 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
       "  trace_flags        : 00\n",
       "  scope              : \n",
       "    name             : opentelelemtry_library\n",
-      "    version          : " OPENTELEMETRY_SDK_VERSION "\n",
+      "    version          : ",
+      OPENTELEMETRY_SDK_VERSION,
+      "\n",
       "    schema_url       : https://opentelemetry.io/schemas/1.11.0\n",
       "    attributes       : \n",
       "      scope.attr.key: 123\n",
@@ -429,7 +439,7 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }
@@ -500,7 +510,7 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
     std::string::size_type result = ostream_output.find(expected);
     if (result == std::string::npos)
     {
-      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << std::endl;
+      std::cout << "Can not find: \"" << expected << "\" in\n" << ostream_output << '\n';
     }
     ASSERT_NE(result, std::string::npos);
   }

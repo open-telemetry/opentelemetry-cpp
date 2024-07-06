@@ -17,6 +17,7 @@
 #  include "nlohmann/json.hpp"
 
 #  include <string>
+#  include <utility>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -47,7 +48,7 @@ public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
       std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
   {
-    return std::unique_ptr<sdk::trace::SpanExporter>(new ZipkinExporter(http_client));
+    return std::unique_ptr<sdk::trace::SpanExporter>(new ZipkinExporter(std::move(http_client)));
   }
 
   // Get the options associated with the given exporter.

@@ -240,7 +240,7 @@ int HttpOperation::OnProgressCallback(void *clientp,
 #endif
 
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
-                                  std::string reason)
+                                  const std::string &reason)
 {
   if (event_handle_ != nullptr)
   {
@@ -273,7 +273,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       last_curl_result_(CURLE_OK),
       event_handle_(event_handle),
       method_(method),
-      url_(url),
+      url_(std::move(url)),
       ssl_options_(ssl_options),
       // Local vars
       request_headers_(request_headers),
@@ -453,7 +453,7 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-static long parse_min_ssl_version(std::string version)
+static int64_t parse_min_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -470,7 +470,7 @@ static long parse_min_ssl_version(std::string version)
   return 0;
 }
 
-static long parse_max_ssl_version(std::string version)
+static int64_t parse_max_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -529,7 +529,7 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
   return rc;
 }
 
-CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
+CURLcode HttpOperation::SetCurlLongOption(CURLoption option, int64_t value)
 {
   CURLcode rc;
 
@@ -729,9 +729,9 @@ CURLcode HttpOperation::Setup()
 
 #ifdef HAVE_TLS_VERSION
     /* By default, TLSv1.2 or better is required (if we have TLS). */
-    long min_ssl_version = CURL_SSLVERSION_TLSv1_2;
+    int64_t min_ssl_version = CURL_SSLVERSION_TLSv1_2;
 #else
-    long min_ssl_version = 0;
+    int64_t min_ssl_version = 0;
 #endif
 
     if (!ssl_options_.ssl_min_tls.empty())
@@ -755,7 +755,7 @@ CURLcode HttpOperation::Setup()
      * The CURL + openssl library may be more recent than this code,
      * and support a version we do not know about.
      */
-    long max_ssl_version = 0;
+    int64_t max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
     {
@@ -773,7 +773,7 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
-    long version_range = min_ssl_version | max_ssl_version;
+    int64_t version_range = min_ssl_version | max_ssl_version;
     if (version_range != 0)
     {
       rc = SetCurlLongOption(CURLOPT_SSLVERSION, version_range);
@@ -819,7 +819,7 @@ CURLcode HttpOperation::Setup()
     if (ssl_options_.ssl_insecure_skip_verify)
     {
       /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_NONE));
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<int64_t>(CURLUSESSL_NONE));
       if (rc != CURLE_OK)
       {
         return rc;
@@ -840,7 +840,7 @@ CURLcode HttpOperation::Setup()
     else
     {
       /* 6 - ENFORCE VERIFICATION */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<int64_t>(CURLUSESSL_ALL));
       if (rc != CURLE_OK)
       {
         return rc;

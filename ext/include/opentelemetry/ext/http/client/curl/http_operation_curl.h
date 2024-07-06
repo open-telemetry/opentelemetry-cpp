@@ -124,7 +124,8 @@ private:
                                 double ulnow);
 #endif
 public:
-  void DispatchEvent(opentelemetry::ext::http::client::SessionState type, std::string reason = "");
+  void DispatchEvent(opentelemetry::ext::http::client::SessionState type,
+                     const std::string &reason = "");
 
   /**
    * Create local CURL instance for url and body
@@ -267,7 +268,7 @@ private:
     return SetCurlPtrOption(option, list);
   }
 
-  CURLcode SetCurlLongOption(CURLoption option, long value);
+  CURLcode SetCurlLongOption(CURLoption option, int64_t value);
 
   CURLcode SetCurlOffOption(CURLoption option, curl_off_t value);
 
@@ -300,7 +301,7 @@ private:
   const opentelemetry::ext::http::client::Compression &compression_;
 
   // Processed response headers and body
-  long response_code_;
+  int64_t response_code_;
   std::vector<uint8_t> response_headers_;
   std::vector<uint8_t> response_body_;
   std::vector<uint8_t> raw_response_;

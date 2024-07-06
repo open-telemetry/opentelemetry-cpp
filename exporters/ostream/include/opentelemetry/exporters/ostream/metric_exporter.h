@@ -79,7 +79,7 @@ private:
   void printPointData(const opentelemetry::sdk::metrics::PointType &point_data);
   void printPointAttributes(const opentelemetry::sdk::metrics::PointAttributes &point_attributes);
   void printAttributes(const std::map<std::string, sdk::common::OwnedAttributeValue> &map,
-                       const std::string prefix);
+                       const std::string &prefix);
   void printResources(const opentelemetry::sdk::resource::Resource &resources);
 };
 }  // namespace metrics

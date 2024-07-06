@@ -172,11 +172,11 @@ static std::size_t FormatPath(char *buff,
   {                                     \
     tm_obj_cache = GetLocalTime();      \
     tm_obj_ptr   = &tm_obj_cache;       \
-    VAR          = tm_obj_ptr->EXPRESS; \
+    (VAR)        = tm_obj_ptr->EXPRESS; \
   }                                     \
   else                                  \
   {                                     \
-    VAR = tm_obj_ptr->EXPRESS;          \
+    (VAR) = tm_obj_ptr->EXPRESS;        \
   }
 
   for (size_t i = 0; i < fmt.size() && ret < bufz && running; ++i)
@@ -619,7 +619,7 @@ public:
   }
 
 #if !defined(UTIL_FS_DISABLE_LINK)
-  enum class LinkOption : int32_t
+  enum class LinkOption : uint8_t
   {
     kDefault       = 0x00,  // hard link for default
     kSymbolicLink  = 0x01,  // or soft link

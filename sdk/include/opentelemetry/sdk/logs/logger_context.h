@@ -34,7 +34,7 @@ class LoggerContext
 {
 public:
   explicit LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                         opentelemetry::sdk::resource::Resource resource =
+                         const opentelemetry::sdk::resource::Resource &resource =
                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
