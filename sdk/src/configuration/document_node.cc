@@ -24,6 +24,13 @@ namespace configuration
 */
 void DocumentNode::DoSubstitution(std::string &value)
 {
+  // FIXME:
+  // The following needs to be supported (spec changes)
+  // ${env:ENV_NAME}
+  // ${ENV_NAME:-fallback}
+  // some text with ${ENV_NAME} in it
+  // multiple ${env:HOST:-localhost}${env:PORT:-:4318} substitutions
+
   size_t len = value.length();
   char c;
 

@@ -28,7 +28,7 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(const std::st
 
   if (input_file.empty())
   {
-    const char *env_var = std::getenv("OTEL_CONFIG_FILE");
+    const char *env_var = std::getenv("OTEL_EXPERIMENTAL_CONFIG_FILE");
     if (env_var != nullptr)
     {
       input_file = env_var;
