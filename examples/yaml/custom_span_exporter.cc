@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/span_context.h"
 
 #include "custom_span_exporter.h"
 

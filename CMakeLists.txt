@@ -509,7 +509,6 @@ endif()
 #
 
 if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
-  # No specific version required.
   find_package(ryml 0.6.0 REQUIRED)
   message(
     STATUS

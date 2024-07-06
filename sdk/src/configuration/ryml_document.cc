@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
 #include <ryml.hpp>
 #include <ryml_std.hpp>
+#include <string>
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
-
+#include "opentelemetry/sdk/configuration/document.h"
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"

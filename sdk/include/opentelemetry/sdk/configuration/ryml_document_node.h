@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <memory>
 #include <ryml.hpp>
 #include <string>
 

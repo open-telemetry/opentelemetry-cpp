@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
-#include "opentelemetry/sdk/init/configured_sdk.h"
-#include "opentelemetry/sdk/init/registry.h"
+#include <map>
+#include <memory>
+
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/trace_state.h"
 
 #include "custom_sampler.h"
 

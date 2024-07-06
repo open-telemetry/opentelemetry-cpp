@@ -1,6 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdio.h>
+#include <string.h>
+#include <memory>
+#include <string>
+
+#include "opentelemetry/exporters/ostream/console_builder.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
@@ -16,8 +22,6 @@
 #  include "foo_library/foo_library.h"
 #endif
 
-#include "opentelemetry/exporters/ostream/console_builder.h"
-
 #ifdef OTEL_HAVE_OTLP
 #  include "opentelemetry/exporters/otlp/otlp_builder.h"
 #endif
@@ -25,9 +29,6 @@
 #ifdef OTEL_HAVE_ZIPKIN
 #  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #endif
-
-#include <iostream>
-#include <string>
 
 static bool opt_help              = false;
 static std::string yaml_file_path = "";

@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/global_log_handler.h"
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
-#include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
