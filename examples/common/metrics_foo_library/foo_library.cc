@@ -17,17 +17,17 @@
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/provider.h"
+#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 
-namespace nostd       = opentelemetry::nostd;
 namespace metrics_api = opentelemetry::metrics;
 
 namespace
 {
 
-static nostd::shared_ptr<metrics_api::ObservableInstrument> double_observable_counter;
+static opentelemetry::nostd::shared_ptr<metrics_api::ObservableInstrument>
+    double_observable_counter;
 
 std::map<std::string, std::string> get_random_attr()
 {
@@ -45,13 +45,15 @@ class MeasurementFetcher
 public:
   static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void * /* state */)
   {
-    if (nostd::holds_alternative<
-            nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer_result))
+    if (opentelemetry::nostd::holds_alternative<
+            opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
+            observer_result))
     {
       double random_incr = (rand() % 5) + 1.1;
       value_ += random_incr;
       std::map<std::string, std::string> labels = get_random_attr();
-      nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
+      opentelemetry::nostd::get<
+          opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
           observer_result)
           ->Observe(value_, labels);
     }
@@ -63,10 +65,10 @@ double MeasurementFetcher::value_ = 0.0;
 
 void foo_library::counter_example(const std::string &name)
 {
-  std::string counter_name                    = name + "_counter";
-  auto provider                               = metrics_api::Provider::GetMeterProvider();
-  nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  auto double_counter                         = meter->CreateDoubleCounter(counter_name);
+  std::string counter_name = name + "_counter";
+  auto provider            = metrics_api::Provider::GetMeterProvider();
+  opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  auto double_counter = meter->CreateDoubleCounter(counter_name);
 
   for (uint32_t i = 0; i < 20; ++i)
   {
@@ -78,10 +80,10 @@ void foo_library::counter_example(const std::string &name)
 
 void foo_library::observable_counter_example(const std::string &name)
 {
-  std::string counter_name                    = name + "_observable_counter";
-  auto provider                               = metrics_api::Provider::GetMeterProvider();
-  nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  double_observable_counter                   = meter->CreateDoubleObservableCounter(counter_name);
+  std::string counter_name = name + "_observable_counter";
+  auto provider            = metrics_api::Provider::GetMeterProvider();
+  opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  double_observable_counter = meter->CreateDoubleObservableCounter(counter_name);
   double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
   for (uint32_t i = 0; i < 20; ++i)
   {
@@ -91,9 +93,9 @@ void foo_library::observable_counter_example(const std::string &name)
 
 void foo_library::histogram_example(const std::string &name)
 {
-  std::string histogram_name                  = name + "_histogram";
-  auto provider                               = metrics_api::Provider::GetMeterProvider();
-  nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  std::string histogram_name = name + "_histogram";
+  auto provider              = metrics_api::Provider::GetMeterProvider();
+  opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
   auto histogram_counter = meter->CreateDoubleHistogram(histogram_name, "des", "unit");
   auto context           = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)

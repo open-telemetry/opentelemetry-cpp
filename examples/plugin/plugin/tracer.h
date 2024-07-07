@@ -4,7 +4,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <memory>
 
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"

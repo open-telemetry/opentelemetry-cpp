@@ -3,6 +3,8 @@
 
 #pragma once
 
+// IWYU pragma: private, include "opentelemetry/nostd/span.h"
+
 #include "opentelemetry/version.h"
 
 // Standard library implementation requires at least C++17 compiler.
