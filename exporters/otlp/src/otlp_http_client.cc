@@ -652,7 +652,11 @@ void ConvertListFieldToJson(nlohmann::json &value,
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
-    : is_shutdown_(false), options_(options), http_client_(http_client::HttpClientFactory::Create())
+    : is_shutdown_(false),
+      options_(options),
+      http_client_(http_client::HttpClientFactory::Create()),
+      start_session_counter_(0),
+      finished_session_counter_(0)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -691,7 +695,11 @@ OtlpHttpClient::~OtlpHttpClient()
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false), options_(options), http_client_(http_client)
+    : is_shutdown_(false),
+      options_(options),
+      http_client_(http_client),
+      start_session_counter_(0),
+      finished_session_counter_(0)
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -790,6 +798,8 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     timeout_steady = (std::chrono::steady_clock::duration::max)();
   }
 
+  size_t wait_counter = start_session_counter_.load(std::memory_order_acquire);
+
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
   {
     {
@@ -807,7 +817,7 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
     {
       cleanupGCSessions();
     }
-    else
+    else if (finished_session_counter_.load(std::memory_order_acquire) >= wait_counter)
     {
       break;
     }
@@ -822,7 +832,7 @@ bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_.store(true, std::memory_order_release);
 
-  ForceFlush(timeout);
+  bool force_flush_result = ForceFlush(timeout);
 
   {
     std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
@@ -837,7 +847,7 @@ bool OtlpHttpClient::Shutdown(std::chrono::microseconds timeout) noexcept
   {
     ForceFlush(std::chrono::milliseconds{1});
   }
-  return true;
+  return force_flush_result;
 }
 
 void OtlpHttpClient::ReleaseSession(
@@ -854,6 +864,7 @@ void OtlpHttpClient::ReleaseSession(
     gc_sessions_.emplace_back(std::move(session_iter->second));
     running_sessions_.erase(session_iter);
 
+    finished_session_counter_.fetch_add(1, std::memory_order_release);
     has_session = true;
   }
 
@@ -998,6 +1009,7 @@ void OtlpHttpClient::addSession(HttpSessionData &&session_data) noexcept
     store_session_data                  = std::move(session_data);
   }
 
+  start_session_counter_.fetch_add(1, std::memory_order_release);
   // Send request after the session is added
   session->SendRequest(handle);
 }

@@ -296,6 +296,8 @@ private:
   // Condition variable and mutex to control the concurrency count of running sessions
   std::mutex session_waker_lock_;
   std::condition_variable session_waker_;
+  std::atomic<size_t> start_session_counter_;
+  std::atomic<size_t> finished_session_counter_;
 };
 }  // namespace otlp
 }  // namespace exporter
