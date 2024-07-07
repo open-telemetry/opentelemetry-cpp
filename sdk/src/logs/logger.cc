@@ -14,6 +14,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
@@ -48,44 +49,64 @@ const opentelemetry::nostd::string_view Logger::GetName() noexcept
 
 opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
-  auto recordable = context_->GetProcessor().MakeRecordable();
+  std::unique_ptr<Recordable> recordable;
+  try
+  {
+    recordable = context_->GetProcessor().MakeRecordable();
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Logger::CreateLogRecord]"
+                            << "Error while creating recordable: " << e.what()
+                            << " Unable to create new Log Record");
+    return nullptr;
+  }
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
-  if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
+  try
   {
-    opentelemetry::context::ContextValue context_value =
-        opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
-            opentelemetry::trace::kSpanKey);
-    if (opentelemetry::nostd::holds_alternative<
-            opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
+    if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
     {
-      opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> &data =
-          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(
-              context_value);
-      if (data)
+      opentelemetry::context::ContextValue context_value =
+          opentelemetry::context::RuntimeContext::GetCurrent().GetValue(
+              opentelemetry::trace::kSpanKey);
+      if (opentelemetry::nostd::holds_alternative<
+              opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(context_value))
       {
-        recordable->SetTraceId(data->GetContext().trace_id());
-        recordable->SetTraceFlags(data->GetContext().trace_flags());
-        recordable->SetSpanId(data->GetContext().span_id());
+        opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> &data =
+            opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>>(
+                context_value);
+        if (data)
+        {
+          recordable->SetTraceId(data->GetContext().trace_id());
+          recordable->SetTraceFlags(data->GetContext().trace_flags());
+          recordable->SetSpanId(data->GetContext().span_id());
+        }
+      }
+      else if (opentelemetry::nostd::holds_alternative<
+                   opentelemetry::nostd::shared_ptr<trace::SpanContext>>(context_value))
+      {
+        opentelemetry::nostd::shared_ptr<trace::SpanContext> &data =
+            opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<trace::SpanContext>>(
+                context_value);
+        if (data)
+        {
+          recordable->SetTraceId(data->trace_id());
+          recordable->SetTraceFlags(data->trace_flags());
+          recordable->SetSpanId(data->span_id());
+        }
       }
     }
-    else if (opentelemetry::nostd::holds_alternative<
-                 opentelemetry::nostd::shared_ptr<trace::SpanContext>>(context_value))
-    {
-      opentelemetry::nostd::shared_ptr<trace::SpanContext> &data =
-          opentelemetry::nostd::get<opentelemetry::nostd::shared_ptr<trace::SpanContext>>(
-              context_value);
-      if (data)
-      {
-        recordable->SetTraceId(data->trace_id());
-        recordable->SetTraceFlags(data->trace_flags());
-        recordable->SetSpanId(data->span_id());
-      }
-    }
-  }
 
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Logger::CreateLogRecord]: " << e.what()
+                                                          << "Unable to create a new LogRecord");
+    return nullptr;
+  }
 }
 
 void Logger::EmitLogRecord(

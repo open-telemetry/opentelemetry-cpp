@@ -749,6 +749,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::Message &message,
                                    const google::protobuf::FieldDescriptor *field_descriptor);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message)
 {
@@ -952,6 +953,8 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
+// Dynamic memory allocation
 }  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender

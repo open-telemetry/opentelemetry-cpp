@@ -75,38 +75,54 @@ sdk::common::ExportResult ZipkinExporter::Export(
   exporter::zipkin::ZipkinSpan json_spans = {};
   for (auto &recordable : spans)
   {
-    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
-    if (rec != nullptr)
+    try
     {
-      auto json_span = rec->span();
-      // add localEndPoint
-      json_span["localEndpoint"] = local_end_point_;
-      // check service.name
-      auto service_name = rec->GetServiceName();
-      if (service_name.size())
+      auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
+      if (rec != nullptr)
       {
-        json_span["localEndpoint"]["serviceName"] = service_name;
+        auto json_span = rec->span();
+        // add localEndPoint
+        json_span["localEndpoint"] = local_end_point_;
+        // check service.name
+        auto service_name = rec->GetServiceName();
+        if (service_name.size())
+        {
+          json_span["localEndpoint"]["serviceName"] = service_name;
+        }
+        json_spans.push_back(json_span);
       }
-      json_spans.push_back(json_span);
     }
-  }
-  auto body_s = json_spans.dump();
-  http_client::Body body_v(body_s.begin(), body_s.end());
-  auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
-  if (result &&
-      (result.GetResponse().GetStatusCode() >= 200 && result.GetResponse().GetStatusCode() <= 299))
-  {
-    return sdk::common::ExportResult::kSuccess;
-  }
-  else
-  {
-    if (result.GetSessionState() == http_client::SessionState::ConnectFailed)
+    catch (const std::exception &e)
     {
-      OTEL_INTERNAL_LOG_ERROR("ZIPKIN EXPORTER] Zipkin Exporter: Connection failed");
+      OTEL_INTERNAL_LOG_ERROR(
+          "[Zipkin Trace Exporter] Exception while processing spans: " << e.what());
     }
+  }
+
+  try
+  {
+    auto body_s = json_spans.dump();
+    http_client::Body body_v(body_s.begin(), body_s.end());
+    auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
+    if (result && (result.GetResponse().GetStatusCode() >= 200 &&
+                   result.GetResponse().GetStatusCode() <= 299))
+    {
+      return sdk::common::ExportResult::kSuccess;
+    }
+    else
+    {
+      if (result.GetSessionState() == http_client::SessionState::ConnectFailed)
+      {
+        OTEL_INTERNAL_LOG_ERROR("ZIPKIN EXPORTER] Zipkin Exporter: Connection failed");
+      }
+      return sdk::common::ExportResult::kFailure;
+    }
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Exception during HTTP request: " << e.what());
     return sdk::common::ExportResult::kFailure;
   }
-  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()

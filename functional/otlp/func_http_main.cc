@@ -39,7 +39,7 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
-enum test_mode
+enum test_mode : std::uint8_t
 {
   MODE_NONE,
   MODE_HTTP,

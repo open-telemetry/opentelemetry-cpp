@@ -47,26 +47,44 @@ void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* att
 
 std::unique_ptr<Aggregation> LongSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
-  int64_t merge_value =
-      nostd::get<int64_t>(
-          nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
-              .value_) +
-      nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
-  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
-  return aggr;
+  try
+  {
+    int64_t merge_value =
+        nostd::get<int64_t>(
+            nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(delta).ToPoint()))
+                .value_) +
+        nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
+    std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
+    static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
+    return aggr;
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(" [LongSumAggregation::Merge]: "
+                            << e.what() << ". Unable to merge aggregation with delta.");
+    return nullptr;
+  }
 }
 
 std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) const noexcept
 {
-  int64_t diff_value =
-      nostd::get<int64_t>(
-          nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(next).ToPoint()))
-              .value_) -
-      nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
-  static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
-  return aggr;
+  try
+  {
+    int64_t diff_value =
+        nostd::get<int64_t>(
+            nostd::get<SumPointData>((static_cast<const LongSumAggregation &>(next).ToPoint()))
+                .value_) -
+        nostd::get<int64_t>(nostd::get<SumPointData>(ToPoint()).value_);
+    std::unique_ptr<Aggregation> aggr(new LongSumAggregation(point_data_.is_monotonic_));
+    static_cast<LongSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
+    return aggr;
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(" [LongSumAggregation::Diff]: "
+                            << e.what() << ". Unable to compute difference with next aggregation.");
+    return nullptr;
+  }
 }
 
 PointType LongSumAggregation::ToPoint() const noexcept
@@ -102,26 +120,44 @@ void DoubleSumAggregation::Aggregate(double value,
 
 std::unique_ptr<Aggregation> DoubleSumAggregation::Merge(const Aggregation &delta) const noexcept
 {
-  double merge_value =
-      nostd::get<double>(
-          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(delta).ToPoint()))
-              .value_) +
-      nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
-  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
-  return aggr;
+  try
+  {
+    double merge_value =
+        nostd::get<double>(
+            nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(delta).ToPoint()))
+                .value_) +
+        nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
+    std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
+    static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = merge_value;
+    return aggr;
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(" [DoubleSumAggregation::Merge]: "
+                            << e.what() << ". Unable to merge aggregation with delta.");
+    return nullptr;
+  }
 }
 
 std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(const Aggregation &next) const noexcept
 {
-  double diff_value =
-      nostd::get<double>(
-          nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(next).ToPoint()))
-              .value_) -
-      nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
-  std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
-  static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
-  return aggr;
+  try
+  {
+    double diff_value =
+        nostd::get<double>(
+            nostd::get<SumPointData>((static_cast<const DoubleSumAggregation &>(next).ToPoint()))
+                .value_) -
+        nostd::get<double>(nostd::get<SumPointData>(ToPoint()).value_);
+    std::unique_ptr<Aggregation> aggr(new DoubleSumAggregation(point_data_.is_monotonic_));
+    static_cast<DoubleSumAggregation *>(aggr.get())->point_data_.value_ = diff_value;
+    return aggr;
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(" [LongSumAggregation::Diff]: "
+                            << e.what() << ". Unable to compute difference with next aggregation.");
+    return nullptr;
+  }
 }
 
 PointType DoubleSumAggregation::ToPoint() const noexcept

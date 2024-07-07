@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/version.h"
@@ -23,42 +24,52 @@ const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
-  std::string attributes_str, service_name;
-
-  bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
-      OTEL_RESOURCE_ATTRIBUTES, attributes_str);
-  bool service_name_exists =
-      opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
-
-  if (!attributes_exists && !service_name_exists)
+  try
   {
-    return Resource();
-  }
+    std::string attributes_str, service_name;
 
-  ResourceAttributes attributes;
+    bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
+        OTEL_RESOURCE_ATTRIBUTES, attributes_str);
+    bool service_name_exists =
+        opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
 
-  if (attributes_exists)
-  {
-    std::istringstream iss(attributes_str);
-    std::string token;
-    while (std::getline(iss, token, ','))
+    if (!attributes_exists && !service_name_exists)
     {
-      size_t pos = token.find('=');
-      if (pos != std::string::npos)
+      return Resource();
+    }
+
+    ResourceAttributes attributes;
+
+    if (attributes_exists)
+    {
+      std::istringstream iss(attributes_str);
+      std::string token;
+      while (std::getline(iss, token, ','))
       {
-        std::string key   = token.substr(0, pos);
-        std::string value = token.substr(pos + 1);
-        attributes[key]   = value;
+        size_t pos = token.find('=');
+        if (pos != std::string::npos)
+        {
+          std::string key   = token.substr(0, pos);
+          std::string value = token.substr(pos + 1);
+          attributes[key]   = value;
+        }
       }
     }
-  }
 
-  if (service_name_exists)
+    if (service_name_exists)
+    {
+      attributes[SemanticConventions::kServiceName] = service_name;
+    }
+
+    return Resource(attributes);
+  }
+  catch (const std::exception &e)
   {
-    attributes[SemanticConventions::kServiceName] = service_name;
-  }
 
-  return Resource(attributes);
+    // OTEL_INTERNAL_LOG_ERROR(" [OTELResourceDetector::Detect]: " << e.what() << ". Unable to
+    // detect resources and returning empty resource.");
+    return Resource();
+  }
 }
 
 }  // namespace resource

@@ -181,7 +181,7 @@ TEST(OStreamLogRecordExporter, SimpleLogToCout)
           "  severity_text      : TRACE\n"
           "  body               : Message\n",
       "  resource           : \n",
-      "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
+      "    telemetry.sdk.version: ", OPENTELEMETRY_VERSION, "\n",
       "    telemetry.sdk.name: opentelemetry\n",
       "    telemetry.sdk.language: cpp\n",
       "  attributes         : \n",
@@ -248,8 +248,8 @@ TEST(OStreamLogRecordExporter, LogWithStringAttributesToCerr)
   std::vector<std::string> expected_output{
       "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
       "    telemetry.sdk.version: ",
@@ -333,8 +333,8 @@ TEST(OStreamLogRecordExporter, LogWithVariantTypesToClog)
   std::vector<std::string> expected_output{
       "{\n",
       "  timestamp          : 0\n",
-      "  severity_num       : 0\n"
-      "  severity_text      : INVALID\n"
+      "  severity_num       : 0\n",
+      "  severity_text      : INVALID\n",
       "  body               : \n",
       "  resource           : \n",
       "    service.name: unknown_service\n",
@@ -409,8 +409,8 @@ TEST(OStreamLogRecordExporter, IntegrationTest)
   std::vector<std::string> expected_output{
       "{\n",
       "  timestamp          : " + std::to_string(now.time_since_epoch().count()) + "\n",
-      "  severity_num       : 5\n"
-      "  severity_text      : DEBUG\n"
+      "  severity_num       : 5\n",
+      "  severity_text      : DEBUG\n",
       "  body               : Hello\n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
@@ -482,8 +482,8 @@ TEST(OStreamLogRecordExporter, IntegrationTestWithEventId)
 
   // Compare actual vs expected outputs
   std::vector<std::string> expected_output{
-      "  severity_num       : 5\n"
-      "  severity_text      : DEBUG\n"
+      "  severity_num       : 5\n",
+      "  severity_text      : DEBUG\n",
       "  body               : Hello {key1} {key2}\n",
       "  resource           : \n",
       "    telemetry.sdk.version: " OPENTELEMETRY_VERSION "\n",
