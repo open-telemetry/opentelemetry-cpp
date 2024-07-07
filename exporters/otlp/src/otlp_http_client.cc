@@ -655,7 +655,8 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
-// NOLINTEND(misc-no-recursion) suppressing for performance, if implemented iterative process needs DMA
+// NOLINTEND(misc-no-recursion) suppressing for performance, if implemented iterative process needs
+// DMA
 
 }  // namespace
 

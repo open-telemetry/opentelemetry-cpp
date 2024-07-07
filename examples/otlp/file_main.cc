@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
@@ -69,24 +70,25 @@ void CleanupTracer()
 
 int main(int argc, char *argv[])
 {
-    try{
-  if (argc > 1)
+  try
   {
-    opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
-    fs_backend.file_pattern = argv[1];
-    opts.backend_options    = fs_backend;
-  }
-  // Removing this line will leave the default noop TracerProvider in place.
-  InitTracer();
-
-  foo_library();
-
-  CleanupTracer();
-    }
-    catch (const std::exception &e)
+    if (argc > 1)
     {
-        std::cerr << " [FileTracerMain]: Error in main due to  " << e.what() << "Exiting the program"
-                  << '\n';
-        return EXIT_FAILURE;
+      opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
+      fs_backend.file_pattern = argv[1];
+      opts.backend_options    = fs_backend;
     }
+    // Removing this line will leave the default noop TracerProvider in place.
+    InitTracer();
+
+    foo_library();
+
+    CleanupTracer();
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << " [FileTracerMain]: Error in main due to  " << e.what() << "Exiting the program"
+              << '\n';
+    return EXIT_FAILURE;
+  }
 }

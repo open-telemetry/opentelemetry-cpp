@@ -99,7 +99,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
       }
     }
 
-  return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
+    return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
   }
   catch (const std::exception &e)
   {

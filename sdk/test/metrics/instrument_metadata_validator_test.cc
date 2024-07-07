@@ -19,8 +19,8 @@ TEST(InstrumentMetadataValidator, TestName)
 {
   opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
   std::vector<std::string> invalid_names = {
-      "",                                                             // empty string
-      "1sdf",                                                         // string starting with number
+      "",      // empty string
+      "1sdf",  // string starting with number
       "\x31\x32\x33\xe2\x82\xac\x41\x41\x41\xe2\x82\xac\x42\x42\x42",  // unicode characters
       "/\\sdsd",                        // string starting with special character
       "***sSSs",                        // string starting with special character
