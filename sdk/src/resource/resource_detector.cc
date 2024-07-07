@@ -24,50 +24,47 @@ const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
-  try
+  std::string attributes_str, service_name;
+
+  bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
+      OTEL_RESOURCE_ATTRIBUTES, attributes_str);
+  bool service_name_exists =
+      opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
+
+  if (!attributes_exists && !service_name_exists)
   {
-    std::string attributes_str, service_name;
+    return Resource();
+  }
 
-    bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
-        OTEL_RESOURCE_ATTRIBUTES, attributes_str);
-    bool service_name_exists =
-        opentelemetry::sdk::common::GetStringEnvironmentVariable(OTEL_SERVICE_NAME, service_name);
+  ResourceAttributes attributes;
 
-    if (!attributes_exists && !service_name_exists)
+  if (attributes_exists)
+  {
+    std::istringstream iss(attributes_str);
+    std::string token;
+    while (std::getline(iss, token, ','))
     {
-      return Resource();
-    }
-
-    ResourceAttributes attributes;
-
-    if (attributes_exists)
-    {
-      std::istringstream iss(attributes_str);
-      std::string token;
-      while (std::getline(iss, token, ','))
+      size_t pos = token.find('=');
+      if (pos != std::string::npos)
       {
-        size_t pos = token.find('=');
-        if (pos != std::string::npos)
-        {
-          std::string key   = token.substr(0, pos);
-          std::string value = token.substr(pos + 1);
-          attributes[key]   = value;
-        }
+        std::string key   = token.substr(0, pos);
+        std::string value = token.substr(pos + 1);
+        attributes[key]   = value;
       }
     }
+  }
 
-    if (service_name_exists)
-    {
-      attributes[SemanticConventions::kServiceName] = service_name;
-    }
+  if (service_name_exists)
+  {
+    attributes[SemanticConventions::kServiceName] = service_name;
+  }
 
     return Resource(attributes);
   }
   catch (const std::exception &e)
   {
 
-    // OTEL_INTERNAL_LOG_ERROR(" [OTELResourceDetector::Detect]: " << e.what() << ". Unable to
-    // detect resources and returning empty resource.");
+     OTEL_INTERNAL_LOG_ERROR(" [OTELResourceDetector::Detect]: " << e.what() << ". Unable to detect resources and returning empty resource.");
     return Resource();
   }
 }

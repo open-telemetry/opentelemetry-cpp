@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   catch (const std::exception &e)
   {
     std::cerr << " [FileLogMain]: Error in main due to  " << e.what() << "Exiting the program"
-              << std::endl;
+              << '\n';
     return EXIT_FAILURE;
   }
 
