@@ -100,13 +100,10 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
           {
             OTEL_INTERNAL_LOG_ERROR(
                 "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-                << static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
-                       ->export_timeout_millis_.count()
-                << " ms, and timed out");
+                << keep_lifetime->export_timeout_millis_.count() << " ms, and timed out");
             return false;
           }
-          static_cast<PeriodicExportingMetricReader *>(keep_lifetime.get())
-              ->exporter_->Export(metric_data);
+          keep_lifetime->exporter_->Export(metric_data);
           return true;
         });
   });

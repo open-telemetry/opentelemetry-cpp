@@ -20,7 +20,7 @@ namespace metrics
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
-class MetricReader : public std::enable_shared_from_this<MetricReader>
+class MetricReader
 {
 public:
   MetricReader();
