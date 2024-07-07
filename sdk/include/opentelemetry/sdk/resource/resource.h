@@ -5,8 +5,8 @@
 
 #include <string>
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

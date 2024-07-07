@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/loader_info.h"
 #include "opentelemetry/plugin/detail/utility.h"
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/plugin/hook.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin

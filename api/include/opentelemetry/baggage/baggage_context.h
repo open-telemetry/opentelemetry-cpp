@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

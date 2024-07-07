@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
@@ -28,7 +29,6 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/version.h"
 
 namespace sdklogs   = opentelemetry::sdk::logs;
 namespace sdkcommon = opentelemetry::sdk::common;

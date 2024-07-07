@@ -6,8 +6,8 @@
 #include <cassert>
 #include <utility>
 
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

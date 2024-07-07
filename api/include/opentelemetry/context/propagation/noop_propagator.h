@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context

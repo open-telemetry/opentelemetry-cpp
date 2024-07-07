@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

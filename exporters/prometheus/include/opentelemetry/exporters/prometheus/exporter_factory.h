@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

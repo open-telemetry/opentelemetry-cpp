@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/noop.h"
@@ -23,7 +24,6 @@
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk_config.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

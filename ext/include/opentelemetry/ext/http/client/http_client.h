@@ -8,9 +8,10 @@
 #include <map>
 #include <string>
 #include <vector>
+
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/version.h"
 
 /*
  Usage Example

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/string_view.h"
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>

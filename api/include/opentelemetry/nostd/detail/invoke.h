@@ -6,9 +6,9 @@
 #include <type_traits>
 #include <utility>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/detail/decay.h"
 #include "opentelemetry/nostd/detail/void.h"
-#include "opentelemetry/version.h"
 
 #define OPENTELEMETRY_RETURN(...)                        \
   noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) \

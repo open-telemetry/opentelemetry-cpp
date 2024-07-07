@@ -18,7 +18,6 @@
 #  include <utility>
 
 #  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

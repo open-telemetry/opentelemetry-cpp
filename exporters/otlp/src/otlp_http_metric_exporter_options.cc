@@ -1,12 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
-
 #include <chrono>
-#include <cstddef>
-#include <memory>
 #include <string>
+
+#include "opentelemetry/version.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

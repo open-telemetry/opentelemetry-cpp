@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace baggage

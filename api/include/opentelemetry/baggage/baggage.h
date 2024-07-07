@@ -5,11 +5,11 @@
 
 #include <cctype>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

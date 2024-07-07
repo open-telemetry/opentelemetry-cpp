@@ -8,6 +8,7 @@
 #include <mutex>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
@@ -17,7 +18,6 @@
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
 // TODO: Add link to logging spec once this is added to it

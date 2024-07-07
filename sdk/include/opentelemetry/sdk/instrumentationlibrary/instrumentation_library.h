@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

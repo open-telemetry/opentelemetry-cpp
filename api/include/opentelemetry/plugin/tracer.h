@@ -5,11 +5,11 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"  // IWYU pragma: export
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin

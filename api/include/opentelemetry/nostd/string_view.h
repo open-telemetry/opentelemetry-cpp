@@ -21,7 +21,6 @@
 #  include <string>
 
 #  include "opentelemetry/common/macros.h"
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

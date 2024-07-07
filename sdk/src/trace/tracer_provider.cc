@@ -3,12 +3,11 @@
 
 #include <algorithm>
 #include <chrono>
-#include <memory>
 #include <mutex>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -23,7 +22,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -303,10 +303,10 @@ BENCHMARK_MAIN() runs all benchmarks.  As a proof of concept, below is a unit
 test for the PrometheusCollector class into a benchmark:
 
 ```cpp
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 #include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
 #include <benchmark/benchmark.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE

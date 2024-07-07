@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/prometheus/collector.h"
 #include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/version.h"
+
 #include "prometheus_test_helper.h"
 
 #include <gtest/gtest.h>

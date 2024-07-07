@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

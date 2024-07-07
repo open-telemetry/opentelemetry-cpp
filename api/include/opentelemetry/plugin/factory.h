@@ -6,9 +6,9 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/plugin/detail/utility.h"  // IWYU pragma: export
 #include "opentelemetry/plugin/tracer.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/logs/log_record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -5,12 +5,12 @@
 #include <chrono>
 #include <iostream>
 #include <map>
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
@@ -29,7 +29,6 @@
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
-#include "opentelemetry/version.h"
 
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace trace_api = opentelemetry::trace;

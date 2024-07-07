@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/common/macros.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

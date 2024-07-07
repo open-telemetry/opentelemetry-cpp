@@ -5,8 +5,8 @@
 
 #include <cstdint>
 
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

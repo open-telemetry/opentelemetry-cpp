@@ -5,8 +5,8 @@
 
 #include <stdint.h>
 
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/span.h"
 #include "src/common/fast_random_number_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -8,9 +8,9 @@
 #include <mutex>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/trace/multi_recordable.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

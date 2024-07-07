@@ -6,8 +6,8 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

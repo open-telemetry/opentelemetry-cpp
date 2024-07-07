@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -18,7 +19,6 @@
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentelemetry/version.h"
 
 namespace trace_api = opentelemetry::trace;
 

@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

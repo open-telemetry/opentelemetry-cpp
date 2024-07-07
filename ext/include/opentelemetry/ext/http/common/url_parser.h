@@ -6,8 +6,10 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "opentelemetry/nostd/string_view.h"
+
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/string_view.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {

@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 

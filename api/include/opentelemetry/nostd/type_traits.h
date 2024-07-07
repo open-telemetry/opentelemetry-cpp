@@ -18,7 +18,6 @@
 
 #  include "opentelemetry/config.h"
 #  include "opentelemetry/nostd/detail/void.h"  // IWYU pragma: export
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

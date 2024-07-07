@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <memory>
 #include <mutex>
 #include <ostream>
 #include <string>
@@ -11,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/metrics/async_instruments.h"
@@ -36,7 +36,6 @@
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_utils.h"

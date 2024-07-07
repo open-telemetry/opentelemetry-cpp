@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 

@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

@@ -3,9 +3,9 @@
 
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
 #include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

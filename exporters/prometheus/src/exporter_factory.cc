@@ -3,10 +3,10 @@
 
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/prometheus/exporter.h"
 #include "opentelemetry/exporters/prometheus/exporter_factory.h"
 #include "opentelemetry/exporters/prometheus/exporter_options.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

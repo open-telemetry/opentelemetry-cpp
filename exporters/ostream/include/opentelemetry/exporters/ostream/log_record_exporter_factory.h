@@ -6,8 +6,8 @@
 #include <iostream>
 #include <memory>
 
-#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

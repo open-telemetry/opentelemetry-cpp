@@ -5,8 +5,8 @@
 
 #include <type_traits>
 
-#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

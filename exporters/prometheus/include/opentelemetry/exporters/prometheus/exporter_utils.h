@@ -3,13 +3,15 @@
 
 #pragma once
 
-#include <prometheus/metric_family.h>
 #include <string>
 #include <vector>
+
+#include "opentelemetry/version.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/version.h"
+
+#include <prometheus/metric_family.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

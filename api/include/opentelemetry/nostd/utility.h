@@ -19,7 +19,6 @@
 
 #  include "opentelemetry/nostd/detail/decay.h"   // IWYU pragma: export
 #  include "opentelemetry/nostd/detail/invoke.h"  // IWYU pragma: export
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

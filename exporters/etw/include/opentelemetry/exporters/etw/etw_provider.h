@@ -26,9 +26,9 @@
 #  pragma warning(disable : 5054)
 #endif
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/uuid.h"
-#include "opentelemetry/version.h"
 
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/utils.h"

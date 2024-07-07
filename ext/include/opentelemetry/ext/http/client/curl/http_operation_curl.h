@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 
 #if defined(_MSC_VER)
 #  pragma warning(suppress : 5204)

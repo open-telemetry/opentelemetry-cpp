@@ -11,10 +11,10 @@
 #include <sstream>
 #include <string>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/etw/uuid.h"
-#include "opentelemetry/version.h"
 
 #ifdef _WIN32
 #  include <Windows.h>

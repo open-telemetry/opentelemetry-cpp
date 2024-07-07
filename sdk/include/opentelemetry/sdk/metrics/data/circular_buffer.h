@@ -8,8 +8,8 @@
 #include <limits>
 #include <vector>
 
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/variant.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

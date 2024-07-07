@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
 #include <string>

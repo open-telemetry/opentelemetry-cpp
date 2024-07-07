@@ -18,8 +18,6 @@
 #  include <type_traits>
 #  include <utility>
 
-#  include "opentelemetry/version.h"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {

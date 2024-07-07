@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

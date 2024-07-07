@@ -5,11 +5,11 @@
 
 #include <mutex>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs

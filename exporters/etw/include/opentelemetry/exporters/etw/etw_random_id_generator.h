@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 
 #ifdef _WIN32
 #  include "Windows.h"

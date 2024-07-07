@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

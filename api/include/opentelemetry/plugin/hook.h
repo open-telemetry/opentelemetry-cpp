@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 #ifdef _WIN32
 

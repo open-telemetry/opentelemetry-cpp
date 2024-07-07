@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/view/predicate.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

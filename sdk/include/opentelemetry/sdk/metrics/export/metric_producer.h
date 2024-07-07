@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

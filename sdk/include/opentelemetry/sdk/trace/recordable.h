@@ -5,6 +5,7 @@
 
 #include <chrono>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -13,7 +14,6 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
-#include "opentelemetry/version.h"
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
 

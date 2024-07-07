@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/metrics/observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
