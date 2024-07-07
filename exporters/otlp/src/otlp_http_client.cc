@@ -434,6 +434,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::FieldDescriptor *field_descriptor,
                                    const OtlpHttpClientOptions &options);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message,
                                         const OtlpHttpClientOptions &options)
@@ -468,7 +469,6 @@ bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Mess
   return true;
 }
 
-// NOLINTBEGIN(misc-no-recursion)
 void ConvertGenericFieldToJson(nlohmann::json &value,
                                const google::protobuf::Message &message,
                                const google::protobuf::FieldDescriptor *field_descriptor,
@@ -655,8 +655,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
-// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
-// Dynamic memory allocation
+// NOLINTEND(misc-no-recursion) suppressing for performance, if implemented iterative process needs DMA
 
 }  // namespace
 
