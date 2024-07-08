@@ -6,6 +6,12 @@ cc_test(
     srcs = [
         "curl_http_test.cc",
     ],
+    linkopts = select({
+        "//bazel:windows": [
+            "-DEFAULTLIB:wldap32.lib",
+        ],
+        "//conditions:default": [],
+    }),
     tags = ["test"],
     deps = [
         "//ext:headers",
