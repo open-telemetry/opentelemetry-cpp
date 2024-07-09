@@ -70,16 +70,16 @@ void CleanupTracer()
 
 int main(int argc, char *argv[])
 {
-    if (argc > 1)
-    {
-      opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
-      fs_backend.file_pattern = argv[1];
-      opts.backend_options    = fs_backend;
-    }
-    // Removing this line will leave the default noop TracerProvider in place.
-    InitTracer();
+  if (argc > 1)
+  {
+    opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
+    fs_backend.file_pattern = argv[1];
+    opts.backend_options    = fs_backend;
+  }
+  // Removing this line will leave the default noop TracerProvider in place.
+  InitTracer();
 
-    foo_library();
+  foo_library();
 
-    CleanupTracer();
+  CleanupTracer();
 }

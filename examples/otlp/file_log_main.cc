@@ -114,29 +114,29 @@ void CleanupLogger()
 
 int main(int argc, char *argv[])
 {
-    if (argc > 1)
+  if (argc > 1)
+  {
+    opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
+    fs_backend.file_pattern = argv[1];
+    opts.backend_options    = fs_backend;
+    if (argc > 2)
     {
-      opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
-      fs_backend.file_pattern = argv[1];
-      opts.backend_options    = fs_backend;
-      if (argc > 2)
-      {
-        opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions logs_fs_backend;
-        logs_fs_backend.file_pattern = argv[2];
-        log_opts.backend_options     = logs_fs_backend;
-      }
-      else
-      {
-        log_opts.backend_options = std::ref(std::cout);
-      }
+      opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions logs_fs_backend;
+      logs_fs_backend.file_pattern = argv[2];
+      log_opts.backend_options     = logs_fs_backend;
     }
     else
     {
-      opts.backend_options = std::ref(std::cout);
+      log_opts.backend_options = std::ref(std::cout);
     }
-    InitLogger();
-    InitTracer();
-    foo_library();
-    CleanupTracer();
-    CleanupLogger();
+  }
+  else
+  {
+    opts.backend_options = std::ref(std::cout);
+  }
+  InitLogger();
+  InitTracer();
+  foo_library();
+  CleanupTracer();
+  CleanupLogger();
 }

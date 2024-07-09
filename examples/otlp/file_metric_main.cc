@@ -73,43 +73,43 @@ void CleanupMetrics()
 int main(int argc, char *argv[])
 {
 
-    std::string example_type;
-    if (argc > 1)
+  std::string example_type;
+  if (argc > 1)
+  {
+    opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
+    fs_backend.file_pattern          = argv[1];
+    exporter_options.backend_options = fs_backend;
+    if (argc > 2)
     {
-      opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
-      fs_backend.file_pattern          = argv[1];
-      exporter_options.backend_options = fs_backend;
-      if (argc > 2)
-      {
-        example_type = argv[2];
-      }
+      example_type = argv[2];
     }
-    // Removing this line will leave the default noop MetricProvider in place.
-    InitMetrics();
-    std::string name{"otlp_file_metric_example"};
+  }
+  // Removing this line will leave the default noop MetricProvider in place.
+  InitMetrics();
+  std::string name{"otlp_file_metric_example"};
 
-    if (example_type == "counter")
-    {
-      foo_library::counter_example(name);
-    }
-    else if (example_type == "observable_counter")
-    {
-      foo_library::observable_counter_example(name);
-    }
-    else if (example_type == "histogram")
-    {
-      foo_library::histogram_example(name);
-    }
-    else
-    {
-      std::thread counter_example{&foo_library::counter_example, name};
-      std::thread observable_counter_example{&foo_library::observable_counter_example, name};
-      std::thread histogram_example{&foo_library::histogram_example, name};
+  if (example_type == "counter")
+  {
+    foo_library::counter_example(name);
+  }
+  else if (example_type == "observable_counter")
+  {
+    foo_library::observable_counter_example(name);
+  }
+  else if (example_type == "histogram")
+  {
+    foo_library::histogram_example(name);
+  }
+  else
+  {
+    std::thread counter_example{&foo_library::counter_example, name};
+    std::thread observable_counter_example{&foo_library::observable_counter_example, name};
+    std::thread histogram_example{&foo_library::histogram_example, name};
 
-      counter_example.join();
-      observable_counter_example.join();
-      histogram_example.join();
-    }
+    counter_example.join();
+    observable_counter_example.join();
+    histogram_example.join();
+  }
 
-    CleanupMetrics();
+  CleanupMetrics();
 }
