@@ -3,7 +3,6 @@
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/common/env_variables.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/version.h"

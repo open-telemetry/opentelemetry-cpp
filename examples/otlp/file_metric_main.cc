@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
@@ -72,7 +71,6 @@ void CleanupMetrics()
 
 int main(int argc, char *argv[])
 {
-
   std::string example_type;
   if (argc > 1)
   {

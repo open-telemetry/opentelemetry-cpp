@@ -90,7 +90,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
       json_spans.push_back(json_span);
     }
   }
-
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
   auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
@@ -107,6 +106,9 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
+  // Commenting this return statement as the code is unreachable:
+  // The function always returns either kSuccess or kFailure based on the HTTP status code or
+  // session state. return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
