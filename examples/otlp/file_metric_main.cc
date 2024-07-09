@@ -73,8 +73,6 @@ void CleanupMetrics()
 int main(int argc, char *argv[])
 {
 
-  try
-  {
     std::string example_type;
     if (argc > 1)
     {
@@ -114,11 +112,4 @@ int main(int argc, char *argv[])
     }
 
     CleanupMetrics();
-  }
-  catch (const std::exception &e)
-  {
-    std::cerr << " [FileMetricMain]: Error in main due to  " << e.what() << "Exiting the program"
-              << '\n';
-    return EXIT_FAILURE;
-  }
 }

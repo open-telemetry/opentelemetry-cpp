@@ -61,9 +61,8 @@ Checks: >
 # Use existing clang-format for formatting the code
 FormatStyle: 'file'
 
-# TODO: Part 2 : include checks:  readability, cppcoreguidelines, modernize , google-readability-namespace-comments,
-# google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg (to be discussed if this breaks ABI or leave out the OpenTelemetry API),
-# TODO: CMAKE in CI (Only autofixes - checks which has auto FIX-IT, check warnings will be ignored)
+# TODO: include checks: readability, cppcoreguidelines, modernize , google-readability-namespace-comments, google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg
+
 
 
 

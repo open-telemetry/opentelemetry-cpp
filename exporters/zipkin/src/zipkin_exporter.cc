@@ -75,8 +75,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
   exporter::zipkin::ZipkinSpan json_spans = {};
   for (auto &recordable : spans)
   {
-    try
-    {
       auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
       if (rec != nullptr)
       {
@@ -91,16 +89,9 @@ sdk::common::ExportResult ZipkinExporter::Export(
         }
         json_spans.push_back(json_span);
       }
-    }
-    catch (const std::exception &e)
-    {
-      OTEL_INTERNAL_LOG_ERROR(
-          "[Zipkin Trace Exporter] Exception while processing spans: " << e.what());
-    }
   }
 
-  try
-  {
+
     auto body_s = json_spans.dump();
     http_client::Body body_v(body_s.begin(), body_s.end());
     auto result = http_client_->PostNoSsl(url_parser_.url_, body_v, options_.headers);
@@ -117,12 +108,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
       }
       return sdk::common::ExportResult::kFailure;
     }
-  }
-  catch (const std::exception &e)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Exception during HTTP request: " << e.what());
-    return sdk::common::ExportResult::kFailure;
-  }
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()

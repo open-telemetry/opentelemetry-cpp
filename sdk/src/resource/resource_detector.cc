@@ -24,8 +24,6 @@ const char *OTEL_SERVICE_NAME        = "OTEL_SERVICE_NAME";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
-  try
-  {
     std::string attributes_str, service_name;
 
     bool attributes_exists = opentelemetry::sdk::common::GetStringEnvironmentVariable(
@@ -62,14 +60,6 @@ Resource OTELResourceDetector::Detect() noexcept
     }
 
     return Resource(attributes);
-  }
-  catch (const std::exception &e)
-  {
-
-    OTEL_INTERNAL_LOG_ERROR(" [OTELResourceDetector::Detect]: "
-                            << e.what()
-                            << ". Unable to detect resources and returning empty resource.");
-    return Resource();
   }
 }
 

@@ -105,6 +105,7 @@ void assert_basic(prometheus_client::MetricFamily &metric,
       // Summary and Info type not supported
       ASSERT_TRUE(false);
       break;
+    case prometheus::MetricType::Untyped:
     default:
       break;
   }

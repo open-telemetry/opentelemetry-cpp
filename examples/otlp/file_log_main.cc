@@ -114,8 +114,6 @@ void CleanupLogger()
 
 int main(int argc, char *argv[])
 {
-  try
-  {
     if (argc > 1)
     {
       opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions fs_backend;
@@ -141,13 +139,4 @@ int main(int argc, char *argv[])
     foo_library();
     CleanupTracer();
     CleanupLogger();
-  }
-  catch (const std::exception &e)
-  {
-    std::cerr << " [FileLogMain]: Error in main due to  " << e.what() << "Exiting the program"
-              << '\n';
-    return EXIT_FAILURE;
-  }
-
-  return EXIT_SUCCESS;
 }

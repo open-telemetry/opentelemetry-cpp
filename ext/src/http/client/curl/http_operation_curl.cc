@@ -453,7 +453,7 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-static int64_t parse_min_ssl_version(const std::string &version)
+static long parse_min_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -470,7 +470,7 @@ static int64_t parse_min_ssl_version(const std::string &version)
   return 0;
 }
 
-static int64_t parse_max_ssl_version(const std::string &version)
+static long parse_max_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -529,7 +529,7 @@ CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
   return rc;
 }
 
-CURLcode HttpOperation::SetCurlLongOption(CURLoption option, int64_t value)
+CURLcode HttpOperation::SetCurlLongOption(CURLoption option, long value)
 {
   CURLcode rc;
 
@@ -729,9 +729,9 @@ CURLcode HttpOperation::Setup()
 
 #ifdef HAVE_TLS_VERSION
     /* By default, TLSv1.2 or better is required (if we have TLS). */
-    int64_t min_ssl_version = CURL_SSLVERSION_TLSv1_2;
+    long min_ssl_version = CURL_SSLVERSION_TLSv1_2;
 #else
-    int64_t min_ssl_version = 0;
+    long min_ssl_version = 0;
 #endif
 
     if (!ssl_options_.ssl_min_tls.empty())
@@ -755,7 +755,7 @@ CURLcode HttpOperation::Setup()
      * The CURL + openssl library may be more recent than this code,
      * and support a version we do not know about.
      */
-    int64_t max_ssl_version = 0;
+    long max_ssl_version = 0;
 
     if (!ssl_options_.ssl_max_tls.empty())
     {
@@ -773,7 +773,7 @@ CURLcode HttpOperation::Setup()
 #endif
     }
 
-    int64_t version_range = min_ssl_version | max_ssl_version;
+    long version_range = min_ssl_version | max_ssl_version;
     if (version_range != 0)
     {
       rc = SetCurlLongOption(CURLOPT_SSLVERSION, version_range);
@@ -819,7 +819,7 @@ CURLcode HttpOperation::Setup()
     if (ssl_options_.ssl_insecure_skip_verify)
     {
       /* 6 - DO NOT ENFORCE VERIFICATION, This is not secure. */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<int64_t>(CURLUSESSL_NONE));
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_NONE));
       if (rc != CURLE_OK)
       {
         return rc;
@@ -840,7 +840,7 @@ CURLcode HttpOperation::Setup()
     else
     {
       /* 6 - ENFORCE VERIFICATION */
-      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<int64_t>(CURLUSESSL_ALL));
+      rc = SetCurlLongOption(CURLOPT_USE_SSL, static_cast<long>(CURLUSESSL_ALL));
       if (rc != CURLE_OK)
       {
         return rc;
