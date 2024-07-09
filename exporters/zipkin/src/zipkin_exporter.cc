@@ -106,9 +106,8 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
-  // Commenting this return statement as the code is unreachable:
-  // The function always returns either kSuccess or kFailure based on the HTTP status code or
-  // session state. return sdk::common::ExportResult::kSuccess;
+  // Commenting this return statement as the code is unreachable.
+  // return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
