@@ -48,10 +48,10 @@ const opentelemetry::nostd::string_view Logger::GetName() noexcept
 
 opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateLogRecord() noexcept
 {
-  std::unique_ptr<Recordable> recordable;
-  recordable = context_->GetProcessor().MakeRecordable();
+  auto recordable = context_->GetProcessor().MakeRecordable();
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
+
   if (opentelemetry::context::RuntimeContext::GetCurrent().HasKey(opentelemetry::trace::kSpanKey))
   {
     opentelemetry::context::ContextValue context_value =
