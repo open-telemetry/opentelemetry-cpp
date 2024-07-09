@@ -15,7 +15,6 @@ cc_binary(
             "-DEFAULTLIB:advapi32.lib",
             "-DEFAULTLIB:crypt32.lib",
             "-DEFAULTLIB:Normaliz.lib",
-            "-DEFAULTLIB:wldap32.lib",
         ],
         "//conditions:default": [],
     }),
