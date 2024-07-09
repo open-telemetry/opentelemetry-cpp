@@ -159,6 +159,20 @@ disabled: ${ENV_NAME}
   ASSERT_EQ(config->disabled, false);
 }
 
+TEST(Yaml, no_boolean_substitution_env)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${env:ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
 TEST(Yaml, empty_boolean_substitution)
 {
   setenv("ENV_NAME", "", 1);
@@ -166,6 +180,20 @@ TEST(Yaml, empty_boolean_substitution)
   std::string yaml = R"(
 file_format: 0.0
 disabled: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, empty_boolean_substitution_env)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${env:ENV_NAME}
 )";
 
   auto config = DoParse(yaml);
@@ -214,6 +242,75 @@ disabled: ${ENV_NAME}
   ASSERT_EQ(config, nullptr);
 }
 
+TEST(Yaml, empty_boolean_substitution_fallback)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME:-}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, true_boolean_substitution_fallback)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME:-true}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, true);
+}
+
+TEST(Yaml, false_boolean_substitution_fallback)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME:-false}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, false);
+}
+
+TEST(Yaml, illegal_boolean_substitution_fallback)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${ENV_NAME:-illegal}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(Yaml, torture_boolean_substitution_fallback)
+{
+  setenv("env", "true", 1);
+
+  std::string yaml = R"(
+file_format: 0.0
+disabled: ${env:-false}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, true);
+}
+
 TEST(Yaml, no_required_string)
 {
   std::string yaml = R"(
@@ -236,6 +333,18 @@ file_format: ${ENV_NAME}
   ASSERT_EQ(config, nullptr);
 }
 
+TEST(Yaml, no_string_substitution_env)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: ${env:ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
 TEST(Yaml, empty_string_substitution)
 {
   setenv("ENV_NAME", "", 1);
@@ -248,12 +357,65 @@ file_format: ${ENV_NAME}
   ASSERT_EQ(config, nullptr);
 }
 
+TEST(Yaml, empty_string_substitution_env)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: ${env:ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
 TEST(Yaml, with_string_substitution)
 {
   setenv("ENV_NAME", "foo.bar", 1);
 
   std::string yaml = R"(
 file_format: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "foo.bar");
+}
+
+TEST(Yaml, with_string_substitution_env)
+{
+  setenv("ENV_NAME", "foo.bar", 1);
+
+  std::string yaml = R"(
+file_format: ${env:ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "foo.bar");
+}
+
+TEST(Yaml, with_string_substitution_fallback)
+{
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: ${env:ENV_NAME:-foo.bar}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "foo.bar");
+}
+
+TEST(Yaml, multiple_string_substitution)
+{
+  setenv("PREFIX", "foo", 1);
+  unsetenv("DOT");
+  setenv("SUFFIX", "bar", 1);
+
+  std::string yaml = R"(
+file_format: ${env:PREFIX:-failed}${DOT:-.}${SUFFIX:-failed}
 )";
 
   auto config = DoParse(yaml);

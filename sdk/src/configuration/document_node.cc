@@ -17,74 +17,198 @@ namespace configuration
 {
 
 /**
-  Perform substitution on a string scalar.
-  Only if the entire scalar string is: ${ENV_NAME},
-  this code does not perform substitution in:
-  "some text with ${ENV_NAME} in it".
+ * Perform environment variables substitution on a full line.
+ * Supported:
+ * - Text line with no substitution
+ * - ${SUBSTITUTION}
+ * - Some text with ${SUBSTITUTION} in it
+ * - Multiple ${SUBSTITUTION_A} substitutions ${SUBSTITUTION_B} in the line
+ */
+std::string DocumentNode::DoSubstitution(const std::string &text)
+{
+  static std::string begin_token{"${"};
+  static std::string end_token{"}"};
+
+  std::string result;
+
+  std::string::size_type current_pos;
+  std::string::size_type begin_pos;
+  std::string::size_type end_pos;
+  std::string copy;
+  std::string substitution;
+
+  current_pos = 0;
+  begin_pos   = text.find(begin_token);
+
+  while (begin_pos != std::string::npos)
+  {
+
+    if (current_pos < begin_pos)
+    {
+      /*
+       * ^ < COPY_ME > ${...
+       * ...} < COPY_ME > ${...
+       *
+       * copy [current_pos, begin_pos[
+       */
+      copy = text.substr(current_pos, begin_pos - current_pos);
+      result.append(copy);
+      current_pos = begin_pos;
+    }
+
+    end_pos = text.find(end_token, begin_pos);
+
+    if (end_pos == std::string::npos)
+    {
+      /* ... < ${NOT_A_SUBSTITUTION > */
+      copy = text.substr(current_pos);
+      result.append(copy);
+      return result;
+    }
+
+    /* ... < ${SUBSTITUTION} > ... */
+    substitution = text.substr(current_pos, end_pos - current_pos + 1);
+
+    copy = DoOneSubstitution(substitution);
+    result.append(copy);
+    begin_pos   = text.find(begin_token, end_pos);
+    current_pos = end_pos + 1;
+  }
+
+  copy = text.substr(current_pos);
+  result.append(copy);
+
+  return result;
+}
+
+/**
+  Perform one substitution on a string scalar.
+  Supported:
+  - ${ENV_NAME}
+  - ${env:ENV_NAME}
+  - ${ENV_NAME:-fallback} (including when ENV_NAME is actually "env")
+  - ${env:ENV_NAME:-fallback}
 */
-void DocumentNode::DoSubstitution(std::string &value)
+std::string DocumentNode::DoOneSubstitution(const std::string &text)
 {
   // FIXME:
-  // The following needs to be supported (spec changes)
   // ${env:ENV_NAME}
   // ${ENV_NAME:-fallback}
-  // some text with ${ENV_NAME} in it
-  // multiple ${env:HOST:-localhost}${env:PORT:-:4318} substitutions
 
-  size_t len = value.length();
+  static std::string env_token{"env:"};
+  static std::string env_with_replacement{"env:-"};
+  static std::string replacement_token{":-"};
+
+  size_t len = text.length();
   char c;
+  std::string::size_type begin_name;
+  std::string::size_type end_name;
+  std::string::size_type begin_fallback;
+  std::string::size_type end_fallback;
+  std::string::size_type pos;
+  std::string name;
+  std::string fallback;
+  const char *sub;
 
   if (len < 4)
   {
-    return;
+    goto illegal;
   }
 
-  c = value[0];
+  c = text[0];
   if (c != '$')
   {
-    return;
+    goto illegal;
   }
 
-  c = value[1];
+  c = text[1];
   if (c != '{')
   {
-    return;
+    goto illegal;
   }
 
-  c = value[len - 1];
+  c = text[len - 1];
   if (c != '}')
   {
-    return;
+    goto illegal;
   }
 
-  c = value[2];
-  if (!std::isalpha(c) && c != '_')
-  {
-    return;
-  }
+  begin_name = 2;
 
-  for (size_t i = 3; i + 2 <= len; i++)
+  /* If text[2] starts with "env:" */
+  if (text.find(env_token, begin_name) == begin_name)
   {
-    c = value[i];
-    if (!std::isalnum(c) && c != '_')
+    /* If text[2] starts with "env:-" */
+    if (text.find(env_with_replacement, begin_name) == begin_name)
     {
-      return;
+      /* ${env:-fallback} is legal. It is variable "env". */
+    }
+    else
+    {
+      begin_name += 4;  // Skip "env:"
     }
   }
 
-  // value is of the form ${ENV_NAME}
-
-  std::string name = value.substr(2, len - 3);
-
-  const char *sub = std::getenv(name.c_str());
-  if (sub != nullptr)
+  c = text[begin_name];
+  if (!std::isalpha(c) && c != '_')
   {
-    value = sub;
+    goto illegal;
+  }
+
+  for (size_t i = begin_name + 1; i + 2 <= len; i++)
+  {
+    c = text[i];
+    if (std::isalnum(c) || (c == '_'))
+    {
+      end_name = i + 1;
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  // text is of the form ${ENV_NAME ...
+
+  name = text.substr(begin_name, end_name - begin_name);
+
+  if (end_name + 1 == len)
+  {
+    // text is of the form ${ENV_NAME}
+    begin_fallback = 0;
+    end_fallback   = 0;
   }
   else
   {
-    value = "";
+    pos = text.find(replacement_token, end_name);
+    if (pos != end_name)
+    {
+      goto illegal;
+    }
+    // text is of the form ${ENV_NAME:-fallback}
+    begin_fallback = pos + 2;
+    end_fallback   = len - 1;
   }
+
+  sub = std::getenv(name.c_str());
+  if (sub != nullptr)
+  {
+    return sub;
+  }
+
+  if (begin_fallback < end_fallback)
+  {
+    fallback = text.substr(begin_fallback, end_fallback - begin_fallback);
+  }
+  else
+  {
+    fallback = "";
+  }
+  return fallback;
+
+illegal:
+  OTEL_INTERNAL_LOG_ERROR("Illegal substitution expression: " << text);
+  throw InvalidSchemaException("Illegal substitution expression");
 }
 
 bool DocumentNode::BooleanFromString(const std::string &value)

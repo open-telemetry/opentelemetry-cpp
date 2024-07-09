@@ -62,7 +62,8 @@ public:
   virtual std::string Dump() const = 0;
 
 protected:
-  void DoSubstitution(std::string &value);
+  std::string DoSubstitution(const std::string &text);
+  std::string DoOneSubstitution(const std::string &text);
 
   bool BooleanFromString(const std::string &value);
   size_t IntegerFromString(const std::string &value);

@@ -198,7 +198,7 @@ bool RymlDocumentNode::GetRequiredBoolean(const std::string &name)
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   return BooleanFromString(value);
 }
@@ -217,7 +217,7 @@ bool RymlDocumentNode::GetBoolean(const std::string &name, bool default_value)
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   if (value.empty())
   {
@@ -236,7 +236,7 @@ size_t RymlDocumentNode::GetRequiredInteger(const std::string &name)
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   return IntegerFromString(value);
 }
@@ -255,7 +255,7 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   if (value.empty())
   {
@@ -274,7 +274,7 @@ double RymlDocumentNode::GetRequiredDouble(const std::string &name)
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   return DoubleFromString(value);
 }
@@ -293,7 +293,7 @@ double RymlDocumentNode::GetDouble(const std::string &name, double default_value
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   if (value.empty())
   {
@@ -311,7 +311,7 @@ std::string RymlDocumentNode::GetRequiredString(const std::string &name)
   ryml::csubstr view            = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   if (value.empty())
   {
@@ -336,7 +336,7 @@ std::string RymlDocumentNode::GetString(const std::string &name, const std::stri
   ryml::csubstr view = ryml_child.val();
   std::string value(view.str, view.len);
 
-  DoSubstitution(value);
+  value = DoSubstitution(value);
 
   return value;
 }
