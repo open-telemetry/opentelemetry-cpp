@@ -157,7 +157,9 @@ TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)
   size_t hash_c_str = 0;
   size_t hash_std_str = 0;
   size_t hash_nostd_str_view = 0;
+  #if __cplusplus >= 201703L
   size_t hash_std_str_view = 0;
+  #endif
 
   opentelemetry::sdk::common::GetHash(hash_c_str, c_str);
   opentelemetry::sdk::common::GetHash(hash_std_str, std_str);
