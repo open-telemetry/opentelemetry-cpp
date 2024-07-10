@@ -57,7 +57,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
         hash_map.GetOrSetDefault(attributes, aggregation_callback, hash))
         ->Aggregate(record_value);
   }
-  EXPECT_EQ(hash_map.Size(), 10); // no new metric point added
+  EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
   auto agg = hash_map.GetOrSetDefault(
@@ -68,31 +68,35 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg->ToPoint()).value_),
             record_value * 6);  // 1 from previous 10, 5 from current 5.
   // get remaining metric points
-  for (auto i = 0 ; i < 9 ; i ++) {
+  for (auto i = 0; i < 9; i++)
+  {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
     auto hash = opentelemetry::sdk::common::GetHashForAttributeMap(attributes);
-    auto agg = hash_map.GetOrSetDefault(
-      FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
-      aggregation_callback, hash);
+    auto agg  = hash_map.GetOrSetDefault(
+        FilteredOrderedAttributeMap({{kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}}),
+        aggregation_callback, hash);
     EXPECT_NE(agg, nullptr);
     auto sum_agg = static_cast<LongSumAggregation *>(agg);
-    if (i < 5) {
+    if (i < 5)
+    {
       EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg->ToPoint()).value_),
-            record_value * 2);  // 1 from first recording, 1 from third recording
-    } else {
+                record_value * 2);  // 1 from first recording, 1 from third recording
+    }
+    else
+    {
       EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg->ToPoint()).value_),
-            record_value);  // 1 from first recording
+                record_value);  // 1 from first recording
     }
   }
 }
 
 TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
 {
-  const auto kCardinalityLimit        = 10;
-  AggregationTemporality temporality  = AggregationTemporality::kCumulative;
-  auto sdk_start_ts                   = std::chrono::system_clock::now();
-  InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kCounter,
-                                         InstrumentValueType::kLong};
+  const auto kCardinalityLimit       = 10;
+  AggregationTemporality temporality = AggregationTemporality::kCumulative;
+  auto sdk_start_ts                  = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                        InstrumentValueType::kLong};
 
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
