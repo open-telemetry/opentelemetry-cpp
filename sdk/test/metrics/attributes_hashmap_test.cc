@@ -15,8 +15,7 @@ namespace nostd = opentelemetry::nostd;
 class MockKeyValueIterable : public opentelemetry::common::KeyValueIterable
 {
 public:
-  MockKeyValueIterable(
-      std::initializer_list<std::pair<std::string, std::string>> init)
+  MockKeyValueIterable(std::initializer_list<std::pair<std::string, std::string>> init)
   {
     for (const auto &kv : init)
     {
@@ -43,7 +42,6 @@ public:
 private:
   std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>> attributes_;
 };
-
 
 TEST(AttributesHashMap, BasicTests)
 {
@@ -107,42 +105,41 @@ TEST(AttributesHashMap, BasicTests)
   EXPECT_EQ(count, hash_map.Size());
 }
 
-std::string make_unique_string(const char* str)
+std::string make_unique_string(const char *str)
 {
-    return std::string(str);
+  return std::string(str);
 }
 
 TEST(AttributesHashMap, HashWithKeyValueIterable)
 {
   // Create mock KeyValueIterable instances with the same content but different variables
   MockKeyValueIterable attributes1({{make_unique_string("k1"), make_unique_string("v1")},
-                                      {make_unique_string("k2"), make_unique_string("v2")}});
+                                    {make_unique_string("k2"), make_unique_string("v2")}});
   MockKeyValueIterable attributes2({{make_unique_string("k1"), make_unique_string("v1")},
-                                      {make_unique_string("k2"), make_unique_string("v2")}});
+                                    {make_unique_string("k2"), make_unique_string("v2")}});
   MockKeyValueIterable attributes3({{make_unique_string("k1"), make_unique_string("v1")},
-                                      {make_unique_string("k2"), make_unique_string("v2")},
-                                      {make_unique_string("k3"), make_unique_string("v3")}});
-
+                                    {make_unique_string("k2"), make_unique_string("v2")},
+                                    {make_unique_string("k3"), make_unique_string("v3")}});
 
   // Create a callback that filters "k3" key
-auto is_key_filter_k3_callback = [](nostd::string_view key) {
-  if (key == "k3") {
-    return false;
-  }
-  return true;
-};
+  auto is_key_filter_k3_callback = [](nostd::string_view key) {
+    if (key == "k3")
+    {
+      return false;
+    }
+    return true;
+  };
   // Calculate hash
   size_t hash1 =
       opentelemetry::sdk::common::GetHashForAttributeMap(attributes1, is_key_filter_k3_callback);
   size_t hash2 =
       opentelemetry::sdk::common::GetHashForAttributeMap(attributes2, is_key_filter_k3_callback);
 
-    size_t hash3 =
+  size_t hash3 =
       opentelemetry::sdk::common::GetHashForAttributeMap(attributes3, is_key_filter_k3_callback);
 
   // Expect the hashes to be the same because the content is the same
   EXPECT_EQ(hash1, hash2);
-    // Expect the hashes to be the same because the content is the same
+  // Expect the hashes to be the same because the content is the same
   EXPECT_EQ(hash1, hash3);
-
 }
