@@ -91,10 +91,6 @@ std::string DocumentNode::DoSubstitution(const std::string &text)
 */
 std::string DocumentNode::DoOneSubstitution(const std::string &text)
 {
-  // FIXME:
-  // ${env:ENV_NAME}
-  // ${ENV_NAME:-fallback}
-
   static std::string env_token{"env:"};
   static std::string env_with_replacement{"env:-"};
   static std::string replacement_token{":-"};
@@ -145,7 +141,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
     }
     else
     {
-      begin_name += 4;  // Skip "env:"
+      begin_name += env_token.length();  // Skip "env:"
     }
   }
 
@@ -154,6 +150,8 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
   {
     goto illegal;
   }
+
+  end_name = begin_name + 1;
 
   for (size_t i = begin_name + 1; i + 2 <= len; i++)
   {
@@ -186,7 +184,7 @@ std::string DocumentNode::DoOneSubstitution(const std::string &text)
       goto illegal;
     }
     // text is of the form ${ENV_NAME:-fallback}
-    begin_fallback = pos + 2;
+    begin_fallback = pos + replacement_token.length();
     end_fallback   = len - 1;
   }
 
