@@ -18,44 +18,6 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 namespace nostd = opentelemetry::nostd;
 
-// Mock KeyValueIterable implementation
-class MockKeyValueIterable : public opentelemetry::common::KeyValueIterable
-{
-public:
-  MockKeyValueIterable(std::initializer_list<std::pair<std::string, std::string>> init)
-  {
-    for (const auto &kv : init)
-    {
-      attributes_.emplace_back(kv.first, kv.second);
-    }
-  }
-
-  bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)> callback)
-      const noexcept override
-  {
-    for (const auto &kv : attributes_)
-    {
-      if (!callback(kv.first, kv.second))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  size_t size() const noexcept override { return attributes_.size(); }
-
-private:
-  std::vector<std::pair<std::string, opentelemetry::common::AttributeValue>> attributes_;
-};
-
-
-std::string make_unique_string(const char *str)
-{
-  return std::string(str);
-}
-
 TEST(CardinalityLimit, AttributesHashMapBasicTests)
 {
   AttributesHashMap hash_map(10);
