@@ -110,7 +110,7 @@ TEST(AttributesHashMap, HashWithKeyValueIterable)
   MockKeyValueIterable attributes2({{"k1", "v1"}, {"k2", "v2"}});
 
   // Create a callback that accepts all keys
-  auto is_key_present_callback = [](nostd::string_view key) {
+  auto is_key_present_callback = [](nostd::string_view /*key*/) {
     return true;  // Consider all keys
   };
 
