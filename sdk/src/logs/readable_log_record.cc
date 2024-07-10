@@ -7,7 +7,6 @@
 
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"

@@ -1,20 +1,33 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <new>
+#include <ostream>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/version.h"
 
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 #include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#include "opentelemetry/sdk/common/global_log_handler.h"
-
-namespace nostd = opentelemetry::nostd;
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -82,7 +95,8 @@ OtlpHttpLogRecordExporter::MakeRecordable() noexcept
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
+        &logs) noexcept
 {
   if (http_client_->IsShutdown())
   {
