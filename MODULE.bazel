@@ -4,13 +4,13 @@ module(
     repo_name = "io_opentelemetry_cpp",
 )
 
-bazel_dep(name = "curl", version = "8.7.1")
+bazel_dep(name = "curl", version = "8.8.0")
 bazel_dep(name = "abseil-cpp", version = "20240116.2")
 bazel_dep(name = "aspect_bazel_lib", version = "2.7.8")
 
-bazel_dep(name = "rules_pkg", version = "0.10.1", dev_dependency = True)
+bazel_dep(name = "rules_pkg", version = "1.0.1", dev_dependency = True)
 
-bazel_dep(name = "rules_python", version = "0.33.2")
+bazel_dep(name = "rules_python", version = "0.34.0")
 bazel_dep(name = "rules_cc", version = "0.0.9")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "0.0.10")
