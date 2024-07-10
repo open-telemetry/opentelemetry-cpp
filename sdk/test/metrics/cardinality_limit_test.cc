@@ -88,7 +88,7 @@ namespace nostd = opentelemetry::nostd;
 
 TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
 {
-  const auto kCardinalityLimit = 10;
+  const auto kCardinalityLimit        = 10;
   AggregationTemporality temporality  = AggregationTemporality::kCumulative;
   auto sdk_start_ts                   = std::chrono::system_clock::now();
   int64_t expected_total_get_requests = 0;
@@ -106,22 +106,31 @@ TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
       nullptr, kCardinalityLimit);
 
   int64_t first_recorded_value = 10;
-  for (auto i = 0 ; i < 10 ;i ++){
-    std::map<std::string, std::string> attributes =  {{"key", std::to_string(i)}};
-    storage.RecordLong(first_recorded_value, KeyValueIterableView<std::map<std::string, std::string>>(attributes),opentelemetry::context::Context{});
+  for (auto i = 0; i < 10; i++)
+  {
+    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    storage.RecordLong(first_recorded_value,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                       opentelemetry::context::Context{});
   }
 
   // record again
   int64_t second_recorded_value = 30;
-  for (auto i = 0 ; i < 10 ;i ++){
-    std::map<std::string, std::string> attributes =  {{"key", std::to_string(i)}};
-    storage.RecordLong(second_recorded_value, KeyValueIterableView<std::map<std::string, std::string>>(attributes),opentelemetry::context::Context{});
+  for (auto i = 0; i < 10; i++)
+  {
+    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    storage.RecordLong(second_recorded_value,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                       opentelemetry::context::Context{});
   }
-  //record 5 more with new attributes to go to overflow metrics
+  // record 5 more with new attributes to go to overflow metrics
   int64_t third_recorded_value = 40;
-  for (auto i = 11 ; i < 16 ; i++){
-    std::map<std::string, std::string> attributes =  {{"key", std::to_string(i)}};
-    storage.RecordLong(third_recorded_value, KeyValueIterableView<std::map<std::string, std::string>>(attributes),opentelemetry::context::Context{});
+  for (auto i = 11; i < 16; i++)
+  {
+    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    storage.RecordLong(third_recorded_value,
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                       opentelemetry::context::Context{});
   }
 
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
@@ -138,12 +147,15 @@ TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           if (data_attr.attributes.find("key") != data_attr.attributes.end())
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), first_recorded_value + second_recorded_value);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+                      first_recorded_value + second_recorded_value);
             count_attributes++;
           }
-          else if (data_attr.attributes.find(kAttributesLimitOverflowKey) != data_attr.attributes.end())
+          else if (data_attr.attributes.find(kAttributesLimitOverflowKey) !=
+                   data_attr.attributes.end())
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), first_recorded_value + second_recorded_value + 5 * third_recorded_value);
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+                      first_recorded_value + second_recorded_value + 5 * third_recorded_value);
             count_attributes++;
           }
         }
