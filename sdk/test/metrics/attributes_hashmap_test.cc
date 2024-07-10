@@ -144,33 +144,32 @@ TEST(AttributesHashMap, HashWithKeyValueIterable)
   EXPECT_EQ(hash1, hash3);
 }
 
-
 TEST(AttributesHashMap, HashConsistencyAcrossStringTypes)
 {
-  const char* c_str = "teststring";
-  std::string std_str = "teststring";
+  const char *c_str                 = "teststring";
+  std::string std_str               = "teststring";
   nostd::string_view nostd_str_view = "teststring";
-  #if __cplusplus >= 201703L
+#if __cplusplus >= 201703L
   std::string_view std_str_view = "teststring";
-  #endif
+#endif
 
-  size_t hash_c_str = 0;
-  size_t hash_std_str = 0;
+  size_t hash_c_str          = 0;
+  size_t hash_std_str        = 0;
   size_t hash_nostd_str_view = 0;
-  #if __cplusplus >= 201703L
+#if __cplusplus >= 201703L
   size_t hash_std_str_view = 0;
-  #endif
+#endif
 
   opentelemetry::sdk::common::GetHash(hash_c_str, c_str);
   opentelemetry::sdk::common::GetHash(hash_std_str, std_str);
   opentelemetry::sdk::common::GetHash(hash_nostd_str_view, nostd_str_view);
-  #if __cplusplus >= 201703L
+#if __cplusplus >= 201703L
   opentelemetry::sdk::common::GetHash(hash_std_str_view, std_str_view);
-  #endif
+#endif
 
   EXPECT_EQ(hash_c_str, hash_std_str);
   EXPECT_EQ(hash_c_str, hash_nostd_str_view);
-  #if __cplusplus >= 201703L
+#if __cplusplus >= 201703L
   EXPECT_EQ(hash_c_str, hash_std_str_view);
-  #endif
+#endif
 }
