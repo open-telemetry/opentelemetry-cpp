@@ -5,7 +5,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <memory>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
