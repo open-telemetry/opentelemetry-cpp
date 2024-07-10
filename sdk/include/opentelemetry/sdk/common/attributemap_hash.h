@@ -10,6 +10,7 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
+#include<iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -71,7 +72,7 @@ inline size_t GetHashForAttributeMap(
         {
           return true;
         }
-        GetHash(seed, key.data());
+        GetHash(seed, key);
         auto attr_val = nostd::visit(converter, value);
         nostd::visit(GetHashForAttributeValueVisitor(seed), attr_val);
         return true;
