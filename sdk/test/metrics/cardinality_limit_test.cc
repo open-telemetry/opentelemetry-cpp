@@ -110,7 +110,7 @@ TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
   int64_t first_recorded_value = 10;
   for (auto i = 0; i < 10; i++)
   {
-    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    std::map<std::string, std::string> attributes = {{std::string{"key"}, std::to_string(i)}};
     storage.RecordLong(first_recorded_value,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes),
                        opentelemetry::context::Context{});
@@ -120,16 +120,17 @@ TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
   int64_t second_recorded_value = 30;
   for (auto i = 0; i < 10; i++)
   {
-    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    std::map<std::string, std::string> attributes = {{std::string{"key"}, std::to_string(i)}};
     storage.RecordLong(second_recorded_value,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes),
                        opentelemetry::context::Context{});
   }
+
   // record 5 more with new attributes to go to overflow metrics
   int64_t third_recorded_value = 40;
   for (auto i = 11; i < 16; i++)
   {
-    std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
+    std::map<std::string, std::string> attributes = {{std::string{"key"}, std::to_string(i)}};
     storage.RecordLong(third_recorded_value,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes),
                        opentelemetry::context::Context{});
