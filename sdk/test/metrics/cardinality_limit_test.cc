@@ -18,7 +18,7 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
 namespace nostd = opentelemetry::nostd;
 
-/*TEST(CardinalityLimit, AttributesHashMapBasicTests)
+TEST(CardinalityLimit, AttributesHashMapBasicTests)
 {
   AttributesHashMap hash_map(10);
   std::function<std::unique_ptr<Aggregation>()> aggregation_callback =
@@ -84,15 +84,13 @@ namespace nostd = opentelemetry::nostd;
             record_value);  // 1 from first recording
     }
   }
-}*/
+}
 
 TEST(WritableMetricStorageTestFixture, SyncStorageCardinalityLimit)
 {
   const auto kCardinalityLimit        = 10;
   AggregationTemporality temporality  = AggregationTemporality::kCumulative;
   auto sdk_start_ts                   = std::chrono::system_clock::now();
-  int64_t expected_total_get_requests = 0;
-  int64_t expected_total_put_requests = 0;
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kCounter,
                                          InstrumentValueType::kLong};
 
@@ -168,7 +166,7 @@ class WritableMetricStorageCardinalityLimitTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>
 {};
 
-/*TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregation)
+TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregation)
 {
   auto sdk_start_ts               = std::chrono::system_clock::now();
   const size_t attributes_limit   = 10;
@@ -219,4 +217,4 @@ class WritableMetricStorageCardinalityLimitTestFixture
 }
 INSTANTIATE_TEST_SUITE_P(All,
                          WritableMetricStorageCardinalityLimitTestFixture,
-                         ::testing::Values(AggregationTemporality::kDelta));*/
+                         ::testing::Values(AggregationTemporality::kDelta));

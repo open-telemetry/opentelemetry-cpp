@@ -35,7 +35,7 @@ public:
     return true;
   }
 
-  size_t size() const noexcept { return attributes_.size(); }
+  size_t size() const noexcept override { return attributes_.size(); }
 
 private:
   std::vector<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> attributes_;
