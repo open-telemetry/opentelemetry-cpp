@@ -11,9 +11,38 @@
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
 
+
+// Mock KeyValueIterable implementation
+class MockKeyValueIterable : public opentelemetry::common::KeyValueIterable
+{
+public:
+  MockKeyValueIterable(std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> init)
+      : attributes_(init)
+  {}
+
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)> callback) const noexcept override
+  {
+    for (const auto &kv : attributes_)
+    {
+      if (!callback(kv.first, kv.second))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  size_t size() const noexcept {
+    return attributes_.size();
+  }
+
+private:
+  std::vector<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> attributes_;
+};
+
+
 TEST(AttributesHashMap, BasicTests)
 {
-
   // Empty map
   AttributesHashMap hash_map;
   EXPECT_EQ(hash_map.Size(), 0);
@@ -72,4 +101,30 @@ TEST(AttributesHashMap, BasicTests)
         return true;
       });
   EXPECT_EQ(count, hash_map.Size());
+}
+
+TEST(AttributesHashMap, HashWithKeyValueIterable)
+{
+  // Create mock KeyValueIterable instances with the same content but different variables
+  MockKeyValueIterable attributes1({{"k1", "v1"}, {"k2", "v2"}});
+  MockKeyValueIterable attributes2({{"k1", "v1"}, {"k2", "v2"}});
+
+  // Create a callback that accepts all keys
+  auto is_key_present_callback = [](nostd::string_view key) {
+    return true; // Consider all keys
+  };
+
+  // Calculate hash
+  size_t hash1 = opentelemetry::sdk::common::GetHashForAttributeMap(attributes1, is_key_present_callback);
+  size_t hash2 = opentelemetry::sdk::common::GetHashForAttributeMap(attributes2, is_key_present_callback);
+
+  // Expect the hashes to be the same because the content is the same
+  EXPECT_EQ(hash1, hash2);
+
+  // Create mock KeyValueIterable instance with different order
+  MockKeyValueIterable attributes3({{"k2", "v2"}, {"k1", "v1"}});
+  size_t hash3 = opentelemetry::sdk::common::GetHashForAttributeMap(attributes3, is_key_present_callback);
+
+  // Expect the hash to be different because the order is different
+  EXPECT_NE(hash1, hash3);
 }
