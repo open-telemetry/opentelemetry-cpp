@@ -33,8 +33,8 @@ jobs:
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
-          sudo -E ./ci/install_abseil.sh
-          sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+#          sudo -E ./ci/install_abseil.sh
+#          sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
 
 
       # WITH_OPENTRACING_SHIM and WITH_ETW is not present and will be excluded.
@@ -50,7 +50,6 @@ jobs:
           -DWITH_OTLP_FILE=ON \
           -DWITH_PROMETHEUS=ON \
           -DWITH_ZIPKIN=ON \
-          -DWITH_ABSEIL=ON \
           -DWITH_ELASTICSEARCH=ON \
           -DWITH_OTLP_HTTP_COMPRESSION=ON \
           -DWITH_EXAMPLES=ON \
@@ -59,9 +58,10 @@ jobs:
           -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
           -DWITH_ASYNC_EXPORT_PREVIEW=ON \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-          -DWITH_OTLP_GRPC=ON \
-          -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
-          -DCMAKE_CXX_CLANG_TIDY clang-tidy-18"
+          -DCMAKE_CXX_CLANG_TIDY clang-tidy-18
+#                         -DWITH_ABSEIL=ON \
+#                    -DWITH_OTLP_GRPC=ON \
+#                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
           cd ..
 
 #      - name: Run Clang-Tidy
