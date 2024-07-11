@@ -59,8 +59,7 @@ Checks: >
 
 # Use existing clang-format for formatting the code
 FormatStyle: 'file'
-HeaderFilterRegex: '.*include/opentelemetry/.*'
-
+ExcludeHeaderFilterRegex: '.*(third_party|opentracing-shim).*'
 # TODO: include checks: readability, cppcoreguidelines, modernize , google-readability-namespace-comments, google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg
 
 
