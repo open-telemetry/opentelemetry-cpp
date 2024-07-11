@@ -22,6 +22,61 @@ if [ ! -z "${CXX_STANDARD}" ]; then
     ABSEIL_CPP_BUILD_OPTIONS=(${ABSEIL_CPP_BUILD_OPTIONS[@]} "-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
 
+#
+# ABSEIL_CPP_VERSION="20240116.1" fails to build with CMake 3.30
+# ABSEIL_CPP_VERSION="20240116.2" fails to build with CMake 3.30
+# note that somehow the same builds with CMake 3.29.6
+#
+# Error reported:
+#   CMake Error at CMake/AbseilHelpers.cmake:317 (target_link_libraries):
+#    The link interface of target "test_allocator" contains:
+#
+#      GTest::gmock
+#
+#    but the target was not found.  Possible reasons include:
+#
+#      * There is a typo in the target name.
+#      * A find_package call is missing for an IMPORTED target.
+#      * An ALIAS target is missing.
+#
+#   Call Stack (most recent call first):
+#    absl/container/CMakeLists.txt:206 (absl_cc_library)
+#
+# Root cause:
+#   https://github.com/abseil/abseil-cpp/pull/1536
+#
+# Applying fix from abseil commit 779a3565ac6c5b69dd1ab9183e500a27633117d5
+#
+# TODO(marcalff) Cleanup once abseil is upgraded to the next LTS
+
+echo "Patching abseil"
+
+patch -p1 << EOF
+commit 779a3565ac6c5b69dd1ab9183e500a27633117d5
+Author: Derek Mauro <dmauro@google.com>
+Date:   Tue Jan 30 10:13:25 2024 -0800
+
+    Avoid export of testonly target absl::test_allocator in CMake builds
+    
+    Closes #1536
+    
+    PiperOrigin-RevId: 602764437
+    Change-Id: Ia5c20a3874262a2ddb8797f608af17d7e86dd6d6
+
+diff --git a/absl/container/CMakeLists.txt b/absl/container/CMakeLists.txt
+index 449a2cad..ee9ca9c3 100644
+--- a/absl/container/CMakeLists.txt
++++ b/absl/container/CMakeLists.txt
+@@ -213,6 +213,7 @@ absl_cc_library(
+   DEPS
+     absl::config
+     GTest::gmock
++  TESTONLY
+ )
+ 
+ absl_cc_test(
+EOF
+
 mkdir build && pushd build
 cmake "${ABSEIL_CPP_BUILD_OPTIONS[@]}" ..
 make -j $(nproc)
