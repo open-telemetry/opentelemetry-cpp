@@ -39,7 +39,7 @@ namespace trace
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
-    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{context}
+    : instrumentation_scope_{std::move(instrumentation_scope)}, context_{std::move(context)}
 {}
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(

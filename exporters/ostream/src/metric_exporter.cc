@@ -117,7 +117,7 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
 
 void OStreamMetricExporter::printAttributes(
     const std::map<std::string, sdk::common::OwnedAttributeValue> &map,
-    const std::string prefix)
+    const std::string &prefix)
 {
   for (const auto &kv : map)
   {

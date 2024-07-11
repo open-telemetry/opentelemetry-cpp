@@ -38,7 +38,7 @@ TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context) noexcept
 }
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
-                               resource::Resource resource,
+                               const resource::Resource &resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
 {
@@ -49,7 +49,7 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
 }
 
 TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                               resource::Resource resource,
+                               const resource::Resource &resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
 {

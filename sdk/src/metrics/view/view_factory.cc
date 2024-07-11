@@ -53,7 +53,7 @@ std::unique_ptr<View> ViewFactory::Create(const std::string &name,
   auto attributes_processor =
       std::unique_ptr<AttributesProcessor>(new DefaultAttributesProcessor());
 
-  return Create(name, description, unit, aggregation_type, aggregation_config,
+  return Create(name, description, unit, aggregation_type, std::move(aggregation_config),
                 std::move(attributes_processor));
 }
 
@@ -64,7 +64,8 @@ std::unique_ptr<View> ViewFactory::Create(const std::string &name,
                                           std::shared_ptr<AggregationConfig> aggregation_config,
                                           std::unique_ptr<AttributesProcessor> attributes_processor)
 {
-  std::unique_ptr<View> view(new View(name, description, unit, aggregation_type, aggregation_config,
+  std::unique_ptr<View> view(new View(name, description, unit, aggregation_type,
+                                      std::move(aggregation_config),
                                       std::move(attributes_processor)));
   return view;
 }

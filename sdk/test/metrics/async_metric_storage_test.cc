@@ -262,7 +262,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
@@ -288,7 +288,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
   storage.Collect(
-      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData metric_data) {
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (auto data_attr : metric_data.point_data_attr_)
         {
           auto data = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);

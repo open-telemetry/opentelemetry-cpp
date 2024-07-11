@@ -9,6 +9,21 @@ load(
     rules_cc_test = "cc_test",
 )
 
+
+def _is_windows_impl(ctx):
+  if ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]):
+    return [DefaultInfo()]
+  else:
+    return [DefaultInfo()]
+ 
+is_windows = rule(
+  implementation = _is_windows_impl,
+  attrs = {
+    '_windows_constraint': attr.label(default = '@platforms//os:windows'),
+  },
+)
+
+
 def otel_cc_library(**kwargs):
     # dump = kwargs["name"] + ": "
     # dump = dump + " mod=" + native.module_name()
@@ -22,6 +37,9 @@ def otel_cc_library(**kwargs):
 
     # Don't create .so files for dbg/fastbuild, always create static libs
     kwargs["linkstatic"] = kwargs.get("linkstatic", True)
+
+    x = is_windows(name=kwargs["name"]+"_is_windows")
+    print(x)
 
     rules_cc_library(**kwargs)
 

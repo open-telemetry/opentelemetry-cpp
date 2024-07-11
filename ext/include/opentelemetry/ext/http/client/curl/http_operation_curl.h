@@ -124,7 +124,8 @@ private:
                                 double ulnow);
 #endif
 public:
-  void DispatchEvent(opentelemetry::ext::http::client::SessionState type, std::string reason = "");
+  void DispatchEvent(opentelemetry::ext::http::client::SessionState type,
+                     const std::string &reason = "");
 
   /**
    * Create local CURL instance for url and body

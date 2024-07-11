@@ -43,7 +43,7 @@ public:
    */
   explicit TracerProvider(
       std::unique_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource resource =
+      const opentelemetry::sdk::resource::Resource &resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
@@ -51,7 +51,7 @@ public:
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-      opentelemetry::sdk::resource::Resource resource =
+      const opentelemetry::sdk::resource::Resource &resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =

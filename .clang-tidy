@@ -1,0 +1,69 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+Checks: >
+  -*,
+  abseil-*,
+  -abseil-string-find-str-contains,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-inc-dec-in-conditions,
+  -bugprone-narrowing-conversions,
+  -bugprone-unchecked-optional-access,
+  -bugprone-unhandled-exception-at-new,
+  -bugprone-unused-local-non-trivial-variable,
+  -bugprone-unused-return-value,
+  google-*,
+  -google-build-using-namespace,
+  -google-default-arguments,
+  -google-explicit-constructor,
+  -google-readability-avoid-underscore-in-googletest-name,
+  -google-readability-braces-around-statements,
+  -google-readability-namespace-comments,
+  -google-readability-todo,
+  -google-runtime-references,
+  misc-*,
+  -misc-const-correctness,
+  -misc-include-cleaner,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-alias-decls,
+  -misc-use-anonymous-namespace,
+  performance-*,
+  -performance-move-const-arg,
+  portability-*
+#  readability-*,
+#  -readability-convert-member-functions-to-static,
+#  -readability-else-after-return,
+#  -readability-function-cognitive-complexity,
+#  -readability-identifier-length,
+#  -readability-implicit-bool-conversion,
+#  -readability-isolate-declaration,
+#  -readability-magic-numbers,
+#  -readability-named-parameter,
+#  -readability-redundant-*,
+#  -readability-string-compare,
+#  cppcoreguidelines-*,
+#  -cppcoreguidelines-avoid-c-arrays,
+#  -cppcoreguidelines-avoid-magic-numbers,
+#  -cppcoreguidelines-init-variables,
+#  -cppcoreguidelines-macro-usage,
+#  -cppcoreguidelines-non-private-member-variables-in-classes,
+#  -cppcoreguidelines-pro-*,
+#  modernize-*,
+#  -modernize-use-default-member-init,
+#  -modernize-use-nodiscard,
+#  -modernize-use-trailing-return-type,
+#  -modernize-avoid-c-arrays,
+#  -modernize-use-using
+
+# Use existing clang-format for formatting the code
+# FormatStyle: 'file'
+
+# TODO: include checks: readability, cppcoreguidelines, modernize , google-readability-namespace-comments, google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg
+
+
+
+
+
+

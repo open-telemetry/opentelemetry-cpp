@@ -36,7 +36,7 @@ namespace metrics
 {
 
 MeterContext::MeterContext(std::unique_ptr<ViewRegistry> views,
-                           opentelemetry::sdk::resource::Resource resource) noexcept
+                           const opentelemetry::sdk::resource::Resource &resource) noexcept
     : resource_{resource}, views_(std::move(views)), sdk_start_ts_{std::chrono::system_clock::now()}
 {}
 
@@ -82,7 +82,7 @@ opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
 
 void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
 {
-  auto collector = std::shared_ptr<MetricCollector>{new MetricCollector(this, reader)};
+  auto collector = std::shared_ptr<MetricCollector>{new MetricCollector(this, std::move(reader))};
   collectors_.push_back(collector);
 }
 
@@ -107,7 +107,7 @@ ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
+void MeterContext::AddMeter(const std::shared_ptr<Meter> &meter)
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
   meters_.push_back(meter);

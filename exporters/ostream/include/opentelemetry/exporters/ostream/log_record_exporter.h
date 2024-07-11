@@ -66,10 +66,10 @@ private:
   bool isShutdown() const noexcept;
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
-      const std::string prefix = "\n\t");
+      const std::string &prefix = "\n\t");
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &map,
-      const std::string prefix = "\n\t");
+      const std::string &prefix = "\n\t");
 };
 }  // namespace logs
 }  // namespace exporter

@@ -37,7 +37,7 @@ protected:
 class OPENTELEMETRY_EXPORT_TYPE LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
 {
 public:
-  LongCounter(InstrumentDescriptor instrument_descriptor,
+  LongCounter(const InstrumentDescriptor &instrument_descriptor,
               std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(uint64_t value,
@@ -56,7 +56,7 @@ class OPENTELEMETRY_EXPORT_TYPE DoubleCounter : public Synchronous, public opent
 {
 
 public:
-  DoubleCounter(InstrumentDescriptor instrument_descriptor,
+  DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
                 std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(double value,
@@ -72,7 +72,7 @@ public:
 class OPENTELEMETRY_EXPORT_TYPE LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
-  LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
+  LongUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                     std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(int64_t value,
@@ -88,7 +88,7 @@ public:
 class OPENTELEMETRY_EXPORT_TYPE DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
-  DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
+  DoubleUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                       std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(double value,
@@ -104,7 +104,7 @@ public:
 class OPENTELEMETRY_EXPORT_TYPE LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
 {
 public:
-  LongHistogram(InstrumentDescriptor instrument_descriptor,
+  LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                 std::unique_ptr<SyncWritableMetricStorage> storage);
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -124,7 +124,7 @@ public:
 class OPENTELEMETRY_EXPORT_TYPE DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
-  DoubleHistogram(InstrumentDescriptor instrument_descriptor,
+  DoubleHistogram(const InstrumentDescriptor &instrument_descriptor,
                   std::unique_ptr<SyncWritableMetricStorage> storage);
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

@@ -21,7 +21,7 @@ namespace logs
 EventLogger::EventLogger(
     opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
     opentelemetry::nostd::string_view event_domain) noexcept
-    : delegate_logger_(delegate_logger), event_domain_(event_domain)
+    : delegate_logger_(std::move(delegate_logger)), event_domain_(event_domain)
 {}
 
 const opentelemetry::nostd::string_view EventLogger::GetName() noexcept

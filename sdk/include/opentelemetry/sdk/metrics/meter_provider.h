@@ -39,8 +39,8 @@ public:
    * @param resource  The resources for this meter provider.
    */
   MeterProvider(
-      std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
-      sdk::resource::Resource resource    = sdk::resource::Resource::Create({})) noexcept;
+      std::unique_ptr<ViewRegistry> views     = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+      const sdk::resource::Resource &resource = sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Initialize a new meter provider with a specified context

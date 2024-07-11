@@ -29,7 +29,6 @@
 #include "opentelemetry/trace/span_context.h"
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
-using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
 using opentelemetry::trace::SpanContext;
 

@@ -88,7 +88,7 @@ inline std::string Sanitize(std::string name, const T &valid)
  */
 std::string SanitizeLabel(std::string label_key)
 {
-  return Sanitize(label_key, [](int i, char c) {
+  return Sanitize(std::move(label_key), [](int i, char c) {
     return (c >= 'a' && c <= 'z') ||  //
            (c >= 'A' && c <= 'Z') ||  //
            c == '_' ||                //
@@ -396,7 +396,7 @@ std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string
 std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
     const std::string &rate_expressed_unit)
 {
-  size_t pos = rate_expressed_unit.find("/");
+  size_t pos = rate_expressed_unit.find('/');
   if (pos == std::string::npos)
   {
     return rate_expressed_unit;

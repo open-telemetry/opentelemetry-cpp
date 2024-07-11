@@ -54,7 +54,7 @@ public:
    */
   MeterContext(
       std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
-      opentelemetry::sdk::resource::Resource resource =
+      const opentelemetry::sdk::resource::Resource &resource =
           opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
@@ -131,7 +131,7 @@ public:
    *
    * @param meter
    */
-  void AddMeter(std::shared_ptr<Meter> meter);
+  void AddMeter(const std::shared_ptr<Meter> &meter);
 
   void RemoveMeter(nostd::string_view name,
                    nostd::string_view version,

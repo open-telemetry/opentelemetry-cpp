@@ -435,6 +435,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::FieldDescriptor *field_descriptor,
                                    const OtlpHttpClientOptions &options);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message,
                                         const OtlpHttpClientOptions &options)
@@ -655,6 +656,9 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance, if implemented iterative process needs
+// Dynamic memory allocation
+
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
@@ -697,7 +701,7 @@ OtlpHttpClient::~OtlpHttpClient()
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
-    : is_shutdown_(false), options_(options), http_client_(http_client)
+    : is_shutdown_(false), options_(options), http_client_(std::move(http_client))
 {
   http_client_->SetMaxSessionsPerConnection(options_.max_requests_per_connection);
 }
@@ -882,7 +886,7 @@ OtlpHttpClient::createSession(
       std::string error_message = "[OTLP HTTP Client] Export failed, invalid url: " + options_.url;
       if (options_.console_debug)
       {
-        std::cerr << error_message << std::endl;
+        std::cerr << error_message << '\n';
       }
       OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
 
@@ -947,7 +951,7 @@ OtlpHttpClient::createSession(
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
     {
-      std::cerr << error_message << std::endl;
+      std::cerr << error_message << '\n';
     }
     OTEL_INTERNAL_LOG_ERROR(error_message);
 

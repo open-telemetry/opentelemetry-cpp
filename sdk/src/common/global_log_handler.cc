@@ -31,7 +31,7 @@ void DefaultLogHandler::Handle(LogLevel level,
   {
     output_s << msg;
   }
-  output_s << std::endl;
+  output_s << '\n';
   // TBD - print attributes
 
   switch (level)

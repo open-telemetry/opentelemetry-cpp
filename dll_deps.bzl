@@ -16,10 +16,11 @@ def _filter_libs(deps):
     """ Removes references to the api/sdk/exporters/ext static libraries """
     filtered_dll_deps = []
 
-    #    dll_deps = select({
-    #        "@platforms//os:windows": dll_deps_windows,
-    #        "//conditions:default": dll_deps_non_windows,
-    #    })
+#    x_dll_deps = select({
+#        "@platforms//os:windows": dll_deps_windows,
+#        "//conditions:default": dll_deps_non_windows,
+#    })
+#    print(x_dll_deps)
     dll_deps = dll_deps_windows
     for dep in deps:
         label = Label(_absolute_label(dep))

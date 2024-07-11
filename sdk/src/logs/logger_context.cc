@@ -19,7 +19,7 @@ namespace logs
 {
 
 LoggerContext::LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                             opentelemetry::sdk::resource::Resource resource) noexcept
+                             const opentelemetry::sdk::resource::Resource &resource) noexcept
     : resource_(resource),
       processor_(
           std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors))))

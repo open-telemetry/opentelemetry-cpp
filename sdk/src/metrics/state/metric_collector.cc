@@ -27,7 +27,7 @@ namespace metrics
 
 MetricCollector::MetricCollector(opentelemetry::sdk::metrics::MeterContext *context,
                                  std::shared_ptr<MetricReader> metric_reader)
-    : meter_context_{context}, metric_reader_{metric_reader}
+    : meter_context_{context}, metric_reader_{std::move(metric_reader)}
 {
   metric_reader_->SetMetricProducer(this);
 }
@@ -48,7 +48,7 @@ bool MetricCollector::Collect(
     return false;
   }
   ResourceMetrics resource_metrics;
-  meter_context_->ForEachMeter([&](std::shared_ptr<Meter> meter) noexcept {
+  meter_context_->ForEachMeter([&](const std::shared_ptr<Meter> &meter) noexcept {
     auto collection_ts = std::chrono::system_clock::now();
     auto metric_data   = meter->Collect(this, collection_ts);
     if (!metric_data.empty())

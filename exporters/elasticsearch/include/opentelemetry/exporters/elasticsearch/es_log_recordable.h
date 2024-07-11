@@ -33,13 +33,13 @@ private:
    */
   void WriteKeyValue(nostd::string_view key,
                      const opentelemetry::common::AttributeValue &value,
-                     std::string name);
+                     const std::string &name);
 
   void WriteKeyValue(nostd::string_view key,
                      const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                     std::string name);
+                     const std::string &name);
 
-  void WriteValue(const opentelemetry::common::AttributeValue &value, std::string name);
+  void WriteValue(const opentelemetry::common::AttributeValue &value, const std::string &name);
 
 public:
   /**

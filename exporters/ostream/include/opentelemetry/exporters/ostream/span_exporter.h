@@ -69,7 +69,7 @@ private:
   // various print helpers
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
-      const std::string prefix = "\n\t");
+      const std::string &prefix = "\n\t");
 
   void printEvents(const std::vector<opentelemetry::sdk::trace::SpanDataEvent> &events);
 
