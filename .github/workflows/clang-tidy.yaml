@@ -22,12 +22,18 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
-          build-essential
-          sudo -E ./ci/setup_cmake.sh
-          sudo -E ./ci/setup_ci_environment.sh
-          sudo -E ./ci/setup_googletest.sh
+          build-essential \
+          iwyu \
+          cmake \
+          ninja-build \
+          libssl-dev \
+          libcurl4-openssl-dev \
+          libprotobuf-dev \
+          protobuf-compiler \
+          libgmock-dev \
+          libgtest-dev \
+          libbenchmark-dev
           sudo -E ./ci/install_abseil.sh
-          sudo -E ./ci/install_protobuf.sh
           sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
 
 
@@ -54,21 +60,22 @@ jobs:
           -DWITH_ASYNC_EXPORT_PREVIEW=ON \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
           -DWITH_OTLP_GRPC=ON \
-          -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON
+          -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+          -DCMAKE_CXX_CLANG_TIDY clang-tidy-18"
           cd ..
 
-      - name: Run Clang-Tidy
-        run: |
-          chmod +x tools/clang-tidy.sh
-          ./tools/clang-tidy.sh | tee clang-tidy-output.log
+#      - name: Run Clang-Tidy
+#        run: |
+#          chmod +x tools/clang-tidy.sh
+#          ./tools/clang-tidy.sh | tee clang-tidy-output.log
 
-      - uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: Logs (clang-tidy)
-          path: clang-tidy-output.log
-
-      - name: Count Warnings
-        run: |
-          COUNT=$(grep -c "warning:" clang-tidy-output.log)
-          echo "clang-tidy reported ${COUNT} warning(s)"
+#      - uses: actions/upload-artifact@v4
+#        if: success() || failure()
+#        with:
+#          name: Logs (clang-tidy)
+#          path: clang-tidy-output.log
+#
+#      - name: Count Warnings
+#        run: |
+#          COUNT=$(grep -c "warning:" clang-tidy-output.log)
+#          echo "clang-tidy reported ${COUNT} warning(s)"
