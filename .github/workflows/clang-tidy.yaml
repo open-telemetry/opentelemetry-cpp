@@ -22,11 +22,7 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
-          build-essential \
-          wget
-          wget https://apt.llvm.org/llvm.sh
-          chmod u+x llvm.sh
-          sudo ./llvm.sh 18
+          build-essential
           sudo -E ./ci/setup_cmake.sh
           sudo -E ./ci/setup_ci_environment.sh
           sudo -E ./ci/setup_googletest.sh
@@ -58,7 +54,7 @@ jobs:
           -DWITH_ASYNC_EXPORT_PREVIEW=ON \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
           -DWITH_OTLP_GRPC=ON \
-          -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON 
+          -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON
           cd ..
 
       - name: Run Clang-Tidy
