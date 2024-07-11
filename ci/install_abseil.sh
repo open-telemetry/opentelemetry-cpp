@@ -50,7 +50,7 @@ fi
 # TODO(marcalff) Cleanup once abseil is upgraded to the next LTS
 
 
-if [ "${ABSEIL_CPP_VERSION}" -eq "20240116.1" ] || [ "${ABSEIL_CPP_VERSION}" -eq "20240116.2" ]; then
+if [ "${ABSEIL_CPP_VERSION}" = "20240116.1" ] || [ "${ABSEIL_CPP_VERSION}" = "20240116.2" ]; then
   echo "Patching abseil"
   patch -p1 << EOF
 commit 779a3565ac6c5b69dd1ab9183e500a27633117d5
