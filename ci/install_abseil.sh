@@ -55,7 +55,6 @@ fi
 if [ "${ABSEIL_CPP_VERSION}" = "20240116.1" ] || [ "${ABSEIL_CPP_VERSION}" = "20240116.2" ]; then
   echo "Patching abseil"
   patch -p1 < ${TOPDIR}/ci/fix-abseil-cpp-issue-1536.patch
-EOF
 else
   echo "Not patching abseil"
 fi
