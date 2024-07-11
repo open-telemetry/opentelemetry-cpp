@@ -62,7 +62,23 @@ jobs:
 #                         -DWITH_ABSEIL=ON \
 #                    -DWITH_OTLP_GRPC=ON \
 #                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
-#          cd ..
+
+      - name: clang-tidy
+        run: |
+          cd build
+          make -k 2>&1 | tee -a clang-tidy.log
+
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: Logs (clang-tidy)
+          path: ./build/*.log
+
+      - name: count warnings
+        run: |
+          cd build
+          COUNT=`grep -c "warning:" iwyu.log`
+          echo "clang-tidy reported ${COUNT} warning(s)"
 
 #      - name: Run Clang-Tidy
 #        run: |
