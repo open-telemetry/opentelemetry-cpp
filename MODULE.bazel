@@ -20,35 +20,29 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1", dev_dependency = True)
 
 bazel_dep(name = "nlohmann_json", version = "3.11.3")
 
-# Still needs repo_name="com_github_grpc_grpc" due to 
+# Still needs repo_name="com_github_grpc_grpc" due to
 #
-#   ERROR: no such package '@@[unknown repo 'com_github_grpc_grpc' requested from @@]//src/compiler': 
-#           The repository '@@[unknown repo 'com_github_grpc_grpc' requested from @@]' could not be resolved: 
+#   ERROR: no such package '@@[unknown repo 'com_github_grpc_grpc' requested from @@]//src/compiler':
+#           The repository '@@[unknown repo 'com_github_grpc_grpc' requested from @@]' could not be resolved:
 #                 No repository visible as '@com_github_grpc_grpc' from main repository
 #
-bazel_dep(name = "grpc", version = "1.63.1", repo_name = "com_github_grpc_grpc")
-single_version_override(
-    module_name = "grpc",
-    patch_strip = 1,
-    patches = ["bazel/grpc_deps_remove_googleapis.patch"],
-)
-
+bazel_dep(name = "grpc", version = "1.63.1.bcr.1", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
 archive_override(
     module_name = "opentelemetry-proto",
-    strip_prefix = "opentelemetry-proto-1.3.2",
     integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
-    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
+    patch_strip = 1,
     # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
     patches = ["bazel/opentelemetry-proto.patch"],
-    patch_strip = 1,
+    strip_prefix = "opentelemetry-proto-1.3.2",
+    urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
 )
 
 bazel_dep(name = "prometheus-cpp", version = "1.3.0")
 archive_override(
     module_name = "prometheus-cpp",
-    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
     integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
+    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
     urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
 )
 

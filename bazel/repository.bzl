@@ -34,7 +34,7 @@ def _deps1(mod_ext):
         urls = [
             "https://github.com/grafana/loki/releases/download/v2.8.7/loki-windows-amd64.exe.zip",
         ],
-        build_file_content = """exports_files(["loki-windows-amd64.exe"],visibility=["//visibility:public"])"""
+        build_file_content = """exports_files(["loki-windows-amd64.exe"],visibility=["//visibility:public"])""",
     )
 
     maybe(
@@ -44,7 +44,7 @@ def _deps1(mod_ext):
         urls = [
             "https://github.com/grafana/tempo/releases/download/v2.3.1/tempo_2.3.1_windows_amd64.tar.gz",
         ],
-        build_file_content = """exports_files(["tempo.exe", "temp-cli.exe", "tempo-query.exe"],visibility=["//visibility:public"])"""
+        build_file_content = """exports_files(["tempo.exe", "temp-cli.exe", "tempo-query.exe"],visibility=["//visibility:public"])""",
     )
 
     maybe(
@@ -54,7 +54,7 @@ def _deps1(mod_ext):
         urls = [
             "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.91.0/otelcol-contrib_0.91.0_windows_amd64.tar.gz",
         ],
-        build_file_content = """exports_files(["otelcol-contrib.exe"],visibility=["//visibility:public"])"""
+        build_file_content = """exports_files(["otelcol-contrib.exe"],visibility=["//visibility:public"])""",
     )
 
     maybe(
@@ -65,7 +65,7 @@ def _deps1(mod_ext):
             "https://github.com/prometheus/prometheus/releases/download/v2.48.1/prometheus-2.48.1.windows-amd64.tar.gz",
         ],
         strip_prefix = "prometheus-2.48.1.windows-amd64",
-        build_file_content = """exports_files(["prometheus.exe","prometheus.yml","promtool.exe"],visibility=["//visibility:public"])"""
+        build_file_content = """exports_files(["prometheus.exe","prometheus.yml","promtool.exe"],visibility=["//visibility:public"])""",
     )
 
     maybe(
@@ -79,7 +79,7 @@ def _deps1(mod_ext):
         build_file_content = """
 exports_files(glob(["**/*"]),visibility=["//visibility:public"])
 filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
-"""
+""",
     )
 
     maybe(
@@ -89,8 +89,8 @@ filegroup(name="files",srcs=glob(["**/*"]),visibility=["//visibility:public"])
         integrity = "sha256-muqkm+RrpTI0MpOcQ455vRXwrOm0rs5rUfvI3BXHwGk=",
         type = "zip",
         urls = [
-            "https://codeload.github.com/malkia/FTXUI/zip/8178c7ac3adb9a14d76589126d611b10e1c45a97"
-        ]
+            "https://codeload.github.com/malkia/FTXUI/zip/8178c7ac3adb9a14d76589126d611b10e1c45a97",
+        ],
     )
 
 deps1 = module_extension(implementation = _deps1)

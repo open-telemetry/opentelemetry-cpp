@@ -1,12 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
+load("//:dll_deps.bzl", "dll_deps")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
-
-avoid_dll_lock()
 
 otel_cc_library(
     name = "ostream_log_record_exporter",
@@ -128,6 +126,6 @@ otel_cc_library(
 
 # This is used for otel_sdk.zip packaging
 filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )

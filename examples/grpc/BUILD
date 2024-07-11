@@ -5,10 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@@grpc~//bazel:cc_grpc_library.bzl", "cc_grpc_library")
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
-
-avoid_dll_lock()
+load("//:dll_deps.bzl", "dll_deps")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 proto_library(
     name = "messages_proto",
@@ -32,8 +30,8 @@ cc_grpc_library(
 # include_prefix, includes or strip_include_prefix right now.
 otel_cc_library(
     name = "messages_cc_grpc",
-    deps = [ "_messages_cc_grpc" ],
     includes = ["protos"],
+    deps = ["_messages_cc_grpc"],
 )
 
 otel_cc_library(

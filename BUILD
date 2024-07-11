@@ -6,7 +6,7 @@ load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 bool_flag(
     name = "with_dll",
@@ -24,11 +24,11 @@ config_setting(
 
 otel_cc_library(
     name = "windows_only",
-    visibility = ["//visibility:public"],
     target_compatible_with = select({
         "@platforms//os:windows": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    visibility = ["//visibility:public"],
 )
 
 # TODO: Version needs to be updated better here.
@@ -57,27 +57,27 @@ config_setting(
 # But it's impossible to know this in advance.
 otel_cc_library(
     name = "otel_sdk_deps",
-    visibility = ["//visibility:private"],
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
         "with_dll_enabled": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
+    visibility = ["//visibility:private"],
     deps = [
         "//exporters/elasticsearch:es_log_record_exporter",
         "//exporters/memory:in_memory_span_exporter",
         "//exporters/ostream:ostream_log_record_exporter",
         "//exporters/ostream:ostream_metric_exporter",
         "//exporters/ostream:ostream_span_exporter",
-        "//exporters/otlp:otlp_grpc_exporter", 
-        "//exporters/otlp:otlp_grpc_log_record_exporter",
-        "//exporters/otlp:otlp_grpc_metric_exporter",
-        "//exporters/otlp:otlp_http_exporter", 
-        "//exporters/otlp:otlp_http_log_record_exporter",
-        "//exporters/otlp:otlp_http_metric_exporter",
-        "//exporters/otlp:otlp_file_exporter", 
+        "//exporters/otlp:otlp_file_exporter",
         "//exporters/otlp:otlp_file_log_record_exporter",
         "//exporters/otlp:otlp_file_metric_exporter",
+        "//exporters/otlp:otlp_grpc_exporter",
+        "//exporters/otlp:otlp_grpc_log_record_exporter",
+        "//exporters/otlp:otlp_grpc_metric_exporter",
+        "//exporters/otlp:otlp_http_exporter",
+        "//exporters/otlp:otlp_http_log_record_exporter",
+        "//exporters/otlp:otlp_http_metric_exporter",
         "//exporters/prometheus:prometheus_exporter",
         "//exporters/prometheus:prometheus_push_exporter",
         "//exporters/zipkin:zipkin_exporter",
@@ -115,17 +115,17 @@ otel_cc_library(
 
 otel_cc_library(
     name = "api_sdk_includes",
-    # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
-    visibility = ["//visibility:private"],
+    srcs = [
+        "all_api_includes.cc",
+        "all_sdk_includes.cc",
+    ],
     target_compatible_with = select({
         # To compile you need `--//:with_dll=true` on the command line
         "with_dll_enabled": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    srcs = [
-        "all_api_includes.cc",
-        "all_sdk_includes.cc",
-    ],
+    # Almost all headers are included here, such that the compiler can notice the __declspec(dllexport) members.
+    visibility = ["//visibility:private"],
     deps = ["otel_sdk_deps"],
 )
 
@@ -134,7 +134,7 @@ otel_cc_library(
     name = otel_sdk_binary,
     # Force generation of .pdb file for for opt builds
     features = select({
-        "@platforms//os:windows": [ "generate_pdb_file" ],
+        "@platforms//os:windows": ["generate_pdb_file"],
         "//conditions:default": None,
     }),
     target_compatible_with = select({
@@ -193,7 +193,7 @@ alias(
     name = otel_sdk_binary + "_import",
     data = select({
         "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
-        "//conditions:default": None
+        "//conditions:default": None,
     }),
     interface_library = otel_sdk_binary + "_lib_file",
     shared_library = otel_sdk_binary,
@@ -266,7 +266,7 @@ pkg_files(
             "//exporters/etw:header_files",
         ],
         "//conditions:default": [],
-    }),    
+    }),
     prefix = otel_sdk_prefix,  # + "include",
     strip_prefix = pkg_strip_prefix.from_pkg(),
 )
@@ -306,7 +306,7 @@ pkg_files(
     name = otel_sdk_binary + "_src_bundle" + "_force",
     compilation_mode = compilation_mode,
     data = select({
-        "@platforms//os:windows": [ otel_sdk_binary + "_make_src_bundle" ],
+        "@platforms//os:windows": [otel_sdk_binary + "_make_src_bundle"],
         "//conditions:default": [],
     }),
 ) for (otel_sdk_binary, compilation_mode) in [
@@ -330,8 +330,8 @@ pkg_files(
         "@platforms//os:windows": ["$(location " + otel_sdk_binary + "_pdb_file" + ")"],
         "//conditions:default": ["$(location " + otel_sdk_binary + "_lib_file" + ")"],
     }),
-    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
     tags = ["manual"],
+    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
@@ -377,9 +377,9 @@ pkg_files(
 pkg_filegroup(
     name = "otel_sdk_files",
     srcs = [
-        "otel_sdk_header_files",
         "otel_sdk_d_bin_files",
         "otel_sdk_d_lib_files",
+        "otel_sdk_header_files",
         "otel_sdk_r_bin_files",
         "otel_sdk_r_lib_files",
         "otel_sdk_rd_bin_files",
@@ -390,7 +390,7 @@ pkg_filegroup(
             "otel_sdk_r_src_bundle",
             "otel_sdk_rd_src_bundle",
         ],
-        "//conditions:default": []
+        "//conditions:default": [],
     }),
 )
 
@@ -415,7 +415,10 @@ write_source_file(
     data = ["otel_sdk_all_deps_" + os],
     local_defines = ['DEPS_FILE=\\"$(rlocationpath otel_sdk_all_deps_' + os + ')\\"'],
     deps = ["@bazel_tools//tools/cpp/runfiles"],
-) for os in ["non_windows", "windows"]]
+) for os in [
+    "non_windows",
+    "windows",
+]]
 
 [run_binary(
     name = "dll_deps_update_run_" + os,
@@ -423,7 +426,10 @@ write_source_file(
     outs = ["dll_deps_generated_internally_" + os + ".bzl"],
     args = ["$(location dll_deps_generated_internally_" + os + ".bzl)"],
     tool = "dll_deps_update_binary_" + os,
-) for os in ["non_windows", "windows"]]
+) for os in [
+    "non_windows",
+    "windows",
+]]
 
 # To update the dll_deps_generated.bzl files, do this:
 #    bazel run dll_deps_update_windows
@@ -432,7 +438,10 @@ write_source_file(
     name = "dll_deps_update_" + os,
     in_file = "dll_deps_generated_internally_" + os + ".bzl",
     out_file = "dll_deps_generated_" + os + ".bzl",
-) for os in ["non_windows", "windows"]]
+) for os in [
+    "non_windows",
+    "windows",
+]]
 
 platform(
     name = "x64_windows-clang-cl",

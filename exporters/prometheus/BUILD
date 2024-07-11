@@ -1,11 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
-
-avoid_dll_lock()
+load("//:dll_deps.bzl", "dll_deps")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -136,7 +134,7 @@ otel_cc_test(
         ":prometheus_test_helper",
         "@googletest//:gtest_main",
         "@prometheus-cpp//core",
-        "@prometheus-cpp//pull",        
+        "@prometheus-cpp//pull",
     ]),
 )
 
@@ -154,13 +152,13 @@ otel_cc_library(
     strip_include_prefix = "include",
     tags = ["prometheus"],
     deps = [
-        "@prometheus-cpp//core",
-        "@prometheus-cpp//push",
         "//api",
         "//exporters/prometheus:prometheus_collector",
         "//exporters/prometheus:prometheus_exporter_utils",
         "//sdk:headers",
         "//sdk/src/metrics",
+        "@prometheus-cpp//core",
+        "@prometheus-cpp//push",
     ],
 )
 
@@ -180,10 +178,10 @@ otel_cc_library(
 
 otel_cc_test(
     name = "prometheus_push_exporter_test",
-    flaky = True,
     srcs = [
         "test/push_exporter_test.cc",
     ],
+    flaky = True,
     tags = [
         "prometheus",
         "test",
@@ -211,6 +209,6 @@ otel_cc_library(
 
 # This is used for otel_sdk.zip packaging
 filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )

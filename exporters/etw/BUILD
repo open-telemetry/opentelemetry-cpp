@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
-load("//:dll_deps.bzl", "dll_deps", "avoid_dll_lock")
-load("//bazel:otel_cc.bzl", "otel_cc_library", "otel_cc_binary", "otel_cc_test", "otel_cc_import", "otel_cc_shared_library")
-
-avoid_dll_lock()
+load("//:dll_deps.bzl", "dll_deps")
+load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -20,10 +18,10 @@ otel_cc_library(
     ],
     tags = ["etw"],
     deps = [
+        "//:windows_only",
         "//api",
         "//sdk/src/trace",
         "@nlohmann_json//:json",
-        "//:windows_only",
     ],
 )
 
@@ -101,13 +99,13 @@ otel_cc_library(
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
     deps = [
-        "//sdk:headers",
         "//:windows_only",
+        "//sdk:headers",
     ],
 )
 
 # This is used for otel_sdk.zip packaging
 filegroup(
-    name="header_files",
-    srcs=glob(["include/**/*.h"]),
+    name = "header_files",
+    srcs = glob(["include/**/*.h"]),
 )
