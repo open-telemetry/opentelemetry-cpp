@@ -8,10 +8,11 @@ load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
 load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
+package(default_visibility = ["//visibility:public"])
+
 bool_flag(
     name = "with_dll",
     build_setting_default = False,
-    visibility = ["//visibility:public"],
 )
 
 config_setting(
@@ -19,7 +20,6 @@ config_setting(
     flag_values = {
         "with_dll": "true",
     },
-    visibility = ["//visibility:public"],
 )
 
 otel_cc_library(
@@ -28,7 +28,6 @@ otel_cc_library(
         "@platforms//os:windows": None,
         "//conditions:default": ["@platforms//:incompatible"],
     }),
-    visibility = ["//visibility:public"],
 )
 
 # TODO: Version needs to be updated better here.

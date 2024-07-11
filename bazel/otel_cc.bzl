@@ -38,8 +38,8 @@ def otel_cc_library(**kwargs):
     # Don't create .so files for dbg/fastbuild, always create static libs
     kwargs["linkstatic"] = kwargs.get("linkstatic", True)
 
-    x = is_windows(name=kwargs["name"]+"_is_windows")
-    print(x)
+#    x = is_windows(name=kwargs["name"]+"_is_windows")
+#    print(x)
 
     rules_cc_library(**kwargs)
 

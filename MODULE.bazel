@@ -26,7 +26,7 @@ bazel_dep(name = "nlohmann_json", version = "3.11.3")
 #           The repository '@@[unknown repo 'com_github_grpc_grpc' requested from @@]' could not be resolved:
 #                 No repository visible as '@com_github_grpc_grpc' from main repository
 #
-bazel_dep(name = "grpc", version = "1.63.1.bcr.1", repo_name = "com_github_grpc_grpc")
+bazel_dep(name = "grpc", version = "1.65.0", repo_name = "com_github_grpc_grpc")
 bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
 archive_override(
     module_name = "opentelemetry-proto",
