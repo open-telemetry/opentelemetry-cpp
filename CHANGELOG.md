@@ -15,11 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
-* [CI] Added clang-tidy to the CI pipeline, which outputs the number of warnings and generates a log file containing the details of these warnings.
+* [CI] Added clang-tidy to the CI pipeline, which outputs 
+the number of warnings and generates a log file containing the 
+details of these warnings [#2051](https://github.com/open-telemetry/opentelemetry-cpp/issues/2051)
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
   require TLS 1.2 or better
   [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
-
 
 Breaking changes:
 
