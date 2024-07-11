@@ -21,6 +21,7 @@ apt install -y clang-format-${CLANG_VERSION} python3 python3-pip git curl
 
 # Install cmake_format
 pip3 install --break-system-packages cmake_format==${CMAKE_FORMAT_VERSION}
+pip3 install --break-system-packages clang-tidy
 
 # Install buildifier
 curl -L -o /usr/local/bin/buildifier https://github.com/bazelbuild/buildtools/releases/download/${BUILDIFIER_VERSION}/buildifier

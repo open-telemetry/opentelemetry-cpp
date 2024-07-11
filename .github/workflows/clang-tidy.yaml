@@ -23,7 +23,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
           build-essential
-          sudo -E ./ci/install_clang18.sh
+          sudo -E ./ci/install_format_tools.sh
           sudo -E ./ci/setup_cmake.sh
           sudo -E ./ci/setup_ci_environment.sh
           sudo -E ./ci/setup_googletest.sh
