@@ -8,7 +8,7 @@ on:
 
 jobs:
   clang-tidy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,8 +22,11 @@ jobs:
         run: |
           sudo apt update -y
           sudo apt install -y --no-install-recommends --no-install-suggests \
-          build-essential
-          sudo -E ./ci/install_clang18.sh
+          build-essential \
+          wget
+          wget https://apt.llvm.org/llvm.sh
+          chmod u+x llvm.sh
+          sudo ./llvm.sh 18
           sudo -E ./ci/setup_cmake.sh
           sudo -E ./ci/setup_ci_environment.sh
           sudo -E ./ci/setup_googletest.sh
