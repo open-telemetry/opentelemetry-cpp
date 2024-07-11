@@ -62,7 +62,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
       {"invalid_header", ""},                                 // invalid header
       {very_large_baggage_header, ""}};  // baggage header larger than allowed size.
 
-  for (auto baggage : baggages)
+  for (const auto &baggage : baggages)
   {
     BaggageCarrierTest carrier1;
     carrier1.headers_[baggage::kBaggageHeader.data()] = baggage.first;

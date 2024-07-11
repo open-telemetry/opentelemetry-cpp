@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -172,7 +173,7 @@ private:
 public:
   // A processor used for testing that keeps a track of the recordable it received
   explicit MockProcessor(std::shared_ptr<MockLogRecordable> record_received) noexcept
-      : record_received_(record_received)
+      : record_received_(std::move(record_received))
   {}
 
   std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override

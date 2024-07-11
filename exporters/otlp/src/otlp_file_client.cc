@@ -172,11 +172,11 @@ static std::size_t FormatPath(char *buff,
   {                                     \
     tm_obj_cache = GetLocalTime();      \
     tm_obj_ptr   = &tm_obj_cache;       \
-    VAR          = tm_obj_ptr->EXPRESS; \
+    (VAR)        = tm_obj_ptr->EXPRESS; \
   }                                     \
   else                                  \
   {                                     \
-    VAR = tm_obj_ptr->EXPRESS;          \
+    (VAR) = tm_obj_ptr->EXPRESS;        \
   }
 
   for (size_t i = 0; i < fmt.size() && ret < bufz && running; ++i)
@@ -619,7 +619,7 @@ public:
   }
 
 #if !defined(UTIL_FS_DISABLE_LINK)
-  enum class LinkOption : int32_t
+  enum class LinkOption : uint8_t
   {
     kDefault       = 0x00,  // hard link for default
     kSymbolicLink  = 0x01,  // or soft link
@@ -749,6 +749,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::Message &message,
                                    const google::protobuf::FieldDescriptor *field_descriptor);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message)
 {
@@ -952,6 +953,8 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
+// Dynamic memory allocation
 }  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender

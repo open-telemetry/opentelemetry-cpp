@@ -12,6 +12,7 @@
 #include <fstream>
 #include <memory>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #define HTTP_PORT 19000
@@ -74,7 +75,9 @@ class PostEventHandler : public CustomEventHandler
 class FinishInCallbackHandler : public CustomEventHandler
 {
 public:
-  FinishInCallbackHandler(std::shared_ptr<http_client::Session> session) : session_(session) {}
+  FinishInCallbackHandler(std::shared_ptr<http_client::Session> session)
+      : session_(std::move(session))
+  {}
 
   void OnResponse(http_client::Response &response) noexcept override
   {
