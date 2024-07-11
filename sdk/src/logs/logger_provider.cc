@@ -27,7 +27,7 @@ namespace logs
 {
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
@@ -36,7 +36,7 @@ LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
     : context_{std::make_shared<LoggerContext>(std::move(processors), std::move(resource))}
 {}
 

@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -75,7 +76,7 @@ public:
                size_t *batch_size_received)
       : force_flush_counter_(force_flush_counter),
         shutdown_counter_(shutdown_counter),
-        logs_received_(logs_received),
+        logs_received_(std::move(logs_received)),
         batch_size_received(batch_size_received)
   {}
 
