@@ -62,7 +62,7 @@ jobs:
 #                         -DWITH_ABSEIL=ON \
 #                    -DWITH_OTLP_GRPC=ON \
 #                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
-          cd ..
+#          cd ..
 
 #      - name: Run Clang-Tidy
 #        run: |
