@@ -58,7 +58,7 @@ jobs:
           -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
           -DWITH_ASYNC_EXPORT_PREVIEW=ON \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-          -DCMAKE_CXX_CLANG_TIDY clang-tidy-18
+          -DCMAKE_CXX_CLANG_TIDY="clang-tidy-18"
 #                         -DWITH_ABSEIL=ON \
 #                    -DWITH_OTLP_GRPC=ON \
 #                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
