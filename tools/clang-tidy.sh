@@ -34,7 +34,6 @@ FILTER_PATTERN="Suppressed [0-9]* warnings.*|Use -header-filter=.*|Use -system-h
 rm -f $LOG_FILE
 
 run_clang_tidy() {
-  clang-tidy --dump-config
   file=$1
   echo "Running clang-tidy on $file" >> $LOG_FILE
   clang-tidy -p=$COMPILE_COMMANDS_PATH "$file" 2>&1 | grep -Ev "$FILTER_PATTERN" | tee -a $LOG_FILE
