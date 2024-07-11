@@ -36,8 +36,6 @@ jobs:
 #          sudo -E ./ci/install_abseil.sh
 #          sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
 
-
-      # WITH_OPENTRACING_SHIM and WITH_ETW is not present and will be excluded.
       - name: Prepare CMake
         run: |
           TOPDIR=$(pwd)
@@ -66,7 +64,7 @@ jobs:
       - name: clang-tidy
         run: |
           cd build
-          make -j$(nproc) 2>&1 | tee -a clang-tidy.log
+          make 2>&1 | tee -a clang-tidy.log
 
       - uses: actions/upload-artifact@v4
         if: success() || failure()
@@ -79,19 +77,3 @@ jobs:
           cd build
           COUNT=`grep -c "warning:" clang-tidy.log`
           echo "clang-tidy reported ${COUNT} warning(s)"
-
-#      - name: Run Clang-Tidy
-#        run: |
-#          chmod +x tools/clang-tidy.sh
-#          ./tools/clang-tidy.sh | tee clang-tidy-output.log
-
-#      - uses: actions/upload-artifact@v4
-#        if: success() || failure()
-#        with:
-#          name: Logs (clang-tidy)
-#          path: clang-tidy-output.log
-#
-#      - name: Count Warnings
-#        run: |
-#          COUNT=$(grep -c "warning:" clang-tidy-output.log)
-#          echo "clang-tidy reported ${COUNT} warning(s)"
