@@ -6,6 +6,9 @@
 set -e
 
 apt-get update
+apt-get install --no-install-recommends --no-install-suggests -y \
+wget
+
 wget https://apt.llvm.org/llvm.sh
 chmod u+x llvm.sh
 sudo ./llvm.sh 18
