@@ -7,6 +7,8 @@ set -ex
 export DEBIAN_FRONTEND=noninteractive
 [ -z "${ABSEIL_CPP_VERSION}" ] && export ABSEIL_CPP_VERSION="20240116.1"
 
+TOPDIR=`pwd`
+
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
@@ -52,30 +54,7 @@ fi
 
 if [ "${ABSEIL_CPP_VERSION}" = "20240116.1" ] || [ "${ABSEIL_CPP_VERSION}" = "20240116.2" ]; then
   echo "Patching abseil"
-  patch -p1 << EOF
-commit 779a3565ac6c5b69dd1ab9183e500a27633117d5
-Author: Derek Mauro <dmauro@google.com>
-Date:   Tue Jan 30 10:13:25 2024 -0800
-
-    Avoid export of testonly target absl::test_allocator in CMake builds
-    
-    Closes #1536
-    
-    PiperOrigin-RevId: 602764437
-    Change-Id: Ia5c20a3874262a2ddb8797f608af17d7e86dd6d6
-
-diff --git a/absl/container/CMakeLists.txt b/absl/container/CMakeLists.txt
-index 449a2cad..ee9ca9c3 100644
---- a/absl/container/CMakeLists.txt
-+++ b/absl/container/CMakeLists.txt
-@@ -213,6 +213,7 @@ absl_cc_library(
-   DEPS
-     absl::config
-     GTest::gmock
-+  TESTONLY
- )
- 
- absl_cc_test(
+  patch -p1 < ${TOPDIR}/ci/fix-abseil-cpp-issue-1536.patch
 EOF
 else
   echo "Not patching abseil"
