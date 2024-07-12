@@ -53,7 +53,7 @@ jobs:
       - name: iwyu_tool
         run: |
           cd build
-          make -k | tee -a iwyu.log 2>&1
+          make -k 2>&1 | tee -a iwyu.log
 
       - uses: actions/upload-artifact@v4
         if: success() || failure()
