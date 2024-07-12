@@ -9,6 +9,7 @@
 #include <chrono>
 #include <memory>
 #include <thread>
+#include <utility>
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -74,10 +75,10 @@ public:
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
                   const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
-      : logs_received_(logs_received),
-        force_flush_counter_(force_flush_counter),
-        is_shutdown_(is_shutdown),
-        is_export_completed_(is_export_completed),
+      : logs_received_(std::move(logs_received)),
+        force_flush_counter_(std::move(force_flush_counter)),
+        is_shutdown_(std::move(is_shutdown)),
+        is_export_completed_(std::move(is_export_completed)),
         export_delay_(export_delay)
   {}
 
@@ -154,7 +155,8 @@ public:
   {
     return std::shared_ptr<LogRecordProcessor>(new BatchLogRecordProcessor(
         std::unique_ptr<LogRecordExporter>(new MockLogExporter(
-            logs_received, force_flush_counter, is_shutdown, is_export_completed, export_delay)),
+            std::move(logs_received), std::move(force_flush_counter), std::move(is_shutdown),
+            std::move(is_export_completed), export_delay)),
         max_queue_size, scheduled_delay_millis, max_export_batch_size));
   }
 };

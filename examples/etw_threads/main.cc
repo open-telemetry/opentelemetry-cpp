@@ -113,7 +113,7 @@ void beep()
 // Max number of threads to spawn
 constexpr int kMaxThreads = 10;
 
-int main(int arc, char **argv)
+int main(int /*arc*/, char ** /*argv*/)
 {
   std::thread pool[kMaxThreads];
 

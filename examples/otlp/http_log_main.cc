@@ -71,7 +71,7 @@ void InitTracer()
       trace_opts.url = opentelemetry::exporter::otlp::GetOtlpDefaultHttpTracesEndpoint();
     }
   }
-  std::cout << "Using " << trace_opts.url << " to export trace spans." << std::endl;
+  std::cout << "Using " << trace_opts.url << " to export trace spans." << '\n';
 
   // Create OTLP exporter instance
   auto exporter   = otlp::OtlpHttpExporterFactory::Create(trace_opts);
@@ -110,7 +110,7 @@ std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 
 void InitLogger()
 {
-  std::cout << "Using " << logger_opts.url << " to export log records." << std::endl;
+  std::cout << "Using " << logger_opts.url << " to export log records." << '\n';
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
   auto exporter   = otlp::OtlpHttpLogRecordExporterFactory::Create(logger_opts);

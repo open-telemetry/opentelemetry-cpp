@@ -55,6 +55,7 @@ void run_threads()
   auto thread_span = get_tracer()->StartSpan(__func__);
 
   std::vector<std::thread> threads;
+  threads.reserve(5);
   for (int thread_num = 0; thread_num < 5; ++thread_num)
   {
     // This shows how one can effectively use Scope objects to correctly

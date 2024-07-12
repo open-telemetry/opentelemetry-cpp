@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
 
 #include <stdint.h>
@@ -105,7 +106,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
-  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
