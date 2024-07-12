@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include <cstdint>
+#include <ctype.h>
+#include <cstddef>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"

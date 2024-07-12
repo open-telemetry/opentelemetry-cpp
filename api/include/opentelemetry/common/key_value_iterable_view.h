@@ -3,9 +3,13 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <initializer_list>
 #include <iterator>
 #include <utility>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"

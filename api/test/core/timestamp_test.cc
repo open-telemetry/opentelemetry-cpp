@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <chrono>
 
 #include "opentelemetry/common/timestamp.h"
 
