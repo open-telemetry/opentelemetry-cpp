@@ -16,13 +16,8 @@
 #include <benchmark/benchmark.h>
 
 using opentelemetry::logs::EventId;
-using opentelemetry::logs::Logger;
-using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
-using opentelemetry::nostd::shared_ptr;
-using opentelemetry::nostd::span;
-using opentelemetry::nostd::string_view;
 
 namespace common  = opentelemetry::common;
 namespace nostd   = opentelemetry::nostd;
@@ -66,7 +61,7 @@ private:
 static void ThreadRoutine(Barrier &barrier,
                           benchmark::State &state,
                           int thread_id,
-                          std::function<void()> func)
+                          const std::function<void()> &func)
 {
   barrier.Wait();
 
@@ -87,7 +82,7 @@ static void ThreadRoutine(Barrier &barrier,
   barrier.Wait();
 }
 
-void MultiThreadRunner(benchmark::State &state, std::function<void()> func)
+void MultiThreadRunner(benchmark::State &state, const std::function<void()> &func)
 {
   int num_threads = std::thread::hardware_concurrency();
 
@@ -95,6 +90,7 @@ void MultiThreadRunner(benchmark::State &state, std::function<void()> func)
 
   std::vector<std::thread> threads;
 
+  threads.reserve(num_threads);
   for (int i = 0; i < num_threads; i++)
   {
     threads.emplace_back(ThreadRoutine, std::ref(barrier), std::ref(state), i, func);

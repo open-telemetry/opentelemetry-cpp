@@ -26,7 +26,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
     return std::unique_ptr<Aggregation>(new LongSumAggregation(true));
   };
   // add 10 unique metric points. 9 should be added to hashmap, 10th should be overflow.
-  long record_value = 100;
+  int64_t record_value = 100;
   for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
@@ -76,7 +76,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
 #endif
                             nullptr, attributes_limit);
 
-  long record_value = 100;
+  int64_t record_value = 100;
   // add 9 unique metric points, and 6 more above limit.
   for (auto i = 0; i < 15; i++)
   {

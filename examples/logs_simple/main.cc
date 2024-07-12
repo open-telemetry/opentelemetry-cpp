@@ -48,7 +48,7 @@ void InitTracer()
       opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
-  std::shared_ptr<trace_api::TracerProvider> api_provider = provider;
+  const std::shared_ptr<trace_api::TracerProvider> &api_provider = provider;
   trace_api::Provider::SetTracerProvider(api_provider);
 }
 
@@ -69,7 +69,7 @@ void InitLogger()
       opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
 
   // Set the global logger provider
-  std::shared_ptr<logs_api::LoggerProvider> api_provider = provider;
+  const std::shared_ptr<logs_api::LoggerProvider> &api_provider = provider;
   logs_api::Provider::SetLoggerProvider(api_provider);
 }
 

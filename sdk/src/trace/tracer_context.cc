@@ -22,7 +22,7 @@ namespace trace
 namespace resource = opentelemetry::sdk::resource;
 
 TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                             resource::Resource resource,
+                             const resource::Resource &resource,
                              std::unique_ptr<Sampler> sampler,
                              std::unique_ptr<IdGenerator> id_generator) noexcept
     : resource_(resource),

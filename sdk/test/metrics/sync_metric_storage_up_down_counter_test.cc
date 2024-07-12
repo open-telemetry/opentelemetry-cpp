@@ -71,7 +71,7 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
   auto collection_ts      = std::chrono::system_clock::now();
   size_t count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -105,7 +105,7 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     if (temporality == AggregationTemporality::kCumulative)
                     {
                       EXPECT_EQ(data.start_ts, sdk_start_ts);
@@ -147,7 +147,7 @@ TEST_P(WritableMetricStorageTestFixture, LongUpDownCounterSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -224,7 +224,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
   auto collection_ts      = std::chrono::system_clock::now();
   size_t count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
@@ -259,7 +259,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     if (temporality == AggregationTemporality::kCumulative)
                     {
                       EXPECT_EQ(data.start_ts, sdk_start_ts);
@@ -301,7 +301,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleUpDownCounterSumAggregation)
   collection_ts    = std::chrono::system_clock::now();
   count_attributes = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
-                  [&](const MetricData data) {
+                  [&](const MetricData &data) {
                     for (auto data_attr : data.point_data_attr_)
                     {
                       auto sum_data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);

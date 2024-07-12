@@ -75,10 +75,10 @@ struct Uri
   uint16_t port;
   std::string path;
 
-  Uri(std::string uri)
+  Uri(const std::string &uri)
   {
-    size_t host_end = uri.substr(7, std::string::npos).find(":");
-    size_t port_end = uri.substr(host_end + 1, std::string::npos).find("/");
+    size_t host_end = uri.substr(7, std::string::npos).find(':');
+    size_t port_end = uri.substr(host_end + 1, std::string::npos).find('/');
 
     host = uri.substr(0, host_end + 7);
     port = std::stoi(uri.substr(7 + host_end + 1, port_end));

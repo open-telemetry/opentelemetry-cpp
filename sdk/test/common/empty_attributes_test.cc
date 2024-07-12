@@ -15,5 +15,5 @@ TEST(EmptyAttributesTest, TestMemory)
 {
   auto attributes1 = opentelemetry::sdk::GetEmptyAttributes();
   auto attributes2 = opentelemetry::sdk::GetEmptyAttributes();
-  EXPECT_EQ(memcmp(&attributes1, &attributes2, sizeof(attributes1)), 0);
+  EXPECT_EQ(memcmp(&attributes1, &attributes2, sizeof(attributes1)), 0);  // NOLINT
 }
