@@ -39,6 +39,7 @@ jobs:
       - name: Prepare CMake
         run: |
           TOPDIR=$(pwd)
+          echo "Using $(clang-tidy --version)"
           mkdir -p build && cd build
           echo "Running cmake..."
           CC="clang" CXX="clang++" cmake .. \
@@ -56,7 +57,7 @@ jobs:
           -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
           -DWITH_ASYNC_EXPORT_PREVIEW=ON \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-          -DCMAKE_CXX_CLANG_TIDY="clang-tidy-18"
+          -DCMAKE_CXX_CLANG_TIDY="$(which clang-tidy)"
 #                         -DWITH_ABSEIL=ON \
 #                    -DWITH_OTLP_GRPC=ON \
 #                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
