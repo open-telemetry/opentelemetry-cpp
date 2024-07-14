@@ -38,8 +38,7 @@ jobs:
 
       - name: Prepare CMake
         run: |
-          TOPDIR=$(pwd)
-          echo "Using $(clang-tidy --version)"
+          echo "Using clang-tidy version: $(clang-tidy --version)"
           mkdir -p build && cd build
           echo "Running cmake..."
           CC="clang" CXX="clang++" cmake .. \
