@@ -18,7 +18,7 @@ using namespace opentelemetry::sdk::metrics;
 namespace
 {
 nostd::shared_ptr<metrics::Meter> InitMeter(MetricReader **metricReaderPtr,
-                                            std::string meter_name = "meter_name")
+                                            const std::string &meter_name = "meter_name")
 {
   static std::shared_ptr<metrics::MeterProvider> provider(new MeterProvider());
   std::unique_ptr<MetricReader> metric_reader(new MockMetricReader());

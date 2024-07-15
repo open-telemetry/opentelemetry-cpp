@@ -216,7 +216,7 @@ TEST(OtlpRecordable, SetResource)
   bool found_service_name = false;
   for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
-    auto attr = proto_resource.attributes(static_cast<int>(i));
+    const auto &attr = proto_resource.attributes(static_cast<int>(i));
     if (attr.key() == service_name_key && attr.value().string_value() == service_name)
     {
       found_service_name = true;
@@ -322,7 +322,7 @@ TEST(OtlpRecordable, PopulateRequest)
   OtlpRecordableUtils::PopulateRequest(spans_span, &req);
 
   EXPECT_EQ(req.resource_spans().size(), 2);
-  for (auto resource_spans : req.resource_spans())
+  for (const auto &resource_spans : req.resource_spans())
   {
     auto service_name     = resource_spans.resource().attributes(0).value().string_value();
     auto scope_spans_size = resource_spans.scope_spans().size();
@@ -359,7 +359,7 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   OtlpRecordableUtils::PopulateRequest(spans_span, &req);
 
   EXPECT_EQ(req.resource_spans().size(), 2);
-  for (auto resource_spans : req.resource_spans())
+  for (const auto &resource_spans : req.resource_spans())
   {
     // Both should have scope spans
     EXPECT_EQ(resource_spans.scope_spans().size(), 1);
