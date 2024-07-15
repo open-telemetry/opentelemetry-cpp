@@ -11,8 +11,8 @@ $nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
 # Workaround https://github.com/bazelbuild/bazel/issues/18683
-$BAZEL_STARTUP_OPTIONS = "--output_base=C:\Out"
-$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_STARTUP_OPTIONS = "--output_base=C:\O"
+$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT --compilation_mode=dbg"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
