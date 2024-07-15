@@ -59,11 +59,5 @@ Checks: >
 
 # Use existing clang-format for formatting the code
 FormatStyle: 'file'
-HeaderFilterRegex: '.*(opentelemetry/(?!proto)|functional).*'
+HeaderFilterRegex: '.*(opentelemetry|functional).*'
 # TODO: include checks: readability, cppcoreguidelines, modernize , google-readability-namespace-comments, google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg
-
-
-
-
-
-
