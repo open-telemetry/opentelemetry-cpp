@@ -112,11 +112,11 @@ std::string make_unique_string(const char *str)
 
 TEST(AttributesHashMap, HashWithKeyValueIterable)
 {
-  std::string key1 = make_unique_string("k1");
+  std::string key1   = make_unique_string("k1");
   std::string value1 = make_unique_string("v1");
-  std::string key2 = make_unique_string("k2");
+  std::string key2   = make_unique_string("k2");
   std::string value2 = make_unique_string("v2");
-  std::string key3 = make_unique_string("k3");
+  std::string key3   = make_unique_string("k3");
   std::string value3 = make_unique_string("v3");
 
   // Create mock KeyValueIterable instances with the same content but different variables
