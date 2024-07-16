@@ -25,7 +25,6 @@ jobs:
           build-essential \
           iwyu \
           cmake \
-          ninja-build \
           libssl-dev \
           libcurl4-openssl-dev \
           libprotobuf-dev \
@@ -33,49 +32,53 @@ jobs:
           libgmock-dev \
           libgtest-dev \
           libbenchmark-dev
-           echo "Using clang-tidy version: $(clang-tidy --version)"
-#          sudo -E ./ci/install_abseil.sh
-#          sudo -E ./ci/setup_grpc.sh -m -p protobuf -p abseil-cpp
+
+          if ! command -v clang-tidy &> /dev/null; then
+            echo "clang-tidy could not be found"
+            exit 1
+          fi
+          echo "Using clang-tidy version: $(clang-tidy --version)"
+          echo "clang-tidy installed at: $(which clang-tidy)"
+
 
       - name: Prepare CMake
+        env:
+          CC: clang
+          CXX: clang++
         run: |
-          echo "Using clang-tidy version: $(clang-tidy --version)"
           mkdir -p build && cd build
           echo "Running cmake..."
-          CC="clang" CXX="clang++" cmake .. \
-          -DCMAKE_CXX_STANDARD=14 \
-          -DWITH_STL=CXX14 \
-          -DWITH_OTLP_HTTP=ON \
-          -DWITH_OTLP_FILE=ON \
-          -DWITH_PROMETHEUS=ON \
-          -DWITH_ZIPKIN=ON \
-          -DWITH_ELASTICSEARCH=ON \
-          -DWITH_OPENTRACING=ON \
-          -DWITH_OTLP_HTTP_COMPRESSION=ON \
-          -DWITH_EXAMPLES=ON \
-          -DWITH_EXAMPLES_HTTP=ON \
-          -DBUILD_W3CTRACECONTEXT_TEST=ON \
-          -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-          -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-          -DCMAKE_CXX_CLANG_TIDY="$(which clang-tidy)"
-#                         -DWITH_ABSEIL=ON \
-#                    -DWITH_OTLP_GRPC=ON \
-#                    -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+          cmake .. \
+            -DCMAKE_CXX_STANDARD=14 \
+            -DWITH_STL=CXX14 \
+            -DWITH_OTLP_HTTP=ON \
+            -DWITH_OTLP_FILE=ON \
+            -DWITH_PROMETHEUS=ON \
+            -DWITH_ZIPKIN=ON \
+            -DWITH_ELASTICSEARCH=ON \
+            -DWITH_OTLP_HTTP_COMPRESSION=ON \
+            -DWITH_EXAMPLES=ON \
+            -DWITH_EXAMPLES_HTTP=ON \
+            -DBUILD_W3CTRACECONTEXT_TEST=ON \
+            -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+            -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_CXX_CLANG_TIDY="clang-tidy"
 
-      - name: clang-tidy
+      - name: Run clang-tidy
         run: |
           cd build
-          make -j$(nproc) 2>&1 | tee -a clang-tidy.log
+          make -j$(nproc) 2>&1 | tee -a clang-tidy.log || exit 1
 
       - uses: actions/upload-artifact@v4
-        if: success() || failure()
         with:
           name: Logs (clang-tidy)
-          path: ./build/*.log
+          path: ./build/clang-tidy.log
 
-      - name: count warnings
+      - name: Count warnings
         run: |
           cd build
-          COUNT=`grep -c "warning:" clang-tidy.log`
+          COUNT=$(grep -c "warning:" clang-tidy.log)
           echo "clang-tidy reported ${COUNT} warning(s)"
+
+# TODO: include WITH_OTLP_GRPC and WITH_ABSEIL flags.

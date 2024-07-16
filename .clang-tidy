@@ -3,6 +3,8 @@
 
 Checks: >
   -*,
+  performance-*,
+  portability-*,
   abseil-*,
   -abseil-string-find-str-contains,
   bugprone-*,
@@ -12,8 +14,7 @@ Checks: >
   -bugprone-narrowing-conversions,
   -bugprone-unchecked-optional-access,
   -bugprone-unhandled-exception-at-new,
-  -bugprone-unused-local-non-trivial-variable,
-  -bugprone-unused-return-value,
+  -bugprone-unused-local-non-trivial-variable
   google-*,
   -google-build-using-namespace,
   -google-default-arguments,
@@ -29,19 +30,6 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   -misc-unused-alias-decls,
   -misc-use-anonymous-namespace,
-  performance-*
-  portability-*
-  readability-*,
-  -readability-convert-member-functions-to-static,
-  -readability-else-after-return,
-  -readability-function-cognitive-complexity,
-  -readability-identifier-length,
-  -readability-implicit-bool-conversion,
-  -readability-isolate-declaration,
-  -readability-magic-numbers,
-  -readability-named-parameter,
-  -readability-redundant-*,
-  -readability-string-compare,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,
@@ -49,13 +37,3 @@ Checks: >
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-pro-*,
-  modernize-*,
-  -modernize-use-default-member-init,
-  -modernize-use-nodiscard,
-  -modernize-use-trailing-return-type,
-  -modernize-avoid-c-arrays,
-  -modernize-use-using
-
-# Use existing clang-format for formatting the code
-FormatStyle: 'file'
-# TODO: include checks: readability, cppcoreguidelines, modernize , google-readability-namespace-comments, google-readability-avoid-underscore-in-googletest-name, performance-move-const-arg
