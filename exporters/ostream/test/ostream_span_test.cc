@@ -31,7 +31,7 @@ using Attributes = std::initializer_list<std::pair<nostd::string_view, common::A
 class TestResource : public resource::Resource
 {
 public:
-  TestResource(resource::ResourceAttributes attributes = resource::ResourceAttributes())
+  TestResource(const resource::ResourceAttributes &attributes = resource::ResourceAttributes())
       : resource::Resource(attributes)
   {}
 };

@@ -100,7 +100,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
             << "\n  duration      : " << span->GetDuration().count()
             << "\n  description   : " << span->GetDescription()
             << "\n  span kind     : " << span->GetSpanKind()
-            << "\n  status        : " << statusMap[int(span->GetStatus())]
+            << "\n  status        : " << statusMap[static_cast<int>(span->GetStatus())]
             << "\n  attributes    : ";
       printAttributes(span->GetAttributes());
       sout_ << "\n  events        : ";
@@ -137,7 +137,7 @@ bool OStreamSpanExporter::isShutdown() const noexcept
 
 void OStreamSpanExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
-    const std::string prefix)
+    const std::string &prefix)
 {
   for (const auto &kv : map)
   {
@@ -177,7 +177,7 @@ void OStreamSpanExporter::printLinks(const std::vector<trace_sdk::SpanDataLink> 
 
 void OStreamSpanExporter::printResources(const opentelemetry::sdk::resource::Resource &resources)
 {
-  auto attributes = resources.GetAttributes();
+  const auto &attributes = resources.GetAttributes();
   if (attributes.size())
   {
     printAttributes(attributes, "\n\t");
@@ -188,7 +188,7 @@ void OStreamSpanExporter::printInstrumentationScope(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope)
 {
   sout_ << instrumentation_scope.GetName();
-  auto version = instrumentation_scope.GetVersion();
+  const auto &version = instrumentation_scope.GetVersion();
   if (version.size())
   {
     sout_ << "-" << version;

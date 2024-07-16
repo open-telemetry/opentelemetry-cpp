@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+
+#include <utility>
 #include "prometheus/metric_family.h"
 #include "prometheus/metric_type.h"
 
@@ -24,7 +26,7 @@ class SanitizeNameTester
 public:
   static std::string sanitize(std::string name)
   {
-    return PrometheusExporterUtils::SanitizeNames(name);
+    return PrometheusExporterUtils::SanitizeNames(std::move(name));
   }
   static std::string getPrometheusUnit(const std::string &unit_abbreviation)
   {
@@ -104,14 +106,13 @@ void assert_basic(prometheus_client::MetricFamily &metric,
       ASSERT_TRUE(false);
       break;
     case prometheus::MetricType::Untyped:
-      break;
     default:
       break;
   }
 }
 
 void assert_histogram(prometheus_client::MetricFamily &metric,
-                      std::list<double> boundaries,
+                      const std::list<double> &boundaries,
                       std::vector<int> correct)
 {
   int cumulative_count = 0;
