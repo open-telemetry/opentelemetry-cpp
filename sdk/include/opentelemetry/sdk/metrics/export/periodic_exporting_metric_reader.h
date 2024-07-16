@@ -23,9 +23,7 @@ namespace sdk
 namespace metrics
 {
 
-class PeriodicExportingMetricReader
-    : public MetricReader,
-      public std::enable_shared_from_this<PeriodicExportingMetricReader>
+class PeriodicExportingMetricReader : public MetricReader
 {
 
 public:
