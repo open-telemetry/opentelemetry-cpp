@@ -29,8 +29,7 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   -misc-unused-alias-decls,
   -misc-use-anonymous-namespace,
-  performance-*,
-  -performance-move-const-arg,
+  performance-*
   portability-*
   readability-*,
   -readability-convert-member-functions-to-static,
