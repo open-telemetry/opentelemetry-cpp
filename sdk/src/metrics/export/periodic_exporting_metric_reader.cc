@@ -91,11 +91,16 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
 {
   std::shared_ptr<std::atomic<bool>> cancel_export_for_timeout =
       std::make_shared<std::atomic<bool>>(false);
-  auto keep_lifetime = shared_from_this();
+  auto watch_lifetime = std::weak_ptr<PeriodicExportingMetricReader>(shared_from_this());
 
-  auto future_receive = std::async(std::launch::async, [keep_lifetime, cancel_export_for_timeout] {
+  auto future_receive = std::async(std::launch::async, [watch_lifetime, cancel_export_for_timeout] {
+    auto keep_lifetime = watch_lifetime.lock();
+    if (!keep_lifetime)
+    {
+      return;
+    }
     keep_lifetime->Collect(
-        [keep_lifetime, cancel_export_for_timeout](ResourceMetrics &metric_data) {
+        [&keep_lifetime, cancel_export_for_timeout](ResourceMetrics &metric_data) {
           if (cancel_export_for_timeout->load(std::memory_order_acquire))
           {
             OTEL_INTERNAL_LOG_ERROR(
