@@ -14,7 +14,7 @@ Checks: >
   -bugprone-narrowing-conversions,
   -bugprone-unchecked-optional-access,
   -bugprone-unhandled-exception-at-new,
-  -bugprone-unused-local-non-trivial-variable
+  -bugprone-unused-local-non-trivial-variable,
   google-*,
   -google-build-using-namespace,
   -google-default-arguments,
@@ -36,4 +36,4 @@ Checks: >
   -cppcoreguidelines-init-variables,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-non-private-member-variables-in-classes,
-  -cppcoreguidelines-pro-*,
+  -cppcoreguidelines-pro-*
