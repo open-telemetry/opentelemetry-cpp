@@ -112,14 +112,17 @@ std::string make_unique_string(const char *str)
 
 TEST(AttributesHashMap, HashWithKeyValueIterable)
 {
+  std::string key1 = make_unique_string("k1");
+  std::string value1 = make_unique_string("v1");
+  std::string key2 = make_unique_string("k2");
+  std::string value2 = make_unique_string("v2");
+  std::string key3 = make_unique_string("k3");
+  std::string value3 = make_unique_string("v3");
+
   // Create mock KeyValueIterable instances with the same content but different variables
-  MockKeyValueIterable attributes1({{make_unique_string("k1"), make_unique_string("v1")},
-                                    {make_unique_string("k2"), make_unique_string("v2")}});
-  MockKeyValueIterable attributes2({{make_unique_string("k1"), make_unique_string("v1")},
-                                    {make_unique_string("k2"), make_unique_string("v2")}});
-  MockKeyValueIterable attributes3({{make_unique_string("k1"), make_unique_string("v1")},
-                                    {make_unique_string("k2"), make_unique_string("v2")},
-                                    {make_unique_string("k3"), make_unique_string("v3")}});
+  MockKeyValueIterable attributes1({{key1, value1}, {key2, value2}});
+  MockKeyValueIterable attributes2({{key1, value1}, {key2, value2}});
+  MockKeyValueIterable attributes3({{key1, value1}, {key2, value2}, {key3, value3}});
 
   // Create a callback that filters "k3" key
   auto is_key_filter_k3_callback = [](nostd::string_view key) {
