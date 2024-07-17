@@ -220,7 +220,6 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_DEPRECATED_SDK_FACTORY=OFF \
         -DWITH_OTLP_HTTP_COMPRESSION=ON \
         -DWITH_CONFIGURATION=ON \
         ${IWYU} \
