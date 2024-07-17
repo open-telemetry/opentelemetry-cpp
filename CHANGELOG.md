@@ -15,7 +15,6 @@ Increment the:
 
 ## [Unreleased]
 
-
 ## [1.16.1 2024-07-17]
 
 * [BUILD] Add bazel missing BUILD file
