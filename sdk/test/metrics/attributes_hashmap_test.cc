@@ -101,13 +101,16 @@ TEST(AttributesHashMap, HashWithKeyValueIterable)
     return true;
   };
   // Calculate hash
-  size_t hash1 =
-      opentelemetry::sdk::common::GetHashForAttributeMap(opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes1), is_key_filter_k3_callback);
-  size_t hash2 =
-      opentelemetry::sdk::common::GetHashForAttributeMap(opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes2), is_key_filter_k3_callback);
+  size_t hash1 = opentelemetry::sdk::common::GetHashForAttributeMap(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes1),
+      is_key_filter_k3_callback);
+  size_t hash2 = opentelemetry::sdk::common::GetHashForAttributeMap(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes2),
+      is_key_filter_k3_callback);
 
-  size_t hash3 =
-      opentelemetry::sdk::common::GetHashForAttributeMap(opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes3), is_key_filter_k3_callback);
+  size_t hash3 = opentelemetry::sdk::common::GetHashForAttributeMap(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attributes3),
+      is_key_filter_k3_callback);
 
   // Expect the hashes to be the same because the content is the same
   EXPECT_EQ(hash1, hash2);
