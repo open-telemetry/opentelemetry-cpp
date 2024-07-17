@@ -51,6 +51,9 @@ Increment the:
 * [CI] Enable bzlmod
   [#2995](https://github.com/open-telemetry/opentelemetry-cpp/pull/2995)
 
+* [Metrics SDK] Fix hash calculation for nostd::string
+  [#2999](https://github.com/open-telemetry/opentelemetry-cpp/pull/2999)
+
 Breaking changes:
 
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
