@@ -15,26 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
-* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
-  require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+* [CI] Add a clang-tidy build
+  [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
+
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
 
 Breaking changes:
-
-* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
-  require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
-  * The OTLP HTTP exporter no longer accept options like:
-    * min_TLS = 1.0
-    * min_TLS = 1.1
-    * max_TLS = 1.0
-    * max_TLS = 1.1
-  * When connecting to an OTLP HTTP endpoint, using `https`,
-    the connection will require TLS 1.2 by default,
-    unless min_TLS is set to 1.3
-  * Plain `http` connections (insecure) are not affected.
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
@@ -68,6 +55,60 @@ Breaking changes:
     * All the examples have been updated, and in particular no
       longer perform static_cast do convert an API object to an SDK object.
       Please refer to examples for guidance on how to adjust.
+
+## [1.16.1 2024-07-17]
+
+* [BUILD] Add bazel missing BUILD file
+  [#2720](https://github.com/open-telemetry/opentelemetry-cpp/pull/2720)
+
+* [SDK] Added reserve for spans array in BatchSpanProcessor.
+  [#2724](https://github.com/open-telemetry/opentelemetry-cpp/pull/2724)
+
+* [DOC] Update "Using triplets" section in building-with-vcpkg documentation.
+  [#2726](https://github.com/open-telemetry/opentelemetry-cpp/pull/2726)
+
+* [DOC] Remove comment for unused LoggerProvider initialization params
+  [#2972](https://github.com/open-telemetry/opentelemetry-cpp/pull/2972)
+
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
+
+* [TEST] Fix opentelemetry-collector bind address
+  [#2989](https://github.com/open-telemetry/opentelemetry-cpp/pull/2989)
+
+* [EXPORTER] Fix references in AttributeValueVisitor
+  [#2985](https://github.com/open-telemetry/opentelemetry-cpp/pull/2985)
+
+* [Code health] include-what-you-use cleanup, part 2
+  [#2704](https://github.com/open-telemetry/opentelemetry-cpp/pull/2704)
+
+* [Code Health] clang-tidy cleanup, part 1
+  [#2990](https://github.com/open-telemetry/opentelemetry-cpp/pull/2990)
+
+* [CI] Build failures with ABSEIL 20240116 and CMAKE 3.30
+  [#3002](https://github.com/open-telemetry/opentelemetry-cpp/pull/3002)
+
+* [CI] Enable bzlmod
+  [#2995](https://github.com/open-telemetry/opentelemetry-cpp/pull/2995)
+
+* [Metrics SDK] Fix hash calculation for nostd::string
+  [#2999](https://github.com/open-telemetry/opentelemetry-cpp/pull/2999)
+
+Breaking changes:
+
+* [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
+  require TLS 1.2 or better
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
+  * The OTLP HTTP exporter no longer accept options like:
+    * min_TLS = 1.0
+    * min_TLS = 1.1
+    * max_TLS = 1.0
+    * max_TLS = 1.1
+  * When connecting to an OTLP HTTP endpoint, using `https`,
+    the connection will require TLS 1.2 by default,
+    unless min_TLS is set to 1.3
+  * Plain `http` connections (insecure) are not affected.
 
 ## [1.16.0] 2024-06-21
 

@@ -345,9 +345,12 @@ if(WITH_PROMETHEUS)
     message(STATUS "Trying to use local prometheus-cpp from submodule")
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
       set(SAVED_ENABLE_TESTING ${ENABLE_TESTING})
+      set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
       set(ENABLE_TESTING OFF)
+      set(CMAKE_CXX_CLANG_TIDY "")
       add_subdirectory(third_party/prometheus-cpp)
       set(ENABLE_TESTING ${SAVED_ENABLE_TESTING})
+      set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
     else()
       message(
         FATAL_ERROR
@@ -425,7 +428,10 @@ if(WITH_OTLP_GRPC
   include(CMakeDependentOption)
 
   message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
+  set(SAVED_CMAKE_CXX_CLANG_TIDY ${CMAKE_CXX_CLANG_TIDY})
+  set(CMAKE_CXX_CLANG_TIDY "")
   include(cmake/opentelemetry-proto.cmake)
+  set(CMAKE_CXX_CLANG_TIDY ${SAVED_CMAKE_CXX_CLANG_TIDY})
 endif()
 
 #
