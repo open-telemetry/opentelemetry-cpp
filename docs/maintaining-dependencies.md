@@ -285,9 +285,9 @@ Update the opentelemetry-proto version to the new tag:
 bazel_dep(name = "opentelemetry-proto", version = "1.3.2", repo_name = "com_github_opentelemetry_proto")
 ```
 
-File `MODULE.bazel` is not used in the github CI for repository
+File `MODULE.bazel` is used in the github CI for repository
 opentelemetry-cpp, so using a tag that does not exist (yet) in bazel central
-will not break the CI build.
+will break the CI build.
 
 See the known issues section.
 
@@ -315,12 +315,7 @@ index 7b84c2b7..3161ffb1 100644
 For bazel, two different methods to build exists.
 
 First, the code can build using file `bazel/repository.bzl`.
-This option does not depend on bazel central, and is used in CI today.
+This option does not depend on bazel central.
 
 Secondly, there is also a build using modules, with file `MODULE.bazel`.
-
-Using modules does introduce a dependency on bazel central.
-Users building locally with modules will need the opentelemetry-proto build
-with the new tag to exist in bazel central.
-
-This work with modules is still experimental, and subject to change.
+This option does depend on bazel central, and CI depends on it.
