@@ -159,14 +159,6 @@ message(STATUS "OPENTELEMETRY_VERSION=${OPENTELEMETRY_VERSION}")
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
 
-# This option is temporary, and will be removed. Set
-# WITH_DEPRECATED_SDK_FACTORY=OFF to migrate to the new SDK code.
-option(WITH_DEPRECATED_SDK_FACTORY "Use deprecated SDK provider factory" ON)
-
-if(WITH_DEPRECATED_SDK_FACTORY)
-  message(WARNING "WITH_DEPRECATED_SDK_FACTORY=ON is temporary and deprecated")
-endif()
-
 set(WITH_STL
     "OFF"
     CACHE STRING "Which version of the Standard Library for C++ to use")
@@ -202,13 +194,6 @@ if(NOT WITH_STL STREQUAL "OFF")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
   endif()
-endif()
-
-if(DEFINED WITH_OTLP)
-  message(
-    FATAL_ERROR
-      "WITH_OTLP is deprecated. Please set either WITH_OTLP_GRPC=ON, WITH_OTLP_HTTP=ON, or both to ON."
-  )
 endif()
 
 option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
@@ -293,10 +278,6 @@ option(
   OFF)
 
 option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
-
-if(DEFINED WITH_LOGS_PREVIEW)
-  message(WARNING "WITH_LOGS_PREVIEW is removed because logs signal is stable")
-endif()
 
 option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 
