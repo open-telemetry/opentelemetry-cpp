@@ -20,7 +20,6 @@ using opentelemetry::common::SystemTimestamp;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 namespace trace_api = opentelemetry::trace;
-using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;

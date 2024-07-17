@@ -64,8 +64,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   OtlpHttpMetricExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
-  options.http_headers.insert(
-      std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
+  options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url, false,                 /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
@@ -154,36 +153,37 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+        .WillOnce(
+            [&mock_session](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resourceMetrics"].begin();
-          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-          auto scope            = scope_metrics["scope"];
-          EXPECT_EQ("library_name", scope["name"].get<std::string>());
-          EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+              auto resource_metrics = *check_json["resourceMetrics"].begin();
+              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
+              auto scope            = scope_metrics["scope"];
+              EXPECT_EQ("library_name", scope["name"].get<std::string>());
+              EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          auto metric = *scope_metrics["metrics"].begin();
-          EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
-          EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
-          EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
+              auto metric = *scope_metrics["metrics"].begin();
+              EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
+              EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
+              EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["sum"]["dataPoints"];
-          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
-          EXPECT_EQ(20.0, data_points[1]["asDouble"].get<double>());
+              auto data_points = metric["sum"]["dataPoints"];
+              EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+              EXPECT_EQ(20.0, data_points[1]["asDouble"].get<double>());
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
@@ -237,7 +237,8 @@ public:
 
     EXPECT_CALL(*mock_session, SendRequest)
         .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                          &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
@@ -335,36 +336,37 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+        .WillOnce(
+            [&mock_session](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resourceMetrics"].begin();
-          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-          auto scope            = scope_metrics["scope"];
-          EXPECT_EQ("library_name", scope["name"].get<std::string>());
-          EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+              auto resource_metrics = *check_json["resourceMetrics"].begin();
+              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
+              auto scope            = scope_metrics["scope"];
+              EXPECT_EQ("library_name", scope["name"].get<std::string>());
+              EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          auto metric = *scope_metrics["metrics"].begin();
-          EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
-          EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
-          EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
+              auto metric = *scope_metrics["metrics"].begin();
+              EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
+              EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
+              EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["gauge"]["dataPoints"];
-          EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
-          EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["asInt"]));
+              auto data_points = metric["gauge"]["dataPoints"];
+              EXPECT_EQ(10.0, data_points[0]["asDouble"].get<double>());
+              EXPECT_EQ(20l, JsonToInteger<int64_t>(data_points[1]["asInt"]));
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
@@ -427,7 +429,8 @@ public:
 
     EXPECT_CALL(*mock_session, SendRequest)
         .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                          &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));
@@ -530,71 +533,72 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+        .WillOnce(
+            [&mock_session](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
 
-          auto resource_metrics = *check_json["resourceMetrics"].begin();
-          auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
-          auto scope            = scope_metrics["scope"];
-          EXPECT_EQ("library_name", scope["name"].get<std::string>());
-          EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
+              auto resource_metrics = *check_json["resourceMetrics"].begin();
+              auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
+              auto scope            = scope_metrics["scope"];
+              EXPECT_EQ("library_name", scope["name"].get<std::string>());
+              EXPECT_EQ("1.5.0", scope["version"].get<std::string>());
 
-          auto metric = *scope_metrics["metrics"].begin();
-          EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
-          EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
-          EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
+              auto metric = *scope_metrics["metrics"].begin();
+              EXPECT_EQ("metrics_library_name", metric["name"].get<std::string>());
+              EXPECT_EQ("metrics_description", metric["description"].get<std::string>());
+              EXPECT_EQ("metrics_unit", metric["unit"].get<std::string>());
 
-          auto data_points = metric["histogram"]["dataPoints"];
-          EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[0]["count"]));
-          EXPECT_EQ(900.5, data_points[0]["sum"].get<double>());
-          EXPECT_EQ(1.8, data_points[0]["min"].get<double>());
-          EXPECT_EQ(19, data_points[0]["max"].get<double>());
-          EXPECT_EQ(4, data_points[0]["bucketCounts"].size());
-          if (4 == data_points[0]["bucketCounts"].size())
-          {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][3]));
-          }
-          EXPECT_EQ(3, data_points[0]["explicitBounds"].size());
-          if (3 == data_points[0]["explicitBounds"].size())
-          {
-            EXPECT_EQ(10.1, data_points[0]["explicitBounds"][0].get<double>());
-            EXPECT_EQ(20.2, data_points[0]["explicitBounds"][1].get<double>());
-            EXPECT_EQ(30.2, data_points[0]["explicitBounds"][2].get<double>());
-          }
+              auto data_points = metric["histogram"]["dataPoints"];
+              EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[0]["count"]));
+              EXPECT_EQ(900.5, data_points[0]["sum"].get<double>());
+              EXPECT_EQ(1.8, data_points[0]["min"].get<double>());
+              EXPECT_EQ(19, data_points[0]["max"].get<double>());
+              EXPECT_EQ(4, data_points[0]["bucketCounts"].size());
+              if (4 == data_points[0]["bucketCounts"].size())
+              {
+                EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][0]));
+                EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][1]));
+                EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][2]));
+                EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[0]["bucketCounts"][3]));
+              }
+              EXPECT_EQ(3, data_points[0]["explicitBounds"].size());
+              if (3 == data_points[0]["explicitBounds"].size())
+              {
+                EXPECT_EQ(10.1, data_points[0]["explicitBounds"][0].get<double>());
+                EXPECT_EQ(20.2, data_points[0]["explicitBounds"][1].get<double>());
+                EXPECT_EQ(30.2, data_points[0]["explicitBounds"][2].get<double>());
+              }
 
-          EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[1]["count"]));
-          EXPECT_EQ(900.0, data_points[1]["sum"].get<double>());
-          EXPECT_EQ(4, data_points[1]["bucketCounts"].size());
-          if (4 == data_points[1]["bucketCounts"].size())
-          {
-            EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][0]));
-            EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][1]));
-            EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][2]));
-            EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][3]));
-          }
-          EXPECT_EQ(3, data_points[1]["explicitBounds"].size());
-          if (3 == data_points[1]["explicitBounds"].size())
-          {
-            EXPECT_EQ(10.0, data_points[1]["explicitBounds"][0].get<double>());
-            EXPECT_EQ(20.0, data_points[1]["explicitBounds"][1].get<double>());
-            EXPECT_EQ(30.0, data_points[1]["explicitBounds"][2].get<double>());
-          }
+              EXPECT_EQ(3, JsonToInteger<int64_t>(data_points[1]["count"]));
+              EXPECT_EQ(900.0, data_points[1]["sum"].get<double>());
+              EXPECT_EQ(4, data_points[1]["bucketCounts"].size());
+              if (4 == data_points[1]["bucketCounts"].size())
+              {
+                EXPECT_EQ(200, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][0]));
+                EXPECT_EQ(300, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][1]));
+                EXPECT_EQ(400, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][2]));
+                EXPECT_EQ(500, JsonToInteger<int64_t>(data_points[1]["bucketCounts"][3]));
+              }
+              EXPECT_EQ(3, data_points[1]["explicitBounds"].size());
+              if (3 == data_points[1]["explicitBounds"].size())
+              {
+                EXPECT_EQ(10.0, data_points[1]["explicitBounds"][0].get<double>());
+                EXPECT_EQ(20.0, data_points[1]["explicitBounds"][1].get<double>());
+                EXPECT_EQ(30.0, data_points[1]["explicitBounds"][2].get<double>());
+              }
 
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     auto result = exporter->Export(data);
     EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
@@ -661,7 +665,8 @@ public:
 
     EXPECT_CALL(*mock_session, SendRequest)
         .WillOnce([&mock_session](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+                      const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
+                          &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
           request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                       static_cast<int>(mock_session->GetRequest()->body_.size()));

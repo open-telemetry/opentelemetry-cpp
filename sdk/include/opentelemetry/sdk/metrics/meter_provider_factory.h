@@ -21,30 +21,6 @@ namespace metrics
 class OPENTELEMETRY_EXPORT MeterProviderFactory
 {
 public:
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-
-#  ifndef OPENTELEMETRY_NO_DEPRECATED_CODE
-
-  OPENTELEMETRY_DEPRECATED
-  static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create();
-
-  OPENTELEMETRY_DEPRECATED
-  static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create(
-      std::unique_ptr<ViewRegistry> views);
-
-  OPENTELEMETRY_DEPRECATED
-  static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create(
-      std::unique_ptr<ViewRegistry> views,
-      const opentelemetry::sdk::resource::Resource &resource);
-
-  OPENTELEMETRY_DEPRECATED
-  static std::unique_ptr<opentelemetry::metrics::MeterProvider> Create(
-      std::unique_ptr<sdk::metrics::MeterContext> context);
-
-#  endif /* OPENTELEMETRY_NO_DEPRECATED_CODE */
-
-#else
-
   static std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> Create();
 
   static std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> Create(
@@ -56,8 +32,6 @@ public:
 
   static std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> Create(
       std::unique_ptr<sdk::metrics::MeterContext> context);
-
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 };
 
 }  // namespace metrics
