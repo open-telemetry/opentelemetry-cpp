@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CI] Add a clang-tidy build
+  [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
+
 ## [1.16.1 2024-07-17]
 
 * [BUILD] Add bazel missing BUILD file
