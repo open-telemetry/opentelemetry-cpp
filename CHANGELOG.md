@@ -18,15 +18,45 @@ Increment the:
 
 ## [1.16.1 2024-07-17]
 
+* [BUILD] Add bazel missing BUILD file
+  [#2720](https://github.com/open-telemetry/opentelemetry-cpp/pull/2720)
+
+* [SDK] Added reserve for spans array in BatchSpanProcessor.
+  [#2724](https://github.com/open-telemetry/opentelemetry-cpp/pull/2724)
+
+* [DOC] Update "Using triplets" section in building-with-vcpkg documentation.
+  [#2726](https://github.com/open-telemetry/opentelemetry-cpp/pull/2726)
+
+* [DOC] Remove comment for unused LoggerProvider initialization params
+  [#2972](https://github.com/open-telemetry/opentelemetry-cpp/pull/2972)
+
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
   require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
+
+* [TEST] Fix opentelemetry-collector bind address
+  [#2989](https://github.com/open-telemetry/opentelemetry-cpp/pull/2989)
+
+* [EXPORTER] Fix references in AttributeValueVisitor
+  [#2985](https://github.com/open-telemetry/opentelemetry-cpp/pull/2985)
+
+* [Code health] include-what-you-use cleanup, part 2
+  [#2704](https://github.com/open-telemetry/opentelemetry-cpp/pull/2704)
+
+* [Code Health] clang-tidy cleanup, part 1
+  [#2990](https://github.com/open-telemetry/opentelemetry-cpp/pull/2990)
+
+* [CI] Build failures with ABSEIL 20240116 and CMAKE 3.30
+  [#3002](https://github.com/open-telemetry/opentelemetry-cpp/pull/3002)
+
+* [CI] Enable bzlmod
+  [#2995](https://github.com/open-telemetry/opentelemetry-cpp/pull/2995)
 
 Breaking changes:
 
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
   require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
   * The OTLP HTTP exporter no longer accept options like:
     * min_TLS = 1.0
     * min_TLS = 1.1
