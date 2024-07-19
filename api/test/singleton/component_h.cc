@@ -35,12 +35,13 @@ extern "C"
     __declspec(dllexport)
 
 #else
-// component_h is a shared library (*.so)
-// component_h is compiled with visibility("hidden"),
-__attribute__((visibility("default")))
+    // component_h is a shared library (*.so)
+    // component_h is compiled with visibility("hidden"),
+    __attribute__((visibility("default")))
 #endif
 
-        void do_something_in_h()
+    void
+    do_something_in_h()
 {
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("H::library"));
 

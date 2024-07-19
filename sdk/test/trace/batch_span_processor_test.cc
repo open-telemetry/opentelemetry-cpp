@@ -16,6 +16,7 @@
 #include <list>
 #include <memory>
 #include <thread>
+#include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -32,10 +33,10 @@ public:
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
       const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
-      : spans_received_(spans_received),
-        shut_down_counter_(shut_down_counter),
-        is_shutdown_(is_shutdown),
-        is_export_completed_(is_export_completed),
+      : spans_received_(std::move(spans_received)),
+        shut_down_counter_(std::move(shut_down_counter)),
+        is_shutdown_(std::move(is_shutdown)),
+        is_export_completed_(std::move(is_export_completed)),
         export_delay_(export_delay)
   {}
 
@@ -96,7 +97,7 @@ class BatchSpanProcessorTestPeer : public testing::Test
 {
 public:
   std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> GetTestSpans(
-      std::shared_ptr<sdk::trace::SpanProcessor> processor,
+      const std::shared_ptr<sdk::trace::SpanProcessor> &processor,
       const int num_spans)
   {
     std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> test_spans(

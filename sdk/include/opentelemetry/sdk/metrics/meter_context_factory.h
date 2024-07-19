@@ -3,20 +3,18 @@
 
 #pragma once
 
+#include <memory>
+
+#include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
-// forward declaration
-class MeterContext;
-class ViewRegistry;
 
 /**
  * Factory class for MeterContext.

@@ -62,10 +62,10 @@ public:
   virtual ~Span() = default;
 
   // Not copiable or movable.
-  Span(const Span &) = delete;
-  Span(Span &&)      = delete;
+  Span(const Span &)            = delete;
+  Span(Span &&)                 = delete;
   Span &operator=(const Span &) = delete;
-  Span &operator=(Span &&) = delete;
+  Span &operator=(Span &&)      = delete;
 
   /**
    * Sets an attribute on the Span (ABI).

@@ -3,7 +3,7 @@
 
 #include "opentelemetry/sdk/logs/event_logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"
-#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -11,9 +11,9 @@ namespace sdk
 namespace logs
 {
 
-std::unique_ptr<opentelemetry::logs::EventLoggerProvider> EventLoggerProviderFactory::Create()
+std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider> EventLoggerProviderFactory::Create()
 {
-  return std::unique_ptr<opentelemetry::logs::EventLoggerProvider>(new EventLoggerProvider());
+  return std::unique_ptr<opentelemetry::sdk::logs::EventLoggerProvider>(new EventLoggerProvider());
 }
 
 }  // namespace logs

@@ -3,8 +3,7 @@
 
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-
-namespace trace_api = opentelemetry::trace;
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -8,8 +8,10 @@
 #include <vector>
 
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/version.h"
 
@@ -37,7 +39,7 @@ class TracerContext
 public:
   explicit TracerContext(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor,
-      opentelemetry::sdk::resource::Resource resource =
+      const opentelemetry::sdk::resource::Resource &resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =

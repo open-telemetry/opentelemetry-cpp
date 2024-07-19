@@ -58,7 +58,17 @@ namespace {{class}}
  */
 static constexpr const char *kSchemaUrl = "{{schemaUrl}}";
   {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+{#
+  MAINTAINER:
+  semconv "messaging.client_id" is deprecated
+  semconv "messaging.client.id" is to be used instead
 
+  Now, because we use k{{attribute.fqn | to_camelcase(True)}},
+  both names collide on C++ symbol kMessagingClientId.
+
+  Do not generate code for semconv "messaging.client_id"
+#}
+{%- if (attribute.fqn != "messaging.client_id") %}
 /**
  * {{attribute.brief | render_markdown(code="{{@code {0}}}", paragraph="{0}")}}
   {%- if attribute.note %}
@@ -75,6 +85,7 @@ static constexpr const char *kSchemaUrl = "{{schemaUrl}}";
 OPENTELEMETRY_DEPRECATED
   {%- endif %}
 static constexpr const char *k{{attribute.fqn | to_camelcase(True)}} = "{{attribute.fqn}}";
+{%- endif %}
 {%- endfor %}
 
 // Enum definitions

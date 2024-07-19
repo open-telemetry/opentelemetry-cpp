@@ -3,14 +3,18 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <string>
 #include <unordered_map>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -107,8 +111,8 @@ public:
    * Get attributes of this log.
    * @return the body field of this log
    */
-  virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue>
-      &GetAttributes() const noexcept = 0;
+  virtual const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &
+  GetAttributes() const noexcept = 0;
 
   /**
    * Get resource of this log

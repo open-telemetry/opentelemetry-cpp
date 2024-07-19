@@ -5,7 +5,6 @@
 
 #include <string>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 

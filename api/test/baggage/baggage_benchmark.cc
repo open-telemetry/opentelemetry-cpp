@@ -22,7 +22,7 @@ std::string header_with_custom_entries(size_t num_entries)
   {
     std::string key   = "ADecentlyLargekey" + std::to_string(i);
     std::string value = "ADecentlyLargeValue" + std::to_string(i);
-    header += key + "=" + value;
+    header.append(key).append("=").append(value);
     if (i != num_entries - 1)
     {
       header += ",";

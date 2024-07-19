@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -12,7 +13,6 @@ namespace sdk
 {
 namespace trace
 {
-class Sampler;
 
 /**
  * Factory class for ParentBasedSampler.
@@ -23,7 +23,7 @@ public:
   /**
    * Create a ParentBasedSampler.
    */
-  static std::unique_ptr<Sampler> Create(std::shared_ptr<Sampler> delegate_sampler);
+  static std::unique_ptr<Sampler> Create(const std::shared_ptr<Sampler> &delegate_sampler);
 };
 
 }  // namespace trace

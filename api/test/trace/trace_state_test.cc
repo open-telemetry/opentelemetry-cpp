@@ -20,7 +20,7 @@ const char *kLongString =
 
 // -------------------------- TraceState class tests ---------------------------
 
-std::string create_ts_return_header(std::string header)
+std::string create_ts_return_header(const std::string &header)
 {
   auto ts = TraceState::FromHeader(header);
   return ts->ToHeader();
@@ -34,7 +34,7 @@ std::string header_with_max_members()
   {
     std::string key   = "key" + std::to_string(i);
     std::string value = "value" + std::to_string(i);
-    header += key + "=" + value;
+    header.append(key).append("=").append(value);
     if (i != max_members - 1)
     {
       header += ",";
@@ -177,7 +177,7 @@ TEST(TraceStateTest, MemorySafe)
   nostd::string_view key_string        = "test_key_1test_key_2test_key_3";
   nostd::string_view val_string        = "test_val_1test_val_2test_val_3";
   nostd::string_view keys[kNumPairs]   = {key_string.substr(0, 10), key_string.substr(10, 10),
-                                        key_string.substr(20, 10)};
+                                          key_string.substr(20, 10)};
   nostd::string_view values[kNumPairs] = {val_string.substr(0, 10), val_string.substr(10, 10),
                                           val_string.substr(20, 10)};
 

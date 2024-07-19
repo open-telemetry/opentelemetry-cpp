@@ -11,7 +11,10 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,10 +22,6 @@ namespace sdk
 {
 namespace metrics
 {
-class AggregationConfig;
-class AttributesHashMap;
-class CollectorHandle;
-class MetricData;
 
 struct LastReportedMetrics
 {
@@ -41,7 +40,7 @@ public:
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                     opentelemetry::common::SystemTimestamp sdk_start_ts,
                     opentelemetry::common::SystemTimestamp collection_ts,
-                    std::shared_ptr<AttributesHashMap> delta_metrics,
+                    const std::shared_ptr<AttributesHashMap> &delta_metrics,
                     nostd::function_ref<bool(MetricData)> callback) noexcept;
 
 private:

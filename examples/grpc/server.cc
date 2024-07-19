@@ -27,7 +27,6 @@
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
-using grpc::ServerWriter;
 using grpc::Status;
 
 using grpc_example::Greeter;
@@ -49,7 +48,7 @@ public:
                const GreetRequest *request,
                GreetResponse *response) override
   {
-    for (auto elem : context->client_metadata())
+    for (const auto &elem : context->client_metadata())
     {
       std::cout << "ELEM: " << elem.first << " " << elem.second << "\n";
     }
@@ -68,18 +67,18 @@ public:
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                              {{SemanticConventions::kRpcSystem, "grpc"},
-                                               {SemanticConventions::kRpcService, "GreeterService"},
-                                               {SemanticConventions::kRpcMethod, "Greet"},
-                                               {SemanticConventions::kRpcGrpcStatusCode, 0}},
-                                              options);
+                                                          {{SemanticConventions::kRpcSystem, "grpc"},
+                                                           {SemanticConventions::kRpcService, "GreeterService"},
+                                                           {SemanticConventions::kRpcMethod, "Greet"},
+                                                           {SemanticConventions::kRpcGrpcStatusCode, 0}},
+                                                          options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
     // Fetch and parse whatever HTTP headers we can from the gRPC request.
     span->AddEvent("Processing client attributes");
 
-    std::string req = request->request();
-    std::cout << std::endl << "grpc_client says: " << req << std::endl;
+    const std::string &req = request->request();
+    std::cout << '\n' << "grpc_client says: " << req << '\n';
     std::string message = "The pleasure is mine.";
     // Send response to client
     response->set_response(message);
@@ -102,7 +101,7 @@ void RunServer(uint16_t port)
   builder.AddListeningPort(address, grpc::InsecureServerCredentials());
 
   std::unique_ptr<Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on port: " << address << std::endl;
+  std::cout << "Server listening on port: " << address << '\n';
   server->Wait();
   server->Shutdown();
 }

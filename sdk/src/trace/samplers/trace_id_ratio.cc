@@ -2,11 +2,20 @@
 // Copyright 2017, OpenCensus Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
-
 #include <cmath>
 #include <cstdint>
-#include <stdexcept>
+#include <cstring>
+#include <map>
+#include <memory>
+#include <string>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
 namespace trace_api = opentelemetry::trace;
 

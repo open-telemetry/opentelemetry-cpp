@@ -1,14 +1,33 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter_context.h"
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <mutex>
+#include <ostream>
+#include <ratio>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-#include "opentelemetry/sdk_config.h"
-
-#include <mutex>
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,7 +36,7 @@ namespace metrics
 {
 
 MeterContext::MeterContext(std::unique_ptr<ViewRegistry> views,
-                           opentelemetry::sdk::resource::Resource resource) noexcept
+                           const opentelemetry::sdk::resource::Resource &resource) noexcept
     : resource_{resource}, views_(std::move(views)), sdk_start_ts_{std::chrono::system_clock::now()}
 {}
 
@@ -63,7 +82,7 @@ opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
 
 void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
 {
-  auto collector = std::shared_ptr<MetricCollector>{new MetricCollector(this, reader)};
+  auto collector = std::shared_ptr<MetricCollector>{new MetricCollector(this, std::move(reader))};
   collectors_.push_back(collector);
 }
 
@@ -88,7 +107,7 @@ ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-void MeterContext::AddMeter(std::shared_ptr<Meter> meter)
+void MeterContext::AddMeter(const std::shared_ptr<Meter> &meter)
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
   meters_.push_back(meter);

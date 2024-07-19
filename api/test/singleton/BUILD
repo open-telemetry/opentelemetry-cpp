@@ -1,15 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-DEFAULT_WIN_COPTS = [
-]
-
 # gcc and clang, assumed to be used on this platform
 DEFAULT_NOWIN_COPTS = [
     "-fvisibility=default",
-]
-
-HIDDEN_WIN_COPTS = [
 ]
 
 # gcc and clang, assumed to be used on this platform
@@ -26,6 +20,10 @@ cc_library(
         "component_a.h",
     ],
     linkstatic = True,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -40,6 +38,10 @@ cc_library(
         "component_b.h",
     ],
     linkstatic = True,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -53,11 +55,12 @@ cc_library(
     hdrs = [
         "component_c.h",
     ],
-    copts = select({
-        "//bazel:windows": DEFAULT_WIN_COPTS,
-        "//conditions:default": DEFAULT_NOWIN_COPTS,
-    }),
+    copts = DEFAULT_NOWIN_COPTS,
     linkstatic = False,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -71,11 +74,12 @@ cc_library(
     hdrs = [
         "component_d.h",
     ],
-    copts = select({
-        "//bazel:windows": HIDDEN_WIN_COPTS,
-        "//conditions:default": HIDDEN_NOWIN_COPTS,
-    }),
+    copts = HIDDEN_NOWIN_COPTS,
     linkstatic = False,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -89,11 +93,12 @@ cc_library(
     hdrs = [
         "component_e.h",
     ],
-    copts = select({
-        "//bazel:windows": DEFAULT_WIN_COPTS,
-        "//conditions:default": DEFAULT_NOWIN_COPTS,
-    }),
+    copts = DEFAULT_NOWIN_COPTS,
     linkstatic = False,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -107,11 +112,12 @@ cc_library(
     hdrs = [
         "component_f.h",
     ],
-    copts = select({
-        "//bazel:windows": HIDDEN_WIN_COPTS,
-        "//conditions:default": HIDDEN_NOWIN_COPTS,
-    }),
+    copts = HIDDEN_NOWIN_COPTS,
     linkstatic = False,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -123,11 +129,12 @@ cc_binary(
     srcs = [
         "component_g.cc",
     ],
-    copts = select({
-        "//bazel:windows": DEFAULT_WIN_COPTS,
-        "//conditions:default": DEFAULT_NOWIN_COPTS,
-    }),
+    copts = DEFAULT_NOWIN_COPTS,
     linkshared = True,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -139,11 +146,12 @@ cc_binary(
     srcs = [
         "component_h.cc",
     ],
-    copts = select({
-        "//bazel:windows": HIDDEN_WIN_COPTS,
-        "//conditions:default": HIDDEN_NOWIN_COPTS,
-    }),
+    copts = HIDDEN_NOWIN_COPTS,
     linkshared = True,
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
     ],
@@ -176,6 +184,10 @@ cc_test(
         "api",
         "test",
     ],
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "component_a",
         "component_b",

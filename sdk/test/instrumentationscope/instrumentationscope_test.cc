@@ -22,8 +22,8 @@ TEST(InstrumentationScope, CreateInstrumentationScope)
   auto instrumentation_scope  = InstrumentationScope::Create(
       library_name, library_version, schema_url,
       {{"attribute-key1", "attribute-value"},
-       {"attribute-key2", static_cast<int32_t>(123)},
-       {"attribute-key3", opentelemetry::nostd::span<uint32_t>(attrubite_value3)}});
+        {"attribute-key2", static_cast<int32_t>(123)},
+        {"attribute-key3", opentelemetry::nostd::span<uint32_t>(attrubite_value3)}});
 
   EXPECT_EQ(instrumentation_scope->GetName(), library_name);
   EXPECT_EQ(instrumentation_scope->GetVersion(), library_version);

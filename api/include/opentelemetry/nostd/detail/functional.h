@@ -7,8 +7,11 @@
 
 #include "opentelemetry/version.h"
 
-#define OPENTELEMETRY_RETURN(...) \
-  noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) { return __VA_ARGS__; }
+#define OPENTELEMETRY_RETURN(...)                        \
+  noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) \
+  {                                                      \
+    return __VA_ARGS__;                                  \
+  }
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

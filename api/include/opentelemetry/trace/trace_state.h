@@ -95,7 +95,7 @@ public:
         [&header_s, &first](nostd::string_view key, nostd::string_view value) noexcept {
           if (!first)
           {
-            header_s.append(",");
+            header_s.append(1, kMembersSeparator);
           }
           else
           {

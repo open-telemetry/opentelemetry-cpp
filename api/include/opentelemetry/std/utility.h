@@ -3,6 +3,8 @@
 
 #pragma once
 
+// IWYU pragma: private, include "opentelemetry/nostd/utility.h"
+
 #include <cstddef>
 #include <utility>
 
@@ -54,7 +56,7 @@ auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
 }
 
 template <class T, std::size_t N>
-std::size_t size(T (&/* array */)[N]) noexcept
+std::size_t size(T (& /* array */)[N]) noexcept
 {
   return N;
 }

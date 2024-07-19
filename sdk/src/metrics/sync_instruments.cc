@@ -1,16 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include <stdint.h>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <utility>
 
-#include <cmath>
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
+LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
                          std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {
@@ -70,7 +80,7 @@ void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &con
   return storage_->RecordLong(value, context);
 }
 
-DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
+DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
                              std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {
@@ -154,7 +164,7 @@ void DoubleCounter::Add(double value, const opentelemetry::context::Context &con
   return storage_->RecordDouble(value, context);
 }
 
-LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
+LongUpDownCounter::LongUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                                      std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {
@@ -218,7 +228,7 @@ void LongUpDownCounter::Add(int64_t value, const opentelemetry::context::Context
   return storage_->RecordLong(value, context);
 }
 
-DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
+DoubleUpDownCounter::DoubleUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                                          std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {
@@ -282,7 +292,7 @@ void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Contex
   return storage_->RecordDouble(value, context);
 }
 
-LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
+LongHistogram::LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                              std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {
@@ -345,7 +355,7 @@ void LongHistogram::Record(uint64_t value) noexcept
 }
 #endif
 
-DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
+DoubleHistogram::DoubleHistogram(const InstrumentDescriptor &instrument_descriptor,
                                  std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
 {

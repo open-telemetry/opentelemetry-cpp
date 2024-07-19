@@ -1,20 +1,38 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include <stdint.h>
+#include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
+#include "opentelemetry/exporters/ostream/log_record_exporter.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
-#include <iostream>
-#include <mutex>
-#include <type_traits>
-
-namespace nostd     = opentelemetry::nostd;
 namespace sdklogs   = opentelemetry::sdk::logs;
 namespace sdkcommon = opentelemetry::sdk::common;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -33,7 +51,7 @@ std::unique_ptr<sdklogs::Recordable> OStreamLogRecordExporter::MakeRecordable() 
 }
 
 sdk::common::ExportResult OStreamLogRecordExporter::Export(
-    const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
+    const opentelemetry::nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   if (isShutdown())
   {
@@ -57,11 +75,11 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
 
     // Convert trace, spanid, traceflags into exportable representation
     constexpr int trace_id_len    = 32;
-    constexpr int span_id__len    = 16;
+    constexpr int span_id_len     = 16;
     constexpr int trace_flags_len = 2;
 
     char trace_id[trace_id_len]       = {0};
-    char span_id[span_id__len]        = {0};
+    char span_id[span_id_len]         = {0};
     char trace_flags[trace_flags_len] = {0};
 
     log_record->GetTraceId().ToLowerBase16(trace_id);
@@ -102,7 +120,7 @@ sdk::common::ExportResult OStreamLogRecordExporter::Export(
           << "  event_id           : " << event_id << "\n"
           << "  event_name         : " << log_record->GetEventName() << "\n"
           << "  trace_id           : " << std::string(trace_id, trace_id_len) << "\n"
-          << "  span_id            : " << std::string(span_id, span_id__len) << "\n"
+          << "  span_id            : " << std::string(span_id, span_id_len) << "\n"
           << "  trace_flags        : " << std::string(trace_flags, trace_flags_len) << "\n"
           << "  scope              : \n"
           << "    name             : " << log_record->GetInstrumentationScope().GetName() << "\n"
@@ -137,7 +155,7 @@ bool OStreamLogRecordExporter::isShutdown() const noexcept
 
 void OStreamLogRecordExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
-    const std::string prefix)
+    const std::string &prefix)
 {
   for (const auto &kv : map)
   {
@@ -148,7 +166,7 @@ void OStreamLogRecordExporter::printAttributes(
 
 void OStreamLogRecordExporter::printAttributes(
     const std::unordered_map<std::string, opentelemetry::common::AttributeValue> &map,
-    const std::string prefix)
+    const std::string &prefix)
 {
   for (const auto &kv : map)
   {

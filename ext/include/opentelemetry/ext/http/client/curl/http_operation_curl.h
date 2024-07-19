@@ -70,7 +70,7 @@ struct HttpCurlEasyResource
     return *this;
   }
 
-  HttpCurlEasyResource(const HttpCurlEasyResource &other) = delete;
+  HttpCurlEasyResource(const HttpCurlEasyResource &other)            = delete;
   HttpCurlEasyResource &operator=(const HttpCurlEasyResource &other) = delete;
 };
 
@@ -124,7 +124,8 @@ private:
                                 double ulnow);
 #endif
 public:
-  void DispatchEvent(opentelemetry::ext::http::client::SessionState type, std::string reason = "");
+  void DispatchEvent(opentelemetry::ext::http::client::SessionState type,
+                     const std::string &reason = "");
 
   /**
    * Create local CURL instance for url and body

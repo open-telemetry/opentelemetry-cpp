@@ -141,8 +141,8 @@ TEST(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
   options.references             = {{opentracing::SpanReferenceType::FollowsFromRef, nullptr},
-                        {opentracing::SpanReferenceType::ChildOfRef, span_context},
-                        {opentracing::SpanReferenceType::ChildOfRef, nullptr}};
+                                    {opentracing::SpanReferenceType::ChildOfRef, span_context},
+                                    {opentracing::SpanReferenceType::ChildOfRef, nullptr}};
 
   auto options_shim = shim::utils::makeOptionsShim(options);
   ASSERT_EQ(options_shim.start_system_time,
@@ -162,7 +162,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_FirstInList)
   options.start_system_timestamp = opentracing::SystemTime::time_point::clock::now();
   options.start_steady_timestamp = opentracing::SteadyTime::time_point::clock::now();
   options.references             = {{opentracing::SpanReferenceType::FollowsFromRef, span_context},
-                        {opentracing::SpanReferenceType::FollowsFromRef, nullptr}};
+                                    {opentracing::SpanReferenceType::FollowsFromRef, nullptr}};
 
   auto options_shim = shim::utils::makeOptionsShim(options);
   ASSERT_EQ(options_shim.start_system_time,

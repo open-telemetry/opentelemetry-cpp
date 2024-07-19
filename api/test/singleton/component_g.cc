@@ -34,7 +34,8 @@ extern "C"
     __declspec(dllexport)
 #endif
 
-        void do_something_in_g()
+    void
+    do_something_in_g()
 {
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("G::library"));
 

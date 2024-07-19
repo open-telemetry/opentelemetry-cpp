@@ -73,8 +73,8 @@ private:
     return provider;
   }
 
-  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<EventLoggerProvider>
-      &GetEventProvider() noexcept
+  OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<EventLoggerProvider> &
+  GetEventProvider() noexcept
   {
     static nostd::shared_ptr<EventLoggerProvider> provider(new NoopEventLoggerProvider);
     return provider;

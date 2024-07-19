@@ -1,13 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#include <stdint.h>
+#include <memory>
+#include <mutex>
+#include <utility>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/version.h"
-
-#include <iostream>
-#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

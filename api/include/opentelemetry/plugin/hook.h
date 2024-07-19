@@ -16,13 +16,13 @@
  * library and a dynamically loaded plugin. The weak linkage allows for multiple implementations to
  * be linked in without getting multiple definition errors.
  */
-#  define OPENTELEMETRY_DEFINE_PLUGIN_HOOK(X)                                            \
-    extern "C" {                                                                         \
-    extern __declspec(dllexport)                                                         \
-        opentelemetry::plugin::OpenTelemetryHook const OpenTelemetryMakeFactoryImpl;     \
-                                                                                         \
-    __declspec(selectany)                                                                \
-        opentelemetry::plugin::OpenTelemetryHook const OpenTelemetryMakeFactoryImpl = X; \
+#  define OPENTELEMETRY_DEFINE_PLUGIN_HOOK(X)                                   \
+    extern "C" {                                                                \
+    extern __declspec(dllexport) opentelemetry::plugin::OpenTelemetryHook const \
+        OpenTelemetryMakeFactoryImpl;                                           \
+                                                                                \
+    __declspec(selectany) opentelemetry::plugin::OpenTelemetryHook const        \
+        OpenTelemetryMakeFactoryImpl = X;                                       \
     }  // extern "C"
 
 #else

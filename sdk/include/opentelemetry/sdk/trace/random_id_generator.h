@@ -4,6 +4,8 @@
 #pragma once
 
 #include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

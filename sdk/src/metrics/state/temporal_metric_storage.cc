@@ -1,16 +1,30 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include <algorithm>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-
-#include <cstddef>
-#include <mutex>
-#include <utility>
+#include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -21,7 +35,7 @@ namespace metrics
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                                              AggregationType aggregation_type,
                                              const AggregationConfig *aggregation_config)
-    : instrument_descriptor_(instrument_descriptor),
+    : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
       aggregation_config_(aggregation_config)
 {}
@@ -30,7 +44,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                                          opentelemetry::common::SystemTimestamp sdk_start_ts,
                                          opentelemetry::common::SystemTimestamp collection_ts,
-                                         std::shared_ptr<AttributesHashMap> delta_metrics,
+                                         const std::shared_ptr<AttributesHashMap> &delta_metrics,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);

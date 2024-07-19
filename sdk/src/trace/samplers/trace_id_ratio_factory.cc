@@ -2,10 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
-#include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
-
-namespace trace_api = opentelemetry::trace;
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

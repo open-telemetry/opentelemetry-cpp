@@ -3,8 +3,12 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <memory>
+#include <utility>
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -16,9 +20,6 @@ namespace sdk
 {
 namespace metrics
 {
-
-// forward declaration
-class SyncWritableMetricStorage;
 
 class Synchronous
 {
@@ -36,7 +37,7 @@ protected:
 class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<uint64_t>
 {
 public:
-  LongCounter(InstrumentDescriptor instrument_descriptor,
+  LongCounter(const InstrumentDescriptor &instrument_descriptor,
               std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(uint64_t value,
@@ -55,7 +56,7 @@ class DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter
 {
 
 public:
-  DoubleCounter(InstrumentDescriptor instrument_descriptor,
+  DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
                 std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(double value,
@@ -71,7 +72,7 @@ public:
 class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<int64_t>
 {
 public:
-  LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
+  LongUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                     std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(int64_t value,
@@ -87,7 +88,7 @@ public:
 class DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
-  DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
+  DoubleUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
                       std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Add(double value,
@@ -103,7 +104,7 @@ public:
 class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
 {
 public:
-  LongHistogram(InstrumentDescriptor instrument_descriptor,
+  LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                 std::unique_ptr<SyncWritableMetricStorage> storage);
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -123,7 +124,7 @@ public:
 class DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
-  DoubleHistogram(InstrumentDescriptor instrument_descriptor,
+  DoubleHistogram(const InstrumentDescriptor &instrument_descriptor,
                   std::unique_ptr<SyncWritableMetricStorage> storage);
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2

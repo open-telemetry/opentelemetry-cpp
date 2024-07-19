@@ -3,16 +3,34 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
-#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
-#include "opentelemetry/proto/metrics/v1/metrics.pb.h"
-#include "opentelemetry/proto/resource/v1/resource.pb.h"
-
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/version.h"
+
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/metrics/v1/metrics.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
+
+namespace opentelemetry
+{
+namespace proto
+{
+namespace collector
+{
+namespace metrics
+{
+namespace v1
+{
+class ExportMetricsServiceRequest;
+}
+}  // namespace metrics
+}  // namespace collector
+}  // namespace proto
+}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

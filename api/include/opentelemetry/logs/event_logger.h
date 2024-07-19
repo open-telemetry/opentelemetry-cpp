@@ -56,7 +56,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitEvent(nostd::string_view event_name, ArgumentType &&... args)
+  void EmitEvent(nostd::string_view event_name, ArgumentType &&...args)
   {
     nostd::shared_ptr<Logger> delegate_logger = GetDelegateLogger();
     if (!delegate_logger)

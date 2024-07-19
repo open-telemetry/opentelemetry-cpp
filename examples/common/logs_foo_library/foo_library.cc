@@ -1,25 +1,31 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <map>
-#include <string>
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/scope.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 namespace logs  = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
-namespace nostd = opentelemetry::nostd;
 
 namespace
 {
-nostd::shared_ptr<trace::Tracer> get_tracer()
+opentelemetry::nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   auto provider = trace::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library", OPENTELEMETRY_SDK_VERSION);
 }
 
-nostd::shared_ptr<logs::Logger> get_logger()
+opentelemetry::nostd::shared_ptr<logs::Logger> get_logger()
 {
   auto provider = logs::Provider::GetLoggerProvider();
   return provider->GetLogger("foo_library_logger", "foo_library");

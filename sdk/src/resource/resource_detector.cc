@@ -5,9 +5,12 @@
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/version.h"
 
+#include <stddef.h>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -63,7 +63,7 @@ TEST(SharedPtrTest, MoveConstruction)
   auto value = new int{123};
   shared_ptr<int> ptr1{value};
   shared_ptr<int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
@@ -72,7 +72,7 @@ TEST(SharedPtrTest, MoveConstructionFromDifferentType)
   auto value = new int{123};
   shared_ptr<int> ptr1{value};
   shared_ptr<const int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
@@ -81,14 +81,14 @@ TEST(SharedPtrTest, MoveConstructionFromStdSharedPtr)
   auto value = new int{123};
   std::shared_ptr<int> ptr1{value};
   shared_ptr<int> ptr2{std::move(ptr1)};
-  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr1.get(), nullptr);  // NOLINT
   EXPECT_EQ(ptr2.get(), value);
 }
 
 TEST(SharedPtrTest, Destruction)
 {
   bool was_destructed;
-  shared_ptr<A>{new A{was_destructed}};
+  shared_ptr<A>{new A{was_destructed}};  // NOLINT
   EXPECT_TRUE(was_destructed);
 }
 
@@ -129,8 +129,7 @@ TEST(SharedPtrTest, PointerOperators)
   shared_ptr<int> ptr1{value};
 
   EXPECT_EQ(&*ptr1, value);
-  EXPECT_EQ(
-      shared_ptr<B> { new B }->f(), 123);
+  EXPECT_EQ(shared_ptr<B> { new B } -> f(), 123);
 }
 
 TEST(SharedPtrTest, Swap)
@@ -174,7 +173,7 @@ static void SharedPtrTest_Sort(size_t size = 10)
   auto nums2 = nums;
 
   std::sort(nums.begin(), nums.end(),
-            [](shared_ptr<const int> a, shared_ptr<const int> b) { return *a < *b; });
+            [](const shared_ptr<const int> &a, const shared_ptr<const int> &b) { return *a < *b; });
 
   EXPECT_NE(nums, nums2);
 

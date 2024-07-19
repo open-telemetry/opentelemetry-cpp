@@ -16,7 +16,7 @@ namespace logs
 {
 void ElasticSearchRecordable::WriteKeyValue(nostd::string_view key,
                                             const opentelemetry::common::AttributeValue &value,
-                                            std::string name)
+                                            const std::string &name)
 {
   switch (value.index())
   {
@@ -53,7 +53,7 @@ void ElasticSearchRecordable::WriteKeyValue(nostd::string_view key,
 void ElasticSearchRecordable::WriteKeyValue(
     nostd::string_view key,
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    std::string name)
+    const std::string &name)
 {
   namespace common = opentelemetry::sdk::common;
   switch (value.index())
@@ -85,7 +85,7 @@ void ElasticSearchRecordable::WriteKeyValue(
 }
 
 void ElasticSearchRecordable::WriteValue(const opentelemetry::common::AttributeValue &value,
-                                         std::string name)
+                                         const std::string &name)
 {
 
   // Assert size of variant to ensure that this method gets updated if the variant
