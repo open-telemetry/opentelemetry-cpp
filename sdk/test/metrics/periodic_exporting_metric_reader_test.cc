@@ -7,6 +7,10 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
+#include <memory>
+#include <thread>
+
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
@@ -14,8 +18,14 @@ using namespace opentelemetry::sdk::metrics;
 class MockPushMetricExporter : public PushMetricExporter
 {
 public:
+  MockPushMetricExporter(std::chrono::milliseconds wait) : wait_(wait) {}
+
   opentelemetry::sdk::common::ExportResult Export(const ResourceMetrics &record) noexcept override
   {
+    if (wait_ > std::chrono::milliseconds::zero())
+    {
+      std::this_thread::sleep_for(wait_);
+    }
     records_.push_back(record);
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
@@ -34,6 +44,7 @@ public:
 
 private:
   std::vector<ResourceMetrics> records_;
+  std::chrono::milliseconds wait_;
 };
 
 class MockMetricProducer : public MetricProducer
@@ -61,17 +72,34 @@ private:
 
 TEST(PeriodicExporingMetricReader, BasicTests)
 {
-  std::unique_ptr<PushMetricExporter> exporter(new MockPushMetricExporter());
+  std::unique_ptr<PushMetricExporter> exporter(
+      new MockPushMetricExporter(std::chrono::milliseconds{0}));
   PeriodicExportingMetricReaderOptions options;
   options.export_timeout_millis  = std::chrono::milliseconds(200);
   options.export_interval_millis = std::chrono::milliseconds(500);
   auto exporter_ptr              = exporter.get();
-  PeriodicExportingMetricReader reader(std::move(exporter), options);
+  std::shared_ptr<PeriodicExportingMetricReader> reader =
+      std::make_shared<PeriodicExportingMetricReader>(std::move(exporter), options);
   MockMetricProducer producer;
-  reader.SetMetricProducer(&producer);
+  reader->SetMetricProducer(&producer);
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  EXPECT_NO_THROW(reader.ForceFlush());
-  reader.Shutdown();
+  EXPECT_NO_THROW(reader->ForceFlush());
+  reader->Shutdown();
   EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());
+}
+
+TEST(PeriodicExporingMetricReader, Timeout)
+{
+  std::unique_ptr<PushMetricExporter> exporter(
+      new MockPushMetricExporter(std::chrono::milliseconds{2000}));
+  PeriodicExportingMetricReaderOptions options;
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(500);
+  std::shared_ptr<PeriodicExportingMetricReader> reader =
+      std::make_shared<PeriodicExportingMetricReader>(std::move(exporter), options);
+  MockMetricProducer producer;
+  reader->SetMetricProducer(&producer);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  reader->Shutdown();
 }
