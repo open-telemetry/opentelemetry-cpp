@@ -15,8 +15,6 @@
 // clang-format on
 
 #include "google/protobuf/message.h"
-#include "google/protobuf/reflection.h"
-#include "google/protobuf/stubs/common.h"
 #include "nlohmann/json.hpp"
 
 // clang-format off
@@ -28,15 +26,26 @@
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strcasecmp _stricmp
+#else
+#  include <strings.h>
+#endif
+
+#include <limits.h>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <fstream>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #if !defined(__CYGWIN__) && defined(_WIN32)
@@ -64,11 +73,8 @@
 
 #else
 
-#  include <dirent.h>
-#  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)
@@ -87,10 +93,6 @@
 
 #ifdef GetMessage
 #  undef GetMessage
-#endif
-
-#ifdef _MSC_VER
-#  define strcasecmp _stricmp
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \

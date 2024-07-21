@@ -15,6 +15,8 @@ common --noexperimental_merged_skyframe_analysis_execution
 
 common --nolegacy_external_runfiles
 common --skip_incompatible_explicit_targets
+
+# Enable automatic configs based on platform
 common --enable_platform_specific_config
 common --enable_runfiles
 

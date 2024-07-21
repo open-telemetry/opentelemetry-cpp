@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "opentelemetry/version.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -27,6 +28,10 @@
 #  include <future>
 #else
 #  include <future>
+#endif
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -90,31 +95,61 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 bool PeriodicExportingMetricReader::CollectAndExportOnce()
 {
   std::atomic<bool> cancel_export_for_timeout{false};
-  auto future_receive = std::async(std::launch::async, [this, &cancel_export_for_timeout] {
-    Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-      if (cancel_export_for_timeout)
-      {
-        OTEL_INTERNAL_LOG_ERROR(
-            "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-            << export_timeout_millis_.count() << " ms, and timed out");
-        return false;
-      }
-      this->exporter_->Export(metric_data);
-      return true;
-    });
-  });
 
-  std::future_status status;
   std::uint64_t notify_force_flush = force_flush_pending_sequence_.load(std::memory_order_acquire);
-  do
+  std::unique_ptr<std::thread> task_thread;
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
   {
-    status = future_receive.wait_for(std::chrono::milliseconds(export_timeout_millis_));
-    if (status == std::future_status::timeout)
+#endif
+    std::promise<void> sender;
+    auto receiver = sender.get_future();
+
+    task_thread.reset(new std::thread([this, &cancel_export_for_timeout] {
+      this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
+        if (cancel_export_for_timeout.load(std::memory_order_acquire))
+        {
+          OTEL_INTERNAL_LOG_ERROR(
+              "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+              << this->export_timeout_millis_.count() << " ms, and timed out");
+          return false;
+        }
+        this->exporter_->Export(metric_data);
+        return true;
+      });
+    }));
+
+    std::future_status status;
+    do
     {
-      cancel_export_for_timeout = true;
-      break;
-    }
-  } while (status != std::future_status::ready);
+      status = receiver.wait_for(std::chrono::milliseconds(export_timeout_millis_));
+      if (status == std::future_status::timeout)
+      {
+        cancel_export_for_timeout.store(true, std::memory_order_release);
+        break;
+      }
+    } while (status != std::future_status::ready);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Periodic Exporting Metric Reader] Collect failed with exception "
+                            << e.what());
+    return false;
+  }
+  catch (...)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Periodic Exporting Metric Reader] Collect failed with unknown exception");
+    return false;
+  }
+#endif
+
+  if (task_thread && task_thread->joinable())
+  {
+    task_thread->join();
+  }
 
   std::uint64_t notified_sequence = force_flush_notified_sequence_.load(std::memory_order_acquire);
   while (notify_force_flush > notified_sequence)

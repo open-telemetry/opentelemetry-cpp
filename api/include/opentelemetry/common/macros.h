@@ -389,6 +389,37 @@ point.
 
 #define OPENTELEMETRY_EXPORT_TYPE OPENTELEMETRY_EXPORT
 
+// OPENTELEMETRY_HAVE_EXCEPTIONS
+//
+// Checks whether the compiler both supports and enables exceptions. Many
+// compilers support a "no exceptions" mode that disables exceptions.
+//
+// Generally, when OPENTELEMETRY_HAVE_EXCEPTIONS is not defined:
+//
+// * Code using `throw` and `try` may not compile.
+// * The `noexcept` specifier will still compile and behave as normal.
+// * The `noexcept` operator may still return `false`.
+//
+// For further details, consult the compiler's documentation.
+#ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
+#  if defined(__clang__) && ((__clang_major__ * 100) + __clang_minor__) < 306
+// Clang < 3.6
+// http://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
+#    if defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+#      define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+#    endif  // defined(__EXCEPTIONS) && OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+#  elif OPENTELEMETRY_HAVE_FEATURE(cxx_exceptions)
+#    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+// Handle remaining special cases and default to exceptions being supported.
+#  elif !(defined(__GNUC__) && !defined(__EXCEPTIONS) && !defined(__cpp_exceptions)) && \
+      !(defined(_MSC_VER) && !defined(_CPPUNWIND))
+#    define OPENTELEMETRY_HAVE_EXCEPTIONS 1
+#  endif
+#endif
+#ifndef OPENTELEMETRY_HAVE_EXCEPTIONS
+#  define OPENTELEMETRY_HAVE_EXCEPTIONS 0
+#endif
+
 /*
    OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND indicates that a resource owned by a function
    parameter or implicit object parameter is retained by the return value of the
@@ -529,6 +560,8 @@ point.
 //  We ensure that this is defined to a value of, as its gets encoded down in the detect_mismatch
 #   undef OPENTELEMETRY_RTTI_ENABLED
 #   define OPENTELEMETRY_RTTI_ENABLED 1
+#   undef OPENTELEMETRY_HAVE_EXCEPTIONS
+#   define OPENTELEMETRY_HAVE_EXCEPTIONS 1
 //
 #   undef OPENTELEMETRY_EXPORT
 #   undef OPENTELEMETRY_EXPORT_TYPE
@@ -547,7 +580,6 @@ point.
 #     define OPENTELEMETRY_EXPORT_TYPE OPENTELEMETRY_EXPORT
 #     define OPENTELEMETRY_LOCAL_SYMBOL
 #  else
-#    error 1
 #     define OPENTELEMETRY_EXPORT __attribute__((visibility("default")))
 #     if defined(__clang__)
 #        define OPENTELEMETRY_EXPORT_TYPE __attribute__((type_visibility("default")))
