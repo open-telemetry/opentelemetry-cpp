@@ -39,8 +39,12 @@ build:macos --host_cxxopt=-std=c++17 --cxxopt=-std=c++17
 build:linux --host_cxxopt=-std=c++17 --cxxopt=-std=c++17
 build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 
-# build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden --dynamic_mode=off
+#build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 build:linux --dynamic_mode=off --fission=yes --copt=-g 
+
+#build:macos --cxxopt=-fvisibility=hidden
+#build:macos --copt=-fvisibility=hidden
+build:macos --dynamic_mode=off --fission=yes --copt=-g 
 
 # --config=asan : Address Sanitizer.
 common:asan --copt -DADDRESS_SANITIZER
