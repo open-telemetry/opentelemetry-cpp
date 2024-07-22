@@ -1,6 +1,6 @@
 module(
     name = "opentelemetry-cpp",
-    version = "1.16.0-dll",
+    version = "1.16.1-dll",
     repo_name = "io_opentelemetry_cpp",
 )
 

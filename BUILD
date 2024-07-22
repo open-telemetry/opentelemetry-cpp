@@ -31,7 +31,7 @@ otel_cc_library(
 )
 
 # TODO: Version needs to be updated better here.
-otel_sdk_prefix = "otel_sdk/" + "1.16.0" + "/"
+otel_sdk_prefix = "otel_sdk/" + "1.16.1" + "/"
 
 # Build configuration settings mimicking MSVC: debug=dbg, release=opt, reldeb=fastbuild
 config_setting(
