@@ -189,26 +189,13 @@ alias(
 
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
 [otel_cc_import(
-    name = otel_sdk_binary + "_import",
+    name = otel_sdk_binary + "_dll", #"_import",
     data = select({
         "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
         "//conditions:default": None,
     }),
     interface_library = otel_sdk_binary + "_lib_file",
     shared_library = otel_sdk_binary,
-    visibility = ["//visibility:private"],
-) for otel_sdk_binary in [
-    "otel_sdk_r",
-    "otel_sdk_d",
-    "otel_sdk_rd",
-]]
-
-# Present the import library above as otel_cc_library so we can add headers to it, force defines, and make it public.
-[otel_cc_library(
-    name = otel_sdk_binary + "_dll",
-    implementation_deps = [
-        otel_sdk_binary + "_import",  # The otel_sdk.dll, .lib and .pdb files
-    ],
     visibility = ["//visibility:public"],
     deps = [
         "//api:headers",
