@@ -40,7 +40,6 @@ jobs:
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
             -DBUILD_TESTING=ON \
-            -DWITH_DEPRECATED_SDK_FACTORY=OFF \
             -DBUILD_W3CTRACECONTEXT_TEST=ON \
             -DWITH_OTLP_GRPC=OFF \
             -DWITH_OTLP_HTTP=ON \

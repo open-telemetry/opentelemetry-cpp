@@ -11,8 +11,8 @@ $nproc = (Get-ComputerInfo).CsNumberOfLogicalProcessors
 $SRC_DIR = (Get-Item -Path ".\").FullName
 
 # Workaround https://github.com/bazelbuild/bazel/issues/18683
-$BAZEL_STARTUP_OPTIONS = "--output_base=C:\Out"
-$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT"
+$BAZEL_STARTUP_OPTIONS = "--output_base=C:\O"
+$BAZEL_OPTIONS = "--copt=-DENABLE_ASYNC_EXPORT --compilation_mode=dbg"
 $BAZEL_TEST_OPTIONS = "$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
@@ -135,7 +135,6 @@ switch ($action) {
     cmake $SRC_DIR `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_DEPRECATED_SDK_FACTORY=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -160,7 +159,6 @@ switch ($action) {
       -DCMAKE_CXX_STANDARD=20 `
       -DOTELCPP_MAINTAINER_MODE=ON `
       -DWITH_NO_DEPRECATED_CODE=ON `
-      -DWITH_DEPRECATED_SDK_FACTORY=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
