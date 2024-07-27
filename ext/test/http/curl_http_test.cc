@@ -26,11 +26,11 @@ namespace nostd       = opentelemetry::nostd;
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
-  virtual void OnResponse(http_client::Response & /* response */) noexcept override
+  void OnResponse(http_client::Response & /* response */) noexcept override
   {
     got_response_ = true;
   }
-  virtual void OnEvent(http_client::SessionState state,
+  void OnEvent(http_client::SessionState state,
                        nostd::string_view /* reason */) noexcept override
   {
     switch (state)
@@ -113,7 +113,7 @@ protected:
 public:
   BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
 
-  virtual void SetUp() override
+  void SetUp() override
   {
     if (is_setup_.exchange(true))
     {
@@ -132,7 +132,7 @@ public:
     is_running_ = true;
   }
 
-  virtual void TearDown() override
+  void TearDown() override
   {
     if (!is_setup_.exchange(false))
       return;
@@ -140,7 +140,7 @@ public:
     is_running_ = false;
   }
 
-  virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
+  int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                             HTTP_SERVER_NS::HttpResponse &response) override
   {
     int response_status = 404;

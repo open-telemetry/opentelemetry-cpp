@@ -15,13 +15,13 @@ namespace exporter
 namespace otlp
 {
 
-OtlpHttpExporterOptions::OtlpHttpExporterOptions()
+OtlpHttpExporterOptions::OtlpHttpExporterOptions() : json_bytes_mapping(JsonBytesMappingKind::kHexId), use_json_name(false), console_debug(false), ssl_insecure_skip_verify(false)
 {
   url                = GetOtlpDefaultHttpTracesEndpoint();
   content_type       = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpTracesProtocol());
-  json_bytes_mapping = JsonBytesMappingKind::kHexId;
-  use_json_name      = false;
-  console_debug      = false;
+  
+  
+  
   timeout            = GetOtlpDefaultTracesTimeout();
   http_headers       = GetOtlpDefaultTracesHeaders();
 

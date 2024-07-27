@@ -966,7 +966,7 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
 public:
   explicit OtlpFileSystemBackend(const OtlpFileClientFileSystemOptions &options)
-      : options_(options), is_initialized_{false}, check_file_path_interval_{0}
+      : options_(options), is_initialized_{false} 
   {
     file_ = std::make_shared<FileStats>();
     file_->is_shutdown.store(false);
@@ -1539,7 +1539,7 @@ private:
   std::shared_ptr<FileStats> file_;
 
   std::atomic<bool> is_initialized_;
-  std::time_t check_file_path_interval_;
+  std::time_t check_file_path_interval_{0};
 };
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileOstreamBackend : public OtlpFileAppender

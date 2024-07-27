@@ -51,7 +51,7 @@ class MockMetricProducer : public MetricProducer
 {
 public:
   MockMetricProducer(std::chrono::microseconds sleep_ms = std::chrono::microseconds::zero())
-      : sleep_ms_{sleep_ms}, data_sent_size_(0)
+      : sleep_ms_{sleep_ms} 
   {}
 
   bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override
@@ -67,7 +67,7 @@ public:
 
 private:
   std::chrono::microseconds sleep_ms_;
-  size_t data_sent_size_;
+  size_t data_sent_size_{0};
 };
 
 TEST(PeriodicExporingMetricReader, BasicTests)

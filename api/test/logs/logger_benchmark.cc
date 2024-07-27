@@ -32,7 +32,7 @@ constexpr int64_t kMaxIterations = 1000000000;
 class Barrier
 {
 public:
-  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
+  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount) {}
 
   void Wait()
   {
@@ -55,7 +55,7 @@ private:
   std::condition_variable mCond;
   std::size_t mThreshold;
   std::size_t mCount;
-  std::size_t mGeneration;
+  std::size_t mGeneration{0};
 };
 
 static void ThreadRoutine(Barrier &barrier,
