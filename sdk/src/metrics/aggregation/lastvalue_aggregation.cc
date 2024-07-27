@@ -28,9 +28,7 @@ LongLastValueAggregation::LongLastValueAggregation()
   point_data_.value_              = static_cast<int64_t>(0);
 }
 
-LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data)
-    : point_data_{data}
-{}
+LongLastValueAggregation::LongLastValueAggregation(LastValuePointData &&data) : point_data_{data} {}
 
 LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &data)
     : point_data_{data}

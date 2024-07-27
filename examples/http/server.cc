@@ -22,7 +22,7 @@ class RequestHandler : public HTTP_SERVER_NS::HttpRequestCallback
 {
 public:
   int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
-                            HTTP_SERVER_NS::HttpResponse &response) override
+                    HTTP_SERVER_NS::HttpResponse &response) override
   {
     StartSpanOptions options;
     options.kind          = SpanKind::kServer;  // server

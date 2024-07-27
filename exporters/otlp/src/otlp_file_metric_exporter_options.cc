@@ -12,7 +12,8 @@ namespace exporter
 namespace otlp
 {
 
-OtlpFileMetricExporterOptions::OtlpFileMetricExporterOptions() : aggregation_temporality(PreferredAggregationTemporality::kCumulative)
+OtlpFileMetricExporterOptions::OtlpFileMetricExporterOptions()
+    : aggregation_temporality(PreferredAggregationTemporality::kCumulative)
 {
   console_debug = false;
 
@@ -25,8 +26,6 @@ OtlpFileMetricExporterOptions::OtlpFileMetricExporterOptions() : aggregation_tem
   fs_options.rotate_size    = 10;
 
   backend_options = fs_options;
-
-  
 }
 
 OtlpFileMetricExporterOptions::~OtlpFileMetricExporterOptions() {}

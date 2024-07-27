@@ -966,7 +966,7 @@ class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
 public:
   explicit OtlpFileSystemBackend(const OtlpFileClientFileSystemOptions &options)
-      : options_(options), is_initialized_{false} 
+      : options_(options), is_initialized_{false}
   {
     file_ = std::make_shared<FileStats>();
     file_->is_shutdown.store(false);

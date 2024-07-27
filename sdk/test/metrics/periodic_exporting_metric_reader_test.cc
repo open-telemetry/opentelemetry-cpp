@@ -51,7 +51,7 @@ class MockMetricProducer : public MetricProducer
 {
 public:
   MockMetricProducer(std::chrono::microseconds sleep_ms = std::chrono::microseconds::zero())
-      : sleep_ms_{sleep_ms} 
+      : sleep_ms_{sleep_ms}
   {}
 
   bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override

@@ -52,7 +52,7 @@ TEST(RandomTest, AtomicFlagMultiThreadTest)
   std::vector<std::thread> threads;
   std::atomic_uint count(0);
   threads.reserve(10);
-for (int i = 0; i < 10; ++i)
+  for (int i = 0; i < 10; ++i)
   {
     threads.push_back(std::thread(doSomethingOnce, &count));
   }

@@ -15,15 +15,17 @@ namespace exporter
 namespace otlp
 {
 
-OtlpHttpExporterOptions::OtlpHttpExporterOptions() : json_bytes_mapping(JsonBytesMappingKind::kHexId), use_json_name(false), console_debug(false), ssl_insecure_skip_verify(false)
+OtlpHttpExporterOptions::OtlpHttpExporterOptions()
+    : json_bytes_mapping(JsonBytesMappingKind::kHexId),
+      use_json_name(false),
+      console_debug(false),
+      ssl_insecure_skip_verify(false)
 {
-  url                = GetOtlpDefaultHttpTracesEndpoint();
-  content_type       = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpTracesProtocol());
-  
-  
-  
-  timeout            = GetOtlpDefaultTracesTimeout();
-  http_headers       = GetOtlpDefaultTracesHeaders();
+  url          = GetOtlpDefaultHttpTracesEndpoint();
+  content_type = GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpTracesProtocol());
+
+  timeout      = GetOtlpDefaultTracesTimeout();
+  http_headers = GetOtlpDefaultTracesHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests     = 64;

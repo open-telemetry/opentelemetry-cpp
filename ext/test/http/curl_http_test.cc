@@ -30,8 +30,7 @@ public:
   {
     got_response_ = true;
   }
-  void OnEvent(http_client::SessionState state,
-                       nostd::string_view /* reason */) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
     switch (state)
     {
@@ -141,7 +140,7 @@ public:
   }
 
   int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
-                            HTTP_SERVER_NS::HttpResponse &response) override
+                    HTTP_SERVER_NS::HttpResponse &response) override
   {
     int response_status = 404;
     if (request.uri == "/get/")
