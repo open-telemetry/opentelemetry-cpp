@@ -32,12 +32,12 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions()
   max_requests_per_connection = 8;
 #endif /* ENABLE_ASYNC_EXPORT */
 
-  ssl_ca_cert_path         = GetOtlpDefaultTracesSslCertificatePath();
-  ssl_ca_cert_string       = GetOtlpDefaultTracesSslCertificateString();
-  ssl_client_key_path      = GetOtlpDefaultTracesSslClientKeyPath();
-  ssl_client_key_string    = GetOtlpDefaultTracesSslClientKeyString();
-  ssl_client_cert_path     = GetOtlpDefaultTracesSslClientCertificatePath();
-  ssl_client_cert_string   = GetOtlpDefaultTracesSslClientCertificateString();
+  ssl_ca_cert_path       = GetOtlpDefaultTracesSslCertificatePath();
+  ssl_ca_cert_string     = GetOtlpDefaultTracesSslCertificateString();
+  ssl_client_key_path    = GetOtlpDefaultTracesSslClientKeyPath();
+  ssl_client_key_string  = GetOtlpDefaultTracesSslClientKeyString();
+  ssl_client_cert_path   = GetOtlpDefaultTracesSslClientCertificatePath();
+  ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 
   ssl_min_tls      = GetOtlpDefaultTracesSslTlsMinVersion();
   ssl_max_tls      = GetOtlpDefaultTracesSslTlsMaxVersion();
