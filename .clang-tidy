@@ -31,10 +31,12 @@ Checks: >
   -misc-unused-alias-decls,
   -misc-use-anonymous-namespace,
   cppcoreguidelines-*,
+  -cppcoreguidelines-owning-memory,
   -cppcoreguidelines-avoid-do-while,
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-init-variables,
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-pro-*
