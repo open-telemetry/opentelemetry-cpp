@@ -32,7 +32,6 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions()
   max_requests_per_connection = 8;
 #endif /* ENABLE_ASYNC_EXPORT */
 
-  ssl_insecure_skip_verify = false;
   ssl_ca_cert_path         = GetOtlpDefaultTracesSslCertificatePath();
   ssl_ca_cert_string       = GetOtlpDefaultTracesSslCertificateString();
   ssl_client_key_path      = GetOtlpDefaultTracesSslClientKeyPath();

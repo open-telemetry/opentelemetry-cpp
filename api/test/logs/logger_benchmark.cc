@@ -91,7 +91,7 @@ void MultiThreadRunner(benchmark::State &state, const std::function<void()> &fun
   std::vector<std::thread> threads;
 
   threads.reserve(num_threads);
-  for (int i = 0; i < num_threads; i++)
+  for (uint i = 0; i < num_threads; i++)
   {
     threads.emplace_back(ThreadRoutine, std::ref(barrier), std::ref(state), i, func);
   }
