@@ -1568,7 +1568,7 @@ private:
 };
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options)
-    : is_shutdown_(false), options_(options)
+    : is_shutdown_(false), options_(std::move(options))
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {

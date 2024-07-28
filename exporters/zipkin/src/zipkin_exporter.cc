@@ -50,7 +50,9 @@ ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser
 
 ZipkinExporter::ZipkinExporter(
     std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
-    : options_(ZipkinExporterOptions()), http_client_(http_client), url_parser_(options_.endpoint)
+    : options_(ZipkinExporterOptions()),
+      http_client_(std::move(http_client)),
+      url_parser_(options_.endpoint)
 {
 
   InitializeLocalEndpoint();
