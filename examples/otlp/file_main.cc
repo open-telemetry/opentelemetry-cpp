@@ -1,16 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-
-#include <iostream>
-#include <string>
-#include <utility>
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/foo_library/foo_library.h"
@@ -26,11 +31,7 @@ namespace
 {
 opentelemetry::exporter::otlp::OtlpFileExporterOptions opts;
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-std::shared_ptr<opentelemetry::trace::TracerProvider> provider;
-#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider;
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -49,11 +50,7 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (provider)
   {
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-    static_cast<opentelemetry::sdk::trace::TracerProvider *>(provider.get())->ForceFlush();
-#else
     provider->ForceFlush();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   provider.reset();

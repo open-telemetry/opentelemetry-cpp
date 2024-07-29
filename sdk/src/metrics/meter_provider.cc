@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
-#include <memory>
 #include <mutex>
-#include <type_traits>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"
@@ -39,7 +37,7 @@ MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
 {}
 
 MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             sdk::resource::Resource resource) noexcept
+                             const sdk::resource::Resource &resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(views), resource))
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
@@ -112,7 +110,7 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
 
 void MeterProvider::AddMetricReader(std::shared_ptr<MetricReader> reader) noexcept
 {
-  context_->AddMetricReader(reader);
+  context_->AddMetricReader(std::move(reader));
 }
 
 void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,

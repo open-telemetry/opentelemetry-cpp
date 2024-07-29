@@ -3,7 +3,6 @@
 
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"

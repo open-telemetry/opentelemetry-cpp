@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
@@ -12,7 +11,6 @@
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger.h"
@@ -29,7 +27,7 @@ namespace logs
 {
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
@@ -38,7 +36,7 @@ LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                               opentelemetry::sdk::resource::Resource resource) noexcept
+                               const opentelemetry::sdk::resource::Resource &resource) noexcept
     : context_{std::make_shared<LoggerContext>(std::move(processors), std::move(resource))}
 {}
 

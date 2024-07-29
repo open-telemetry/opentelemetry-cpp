@@ -3,20 +3,27 @@
 
 #pragma once
 
-#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
-#include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/version.h"
-
+#include <curl/curl.h>
 #include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <list>
+#include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
+#include <utility>
+
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

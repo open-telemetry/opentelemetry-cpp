@@ -10,34 +10,42 @@
 #endif
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // clang-format on
 
 #include "google/protobuf/message.h"
-#include "google/protobuf/reflection.h"
-#include "google/protobuf/stubs/common.h"
 #include "nlohmann/json.hpp"
 
 // clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/version.h"
 
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strcasecmp _stricmp
+#else
+#  include <strings.h>
+#endif
+
+#include <limits.h>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <fstream>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #if !defined(__CYGWIN__) && defined(_WIN32)
@@ -65,11 +73,8 @@
 
 #else
 
-#  include <dirent.h>
-#  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/stat.h>
-#  include <sys/types.h>
 #  include <unistd.h>
 
 #  define FS_ACCESS(x) access(x, F_OK)
@@ -88,10 +93,6 @@
 
 #ifdef GetMessage
 #  undef GetMessage
-#endif
-
-#ifdef _MSC_VER
-#  define strcasecmp _stricmp
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
@@ -173,11 +174,11 @@ static std::size_t FormatPath(char *buff,
   {                                     \
     tm_obj_cache = GetLocalTime();      \
     tm_obj_ptr   = &tm_obj_cache;       \
-    VAR          = tm_obj_ptr->EXPRESS; \
+    (VAR)        = tm_obj_ptr->EXPRESS; \
   }                                     \
   else                                  \
   {                                     \
-    VAR = tm_obj_ptr->EXPRESS;          \
+    (VAR) = tm_obj_ptr->EXPRESS;        \
   }
 
   for (size_t i = 0; i < fmt.size() && ret < bufz && running; ++i)
@@ -620,7 +621,7 @@ public:
   }
 
 #if !defined(UTIL_FS_DISABLE_LINK)
-  enum class LinkOption : int32_t
+  enum class LinkOption : uint8_t
   {
     kDefault       = 0x00,  // hard link for default
     kSymbolicLink  = 0x01,  // or soft link
@@ -750,6 +751,7 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::Message &message,
                                    const google::protobuf::FieldDescriptor *field_descriptor);
 
+// NOLINTBEGIN(misc-no-recursion)
 static void ConvertGenericMessageToJson(nlohmann::json &value,
                                         const google::protobuf::Message &message)
 {
@@ -953,6 +955,8 @@ void ConvertListFieldToJson(nlohmann::json &value,
   }
 }
 
+// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
+// Dynamic memory allocation
 }  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender

@@ -1,13 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOLINTNEXTLINE
 #define _WINSOCKAPI_  // stops including winsock.h
-#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
-#include <mutex>
+
+#include <stdint.h>
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <ostream>
+#include <string>
+
+#include "nlohmann/json.hpp"
+
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/sdk_config.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/version.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 
@@ -90,7 +106,6 @@ sdk::common::ExportResult ZipkinExporter::Export(
     }
     return sdk::common::ExportResult::kFailure;
   }
-  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()

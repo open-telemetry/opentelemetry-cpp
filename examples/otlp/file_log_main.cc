@@ -1,27 +1,32 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <functional>
+#include <iostream>
+#include <string>
+#include <utility>
+
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
+#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
-#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
-#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
-
-#include <iostream>
-#include <string>
-#include <utility>
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "examples/common/logs_foo_library/foo_library.h"
@@ -41,13 +46,8 @@ namespace
 opentelemetry::exporter::otlp::OtlpFileExporterOptions opts;
 opentelemetry::exporter::otlp::OtlpFileLogRecordExporterOptions log_opts;
 
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-std::shared_ptr<opentelemetry::trace::TracerProvider> tracer_provider;
-std::shared_ptr<opentelemetry::logs::LoggerProvider> logger_provider;
-#else
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
 
 void InitTracer()
 {
@@ -66,11 +66,7 @@ void CleanupTracer()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (tracer_provider)
   {
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-    static_cast<opentelemetry::sdk::trace::TracerProvider *>(tracer_provider.get())->ForceFlush();
-#else
     tracer_provider->ForceFlush();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   tracer_provider.reset();
@@ -94,11 +90,7 @@ void CleanupLogger()
   // We call ForceFlush to prevent to cancel running exportings, It's optional.
   if (logger_provider)
   {
-#ifdef OPENTELEMETRY_DEPRECATED_SDK_FACTORY
-    static_cast<opentelemetry::sdk::logs::LoggerProvider *>(logger_provider.get())->ForceFlush();
-#else
     logger_provider->ForceFlush();
-#endif /* OPENTELEMETRY_DEPRECATED_SDK_FACTORY */
   }
 
   logger_provider.reset();

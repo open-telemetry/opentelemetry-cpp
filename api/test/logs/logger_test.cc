@@ -16,7 +16,6 @@ using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
-using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
 namespace nostd  = opentelemetry::nostd;

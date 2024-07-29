@@ -1,12 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
+#include <curl/curlver.h>
+#include <curl/system.h>
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cstdint>
 #include <cstring>
-
-#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include <functional>
+#include <future>
+#include <istream>
+#include <map>
+#include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
 
 // CURL_VERSION_BITS was added in CURL 7.43.0
 #ifndef CURL_VERSION_BITS
@@ -223,7 +240,7 @@ int HttpOperation::OnProgressCallback(void *clientp,
 #endif
 
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
-                                  std::string reason)
+                                  const std::string &reason)
 {
   if (event_handle_ != nullptr)
   {
@@ -256,7 +273,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
       last_curl_result_(CURLE_OK),
       event_handle_(event_handle),
       method_(method),
-      url_(url),
+      url_(std::move(url)),
       ssl_options_(ssl_options),
       // Local vars
       request_headers_(request_headers),
@@ -436,7 +453,7 @@ void HttpOperation::Cleanup()
 #  define HAVE_TLS_VERSION
 #endif
 
-static long parse_min_ssl_version(std::string version)
+static long parse_min_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")
@@ -453,7 +470,7 @@ static long parse_min_ssl_version(std::string version)
   return 0;
 }
 
-static long parse_max_ssl_version(std::string version)
+static long parse_max_ssl_version(const std::string &version)
 {
 #ifdef HAVE_TLS_VERSION
   if (version == "1.2")

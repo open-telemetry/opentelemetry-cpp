@@ -1,16 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/provider.h"
-
+#include <stdio.h>
+#include <string.h>
 #include <iostream>
 #include <string>
+#include <utility>
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 namespace trace     = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -26,7 +39,7 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
-enum test_mode
+enum test_mode : std::uint8_t
 {
   MODE_NONE,
   MODE_HTTP,
@@ -71,7 +84,7 @@ struct TestResult
 
 struct TestResult g_test_result;
 
-void parse_error_msg(TestResult *result, std::string msg)
+void parse_error_msg(TestResult *result, const std::string &msg)
 {
   static std::string connection_failed("Session state: connection failed.");
 
@@ -116,11 +129,11 @@ void parse_error_msg(TestResult *result, std::string msg)
   }
 }
 
-void parse_warning_msg(TestResult * /* result */, std::string /* msg */) {}
+void parse_warning_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_info_msg(TestResult * /* result */, std::string /* msg */) {}
+void parse_info_msg(TestResult * /* result */, const std::string & /* msg */) {}
 
-void parse_debug_msg(TestResult *result, std::string msg)
+void parse_debug_msg(TestResult *result, const std::string &msg)
 {
   static std::string export_success("Export 1 trace span(s) success");
 
@@ -149,19 +162,19 @@ public:
       case opentelemetry::sdk::common::internal_log::LogLevel::None:
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Error:
-        std::cout << " - [E] " << msg << std::endl;
+        std::cout << " - [E] " << msg << '\n';
         parse_error_msg(&g_test_result, msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Warning:
-        std::cout << " - [W] " << msg << std::endl;
+        std::cout << " - [W] " << msg << '\n';
         parse_warning_msg(&g_test_result, msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Info:
-        std::cout << " - [I] " << msg << std::endl;
+        std::cout << " - [I] " << msg << '\n';
         parse_info_msg(&g_test_result, msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Debug:
-        std::cout << " - [D] " << msg << std::endl;
+        std::cout << " - [D] " << msg << '\n';
         parse_debug_msg(&g_test_result, msg);
         break;
     }
@@ -416,12 +429,12 @@ void list_test_cases()
 
   while (current->m_func != nullptr)
   {
-    std::cout << current->m_name << std::endl;
+    std::cout << current->m_name << '\n';
     current++;
   }
 }
 
-int run_test_case(std::string name)
+int run_test_case(const std::string &name)
 {
   const test_case *current = all_tests;
 
@@ -435,7 +448,7 @@ int run_test_case(std::string name)
     current++;
   }
 
-  std::cerr << "Unknown test <" << name << ">" << std::endl;
+  std::cerr << "Unknown test <" << name << ">" << '\n';
   return 1;
 }
 

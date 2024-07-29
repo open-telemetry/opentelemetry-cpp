@@ -35,7 +35,7 @@ namespace metrics
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                                              AggregationType aggregation_type,
                                              const AggregationConfig *aggregation_config)
-    : instrument_descriptor_(instrument_descriptor),
+    : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
       aggregation_config_(aggregation_config)
 {}
@@ -44,7 +44,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                                          opentelemetry::common::SystemTimestamp sdk_start_ts,
                                          opentelemetry::common::SystemTimestamp collection_ts,
-                                         std::shared_ptr<AttributesHashMap> delta_metrics,
+                                         const std::shared_ptr<AttributesHashMap> &delta_metrics,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);

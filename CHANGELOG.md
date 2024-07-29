@@ -15,15 +15,91 @@ Increment the:
 
 ## [Unreleased]
 
+* [CI] Add a clang-tidy build
+  [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
+
+* [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
+  [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
+
+Breaking changes:
+
+* [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
+  [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
+
+  * As announced in opentelemetry-cpp previous release 1.16.0,
+    CMake option `WITH_DEPRECATED_SDK_FACTORY` was temporary,
+    and to be removed by the next release.
+  * This option is now removed.
+  * Code configuring the SDK must be adjusted, as previously described:
+
+    * [API/SDK] Provider cleanup
+      [#2664](https://github.com/open-telemetry/opentelemetry-cpp/pull/2664)
+
+    * Before this fix:
+      * SDK factory methods such as:
+        * opentelemetry::sdk::trace::TracerProviderFactory::Create()
+        * opentelemetry::sdk::metrics::MeterProviderFactory::Create()
+        * opentelemetry::sdk::logs::LoggerProviderFactory::Create()
+        * opentelemetry::sdk::logs::EventLoggerProviderFactory::Create()
+
+        returned an API object (opentelemetry::trace::TracerProvider)
+          to the caller.
+
+    * After this fix, these methods return an SDK level object
+      (opentelemetry::sdk::trace::TracerProvider) to the caller.
+    * Returning an SDK object is necessary for the application to
+      cleanup and invoke SDK level methods, such as ForceFlush(),
+      on a provider.
+    * The application code that configures the SDK, by calling
+      the various provider factories, may need adjustment.
+    * All the examples have been updated, and in particular no
+      longer perform static_cast do convert an API object to an SDK object.
+      Please refer to examples for guidance on how to adjust.
+
+## [1.16.1 2024-07-17]
+
+* [BUILD] Add bazel missing BUILD file
+  [#2720](https://github.com/open-telemetry/opentelemetry-cpp/pull/2720)
+
+* [SDK] Added reserve for spans array in BatchSpanProcessor.
+  [#2724](https://github.com/open-telemetry/opentelemetry-cpp/pull/2724)
+
+* [DOC] Update "Using triplets" section in building-with-vcpkg documentation.
+  [#2726](https://github.com/open-telemetry/opentelemetry-cpp/pull/2726)
+
+* [DOC] Remove comment for unused LoggerProvider initialization params
+  [#2972](https://github.com/open-telemetry/opentelemetry-cpp/pull/2972)
+
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
   require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
+
+* [TEST] Fix opentelemetry-collector bind address
+  [#2989](https://github.com/open-telemetry/opentelemetry-cpp/pull/2989)
+
+* [EXPORTER] Fix references in AttributeValueVisitor
+  [#2985](https://github.com/open-telemetry/opentelemetry-cpp/pull/2985)
+
+* [Code health] include-what-you-use cleanup, part 2
+  [#2704](https://github.com/open-telemetry/opentelemetry-cpp/pull/2704)
+
+* [Code Health] clang-tidy cleanup, part 1
+  [#2990](https://github.com/open-telemetry/opentelemetry-cpp/pull/2990)
+
+* [CI] Build failures with ABSEIL 20240116 and CMAKE 3.30
+  [#3002](https://github.com/open-telemetry/opentelemetry-cpp/pull/3002)
+
+* [CI] Enable bzlmod
+  [#2995](https://github.com/open-telemetry/opentelemetry-cpp/pull/2995)
+
+* [Metrics SDK] Fix hash calculation for nostd::string
+  [#2999](https://github.com/open-telemetry/opentelemetry-cpp/pull/2999)
 
 Breaking changes:
 
 * [SECURITY] Remove OTLP HTTP support for TLS 1.0 and TLS 1.1,
   require TLS 1.2 or better
-  [#2721](https://github.com/open-telemetry/opentelemetry-cpp/pull/2721)
+  [#2722](https://github.com/open-telemetry/opentelemetry-cpp/pull/2722)
   * The OTLP HTTP exporter no longer accept options like:
     * min_TLS = 1.0
     * min_TLS = 1.1

@@ -132,7 +132,7 @@ static std::string GetFileContentsOrInMemoryContents(const std::string &file_pat
 #ifdef ENABLE_ASYNC_EXPORT
 template <class StubType, class RequestType, class ResponseType>
 static sdk::common::ExportResult InternalDelegateAsyncExport(
-    std::shared_ptr<OtlpGrpcClientAsyncData> async_data,
+    const std::shared_ptr<OtlpGrpcClientAsyncData> &async_data,
     StubType *stub,
     std::unique_ptr<grpc::ClientContext> &&context,
     std::unique_ptr<google::protobuf::Arena> &&arena,
@@ -163,8 +163,8 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
   call_data->arena.swap(arena);
   call_data->result_callback.swap(result_callback);
 
-  call_data->request =
-      google::protobuf::Arena::Create<RequestType>(call_data->arena.get(), std::move(request));
+  call_data->request = google::protobuf::Arena::Create<RequestType>(
+      call_data->arena.get(), std::forward<RequestType>(request));
   call_data->response = google::protobuf::Arena::Create<ResponseType>(call_data->arena.get());
 
   if (call_data->request == nullptr || call_data->response == nullptr)
@@ -567,14 +567,19 @@ bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
     return true;
   }
 
+  bool force_flush_result;
   if (false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
-    is_shutdown_ = true;
+    force_flush_result = ForceFlush(timeout);
 
     async_data_->cq.Shutdown();
   }
+  else
+  {
+    force_flush_result = ForceFlush(timeout);
+  }
 
-  return ForceFlush(timeout);
+  return force_flush_result;
 }
 
 #endif

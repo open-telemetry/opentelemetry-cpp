@@ -8,7 +8,6 @@
 #include <gtest/gtest.h>
 
 using opentelemetry::exporter::memory::InMemorySpanData;
-using opentelemetry::sdk::trace::Recordable;
 using opentelemetry::sdk::trace::SpanData;
 
 TEST(InMemorySpanData, AddRecordable)

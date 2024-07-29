@@ -35,6 +35,15 @@ inline void GetHash(size_t &seed, const std::vector<T> &arg)
   }
 }
 
+// Specialization for const char*
+// this creates an intermediate string.
+template <>
+inline void GetHash<const char *>(size_t &seed, const char *const &arg)
+{
+  std::hash<std::string> hasher;
+  seed ^= hasher(std::string(arg)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
 struct GetHashForAttributeValueVisitor
 {
   GetHashForAttributeValueVisitor(size_t &seed) : seed_(seed) {}
@@ -71,7 +80,7 @@ inline size_t GetHashForAttributeMap(
         {
           return true;
         }
-        GetHash(seed, key.data());
+        GetHash(seed, key);
         auto attr_val = nostd::visit(converter, value);
         nostd::visit(GetHashForAttributeValueVisitor(seed), attr_val);
         return true;

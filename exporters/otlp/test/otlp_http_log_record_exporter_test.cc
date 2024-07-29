@@ -57,8 +57,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   OtlpHttpLogRecordExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
-  options.http_headers.insert(
-      std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
+  options.http_headers.insert(std::make_pair("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
       options.url, false,                 /* ssl_insecure_skip_verify */
       "", /* ssl_ca_cert_path */ "",      /* ssl_ca_cert_string */
@@ -151,46 +150,47 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id, report_span_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resourceLogs"].begin();
-          auto scope_logs        = *resource_logs["scopeLogs"].begin();
-          auto scope             = scope_logs["scope"];
-          auto log               = *scope_logs["logRecords"].begin();
-          auto received_trace_id = log["traceId"].get<std::string>();
-          auto received_span_id  = log["spanId"].get<std::string>();
-          EXPECT_EQ(received_trace_id, report_trace_id);
-          EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
-          EXPECT_LE(15, log["attributes"].size());
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+        .WillOnce(
+            [&mock_session, report_trace_id, report_span_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+              auto resource_logs     = *check_json["resourceLogs"].begin();
+              auto scope_logs        = *resource_logs["scopeLogs"].begin();
+              auto scope             = scope_logs["scope"];
+              auto log               = *scope_logs["logRecords"].begin();
+              auto received_trace_id = log["traceId"].get<std::string>();
+              auto received_span_id  = log["spanId"].get<std::string>();
+              EXPECT_EQ(received_trace_id, report_trace_id);
+              EXPECT_EQ(received_span_id, report_span_id);
+              EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
+              EXPECT_LE(15, log["attributes"].size());
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          bool check_scope_attribute = false;
-          auto scope_attributes      = scope["attributes"];
-          for (auto &attribute : scope_attributes)
-          {
-            if (!attribute.is_object())
-            {
-              continue;
-            }
-            if ("scope_key1" == attribute["key"])
-            {
-              check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
-            }
-          }
-          ASSERT_TRUE(check_scope_attribute);
+              bool check_scope_attribute = false;
+              auto scope_attributes      = scope["attributes"];
+              for (auto &attribute : scope_attributes)
+              {
+                if (!attribute.is_object())
+                {
+                  continue;
+                }
+                if ("scope_key1" == attribute["key"])
+                {
+                  check_scope_attribute = true;
+                  EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
+                }
+              }
+              ASSERT_TRUE(check_scope_attribute);
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
@@ -268,57 +268,58 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id, report_span_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          auto check_json =
-              nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
-          auto resource_logs     = *check_json["resourceLogs"].begin();
-          auto scope_logs        = *resource_logs["scopeLogs"].begin();
-          auto schema_url        = scope_logs["schemaUrl"].get<std::string>();
-          auto scope             = scope_logs["scope"];
-          auto scope_name        = scope["name"];
-          auto scope_version     = scope["version"];
-          auto log               = *scope_logs["logRecords"].begin();
-          auto received_trace_id = log["traceId"].get<std::string>();
-          auto received_span_id  = log["spanId"].get<std::string>();
-          EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
-          EXPECT_EQ(scope_name, "opentelelemtry_library");
-          EXPECT_EQ(scope_version, "1.2.0");
-          EXPECT_EQ(received_trace_id, report_trace_id);
-          EXPECT_EQ(received_span_id, report_span_id);
-          EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
-          EXPECT_LE(15, log["attributes"].size());
-          auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
-          ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
-          if (custom_header != mock_session->GetRequest()->headers_.end())
-          {
-            EXPECT_EQ("Custom-Header-Value", custom_header->second);
-          }
+        .WillOnce(
+            [&mock_session, report_trace_id, report_span_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              auto check_json =
+                  nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+              auto resource_logs     = *check_json["resourceLogs"].begin();
+              auto scope_logs        = *resource_logs["scopeLogs"].begin();
+              auto schema_url        = scope_logs["schemaUrl"].get<std::string>();
+              auto scope             = scope_logs["scope"];
+              auto scope_name        = scope["name"];
+              auto scope_version     = scope["version"];
+              auto log               = *scope_logs["logRecords"].begin();
+              auto received_trace_id = log["traceId"].get<std::string>();
+              auto received_span_id  = log["spanId"].get<std::string>();
+              EXPECT_EQ(schema_url, "https://opentelemetry.io/schemas/1.2.0");
+              EXPECT_EQ(scope_name, "opentelelemtry_library");
+              EXPECT_EQ(scope_version, "1.2.0");
+              EXPECT_EQ(received_trace_id, report_trace_id);
+              EXPECT_EQ(received_span_id, report_span_id);
+              EXPECT_EQ("Log message", log["body"]["stringValue"].get<std::string>());
+              EXPECT_LE(15, log["attributes"].size());
+              auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+              ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+              if (custom_header != mock_session->GetRequest()->headers_.end())
+              {
+                EXPECT_EQ("Custom-Header-Value", custom_header->second);
+              }
 
-          bool check_scope_attribute = false;
-          auto scope_attributes      = scope["attributes"];
-          for (auto &attribute : scope_attributes)
-          {
-            if (!attribute.is_object())
-            {
-              continue;
-            }
-            if ("scope_key1" == attribute["key"])
-            {
-              check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
-            }
-          }
-          ASSERT_TRUE(check_scope_attribute);
+              bool check_scope_attribute = false;
+              auto scope_attributes      = scope["attributes"];
+              for (auto &attribute : scope_attributes)
+              {
+                if (!attribute.is_object())
+                {
+                  continue;
+                }
+                if ("scope_key1" == attribute["key"])
+                {
+                  check_scope_attribute = true;
+                  EXPECT_EQ("scope_value", attribute["value"]["stringValue"].get<std::string>());
+                }
+              }
+              ASSERT_TRUE(check_scope_attribute);
 
-          // let the otlp_http_client to continue
-          std::thread async_finish{[callback]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            http_client::nosend::Response response;
-            response.Finish(*callback.get());
-          }};
-          async_finish.detach();
-        });
+              // let the otlp_http_client to continue
+              std::thread async_finish{[callback]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                http_client::nosend::Response response;
+                response.Finish(*callback.get());
+              }};
+              async_finish.detach();
+            });
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
@@ -390,47 +391,49 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id, report_span_id](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto scope_log = request_body.resource_logs(0).scope_logs(0);
-          EXPECT_EQ(scope_log.schema_url(), "https://opentelemetry.io/schemas/1.2.0");
-          EXPECT_EQ(scope_log.scope().name(), "opentelelemtry_library");
-          EXPECT_EQ(scope_log.scope().version(), "1.2.0");
-          auto received_log = scope_log.log_records(0);
-          EXPECT_EQ(received_log.trace_id(), report_trace_id);
-          EXPECT_EQ(received_log.span_id(), report_span_id);
-          EXPECT_EQ("Log message", received_log.body().string_value());
-          EXPECT_LE(15, received_log.attributes_size());
-          bool check_service_name = false;
-          for (auto &attribute : received_log.attributes())
-          {
-            if ("service.name" == attribute.key())
-            {
-              check_service_name = true;
-              EXPECT_EQ("unit_test_service", attribute.value().string_value());
-            }
-          }
-          ASSERT_TRUE(check_service_name);
+        .WillOnce(
+            [&mock_session, report_trace_id, report_span_id](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
+              request_body.ParseFromArray(
+                  &mock_session->GetRequest()->body_[0],
+                  static_cast<int>(mock_session->GetRequest()->body_.size()));
+              auto scope_log = request_body.resource_logs(0).scope_logs(0);
+              EXPECT_EQ(scope_log.schema_url(), "https://opentelemetry.io/schemas/1.2.0");
+              EXPECT_EQ(scope_log.scope().name(), "opentelelemtry_library");
+              EXPECT_EQ(scope_log.scope().version(), "1.2.0");
+              const auto &received_log = scope_log.log_records(0);
+              EXPECT_EQ(received_log.trace_id(), report_trace_id);
+              EXPECT_EQ(received_log.span_id(), report_span_id);
+              EXPECT_EQ("Log message", received_log.body().string_value());
+              EXPECT_LE(15, received_log.attributes_size());
+              bool check_service_name = false;
+              for (auto &attribute : received_log.attributes())
+              {
+                if ("service.name" == attribute.key())
+                {
+                  check_service_name = true;
+                  EXPECT_EQ("unit_test_service", attribute.value().string_value());
+                }
+              }
+              ASSERT_TRUE(check_service_name);
 
-          bool check_scope_attribute = false;
-          for (auto &attribute : scope_log.scope().attributes())
-          {
-            if ("scope_key1" == attribute.key())
-            {
-              check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute.value().string_value());
-            }
-          }
-          ASSERT_TRUE(check_scope_attribute);
+              bool check_scope_attribute = false;
+              for (auto &attribute : scope_log.scope().attributes())
+              {
+                if ("scope_key1" == attribute.key())
+                {
+                  check_scope_attribute = true;
+                  EXPECT_EQ("scope_value", attribute.value().string_value());
+                }
+              }
+              ASSERT_TRUE(check_scope_attribute);
 
-          // let the otlp_http_client to continue
+              // let the otlp_http_client to continue
 
-          http_client::nosend::Response response;
-          response.Finish(*callback.get());
-        });
+              http_client::nosend::Response response;
+              response.Finish(*callback.get());
+            });
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",
@@ -503,51 +506,53 @@ public:
     auto mock_session =
         std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
     EXPECT_CALL(*mock_session, SendRequest)
-        .WillOnce([&mock_session, report_trace_id, report_span_id, schema_url](
-                      std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
-          opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
-          auto &scope_log   = request_body.resource_logs(0).scope_logs(0);
-          auto received_log = scope_log.log_records(0);
-          EXPECT_EQ(received_log.trace_id(), report_trace_id);
-          EXPECT_EQ(received_log.span_id(), report_span_id);
-          EXPECT_EQ("Log message", received_log.body().string_value());
-          EXPECT_LE(15, received_log.attributes_size());
-          bool check_service_name = false;
-          for (auto &attribute : received_log.attributes())
-          {
-            if ("service.name" == attribute.key())
-            {
-              check_service_name = true;
-              EXPECT_EQ("unit_test_service", attribute.value().string_value());
-            }
-          }
-          ASSERT_TRUE(check_service_name);
+        .WillOnce(
+            [&mock_session, report_trace_id, report_span_id, schema_url](
+                const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
+              opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
+              request_body.ParseFromArray(
+                  &mock_session->GetRequest()->body_[0],
+                  static_cast<int>(mock_session->GetRequest()->body_.size()));
+              auto &scope_log   = request_body.resource_logs(0).scope_logs(0);
+              auto received_log = scope_log.log_records(0);
+              EXPECT_EQ(received_log.trace_id(), report_trace_id);
+              EXPECT_EQ(received_log.span_id(), report_span_id);
+              EXPECT_EQ("Log message", received_log.body().string_value());
+              EXPECT_LE(15, received_log.attributes_size());
+              bool check_service_name = false;
+              for (auto &attribute : received_log.attributes())
+              {
+                if ("service.name" == attribute.key())
+                {
+                  check_service_name = true;
+                  EXPECT_EQ("unit_test_service", attribute.value().string_value());
+                }
+              }
+              ASSERT_TRUE(check_service_name);
 
-          auto &scope = scope_log.scope();
-          EXPECT_EQ(scope.name(), "opentelelemtry_library");
-          EXPECT_EQ(scope_log.schema_url(), schema_url);
-          bool check_scope_attribute = false;
-          for (auto &attribute : scope.attributes())
-          {
-            if ("scope_key1" == attribute.key())
-            {
-              check_scope_attribute = true;
-              EXPECT_EQ("scope_value", attribute.value().string_value());
-            }
-          }
-          ASSERT_TRUE(check_scope_attribute);
+              auto &scope = scope_log.scope();
+              EXPECT_EQ(scope.name(), "opentelelemtry_library");
+              EXPECT_EQ(scope_log.schema_url(), schema_url);
+              bool check_scope_attribute = false;
+              for (auto &attribute : scope.attributes())
+              {
+                if ("scope_key1" == attribute.key())
+                {
+                  check_scope_attribute = true;
+                  EXPECT_EQ("scope_value", attribute.value().string_value());
+                }
+              }
+              ASSERT_TRUE(check_scope_attribute);
 
-          // let the otlp_http_client to continue
+              // let the otlp_http_client to continue
 
-          std::thread async_finish{[callback]() {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            http_client::nosend::Response response;
-            response.Finish(*callback.get());
-          }};
-          async_finish.detach();
-        });
+              std::thread async_finish{[callback]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                http_client::nosend::Response response;
+                response.Finish(*callback.get());
+              }};
+              async_finish.detach();
+            });
 
     logger->EmitLogRecord(
         opentelemetry::logs::Severity::kInfo, "Log message",

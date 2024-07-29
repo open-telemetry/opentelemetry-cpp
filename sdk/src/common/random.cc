@@ -5,6 +5,7 @@
 #include "src/common/random.h"
 #include "src/common/platform/fork.h"
 
+#include <atomic>
 #include <cstring>
 #include <random>
 
@@ -26,12 +27,17 @@ public:
   TlsRandomNumberGenerator() noexcept
   {
     Seed();
-    platform::AtFork(nullptr, nullptr, OnFork);
+    if (!flag.test_and_set())
+    {
+      platform::AtFork(nullptr, nullptr, OnFork);
+    }
   }
 
   static FastRandomNumberGenerator &engine() noexcept { return engine_; }
 
 private:
+  static std::atomic_flag flag;
+
   static thread_local FastRandomNumberGenerator engine_;
 
   static void OnFork() noexcept { Seed(); }
@@ -44,6 +50,7 @@ private:
   }
 };
 
+std::atomic_flag TlsRandomNumberGenerator::flag;
 thread_local FastRandomNumberGenerator TlsRandomNumberGenerator::engine_{};
 }  // namespace
 

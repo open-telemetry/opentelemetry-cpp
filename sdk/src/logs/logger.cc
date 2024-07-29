@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
-#include <memory>
 #include <string>
 #include <utility>
 
@@ -39,7 +38,7 @@ Logger::Logger(
     std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : logger_name_(std::string(name)),
       instrumentation_scope_(std::move(instrumentation_scope)),
-      context_(context)
+      context_(std::move(context))
 {}
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
