@@ -55,6 +55,7 @@
 #include "opentelemetry/sdk/init/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/init/extension_sampler_builder.h"
 #include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_span_processor_builder.h"
@@ -566,7 +567,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
-  // https://github.com/open-telemetry/opentelemetry-configuration/issues/70
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/70
   OTEL_INTERNAL_LOG_ERROR("CreateTracerProvider: FIXME (IdGenerator)");
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
@@ -851,13 +852,25 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
 SdkBuilder::CreateExtensionLogRecordProcessor(
-    const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration * /* model */)
-    const
+    const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
+  std::string name = model->name;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateExtensionLogRecordProcessor() FIXME");
+  const ExtensionLogRecordProcessorBuilder *builder =
+      m_registry->GetExtensionLogRecordProcessorBuilder(name);
 
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordProcessor() using registered builder "
+                            << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("CreateExtensionLogRecordProcessor() no builder for " << name);
+    throw UnsupportedException("CreateExtensionLogRecordProcessor() no builder for " + name);
+  }
   return sdk;
 }
 

@@ -784,7 +784,7 @@ static std::unique_ptr<PropagatorConfiguration> ParsePropagatorConfiguration(
     return ParseCompositePropagatorConfiguration(child);
   }
 
-  // FIXME: File bug with opentelemetry-configuration
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/75
   child = node->GetChildNode("simple");
   if (child)
   {

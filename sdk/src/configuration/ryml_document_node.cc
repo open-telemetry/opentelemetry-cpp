@@ -63,48 +63,42 @@ bool RymlDocumentNode::AsBoolean()
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsBoolean()");
 
-#ifdef LATER
-  if (!m_yaml.IsScalar())
+  if (!m_node.is_val() && !m_node.is_keyval())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
     throw InvalidSchemaException("");
   }
-  bool value = m_yaml.as<bool>();
-  return value;
-#endif
-  return false;
+  ryml::csubstr view = m_node.val();
+  std::string value(view.str, view.len);
+  return BooleanFromString(value);
 }
 
 size_t RymlDocumentNode::AsInteger()
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsInteger()");
 
-#ifdef LATER
-  if (!m_yaml.IsScalar())
+  if (!m_node.is_val() && !m_node.is_keyval())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
     throw InvalidSchemaException("");
   }
-  size_t value = m_yaml.as<size_t>();
-  return value;
-#endif
-  return 0;
+  ryml::csubstr view = m_node.val();
+  std::string value(view.str, view.len);
+  return IntegerFromString(value);
 }
 
 double RymlDocumentNode::AsDouble()
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::AsDouble()");
 
-#ifdef LATER
-  if (!m_yaml.IsScalar())
+  if (!m_node.is_val() && !m_node.is_keyval())
   {
     OTEL_INTERNAL_LOG_ERROR("Yaml: not scalar");
     throw InvalidSchemaException("");
   }
-  double value = m_yaml.as<double>();
-  return value;
-#endif
-  return 0.0;
+  ryml::csubstr view = m_node.val();
+  std::string value(view.str, view.len);
+  return DoubleFromString(value);
 }
 
 std::string RymlDocumentNode::AsString()
