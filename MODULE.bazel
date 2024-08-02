@@ -3,7 +3,7 @@
 
 module(
     name = "opentelemetry-cpp",
-    version = "0",
+    version = "1.16.1",
     compatibility_level = 0,
     repo_name = "io_opentelemetry_cpp",
 )
