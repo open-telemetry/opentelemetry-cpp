@@ -31,9 +31,13 @@ std::unique_ptr<ConfiguredSdk> ConfiguredSdk::Create(
       SdkBuilder builder(registry);
       sdk = builder.CreateConfiguredSdk(model);
     }
+    catch (const std::exception &e)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[Configured Sdk] builder failed with exception: " << e.what());
+    }
     catch (...)
     {
-      OTEL_INTERNAL_LOG_ERROR("Failed to build from the model.");
+      OTEL_INTERNAL_LOG_ERROR("[Configured Sdk] builder failed with unknown exception.");
     }
   }
 

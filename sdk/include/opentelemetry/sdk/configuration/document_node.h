@@ -25,6 +25,9 @@ class PropertiesNodeConstIterator;
 class DocumentNode
 {
 public:
+  // FIXME: proper sizing
+  static constexpr size_t MAX_NODE_DEPTH = 100;
+
   DocumentNode()          = default;
   virtual ~DocumentNode() = default;
 
@@ -116,14 +119,6 @@ public:
     m_impl->Next();
     return *this;
   }
-
-#ifdef NEVER
-  DocumentNodeConstIterator &operator++(int)
-  {
-    m_impl->Next();
-    return *this;
-  }
-#endif
 
 private:
   DocumentNodeConstIteratorImpl *m_impl;

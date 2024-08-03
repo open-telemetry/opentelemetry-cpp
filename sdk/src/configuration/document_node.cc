@@ -42,7 +42,6 @@ std::string DocumentNode::DoSubstitution(const std::string &text)
 
   while (begin_pos != std::string::npos)
   {
-
     if (current_pos < begin_pos)
     {
       /*
@@ -229,7 +228,7 @@ size_t DocumentNode::IntegerFromString(const std::string &value)
 {
   const char *ptr = value.c_str();
   char *end       = nullptr;
-  int len         = value.length();
+  size_t len      = value.length();
   size_t val      = strtoll(ptr, &end, 10);
   if (ptr + len != end)
   {
@@ -243,7 +242,7 @@ double DocumentNode::DoubleFromString(const std::string &value)
 {
   const char *ptr = value.c_str();
   char *end       = nullptr;
-  int len         = value.length();
+  size_t len      = value.length();
   double val      = strtod(ptr, &end);
   if (ptr + len != end)
   {

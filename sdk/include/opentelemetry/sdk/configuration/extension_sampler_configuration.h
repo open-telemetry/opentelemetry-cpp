@@ -27,6 +27,7 @@ public:
 
   std::string name;
   std::unique_ptr<DocumentNode> node;
+  size_t depth;
 };
 
 }  // namespace configuration

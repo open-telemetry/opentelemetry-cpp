@@ -50,36 +50,29 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseFile(const std::st
   {
     std::ostringstream content;
     content << in.rdbuf();
-    conf = YamlConfigurationFactory::ParseString(content.str());
+    conf = YamlConfigurationFactory::ParseString(input_file, content.str());
   }
 
   return conf;
 }
 
-static std::unique_ptr<Document> RymlParse(const std::string &content)
+static std::unique_ptr<Document> RymlParse(const std::string &source, const std::string &content)
 {
   std::unique_ptr<Document> doc;
 
-  try
-  {
-    doc = RymlDocument::Parse(content);
-  }
-  catch (...)
-  {
-    OTEL_INTERNAL_LOG_ERROR("Failed to parse yaml.");
-    return nullptr;
-  }
+  doc = RymlDocument::Parse(source, content);
 
   return doc;
 }
 
-std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(const std::string &content)
+std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(const std::string &source,
+                                                                     const std::string &content)
 {
   std::unique_ptr<Document> doc;
   std::unique_ptr<DocumentNode> root;
   std::unique_ptr<Configuration> config;
 
-  doc = RymlParse(content);
+  doc = RymlParse(source, content);
 
   try
   {
@@ -88,9 +81,15 @@ std::unique_ptr<Configuration> YamlConfigurationFactory::ParseString(const std::
       config = ConfigurationFactory::ParseConfiguration(std::move(doc));
     }
   }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Yaml Configuration Factory] ParseConfiguration failed with exception: " << e.what());
+  }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to interpret yaml.");
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Yaml Configuration Factory] ParseConfiguration failed with unknown exception.");
   }
 
   return config;

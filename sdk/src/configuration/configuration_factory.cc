@@ -77,6 +77,9 @@ namespace sdk
 namespace configuration
 {
 
+// FIXME: proper sizing
+constexpr size_t MAX_SAMPLER_DEPTH = 10;
+
 static std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
@@ -146,10 +149,10 @@ static std::unique_ptr<ExtensionLogRecordExporterConfiguration>
 ParseExtensionLogRecordExporterConfiguration(const std::string &name,
                                              std::unique_ptr<DocumentNode> node)
 {
-  auto extension  = new ExtensionLogRecordExporterConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<ExtensionLogRecordExporterConfiguration> model(extension);
+  std::unique_ptr<ExtensionLogRecordExporterConfiguration> model(
+      new ExtensionLogRecordExporterConfiguration);
+  model->name = name;
+  model->node = std::move(node);
   return model;
 }
 
@@ -226,10 +229,10 @@ static std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
 ParseExtensionLogRecordProcessorConfiguration(const std::string &name,
                                               std::unique_ptr<DocumentNode> node)
 {
-  auto extension  = new ExtensionLogRecordProcessorConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<ExtensionLogRecordProcessorConfiguration> model(extension);
+  std::unique_ptr<ExtensionLogRecordProcessorConfiguration> model(
+      new ExtensionLogRecordProcessorConfiguration);
+  model->name = name;
+  model->node = std::move(node);
   return model;
 }
 
@@ -385,10 +388,10 @@ static std::unique_ptr<ExtensionMetricExporterConfiguration>
 ParseMetricExporterExtensionConfiguration(const std::string &name,
                                           std::unique_ptr<DocumentNode> node)
 {
-  auto extension  = new ExtensionMetricExporterConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<ExtensionMetricExporterConfiguration> model(extension);
+  std::unique_ptr<ExtensionMetricExporterConfiguration> model(
+      new ExtensionMetricExporterConfiguration);
+  model->name = name;
+  model->node = std::move(node);
   return model;
 }
 
@@ -812,26 +815,30 @@ static std::unique_ptr<SpanLimitsConfiguration> ParseSpanLimitsConfiguration(
 }
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node);
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth);
 
-static std::unique_ptr<SamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+static std::unique_ptr<AlwaysOffSamplerConfiguration> ParseAlwaysOffSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */)
 {
-  std::unique_ptr<SamplerConfiguration> model(new AlwaysOffSamplerConfiguration);
+  std::unique_ptr<AlwaysOffSamplerConfiguration> model(new AlwaysOffSamplerConfiguration);
 
   return model;
 }
 
-static std::unique_ptr<SamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+static std::unique_ptr<AlwaysOnSamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */)
 {
-  std::unique_ptr<SamplerConfiguration> model(new AlwaysOnSamplerConfiguration);
+  std::unique_ptr<AlwaysOnSamplerConfiguration> model(new AlwaysOnSamplerConfiguration);
 
   return model;
 }
 
-static std::unique_ptr<SamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth)
 {
   std::unique_ptr<JaegerRemoteSamplerConfiguration> model(new JaegerRemoteSamplerConfiguration);
   std::unique_ptr<DocumentNode> child;
@@ -845,14 +852,15 @@ static std::unique_ptr<SamplerConfiguration> ParseJaegerRemoteSamplerConfigurati
   child = node->GetChildNode("initial_sampler");
   if (child)
   {
-    model->initial_sampler = ParseSamplerConfiguration(child);
+    model->initial_sampler = ParseSamplerConfiguration(child, depth + 1);
   }
 
   return model;
 }
 
-static std::unique_ptr<SamplerConfiguration> ParseParentBasedSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth)
 {
   std::unique_ptr<ParentBasedSamplerConfiguration> model(new ParentBasedSamplerConfiguration);
   std::unique_ptr<DocumentNode> child;
@@ -860,38 +868,39 @@ static std::unique_ptr<SamplerConfiguration> ParseParentBasedSamplerConfiguratio
   child = node->GetChildNode("root");
   if (child)
   {
-    model->root = ParseSamplerConfiguration(child);
+    model->root = ParseSamplerConfiguration(child, depth + 1);
   }
 
   child = node->GetChildNode("remote_parent_sampled");
   if (child)
   {
-    model->remote_parent_sampled = ParseSamplerConfiguration(child);
+    model->remote_parent_sampled = ParseSamplerConfiguration(child, depth + 1);
   }
 
   child = node->GetChildNode("remote_parent_not_sampled");
   if (child)
   {
-    model->remote_parent_not_sampled = ParseSamplerConfiguration(child);
+    model->remote_parent_not_sampled = ParseSamplerConfiguration(child, depth + 1);
   }
 
   child = node->GetChildNode("local_parent_sampled");
   if (child)
   {
-    model->local_parent_sampled = ParseSamplerConfiguration(child);
+    model->local_parent_sampled = ParseSamplerConfiguration(child, depth + 1);
   }
 
   child = node->GetChildNode("local_parent_not_sampled");
   if (child)
   {
-    model->local_parent_not_sampled = ParseSamplerConfiguration(child);
+    model->local_parent_not_sampled = ParseSamplerConfiguration(child, depth + 1);
   }
 
   return model;
 }
 
-static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
+ParseTraceIdRatioBasedSamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                           size_t /* depth */)
 {
   std::unique_ptr<TraceIdRatioBasedSamplerConfiguration> model(
       new TraceIdRatioBasedSamplerConfiguration);
@@ -902,20 +911,32 @@ static std::unique_ptr<SamplerConfiguration> ParseTraceIdRatioBasedSamplerConfig
   return model;
 }
 
-static std::unique_ptr<SamplerConfiguration> ParseSamplerExtensionConfiguration(
+static std::unique_ptr<ExtensionSamplerConfiguration> ParseSamplerExtensionConfiguration(
     const std::string &name,
-    std::unique_ptr<DocumentNode> node)
+    std::unique_ptr<DocumentNode> node,
+    size_t depth)
 {
-  auto extension  = new ExtensionSamplerConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<SamplerConfiguration> model(extension);
+  std::unique_ptr<ExtensionSamplerConfiguration> model(new ExtensionSamplerConfiguration);
+  model->name  = name;
+  model->node  = std::move(node);
+  model->depth = depth;
   return model;
 }
 
 static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+    const std::unique_ptr<DocumentNode> &node,
+    size_t depth)
 {
+  /*
+   * ParseSamplerConfiguration() is recursive,
+   * enforce a limit to prevent attacks from yaml.
+   */
+  if (depth >= MAX_SAMPLER_DEPTH)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParseSamplerConfiguration: depth " << depth);
+    throw InvalidSchemaException("Samplers nested too deeply");
+  }
+
   std::unique_ptr<SamplerConfiguration> model;
 
   std::string name;
@@ -937,27 +958,27 @@ static std::unique_ptr<SamplerConfiguration> ParseSamplerConfiguration(
 
   if (name == "always_off")
   {
-    model = ParseAlwaysOffSamplerConfiguration(child);
+    model = ParseAlwaysOffSamplerConfiguration(child, depth);
   }
   else if (name == "always_on")
   {
-    model = ParseAlwaysOnSamplerConfiguration(child);
+    model = ParseAlwaysOnSamplerConfiguration(child, depth);
   }
   else if (name == "jaeger_remote")
   {
-    model = ParseJaegerRemoteSamplerConfiguration(child);
+    model = ParseJaegerRemoteSamplerConfiguration(child, depth);
   }
   else if (name == "parent_based")
   {
-    model = ParseParentBasedSamplerConfiguration(child);
+    model = ParseParentBasedSamplerConfiguration(child, depth);
   }
   else if (name == "trace_id_ratio_based")
   {
-    model = ParseTraceIdRatioBasedSamplerConfiguration(child);
+    model = ParseTraceIdRatioBasedSamplerConfiguration(child, depth);
   }
   else
   {
-    model = ParseSamplerExtensionConfiguration(name, std::move(child));
+    model = ParseSamplerExtensionConfiguration(name, std::move(child), depth);
   }
 
   return model;
@@ -1011,10 +1032,9 @@ static std::unique_ptr<ExtensionSpanExporterConfiguration> ParseExtensionSpanExp
     const std::string &name,
     std::unique_ptr<DocumentNode> node)
 {
-  auto extension  = new ExtensionSpanExporterConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<ExtensionSpanExporterConfiguration> model(extension);
+  std::unique_ptr<ExtensionSpanExporterConfiguration> model(new ExtensionSpanExporterConfiguration);
+  model->name = name;
+  model->node = std::move(node);
   return model;
 }
 
@@ -1093,10 +1113,10 @@ static std::unique_ptr<ExtensionSpanProcessorConfiguration>
 ParseExtensionSpanProcessorConfiguration(const std::string &name,
                                          std::unique_ptr<DocumentNode> node)
 {
-  auto extension  = new ExtensionSpanProcessorConfiguration;
-  extension->name = name;
-  extension->node = std::move(node);
-  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(extension);
+  std::unique_ptr<ExtensionSpanProcessorConfiguration> model(
+      new ExtensionSpanProcessorConfiguration);
+  model->name = name;
+  model->node = std::move(node);
   return model;
 }
 
@@ -1167,7 +1187,7 @@ static std::unique_ptr<TracerProviderConfiguration> ParseTracerProviderConfigura
   child = node->GetChildNode("sampler");
   if (child)
   {
-    model->sampler = ParseSamplerConfiguration(child);
+    model->sampler = ParseSamplerConfiguration(child, 0);
   }
 
   return model;

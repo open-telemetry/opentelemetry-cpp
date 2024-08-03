@@ -153,16 +153,29 @@ ryml::ConstNodeRef RymlDocumentNode::GetRymlChildNode(const std::string &name)
 
 std::unique_ptr<DocumentNode> RymlDocumentNode::GetRequiredChildNode(const std::string &name)
 {
-  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredChildNode(" << name << ")");
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetRequiredChildNode(" << m_depth << ", " << name
+                                                                    << ")");
+
+  if (m_depth >= MAX_NODE_DEPTH)
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml nested too deeply " << name);
+    throw InvalidSchemaException(name);
+  }
 
   auto ryml_child = GetRequiredRymlChildNode(name);
-  auto child      = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child));
+  auto child      = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, m_depth + 1));
   return child;
 }
 
 std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &name)
 {
-  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetChildNode(" << name << ")");
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetChildNode(" << m_depth << ", " << name << ")");
+
+  if (m_depth >= MAX_NODE_DEPTH)
+  {
+    OTEL_INTERNAL_LOG_ERROR("Yaml nested too deeply " << name);
+    throw InvalidSchemaException(name);
+  }
 
   std::unique_ptr<DocumentNode> child;
 
@@ -179,7 +192,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &
   }
 
   ryml::ConstNodeRef ryml_child = m_node[name_str];
-  child                         = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child));
+  child = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, m_depth + 1));
   return child;
 }
 
@@ -348,7 +361,7 @@ DocumentNodeConstIterator RymlDocumentNode::begin() const
   }
 #endif
 
-  return DocumentNodeConstIterator(new RymlDocumentNodeConstIteratorImpl(m_node, 0));
+  return DocumentNodeConstIterator(new RymlDocumentNodeConstIteratorImpl(m_node, 0, m_depth));
 }
 
 DocumentNodeConstIterator RymlDocumentNode::end() const
@@ -356,7 +369,7 @@ DocumentNodeConstIterator RymlDocumentNode::end() const
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end()");
 
   return DocumentNodeConstIterator(
-      new RymlDocumentNodeConstIteratorImpl(m_node, m_node.num_children()));
+      new RymlDocumentNodeConstIteratorImpl(m_node, m_node.num_children(), m_depth));
 }
 
 size_t RymlDocumentNode::num_children() const
@@ -368,7 +381,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChild(size_t index) const
 {
   std::unique_ptr<DocumentNode> child;
   ryml::ConstNodeRef ryml_child = m_node[index];
-  child                         = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child));
+  child = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_child, m_depth + 1));
   return child;
 }
 
@@ -385,7 +398,7 @@ PropertiesNodeConstIterator RymlDocumentNode::begin_properties() const
   }
 #endif
 
-  return PropertiesNodeConstIterator(new RymlPropertiesNodeConstIteratorImpl(m_node, 0));
+  return PropertiesNodeConstIterator(new RymlPropertiesNodeConstIteratorImpl(m_node, 0, m_depth));
 }
 
 PropertiesNodeConstIterator RymlDocumentNode::end_properties() const
@@ -393,7 +406,7 @@ PropertiesNodeConstIterator RymlDocumentNode::end_properties() const
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::end_properties()");
 
   return PropertiesNodeConstIterator(
-      new RymlPropertiesNodeConstIteratorImpl(m_node, m_node.num_children()));
+      new RymlPropertiesNodeConstIteratorImpl(m_node, m_node.num_children(), m_depth));
 }
 
 std::string RymlDocumentNode::Dump() const
@@ -402,8 +415,9 @@ std::string RymlDocumentNode::Dump() const
 }
 
 RymlDocumentNodeConstIteratorImpl::RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent,
-                                                                     size_t index)
-    : m_parent(parent), m_index(index)
+                                                                     size_t index,
+                                                                     size_t depth)
+    : m_parent(parent), m_index(index), m_depth(depth)
 {}
 
 RymlDocumentNodeConstIteratorImpl::~RymlDocumentNodeConstIteratorImpl() {}
@@ -422,7 +436,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNodeConstIteratorImpl::Item() const
     OTEL_INTERNAL_LOG_ERROR("iterator is lost ");
     // Throw
   }
-  item = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item));
+  item = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item, m_depth + 1));
   return item;
 }
 
@@ -434,8 +448,9 @@ bool RymlDocumentNodeConstIteratorImpl::Equal(const DocumentNodeConstIteratorImp
 }
 
 RymlPropertiesNodeConstIteratorImpl::RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent,
-                                                                         size_t index)
-    : m_parent(parent), m_index(index)
+                                                                         size_t index,
+                                                                         size_t depth)
+    : m_parent(parent), m_index(index), m_depth(depth)
 {}
 
 RymlPropertiesNodeConstIteratorImpl::~RymlPropertiesNodeConstIteratorImpl() {}
@@ -462,7 +477,7 @@ std::unique_ptr<DocumentNode> RymlPropertiesNodeConstIteratorImpl::Value() const
   std::unique_ptr<DocumentNode> item;
 
   ryml::ConstNodeRef ryml_item = m_parent[m_index];
-  item                         = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item));
+  item = std::unique_ptr<DocumentNode>(new RymlDocumentNode(ryml_item, m_depth + 1));
 
   OTEL_INTERNAL_LOG_DEBUG("RymlPropertiesNodeConstIteratorImpl::Value()");
 

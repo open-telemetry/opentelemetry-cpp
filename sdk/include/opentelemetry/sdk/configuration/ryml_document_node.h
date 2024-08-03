@@ -20,7 +20,7 @@ namespace configuration
 class RymlDocumentNode : public DocumentNode
 {
 public:
-  RymlDocumentNode(ryml::ConstNodeRef node) : m_node(node) {}
+  RymlDocumentNode(ryml::ConstNodeRef node, size_t depth) : m_node(node), m_depth(depth) {}
   ~RymlDocumentNode() override = default;
 
   std::string Key() const override;
@@ -61,12 +61,13 @@ private:
   ryml::ConstNodeRef GetRymlChildNode(const std::string &name);
 
   ryml::ConstNodeRef m_node;
+  size_t m_depth;
 };
 
 class RymlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl
 {
 public:
-  RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index);
+  RymlDocumentNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index, size_t depth);
   ~RymlDocumentNodeConstIteratorImpl() override;
 
   void Next() override;
@@ -76,12 +77,13 @@ public:
 private:
   ryml::ConstNodeRef m_parent;
   size_t m_index;
+  size_t m_depth;
 };
 
 class RymlPropertiesNodeConstIteratorImpl : public PropertiesNodeConstIteratorImpl
 {
 public:
-  RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index);
+  RymlPropertiesNodeConstIteratorImpl(ryml::ConstNodeRef parent, size_t index, size_t depth);
   ~RymlPropertiesNodeConstIteratorImpl() override;
 
   void Next() override;
@@ -92,6 +94,7 @@ public:
 private:
   ryml::ConstNodeRef m_parent;
   size_t m_index;
+  size_t m_depth;
 };
 
 }  // namespace configuration

@@ -19,7 +19,7 @@ namespace configuration
 class RymlDocument : public Document
 {
 public:
-  static std::unique_ptr<Document> Parse(std::string content);
+  static std::unique_ptr<Document> Parse(const std::string &source, const std::string &content);
 
   RymlDocument(ryml::Tree tree) : m_tree(tree) {}
   ~RymlDocument() override = default;

@@ -19,19 +19,48 @@ namespace sdk
 namespace configuration
 {
 
-std::unique_ptr<Document> RymlDocument::Parse(std::string content)
+std::unique_ptr<Document> RymlDocument::Parse(const std::string &source, const std::string &content)
 {
+  ryml::ParserOptions opts;
+  opts.locations(true);
+
+#if OTEL_HAVE_RYML == 6
+  ryml::Parser parser(opts);
+#endif
+
+#if OTEL_HAVE_RYML == 7
+  ryml::Parser::handler_type event_handler;
+  ryml::Parser parser(&event_handler, opts);
+#endif
+
   ryml::Tree tree;
+  ryml::csubstr filename;
+  ryml::csubstr csubstr_content;
   std::unique_ptr<Document> doc;
+
+  filename        = ryml::to_csubstr(source);
+  csubstr_content = ryml::to_csubstr(content);
 
   try
   {
-    tree = ryml::parse_in_arena(ryml::to_csubstr(content));
+#if OTEL_HAVE_RYML == 6
+    tree = parser.parse_in_arena(filename, csubstr_content);
+#endif
+
+#if OTEL_HAVE_RYML == 7
+    tree = parse_in_arena(&parser, filename, csubstr_content);
+#endif
+
     tree.resolve();
+  }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[Ryml Document] Parse failed with exception: " << e.what());
+    return doc;
   }
   catch (...)
   {
-    OTEL_INTERNAL_LOG_ERROR("Failed to load yaml.");
+    OTEL_INTERNAL_LOG_ERROR("[Ryml Document] Parse failed with unknown exception.");
     return doc;
   }
 
@@ -42,7 +71,7 @@ std::unique_ptr<Document> RymlDocument::Parse(std::string content)
 
 std::unique_ptr<DocumentNode> RymlDocument::GetRootNode()
 {
-  RymlDocumentNode *ryml_node = new RymlDocumentNode(m_tree.rootref());
+  RymlDocumentNode *ryml_node = new RymlDocumentNode(m_tree.rootref(), 0);
   std::unique_ptr<DocumentNode> node(ryml_node);
   return node;
 }
