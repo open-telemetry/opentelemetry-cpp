@@ -4,8 +4,8 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,13 +20,13 @@ enum enum_default_histogram_aggregation
   base2_exponential_bucket_histogram
 };
 
-class OtlpMetricExporterConfiguration : public MetricExporterConfiguration
+class OtlpPushMetricExporterConfiguration : public PushMetricExporterConfiguration
 {
 public:
-  OtlpMetricExporterConfiguration()           = default;
-  ~OtlpMetricExporterConfiguration() override = default;
+  OtlpPushMetricExporterConfiguration()           = default;
+  ~OtlpPushMetricExporterConfiguration() override = default;
 
-  void Accept(MetricExporterConfigurationVisitor *visitor) const override
+  void Accept(PushMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitOtlp(this);
   }

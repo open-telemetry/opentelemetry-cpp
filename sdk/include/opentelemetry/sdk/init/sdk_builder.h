@@ -9,13 +9,20 @@
 #include "opentelemetry/sdk/configuration/composite_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -112,9 +119,32 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)
       const;
 
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreatePushMetricExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::MetricExporterConfiguration> &model)
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpPushMetricExporter(
+      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateConsolePushMetricExporter(
+      const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+  CreateExtensionPushMetricExporter(
+      const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model)
       const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePrometheusPullMetricExporter(
+      const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreateExtensionPullMetricExporter(
+      const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreatePushMetricExporter(
+      const std::unique_ptr<opentelemetry::sdk::configuration::PushMetricExporterConfiguration>
+          &model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePullMetricExporter(
+      const std::unique_ptr<opentelemetry::sdk::configuration::PullMetricExporterConfiguration>
+          &model) const;
 
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePeriodicMetricReader(
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) const;

@@ -4,8 +4,8 @@
 #pragma once
 
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,13 +14,13 @@ namespace sdk
 namespace configuration
 {
 
-class PrometheusMetricExporterConfiguration : public MetricExporterConfiguration
+class PrometheusPullMetricExporterConfiguration : public PullMetricExporterConfiguration
 {
 public:
-  PrometheusMetricExporterConfiguration()           = default;
-  ~PrometheusMetricExporterConfiguration() override = default;
+  PrometheusPullMetricExporterConfiguration()           = default;
+  ~PrometheusPullMetricExporterConfiguration() override = default;
 
-  void Accept(MetricExporterConfigurationVisitor *visitor) const override
+  void Accept(PullMetricExporterConfigurationVisitor *visitor) const override
   {
     visitor->VisitPrometheus(this);
   }

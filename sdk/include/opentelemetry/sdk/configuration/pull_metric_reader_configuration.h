@@ -5,9 +5,9 @@
 
 #include <memory>
 
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,7 +27,7 @@ public:
     visitor->VisitPull(this);
   }
 
-  std::unique_ptr<MetricExporterConfiguration> exporter;
+  std::unique_ptr<PullMetricExporterConfiguration> exporter;
 };
 
 }  // namespace configuration

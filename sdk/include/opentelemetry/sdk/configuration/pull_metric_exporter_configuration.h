@@ -10,15 +10,15 @@ namespace sdk
 {
 namespace configuration
 {
-class MetricExporterConfigurationVisitor;
+class PullMetricExporterConfigurationVisitor;
 
-class MetricExporterConfiguration
+class PullMetricExporterConfiguration
 {
 public:
-  MetricExporterConfiguration()          = default;
-  virtual ~MetricExporterConfiguration() = default;
+  PullMetricExporterConfiguration()          = default;
+  virtual ~PullMetricExporterConfiguration() = default;
 
-  virtual void Accept(MetricExporterConfigurationVisitor *visitor) const = 0;
+  virtual void Accept(PullMetricExporterConfigurationVisitor *visitor) const = 0;
 };
 
 }  // namespace configuration

@@ -38,7 +38,11 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
@@ -56,14 +60,19 @@
 #include "opentelemetry/sdk/configuration/zipkin_span_exporter_configuration.h"
 #include "opentelemetry/sdk/init/configured_sdk.h"
 #include "opentelemetry/sdk/init/console_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_log_record_processor_builder.h"
+#include "opentelemetry/sdk/init/extension_pull_metric_exporter_builder.h"
+#include "opentelemetry/sdk/init/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_sampler_builder.h"
 #include "opentelemetry/sdk/init/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/init/extension_span_processor_builder.h"
 #include "opentelemetry/sdk/init/otlp_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/init/otlp_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/otlp_span_exporter_builder.h"
+#include "opentelemetry/sdk/init/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/init/sdk_builder.h"
 #include "opentelemetry/sdk/init/text_map_propagator_builder.h"
@@ -275,44 +284,64 @@ private:
   const SdkBuilder *m_sdk_builder;
 };
 
-#ifdef LATER
-class MetricExporterBuilder
-    : public opentelemetry::sdk::configuration::MetricExporterConfigurationVisitor
+class PushMetricExporterBuilder
+    : public opentelemetry::sdk::configuration::PushMetricExporterConfigurationVisitor
 {
 public:
-  MetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
-  ~MetricExporterBuilder() override = default;
+  PushMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  ~PushMetricExporterBuilder() override = default;
 
   void VisitOtlp(
-      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
+      const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) override
   {
-    exporter = m_sdk_builder->CreateOtlpSpanExporter(model);
+    exporter = m_sdk_builder->CreateOtlpPushMetricExporter(model);
   }
 
-  void VisitConsole(
-      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
+  void VisitConsole(const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration
+                        *model) override
   {
-    exporter = m_sdk_builder->CreateConsoleSpanExporter(model);
-  }
-
-  void VisitZipkin(
-      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
-  {
-    exporter = m_sdk_builder->CreateZipkinSpanExporter(model);
+    exporter = m_sdk_builder->CreateConsolePushMetricExporter(model);
   }
 
   void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) override
+      const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model)
+      override
   {
-    exporter = m_sdk_builder->CreateExtensionSpanExporter(model);
+    exporter = m_sdk_builder->CreateExtensionPushMetricExporter(model);
   }
 
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> exporter;
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter;
 
 private:
   const SdkBuilder *m_sdk_builder;
 };
-#endif
+
+class PullMetricExporterBuilder
+    : public opentelemetry::sdk::configuration::PullMetricExporterConfigurationVisitor
+{
+public:
+  PullMetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  ~PullMetricExporterBuilder() override = default;
+
+  void VisitPrometheus(
+      const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
+      override
+  {
+    exporter = m_sdk_builder->CreatePrometheusPullMetricExporter(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model)
+      override
+  {
+    exporter = m_sdk_builder->CreateExtensionPullMetricExporter(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> exporter;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
 
 class LogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
@@ -756,19 +785,148 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreateOtlpPushMetricExporter(
+    const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+
+  const OtlpPushMetricExporterBuilder *builder = m_registry->GetOtlpPushMetricExporterBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpPushMetricExporter() using registered builder");
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for OtlpPushMetricExporter");
+    throw UnsupportedException("No builder for OtlpPushMetricExporter");
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreateConsolePushMetricExporter(
+    const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+
+  const ConsolePushMetricExporterBuilder *builder =
+      m_registry->GetConsolePushMetricExporterBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateConsolePushMetricExporter() using registered builder");
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ConsolePushMetricExporter");
+    throw UnsupportedException("No builder for ConsolePushMetricExporter");
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreateExtensionPushMetricExporter(
+    const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+  std::string name = model->name;
+
+  const ExtensionPushMetricExporterBuilder *builder =
+      m_registry->GetExtensionPushMetricExporterBuilder(name);
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPushMetricExporter() using registered builder" << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ExtensionPushMetricExporter" << name);
+    throw UnsupportedException("No builder for " + name);
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
+SdkBuilder::CreatePrometheusPullMetricExporter(
+    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+
+  const PrometheusPullMetricExporterBuilder *builder =
+      m_registry->GetPrometheusPullMetricExporterBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreatePrometheusPullMetricExporter() using registered builder");
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for PrometheusMetricExporter");
+    throw UnsupportedException("No builder for PrometheusMetricExporter");
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
+SdkBuilder::CreateExtensionPullMetricExporter(
+    const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+  std::string name = model->name;
+
+  const ExtensionPullMetricExporterBuilder *builder =
+      m_registry->GetExtensionPullMetricExporterBuilder(name);
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPullMetricExporter() using registered builder" << name);
+    sdk = builder->Build(model);
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR("No builder for ExtensionPullMetricExporter" << name);
+    throw UnsupportedException("No builder for " + name);
+  }
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
 SdkBuilder::CreatePushMetricExporter(
-    const std::unique_ptr<opentelemetry::sdk::configuration::MetricExporterConfiguration> &model)
-    const
+    const std::unique_ptr<opentelemetry::sdk::configuration::PushMetricExporterConfiguration>
+        &model) const
 {
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
 
   OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePushMetricExporter: FIXME");
 
-#ifdef LATER
-  MetricExporterBuilder builder(this);
+  PushMetricExporterBuilder builder(this);
   model->Accept(&builder);
   sdk = std::move(builder.exporter);
-#endif
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricExporter(
+    const std::unique_ptr<opentelemetry::sdk::configuration::PullMetricExporterConfiguration>
+        &model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePullMetricExporter: FIXME");
+
+  PullMetricExporterBuilder builder(this);
+  model->Accept(&builder);
+  sdk = std::move(builder.exporter);
 
   return sdk;
 }
@@ -797,6 +955,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
   OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePullMetricReader: FIXME");
+  sdk = CreatePullMetricExporter(model->exporter);
 
   return sdk;
 }
@@ -1105,10 +1264,7 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->meter_provider)
     {
-      // FIXME: work in progress
-#ifdef LATER
       sdk->m_meter_provider = CreateMeterProvider(model->meter_provider, sdk->m_resource);
-#endif
     }
 
     if (model->logger_provider)

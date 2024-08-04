@@ -195,6 +195,44 @@ void Registry::AddExtensionSpanProcessorBuilder(const std::string &name,
   m_span_processor_builders.insert(entry);
 }
 
+const ExtensionPushMetricExporterBuilder *Registry::GetExtensionPushMetricExporterBuilder(
+    const std::string &name)
+{
+  ExtensionPushMetricExporterBuilder *builder = nullptr;
+  auto search                                 = m_push_metric_exporter_builders.find(name);
+  if (search != m_push_metric_exporter_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionPushMetricExporterBuilder(const std::string &name,
+                                                     ExtensionPushMetricExporterBuilder *builder)
+{
+  std::pair<std::string, ExtensionPushMetricExporterBuilder *> entry{name, builder};
+  m_push_metric_exporter_builders.insert(entry);
+}
+
+const ExtensionPullMetricExporterBuilder *Registry::GetExtensionPullMetricExporterBuilder(
+    const std::string &name)
+{
+  ExtensionPullMetricExporterBuilder *builder = nullptr;
+  auto search                                 = m_pull_metric_exporter_builders.find(name);
+  if (search != m_pull_metric_exporter_builders.end())
+  {
+    builder = search->second;
+  }
+  return builder;
+}
+
+void Registry::AddExtensionPullMetricExporterBuilder(const std::string &name,
+                                                     ExtensionPullMetricExporterBuilder *builder)
+{
+  std::pair<std::string, ExtensionPullMetricExporterBuilder *> entry{name, builder};
+  m_pull_metric_exporter_builders.insert(entry);
+}
+
 const ExtensionLogRecordExporterBuilder *Registry::GetExtensionLogRecordExporterBuilder(
     const std::string &name)
 {

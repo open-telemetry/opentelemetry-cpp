@@ -22,7 +22,7 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_factory.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/console_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
@@ -31,7 +31,8 @@
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
@@ -44,16 +45,17 @@
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/otlp_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/prometheus_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
+#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
@@ -330,10 +332,11 @@ static enum_default_histogram_aggregation ParseDefaultHistogramAggregation(const
   throw InvalidSchemaException("Illegal default_histogram_aggregation");
 }
 
-static std::unique_ptr<OtlpMetricExporterConfiguration> ParseOtlpMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<OtlpPushMetricExporterConfiguration>
+ParseOtlpPushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<OtlpMetricExporterConfiguration> model(new OtlpMetricExporterConfiguration);
+  std::unique_ptr<OtlpPushMetricExporterConfiguration> model(
+      new OtlpPushMetricExporterConfiguration);
   std::unique_ptr<DocumentNode> child;
 
   model->protocol           = node->GetRequiredString("protocol");
@@ -361,19 +364,20 @@ static std::unique_ptr<OtlpMetricExporterConfiguration> ParseOtlpMetricExporterC
   return model;
 }
 
-static std::unique_ptr<ConsoleMetricExporterConfiguration> ParseConsoleMetricExporterConfiguration(
-    const std::unique_ptr<DocumentNode> & /* node */)
+static std::unique_ptr<ConsolePushMetricExporterConfiguration>
+ParseConsolePushMetricExporterConfiguration(const std::unique_ptr<DocumentNode> & /* node */)
 {
-  std::unique_ptr<ConsoleMetricExporterConfiguration> model(new ConsoleMetricExporterConfiguration);
+  std::unique_ptr<ConsolePushMetricExporterConfiguration> model(
+      new ConsolePushMetricExporterConfiguration);
 
   return model;
 }
 
-static std::unique_ptr<PrometheusMetricExporterConfiguration>
-ParsePrometheusMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
+static std::unique_ptr<PrometheusPullMetricExporterConfiguration>
+ParsePrometheusPullMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<PrometheusMetricExporterConfiguration> model(
-      new PrometheusMetricExporterConfiguration);
+  std::unique_ptr<PrometheusPullMetricExporterConfiguration> model(
+      new PrometheusPullMetricExporterConfiguration);
 
   model->host                = node->GetString("host", "localhost");
   model->port                = node->GetInteger("port", 9464);
@@ -384,21 +388,32 @@ ParsePrometheusMetricExporterConfiguration(const std::unique_ptr<DocumentNode> &
   return model;
 }
 
-static std::unique_ptr<ExtensionMetricExporterConfiguration>
-ParseMetricExporterExtensionConfiguration(const std::string &name,
-                                          std::unique_ptr<DocumentNode> node)
+static std::unique_ptr<ExtensionPushMetricExporterConfiguration>
+ParsePushMetricExporterExtensionConfiguration(const std::string &name,
+                                              std::unique_ptr<DocumentNode> node)
 {
-  std::unique_ptr<ExtensionMetricExporterConfiguration> model(
-      new ExtensionMetricExporterConfiguration);
+  std::unique_ptr<ExtensionPushMetricExporterConfiguration> model(
+      new ExtensionPushMetricExporterConfiguration);
   model->name = name;
   model->node = std::move(node);
   return model;
 }
 
-static std::unique_ptr<MetricExporterConfiguration> ParseMetricExporterConfiguration(
+static std::unique_ptr<ExtensionPullMetricExporterConfiguration>
+ParsePullMetricExporterExtensionConfiguration(const std::string &name,
+                                              std::unique_ptr<DocumentNode> node)
+{
+  std::unique_ptr<ExtensionPullMetricExporterConfiguration> model(
+      new ExtensionPullMetricExporterConfiguration);
+  model->name = name;
+  model->node = std::move(node);
+  return model;
+}
+
+static std::unique_ptr<PushMetricExporterConfiguration> ParsePushMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
-  std::unique_ptr<MetricExporterConfiguration> model;
+  std::unique_ptr<PushMetricExporterConfiguration> model;
 
   std::string name;
   std::unique_ptr<DocumentNode> child;
@@ -413,25 +428,55 @@ static std::unique_ptr<MetricExporterConfiguration> ParseMetricExporterConfigura
 
   if (count != 1)
   {
-    OTEL_INTERNAL_LOG_ERROR("ParseMetricExporterConfiguration: count " << count);
+    OTEL_INTERNAL_LOG_ERROR("ParsePushMetricExporterConfiguration: count " << count);
     throw InvalidSchemaException("Illegal metric exporter");
   }
 
   if (name == "otlp")
   {
-    model = ParseOtlpMetricExporterConfiguration(child);
+    model = ParseOtlpPushMetricExporterConfiguration(child);
   }
   else if (name == "console")
   {
-    model = ParseConsoleMetricExporterConfiguration(child);
-  }
-  else if (name == "prometheus")
-  {
-    model = ParsePrometheusMetricExporterConfiguration(child);
+    model = ParseConsolePushMetricExporterConfiguration(child);
   }
   else
   {
-    model = ParseMetricExporterExtensionConfiguration(name, std::move(child));
+    model = ParsePushMetricExporterExtensionConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+static std::unique_ptr<PullMetricExporterConfiguration> ParsePullMetricExporterConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<PullMetricExporterConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    OTEL_INTERNAL_LOG_ERROR("ParsePullMetricExporterConfiguration: count " << count);
+    throw InvalidSchemaException("Illegal metric exporter");
+  }
+
+  if (name == "prometheus")
+  {
+    model = ParsePrometheusPullMetricExporterConfiguration(child);
+  }
+  else
+  {
+    model = ParsePullMetricExporterExtensionConfiguration(name, std::move(child));
   }
 
   return model;
@@ -447,7 +492,7 @@ static std::unique_ptr<PeriodicMetricReaderConfiguration> ParsePeriodicMetricRea
   model->timeout  = node->GetInteger("timeout", 30000);
 
   child           = node->GetRequiredChildNode("exporter");
-  model->exporter = ParseMetricExporterConfiguration(child);
+  model->exporter = ParsePushMetricExporterConfiguration(child);
 
   return model;
 }
@@ -459,7 +504,7 @@ static std::unique_ptr<PullMetricReaderConfiguration> ParsePullMetricReaderConfi
   std::unique_ptr<DocumentNode> child;
 
   child           = node->GetRequiredChildNode("exporter");
-  model->exporter = ParseMetricExporterConfiguration(child);
+  model->exporter = ParsePullMetricExporterConfiguration(child);
 
   return model;
 }
