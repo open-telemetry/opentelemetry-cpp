@@ -18,9 +18,11 @@
 #include "custom_span_processor_builder.h"
 
 #ifdef BAZEL_BUILD
-#  include "examples/common/foo_library/foo_library.h"
+#  include "examples/common/logs_foo_library/foo_library.h"
+#  include "examples/common/metrics_foo_library/foo_library.h"
 #else
-#  include "foo_library/foo_library.h"
+#  include "logs_foo_library/foo_library.h"
+#  include "metrics_foo_library/foo_library.h"
 #endif
 
 #ifdef OTEL_HAVE_OTLP
@@ -174,6 +176,9 @@ int main(int argc, char *argv[])
   InitOtel(yaml_file_path);
 
   foo_library();
+  foo_library::counter_example("yaml");
+  foo_library::observable_counter_example("yaml");
+  foo_library::histogram_example("yaml");
 
   CleanupOtel();
 }

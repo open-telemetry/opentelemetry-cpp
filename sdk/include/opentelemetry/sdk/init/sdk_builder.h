@@ -11,8 +11,11 @@
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
@@ -20,7 +23,9 @@
 #include "opentelemetry/sdk/init/registry.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -91,8 +96,8 @@ public:
       const;
 
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model)
-      const;
+      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
+      const opentelemetry::sdk::resource::Resource &resource) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;
@@ -107,13 +112,27 @@ public:
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)
       const;
 
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreatePushMetricExporter(
+      const std::unique_ptr<opentelemetry::sdk::configuration::MetricExporterConfiguration> &model)
+      const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePeriodicMetricReader(
+      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePullMetricReader(
+      const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreateMetricReader(
+      const std::unique_ptr<opentelemetry::sdk::configuration::MetricReaderConfiguration> &model)
+      const;
+
   void AddView(
       opentelemetry::sdk::metrics::ViewRegistry *registry,
       const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const;
 
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model)
-      const;
+      const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
+      const opentelemetry::sdk::resource::Resource &resource) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpLogRecordExporter(
       const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model) const;
@@ -144,8 +163,12 @@ public:
           &model) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
-      const;
+      const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
+      const opentelemetry::sdk::resource::Resource &resource) const;
+
+  void SetResource(opentelemetry::sdk::resource::Resource &resource,
+                   const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration>
+                       &opt_model) const;
 
   std::unique_ptr<ConfiguredSdk> CreateConfiguredSdk(
       const std::unique_ptr<opentelemetry::sdk::configuration::Configuration> &model) const;

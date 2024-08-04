@@ -7,6 +7,7 @@
 
 #include "opentelemetry/sdk/configuration/metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,6 +21,11 @@ class PullMetricReaderConfiguration : public MetricReaderConfiguration
 public:
   PullMetricReaderConfiguration()           = default;
   ~PullMetricReaderConfiguration() override = default;
+
+  void Accept(MetricReaderConfigurationVisitor *visitor) const override
+  {
+    visitor->VisitPull(this);
+  }
 
   std::unique_ptr<MetricExporterConfiguration> exporter;
 };

@@ -31,11 +31,14 @@
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/selector_configuration.h"
@@ -74,8 +77,12 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_context_factory.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
@@ -242,6 +249,70 @@ public:
 private:
   const SdkBuilder *m_sdk_builder;
 };
+
+class MetricReaderBuilder
+    : public opentelemetry::sdk::configuration::MetricReaderConfigurationVisitor
+{
+public:
+  MetricReaderBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  ~MetricReaderBuilder() override = default;
+
+  void VisitPeriodic(
+      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) override
+  {
+    metric_reader = m_sdk_builder->CreatePeriodicMetricReader(model);
+  }
+
+  void VisitPull(
+      const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) override
+  {
+    metric_reader = m_sdk_builder->CreatePullMetricReader(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> metric_reader;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
+
+#ifdef LATER
+class MetricExporterBuilder
+    : public opentelemetry::sdk::configuration::MetricExporterConfigurationVisitor
+{
+public:
+  MetricExporterBuilder(const SdkBuilder *b) : m_sdk_builder(b) {}
+  ~MetricExporterBuilder() override = default;
+
+  void VisitOtlp(
+      const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateOtlpSpanExporter(model);
+  }
+
+  void VisitConsole(
+      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateConsoleSpanExporter(model);
+  }
+
+  void VisitZipkin(
+      const opentelemetry::sdk::configuration::ZipkinSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateZipkinSpanExporter(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) override
+  {
+    exporter = m_sdk_builder->CreateExtensionSpanExporter(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricExporter> exporter;
+
+private:
+  const SdkBuilder *m_sdk_builder;
+};
+#endif
 
 class LogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
@@ -562,8 +633,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSpan
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model)
-    const
+    const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
+    const opentelemetry::sdk::resource::Resource &resource) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
@@ -585,7 +656,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   }
 
   // FIXME: use sampler, limits, id_generator, ...
-  sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors));
+  sdk =
+      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors), resource);
 
   return sdk;
 }
@@ -683,6 +755,65 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+SdkBuilder::CreatePushMetricExporter(
+    const std::unique_ptr<opentelemetry::sdk::configuration::MetricExporterConfiguration> &model)
+    const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePushMetricExporter: FIXME");
+
+#ifdef LATER
+  MetricExporterBuilder builder(this);
+  model->Accept(&builder);
+  sdk = std::move(builder.exporter);
+#endif
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePeriodicMetricReader(
+    const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+
+  opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
+
+  options.export_interval_millis = std::chrono::milliseconds(model->interval);
+  options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
+
+  auto exporter_sdk = CreatePushMetricExporter(model->exporter);
+
+  sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
+      std::move(exporter_sdk), options);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricReader(
+    const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+
+  OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreatePullMetricReader: FIXME");
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreateMetricReader(
+    const std::unique_ptr<opentelemetry::sdk::configuration::MetricReaderConfiguration> &model)
+    const
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
+
+  MetricReaderBuilder builder(this);
+  model->Accept(&builder);
+  sdk = std::move(builder.metric_reader);
+
+  return sdk;
+}
+
 void SdkBuilder::AddView(
     opentelemetry::sdk::metrics::ViewRegistry *registry,
     const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
@@ -723,8 +854,8 @@ void SdkBuilder::AddView(
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMeterProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model)
-    const
+    const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
+    const opentelemetry::sdk::resource::Resource &resource) const
 {
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> sdk;
 
@@ -735,7 +866,19 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
     AddView(view_registry.get(), view_configuration);
   }
 
+  auto meter_context =
+      opentelemetry::sdk::metrics::MeterContextFactory::Create(std::move(view_registry), resource);
+
   OTEL_INTERNAL_LOG_ERROR("CreateMeterProvider() FIXME");
+
+  for (const auto &reader_configuration : model->readers)
+  {
+    std::shared_ptr<opentelemetry::v1::sdk::metrics::MetricReader> metric_reader;
+    metric_reader = CreateMetricReader(reader_configuration);
+    meter_context->AddMetricReader(metric_reader);
+  }
+
+  sdk = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(meter_context));
 
   return sdk;
 }
@@ -888,8 +1031,8 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> SdkBuilder::Create
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model)
-    const
+    const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
+    const opentelemetry::sdk::resource::Resource &resource) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk;
 
@@ -901,9 +1044,37 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   }
 
   // FIXME: use limits
-  sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors));
+  sdk =
+      opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors), resource);
 
   return sdk;
+}
+
+void SdkBuilder::SetResource(
+    opentelemetry::sdk::resource::Resource &resource,
+    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration> &opt_model)
+    const
+{
+  if (opt_model)
+  {
+    opentelemetry::sdk::resource::ResourceAttributes sdk_attributes;
+
+    if (opt_model->attributes)
+    {
+      for (const auto &kv : opt_model->attributes->kv_map)
+      {
+        sdk_attributes.SetAttribute(kv.first, kv.second);
+      }
+    }
+
+    auto sdk_resource =
+        opentelemetry::sdk::resource::Resource::Create(sdk_attributes, opt_model->schema_url);
+    resource = resource.Merge(sdk_resource);
+  }
+  else
+  {
+    resource = opentelemetry::sdk::resource::Resource::GetDefault();
+  }
 }
 
 std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
@@ -913,9 +1084,18 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
   if (!model->disabled)
   {
+    SetResource(sdk->m_resource, model->resource);
+
+    if (model->attribute_limits)
+    {
+      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::CreateConfiguredSdk: FIXME limits");
+      // Ignore limits
+      // throw UnsupportedException("attribute_limits not available in opentelemetry-cpp");
+    }
+
     if (model->tracer_provider)
     {
-      sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider);
+      sdk->m_tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->m_resource);
     }
 
     if (model->propagator)
@@ -925,12 +1105,15 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->meter_provider)
     {
-      sdk->m_meter_provider = CreateMeterProvider(model->meter_provider);
+      // FIXME: work in progress
+#ifdef LATER
+      sdk->m_meter_provider = CreateMeterProvider(model->meter_provider, sdk->m_resource);
+#endif
     }
 
     if (model->logger_provider)
     {
-      sdk->m_logger_provider = CreateLoggerProvider(model->logger_provider);
+      sdk->m_logger_provider = CreateLoggerProvider(model->logger_provider, sdk->m_resource);
     }
   }
 

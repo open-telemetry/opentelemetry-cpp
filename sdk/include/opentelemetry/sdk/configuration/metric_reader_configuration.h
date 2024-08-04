@@ -12,12 +12,15 @@ namespace sdk
 {
 namespace configuration
 {
+class MetricReaderConfigurationVisitor;
 
 class MetricReaderConfiguration
 {
 public:
   MetricReaderConfiguration()          = default;
   virtual ~MetricReaderConfiguration() = default;
+
+  virtual void Accept(MetricReaderConfigurationVisitor *visitor) const = 0;
 };
 
 }  // namespace configuration
