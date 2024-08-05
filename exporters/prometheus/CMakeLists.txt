@@ -9,7 +9,7 @@ endif()
 add_library(
   opentelemetry_exporter_prometheus
   src/exporter.cc src/exporter_options.cc src/exporter_factory.cc
-  src/collector.cc src/exporter_utils.cc)
+  src/collector.cc src/exporter_utils.cc src/prometheus_pull_builder.cc)
 
 set_target_properties(opentelemetry_exporter_prometheus
                       PROPERTIES EXPORT_NAME prometheus_exporter)

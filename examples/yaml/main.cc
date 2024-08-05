@@ -34,6 +34,10 @@
 #  include "opentelemetry/exporters/zipkin/zipkin_builder.h"
 #endif
 
+#ifdef OTEL_HAVE_PROMETHEUS
+#  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
+#endif
+
 static bool opt_help              = false;
 static std::string yaml_file_path = "";
 
@@ -65,6 +69,10 @@ void InitOtel(const std::string &config_file)
 
 #ifdef OTEL_HAVE_ZIPKIN
   opentelemetry::exporter::zipkin::ZipkinBuilder::Register(registry.get());
+#endif
+
+#ifdef OTEL_HAVE_PROMETHEUS
+  opentelemetry::exporter::metrics::PrometheusPullBuilder::Register(registry.get());
 #endif
 
   /* 3 - Populate the registry with external extensions plugins */

@@ -34,6 +34,12 @@ if(WITH_ZIPKIN)
   target_link_libraries(example_yaml opentelemetry_exporter_zipkin_trace)
 endif()
 
+if(WITH_PROMETHEUS)
+  include_directories(${CMAKE_SOURCE_DIR}/exporters/prometheus/include)
+  add_definitions(-DOTEL_HAVE_PROMETHEUS)
+  target_link_libraries(example_yaml opentelemetry_exporter_prometheus)
+endif()
+
 if(DEFINED OPENTELEMETRY_BUILD_DLL)
   target_link_libraries(example_yaml opentelemetry_cpp)
 else()
