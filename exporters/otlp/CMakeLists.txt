@@ -267,8 +267,10 @@ target_link_libraries(
   opentelemetry_otlp_recordable
   PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
-add_library(opentelemetry_otlp_builder src/otlp_span_builder.cc
-                                       src/otlp_log_record_builder.cc)
+add_library(
+  opentelemetry_otlp_builder
+  src/otlp_span_builder.cc src/otlp_push_metric_builder.cc
+  src/otlp_log_record_builder.cc)
 set_target_properties(opentelemetry_otlp_builder PROPERTIES EXPORT_NAME
                                                             otlp_builder)
 set_target_version(opentelemetry_otlp_builder)
@@ -285,12 +287,16 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_otlp_builder
                         PUBLIC opentelemetry_exporter_otlp_http)
   target_link_libraries(opentelemetry_otlp_builder
+                        PUBLIC opentelemetry_exporter_otlp_http_metric)
+  target_link_libraries(opentelemetry_otlp_builder
                         PUBLIC opentelemetry_exporter_otlp_http_log)
 endif()
 
 if(WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_otlp_builder
                         PUBLIC opentelemetry_exporter_otlp_grpc)
+  target_link_libraries(opentelemetry_otlp_builder
+                        PUBLIC opentelemetry_exporter_otlp_grpc_metrics)
   target_link_libraries(opentelemetry_otlp_builder
                         PUBLIC opentelemetry_exporter_otlp_grpc_log)
 endif()

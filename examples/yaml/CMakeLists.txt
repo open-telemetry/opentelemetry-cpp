@@ -18,8 +18,12 @@ add_executable(
   custom_span_processor_builder.cc)
 
 target_link_libraries(
-  example_yaml ${CMAKE_THREAD_LIBS_INIT} common_metrics_foo_library
-  common_logs_foo_library opentelemetry_exporter_ostream_span
+  example_yaml
+  ${CMAKE_THREAD_LIBS_INIT}
+  common_metrics_foo_library
+  common_logs_foo_library
+  opentelemetry_exporter_ostream_span
+  opentelemetry_exporter_ostream_metrics
   opentelemetry_exporter_ostream_logs)
 
 if(WITH_OTLP_HTTP)

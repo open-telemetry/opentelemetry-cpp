@@ -41,8 +41,10 @@ if(BUILD_TESTING)
     TEST_LIST ostream_span_test)
 endif() # BUILD_TESTING
 
-add_library(opentelemetry_exporter_ostream_metrics
-            src/metric_exporter.cc src/metric_exporter_factory.cc)
+add_library(
+  opentelemetry_exporter_ostream_metrics
+  src/metric_exporter.cc src/metric_exporter_factory.cc
+  src/console_push_metric_builder.cc)
 set_target_properties(opentelemetry_exporter_ostream_metrics
                       PROPERTIES EXPORT_NAME ostream_metrics_exporter)
 set_target_version(opentelemetry_exporter_ostream_metrics)

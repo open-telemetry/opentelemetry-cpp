@@ -1032,7 +1032,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
 
   for (const auto &reader_configuration : model->readers)
   {
-    std::shared_ptr<opentelemetry::v1::sdk::metrics::MetricReader> metric_reader;
+    std::shared_ptr<opentelemetry::sdk::metrics::MetricReader> metric_reader;
     metric_reader = CreateMetricReader(reader_configuration);
     meter_context->AddMetricReader(metric_reader);
   }
