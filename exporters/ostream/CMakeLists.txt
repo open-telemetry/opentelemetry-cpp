@@ -1,8 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc
-                                                src/span_exporter_factory.cc)
+add_library(
+  opentelemetry_exporter_ostream_span
+  src/span_exporter.cc src/span_exporter_factory.cc src/console_span_builder.cc)
 
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
@@ -40,8 +41,10 @@ if(BUILD_TESTING)
     TEST_LIST ostream_span_test)
 endif() # BUILD_TESTING
 
-add_library(opentelemetry_exporter_ostream_metrics
-            src/metric_exporter.cc src/metric_exporter_factory.cc)
+add_library(
+  opentelemetry_exporter_ostream_metrics
+  src/metric_exporter.cc src/metric_exporter_factory.cc
+  src/console_push_metric_builder.cc)
 set_target_properties(opentelemetry_exporter_ostream_metrics
                       PROPERTIES EXPORT_NAME ostream_metrics_exporter)
 set_target_version(opentelemetry_exporter_ostream_metrics)
@@ -76,8 +79,10 @@ if(BUILD_TESTING)
     TEST_LIST ostream_metric_test)
 endif()
 
-add_library(opentelemetry_exporter_ostream_logs
-            src/log_record_exporter.cc src/log_record_exporter_factory.cc)
+add_library(
+  opentelemetry_exporter_ostream_logs
+  src/log_record_exporter.cc src/log_record_exporter_factory.cc
+  src/console_log_record_builder.cc)
 set_target_properties(opentelemetry_exporter_ostream_logs
                       PROPERTIES EXPORT_NAME ostream_log_record_exporter)
 set_target_version(opentelemetry_exporter_ostream_logs)
