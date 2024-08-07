@@ -319,3 +319,126 @@ This option does not depend on bazel central.
 
 Secondly, there is also a build using modules, with file `MODULE.bazel`.
 This option does depend on bazel central, and CI depends on it.
+
+## semantic-conventions and build-tools
+
+### Comments
+
+Some code in opentelemetry-cpp is generated automatically, namely files:
+
+* api/include/opentelemetry/trace/semantic_conventions.h
+* sdk/include/opentelemetry/sdk/resource/semantic_conventions.h
+
+The semantic conventions C++ declarations are generated using:
+
+* data represented in yaml ("semantic-conventions")
+* a code generator ("build-tools")
+
+This generation is not done as part of the build,
+it is done once by maintainers, and the generated code
+is added (checked in) in the opentelemetry-cpp repository.
+
+### Origin
+
+The repository for semantic-conventions is:
+
+* [repository](https://github.com/open-telemetry/semantic-conventions)
+
+Check release notes at:
+
+* [release-notes](https://github.com/open-telemetry/semantic-conventions/releases)
+
+The repository for build-tools is:
+
+* [repository](https://github.com/open-telemetry/build-tools)
+
+Check release notes at:
+
+* [release-notes](https://github.com/open-telemetry/build-tools/releases)
+
+Semantic conventions and build-tools works together,
+make sure to use the proper version of build-tools
+that is required to use a given version of semantic-conventions.
+
+### Upgrade
+
+When upgrading semantic-conventions to a newer release,
+a few places in the code need adjustment.
+
+In this example, we upgrade from semantic-conventions 1.26.0 to 1.27.0
+
+In this case, semantic-conventions 1.27.0 also
+require a new version of build-tools,
+because the yaml format for the data changed.
+
+In this example, we upgrade from build-tools 0.24.0 to 0.25.0
+
+#### file buildscripts/semantic-convention/generate.sh
+
+Update the line pointing to the semantic-conventions tag.
+
+```text
+SEMCONV_VERSION=1.27.0
+```
+
+Update the line pointing to the build-tools tag.
+
+```text
+GENERATOR_VERSION=0.25.0
+```
+
+Typical change:
+
+```shell
+[malff@malff-desktop opentelemetry-cpp]$ git diff buildscripts/semantic-convention/generate.sh
+diff --git a/buildscripts/semantic-convention/generate.sh b/buildscripts/semantic-convention/generate.sh
+index 2bcd07e2..8ad3292e 100755
+--- a/buildscripts/semantic-convention/generate.sh
++++ b/buildscripts/semantic-convention/generate.sh
+@@ -19,10 +19,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
+ #   https://github.com/open-telemetry/opentelemetry-specification
+ # Repository from 1.21.0:
+ #   https://github.com/open-telemetry/semantic-conventions
+-SEMCONV_VERSION=1.26.0
++SEMCONV_VERSION=1.27.0
+ 
+ # repository: https://github.com/open-telemetry/build-tools
+-GENERATOR_VERSION=0.24.0
++GENERATOR_VERSION=0.25.0
+ 
+ SPEC_VERSION=v$SEMCONV_VERSION
+ SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
+```
+
+This change alone does nothing, the next step is to execute the generate.sh
+script.
+
+If generation is successful, the generated code contains the new schema URL:
+
+```shell
+[malff@malff-desktop opentelemetry-cpp]$ find . -name semantic_conventions.h
+./api/include/opentelemetry/trace/semantic_conventions.h
+./sdk/include/opentelemetry/sdk/resource/semantic_conventions.h
+[malff@malff-desktop opentelemetry-cpp]$ grep kSchemaUrl ./api/include/opentelemetry/trace/semantic_conventions.h
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.27.0";
+[malff@malff-desktop opentelemetry-cpp]$ grep kSchemaUrl ./sdk/include/opentelemetry/sdk/resource/semantic_conventions.h
+static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.27.0";
+```
+
+Apply clang-format on the generated code, and check-in changes.
+
+### Known issues
+
+Depending on tooling changes,
+the generate.sh script may need adjustments.
+
+Depending on changes in code generation,
+the template used to generate code may need adjustments.
+
+This template is implemented in file
+  `buildscripts/semantic-convention/templates/SemanticAttributes.h.j2`.
+
+Last, in some special case like name collisions for a given symbol,
+the template itself may need to be adjusted for special logic.
+
+See for example how `messaging.client_id` is treated.
