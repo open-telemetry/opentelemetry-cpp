@@ -26,7 +26,8 @@ void PrometheusPullBuilder::Register(opentelemetry::sdk::init::Registry *registr
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder::Build(
-    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model) const
+    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration
+        * /* model */) const
 {
   opentelemetry::exporter::metrics::PrometheusExporterOptions options;
 

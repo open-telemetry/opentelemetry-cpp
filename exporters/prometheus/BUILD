@@ -15,7 +15,7 @@ cc_library(
         "include/opentelemetry/exporters/prometheus/exporter.h",
         "include/opentelemetry/exporters/prometheus/exporter_factory.h",
         "include/opentelemetry/exporters/prometheus/exporter_options.h",
-        "include/opentelemetry/exporters/prometheus/prometheus_builder.h",
+        "include/opentelemetry/exporters/prometheus/prometheus_pull_builder.h",
     ],
     strip_include_prefix = "include",
     tags = ["prometheus"],
