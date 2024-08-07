@@ -16,7 +16,7 @@ and inspect the commit for the last upgrade.
 
 ## opentelemetry-proto
 
-### Comments
+### Comments (opentelemetry-proto)
 
 Unlike other opentelemetry SIGs, opentelemetry-cpp generates code
 from opentelemetry-proto as part of the opentelemetry-cpp build.
@@ -30,7 +30,7 @@ so that generated code is never checked in.
 This allows more flexibility, should the compiler (protobuf) be
 upgraded even when the source code (opentelemetry-proto) is unchanged.
 
-### Origin
+### Origin (opentelemetry-proto)
 
 The repository for opentelemetry-proto is:
 
@@ -40,7 +40,7 @@ Check release notes at:
 
 * [release-notes](https://github.com/open-telemetry/opentelemetry-proto/releases)
 
-### Upgrade
+### Upgrade (opentelemetry-proto)
 
 When upgrading opentelemetry-proto to a newer release,
 a few places in the code need adjustment.
@@ -310,7 +310,7 @@ index 7b84c2b7..3161ffb1 100644
  bazel_dep(name = "prometheus-cpp", version = "1.2.4", repo_name = "com_github_jupp0r_prometheus_cpp")
 ```
 
-### Known issues
+### Known issues (opentelemetry-proto)
 
 For bazel, two different methods to build exists.
 
@@ -322,7 +322,7 @@ This option does depend on bazel central, and CI depends on it.
 
 ## semantic-conventions and build-tools
 
-### Comments
+### Comments (semantic-conventions)
 
 Some code in opentelemetry-cpp is generated automatically, namely files:
 
@@ -338,7 +338,7 @@ This generation is not done as part of the build,
 it is done once by maintainers, and the generated code
 is added (checked in) in the opentelemetry-cpp repository.
 
-### Origin
+### Origin (semantic-conventions)
 
 The repository for semantic-conventions is:
 
@@ -360,7 +360,7 @@ Semantic conventions and build-tools works together,
 make sure to use the proper version of build-tools
 that is required to use a given version of semantic-conventions.
 
-### Upgrade
+### Upgrade (semantic-conventions)
 
 When upgrading semantic-conventions to a newer release,
 a few places in the code need adjustment.
@@ -401,11 +401,11 @@ index 2bcd07e2..8ad3292e 100755
  #   https://github.com/open-telemetry/semantic-conventions
 -SEMCONV_VERSION=1.26.0
 +SEMCONV_VERSION=1.27.0
- 
+
  # repository: https://github.com/open-telemetry/build-tools
 -GENERATOR_VERSION=0.24.0
 +GENERATOR_VERSION=0.25.0
- 
+
  SPEC_VERSION=v$SEMCONV_VERSION
  SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
 ```
@@ -427,7 +427,7 @@ static constexpr const char *kSchemaUrl = "https://opentelemetry.io/schemas/1.27
 
 Apply clang-format on the generated code, and check-in changes.
 
-### Known issues
+### Known issues (semantic-conventions)
 
 Depending on tooling changes,
 the generate.sh script may need adjustments.
