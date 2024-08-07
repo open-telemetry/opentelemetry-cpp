@@ -7,6 +7,9 @@
 # Enable automatic configs based on platform
 common --enable_platform_specific_config
 
+# Make globs that don't match anything fail
+common --incompatible_disallow_empty_glob
+
 # Needed by gRPC to build on some platforms.
 build --copt -DGRPC_BAZEL_BUILD
 
