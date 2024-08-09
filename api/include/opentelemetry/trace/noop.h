@@ -7,15 +7,21 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
-#include <memory>
+#include <stdint.h>
+#include <utility>
 
-#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"

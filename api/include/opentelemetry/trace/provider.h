@@ -5,17 +5,15 @@
 
 #include <mutex>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
-class TracerProvider;
 
 /**
  * Stores the singleton global TracerProvider.
