@@ -13,6 +13,7 @@ brew install prometheus-cpp
 brew install c-ares
 brew install openssl@3
 brew install re2
+brew install curl
 ./ci/install_abseil.sh
 
 # Quick Fix for mac to reuse ./ci/install_protobuf.sh
