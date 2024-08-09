@@ -39,8 +39,8 @@ jobs:
             -DCMAKE_CXX_STANDARD=14 \
             -DWITH_STL=CXX14 \
             -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${TOPDIR}/.iwyu.imp;" \
-            -DBUILD_TESTING=OFF \
-            -DBUILD_W3CTRACECONTEXT_TEST=OFF \
+            -DBUILD_TESTING=ON \
+            -DBUILD_W3CTRACECONTEXT_TEST=ON \
             -DWITH_OTLP_GRPC=OFF \
             -DWITH_OTLP_HTTP=ON \
             -DWITH_OTLP_FILE=ON \
