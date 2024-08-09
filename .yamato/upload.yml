@@ -1,7 +1,7 @@
-upload_to_stevedore_testing:
-  name: upload to stevedore testing
+deploy:
+  name: Deploy OpenTelemetry CPP (stevedore)
   agent:
-    image: build-system/unity-ubuntu-18.04:v1.0.3-1042326
+    image: slough-ops/ubuntu-24.04-base:latest
     flavor: b1.small
     type: Unity::VM
   commands:
@@ -9,9 +9,20 @@ upload_to_stevedore_testing:
       set -euxo pipefail
       curl -sSo StevedoreUpload "$STEVEDORE_UPLOAD_TOOL_LINUX_X64_URL"
       chmod +x StevedoreUpload
-      ./StevedoreUpload --version-len=12 --repo=testing --version="$GIT_REVISION" opentelemetry-cpp-lin-amd64.zip opentelemetry-cpp-mac-amd64.zip opentelemetry-cpp-win-amd64.zip
+      ls 
+      ./StevedoreUpload \
+          --version-len=${#OPENTELEMETRY_CPP_VERSION} --repo=$STEVE_REPO --version="$OPENTELEMETRY_CPP_VERSION" \
+          opentelemetry-cpp-lin-x64.zip \
+          opentelemetry-cpp-mac-x64.zip \
+          opentelemetry-cpp-win-arm64.zip \
+          opentelemetry-cpp-win-x64.zip
   skip_checkout: true
   dependencies:
-    - .yamato/build.yml#build_linux
-    - .yamato/build.yml#build_mac_amd64
-    - .yamato/build.yml#build_windows
+    - .yamato/build.yml#build_linux_x64
+    - .yamato/build.yml#build_windows_x64
+    - .yamato/build.yml#build_macos_x64
+    - .yamato/build.yml#build_windows_arm64
+    #- .yamato/build.yml#build_macos_arm64
+  variables:
+    OPENTELEMETRY_CPP_VERSION: v1.16.1
+    STEVE_REPO: testing

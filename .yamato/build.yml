@@ -1,5 +1,15 @@
-build_linux:
-  name: build linux
+build_pr:
+  name: Build OpenTelemetry CPP (PR)
+  dependencies:
+    - .yamato/build.yml#build_linux_x64
+    - .yamato/build.yml#build_windows_x64
+    - .yamato/build.yml#build_macos_x64
+#    - .yamato/build.yml#build_linux_arm64
+    - .yamato/build.yml#build_windows_arm64
+    - .yamato/build.yml#build_macos_arm64
+
+deprecated_build_linux:
+  name: (Deprecated) Build OpenTelemetry CPP (Linux x64)
   agent:
     image: slough-ops/centos-7-base
     flavor: b1.large
@@ -51,11 +61,8 @@ build_linux:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - opentelemetry-cpp-lin-amd64.zip
-  triggers:
-    expression: pull_request.target eq "unity"
-
-build_mac_amd64:
-  name: build mac amd64
+deprecated_build_mac_amd64:
+  name: (Deprecated) Build OpenTelemetry CPP (macOS x64)
   agent:
     image: build-system/unity-macos-10.15:v1.0.3-1026271
     flavor: b1.large
@@ -100,11 +107,8 @@ build_mac_amd64:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - "opentelemetry-cpp-mac-amd64.zip"
-  triggers:
-    expression: pull_request.target eq "unity"
-
-build_windows:
-  name: build windows
+deprecated_build_windows:
+  name: (Deprecated) Build OpenTelemetry CPP (Windows x64)
   agent:
     image: build-system/bee-windows-10-vs2019:v0.1.3-1006513
     flavor: b1.xlarge
@@ -171,5 +175,197 @@ build_windows:
     opentelemetry-cpp-stevedore-pkg:
       paths:
         - "opentelemetry-cpp-win-amd64.zip"
-  triggers:
-    expression: pull_request.target eq "unity"
+
+build_windows_x64:
+  name: Build OpenTelemetry CPP (Windows x64)
+  agent:
+    image: build-system/unity-win10-22H2-vs2022-neutron:v2.2400237
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    BUILDTOOLS_VERSION: vs2022
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBTYPE: x64-windows-static-md
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    VISUAL_STUDIO_PATH: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional"
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        $ErrorActionPreference = "Stop"
+        & git submodule update --recursive --init --jobs $env:NUMBER_OF_PROCESSORS
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      name: Update submodules
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/prepare_vm_windows.ps1
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/build.ps1
+      name: Build OpenTelemetry CPP
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/package_windows.ps1
+      name: Package OpenTelemetry CPP
+  interpreter: powershell
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_windows.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-windows-x64:
+      paths:
+        - opentelemetry-cpp-win-x64.zip
+build_windows_arm64:
+  name: Build OpenTelemetry CPP (Windows arm64)
+  agent:
+    image: build-system/unity-win10-22H2-vs2022-neutron:v2.2400237
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    BUILDTOOLS_VERSION: vs2022
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBTYPE: arm64-windows-static-md
+    OPENTELEMETRY_CPP_LIBARCH: arm64
+    VISUAL_STUDIO_PATH: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional"
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        $ErrorActionPreference = "Stop"
+        & git submodule update --recursive --init --jobs $env:NUMBER_OF_PROCESSORS
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      name: Update submodules
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/prepare_vm_windows.ps1
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/build.ps1
+      name: Build OpenTelemetry CPP
+    - command: |
+        $ErrorActionPreference = "Stop"
+        ./.yamato/scripts/package_windows.ps1
+      name: Package OpenTelemetry CPP
+  interpreter: powershell
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_windows.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-windows-arm64:
+      paths:
+        - opentelemetry-cpp-win-arm64.zip
+
+build_linux_x64:
+  name: Build OpenTelemetry CPP (Linux x64)
+  agent:
+    image: slough-ops/ubuntu-24.04-base:v0.0.1-1331040
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_linux.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/build.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_linux.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-linux-x64:
+      paths:
+        - opentelemetry-cpp-lin-x64.zip
+
+build_macos_x64:
+  name: Build OpenTelemetry CPP (macOS x64)
+  agent:
+    image: slough-ops/macos-14-xcode:v0.0.2-1332463
+    type: Unity::VM::osx
+    flavor: b1.xlarge
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_mac.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/build.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_mac.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-macos-x64:
+      paths:
+        - opentelemetry-cpp-mac-x64.zip
+build_macos_arm64:
+  name: Build OpenTelemetry CPP (macOS arm64)
+  agent:
+    image: slough-ops/macos-14-arm64-xcode:v0.0.4-1332464
+    type: Unity::VM::osx
+    flavor: m1.mac
+    model: M1
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: arm64
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_mac.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/build.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_mac.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-macos-arm64:
+      paths:
+        - opentelemetry-cpp-mac-arm64.zip
