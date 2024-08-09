@@ -128,19 +128,6 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # libcurl (optional)
-    maybe(
-        http_archive,
-        name = "curl",
-        build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
-        sha256 = "816e41809c043ff285e8c0f06a75a1fa250211bbfb2dc0a037eeef39f1a9e427",
-        strip_prefix = "curl-8.4.0",
-        urls = [
-            "https://curl.haxx.se/download/curl-8.4.0.tar.gz",
-            "https://github.com/curl/curl/releases/download/curl-8_4_0/curl-8.4.0.tar.gz",
-        ],
-    )
-
     # rules foreign cc
     maybe(
         http_archive,
