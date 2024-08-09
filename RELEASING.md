@@ -2,7 +2,7 @@
 
 ## Pre Release
 
-1: Upgrade to latest [semantic-conventions](docs/semantic-conventions.md)
+1: Upgrade to latest [dependencies](docs/maintaining-dependencies.md)
 if required.
 
 2: Make sure all relevant changes for this release are included under
