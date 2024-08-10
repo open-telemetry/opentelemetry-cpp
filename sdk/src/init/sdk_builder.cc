@@ -505,7 +505,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> sdk;
   const OtlpSpanExporterBuilder *builder;
 
-  if (model->protocol == "http")
+  if (model->protocol.find("http/") == 0)
   {
     builder = m_registry->GetOtlpHttpSpanBuilder();
     if (builder != nullptr)
@@ -520,7 +520,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpS
     throw UnsupportedException(die);
   }
 
-  if (model->protocol == "grpc")
+  if (model->protocol.find("grpc/") == 0)
   {
     builder = m_registry->GetOtlpGrpcSpanBuilder();
     if (builder != nullptr)
@@ -815,7 +815,7 @@ SdkBuilder::CreateOtlpPushMetricExporter(
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
   const OtlpPushMetricExporterBuilder *builder;
 
-  if (model->protocol == "http")
+  if (model->protocol.find("http/") == 0)
   {
     builder = m_registry->GetOtlpHttpPushMetricExporterBuilder();
     if (builder != nullptr)
@@ -830,7 +830,7 @@ SdkBuilder::CreateOtlpPushMetricExporter(
     throw UnsupportedException(die);
   }
 
-  if (model->protocol == "grpc")
+  if (model->protocol.find("grpc/") == 0)
   {
     builder = m_registry->GetOtlpGrpcPushMetricExporterBuilder();
     if (builder != nullptr)
@@ -1096,7 +1096,7 @@ SdkBuilder::CreateOtlpLogRecordExporter(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> sdk;
   const OtlpLogRecordExporterBuilder *builder;
 
-  if (model->protocol == "http")
+  if (model->protocol.find("http/") == 0)
   {
     builder = m_registry->GetOtlpHttpLogRecordBuilder();
     if (builder != nullptr)
@@ -1111,7 +1111,7 @@ SdkBuilder::CreateOtlpLogRecordExporter(
     throw UnsupportedException(die);
   }
 
-  if (model->protocol == "grpc")
+  if (model->protocol.find("grpc/") == 0)
   {
     builder = m_registry->GetOtlpGrpcLogRecordBuilder();
     if (builder != nullptr)
