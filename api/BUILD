@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_flag")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "int_flag", "string_flag")
 load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
@@ -39,6 +39,10 @@ otel_cc_library(
     }) + select({
         "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1"],
         "//conditions:default": ["OPENTELEMETRY_DLL=0"],
+    }) + select({
+        "//:with_dll_enabled": [], # always use ABI Version 2
+        ":abi_version_no_1": ["OPENTELEMETRY_ABI_VERSION_NO=1"],
+        ":abi_version_no_2": ["OPENTELEMETRY_ABI_VERSION_NO=2"],
     }),
     strip_include_prefix = "include",
     tags = ["api"],
@@ -79,4 +83,19 @@ bool_flag(
     name = "with_abseil",
     build_setting_default = False,
     deprecation = "The value of this flag is ignored. Bazel builds always depend on Abseil for its pre-adopted `std::` types. You should remove this flag from your build command.",
+)
+
+int_flag(
+    name = "abi_version_no",
+    build_setting_default = 1,
+)
+
+config_setting(
+    name = "abi_version_no_1",
+    flag_values = {":abi_version_no": "1"},
+)
+
+config_setting(
+    name = "abi_version_no_2",
+    flag_values = {":abi_version_no": "2"},
 )

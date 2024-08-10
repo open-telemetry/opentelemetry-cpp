@@ -553,6 +553,9 @@ point.
 //  Build settings for otel_sdk are hard-coded in this file, so users don't have to define them.
 #   define OPENTELEMETRY_STL_VERSION 2017
 #   define OPENTELEMETRY_OPTION_USE_STD_SPAN 0 // Use the nostd version, std::span is in C++2020
+#   ifdef OPENTELEMETRY_ABI_VERSION_NO
+#   undef OPENTELEMETRY_ABI_VERSION_NO
+#   endif
 #   define OPENTELEMETRY_ABI_VERSION_NO 2 // Use the new api
 #   define ENABLE_METRICS_EXEMPLAR_PREVIEW 1
 #   define ENABLE_ASYNC_EXPORT 1

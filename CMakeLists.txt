@@ -385,7 +385,8 @@ if(WITH_OTLP_GRPC
   if(WITH_OTLP_GRPC)
     find_package(gRPC)
   endif()
-  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (WITH_OTLP_GRPC
+                                                     AND NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
