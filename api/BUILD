@@ -40,7 +40,6 @@ otel_cc_library(
         "//:with_dll_enabled": ["OPENTELEMETRY_DLL=-1"],
         "//conditions:default": ["OPENTELEMETRY_DLL=0"],
     }) + select({
-        "//:with_dll_enabled": [], # always use ABI Version 2
         ":abi_version_no_1": ["OPENTELEMETRY_ABI_VERSION_NO=1"],
         ":abi_version_no_2": ["OPENTELEMETRY_ABI_VERSION_NO=2"],
     }),
