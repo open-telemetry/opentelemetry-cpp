@@ -28,8 +28,14 @@ target_link_libraries(
 
 if(WITH_OTLP_HTTP)
   include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
-  add_definitions(-DOTEL_HAVE_OTLP)
-  target_link_libraries(example_yaml opentelemetry_otlp_builder)
+  add_definitions(-DOTEL_HAVE_OTLP_HTTP)
+  target_link_libraries(example_yaml opentelemetry_otlp_http_builder)
+endif()
+
+if(WITH_OTLP_GRPC)
+  include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
+  add_definitions(-DOTEL_HAVE_OTLP_GRPC)
+  target_link_libraries(example_yaml opentelemetry_otlp_grpc_builder)
 endif()
 
 if(WITH_ZIPKIN)

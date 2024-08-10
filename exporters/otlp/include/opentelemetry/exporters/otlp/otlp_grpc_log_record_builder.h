@@ -17,14 +17,14 @@ namespace exporter
 namespace otlp
 {
 
-class OPENTELEMETRY_EXPORT OtlpLogRecordBuilder
+class OPENTELEMETRY_EXPORT OtlpGrpcLogRecordBuilder
     : public opentelemetry::sdk::init::OtlpLogRecordExporterBuilder
 {
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
-  OtlpLogRecordBuilder()           = default;
-  ~OtlpLogRecordBuilder() override = default;
+  OtlpGrpcLogRecordBuilder()           = default;
+  ~OtlpGrpcLogRecordBuilder() override = default;
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
       const opentelemetry::sdk::configuration::OtlpLogRecordExporterConfiguration *model)

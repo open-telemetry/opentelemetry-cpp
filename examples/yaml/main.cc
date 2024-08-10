@@ -26,10 +26,16 @@
 #  include "metrics_foo_library/foo_library.h"
 #endif
 
-#ifdef OTEL_HAVE_OTLP
-#  include "opentelemetry/exporters/otlp/otlp_log_record_builder.h"
-#  include "opentelemetry/exporters/otlp/otlp_push_metric_builder.h"
-#  include "opentelemetry/exporters/otlp/otlp_span_builder.h"
+#ifdef OTEL_HAVE_OTLP_HTTP
+#  include "opentelemetry/exporters/otlp/otlp_http_log_record_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_push_metric_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_span_builder.h"
+#endif
+
+#ifdef OTEL_HAVE_OTLP_GRPC
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_record_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_span_builder.h"
 #endif
 
 #ifdef OTEL_HAVE_ZIPKIN
@@ -65,10 +71,16 @@ void InitOtel(const std::string &config_file)
   opentelemetry::exporter::metrics::ConsolePushMetricBuilder::Register(registry.get());
   opentelemetry::exporter::logs::ConsoleLogRecordBuilder::Register(registry.get());
 
-#ifdef OTEL_HAVE_OTLP
-  opentelemetry::exporter::otlp::OtlpSpanBuilder::Register(registry.get());
-  opentelemetry::exporter::otlp::OtlpLogRecordBuilder::Register(registry.get());
-  opentelemetry::exporter::otlp::OtlpPushMetricBuilder::Register(registry.get());
+#ifdef OTEL_HAVE_OTLP_HTTP
+  opentelemetry::exporter::otlp::OtlpHttpSpanBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpHttpPushMetricBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpHttpLogRecordBuilder::Register(registry.get());
+#endif
+
+#ifdef OTEL_HAVE_OTLP_GRPC
+  opentelemetry::exporter::otlp::OtlpGrpcSpanBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpGrpcPushMetricBuilder::Register(registry.get());
+  opentelemetry::exporter::otlp::OtlpGrpcLogRecordBuilder::Register(registry.get());
 #endif
 
 #ifdef OTEL_HAVE_ZIPKIN

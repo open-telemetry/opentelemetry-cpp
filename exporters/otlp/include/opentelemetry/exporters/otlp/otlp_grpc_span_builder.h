@@ -17,14 +17,14 @@ namespace exporter
 namespace otlp
 {
 
-class OPENTELEMETRY_EXPORT OtlpSpanBuilder
+class OPENTELEMETRY_EXPORT OtlpGrpcSpanBuilder
     : public opentelemetry::sdk::init::OtlpSpanExporterBuilder
 {
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
-  OtlpSpanBuilder()           = default;
-  ~OtlpSpanBuilder() override = default;
+  OtlpGrpcSpanBuilder()           = default;
+  ~OtlpGrpcSpanBuilder() override = default;
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
       const opentelemetry::sdk::configuration::OtlpSpanExporterConfiguration *model) const override;

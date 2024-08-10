@@ -17,14 +17,14 @@ namespace exporter
 namespace otlp
 {
 
-class OPENTELEMETRY_EXPORT OtlpPushMetricBuilder
+class OPENTELEMETRY_EXPORT OtlpGrpcPushMetricBuilder
     : public opentelemetry::sdk::init::OtlpPushMetricExporterBuilder
 {
 public:
   static void Register(opentelemetry::sdk::init::Registry *registry);
 
-  OtlpPushMetricBuilder()           = default;
-  ~OtlpPushMetricBuilder() override = default;
+  OtlpGrpcPushMetricBuilder()           = default;
+  ~OtlpGrpcPushMetricBuilder() override = default;
 
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
       const opentelemetry::sdk::configuration::OtlpPushMetricExporterConfiguration *model)
