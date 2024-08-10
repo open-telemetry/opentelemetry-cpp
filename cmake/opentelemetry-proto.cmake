@@ -325,6 +325,7 @@ add_library(
   ${TRACE_SERVICE_PB_CPP_FILE}
   ${LOGS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_PB_CPP_FILE})
+set_target_version(opentelemetry_proto)
 
 # Disable include-what-you-use on generated code.
 set_target_properties(
@@ -341,6 +342,7 @@ if(WITH_OTLP_GRPC)
     opentelemetry_proto_grpc
     ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
     ${LOGS_SERVICE_GRPC_PB_CPP_FILE} ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
+  set_target_version(opentelemetry_proto_grpc)
 
   list(APPEND OPENTELEMETRY_PROTO_TARGETS opentelemetry_proto_grpc)
   target_link_libraries(opentelemetry_proto_grpc PUBLIC opentelemetry_proto)
