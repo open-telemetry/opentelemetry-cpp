@@ -585,7 +585,7 @@ point.
 #  else
 #     define OPENTELEMETRY_EXPORT __attribute__((visibility("default")))
 #     if defined(__clang__)
-#        define OPENTELEMETRY_EXPORT_TYPE __attribute__((type_visibility("default")))
+#        define OPENTELEMETRY_EXPORT_TYPE __attribute__((visibility("default")))  __attribute__((type_visibility("default")))
 #     else
 #        define OPENTELEMETRY_EXPORT_TYPE __attribute__((visibility("default")))
 #     endif

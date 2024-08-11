@@ -42,8 +42,7 @@ build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 #build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 build:linux --dynamic_mode=off --fission=yes --copt=-g 
 
-#build:macos --cxxopt=-fvisibility=hidden
-#build:macos --copt=-fvisibility=hidden
+build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
 build:macos --dynamic_mode=off --fission=yes --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
 # https://github.com/Homebrew/homebrew-core/issues/178435#issuecomment-2250615995
 build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib --linkopt=-lunwind
