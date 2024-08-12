@@ -8,8 +8,8 @@ set -euxo pipefail
 export BEE_INTERNAL_STEVEDORE_7ZA=7z/7za
 .yamato/bee steve internal-unpack public toolchain-llvm-centos-amd64/9.0.1-7.7.1908_9a2f0527b0c16f2524d24e372c7ebb8735e2e85ec99b6914f2a0a00c1e74d34d.7z TC
 .yamato/bee steve internal-unpack public linux-sysroot-amd64/glibc2.17_21db091a7ba6f278ece53e4afe50f840f2ba704112aaed9562fbd86421e4ce3b.7z sysroot
-echo -e '#!/bin/bash\nexec PWD/TC/bin/clang --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/13 -target x86_64-glibc2.17-linux-gnu $*' > clang
-echo -e '#!/bin/bash\nexec PWD/TC/bin/clang++ --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/13 -target x86_64-glibc2.17-linux-gnu $*' > clang++
+echo -e '#!/bin/bash\nexec PWD/TC/bin/clang --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/9.1.0 -target x86_64-glibc2.17-linux-gnu $*' > clang
+echo -e '#!/bin/bash\nexec PWD/TC/bin/clang++ --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/9.1.0 -target x86_64-glibc2.17-linux-gnu $*' > clang++
 sed -i -e "s|PWD|`pwd`|g" clang
 sed -i -e "s|PWD|`pwd`|g" clang++
 chmod +x clang
