@@ -80,3 +80,10 @@ functional/cert/server_cert_b.csr
 functional/cert/server_cert_b.pem
 functional/cert/server_cert_b-key.pem
 functional/cert/unreadable.pem
+
+# Extras
+7z/
+TC/
+sysroot/
+clang
+clang++
