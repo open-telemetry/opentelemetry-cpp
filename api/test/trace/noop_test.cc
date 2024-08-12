@@ -1,14 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/common/timestamp.h"
-
-#include <map>
-#include <memory>
-#include <string>
-
 #include <gtest/gtest.h>
+#include <initializer_list>
+#include <map>
+#include <string>
+#include <vector>
+
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 
 namespace trace_api = opentelemetry::trace;
 namespace nonstd    = opentelemetry::nostd;

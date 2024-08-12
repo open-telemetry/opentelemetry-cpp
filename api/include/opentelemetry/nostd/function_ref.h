@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <memory>
+#include <iosfwd>
 #include <type_traits>
+#include <utility>
 
 #include "opentelemetry/version.h"
 

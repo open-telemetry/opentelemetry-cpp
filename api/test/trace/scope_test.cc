@@ -3,7 +3,9 @@
 
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/noop.h"
 
 #include <gtest/gtest.h>
