@@ -1,11 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/trace/propagation/detail/hex.h"
-
-#include <map>
-
 #include <gtest/gtest.h>
+#include <string>
+
+#include "opentelemetry/trace/propagation/detail/hex.h"
 
 using namespace opentelemetry;
 

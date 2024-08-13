@@ -2,11 +2,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include <gtest/gtest.h>
 #include <map>
 #include <string>
+#include <utility>
+#include <vector>
+
 #include "opentelemetry/baggage/baggage_context.h"
+#include "opentelemetry/baggage/propagation/baggage_propagator.h"
+#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;

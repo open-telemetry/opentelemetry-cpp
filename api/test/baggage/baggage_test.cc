@@ -1,13 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/string_view.h"
-
+#include <assert.h>
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <algorithm>
 #include <string>
 #include <vector>
 
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage;

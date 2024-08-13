@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <initializer_list>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 #include <vector>
 

@@ -1,10 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/span.h"
-
-#include <cstdint>
-
+#include <gtest/gtest.h>
 #include <algorithm>
 #include <array>
 #include <iterator>
@@ -12,7 +9,7 @@
 #include <type_traits>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/nostd/span.h"
 
 using opentelemetry::nostd::span;
 

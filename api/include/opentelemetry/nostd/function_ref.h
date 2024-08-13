@@ -4,6 +4,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <memory>
 #include <type_traits>
 #include <utility>
 

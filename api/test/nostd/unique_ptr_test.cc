@@ -1,9 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/unique_ptr.h"
-
 #include <gtest/gtest.h>
+#include <type_traits>
+#include <utility>
+
+#include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::nostd::unique_ptr;
 
