@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <gtest/gtest.h>
 #include <stddef.h>
-#include <algorithm>
 #include <string>
 #include <vector>
 

@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 #include <cstring>
 #include <map>
+#include <stdexcept>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/nostd/string_view.h"
