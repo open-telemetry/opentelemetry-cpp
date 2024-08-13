@@ -19,10 +19,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 #   https://github.com/open-telemetry/opentelemetry-specification
 # Repository from 1.21.0:
 #   https://github.com/open-telemetry/semantic-conventions
-SEMCONV_VERSION=1.26.0
+SEMCONV_VERSION=1.27.0
 
 # repository: https://github.com/open-telemetry/build-tools
-GENERATOR_VERSION=0.24.0
+GENERATOR_VERSION=0.25.0
 
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
@@ -63,7 +63,7 @@ docker run --rm \
   -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
   -v ${ROOT_DIR}/api/include/opentelemetry/trace/:/output${USE_MOUNT_OPTION} \
   otel/semconvgen:$GENERATOR_VERSION \
-  --only span,event,attribute_group,scope \
+  --only span,event,attribute_group\
   -f /source code \
   --template /templates/SemanticAttributes.h.j2 \
   --output /output/semantic_conventions.h \
