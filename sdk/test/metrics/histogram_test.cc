@@ -134,6 +134,66 @@ TEST(Histogram, DoubleCustomBuckets)
   ASSERT_EQ(std::vector<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
 }
+
+TEST(Histogram, DoubleEmptyBuckets)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
+
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
+  config->boundaries_ = {};
+  std::unique_ptr<View> view{
+      new View("view1", "view1_description", instrument_unit, AggregationType::kHistogram, config)};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto h = m->CreateDoubleHistogram(instrument_name, instrument_desc, instrument_unit);
+
+  h->Record(-5, {});
+  h->Record(10, {});
+  h->Record(15, {});
+  h->Record(20, {});
+  h->Record(25, {});
+  h->Record(30, {});
+  h->Record(35, {});
+  h->Record(40, {});
+  h->Record(45, {});
+  h->Record(50, {});
+
+  std::vector<HistogramPointData> actuals;
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        for (const PointDataAttributes &dp : md.point_data_attr_)
+        {
+          actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+        }
+      }
+    }
+    return true;
+  });
+
+  ASSERT_EQ(1, actuals.size());
+
+  const auto &actual = actuals.at(0);
+  ASSERT_EQ(270.0, opentelemetry::nostd::get<double>(actual.sum_));
+  ASSERT_EQ(9, actual.count_);
+  ASSERT_EQ(10.0, opentelemetry::nostd::get<double>(actual.min_));
+  ASSERT_EQ(50.0, opentelemetry::nostd::get<double>(actual.max_));
+  ASSERT_EQ(std::vector<double>({}), actual.boundaries_);
+  ASSERT_EQ(std::vector<uint64_t>({9}), actual.counts_);
+}
 #endif
 
 TEST(Histogram, UInt64)
@@ -248,5 +308,65 @@ TEST(Histogram, UInt64CustomBuckets)
   ASSERT_EQ(50, opentelemetry::nostd::get<int64_t>(actual.max_));
   ASSERT_EQ(std::vector<double>({10, 20, 30, 40}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({2, 2, 2, 2, 2}), actual.counts_);
+}
+
+TEST(Histogram, UInt64EmptyBuckets)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_name = "historgram1";
+  std::string instrument_desc = "histogram metrics";
+  std::string instrument_unit = "ms";
+
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::shared_ptr<HistogramAggregationConfig> config(new HistogramAggregationConfig());
+  config->boundaries_ = {};
+  std::unique_ptr<View> view{
+      new View("view1", "view1_description", "ms", AggregationType::kHistogram, config)};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kHistogram, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto h = m->CreateUInt64Histogram(instrument_name, instrument_desc, instrument_unit);
+
+  h->Record(5, {});
+  h->Record(10, {});
+  h->Record(15, {});
+  h->Record(20, {});
+  h->Record(25, {});
+  h->Record(30, {});
+  h->Record(35, {});
+  h->Record(40, {});
+  h->Record(45, {});
+  h->Record(50, {});
+
+  std::vector<HistogramPointData> actuals;
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        for (const PointDataAttributes &dp : md.point_data_attr_)
+        {
+          actuals.push_back(opentelemetry::nostd::get<HistogramPointData>(dp.point_data));
+        }
+      }
+    }
+    return true;
+  });
+
+  ASSERT_EQ(1, actuals.size());
+
+  const auto &actual = actuals.at(0);
+  ASSERT_EQ(275, opentelemetry::nostd::get<int64_t>(actual.sum_));
+  ASSERT_EQ(10, actual.count_);
+  ASSERT_EQ(5, opentelemetry::nostd::get<int64_t>(actual.min_));
+  ASSERT_EQ(50, opentelemetry::nostd::get<int64_t>(actual.max_));
+  ASSERT_EQ(std::vector<double>({}), actual.boundaries_);
+  ASSERT_EQ(std::vector<uint64_t>({10}), actual.counts_);
 }
 #endif
