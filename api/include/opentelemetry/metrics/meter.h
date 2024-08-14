@@ -96,7 +96,7 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
-   * Creates a Gauge with the passed characteristics and returns a unique_ptr to that Counter.
+   * Creates a Gauge with the passed characteristics and returns a unique_ptr to that Gauge.
    *
    * @param name the name of the new Gauge.
    * @param description a brief description of what the Gauge is used for.
