@@ -22,7 +22,7 @@ namespace sdk
 {
 namespace trace
 {
-ParentBasedSampler::ParentBasedSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
+ParentBasedSampler::ParentBasedSampler(const std::shared_ptr<Sampler> &delegate_sampler) noexcept
     : delegate_sampler_(delegate_sampler),
       description_("ParentBased{" + std::string{delegate_sampler->GetDescription()} + "}")
 {}

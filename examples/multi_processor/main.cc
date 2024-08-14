@@ -70,29 +70,29 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
   char span_buf[trace_api::SpanId::kSize * 2];
   char trace_buf[trace_api::TraceId::kSize * 2];
   char parent_span_buf[trace_api::SpanId::kSize * 2];
-  std::cout << "\nSpans from memory :" << std::endl;
+  std::cout << "\nSpans from memory :" << '\n';
 
   for (auto &span : spans)
   {
-    std::cout << "\n\tSpan: " << std::endl;
-    std::cout << "\t\tName: " << span->GetName() << std::endl;
+    std::cout << "\n\tSpan: " << '\n';
+    std::cout << "\t\tName: " << span->GetName() << '\n';
     span->GetSpanId().ToLowerBase16(span_buf);
     span->GetTraceId().ToLowerBase16(trace_buf);
     span->GetParentSpanId().ToLowerBase16(parent_span_buf);
-    std::cout << "\t\tTraceId: " << std::string(trace_buf, sizeof(trace_buf)) << std::endl;
-    std::cout << "\t\tSpanId: " << std::string(span_buf, sizeof(span_buf)) << std::endl;
+    std::cout << "\t\tTraceId: " << std::string(trace_buf, sizeof(trace_buf)) << '\n';
+    std::cout << "\t\tSpanId: " << std::string(span_buf, sizeof(span_buf)) << '\n';
     std::cout << "\t\tParentSpanId: " << std::string(parent_span_buf, sizeof(parent_span_buf))
-              << std::endl;
+              << '\n';
 
-    std::cout << "\t\tDescription: " << span->GetDescription() << std::endl;
+    std::cout << "\t\tDescription: " << span->GetDescription() << '\n';
     std::cout << "\t\tSpan kind:"
               << static_cast<typename std::underlying_type<trace_api::SpanKind>::type>(
                      span->GetSpanKind())
-              << std::endl;
+              << '\n';
     std::cout << "\t\tSpan Status: "
               << static_cast<typename std::underlying_type<trace_api::StatusCode>::type>(
                      span->GetStatus())
-              << std::endl;
+              << '\n';
   }
 }
 }  // namespace
