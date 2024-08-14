@@ -28,7 +28,7 @@ namespace metrics
 LongHistogramAggregation::LongHistogramAggregation(const AggregationConfig *aggregation_config)
 {
   auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
-  if (ac && ac->boundaries_.size())
+  if (ac)
   {
     point_data_.boundaries_ = ac->boundaries_;
   }
@@ -109,7 +109,7 @@ PointType LongHistogramAggregation::ToPoint() const noexcept
 DoubleHistogramAggregation::DoubleHistogramAggregation(const AggregationConfig *aggregation_config)
 {
   auto ac = static_cast<const HistogramAggregationConfig *>(aggregation_config);
-  if (ac && ac->boundaries_.size())
+  if (ac)
   {
     point_data_.boundaries_ = ac->boundaries_;
   }
