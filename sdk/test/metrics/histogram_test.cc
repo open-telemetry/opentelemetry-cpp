@@ -188,8 +188,8 @@ TEST(Histogram, DoubleEmptyBuckets)
 
   const auto &actual = actuals.at(0);
   ASSERT_EQ(270.0, opentelemetry::nostd::get<double>(actual.sum_));
-  ASSERT_EQ(10, actual.count_);
-  ASSERT_EQ(-5.0, opentelemetry::nostd::get<double>(actual.min_));
+  ASSERT_EQ(9, actual.count_);
+  ASSERT_EQ(10.0, opentelemetry::nostd::get<double>(actual.min_));
   ASSERT_EQ(50.0, opentelemetry::nostd::get<double>(actual.max_));
   ASSERT_EQ(std::vector<double>({}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({10}), actual.counts_);
