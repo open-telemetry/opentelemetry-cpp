@@ -158,7 +158,7 @@ TEST(Histogram, DoubleEmptyBuckets)
 
   auto h = m->CreateDoubleHistogram(instrument_name, instrument_desc, instrument_unit);
 
-  h->Record(5, {});
+  h->Record(-5, {});
   h->Record(10, {});
   h->Record(15, {});
   h->Record(20, {});
@@ -187,9 +187,9 @@ TEST(Histogram, DoubleEmptyBuckets)
   ASSERT_EQ(1, actuals.size());
 
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(275.0, opentelemetry::nostd::get<double>(actual.sum_));
+  ASSERT_EQ(265.0, opentelemetry::nostd::get<double>(actual.sum_));
   ASSERT_EQ(10, actual.count_);
-  ASSERT_EQ(5.0, opentelemetry::nostd::get<double>(actual.min_));
+  ASSERT_EQ(-5.0, opentelemetry::nostd::get<double>(actual.min_));
   ASSERT_EQ(50.0, opentelemetry::nostd::get<double>(actual.max_));
   ASSERT_EQ(std::vector<double>({}), actual.boundaries_);
   ASSERT_EQ(std::vector<uint64_t>({10}), actual.counts_);
