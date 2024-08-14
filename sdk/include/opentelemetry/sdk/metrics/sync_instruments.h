@@ -101,6 +101,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 class LongGauge : public Synchronous, public opentelemetry::metrics::Gauge<int64_t>
 {
 public:
@@ -132,6 +133,7 @@ public:
   void Record(double value) noexcept override;
   void Record(double value, const opentelemetry::context::Context &context) noexcept override;
 };
+#endif
 
 class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<uint64_t>
 {

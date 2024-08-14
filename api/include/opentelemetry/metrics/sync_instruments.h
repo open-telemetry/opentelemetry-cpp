@@ -247,6 +247,7 @@ public:
   }
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 /* A Gauge instrument that records values. */
 template <class T>
 class Gauge : public SynchronousInstrument
@@ -320,7 +321,7 @@ public:
               context);
   }
 };
-
+#endif
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

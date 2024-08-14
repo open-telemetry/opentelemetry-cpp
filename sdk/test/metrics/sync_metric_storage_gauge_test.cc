@@ -22,6 +22,7 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 
 TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   AggregationTemporality temporality  = GetParam();
   auto sdk_start_ts                   = std::chrono::system_clock::now();
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kGauge,
@@ -33,6 +34,10 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                    ExemplarFilterType::kAlwaysOff,
+                    ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
       nullptr);
 
   int64_t bg_noise_level_1_roomA = 10;
@@ -92,6 +97,9 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
         return true;
       });
   EXPECT_EQ(count_attributes, 2);  // RackA and RackB
+#else
+  EXPECT_TRUE(true);
+#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
@@ -100,6 +108,7 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
 
 TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   AggregationTemporality temporality  = GetParam();
   auto sdk_start_ts                   = std::chrono::system_clock::now();
   InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kGauge,
@@ -111,6 +120,10 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff,
+      ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
       nullptr);
 
   double bg_noise_level_1_roomA = 4.3;
@@ -170,6 +183,9 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
         return true;
       });
   EXPECT_EQ(count_attributes, 2);  // RackA and RackB
+#else
+  EXPECT_TRUE(true);
+#endif
 }
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,

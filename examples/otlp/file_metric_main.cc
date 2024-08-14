@@ -98,21 +98,27 @@ int main(int argc, char *argv[])
   {
     foo_library::histogram_example(name);
   }
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   else if (example_type == "gauge")
   {
     foo_library::gauge_example(name);
   }
+#endif
   else
   {
     std::thread counter_example{&foo_library::counter_example, name};
     std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     std::thread gauge_example{&foo_library::gauge_example, name};
+#endif
 
     counter_example.join();
     observable_counter_example.join();
     histogram_example.join();
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     gauge_example.join();
+#endif
   }
 
   CleanupMetrics();

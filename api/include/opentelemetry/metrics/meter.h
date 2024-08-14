@@ -94,6 +94,7 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   /**
    * Creates a Gauge with the passed characteristics and returns a unique_ptr to that Counter.
    *
@@ -112,6 +113,7 @@ public:
       nostd::string_view name,
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
+#endif
 
   /**
    * Creates a Asynchronous (Observable) Gauge with the passed characteristics and returns a

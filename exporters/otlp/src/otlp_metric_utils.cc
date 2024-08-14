@@ -297,7 +297,9 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::DeltaTemporalitySelector(
     case sdk::metrics::InstrumentType::kObservableCounter:
     case sdk::metrics::InstrumentType::kHistogram:
     case sdk::metrics::InstrumentType::kObservableGauge:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     case sdk::metrics::InstrumentType::kGauge:
+#endif
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:
@@ -321,7 +323,9 @@ sdk::metrics::AggregationTemporality OtlpMetricUtils::LowMemoryTemporalitySelect
     case sdk::metrics::InstrumentType::kHistogram:
       return sdk::metrics::AggregationTemporality::kDelta;
     case sdk::metrics::InstrumentType::kObservableCounter:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     case sdk::metrics::InstrumentType::kGauge:
+#endif
     case sdk::metrics::InstrumentType::kObservableGauge:
     case sdk::metrics::InstrumentType::kUpDownCounter:
     case sdk::metrics::InstrumentType::kObservableUpDownCounter:

@@ -186,6 +186,7 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
       new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gauge(
     opentelemetry::nostd::string_view name,
     opentelemetry::nostd::string_view description,
@@ -229,6 +230,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>{
       new DoubleGauge(instrument_descriptor, std::move(storage))};
 }
+#endif
 
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
 Meter::CreateInt64ObservableGauge(opentelemetry::nostd::string_view name,

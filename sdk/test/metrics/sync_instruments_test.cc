@@ -105,6 +105,7 @@ TEST(SyncInstruments, DoubleUpDownCounter)
   counter.Add(10.10, opentelemetry::common::KeyValueIterableView<M>({}));
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(SyncInstruments, LongGauge)
 {
   InstrumentDescriptor instrument_descriptor = {"long_gauge", "description", "1",
@@ -144,6 +145,7 @@ TEST(SyncInstruments, DoubleGauge)
               opentelemetry::context::Context{});
   gauge.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}));
 }
+#endif
 
 TEST(SyncInstruments, LongHistogram)
 {

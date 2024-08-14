@@ -71,6 +71,7 @@ public:
   {}
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 template <class T>
 class NoopGauge : public Gauge<T>
 {
@@ -88,6 +89,8 @@ public:
            const context::Context & /* context */) noexcept override
   {}
 };
+#endif
+
 
 class NoopObservableInstrument : public ObservableInstrument
 {
@@ -158,6 +161,7 @@ public:
     return nostd::unique_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
   }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::unique_ptr<Gauge<int64_t>> CreateInt64Gauge(
       nostd::string_view name,
       nostd::string_view description = "",
@@ -173,6 +177,7 @@ public:
   {
     return nostd::unique_ptr<Gauge<double>>{new NoopGauge<double>(name, description, unit)};
   }
+#endif
 
   nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(
       nostd::string_view name,

@@ -292,6 +292,7 @@ void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Contex
   return storage_->RecordDouble(value, context);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 LongGauge::LongGauge(const InstrumentDescriptor &instrument_descriptor,
                                      std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
@@ -419,6 +420,7 @@ void DoubleGauge::Record(double value, const opentelemetry::context::Context &co
   }
   return storage_->RecordDouble(value, context);
 }
+#endif
 
 LongHistogram::LongHistogram(const InstrumentDescriptor &instrument_descriptor,
                              std::unique_ptr<SyncWritableMetricStorage> storage)

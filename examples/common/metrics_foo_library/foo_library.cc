@@ -110,6 +110,7 @@ void foo_library::histogram_example(const std::string &name)
  
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 void foo_library::gauge_example(const std::string &name)
 {
   std::string gauge_name = name + "_gauge";
@@ -126,3 +127,4 @@ void foo_library::gauge_example(const std::string &name)
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
   }
 }
+#endif
