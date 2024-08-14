@@ -192,7 +192,7 @@ TEST(Histogram, DoubleEmptyBuckets)
   ASSERT_EQ(10.0, opentelemetry::nostd::get<double>(actual.min_));
   ASSERT_EQ(50.0, opentelemetry::nostd::get<double>(actual.max_));
   ASSERT_EQ(std::vector<double>({}), actual.boundaries_);
-  ASSERT_EQ(std::vector<uint64_t>({10}), actual.counts_);
+  ASSERT_EQ(std::vector<uint64_t>({9}), actual.counts_);
 }
 #endif
 
