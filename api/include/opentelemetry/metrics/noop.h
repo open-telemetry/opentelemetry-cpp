@@ -71,6 +71,24 @@ public:
   {}
 };
 
+template <class T>
+class NoopGauge : public Gauge<T>
+{
+public:
+  NoopGauge(nostd::string_view /* name */,
+                    nostd::string_view /* description */,
+                    nostd::string_view /* unit */) noexcept
+  {}
+  ~NoopGauge() override = default;
+  void Record(T /* value */) noexcept override {}
+  void Record(T /* value */, const context::Context & /* context */) noexcept override {}
+  void Record(T /* value */, const common::KeyValueIterable & /* attributes */) noexcept override {}
+  void Record(T /* value */,
+           const common::KeyValueIterable & /* attributes */,
+           const context::Context & /* context */) noexcept override
+  {}
+};
+
 class NoopObservableInstrument : public ObservableInstrument
 {
 public:
@@ -138,6 +156,22 @@ public:
       nostd::string_view unit        = "") noexcept override
   {
     return nostd::unique_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
+  }
+
+  nostd::unique_ptr<Gauge<int64_t>> CreateInt64Gauge(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::unique_ptr<Gauge<int64_t>>{new NoopGauge<int64_t>(name, description, unit)};
+  }
+
+  nostd::unique_ptr<Gauge<double>> CreateDoubleGauge(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::unique_ptr<Gauge<double>>{new NoopGauge<double>(name, description, unit)};
   }
 
   nostd::shared_ptr<ObservableInstrument> CreateInt64ObservableGauge(

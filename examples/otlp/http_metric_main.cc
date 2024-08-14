@@ -133,15 +133,21 @@ int main(int argc, char *argv[])
   {
     foo_library::histogram_example(name);
   }
+  else if (example_type == "gauge")
+  {
+    foo_library::gauge_example(name);
+  }
   else
   {
     std::thread counter_example{&foo_library::counter_example, name};
     std::thread observable_counter_example{&foo_library::observable_counter_example, name};
     std::thread histogram_example{&foo_library::histogram_example, name};
+    std::thread gauge_example{&foo_library::gauge_example, name};
 
     counter_example.join();
     observable_counter_example.join();
     histogram_example.join();
+    gauge_example.join();
   }
 
   CleanupMetrics();
