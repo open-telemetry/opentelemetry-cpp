@@ -106,19 +106,22 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
     std::promise<void> sender;
     auto receiver = sender.get_future();
 
-    task_thread.reset(new std::thread([this, &cancel_export_for_timeout] {
-      this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
-        if (cancel_export_for_timeout.load(std::memory_order_acquire))
-        {
-          OTEL_INTERNAL_LOG_ERROR(
-              "[Periodic Exporting Metric Reader] Collect took longer configured time: "
-              << this->export_timeout_millis_.count() << " ms, and timed out");
-          return false;
-        }
-        this->exporter_->Export(metric_data);
-        return true;
-      });
-    }));
+    task_thread.reset(
+        new std::thread([this, &cancel_export_for_timeout, sender = std::move(sender)] {
+          this->Collect([this, &cancel_export_for_timeout](ResourceMetrics &metric_data) {
+            if (cancel_export_for_timeout.load(std::memory_order_acquire))
+            {
+              OTEL_INTERNAL_LOG_ERROR(
+                  "[Periodic Exporting Metric Reader] Collect took longer configured time: "
+                  << this->export_timeout_millis_.count() << " ms, and timed out");
+              return false;
+            }
+            this->exporter_->Export(metric_data);
+            return true;
+          });
+
+          sender.set_value();
+        }));
 
     std::future_status status;
     do
