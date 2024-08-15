@@ -112,8 +112,12 @@ public:
 
     provider->ForceFlush();
 
+    output.flush();
+    output.sync();
+    auto check_json_text = output.str();
+    if (!check_json_text.empty())
     {
-      auto check_json        = nlohmann::json::parse(output.str(), nullptr, false);
+      auto check_json        = nlohmann::json::parse(check_json_text, nullptr, false);
       auto resource_span     = *check_json["resourceSpans"].begin();
       auto scope_span        = *resource_span["scopeSpans"].begin();
       auto span              = *scope_span["spans"].begin();
