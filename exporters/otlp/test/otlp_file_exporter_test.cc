@@ -25,6 +25,7 @@
 #include "nlohmann/json.hpp"
 
 #include <chrono>
+#include <iostream>
 #include <sstream>
 
 using namespace testing;
@@ -117,12 +118,19 @@ public:
     auto check_json_text = output.str();
     if (!check_json_text.empty())
     {
-      auto check_json        = nlohmann::json::parse(check_json_text, nullptr, false);
-      auto resource_span     = *check_json["resourceSpans"].begin();
-      auto scope_span        = *resource_span["scopeSpans"].begin();
-      auto span              = *scope_span["spans"].begin();
-      auto received_trace_id = span["traceId"].get<std::string>();
-      EXPECT_EQ(received_trace_id, report_trace_id);
+      auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
+      if (!check_json.is_discarded())
+      {
+        auto resource_span     = *check_json["resourceSpans"].begin();
+        auto scope_span        = *resource_span["scopeSpans"].begin();
+        auto span              = *scope_span["spans"].begin();
+        auto received_trace_id = span["traceId"].get<std::string>();
+        EXPECT_EQ(received_trace_id, report_trace_id);
+      }
+      else
+      {
+        FAIL() << "Failed to parse json:" << check_json_text;
+      }
     }
   }
 };
