@@ -120,7 +120,7 @@ bool PeriodicExportingMetricReader::CollectAndExportOnce()
             return true;
           });
 
-          sender.set_value();
+          const_cast<std::promise<void> &>(sender).set_value();
         }));
 
     std::future_status status;
