@@ -106,8 +106,12 @@ public:
 
     exporter->ForceFlush();
 
+    output.flush();
+    output.sync();
+    auto check_json_text = output.str();
+    if (!check_json_text.empty())
     {
-      auto check_json = nlohmann::json::parse(output.str(), nullptr, false);
+      auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
 
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
@@ -167,8 +171,12 @@ public:
 
     exporter->ForceFlush();
 
+    output.flush();
+    output.sync();
+    auto check_json_text = output.str();
+    if (!check_json_text.empty())
     {
-      auto check_json = nlohmann::json::parse(output.str(), nullptr, false);
+      auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
 
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
@@ -233,8 +241,12 @@ public:
 
     exporter->ForceFlush();
 
+    output.flush();
+    output.sync();
+    auto check_json_text = output.str();
+    if (!check_json_text.empty())
     {
-      auto check_json = nlohmann::json::parse(output.str(), nullptr, false);
+      auto check_json = nlohmann::json::parse(check_json_text, nullptr, false);
 
       auto resource_metrics = *check_json["resourceMetrics"].begin();
       auto scope_metrics    = *resource_metrics["scopeMetrics"].begin();
