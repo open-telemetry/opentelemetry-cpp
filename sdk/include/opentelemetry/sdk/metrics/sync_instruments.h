@@ -106,13 +106,13 @@ class LongGauge : public Synchronous, public opentelemetry::metrics::Gauge<int64
 {
 public:
   LongGauge(const InstrumentDescriptor &instrument_descriptor,
-                    std::unique_ptr<SyncWritableMetricStorage> storage);
+            std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Record(int64_t value,
-           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+              const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
   void Record(int64_t value,
-           const opentelemetry::common::KeyValueIterable &attributes,
-           const opentelemetry::context::Context &context) noexcept override;
+              const opentelemetry::common::KeyValueIterable &attributes,
+              const opentelemetry::context::Context &context) noexcept override;
 
   void Record(int64_t value) noexcept override;
   void Record(int64_t value, const opentelemetry::context::Context &context) noexcept override;
@@ -122,13 +122,13 @@ class DoubleGauge : public Synchronous, public opentelemetry::metrics::Gauge<dou
 {
 public:
   DoubleGauge(const InstrumentDescriptor &instrument_descriptor,
-                      std::unique_ptr<SyncWritableMetricStorage> storage);
+              std::unique_ptr<SyncWritableMetricStorage> storage);
 
   void Record(double value,
-           const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+              const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
   void Record(double value,
-           const opentelemetry::common::KeyValueIterable &attributes,
-           const opentelemetry::context::Context &context) noexcept override;
+              const opentelemetry::common::KeyValueIterable &attributes,
+              const opentelemetry::context::Context &context) noexcept override;
 
   void Record(double value) noexcept override;
   void Record(double value, const opentelemetry::context::Context &context) noexcept override;

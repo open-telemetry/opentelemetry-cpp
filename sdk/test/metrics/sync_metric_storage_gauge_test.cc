@@ -23,21 +23,20 @@ class WritableMetricStorageTestFixture : public ::testing::TestWithParam<Aggrega
 TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  AggregationTemporality temporality  = GetParam();
-  auto sdk_start_ts                   = std::chrono::system_clock::now();
-  InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kGauge,
-                                         InstrumentValueType::kLong};
-  std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};                           
-  std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};               
+  AggregationTemporality temporality = GetParam();
+  auto sdk_start_ts                  = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kGauge,
+                                        InstrumentValueType::kLong};
+  std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
+  std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};
 
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                    ExemplarFilterType::kAlwaysOff,
-                    ExemplarReservoir::GetNoExemplarReservoir(),
-#endif
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
       nullptr);
 
   int64_t bg_noise_level_1_roomA = 10;
@@ -59,7 +58,6 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
   storage.RecordLong(bg_noise_level_2_roomB,
                      KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomB),
                      opentelemetry::context::Context{});
-
 
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
@@ -109,43 +107,41 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
 TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  AggregationTemporality temporality  = GetParam();
-  auto sdk_start_ts                   = std::chrono::system_clock::now();
-  InstrumentDescriptor instr_desc     = {"name", "desc", "1unit", InstrumentType::kGauge,
-                                         InstrumentValueType::kDouble};
-  std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};                           
-  std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};               
+  AggregationTemporality temporality = GetParam();
+  auto sdk_start_ts                  = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc    = {"name", "desc", "1unit", InstrumentType::kGauge,
+                                        InstrumentValueType::kDouble};
+  std::map<std::string, std::string> attributes_roomA = {{"Room.id", "Rack A"}};
+  std::map<std::string, std::string> attributes_roomB = {{"Room.id", "Rack B"}};
 
   std::unique_ptr<DefaultAttributesProcessor> default_attributes_processor{
       new DefaultAttributesProcessor{}};
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor.get(),
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff,
-      ExemplarReservoir::GetNoExemplarReservoir(),
-#endif
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
       nullptr);
 
   double bg_noise_level_1_roomA = 4.3;
   double bg_noise_level_1_roomB = 2.5;
 
   storage.RecordDouble(bg_noise_level_1_roomA,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomA),
-                     opentelemetry::context::Context{});
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomA),
+                       opentelemetry::context::Context{});
   storage.RecordDouble(bg_noise_level_1_roomB,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomB),
-                     opentelemetry::context::Context{});
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomB),
+                       opentelemetry::context::Context{});
 
   double bg_noise_level_2_roomA = 10.5;
   double bg_noise_level_2_roomB = 20.5;
 
   storage.RecordDouble(bg_noise_level_2_roomA,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomA),
-                     opentelemetry::context::Context{});
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomA),
+                       opentelemetry::context::Context{});
   storage.RecordDouble(bg_noise_level_2_roomB,
-                     KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomB),
-                     opentelemetry::context::Context{});
-
+                       KeyValueIterableView<std::map<std::string, std::string>>(attributes_roomB),
+                       opentelemetry::context::Context{});
 
   std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
   std::vector<std::shared_ptr<CollectorHandle>> collectors;
@@ -165,7 +161,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
             if (temporality == AggregationTemporality::kCumulative)
             {
               EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
-                        bg_noise_level_2_roomA);
+                               bg_noise_level_2_roomA);
             }
             count_attributes++;
           }
@@ -175,7 +171,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
             if (temporality == AggregationTemporality::kCumulative)
             {
               EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
-                        bg_noise_level_2_roomB);
+                               bg_noise_level_2_roomB);
             }
             count_attributes++;
           }

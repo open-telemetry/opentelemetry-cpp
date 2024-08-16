@@ -286,8 +286,8 @@ public:
    * @param context The explicit context to associate with this measurement.
    */
   virtual void Record(T value,
-                   const common::KeyValueIterable &attributes,
-                   const context::Context &context) noexcept = 0;
+                      const common::KeyValueIterable &attributes,
+                      const context::Context &context) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
@@ -304,21 +304,22 @@ public:
   }
 
   void Record(T value,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-               attributes) noexcept
+              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+                  attributes) noexcept
   {
     this->Record(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()});
+                            attributes.begin(), attributes.end()});
   }
 
-  void Record(T value,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           const context::Context &context) noexcept
+  void Record(
+      T value,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      const context::Context &context) noexcept
   {
     this->Record(value,
-              nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                  attributes.begin(), attributes.end()},
-              context);
+                 nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                     attributes.begin(), attributes.end()},
+                 context);
   }
 };
 #endif

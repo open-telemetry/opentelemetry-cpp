@@ -109,40 +109,37 @@ TEST(SyncInstruments, DoubleUpDownCounter)
 TEST(SyncInstruments, LongGauge)
 {
   InstrumentDescriptor instrument_descriptor = {"long_gauge", "description", "1",
-                                                InstrumentType::kGauge,
-                                                InstrumentValueType::kLong};
+                                                InstrumentType::kGauge, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   LongGauge gauge(instrument_descriptor, std::move(metric_storage));
   gauge.Record(10);
   gauge.Record(10, opentelemetry::context::Context{});
 
+  gauge.Record(10, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+               opentelemetry::context::Context{});
   gauge.Record(10,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
-              opentelemetry::context::Context{});
-  gauge.Record(10,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
+               opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
   gauge.Record(10, opentelemetry::common::KeyValueIterableView<M>({}),
-              opentelemetry::context::Context{});
+               opentelemetry::context::Context{});
   gauge.Record(10, opentelemetry::common::KeyValueIterableView<M>({}));
 }
 
 TEST(SyncInstruments, DoubleGauge)
 {
-  InstrumentDescriptor instrument_descriptor = {"double_gauge", "description", "1",
-                                                InstrumentType::kGauge,
-                                                InstrumentValueType::kDouble};
+  InstrumentDescriptor instrument_descriptor = {
+      "double_gauge", "description", "1", InstrumentType::kGauge, InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
   DoubleGauge gauge(instrument_descriptor, std::move(metric_storage));
   gauge.Record(10.10);
   gauge.Record(10.10, opentelemetry::context::Context{});
 
   gauge.Record(10.10,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
-              opentelemetry::context::Context{});
+               opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+               opentelemetry::context::Context{});
   gauge.Record(10.10,
-              opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
+               opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}));
   gauge.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
-              opentelemetry::context::Context{});
+               opentelemetry::context::Context{});
   gauge.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}));
 }
 #endif

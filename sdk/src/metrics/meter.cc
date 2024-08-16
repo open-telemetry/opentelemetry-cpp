@@ -202,8 +202,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gaug
   }
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
-      std::string{unit.data(), unit.size()}, InstrumentType::kGauge,
-      InstrumentValueType::kLong};
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>>{
       new LongGauge(instrument_descriptor, std::move(storage))};
@@ -224,8 +223,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
   }
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
-      std::string{unit.data(), unit.size()}, InstrumentType::kGauge,
-      InstrumentValueType::kDouble};
+      std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>{
       new DoubleGauge(instrument_descriptor, std::move(storage))};
