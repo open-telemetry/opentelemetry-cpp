@@ -122,8 +122,12 @@ public:
 
     provider->ForceFlush();
 
+    output.flush();
+    output.sync();
+    auto check_json_text = output.str();
+    if (!check_json_text.empty())
     {
-      auto check_json        = nlohmann::json::parse(output.str(), nullptr, false);
+      auto check_json        = nlohmann::json::parse(check_json_text, nullptr, false);
       auto resource_logs     = *check_json["resourceLogs"].begin();
       auto scope_logs        = *resource_logs["scopeLogs"].begin();
       auto scope             = scope_logs["scope"];
