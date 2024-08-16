@@ -1,6 +1,12 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+common --incompatible_use_plus_in_repo_names
+
+# Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
+# For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
+build --dynamic_mode=off
+
 build --experimental_cc_shared_library
 
 common --incompatible_disable_native_repo_rules 
@@ -41,11 +47,11 @@ build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 
 build:linux --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
-build:linux --dynamic_mode=off --fission=yes --copt=-g 
+build:linux --fission=yes --copt=-g 
 
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
-build:macos --dynamic_mode=off --fission=yes --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
+build:macos --fission=yes --copt=-g --action_env=CC=/opt/homebrew/bin/clang --host_action_env=CC=/opt/homebrew/bin/clang 
 # https://github.com/Homebrew/homebrew-core/issues/178435#issuecomment-2250615995
 build:macos --linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --linkopt=-L/opt/homebrew/opt/llvm/lib --linkopt=-lunwind
 build:macos --host_linkopt=-L/opt/homebrew/opt/llvm/lib/c++ --host_linkopt=-L/opt/homebrew/opt/llvm/lib --host_linkopt=-lunwind
@@ -114,9 +120,9 @@ build:windows --config=clang-cl
 # See MODULE.bazel where we've disabled the platform/toolchain setup, but made it back here
 build:clang-cl --host_platform=//:x64_windows-clang-cl
 build:clang-cl --extra_toolchains=@local_config_cc//:cc-toolchain-x64_windows-clang-cl
-build:clang-cl --per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
-build:clang-cl --host_per_file_copt="external/protobuf~/.*@-Wno-invalid-offsetof"
-build:clang-cl --per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"
-build:clang-cl --host_per_file_copt="external/c-ares~/.*@-Wno-macro-redefined"
+build:clang-cl --per_file_copt="external/protobuf\\+/.*@-Wno-invalid-offsetof"
+build:clang-cl --host_per_file_copt="external/protobuf\\+/.*@-Wno-invalid-offsetof"
+build:clang-cl --per_file_copt="external/c-ares\\+/.*@-Wno-macro-redefined"
+build:clang-cl --host_per_file_copt="external/c-ares\\+/.*@-Wno-macro-redefined"
 
 build --incompatible_strict_action_env
