@@ -17,6 +17,7 @@ jobs:
     steps:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
+      - run: choco install bazelisk
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:
