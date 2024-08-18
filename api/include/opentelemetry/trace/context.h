@@ -20,7 +20,10 @@ inline nostd::shared_ptr<Span> GetSpan(const context::Context &context) noexcept
   {
     return nostd::get<nostd::shared_ptr<Span>>(span);
   }
-  return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+
+  static thread_local nostd::shared_ptr<Span> invalid_span =
+      nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+  return invalid_span;
 }
 
 inline bool IsRootSpan(const context::Context &context) noexcept
