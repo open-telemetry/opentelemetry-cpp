@@ -84,7 +84,7 @@ static void ThreadRoutine(Barrier &barrier,
 
 void MultiThreadRunner(benchmark::State &state, const std::function<void()> &func)
 {
-    uint32_t num_threads = std::thread::hardware_concurrency();
+  uint32_t num_threads = std::thread::hardware_concurrency();
 
   Barrier barrier(num_threads);
 
