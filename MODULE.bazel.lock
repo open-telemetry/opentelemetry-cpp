@@ -190,7 +190,7 @@
   "moduleExtensions": {
     "//bazel:repository.bzl%deps1": {
       "general": {
-        "bzlTransitiveDigest": "vq02HIqelk2AXuuUxsoxGFd6Rlawwzk47+I2ziydAhc=",
+        "bzlTransitiveDigest": "mK2C0bS20oirSyleXj6yEAV3gj6B0cSZ0qALsW7t7gw=",
         "usagesDigest": "QRC5/qNrVX3cYO262GIjjqSMIVJJct3XiMtYhSG0GxY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -240,7 +240,7 @@
                 "https://dl.grafana.com/oss/release/grafana-10.2.3.windows-amd64.zip"
               ],
               "strip_prefix": "grafana-v10.2.3",
-              "build_file_content": "\r\nexports_files(glob([\"**/*\"]),visibility=[\"//visibility:public\"])\r\nfilegroup(name=\"files\",srcs=glob([\"**/*\"]),visibility=[\"//visibility:public\"])\r\n"
+              "build_file_content": "\nexports_files(glob([\"**/*\"]),visibility=[\"//visibility:public\"])\nfilegroup(name=\"files\",srcs=glob([\"**/*\"]),visibility=[\"//visibility:public\"])\n"
             }
           },
           "loki_w64": {
