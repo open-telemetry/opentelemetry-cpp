@@ -8,6 +8,12 @@
 #include <thread>
 #include <vector>
 
+#if defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
+#    include <emmintrin.h>  // for _mm_pause
+#  endif
+#endif
+
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 

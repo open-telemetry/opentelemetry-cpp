@@ -28,11 +28,6 @@ using opentelemetry::logs::EventId;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 
-namespace common  = opentelemetry::common;
-namespace nostd   = opentelemetry::nostd;
-namespace trace   = opentelemetry::trace;
-namespace log_api = opentelemetry::logs;
-
 namespace
 {
 
