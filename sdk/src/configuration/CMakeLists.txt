@@ -6,14 +6,6 @@ add_library(
   configuration_factory.cc document_node.cc yaml_configuration_factory.cc
   ryml_document.cc ryml_document_node.cc)
 
-if(ryml_VERSION VERSION_GREATER_EQUAL 0.7.0)
-  # https://github.com/biojppm/rapidyaml/issues/455
-  message(WARNING "Detected ryml >= 0.7.0, it may be unstable")
-  add_definitions(-DOTEL_HAVE_RYML=7)
-else()
-  add_definitions(-DOTEL_HAVE_RYML=6)
-endif()
-
 set_target_properties(opentelemetry_configuration PROPERTIES EXPORT_NAME
                                                              configuration)
 set_target_version(opentelemetry_configuration)

@@ -13,6 +13,12 @@
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
 
+/* We require 0.7.1 or better */
+#define OTEL_HAVE_RYML 7
+
+/* Code using ryml 0.6.0 preserved for regression testing. */
+/* #define OTEL_HAVE_RYML 6 */
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

@@ -497,7 +497,7 @@ endif()
 #
 
 if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
-  find_package(ryml 0.6.0 REQUIRED)
+  find_package(ryml 0.7.1 REQUIRED)
   message(
     STATUS
       "Found ryml: include ${RYML_INCLUDE_DIR}, lib ${RYML_LIB_DIR}, version ${ryml_VERSION}"
