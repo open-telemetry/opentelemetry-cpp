@@ -200,13 +200,8 @@ static int Base64UnescapeInternal(unsigned char *dst,
     ++line_len;
     if (src[i] == padding_char)
     {
-      if (++j > 2)
+      if (++j > 2 || (valid_slen & 3) == 1 || (valid_slen & 3) == 2)
       {
-        return -2;
-      }
-      else if ((valid_slen & 3) == 1 || (valid_slen & 3) == 2)
-      {
-        // First and second char of every group can not be padding char
         return -2;
       }
     }

@@ -35,7 +35,7 @@ public:
 class D : public C
 {
 public:
-  virtual ~D() {}
+  ~D() override {}
 };
 
 TEST(SharedPtrTest, DefaultConstruction)

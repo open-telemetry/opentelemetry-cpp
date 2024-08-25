@@ -70,7 +70,7 @@ jobs:
       - name: Run clang-tidy
         run: |
           cd build
-          make -j$(nproc) 2>&1 | tee -a clang-tidy.log || exit 1
+          make 2>&1 | tee -a clang-tidy.log || exit 1
 
       - uses: actions/upload-artifact@v4
         with:

@@ -32,7 +32,7 @@ constexpr int64_t kMaxIterations = 1000000000;
 class Barrier
 {
 public:
-  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount), mGeneration(0) {}
+  explicit Barrier(std::size_t iCount) : mThreshold(iCount), mCount(iCount) {}
 
   void Wait()
   {
@@ -55,7 +55,7 @@ private:
   std::condition_variable mCond;
   std::size_t mThreshold;
   std::size_t mCount;
-  std::size_t mGeneration;
+  std::size_t mGeneration{0};
 };
 
 static void ThreadRoutine(Barrier &barrier,
@@ -84,14 +84,14 @@ static void ThreadRoutine(Barrier &barrier,
 
 void MultiThreadRunner(benchmark::State &state, const std::function<void()> &func)
 {
-  int num_threads = std::thread::hardware_concurrency();
+  uint32_t num_threads = std::thread::hardware_concurrency();
 
   Barrier barrier(num_threads);
 
   std::vector<std::thread> threads;
 
   threads.reserve(num_threads);
-  for (int i = 0; i < num_threads; i++)
+  for (uint32_t i = 0; i < num_threads; i++)
   {
     threads.emplace_back(ThreadRoutine, std::ref(barrier), std::ref(state), i, func);
   }
