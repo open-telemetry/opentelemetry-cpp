@@ -707,7 +707,7 @@ OtlpHttpClient::~OtlpHttpClient()
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
                                std::shared_ptr<ext::http::client::HttpClient> http_client)
     : is_shutdown_(false),
-      options_(options),
+      options_(std::move(options)),
       http_client_(std::move(http_client)),
       start_session_counter_(0),
       finished_session_counter_(0)
