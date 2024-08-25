@@ -31,13 +31,13 @@ LoggerProvider::LoggerProvider(std::unique_ptr<LogRecordProcessor> &&processor,
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
-  context_ = std::make_shared<LoggerContext>(std::move(processors), std::move(resource));
+  context_ = std::make_shared<LoggerContext>(std::move(processors), resource);
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
 }
 
 LoggerProvider::LoggerProvider(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
                                const opentelemetry::sdk::resource::Resource &resource) noexcept
-    : context_{std::make_shared<LoggerContext>(std::move(processors), std::move(resource))}
+    : context_{std::make_shared<LoggerContext>(std::move(processors), resource)}
 {}
 
 LoggerProvider::LoggerProvider() noexcept

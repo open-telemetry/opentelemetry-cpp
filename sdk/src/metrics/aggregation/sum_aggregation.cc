@@ -27,7 +27,7 @@ LongSumAggregation::LongSumAggregation(bool is_monotonic)
   point_data_.is_monotonic_ = is_monotonic;
 }
 
-LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{std::move(data)} {}
+LongSumAggregation::LongSumAggregation(SumPointData &&data) : point_data_{data} {}
 
 LongSumAggregation::LongSumAggregation(const SumPointData &data) : point_data_{data} {}
 
@@ -81,7 +81,7 @@ DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
   point_data_.is_monotonic_ = is_monotonic;
 }
 
-DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(std::move(data)) {}
+DoubleSumAggregation::DoubleSumAggregation(SumPointData &&data) : point_data_(data) {}
 
 DoubleSumAggregation::DoubleSumAggregation(const SumPointData &data) : point_data_(data) {}
 

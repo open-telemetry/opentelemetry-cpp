@@ -113,7 +113,6 @@ public:
         data_[head_index].Swap(ptr);
       }
     }
-    return true;
   }
 
   bool Add(std::unique_ptr<T> &&ptr) noexcept

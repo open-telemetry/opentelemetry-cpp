@@ -39,7 +39,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   }
 
   return temporal_metric_storage_.buildMetrics(collector, collectors, sdk_start_ts, collection_ts,
-                                               std::move(delta_metrics), callback);
+                                               delta_metrics, callback);
 }
 
 }  // namespace metrics
