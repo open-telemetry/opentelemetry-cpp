@@ -5,12 +5,22 @@
 
 set -ex
 export DEBIAN_FRONTEND=noninteractive
-[ -z "${RYML_VERSION}" ] && export RYML_VERSION="v0.7.1"
+
+# See https://github.com/biojppm/rapidyaml/issues/468
+# [ -z "${RYML_VERSION}" ] && export RYML_VERSION="v0.7.1"
+
+# work around:
+[ -z "${RYML_VERSION}" ] && export RYML_VERSION="v0.7.1-marc"
 
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
-git clone --recursive -b ${RYML_VERSION} https://github.com/biojppm/rapidyaml.git
+# See https://github.com/biojppm/rapidyaml/issues/468
+# git clone --recursive -b ${RYML_VERSION} https://github.com/biojppm/rapidyaml.git
+
+# Work around
+git clone --recursive -b ${RYML_VERSION} https://github.com/marcalff/rapidyaml.git
+
 cd rapidyaml
 RYML_BUILD_OPTIONS=(
     "-DBUILD_TESTING=OFF"
