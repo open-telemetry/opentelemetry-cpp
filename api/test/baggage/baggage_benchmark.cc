@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <benchmark/benchmark.h>
+#include <stddef.h>
+#include <memory>
+#include <string>
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/string_view.h"
-
-#include <benchmark/benchmark.h>
-#include <cstdint>
+#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry::baggage;
 namespace nostd = opentelemetry::nostd;

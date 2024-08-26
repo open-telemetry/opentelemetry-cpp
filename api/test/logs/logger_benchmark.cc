@@ -1,28 +1,29 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-
-#include <chrono>
+#include <benchmark/benchmark.h>
+#include <stdint.h>
+#include <algorithm>
 #include <condition_variable>
+#include <cstddef>
 #include <functional>
 #include <mutex>
 #include <thread>
 #include <vector>
 
-#include <benchmark/benchmark.h>
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/logs/event_id.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::logs::EventId;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
-
-namespace common  = opentelemetry::common;
-namespace nostd   = opentelemetry::nostd;
-namespace trace   = opentelemetry::trace;
-namespace log_api = opentelemetry::logs;
 
 namespace
 {
