@@ -7,6 +7,8 @@
 #include <string>
 
 #include "opentelemetry/version.h"
+#include "opentelemetry/plugin/factory.h"
+
 #ifdef _WIN32
 #  include "opentelemetry/plugin/detail/dynamic_load_windows.h"  // IWYU pragma: export
 #else
@@ -16,8 +18,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
-
-class Factory;
 
 /**
  * Load an OpenTelemetry implementation as a plugin.

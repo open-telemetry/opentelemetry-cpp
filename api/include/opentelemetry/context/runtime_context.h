@@ -3,9 +3,13 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <algorithm>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"

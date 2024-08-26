@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/span_id.h"
