@@ -107,3 +107,22 @@ void foo_library::histogram_example(const std::string &name)
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
   }
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void foo_library::gauge_example(const std::string &name)
+{
+  std::string gauge_name = name + "_gauge";
+  auto provider          = metrics_api::Provider::GetMeterProvider();
+  opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
+  auto gauge   = meter->CreateInt64Gauge(gauge_name, "des", "unit");
+  auto context = opentelemetry::context::Context{};
+  for (uint32_t i = 0; i < 20; ++i)
+  {
+    int64_t val                               = (rand() % 100) + 100;
+    std::map<std::string, std::string> labels = get_random_attr();
+    auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+    gauge->Record(val, labelkv, context);
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+  }
+}
+#endif
