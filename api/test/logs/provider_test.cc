@@ -2,10 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <array>
+#include <string>
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/logs/event_logger.h"
+#include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 
 using opentelemetry::logs::EventLogger;
 using opentelemetry::logs::EventLoggerProvider;

@@ -2,8 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdint.h>
 #include <map>
+#include <memory>
+#include <string>
+
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/string_view.h"
 
 TEST(Counter, Add)
 {

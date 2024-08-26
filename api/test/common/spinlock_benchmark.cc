@@ -1,10 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/common/spin_lock_mutex.h"
-
 #include <benchmark/benchmark.h>
-#include <mutex>
+#include <stdint.h>
+#include <algorithm>
+#include <atomic>
+#include <thread>
+#include <vector>
+
+#if defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__) || defined(__INTEL_COMPILER)
+#    include <emmintrin.h>  // for _mm_pause
+#  endif
+#endif
+
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/spin_lock_mutex.h"
 
 namespace
 {

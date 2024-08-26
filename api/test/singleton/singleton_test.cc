@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdint.h>
 
 /*
   TODO:
@@ -12,8 +13,6 @@
 #  include <dlfcn.h>
 #endif
 
-#include <iostream>
-
 #include "component_a.h"
 #include "component_b.h"
 #include "component_c.h"
@@ -21,11 +20,18 @@
 #include "component_e.h"
 #include "component_f.h"
 
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
 using namespace opentelemetry;

@@ -1,13 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/utility.h"
-
+#include <gtest/gtest.h>
+#include <initializer_list>
 #include <tuple>
 #include <type_traits>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/nostd/utility.h"
 
 namespace nostd = opentelemetry::nostd;
 
