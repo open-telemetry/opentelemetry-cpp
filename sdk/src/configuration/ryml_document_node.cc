@@ -181,8 +181,7 @@ std::unique_ptr<DocumentNode> RymlDocumentNode::GetChildNode(const std::string &
 
   if (!m_node.is_map())
   {
-    OTEL_INTERNAL_LOG_ERROR("Yaml: not a map, looking for " << name);
-    throw InvalidSchemaException(name);
+    return child;
   }
 
   const char *name_str = name.c_str();

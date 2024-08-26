@@ -432,8 +432,9 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemo
 {
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
 
-  OTEL_INTERNAL_LOG_ERROR("CreateJaegerRemoteSampler: FIXME");
-  throw UnsupportedException("JeagerRemoteSampler not available in opentelemetry-cpp");
+  std::string die("JeagerRemoteSampler not available in opentelemetry-cpp");
+  OTEL_INTERNAL_LOG_ERROR(die);
+  throw UnsupportedException(die);
 
   return sdk;
 }
@@ -481,8 +482,10 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateExtensionS
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSampler() no builder for " << name);
-    throw UnsupportedException("CreateExtensionSampler() no builder for " + name);
+    std::string die("CreateExtensionSampler() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -556,8 +559,9 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ConsoleSpanExporter");
-    throw UnsupportedException("No builder for ConsoleSpanExporter");
+    std::string die("No builder for ConsoleSpanExporter");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -576,8 +580,9 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateZipki
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ZipkinSpanExporter");
-    throw UnsupportedException("No builder for ZipkinSpanExporter");
+    std::string die("No builder for ZipkinSpanExporter");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -598,8 +603,10 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExten
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanExporter() no builder for " << name);
-    throw UnsupportedException("CreateExtensionSpanExporter() no builder for " + name);
+    std::string die("CreateExtensionSpanExporter() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -666,8 +673,10 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExte
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateExtensionSpanProcessor() no builder for " << name);
-    throw UnsupportedException("CreateExtensionSpanProcessor() no builder for " + name);
+    std::string die("CreateExtensionSpanProcessor() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -729,8 +738,10 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateTextMapPropagator() no builder for " << name);
-    throw UnsupportedException("CreateTextMapPropagator() no builder for " + name);
+    std::string die("CreateTextMapPropagator() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -869,8 +880,9 @@ SdkBuilder::CreateConsolePushMetricExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ConsolePushMetricExporter");
-    throw UnsupportedException("No builder for ConsolePushMetricExporter");
+    std::string die("No builder for ConsolePushMetricExporter");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -893,8 +905,10 @@ SdkBuilder::CreateExtensionPushMetricExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ExtensionPushMetricExporter" << name);
-    throw UnsupportedException("No builder for " + name);
+    std::string die("No builder for ExtensionPushMetricExporter ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -916,8 +930,9 @@ SdkBuilder::CreatePrometheusPullMetricExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for PrometheusMetricExporter");
-    throw UnsupportedException("No builder for PrometheusMetricExporter");
+    std::string die("No builder for PrometheusMetricExporter");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -940,8 +955,10 @@ SdkBuilder::CreateExtensionPullMetricExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ExtensionPullMetricExporter" << name);
-    throw UnsupportedException("No builder for " + name);
+    std::string die("No builder for ExtensionPullMetricExporter ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -1149,8 +1166,9 @@ SdkBuilder::CreateConsoleLogRecordExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("No builder for ConsoleLogRecordExporter");
-    throw UnsupportedException("No builder for ConsoleLogRecordExporter");
+    std::string die("No builder for ConsoleLogRecordExporter");
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
 
   return sdk;
@@ -1173,8 +1191,10 @@ SdkBuilder::CreateExtensionLogRecordExporter(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateExtensionLogRecordExporter() no builder for " << name);
-    throw UnsupportedException("CreateExtensionLogRecordExporter() no builder for " + name);
+    std::string die("CreateExtensionLogRecordExporter() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -1242,8 +1262,10 @@ SdkBuilder::CreateExtensionLogRecordProcessor(
   }
   else
   {
-    OTEL_INTERNAL_LOG_ERROR("CreateExtensionLogRecordProcessor() no builder for " << name);
-    throw UnsupportedException("CreateExtensionLogRecordProcessor() no builder for " + name);
+    std::string die("CreateExtensionLogRecordProcessor() no builder for ");
+    die.append(name);
+    OTEL_INTERNAL_LOG_ERROR(die);
+    throw UnsupportedException(die);
   }
   return sdk;
 }
@@ -1296,6 +1318,16 @@ void SdkBuilder::SetResource(
       {
         sdk_attributes.SetAttribute(kv.first, kv.second);
       }
+    }
+
+    if (opt_model->attributes_list.size() != 0)
+    {
+      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME attributes_list");
+    }
+
+    if (opt_model->detectors != nullptr)
+    {
+      OTEL_INTERNAL_LOG_ERROR("SdkBuilder::SetResource: FIXME detectors");
     }
 
     auto sdk_resource =

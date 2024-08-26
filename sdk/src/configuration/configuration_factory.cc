@@ -25,6 +25,7 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/detectors_configuration.h"
 #include "opentelemetry/sdk/configuration/document.h"
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
@@ -66,6 +67,7 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/stream_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
@@ -1260,18 +1262,63 @@ static std::unique_ptr<AttributesConfiguration> ParseAttributesConfiguration(
   return model;
 }
 
+static std::unique_ptr<StringArrayConfiguration> ParseStringArrayConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<StringArrayConfiguration> model(new StringArrayConfiguration);
+
+  for (auto it = node->begin(); it != node->end(); ++it)
+  {
+    std::unique_ptr<DocumentNode> child(*it);
+
+    std::string name = child->AsString();
+
+    model->string_array.push_back(name);
+  }
+
+  return model;
+}
+
+static std::unique_ptr<DetectorsConfiguration> ParseDetectorsConfiguration(
+    const std::unique_ptr<DocumentNode> &node)
+{
+  std::unique_ptr<DetectorsConfiguration> model(new DetectorsConfiguration);
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("included");
+  if (child)
+  {
+    model->included = ParseStringArrayConfiguration(child);
+  }
+
+  child = node->GetChildNode("excluded");
+  if (child)
+  {
+    model->excluded = ParseStringArrayConfiguration(child);
+  }
+
+  return model;
+}
+
 static std::unique_ptr<ResourceConfiguration> ParseResourceConfiguration(
     const std::unique_ptr<DocumentNode> &node)
 {
   std::unique_ptr<ResourceConfiguration> model(new ResourceConfiguration);
   std::unique_ptr<DocumentNode> child;
 
-  model->schema_url = node->GetString("schema_url", "");
+  model->schema_url      = node->GetString("schema_url", "");
+  model->attributes_list = node->GetString("attributes_list", "");
 
-  child = node->GetRequiredChildNode("attributes");
+  child = node->GetChildNode("attributes");
   if (child)
   {
     model->attributes = ParseAttributesConfiguration(child);
+  }
+
+  child = node->GetChildNode("detectors");
+  if (child)
+  {
+    model->detectors = ParseDetectorsConfiguration(child);
   }
 
   return model;

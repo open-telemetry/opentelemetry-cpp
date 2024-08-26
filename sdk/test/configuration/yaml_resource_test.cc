@@ -1,0 +1,217 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#include <gtest/gtest.h>
+#include <stdlib.h>
+
+#include "opentelemetry/sdk/configuration/yaml_configuration_factory.h"
+
+std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(const std::string &yaml)
+{
+  static const std::string source("test");
+  return opentelemetry::sdk::configuration::YamlConfigurationFactory::ParseString(source, yaml);
+}
+
+TEST(YamlResource, empty_resource)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_EQ(config->resource->attributes, nullptr);
+  ASSERT_EQ(config->resource->attributes_list, "");
+  ASSERT_EQ(config->resource->detectors, nullptr);
+}
+
+TEST(YamlResource, empty_attributes)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->attributes, nullptr);
+  ASSERT_EQ(config->resource->attributes->kv_map.size(), 0);
+}
+
+TEST(YamlResource, some_attributes)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes:
+    foo: "1234"
+    bar: "5678"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->attributes, nullptr);
+  ASSERT_EQ(config->resource->attributes->kv_map.size(), 2);
+  ASSERT_EQ(config->resource->attributes->kv_map["foo"], "1234");
+  ASSERT_EQ(config->resource->attributes->kv_map["bar"], "5678");
+}
+
+TEST(YamlResource, empty_attributes_list)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes_list:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_EQ(config->resource->attributes_list, "");
+}
+
+TEST(YamlResource, some_attributes_list)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes_list: "foo=1234,bar=5678"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_EQ(config->resource->attributes_list, "foo=1234,bar=5678");
+}
+
+TEST(YamlResource, both)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  attributes:
+    foo: "1234"
+    bar: "5678"
+  attributes_list: "foo=aaaa,bar=bbbb"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->attributes, nullptr);
+  ASSERT_EQ(config->resource->attributes->kv_map.size(), 2);
+  ASSERT_EQ(config->resource->attributes->kv_map["foo"], "1234");
+  ASSERT_EQ(config->resource->attributes->kv_map["bar"], "5678");
+  ASSERT_EQ(config->resource->attributes_list, "foo=aaaa,bar=bbbb");
+}
+
+TEST(YamlResource, empty_detectors)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  detectors:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detectors, nullptr);
+  ASSERT_EQ(config->resource->detectors->included, nullptr);
+  ASSERT_EQ(config->resource->detectors->excluded, nullptr);
+}
+
+TEST(YamlResource, empty_included_detectors)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  detectors:
+    included:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detectors, nullptr);
+  ASSERT_NE(config->resource->detectors->included, nullptr);
+  ASSERT_EQ(config->resource->detectors->included->string_array.size(), 0);
+  ASSERT_EQ(config->resource->detectors->excluded, nullptr);
+}
+
+TEST(YamlResource, some_included_detectors)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  detectors:
+    included:
+      - foo
+      - bar
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detectors, nullptr);
+  ASSERT_NE(config->resource->detectors->included, nullptr);
+  ASSERT_EQ(config->resource->detectors->included->string_array.size(), 2);
+  ASSERT_EQ(config->resource->detectors->included->string_array[0], "foo");
+  ASSERT_EQ(config->resource->detectors->included->string_array[1], "bar");
+  ASSERT_EQ(config->resource->detectors->excluded, nullptr);
+}
+
+TEST(YamlResource, some_excluded_detectors)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  detectors:
+    excluded:
+      - foo
+      - bar
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detectors, nullptr);
+  ASSERT_EQ(config->resource->detectors->included, nullptr);
+  ASSERT_NE(config->resource->detectors->excluded, nullptr);
+  ASSERT_EQ(config->resource->detectors->excluded->string_array.size(), 2);
+  ASSERT_EQ(config->resource->detectors->excluded->string_array[0], "foo");
+  ASSERT_EQ(config->resource->detectors->excluded->string_array[1], "bar");
+}
+
+TEST(YamlResource, some_detectors)
+{
+  std::string yaml = R"(
+file_format: xx.yy
+resource:
+  detectors:
+    included:
+      - foo.in
+      - bar.in
+    excluded:
+      - foo.ex
+      - bar.ex
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detectors, nullptr);
+  ASSERT_NE(config->resource->detectors->included, nullptr);
+  ASSERT_EQ(config->resource->detectors->included->string_array.size(), 2);
+  ASSERT_EQ(config->resource->detectors->included->string_array[0], "foo.in");
+  ASSERT_EQ(config->resource->detectors->included->string_array[1], "bar.in");
+  ASSERT_NE(config->resource->detectors->excluded, nullptr);
+  ASSERT_EQ(config->resource->detectors->excluded->string_array.size(), 2);
+  ASSERT_EQ(config->resource->detectors->excluded->string_array[0], "foo.ex");
+  ASSERT_EQ(config->resource->detectors->excluded->string_array[1], "bar.ex");
+}
