@@ -6,8 +6,10 @@
 #include <chrono>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"

@@ -1,11 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/nostd/shared_ptr.h"
-
 #include <gtest/gtest.h>
-
+#include <stddef.h>
 #include <algorithm>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/nostd/shared_ptr.h"
 
 using opentelemetry::nostd::shared_ptr;
 
@@ -35,7 +37,7 @@ public:
 class D : public C
 {
 public:
-  virtual ~D() {}
+  ~D() override {}
 };
 
 TEST(SharedPtrTest, DefaultConstruction)

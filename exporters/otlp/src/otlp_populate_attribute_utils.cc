@@ -72,7 +72,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -132,7 +133,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
@@ -186,7 +188,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(nostd::get<uint64_t>(value));
+    proto_value->set_int_value(
+        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -217,7 +220,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<int64_t>>(value))
@@ -233,7 +237,8 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(val);
+      array_value->add_values()->set_int_value(
+          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
     }
   }
   else if (nostd::holds_alternative<std::vector<double>>(value))
