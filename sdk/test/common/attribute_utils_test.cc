@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
-
 #include <gtest/gtest.h>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 
 TEST(AttributeMapTest, DefaultConstruction)
 {
