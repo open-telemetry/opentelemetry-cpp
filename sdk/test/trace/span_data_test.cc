@@ -1,13 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/span_data.h"
+#include <gtest/gtest.h>
+#include <cstdint>
+
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/trace/span.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-
-#include <gtest/gtest.h>
+#include "opentelemetry/trace/trace_state.h"
 
 using opentelemetry::sdk::trace::SpanData;
 namespace trace_api = opentelemetry::trace;

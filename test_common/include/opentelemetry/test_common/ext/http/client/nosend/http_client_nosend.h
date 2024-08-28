@@ -118,7 +118,7 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class HttpClient;
+class HttpClient;  // IWYU pragma: keep
 
 class Session : public opentelemetry::ext::http::client::Session
 {

@@ -1,11 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 
-#include <iterator>
-
-#include <gtest/gtest.h>
 using opentelemetry::sdk::common::CircularBufferRange;
 
 TEST(CircularBufferRangeTest, ForEach)

@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <map>
+
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

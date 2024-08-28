@@ -6,11 +6,11 @@
 #include <functional>
 #include <map>
 
-#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
