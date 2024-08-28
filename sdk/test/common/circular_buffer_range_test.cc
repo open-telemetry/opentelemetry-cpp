@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 
 using opentelemetry::sdk::common::CircularBufferRange;

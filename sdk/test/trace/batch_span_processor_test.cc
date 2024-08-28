@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
-#include <memory>
 #include <string>
 #include <thread>
 #include <utility>
@@ -19,7 +19,10 @@
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

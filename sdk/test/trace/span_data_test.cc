@@ -2,14 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <chrono>
 #include <cstdint>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 

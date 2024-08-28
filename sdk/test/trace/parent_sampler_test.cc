@@ -1,37 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <assert.h>
 #include <gtest/gtest.h>
-#include <algorithm>
-#include <chrono>
 #include <cstdint>
-#include <initializer_list>
 #include <map>
 #include <string>
-#include <type_traits>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context_value.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/random_id_generator.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
-#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 
