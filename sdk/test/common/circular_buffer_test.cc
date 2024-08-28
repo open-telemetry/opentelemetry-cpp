@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <cassert>
-#include <ext/alloc_traits.h>
 #include <initializer_list>
 #include <random>
 #include <thread>

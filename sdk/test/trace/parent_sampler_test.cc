@@ -18,7 +18,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/context_value.h"
-#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/utility.h"
