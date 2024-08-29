@@ -27,7 +27,6 @@
 using opentelemetry::sdk::trace::SpanData;
 namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
-namespace nostd     = opentelemetry::nostd;
 
 TEST(SpanData, DefaultValues)
 {
@@ -85,7 +84,7 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
-  ASSERT_EQ(nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
   ASSERT_EQ(data.GetEvents().at(0).GetName(), "event1");
   ASSERT_EQ(data.GetEvents().at(0).GetTimestamp(), now);
 }
@@ -104,7 +103,9 @@ TEST(SpanData, EventAttributes)
 
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])), values[i]);
+    EXPECT_EQ(
+        opentelemetry::nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])),
+        values[i]);
   }
 }
 
@@ -145,6 +146,7 @@ TEST(SpanData, Links)
   EXPECT_EQ(data.GetLinks().at(0).GetSpanContext(), span_context);
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])), values[i]);
+    EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
+              values[i]);
   }
 }
