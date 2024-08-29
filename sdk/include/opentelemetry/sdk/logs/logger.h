@@ -43,7 +43,7 @@ public:
 
   using opentelemetry::logs::Logger::EmitLogRecord;
 
-  void EmitLogRecord(
+  bool EmitLogRecord(
       nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
 
   /** Returns the associated instrumentation scope */

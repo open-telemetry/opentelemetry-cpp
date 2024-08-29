@@ -35,7 +35,7 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
-  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
+  bool OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;

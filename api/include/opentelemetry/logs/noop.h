@@ -46,7 +46,7 @@ public:
 
   using Logger::EmitLogRecord;
 
-  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&) noexcept override {}
+  bool EmitLogRecord(nostd::unique_ptr<LogRecord> &&) noexcept override { return true; }
 
 private:
   class NoopLogRecord : public LogRecord

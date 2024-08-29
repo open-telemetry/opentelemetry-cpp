@@ -54,11 +54,11 @@ std::unique_ptr<Recordable> MultiLogRecordProcessor::MakeRecordable() noexcept
   return recordable;
 }
 
-void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+bool MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (!record)
   {
-    return;
+    return false;
   }
   auto multi_recordable = static_cast<MultiRecordable *>(record.get());
 
@@ -67,9 +67,13 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     auto recordable = multi_recordable->ReleaseRecordable(*processor);
     if (recordable)
     {
-      processor->OnEmit(std::move(recordable));
+      if (!processor->OnEmit(std::move(recordable)))
+      {
+        return false;
+      };
     }
   }
+  return true;
 }
 
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept

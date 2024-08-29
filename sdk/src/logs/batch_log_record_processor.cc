@@ -63,16 +63,16 @@ std::unique_ptr<Recordable> BatchLogRecordProcessor::MakeRecordable() noexcept
   return exporter_->MakeRecordable();
 }
 
-void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
+bool BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
-    return;
+    return false;
   }
 
   if (buffer_.Add(std::unique_ptr<Recordable>(record.release())) == false)
   {
-    return;
+    return false;
   }
 
   // If the queue gets at least half full a preemptive notification is
@@ -84,6 +84,7 @@ void BatchLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
     synchronization_data_->is_force_wakeup_background_worker.store(true, std::memory_order_release);
     synchronization_data_->cv.notify_all();
   }
+  return true;
 }
 
 bool BatchLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept

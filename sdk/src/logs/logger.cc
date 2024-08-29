@@ -88,12 +88,12 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
   return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(recordable.release());
 }
 
-void Logger::EmitLogRecord(
+bool Logger::EmitLogRecord(
     opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept
 {
   if (!log_record)
   {
-    return;
+    return false;
   }
 
   std::unique_ptr<Recordable> recordable =
@@ -106,7 +106,7 @@ void Logger::EmitLogRecord(
   // TODO: Sampler (should include check for minSeverity)
 
   // Send the log recordable to the processor
-  processor.OnEmit(std::move(recordable));
+  return processor.OnEmit(std::move(recordable));
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &

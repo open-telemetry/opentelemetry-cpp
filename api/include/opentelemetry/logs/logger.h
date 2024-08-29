@@ -43,8 +43,9 @@ public:
    * Emit a Log Record object
    *
    * @param log_record
+   * @return true if the record was successfully exported, false otherwise
    */
-  virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
+  virtual bool EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
   /**
    * Emit a Log Record object with arguments
@@ -65,18 +66,18 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
+  bool EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
   {
     if (!log_record)
     {
-      return;
+      return false;
     }
 
     IgnoreTraitResult(
         detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
             log_record.get(), std::forward<ArgumentType>(args))...);
 
-    EmitLogRecord(std::move(log_record));
+    return EmitLogRecord(std::move(log_record));
   }
 
   /**
@@ -97,11 +98,11 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(ArgumentType &&...args)
+  bool EmitLogRecord(ArgumentType &&...args)
   {
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
 
-    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
+    return EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**

@@ -66,9 +66,10 @@ public:
   /**
    * Called when the Logger's log method creates a log record
    * @param record the log record
+   * @return true if the record was successfully exported, false otherwise
    */
 
-  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
+  bool OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Export all log records that have not been exported yet.

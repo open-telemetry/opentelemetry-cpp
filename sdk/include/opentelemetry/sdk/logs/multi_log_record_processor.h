@@ -35,8 +35,9 @@ public:
   /**
    * OnEmit is called by the SDK once a log record has been successfully created.
    * @param record the log record
+   * @return true if the record was successfully exported, false otherwise
    */
-  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
+  bool OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.

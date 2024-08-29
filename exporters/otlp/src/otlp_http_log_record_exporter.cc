@@ -149,7 +149,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   {
     OTEL_INTERNAL_LOG_DEBUG("[OTLP LOG HTTP Exporter] Export " << log_count << " log(s) success");
   }
-  return opentelemetry::sdk::common::ExportResult::kSuccess;
+  return result;
 #endif
 }
 
