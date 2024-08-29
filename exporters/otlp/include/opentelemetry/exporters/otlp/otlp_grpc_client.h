@@ -13,14 +13,18 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format on
 
 #include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

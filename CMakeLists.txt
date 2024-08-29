@@ -363,7 +363,7 @@ if(WITH_PROMETHEUS)
   endif()
 endif()
 
-if(WITH_ABSEIL)
+if(WITH_ABSEIL OR WITH_OTLP_GRPC)
   if(NOT TARGET absl::strings)
     find_package(absl CONFIG REQUIRED)
   endif()
@@ -374,7 +374,7 @@ if(WITH_OTLP_GRPC
    OR WITH_OTLP_FILE)
   find_package(Protobuf)
   if(Protobuf_VERSION AND Protobuf_VERSION VERSION_GREATER_EQUAL "3.22.0")
-    if(NOT WITH_ABSEIL)
+    if(NOT WITH_ABSEIL AND NOT WITH_OTLP_GRPC)
       message(
         FATAL_ERROR
           "Protobuf 3.22 or upper require abseil-cpp(Recommended version: 20230125 or upper)"
