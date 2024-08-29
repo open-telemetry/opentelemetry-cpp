@@ -328,12 +328,10 @@ add_library(
 set_target_version(opentelemetry_proto)
 
 # Disable include-what-you-use on generated code.
-set_target_properties(
-  opentelemetry_proto
-  PROPERTIES CXX_INCLUDE_WHAT_YOU_USE ""
-)
+set_target_properties(opentelemetry_proto PROPERTIES CXX_INCLUDE_WHAT_YOU_USE
+                                                     "")
 
-if(WITH_ABSEIL)
+if(WITH_ABSEIL OR WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_proto PUBLIC absl::bad_variant_access)
 endif()
 
@@ -393,12 +391,10 @@ else() # cmake 3.8 or lower
 endif()
 
 if(WITH_OTLP_GRPC)
-  if(WITH_ABSEIL)
-    find_package(absl CONFIG)
-    if(TARGET absl::synchronization)
-      target_link_libraries(opentelemetry_proto_grpc
-                            PRIVATE absl::synchronization)
-    endif()
+  find_package(absl CONFIG)
+  if(TARGET absl::synchronization)
+    target_link_libraries(opentelemetry_proto_grpc
+                          PRIVATE absl::synchronization)
   endif()
 endif()
 
