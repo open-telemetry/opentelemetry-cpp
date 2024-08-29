@@ -28,10 +28,27 @@ namespace exporter
 namespace otlp
 {
 
+class OtlpGrpcClient;
 struct OtlpGrpcClientOptions;
 
 #ifdef ENABLE_ASYNC_EXPORT
 struct OtlpGrpcClientAsyncData;
+
+class OtlpGrpcClientReferenceGuard
+{
+public:
+  OtlpGrpcClientReferenceGuard() noexcept;
+  ~OtlpGrpcClientReferenceGuard() noexcept;
+
+  OtlpGrpcClientReferenceGuard(const OtlpGrpcClientReferenceGuard &)            = delete;
+  OtlpGrpcClientReferenceGuard(OtlpGrpcClientReferenceGuard &&)                 = delete;
+  OtlpGrpcClientReferenceGuard &operator=(const OtlpGrpcClientReferenceGuard &) = delete;
+  OtlpGrpcClientReferenceGuard &operator=(OtlpGrpcClientReferenceGuard &&)      = delete;
+
+private:
+  friend class OtlpGrpcClient;
+  std::atomic<bool> has_value_;
+};
 #endif
 
 /**
@@ -95,6 +112,17 @@ public:
       proto::collector::logs::v1::ExportLogsServiceResponse *response);
 
 #ifdef ENABLE_ASYNC_EXPORT
+
+  void AddReference(OtlpGrpcClientReferenceGuard &guard,
+                    const OtlpGrpcClientOptions &options) noexcept;
+
+  /**
+   * Reomve reference fro a guard object
+   *
+   * @param guard guard object to remove reference from
+   * @return true if there is no more reference to this gRPC client
+   */
+  bool RemoveReference(OtlpGrpcClientReferenceGuard &guard) noexcept;
 
   /**
    * Async export
@@ -167,9 +195,12 @@ public:
    * timeout is applied.
    * @return return the status of this operation
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
+  bool Shutdown(OtlpGrpcClientReferenceGuard &guard,
+                std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
 
   std::shared_ptr<OtlpGrpcClientAsyncData> MutableAsyncData(const OtlpGrpcClientOptions &options);
+
+  bool IsShutdown() const noexcept;
 
 private:
   // Stores if this gRPC client had its Shutdown() method called

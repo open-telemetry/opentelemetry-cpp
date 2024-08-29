@@ -28,6 +28,17 @@ OtlpGrpcMetricExporterFactory::Create(const OtlpGrpcMetricExporterOptions &optio
   return exporter;
 }
 
+#ifdef ENABLE_ASYNC_EXPORT
+std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
+OtlpGrpcMetricExporterFactory::Create(const OtlpGrpcMetricExporterOptions &options,
+                                      nostd::shared_ptr<OtlpGrpcClient> client)
+{
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter(
+      new OtlpGrpcMetricExporter(options, std::move(client)));
+  return exporter;
+}
+#endif
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

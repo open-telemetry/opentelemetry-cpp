@@ -12,6 +12,7 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/sdk_config.h"
 
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_utils.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -26,19 +27,62 @@ OtlpGrpcExporter::OtlpGrpcExporter() : OtlpGrpcExporter(OtlpGrpcExporterOptions(
 OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options)
     : options_(options),
 #ifdef ENABLE_ASYNC_EXPORT
-      client_(std::make_shared<OtlpGrpcClient>()),
+      client_(OtlpGrpcClientFactory::Create()),
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
 #endif
       trace_service_stub_(OtlpGrpcClient::MakeTraceServiceStub(options))
-{}
+{
+#ifdef ENABLE_ASYNC_EXPORT
+  client_->AddReference(*client_reference_guard_, options_);
+#endif
+}
 
 OtlpGrpcExporter::OtlpGrpcExporter(
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub)
     : options_(OtlpGrpcExporterOptions()),
 #ifdef ENABLE_ASYNC_EXPORT
-      client_(std::make_shared<OtlpGrpcClient>()),
+      client_(OtlpGrpcClientFactory::Create()),
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
 #endif
       trace_service_stub_(std::move(stub))
-{}
+{
+#ifdef ENABLE_ASYNC_EXPORT
+  client_->AddReference(*client_reference_guard_, options_);
+#endif
+}
+
+#ifdef ENABLE_ASYNC_EXPORT
+OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options,
+                                   nostd::shared_ptr<OtlpGrpcClient> client)
+    : options_(options),
+      client_(std::move(client)),
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      trace_service_stub_(OtlpGrpcClient::MakeTraceServiceStub(options))
+{
+  client_->AddReference(*client_reference_guard_, options_);
+}
+
+OtlpGrpcExporter::OtlpGrpcExporter(
+    std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub,
+    nostd::shared_ptr<OtlpGrpcClient> client)
+    : options_(OtlpGrpcExporterOptions()),
+      client_(std::move(client)),
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
+      trace_service_stub_(std::move(stub))
+{
+  client_->AddReference(*client_reference_guard_, options_);
+}
+#endif
+
+OtlpGrpcExporter::~OtlpGrpcExporter()
+{
+#ifdef ENABLE_ASYNC_EXPORT
+  if (client_)
+  {
+    client_->RemoveReference(*client_reference_guard_);
+  }
+#endif
+}
 
 // ----------------------------- Exporter methods ------------------------------
 
@@ -50,7 +94,8 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (isShutdown())
+  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  if (isShutdown() || !client)
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << spans.size()
                                                      << " span(s) failed, exporter is shutdown");
@@ -82,13 +127,16 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 #ifdef ENABLE_ASYNC_EXPORT
   if (options_.max_concurrent_requests > 1)
   {
-    return client_->DelegateAsyncExport(
+    return client->DelegateAsyncExport(
         options_, trace_service_stub_.get(), std::move(context), std::move(arena),
         std::move(*request),
-        [](opentelemetry::sdk::common::ExportResult result,
-           std::unique_ptr<google::protobuf::Arena> &&,
-           const proto::collector::trace::v1::ExportTraceServiceRequest &request,
-           proto::collector::trace::v1::ExportTraceServiceResponse *) {
+        // Capture the trace_service_stub_ to ensure it is not destroyed before the callback is
+        // called.
+        [trace_service_stub = trace_service_stub_](
+            opentelemetry::sdk::common::ExportResult result,
+            std::unique_ptr<google::protobuf::Arena> &&,
+            const proto::collector::trace::v1::ExportTraceServiceRequest &request,
+            proto::collector::trace::v1::ExportTraceServiceResponse *) {
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] ERROR: Export "
@@ -126,7 +174,13 @@ bool OtlpGrpcExporter::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
 #ifdef ENABLE_ASYNC_EXPORT
-  return client_->ForceFlush(timeout);
+  // Maybe already shutdown, we need to keep thread-safety here.
+  nostd::shared_ptr<OtlpGrpcClient> client = client_;
+  if (!client)
+  {
+    return true;
+  }
+  return client->ForceFlush(timeout);
 #else
   return true;
 #endif
@@ -137,7 +191,14 @@ bool OtlpGrpcExporter::Shutdown(
 {
   is_shutdown_ = true;
 #ifdef ENABLE_ASYNC_EXPORT
-  return client_->Shutdown(timeout);
+  // Maybe already shutdown, we need to keep thread-safety here.
+  nostd::shared_ptr<OtlpGrpcClient> client;
+  client.swap(client_);
+  if (!client)
+  {
+    return true;
+  }
+  return client->Shutdown(*client_reference_guard_, timeout);
 #else
   return true;
 #endif
@@ -147,6 +208,13 @@ bool OtlpGrpcExporter::isShutdown() const noexcept
 {
   return is_shutdown_;
 }
+
+#ifdef ENABLE_ASYNC_EXPORT
+const nostd::shared_ptr<OtlpGrpcClient> &OtlpGrpcExporter::GetClient() const noexcept
+{
+  return client_;
+}
+#endif
 
 }  // namespace otlp
 }  // namespace exporter

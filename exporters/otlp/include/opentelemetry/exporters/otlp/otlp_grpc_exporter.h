@@ -6,12 +6,17 @@
 #include <atomic>
 #include <chrono>
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format on
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
+// clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
@@ -23,6 +28,9 @@ namespace exporter
 namespace otlp
 {
 
+#ifdef ENABLE_ASYNC_EXPORT
+class OtlpGrpcClientReferenceGuard;
+#endif
 class OtlpGrpcClient;
 
 /**
@@ -36,10 +44,23 @@ public:
    */
   OtlpGrpcExporter();
 
+#ifdef ENABLE_ASYNC_EXPORT
+  /**
+   * Create an OtlpGrpcExporter using specified OtlpGrpcClient.
+   *
+   * @param options options to create exporter
+   * @param client the gRPC client to use
+   */
+  OtlpGrpcExporter(const OtlpGrpcExporterOptions &options,
+                   nostd::shared_ptr<OtlpGrpcClient> client);
+#endif
+
   /**
    * Create an OtlpGrpcExporter using the given options.
    */
   explicit OtlpGrpcExporter(const OtlpGrpcExporterOptions &options);
+
+  ~OtlpGrpcExporter() override;
 
   /**
    * Create a span recordable.
@@ -71,12 +92,22 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
+#ifdef ENABLE_ASYNC_EXPORT
+  /**
+   * Get the Client object
+   *
+   * @return return binded gRPC client
+   */
+  const nostd::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
+#endif
+
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcExporterOptions options_;
 
 #ifdef ENABLE_ASYNC_EXPORT
-  std::shared_ptr<OtlpGrpcClient> client_;
+  nostd::shared_ptr<OtlpGrpcClient> client_;
+  nostd::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
 #endif
 
   // For testing
@@ -84,7 +115,7 @@ private:
   friend class OtlpGrpcLogRecordExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
-  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;
+  nostd::shared_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;
 
   /**
    * Create an OtlpGrpcExporter using the specified service stub.
@@ -92,6 +123,18 @@ private:
    * @param stub the service stub to be used for exporting
    */
   OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
+
+#ifdef ENABLE_ASYNC_EXPORT
+  /**
+   * Create an OtlpGrpcExporter using the specified service stub and gRPC client.
+   * Only tests can call this constructor directly.
+   * @param stub the service stub to be used for exporting
+   * @param client the gRPC client to use
+   */
+  OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub,
+                   nostd::shared_ptr<OtlpGrpcClient> client);
+#endif
+
   std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
 };

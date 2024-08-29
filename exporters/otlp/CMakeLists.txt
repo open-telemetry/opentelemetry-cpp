@@ -23,8 +23,10 @@ target_link_libraries(opentelemetry_otlp_recordable
 
 if(WITH_OTLP_GRPC)
   find_package(gRPC REQUIRED)
-  add_library(opentelemetry_exporter_otlp_grpc_client src/otlp_grpc_client.cc
-                                                      src/otlp_grpc_utils.cc)
+  add_library(
+    opentelemetry_exporter_otlp_grpc_client
+    src/otlp_grpc_client.cc src/otlp_grpc_client_factory.cc
+    src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   set_target_version(opentelemetry_exporter_otlp_grpc_client)

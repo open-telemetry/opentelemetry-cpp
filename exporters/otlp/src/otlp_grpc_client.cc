@@ -99,6 +99,9 @@ struct OtlpGrpcClientAsyncData
   std::mutex session_waker_lock;
   std::condition_variable session_waker;
 
+  // Reference count of OtlpGrpcClient
+  std::atomic<int64_t> reference_count{0};
+
   // Do not use OtlpGrpcClientAsyncData() = default; here, some versions of GCC&Clang have BUGs
   // and may not initialize the member correctly. See also
   // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
@@ -239,6 +242,12 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 }
 #endif
 }  // namespace
+
+#ifdef ENABLE_ASYNC_EXPORT
+OtlpGrpcClientReferenceGuard::OtlpGrpcClientReferenceGuard() noexcept : has_value_{false} {}
+
+OtlpGrpcClientReferenceGuard::~OtlpGrpcClientReferenceGuard() noexcept {}
+#endif
 
 OtlpGrpcClient::OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
@@ -399,6 +408,35 @@ grpc::Status OtlpGrpcClient::DelegateExport(
 
 #ifdef ENABLE_ASYNC_EXPORT
 
+void OtlpGrpcClient::AddReference(OtlpGrpcClientReferenceGuard &guard,
+                                  const OtlpGrpcClientOptions &options) noexcept
+{
+  if (false == guard.has_value_.exchange(true, std::memory_order_acq_rel))
+  {
+    MutableAsyncData(options)->reference_count.fetch_add(1, std::memory_order_acq_rel);
+  }
+}
+
+bool OtlpGrpcClient::RemoveReference(OtlpGrpcClientReferenceGuard &guard) noexcept
+{
+  auto async_data = async_data_;
+  if (true == guard.has_value_.exchange(false, std::memory_order_acq_rel))
+  {
+    if (async_data)
+    {
+      int64_t left = async_data->reference_count.fetch_sub(1, std::memory_order_acq_rel);
+      return left <= 1;
+    }
+  }
+
+  if (async_data)
+  {
+    return async_data->reference_count.load(std::memory_order_acquire) <= 0;
+  }
+
+  return true;
+}
+
 /**
  * Async export
  * @param options Options used to message to create gRPC context and stub(if necessary)
@@ -513,6 +551,11 @@ std::shared_ptr<OtlpGrpcClientAsyncData> OtlpGrpcClient::MutableAsyncData(
   return async_data_;
 }
 
+bool OtlpGrpcClient::IsShutdown() const noexcept
+{
+  return is_shutdown_.load(std::memory_order_acquire);
+}
+
 bool OtlpGrpcClient::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (!async_data_)
@@ -560,15 +603,17 @@ bool OtlpGrpcClient::ForceFlush(std::chrono::microseconds timeout) noexcept
   return timeout_steady > std::chrono::steady_clock::duration::zero();
 }
 
-bool OtlpGrpcClient::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
+                              std::chrono::microseconds timeout) noexcept
 {
   if (!async_data_)
   {
     return true;
   }
 
+  bool last_reference_removed = RemoveReference(guard);
   bool force_flush_result;
-  if (false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
+  if (last_reference_removed && false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
     force_flush_result = ForceFlush(timeout);
 
