@@ -94,8 +94,12 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
+#else
+  if (isShutdown())
+#endif
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << spans.size()
                                                      << " span(s) failed, exporter is shutdown");

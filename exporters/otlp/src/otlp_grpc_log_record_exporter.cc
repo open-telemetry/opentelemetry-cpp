@@ -108,8 +108,12 @@ OtlpGrpcLogRecordExporter::MakeRecordable() noexcept
 opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
+#else
+  if (isShutdown())
+#endif
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC log] Exporting " << logs.size()
                                                          << " log(s) failed, exporter is shutdown");

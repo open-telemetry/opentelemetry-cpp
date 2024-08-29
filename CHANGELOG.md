@@ -21,6 +21,9 @@ Increment the:
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
   [#2717](https://github.com/open-telemetry/opentelemetry-cpp/pull/2717)
 
+* [EXPORTER] Allow to share gRPC clients between OTLP exporters.
+  [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
+
 Breaking changes:
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`

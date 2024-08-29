@@ -98,8 +98,12 @@ sdk::metrics::AggregationTemporality OtlpGrpcMetricExporter::GetAggregationTempo
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
+#else
+  if (isShutdown())
+#endif
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP METRICS gRPC] Exporting "
                             << data.scope_metric_data_.size()
