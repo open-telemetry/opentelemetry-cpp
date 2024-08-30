@@ -275,8 +275,12 @@ OtlpGrpcClient::~OtlpGrpcClient()
 #ifdef ENABLE_ASYNC_EXPORT
   if (async_data)
   {
-    std::lock_guard<std::mutex> lock(async_data->running_calls_lock);
-    for (auto &call_data : async_data->running_calls)
+    std::unordered_set<std::shared_ptr<OtlpGrpcAsyncCallDataBase>> running_calls;
+    {
+      std::lock_guard<std::mutex> lock(async_data->running_calls_lock);
+      running_calls = async_data->running_calls;
+    }
+    for (auto &call_data : running_calls)
     {
       if (call_data && call_data->grpc_context)
       {
@@ -663,8 +667,12 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   {
     force_flush_result = ForceFlush(timeout);
 
-    std::lock_guard<std::mutex> lock(async_data_->running_calls_lock);
-    for (auto &call_data : async_data_->running_calls)
+    std::unordered_set<std::shared_ptr<OtlpGrpcAsyncCallDataBase>> running_calls;
+    {
+      std::lock_guard<std::mutex> lock(async_data_->running_calls_lock);
+      running_calls = async_data_->running_calls;
+    }
+    for (auto &call_data : running_calls)
     {
       if (call_data && call_data->grpc_context)
       {
