@@ -14,7 +14,7 @@ build_pr:
 deprecated_build_linux:
   name: (Deprecated) Build OpenTelemetry CPP (Linux x64)
   agent:
-    image: slough-ops/centos-7-base
+    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
     flavor: b1.large
     type: Unity::VM
   commands:
@@ -265,7 +265,7 @@ build_windows_arm64:
 build_linux_x64:
   name: Build OpenTelemetry CPP (Linux x64 - GCC)
   agent:
-    image: slough-ops/centos-7-base
+    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
     type: Unity::VM
     flavor: b1.xlarge
   variables:
@@ -302,7 +302,7 @@ build_linux_x64:
 build_linux_clang_x64:
   name: Build OpenTelemetry CPP (Linux x64 - Clang)
   agent:
-    image: slough-ops/centos-7-base
+    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
     type: Unity::VM
     flavor: b1.xlarge
   variables:
@@ -343,7 +343,7 @@ build_linux_clang_x64:
 build_linux_vcpkg_x64:
   name: Build OpenTelemetry CPP (Linux x64 - VCPKG/GCC)
   agent:
-    image: slough-ops/centos-7-base
+    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
     type: Unity::VM
     flavor: b1.xlarge
   variables:
@@ -381,7 +381,7 @@ build_linux_vcpkg_x64:
 build_linux_clang_vcpkg_x64:
   name: Build OpenTelemetry CPP (Linux x64 - VCPKG/Clang)
   agent:
-    image: slough-ops/centos-7-base
+    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
     type: Unity::VM
     flavor: b1.xlarge
   variables:
