@@ -25,33 +25,26 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter()
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options)
     : options_(options),
-#ifdef ENABLE_ASYNC_EXPORT
-      client_(OtlpGrpcClientFactory::Create()),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-#endif
       aggregation_temporality_selector_{
-          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      metrics_service_stub_(OtlpGrpcClient::MakeMetricsServiceStub(options))
+          OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)}
 {
-#ifdef ENABLE_ASYNC_EXPORT
+  client_                 = OtlpGrpcClientFactory::Create(options_);
+  client_reference_guard_ = OtlpGrpcClientFactory::CreateReferenceGuard();
   client_->AddReference(*client_reference_guard_, options_);
-#endif
+
+  metrics_service_stub_ = client_->MakeMetricsServiceStub();
 }
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
     std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub)
     : options_(OtlpGrpcMetricExporterOptions()),
-#ifdef ENABLE_ASYNC_EXPORT
-      client_(OtlpGrpcClientFactory::Create()),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-#endif
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
       metrics_service_stub_(std::move(stub))
 {
-#ifdef ENABLE_ASYNC_EXPORT
+  client_                 = OtlpGrpcClientFactory::Create(options_);
+  client_reference_guard_ = OtlpGrpcClientFactory::CreateReferenceGuard();
   client_->AddReference(*client_reference_guard_, options_);
-#endif
 }
 
 #ifdef ENABLE_ASYNC_EXPORT
@@ -59,10 +52,11 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptio
                                                nostd::shared_ptr<OtlpGrpcClient> client)
     : options_(options),
       client_(std::move(client)),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-      metrics_service_stub_(OtlpGrpcClient::MakeMetricsServiceStub(options))
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
 {
   client_->AddReference(*client_reference_guard_, options_);
+
+  metrics_service_stub_ = client_->MakeMetricsServiceStub();
 }
 
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
@@ -79,12 +73,10 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
 
 OtlpGrpcMetricExporter::~OtlpGrpcMetricExporter()
 {
-#ifdef ENABLE_ASYNC_EXPORT
   if (client_)
   {
     client_->RemoveReference(*client_reference_guard_);
   }
-#endif
 }
 
 // ----------------------------- Exporter methods ------------------------------
@@ -98,18 +90,23 @@ sdk::metrics::AggregationTemporality OtlpGrpcMetricExporter::GetAggregationTempo
 opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics &data) noexcept
 {
-#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
-#else
-  if (isShutdown())
-#endif
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP METRICS gRPC] Exporting "
                             << data.scope_metric_data_.size()
                             << " metric(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
+
+  if (!metrics_service_stub_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting "
+                            << data.scope_metric_data_.size()
+                            << " metric(s) failed, service stub unavailable");
+    return sdk::common::ExportResult::kFailure;
+  }
+
   if (data.scope_metric_data_.empty())
   {
     return sdk::common::ExportResult::kSuccess;
@@ -182,7 +179,6 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
 bool OtlpGrpcMetricExporter::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
-#ifdef ENABLE_ASYNC_EXPORT
   // Maybe already shutdown, we need to keep thread-safety here.
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (!client)
@@ -190,16 +186,12 @@ bool OtlpGrpcMetricExporter::ForceFlush(
     return true;
   }
   return client->ForceFlush(timeout);
-#else
-  return true;
-#endif
 }
 
 bool OtlpGrpcMetricExporter::Shutdown(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_ = true;
-#ifdef ENABLE_ASYNC_EXPORT
   // Maybe already shutdown, we need to keep thread-safety here.
   nostd::shared_ptr<OtlpGrpcClient> client;
   client.swap(client_);
@@ -208,9 +200,6 @@ bool OtlpGrpcMetricExporter::Shutdown(
     return true;
   }
   return client->Shutdown(*client_reference_guard_, timeout);
-#else
-  return true;
-#endif
 }
 
 bool OtlpGrpcMetricExporter::isShutdown() const noexcept
@@ -218,12 +207,10 @@ bool OtlpGrpcMetricExporter::isShutdown() const noexcept
   return is_shutdown_;
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 const nostd::shared_ptr<OtlpGrpcClient> &OtlpGrpcMetricExporter::GetClient() const noexcept
 {
   return client_;
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

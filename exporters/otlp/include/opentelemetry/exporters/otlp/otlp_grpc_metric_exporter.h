@@ -77,23 +77,19 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
-#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Get the Client object
    *
    * @return return binded gRPC client
    */
   const nostd::shared_ptr<OtlpGrpcClient> &GetClient() const noexcept;
-#endif
 
 private:
   // The configuration options associated with this exporter.
   const OtlpGrpcMetricExporterOptions options_;
 
-#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client_;
   nostd::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
-#endif
 
   // Aggregation Temporality selector
   const sdk::metrics::AggregationTemporalitySelector aggregation_temporality_selector_;

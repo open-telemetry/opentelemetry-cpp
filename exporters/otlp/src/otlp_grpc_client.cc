@@ -78,14 +78,18 @@ public:
   virtual ~OtlpGrpcAsyncCallData() {}
 };
 }  // namespace
+#endif
 
 struct OtlpGrpcClientAsyncData
 {
+
   std::chrono::system_clock::duration export_timeout = std::chrono::seconds{10};
 
   // The best performance trade-off of gRPC is having numcpu's threads and one completion queue
   // per thread, but this exporter should not cost a lot resource and we don't want to create
-  // too many threads in the process. So we use one completion queue.
+  // too many threads in the process. So we use one completion queue and shared context.
+  std::shared_ptr<grpc::Channel> channel;
+#ifdef ENABLE_ASYNC_EXPORT
   grpc::CompletionQueue cq;
 
   // Running requests, this is used to limit the number of concurrent requests.
@@ -98,6 +102,7 @@ struct OtlpGrpcClientAsyncData
   // Condition variable and mutex to control the concurrency count of running requests.
   std::mutex session_waker_lock;
   std::condition_variable session_waker;
+#endif
 
   // Reference count of OtlpGrpcClient
   std::atomic<int64_t> reference_count{0};
@@ -107,7 +112,6 @@ struct OtlpGrpcClientAsyncData
   // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
   OtlpGrpcClientAsyncData() {}
 };
-#endif
 
 namespace
 {
@@ -243,24 +247,23 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 #endif
 }  // namespace
 
-#ifdef ENABLE_ASYNC_EXPORT
 OtlpGrpcClientReferenceGuard::OtlpGrpcClientReferenceGuard() noexcept : has_value_{false} {}
 
 OtlpGrpcClientReferenceGuard::~OtlpGrpcClientReferenceGuard() noexcept {}
-#endif
 
-OtlpGrpcClient::OtlpGrpcClient()
-#ifdef ENABLE_ASYNC_EXPORT
-    : is_shutdown_(false)
-#endif
-{}
+OtlpGrpcClient::OtlpGrpcClient(const OtlpGrpcClientOptions &options) : is_shutdown_(false)
+{
+  std::shared_ptr<OtlpGrpcClientAsyncData> async_data = MutableAsyncData(options);
+  async_data->channel                                 = MakeChannel(options);
+}
 
 OtlpGrpcClient::~OtlpGrpcClient()
 {
-#ifdef ENABLE_ASYNC_EXPORT
+
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data;
   async_data.swap(async_data_);
 
+#ifdef ENABLE_ASYNC_EXPORT
   while (async_data && async_data->running_requests.load(std::memory_order_acquire) > 0)
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
@@ -359,21 +362,33 @@ std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
 }
 
 std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>
-OtlpGrpcClient::MakeTraceServiceStub(const OtlpGrpcClientOptions &options)
+OtlpGrpcClient::MakeTraceServiceStub()
 {
-  return proto::collector::trace::v1::TraceService::NewStub(MakeChannel(options));
+  if (!async_data_ || !async_data_->channel)
+  {
+    return nullptr;
+  }
+  return proto::collector::trace::v1::TraceService::NewStub(async_data_->channel);
 }
 
 std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
-OtlpGrpcClient::MakeMetricsServiceStub(const OtlpGrpcClientOptions &options)
+OtlpGrpcClient::MakeMetricsServiceStub()
 {
-  return proto::collector::metrics::v1::MetricsService::NewStub(MakeChannel(options));
+  if (!async_data_ || !async_data_->channel)
+  {
+    return nullptr;
+  }
+  return proto::collector::metrics::v1::MetricsService::NewStub(async_data_->channel);
 }
 
 std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
-OtlpGrpcClient::MakeLogsServiceStub(const OtlpGrpcClientOptions &options)
+OtlpGrpcClient::MakeLogsServiceStub()
 {
-  return proto::collector::logs::v1::LogsService::NewStub(MakeChannel(options));
+  if (!async_data_ || !async_data_->channel)
+  {
+    return nullptr;
+  }
+  return proto::collector::logs::v1::LogsService::NewStub(async_data_->channel);
 }
 
 grpc::Status OtlpGrpcClient::DelegateExport(
@@ -406,8 +421,6 @@ grpc::Status OtlpGrpcClient::DelegateExport(
   return stub->Export(context.get(), request, response);
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
-
 void OtlpGrpcClient::AddReference(OtlpGrpcClientReferenceGuard &guard,
                                   const OtlpGrpcClientOptions &options) noexcept
 {
@@ -436,6 +449,8 @@ bool OtlpGrpcClient::RemoveReference(OtlpGrpcClientReferenceGuard &guard) noexce
 
   return true;
 }
+
+#ifdef ENABLE_ASYNC_EXPORT
 
 /**
  * Async export
@@ -538,6 +553,8 @@ sdk::common::ExportResult OtlpGrpcClient::DelegateAsyncExport(
                                      "log(s)");
 }
 
+#endif
+
 std::shared_ptr<OtlpGrpcClientAsyncData> OtlpGrpcClient::MutableAsyncData(
     const OtlpGrpcClientOptions &options)
 {
@@ -556,13 +573,15 @@ bool OtlpGrpcClient::IsShutdown() const noexcept
   return is_shutdown_.load(std::memory_order_acquire);
 }
 
-bool OtlpGrpcClient::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool OtlpGrpcClient::ForceFlush(
+    OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   if (!async_data_)
   {
     return true;
   }
 
+#ifdef ENABLE_ASYNC_EXPORT
   std::size_t request_counter = async_data_->start_request_counter.load(std::memory_order_acquire);
   if (request_counter <= async_data_->finished_request_counter.load(std::memory_order_acquire))
   {
@@ -601,16 +620,20 @@ bool OtlpGrpcClient::ForceFlush(std::chrono::microseconds timeout) noexcept
   }
 
   return timeout_steady > std::chrono::steady_clock::duration::zero();
+#else
+  return true;
+#endif
 }
 
 bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
-                              std::chrono::microseconds timeout) noexcept
+                              OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   if (!async_data_)
   {
     return true;
   }
 
+#ifdef ENABLE_ASYNC_EXPORT
   bool last_reference_removed = RemoveReference(guard);
   bool force_flush_result;
   if (last_reference_removed && false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
@@ -625,9 +648,11 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   }
 
   return force_flush_result;
-}
-
+#else
+  RemoveReference(guard);
+  return true;
 #endif
+}
 
 }  // namespace otlp
 }  // namespace exporter

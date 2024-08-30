@@ -362,7 +362,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
 // Create spans, let processor call Export() and share client object between trace and logs
 TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 {
-  nostd::shared_ptr<OtlpGrpcClient> shared_client = OtlpGrpcClientFactory::Create();
+  nostd::shared_ptr<OtlpGrpcClient> shared_client =
+      OtlpGrpcClientFactory::Create(OtlpGrpcLogRecordExporterOptions());
 
   auto mock_stub = new OtlpMockLogsServiceStub();
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub_interface(mock_stub);

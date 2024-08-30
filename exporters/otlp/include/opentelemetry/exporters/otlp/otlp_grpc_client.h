@@ -34,8 +34,6 @@ namespace otlp
 
 class OtlpGrpcClient;
 struct OtlpGrpcClientOptions;
-
-#ifdef ENABLE_ASYNC_EXPORT
 struct OtlpGrpcClientAsyncData;
 
 class OtlpGrpcClientReferenceGuard
@@ -53,7 +51,6 @@ private:
   friend class OtlpGrpcClient;
   std::atomic<bool> has_value_;
 };
-#endif
 
 /**
  * The OTLP gRPC client contains utility functions of gRPC.
@@ -61,7 +58,7 @@ private:
 class OtlpGrpcClient
 {
 public:
-  OtlpGrpcClient();
+  OtlpGrpcClient(const OtlpGrpcClientOptions &options);
 
   ~OtlpGrpcClient();
 
@@ -79,20 +76,18 @@ public:
   /**
    * Create trace service stub to communicate with the OpenTelemetry Collector.
    */
-  static std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>
-  MakeTraceServiceStub(const OtlpGrpcClientOptions &options);
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> MakeTraceServiceStub();
 
   /**
    * Create metrics service stub to communicate with the OpenTelemetry Collector.
    */
-  static std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
-  MakeMetricsServiceStub(const OtlpGrpcClientOptions &options);
+  std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface>
+  MakeMetricsServiceStub();
 
   /**
    * Create logs service stub to communicate with the OpenTelemetry Collector.
    */
-  static std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface>
-  MakeLogsServiceStub(const OtlpGrpcClientOptions &options);
+  std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> MakeLogsServiceStub();
 
   static grpc::Status DelegateExport(
       proto::collector::trace::v1::TraceService::StubInterface *stub,
@@ -115,8 +110,6 @@ public:
       proto::collector::logs::v1::ExportLogsServiceRequest &&request,
       proto::collector::logs::v1::ExportLogsServiceResponse *response);
 
-#ifdef ENABLE_ASYNC_EXPORT
-
   void AddReference(OtlpGrpcClientReferenceGuard &guard,
                     const OtlpGrpcClientOptions &options) noexcept;
 
@@ -128,6 +121,7 @@ public:
    */
   bool RemoveReference(OtlpGrpcClientReferenceGuard &guard) noexcept;
 
+#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Async export
    * @param options Options used to message to create gRPC context and stub(if necessary)
@@ -187,6 +181,7 @@ public:
                          const proto::collector::logs::v1::ExportLogsServiceRequest &,
                          proto::collector::logs::v1::ExportLogsServiceResponse *)>
           &&result_callback) noexcept;
+#endif
 
   /**
    * Force flush the gRPC client.
@@ -212,7 +207,6 @@ private:
 
   // Stores shared data between threads of this gRPC client
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data_;
-#endif
 };
 }  // namespace otlp
 }  // namespace exporter

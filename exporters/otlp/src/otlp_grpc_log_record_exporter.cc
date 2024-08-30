@@ -37,30 +37,22 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter()
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     const OtlpGrpcLogRecordExporterOptions &options)
-    : options_(options),
-#ifdef ENABLE_ASYNC_EXPORT
-      client_(OtlpGrpcClientFactory::Create()),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-#endif
-      log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
+    : options_(options)
 {
-#ifdef ENABLE_ASYNC_EXPORT
+  client_                 = OtlpGrpcClientFactory::Create(options_);
+  client_reference_guard_ = OtlpGrpcClientFactory::CreateReferenceGuard();
   client_->AddReference(*client_reference_guard_, options_);
-#endif
+
+  log_service_stub_ = client_->MakeLogsServiceStub();
 }
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub)
-    : options_(OtlpGrpcLogRecordExporterOptions()),
-#ifdef ENABLE_ASYNC_EXPORT
-      client_(OtlpGrpcClientFactory::Create()),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-#endif
-      log_service_stub_(std::move(stub))
+    : options_(OtlpGrpcLogRecordExporterOptions()), log_service_stub_(std::move(stub))
 {
-#ifdef ENABLE_ASYNC_EXPORT
+  client_                 = OtlpGrpcClientFactory::Create(options_);
+  client_reference_guard_ = OtlpGrpcClientFactory::CreateReferenceGuard();
   client_->AddReference(*client_reference_guard_, options_);
-#endif
 }
 
 #ifdef ENABLE_ASYNC_EXPORT
@@ -69,10 +61,11 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     nostd::shared_ptr<OtlpGrpcClient> client)
     : options_(options),
       client_(std::move(client)),
-      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard()),
-      log_service_stub_(OtlpGrpcClient::MakeLogsServiceStub(options))
+      client_reference_guard_(OtlpGrpcClientFactory::CreateReferenceGuard())
 {
   client_->AddReference(*client_reference_guard_, options_);
+
+  log_service_stub_ = client_->MakeLogsServiceStub();
 }
 
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
@@ -89,12 +82,10 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
 
 OtlpGrpcLogRecordExporter::~OtlpGrpcLogRecordExporter()
 {
-#ifdef ENABLE_ASYNC_EXPORT
   if (client_)
   {
     client_->RemoveReference(*client_reference_guard_);
   }
-#endif
 }
 
 // ----------------------------- Exporter methods ------------------------------
@@ -108,17 +99,20 @@ OtlpGrpcLogRecordExporter::MakeRecordable() noexcept
 opentelemetry::sdk::common::ExportResult OtlpGrpcLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
-#ifdef ENABLE_ASYNC_EXPORT
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (isShutdown() || !client)
-#else
-  if (isShutdown())
-#endif
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC log] Exporting " << logs.size()
                                                          << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
+  if (!log_service_stub_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << logs.size()
+                                                     << " log(s) failed, service stub unavailable");
+    return sdk::common::ExportResult::kFailure;
+  }
+
   if (logs.empty())
   {
     return sdk::common::ExportResult::kSuccess;
@@ -192,8 +186,6 @@ bool OtlpGrpcLogRecordExporter::Shutdown(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_ = true;
-#ifdef ENABLE_ASYNC_EXPORT
-
   // Maybe already shutdown, we need to keep thread-safety here.
   nostd::shared_ptr<OtlpGrpcClient> client;
   client.swap(client_);
@@ -202,15 +194,11 @@ bool OtlpGrpcLogRecordExporter::Shutdown(
     return true;
   }
   return client->Shutdown(*client_reference_guard_, timeout);
-#else
-  return true;
-#endif
 }
 
 bool OtlpGrpcLogRecordExporter::ForceFlush(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
-#ifdef ENABLE_ASYNC_EXPORT
   // Maybe already shutdown, we need to keep thread-safety here.
   nostd::shared_ptr<OtlpGrpcClient> client = client_;
   if (!client)
@@ -218,9 +206,6 @@ bool OtlpGrpcLogRecordExporter::ForceFlush(
     return true;
   }
   return client->ForceFlush(timeout);
-#else
-  return true;
-#endif
 }
 
 bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
@@ -228,12 +213,10 @@ bool OtlpGrpcLogRecordExporter::isShutdown() const noexcept
   return is_shutdown_;
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 const nostd::shared_ptr<OtlpGrpcClient> &OtlpGrpcLogRecordExporter::GetClient() const noexcept
 {
   return client_;
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

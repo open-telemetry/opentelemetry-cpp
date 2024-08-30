@@ -12,9 +12,10 @@ namespace exporter
 namespace otlp
 {
 
-nostd::shared_ptr<OtlpGrpcClient> OtlpGrpcClientFactory::Create()
+nostd::shared_ptr<OtlpGrpcClient> OtlpGrpcClientFactory::Create(
+    const OtlpGrpcClientOptions &options)
 {
-  return nostd::shared_ptr<OtlpGrpcClient>(new OtlpGrpcClient());
+  return nostd::shared_ptr<OtlpGrpcClient>(new OtlpGrpcClient(options));
 }
 
 #ifdef ENABLE_ASYNC_EXPORT

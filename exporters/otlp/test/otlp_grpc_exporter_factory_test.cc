@@ -40,7 +40,7 @@ TEST(OtlpGrpcExporterFactoryTest, ShareClient)
   OtlpGrpcExporterOptions opts;
   opts.endpoint = "localhost:45454";
 
-  nostd::shared_ptr<OtlpGrpcClient> client = OtlpGrpcClientFactory::Create();
+  nostd::shared_ptr<OtlpGrpcClient> client = OtlpGrpcClientFactory::Create(opts);
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter1 =
       OtlpGrpcExporterFactory::Create(opts, client);
 

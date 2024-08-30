@@ -40,7 +40,7 @@ TEST(OtlpGrpcMetricExporterFactory, ShareClient)
   OtlpGrpcMetricExporterOptions opts;
   opts.endpoint = "localhost:45454";
 
-  nostd::shared_ptr<OtlpGrpcClient> client = OtlpGrpcClientFactory::Create();
+  nostd::shared_ptr<OtlpGrpcClient> client = OtlpGrpcClientFactory::Create(opts);
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter1 =
       OtlpGrpcMetricExporterFactory::Create(opts, client);
 
