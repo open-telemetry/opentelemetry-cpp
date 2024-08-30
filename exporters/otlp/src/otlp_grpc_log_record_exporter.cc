@@ -55,7 +55,6 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
   client_->AddReference(*client_reference_guard_, options_);
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
     const OtlpGrpcLogRecordExporterOptions &options,
     nostd::shared_ptr<OtlpGrpcClient> client)
@@ -78,7 +77,6 @@ OtlpGrpcLogRecordExporter::OtlpGrpcLogRecordExporter(
 {
   client_->AddReference(*client_reference_guard_, options_);
 }
-#endif
 
 OtlpGrpcLogRecordExporter::~OtlpGrpcLogRecordExporter()
 {

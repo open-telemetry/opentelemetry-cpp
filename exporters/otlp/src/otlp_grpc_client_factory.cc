@@ -18,12 +18,10 @@ nostd::shared_ptr<OtlpGrpcClient> OtlpGrpcClientFactory::Create(
   return nostd::shared_ptr<OtlpGrpcClient>(new OtlpGrpcClient(options));
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 nostd::shared_ptr<OtlpGrpcClientReferenceGuard> OtlpGrpcClientFactory::CreateReferenceGuard()
 {
   return nostd::shared_ptr<OtlpGrpcClientReferenceGuard>(new OtlpGrpcClientReferenceGuard());
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

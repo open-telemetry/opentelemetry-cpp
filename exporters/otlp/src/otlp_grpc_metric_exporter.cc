@@ -47,7 +47,6 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
   client_->AddReference(*client_reference_guard_, options_);
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options,
                                                nostd::shared_ptr<OtlpGrpcClient> client)
     : options_(options),
@@ -69,7 +68,6 @@ OtlpGrpcMetricExporter::OtlpGrpcMetricExporter(
 {
   client_->AddReference(*client_reference_guard_, options_);
 }
-#endif
 
 OtlpGrpcMetricExporter::~OtlpGrpcMetricExporter()
 {

@@ -14,9 +14,7 @@ namespace exporter
 namespace otlp
 {
 
-#ifdef ENABLE_ASYNC_EXPORT
 class OtlpGrpcClientReferenceGuard;
-#endif
 class OtlpGrpcClient;
 
 /**
@@ -30,9 +28,7 @@ public:
    */
   static nostd::shared_ptr<OtlpGrpcClient> Create(const OtlpGrpcClientOptions &options);
 
-#ifdef ENABLE_ASYNC_EXPORT
   static nostd::shared_ptr<OtlpGrpcClientReferenceGuard> CreateReferenceGuard();
-#endif
 };
 
 }  // namespace otlp

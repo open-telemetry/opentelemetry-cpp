@@ -26,9 +26,7 @@ namespace exporter
 namespace otlp
 {
 
-#ifdef ENABLE_ASYNC_EXPORT
 class OtlpGrpcClientReferenceGuard;
-#endif
 class OtlpGrpcClient;
 
 /**
@@ -42,7 +40,6 @@ public:
    */
   OtlpGrpcMetricExporter();
 
-#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Create an OtlpGrpcMetricExporter using specified OtlpGrpcClient.
    *
@@ -51,7 +48,6 @@ public:
    */
   OtlpGrpcMetricExporter(const OtlpGrpcMetricExporterOptions &options,
                          nostd::shared_ptr<OtlpGrpcClient> client);
-#endif
 
   /**
    * Create an OtlpGrpcMetricExporter using the given options.
@@ -108,7 +104,7 @@ private:
    */
   OtlpGrpcMetricExporter(
       std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub);
-#ifdef ENABLE_ASYNC_EXPORT
+
   /**
    * Create an OtlpGrpcMetricExporter using the specified service stub and gRPC client.
    * Only tests can call this constructor directly.
@@ -118,7 +114,6 @@ private:
   OtlpGrpcMetricExporter(
       std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub,
       nostd::shared_ptr<OtlpGrpcClient> client);
-#endif
 
   std::atomic<bool> is_shutdown_{false};
   bool isShutdown() const noexcept;
