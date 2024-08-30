@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
+cp LICENSE out/LICENSE.md
 mkdir out/lib/extra
 cp /usr/local/lib/libprotobuf*.* out/lib/extra/
 cp /usr/local/opt/curl/lib/libcurl*.* out/lib/extra/

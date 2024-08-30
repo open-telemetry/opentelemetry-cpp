@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
+cp LICENSE out/LICENSE.md
 mkdir out/lib/extra
 cp /usr/local/lib/libprotobuf*.* out/lib/extra/
 find /usr/lib -name 'libcurl.*' -exec cp '{}' out/lib/extra/ ';'

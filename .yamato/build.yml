@@ -2,6 +2,9 @@ build_pr:
   name: Build OpenTelemetry CPP (PR)
   dependencies:
     - .yamato/build.yml#build_linux_x64
+    - .yamato/build.yml#build_linux_vcpkg_x64
+    - .yamato/build.yml#build_linux_clang_x64
+    - .yamato/build.yml#build_linux_clang_vcpkg_x64
     - .yamato/build.yml#build_windows_x64
     - .yamato/build.yml#build_macos_x64
 #    - .yamato/build.yml#build_linux_arm64
@@ -260,7 +263,44 @@ build_windows_arm64:
         - opentelemetry-cpp-win-arm64.zip
 
 build_linux_x64:
-  name: Build OpenTelemetry CPP (Linux x64)
+  name: Build OpenTelemetry CPP (Linux x64 - GCC)
+  agent:
+    image: slough-ops/centos-7-base
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    CXX_STANDARD: 17
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_linux.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/build.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_linux.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-linux-x64:
+      paths:
+        - opentelemetry-cpp-lin-x64.zip
+
+build_linux_clang_x64:
+  name: Build OpenTelemetry CPP (Linux x64 - Clang)
   agent:
     image: slough-ops/centos-7-base
     type: Unity::VM
@@ -296,7 +336,88 @@ build_linux_x64:
   artifacts:
     opentelemetry-cpp-linux-x64:
       paths:
-        - opentelemetry-cpp-lin-x64.zip
+        - opentelemetry-cpp-linclang-x64.zip
+
+
+
+build_linux_vcpkg_x64:
+  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/GCC)
+  agent:
+    image: slough-ops/centos-7-base
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    CXX_STANDARD: 17
+    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_linux_vcpkg.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/build_vcpkg.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_linux_vcpkg.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-linux-x64:
+      paths:
+        - opentelemetry-cpp-linvcpkg-x64.zip
+
+build_linux_vcpkg_clang_x64:
+  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/Clang)
+  agent:
+    image: slough-ops/centos-7-base
+    type: Unity::VM
+    flavor: b1.xlarge
+  variables:
+    OPENTELEMETRY_CPP_CONFIG: Release
+    OPENTELEMETRY_CPP_LIBARCH: x64
+    CXX_STANDARD: 17
+    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
+  commands:
+    - command: |
+        set -euxo pipefail
+        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+      name: Update submodules
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/prepare_vm_linux_vcpkg_clang.sh
+      name: Prepare VM to build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        export CC=`pwd`/clang
+        export CXX=`pwd`/clang++
+        ./.yamato/scripts/build_vcpkg.sh
+      name: Build OpenTelemetry CPP
+    - command: |
+        set -euxo pipefail
+        ./.yamato/scripts/package_linux_vcpkg.sh
+      name: Package OpenTelemetry CPP
+  source:
+    files:
+      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+  metadata:
+    Job Maintainers: "#team-pes"
+  artifacts:
+    opentelemetry-cpp-linux-x64:
+      paths:
+        - opentelemetry-cpp-linclangvcpkg-x64.zip
+
 
 build_macos_x64:
   name: Build OpenTelemetry CPP (macOS x64)
