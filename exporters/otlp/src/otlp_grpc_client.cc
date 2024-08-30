@@ -560,9 +560,11 @@ std::shared_ptr<OtlpGrpcClientAsyncData> OtlpGrpcClient::MutableAsyncData(
 {
   if (!async_data_)
   {
-    async_data_                          = std::make_shared<OtlpGrpcClientAsyncData>();
-    async_data_->export_timeout          = options.timeout;
+    async_data_                 = std::make_shared<OtlpGrpcClientAsyncData>();
+    async_data_->export_timeout = options.timeout;
+#ifdef ENABLE_ASYNC_EXPORT
     async_data_->max_concurrent_requests = options.max_concurrent_requests;
+#endif
   }
 
   return async_data_;
