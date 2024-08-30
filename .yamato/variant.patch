@@ -1,0 +1,11 @@
+--- variant.orig	2019-05-13 12:16:06.167488289 -0700
++++ variant	2019-05-13 12:16:42.574846622 -0700
+@@ -1556,7 +1556,7 @@
+ #endif
+ 
+       template<size_t _Np, typename _Vp>
+-	friend constexpr decltype(auto) __detail::__variant::__get(_Vp&& __v);
++	friend constexpr decltype(auto) __detail::__variant::__get(_Vp&& __v) noexcept;
+ 
+       template<typename _Vp>
+ 	friend void* __detail::__variant::__get_storage(_Vp&& __v);

@@ -24,7 +24,8 @@ declare -a otel_build_options=(
     "-DBUILD_TESTING=OFF"                                       # Whether to enable tests (on), makes the build faster and it does not work with x64-windows-static-md
     "-DWITH_EXAMPLES=OFF"                                       # Whether to build examples (on), makes the build faster and it does not work with x64-windows-static-md
 )
-cmake -S . -B build ${otel_build_options[@]} 
+cmake -S . -B build ${otel_build_options[@]}
+# -GNinja
 cmake --build build --parallel `getconf _NPROCESSORS_ONLN` --config $OPENTELEMETRY_CPP_CONFIG --target all
 ctest --build-config $OPENTELEMETRY_CPP_CONFIG --test-dir build
 cmake --install build --prefix $install_dir --config $OPENTELEMETRY_CPP_CONFIG

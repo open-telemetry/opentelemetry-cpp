@@ -276,7 +276,7 @@ build_linux_x64:
       name: Update submodules
     - command: |
         set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_linux.sh
+        ./.yamato/scripts/prepare_vm_linux_clang.sh
       name: Prepare VM to build OpenTelemetry CPP
     - command: |
         set -euxo pipefail
