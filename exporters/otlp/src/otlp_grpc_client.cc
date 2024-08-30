@@ -90,8 +90,8 @@ struct OtlpGrpcClientAsyncData
   // too many threads in the process. So we use one completion queue and shared context.
   std::shared_ptr<grpc::Channel> channel;
 #ifdef ENABLE_ASYNC_EXPORT
-  grpc::CompletionQueue cq;
-
+  std::mutex running_calls_lock;
+  std::unordered_set<std::shared_ptr<OtlpGrpcAsyncCallDataBase>> running_calls;
   // Running requests, this is used to limit the number of concurrent requests.
   std::atomic<std::size_t> running_requests{0};
   // Request counter is used to record ForceFlush.
@@ -206,6 +206,11 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 
   ++async_data->start_request_counter;
   ++async_data->running_requests;
+  {
+    std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
+    async_data->running_calls.insert(
+        std::static_pointer_cast<OtlpGrpcAsyncCallDataBase>(call_data));
+  }
   // Some old toolchains can only use gRPC 1.33 and it's experimental.
 #  if defined(GRPC_CPP_VERSION_MAJOR) && \
       (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
@@ -215,6 +220,11 @@ static sdk::common::ExportResult InternalDelegateAsyncExport(
 #  endif
       ->Export(call_data->grpc_context.get(), call_data->request, call_data->response,
                [call_data, async_data](::grpc::Status grpc_status) {
+                 {
+                   std::lock_guard<std::mutex> lock{async_data->running_calls_lock};
+                   async_data->running_calls.erase(
+                       std::static_pointer_cast<OtlpGrpcAsyncCallDataBase>(call_data));
+                 }
                  --async_data->running_requests;
                  ++async_data->finished_request_counter;
 
@@ -259,11 +269,22 @@ OtlpGrpcClient::OtlpGrpcClient(const OtlpGrpcClientOptions &options) : is_shutdo
 
 OtlpGrpcClient::~OtlpGrpcClient()
 {
-
   std::shared_ptr<OtlpGrpcClientAsyncData> async_data;
   async_data.swap(async_data_);
 
 #ifdef ENABLE_ASYNC_EXPORT
+  if (async_data)
+  {
+    std::lock_guard<std::mutex> lock(async_data->running_calls_lock);
+    for (auto &call_data : async_data->running_calls)
+    {
+      if (call_data && call_data->grpc_context)
+      {
+        call_data->grpc_context->TryCancel();
+      }
+    }
+  }
+
   while (async_data && async_data->running_requests.load(std::memory_order_acquire) > 0)
   {
     std::unique_lock<std::mutex> lock{async_data->session_waker_lock};
@@ -642,7 +663,14 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   {
     force_flush_result = ForceFlush(timeout);
 
-    async_data_->cq.Shutdown();
+    std::lock_guard<std::mutex> lock(async_data_->running_calls_lock);
+    for (auto &call_data : async_data_->running_calls)
+    {
+      if (call_data && call_data->grpc_context)
+      {
+        call_data->grpc_context->TryCancel();
+      }
+    }
   }
   else
   {
