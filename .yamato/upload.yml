@@ -21,7 +21,7 @@ deploy:
           opentelemetry-cpp-win-x64.zip
   skip_checkout: true
   dependencies:
-    - .yamato/build.yml#build_linux_vcpkg_clang_x64
+    - .yamato/build.yml#build_linux_clang_vcpkg_x64
     - .yamato/build.yml#build_linux_vcpkg_x64
     - .yamato/build.yml#build_linux_clang_x64
     - .yamato/build.yml#build_linux_x64

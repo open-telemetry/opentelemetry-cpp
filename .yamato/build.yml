@@ -378,7 +378,7 @@ build_linux_vcpkg_x64:
       paths:
         - opentelemetry-cpp-linvcpkg-x64.zip
 
-build_linux_vcpkg_clang_x64:
+build_linux_clang_vcpkg_x64:
   name: Build OpenTelemetry CPP (Linux x64 - VCPKG/Clang)
   agent:
     image: slough-ops/centos-7-base
