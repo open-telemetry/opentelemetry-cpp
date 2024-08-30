@@ -458,7 +458,7 @@ build_macos_x64:
 build_macos_arm64:
   name: Build OpenTelemetry CPP (macOS arm64)
   agent:
-    image: slough-ops/macos-14-arm64-xcode:v0.0.4-1332464
+    image: slough-ops/macos-14-xcode:v0.0.2-1332463
     type: Unity::VM::osx
     flavor: m1.mac
     model: M1

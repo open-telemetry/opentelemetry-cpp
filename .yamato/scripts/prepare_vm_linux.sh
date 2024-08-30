@@ -13,8 +13,9 @@ sudo -E apt-get install -y zip
 # ===================================
 sudo -E apt-get install -y zlib1g-dev
 # sudo -E ./tools/setup-ninja.sh
-sudo -E ./ci/setup_cmake.sh
 sudo -E ./ci/setup_ci_environment.sh
+sudo -E ./ci/setup_cmake.sh
+sudo -E ./tools/setup_cmake.sh
 sudo -E ./ci/setup_googletest.sh
 sudo -E ./ci/install_protobuf.sh
 sudo -E ./ci/install_abseil.sh
