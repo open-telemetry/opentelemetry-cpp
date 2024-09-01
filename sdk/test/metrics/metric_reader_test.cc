@@ -25,5 +25,5 @@ TEST(MetricReaderTest, BasicTests)
   std::shared_ptr<MeterContext> meter_context2(new MeterContext());
   std::shared_ptr<MetricProducer> metric_producer{
       new MetricCollector(meter_context2.get(), std::move(metric_reader2))};
-  metric_producer->Collect([](ResourceMetrics & /* metric_data */) { return true; });
+  metric_producer->Produce();
 }
