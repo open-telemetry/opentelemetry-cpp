@@ -317,7 +317,8 @@ pkg_files(
         "//conditions:default": ["$(location " + otel_sdk_binary + "_lib_file" + ")"],
     }),
     tags = ["manual"],
-    tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
+    #tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
+    tool = "@multitool//tools/sentry-cli",
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",

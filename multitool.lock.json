@@ -1,0 +1,42 @@
+{
+  "$schema": "https://raw.githubusercontent.com/theoremlp/rules_multitool/main/lockfile.schema.json",
+  "sentry-cli": {
+    "binaries": [
+      {
+        "kind": "file",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Linux-aarch64",
+        "sha256": "884205693031f9c3d574ca5d41ada9f8cd3bac4402baf8e3013293d13fa2d450",
+        "os": "linux",
+        "cpu": "arm64"
+      },
+      {
+        "kind": "file",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Linux-x86_64",
+        "sha256": "55952c5804f0867ac4bbe9db52d99de5562cad8e3c0a617905b087f621237415",
+        "os": "linux",
+        "cpu": "x86_64"
+      },
+      {
+        "kind": "file",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Darwin-arm64",
+        "sha256": "56df4f9b1c625cc6d44c661d5b0428e583dda7867f3a19212e7ac549227e3bb3",
+        "os": "macos",
+        "cpu": "arm64"
+      },
+      {
+        "kind": "file",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Darwin-x86_64",
+        "sha256": "a67dbe6b2d594c4eeb6d4c838f812df885d8d2b75561c06f8ecbbe6f86c639c8",
+        "os": "macos",
+        "cpu": "x86_64"
+      },
+      {
+        "kind": "file",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Windows-x86_64.exe",
+        "sha256": "38a358adf634a9bd5dda3039fd6a24c9914284cf76b1a5f11a02696679a7c4f5",
+        "os": "windows",
+        "cpu": "x86_64"
+      }
+    ]
+  }
+}
