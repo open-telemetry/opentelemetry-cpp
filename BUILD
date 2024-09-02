@@ -325,7 +325,11 @@ pkg_files(
         "bundle-sources",
         "$(location " + otel_sdk_binary + "_lib_file" + ")"
     ],
-    tags = ["manual", "no-sandbox"],
+    tags = [
+        "manual", 
+        # TODO - Fix this to work in the sandbox, by using sentry-cli's -o folder
+        "no-sandbox"
+    ],
     tool = "@multitool//tools/sentry-cli",
 ) for otel_sdk_binary in [
     "otel_sdk_r",
@@ -344,7 +348,6 @@ pkg_files(
     "otel_sdk_d",
     "otel_sdk_rd",
 ]]
-
 
 [pkg_files(
     name = otel_sdk_binary + "_src_bundle",
