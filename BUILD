@@ -291,10 +291,7 @@ pkg_files(
 [force_compilation_mode(
     name = otel_sdk_binary + "_src_bundle" + "_force",
     compilation_mode = compilation_mode,
-    data = select({
-        "@platforms//os:windows": [otel_sdk_binary + "_make_src_bundle"],
-        "//conditions:default": [],
-    }),
+    data = [otel_sdk_binary + "_make_src_bundle"],
 ) for (otel_sdk_binary, compilation_mode) in [
     ("otel_sdk_r", "opt"),
     ("otel_sdk_d", "dbg"),
@@ -303,27 +300,51 @@ pkg_files(
 
 # Collect all sources in a .src.zip bundle using sentry-cli - https://docs.sentry.io/product/cli/dif/
 [run_binary(
-    name = otel_sdk_binary + "_make_src_bundle",
-    srcs = select({
-        "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
-        "//conditions:default": [otel_sdk_binary + "_lib_file"],
-    }),
+    name = otel_sdk_binary + "_make_src_bundle_windows",
+    srcs = [otel_sdk_binary + "_pdb_file"],
     outs = [otel_sdk_binary + ".src.zip"],
     args = [
         "debug-files",
         "bundle-sources",
-    ] + select({
-        "@platforms//os:windows": ["$(location " + otel_sdk_binary + "_pdb_file" + ")"],
-        "//conditions:default": ["$(location " + otel_sdk_binary + "_lib_file" + ")"],
-    }),
+        "$(location " + otel_sdk_binary + "_pdb_file" + ")",
+    ],
     tags = ["manual"],
-    #tool = "@sentry_cli_windows_amd64//file:sentry-cli.exe",
     tool = "@multitool//tools/sentry-cli",
 ) for otel_sdk_binary in [
     "otel_sdk_r",
     "otel_sdk_d",
     "otel_sdk_rd",
 ]]
+
+[run_binary(
+    name = otel_sdk_binary + "_make_src_bundle_non_windows",
+    srcs = [otel_sdk_binary + "_lib_file"],
+    outs = ["lib" + otel_sdk_binary + ".src.zip"],
+    args = [
+        "debug-files",
+        "bundle-sources",
+        "$(location " + otel_sdk_binary + "_lib_file" + ")"
+    ],
+    tags = ["manual", "no-sandbox"],
+    tool = "@multitool//tools/sentry-cli",
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
+
+[alias(
+    name = otel_sdk_binary + "_make_src_bundle",
+    actual = select({
+        "@platforms//os:windows": otel_sdk_binary + "_make_src_bundle_windows",
+        "//conditions:default": otel_sdk_binary + "_make_src_bundle_non_windows",
+    }),
+) for otel_sdk_binary in [
+    "otel_sdk_r",
+    "otel_sdk_d",
+    "otel_sdk_rd",
+]]
+
 
 [pkg_files(
     name = otel_sdk_binary + "_src_bundle",
@@ -371,14 +392,10 @@ pkg_filegroup(
         "otel_sdk_r_lib_files",
         "otel_sdk_rd_bin_files",
         "otel_sdk_rd_lib_files",
-    ] + select({
-        "@platforms//os:windows": [
-            "otel_sdk_d_src_bundle",
-            "otel_sdk_r_src_bundle",
-            "otel_sdk_rd_src_bundle",
-        ],
-        "//conditions:default": [],
-    }),
+        "otel_sdk_d_src_bundle",
+        "otel_sdk_r_src_bundle",
+        "otel_sdk_rd_src_bundle",
+    ],
 )
 
 pkg_zip(

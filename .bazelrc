@@ -47,7 +47,8 @@ build:windows --host_cxxopt=/std:c++17 --cxxopt=/std:c++17
 
 build:linux --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:linux --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
-build:linux --fission=yes --copt=-g 
+#build:linux --fission=yes --copt=-g 
+build:linux --copt=-g --strip=never
 
 build:macos --copt=-DCIVETWEB_API= --copt=-DCIVETWEB_CXX_API= --cxxopt=-DCIVETWEB_API= --cxxopt=-DCIVETWEB_CXX_API=
 build:macos --cxxopt=-fvisibility=hidden --copt=-fvisibility=hidden
