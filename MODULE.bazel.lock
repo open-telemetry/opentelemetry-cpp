@@ -72,8 +72,8 @@
     "https://bcr.bazel.build/modules/grpc-java/1.62.2/source.json": "06aff4d1261ef8d1f4396cfa8bc6c2651480f2cd1e960786234c07b51bf5c077",
     "https://bcr.bazel.build/modules/grpc/1.41.0/MODULE.bazel": "5bcbfc2b274dabea628f0649dc50c90cf36543b1cfc31624832538644ad1aae8",
     "https://bcr.bazel.build/modules/grpc/1.56.3.bcr.1/MODULE.bazel": "cd5b1eb276b806ec5ab85032921f24acc51735a69ace781be586880af20ab33f",
-    "https://bcr.bazel.build/modules/grpc/1.66.0/MODULE.bazel": "ba144c08f30936ac6d54e387c668d4ee263e7b47a527040bd10baaeea3d08133",
-    "https://bcr.bazel.build/modules/grpc/1.66.0/source.json": "3afbdf903329a19e400658bbeb8bc8570151fb719907fbf111898a341e8cb830",
+    "https://bcr.bazel.build/modules/grpc/1.66.0.bcr.1/MODULE.bazel": "4bc97f0858ee787fac45625d5dcc8b71d89007147c91d90cefada8dd1bb2f7f8",
+    "https://bcr.bazel.build/modules/grpc/1.66.0.bcr.1/source.json": "d1b0aad256607e3a41c664e32521620647a0871264763275a3b2d76d8d71c47e",
     "https://bcr.bazel.build/modules/jsoncpp/1.9.5/MODULE.bazel": "31271aedc59e815656f5736f282bb7509a97c7ecb43e927ac1a37966e0578075",
     "https://bcr.bazel.build/modules/jsoncpp/1.9.5/source.json": "4108ee5085dd2885a341c7fab149429db457b3169b86eb081fa245eadf69169d",
     "https://bcr.bazel.build/modules/libpfm/4.11.0/MODULE.bazel": "45061ff025b301940f1e30d2c16bea596c25b176c8b6b3087e92615adbd52902",
@@ -191,7 +191,7 @@
     "//bazel:repository.bzl%deps1": {
       "general": {
         "bzlTransitiveDigest": "mK2C0bS20oirSyleXj6yEAV3gj6B0cSZ0qALsW7t7gw=",
-        "usagesDigest": "QRC5/qNrVX3cYO262GIjjqSMIVJJct3XiMtYhSG0GxY=",
+        "usagesDigest": "9Jq9ZwOARYharupG7nSWzp+A2UnK6wkYe0eH5Pwd03Q=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -785,7 +785,7 @@
     "@@googleapis+//:extensions.bzl%switched_rules": {
       "general": {
         "bzlTransitiveDigest": "vG6fuTzXD8MMvHWZEQud0MMH7eoC4GXY0va7VrFFh04=",
-        "usagesDigest": "FdjK9vLaAa7CVL80pdTjAw1jzLkPH0MKcl3K2llkDz8=",
+        "usagesDigest": "UuGoccNaW5xbz9WTnhbw3bq5vhCc5VhikPAgQMm2GIs=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -953,7 +953,7 @@
     "@@grpc+//bazel:grpc_deps.bzl%grpc_repo_deps_ext": {
       "general": {
         "bzlTransitiveDigest": "vp+IFf88o0zj4FtqQWndTl5HZOJwHl6jvNTHXxIH47o=",
-        "usagesDigest": "yovulaADfe4hn4kFd41MVlItfFbtAcCrJg24SQg0TH0=",
+        "usagesDigest": "SU4oKqes4EjtYgoP6MH/uaywr7jLNJ5ZCzE1jGx/Zzo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
