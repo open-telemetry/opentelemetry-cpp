@@ -48,14 +48,3 @@ use_repo(
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
 multitool.hub(lockfile = "@@//:multitool.lock.json")
 use_repo(multitool, "multitool")
-
-use_repo(
-    use_extension("//bazel:repository.bzl", "deps1"),
-    "ftxui",
-    "graf_w64",
-    "loki_w64",
-    "otel_w64",
-    "prom_w64",
-    "sentry_cli_windows_amd64",
-    "tempo_w64",
-)
