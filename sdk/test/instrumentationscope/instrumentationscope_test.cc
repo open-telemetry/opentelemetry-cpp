@@ -12,7 +12,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"

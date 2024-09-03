@@ -1,11 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
-
-#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::metrics;

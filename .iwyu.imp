@@ -12,6 +12,7 @@
   # We prefer to include <gtest/gtest.h> for simplicity
   { "include": ["<gtest/gtest-message.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest-test-part.h>", "private", "<gtest/gtest.h>", "public"] },
+  { "include": ["<gtest/gtest-param-test.h>", "private", "<gtest/gtest.h>", "public"] },
   { "include": ["<gtest/gtest_pred_impl.h>", "private", "<gtest/gtest.h>", "public"] },
 
   # We prefer to include <gmock/gmock.h> for simplicity

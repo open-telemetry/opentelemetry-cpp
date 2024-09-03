@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <map>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/ext/http/common/url_parser.h"
