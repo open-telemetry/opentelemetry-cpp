@@ -12,21 +12,10 @@ deploy:
       ls 
       ./StevedoreUpload \
           --version-len=${#OPENTELEMETRY_CPP_VERSION} --repo=$STEVE_REPO --version="$OPENTELEMETRY_CPP_VERSION" \
-#          opentelemetry-cpp-linclang-x64.zip \
-#          opentelemetry-cpp-linvcpkg-x64.zip \
-#          opentelemetry-cpp-linclangvcpkg-x64.zip \
-#          opentelemetry-cpp-lin-x64.zip \
-#          opentelemetry-cpp-mac-x64.zip \
           opentelemetry-cpp-win-arm64.zip \
           opentelemetry-cpp-win-x64.zip
   skip_checkout: true
   dependencies:
-#    - .yamato/build.yml#build_linux_clang_vcpkg_x64
-#    - .yamato/build.yml#build_linux_vcpkg_x64
-#    - .yamato/build.yml#build_linux_clang_x64
-#    - .yamato/build.yml#build_linux_x64
-#    - .yamato/build.yml#build_macos_x64
-#    - .yamato/build.yml#build_macos_arm64
     - .yamato/build.yml#build_windows_arm64
     - .yamato/build.yml#build_windows_x64
   variables:
