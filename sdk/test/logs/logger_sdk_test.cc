@@ -12,6 +12,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_logger.h"
 #include "opentelemetry/logs/event_logger_provider.h"
+#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/severity.h"

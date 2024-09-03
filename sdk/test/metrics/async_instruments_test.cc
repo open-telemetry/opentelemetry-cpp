@@ -3,13 +3,16 @@
 
 #include <gtest/gtest.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
 
