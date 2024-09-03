@@ -1,183 +1,183 @@
 build_pr:
   name: Build OpenTelemetry CPP (PR)
   dependencies:
-    - .yamato/build.yml#build_linux_x64
-    - .yamato/build.yml#build_linux_vcpkg_x64
-    - .yamato/build.yml#build_linux_clang_x64
-    - .yamato/build.yml#build_linux_clang_vcpkg_x64
+#    - .yamato/build.yml#build_linux_x64
+#    - .yamato/build.yml#build_linux_vcpkg_x64
+#    - .yamato/build.yml#build_linux_clang_x64
+#    - .yamato/build.yml#build_linux_clang_vcpkg_x64
     - .yamato/build.yml#build_windows_x64
-    - .yamato/build.yml#build_macos_x64
+#    - .yamato/build.yml#build_macos_x64
 #    - .yamato/build.yml#build_linux_arm64
     - .yamato/build.yml#build_windows_arm64
-    - .yamato/build.yml#build_macos_arm64
+#    - .yamato/build.yml#build_macos_arm64
 
-deprecated_build_linux:
-  name: (Deprecated) Build OpenTelemetry CPP (Linux x64)
-  agent:
-    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
-    flavor: b1.large
-    type: Unity::VM
-  commands:
-    - |
-      set -euxo pipefail
-      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
-      chmod +x bazelisk
-      sudo yum install -y zip
-      .yamato/bee steve internal-unpack public 7za-linux-x64/904b71ca3f79_0d0f2cf7ea23d00d2ba5d151c735ef9f03ed99a9e451c6dcf3a198cbedf69861.zip 7z
-      export BEE_INTERNAL_STEVEDORE_7ZA=7z/7za
-      .yamato/bee steve internal-unpack public toolchain-llvm-centos-amd64/9.0.1-7.7.1908_9a2f0527b0c16f2524d24e372c7ebb8735e2e85ec99b6914f2a0a00c1e74d34d.7z TC
-      .yamato/bee steve internal-unpack public linux-sysroot-amd64/glibc2.17_21db091a7ba6f278ece53e4afe50f840f2ba704112aaed9562fbd86421e4ce3b.7z sysroot
-      echo -e '#!/bin/bash\nexec PWD/TC/bin/clang --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/9.1.0 -target x86_64-glibc2.17-linux-gnu $*' > clang
-      sed -i -e "s|PWD|`pwd`|g" clang
-      chmod +x clang
-      export COMPILATION_MODE=opt # defaults to fastbuild
-      CC=`pwd`/clang ./bazelisk build //examples/otlp:libdummy_remove_me
-      rm -rf trick opentelemetry-cpp-lin-amd64.zip
-      mkdir -p trick/lib
-      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
-      rm -f trick/lib/libdummy_remove_me.a # Don't want the custom library that we added.
-      mkdir -p trick/api trick/sdk
-      cp -ir api/include trick/api/
-      cp -ir sdk/include trick/sdk/
-      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
-      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+#deprecated_build_linux:
+#  name: (Deprecated) Build OpenTelemetry CPP (Linux x64)
+#  agent:
+#    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
+#    flavor: b1.large
+#    type: Unity::VM
+#  commands:
+#    - |
+#      set -euxo pipefail
+#      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-linux-amd64
+#      chmod +x bazelisk
+#      sudo yum install -y zip
+#      .yamato/bee steve internal-unpack public 7za-linux-x64/904b71ca3f79_0d0f2cf7ea23d00d2ba5d151c735ef9f03ed99a9e451c6dcf3a198cbedf69861.zip 7z
+#      export BEE_INTERNAL_STEVEDORE_7ZA=7z/7za
+#      .yamato/bee steve internal-unpack public toolchain-llvm-centos-amd64/9.0.1-7.7.1908_9a2f0527b0c16f2524d24e372c7ebb8735e2e85ec99b6914f2a0a00c1e74d34d.7z TC
+#      .yamato/bee steve internal-unpack public linux-sysroot-amd64/glibc2.17_21db091a7ba6f278ece53e4afe50f840f2ba704112aaed9562fbd86421e4ce3b.7z sysroot
+#      echo -e '#!/bin/bash\nexec PWD/TC/bin/clang --sysroot="PWD/sysroot" --gcc-toolchain="PWD/sysroot/usr" -I=/usr/include/c++/9.1.0 -target x86_64-glibc2.17-linux-gnu $*' > clang
+#      sed -i -e "s|PWD|`pwd`|g" clang
+#      chmod +x clang
+#      export COMPILATION_MODE=opt # defaults to fastbuild
+#      CC=`pwd`/clang ./bazelisk build //examples/otlp:libdummy_remove_me
+#      rm -rf trick opentelemetry-cpp-lin-amd64.zip
+#      mkdir -p trick/lib
+#      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
+#      rm -f trick/lib/libdummy_remove_me.a # Don't want the custom library that we added.
+#      mkdir -p trick/api trick/sdk
+#      cp -ir api/include trick/api/
+#      cp -ir sdk/include trick/sdk/
+#      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
+#      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+#
+#      # We don't support gRPC for now.
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+#
+#      output_base=$(./bazelisk info output_base)
+#      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
+#      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
+#      do
+#        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
+#        mkdir -p "$(dirname $dest)"
+#        cp "$src" "$dest"
+#      done
+#
+#      cd trick
+#      chmod -R u+w .
+#      zip -r ../opentelemetry-cpp-lin-amd64.zip *
+#      cd ..
+#  artifacts:
+#    opentelemetry-cpp-stevedore-pkg:
+#      paths:
+#        - opentelemetry-cpp-lin-amd64.zip
+#deprecated_build_mac_amd64:
+#  name: (Deprecated) Build OpenTelemetry CPP (macOS x64)
+#  agent:
+#    image: build-system/unity-macos-10.15:v1.0.3-1026271
+#    flavor: b1.large
+#    type: Unity::VM::osx
+#  commands:
+#    - |
+#      set -euxo pipefail
+#      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin-amd64
+#      chmod +x bazelisk
+#      # NOTE: when building manually on M1 macs for arm64:
+#      #APPLE_SDK_VERSION_OVERRIDE=11 ./bazelisk build --macos_minimum_os 11 --cpu=darwin_arm64 --host_cpu=darwin_arm64 --subcommands //examples/otlp:hw
+#      ./bazelisk build //examples/otlp:hw
+#      archname=$(arch | sed -e "s/x86_64.*/amd64/" -e "s/i386/amd64/")
+#      rm -rf trick opentelemetry-cpp-mac-${archname}.zip
+#      mkdir -p trick/lib
+#      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
+#      mkdir -p trick/api trick/sdk
+#      cp -ir api/include trick/api/
+#      cp -ir sdk/include trick/sdk/
+#      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
+#      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+#
+#      # We don't support gRPC for now.
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+#      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+#
+#      output_base=$(./bazelisk info output_base)
+#      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
+#      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
+#      do
+#        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
+#        mkdir -p "$(dirname $dest)"
+#        cp "$src" "$dest"
+#      done
+#
+#      cd trick
+#      chmod -R u+w .
+#      zip -r ../opentelemetry-cpp-mac-${archname}.zip *
+#      cd ..
+#  artifacts:
+#    opentelemetry-cpp-stevedore-pkg:
+#      paths:
+#        - "opentelemetry-cpp-mac-amd64.zip"
+#deprecated_build_windows:
+#  name: (Deprecated) Build OpenTelemetry CPP (Windows x64)
+#  agent:
+#    image: build-system/bee-windows-10-vs2019:v0.1.3-1006513
+#    flavor: b1.xlarge
+#    type: Unity::VM
+#  interpreter: powershell
+#  commands:
+#    - |
+#      $ErrorActionPreference = "Stop"
+#      trap { $host.SetShouldExit(1) }
+#      git clone https://github.com/Microsoft/vcpkg.git
+#      cd vcpkg
+#      ./bootstrap-vcpkg.bat
+#      ./vcpkg install opentelemetry-cpp[otlp]:x64-windows-static
 
-      # We don't support gRPC for now.
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+#    - |
+#      $ErrorActionPreference = "Stop"
+#      trap { $host.SetShouldExit(1) }
 
-      output_base=$(./bazelisk info output_base)
-      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
-      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
-      do
-        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
-        mkdir -p "$(dirname $dest)"
-        cp "$src" "$dest"
-      done
+#      mkdir installhere
+#      mkdir installhere\include
+#      mkdir installhere\lib
 
-      cd trick
-      chmod -R u+w .
-      zip -r ../opentelemetry-cpp-lin-amd64.zip *
-      cd ..
-  artifacts:
-    opentelemetry-cpp-stevedore-pkg:
-      paths:
-        - opentelemetry-cpp-lin-amd64.zip
-deprecated_build_mac_amd64:
-  name: (Deprecated) Build OpenTelemetry CPP (macOS x64)
-  agent:
-    image: build-system/unity-macos-10.15:v1.0.3-1026271
-    flavor: b1.large
-    type: Unity::VM::osx
-  commands:
-    - |
-      set -euxo pipefail
-      wget -O bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-darwin-amd64
-      chmod +x bazelisk
-      # NOTE: when building manually on M1 macs for arm64:
-      #APPLE_SDK_VERSION_OVERRIDE=11 ./bazelisk build --macos_minimum_os 11 --cpu=darwin_arm64 --host_cpu=darwin_arm64 --subcommands //examples/otlp:hw
-      ./bazelisk build //examples/otlp:hw
-      archname=$(arch | sed -e "s/x86_64.*/amd64/" -e "s/i386/amd64/")
-      rm -rf trick opentelemetry-cpp-mac-${archname}.zip
-      mkdir -p trick/lib
-      find bazel-out/ -name '*.a' -exec cp '{}' trick/lib/ ';'
-      mkdir -p trick/api trick/sdk
-      cp -ir api/include trick/api/
-      cp -ir sdk/include trick/sdk/
-      cp -ir exporters/otlp/include/opentelemetry/exporters trick/api/include/opentelemetry/
-      cp -ir ext/include/opentelemetry/* trick/api/include/opentelemetry/
+#      Copy-Item -Force -Path vcpkg\packages\protobuf_x64-windows-static\lib\*.lib -Destination installhere/lib/
+#      Copy-Item -Force -Recurse -Path vcpkg\packages\protobuf_x64-windows-static\include\google -Destination installhere\google
 
-      # We don't support gRPC for now.
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
-      rm -f trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
+#      Copy-Item -Force -Path vcpkg\packages\curl_x64-windows-static\lib\*.lib -Destination installhere/lib/curl.lib
+#      Copy-Item -Force -Recurse -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\include\opentelemetry -Destination installhere\include\opentelemetry
+#      Copy-Item -Force -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\lib\*.lib -Destination installhere\lib\
 
-      output_base=$(./bazelisk info output_base)
-      searchdir="$output_base/external/com_google_protobuf/src/google/protobuf"
-      find "$searchdir" -type f \( -name \*.h -o -name \*.inc \) | grep -v -e java -e csharp -e objectivec -e ruby -e unittest | while read src
-      do
-        dest=trick/google/protobuf/$(echo $src | sed -e "s|^$searchdir/||")
-        mkdir -p "$(dirname $dest)"
-        cp "$src" "$dest"
-      done
+#      Copy-Item -Force -Path vcpkg\packages\zlib_x64-windows-static\lib\*.lib -Destination installhere\lib\
 
-      cd trick
-      chmod -R u+w .
-      zip -r ../opentelemetry-cpp-mac-${archname}.zip *
-      cd ..
-  artifacts:
-    opentelemetry-cpp-stevedore-pkg:
-      paths:
-        - "opentelemetry-cpp-mac-amd64.zip"
-deprecated_build_windows:
-  name: (Deprecated) Build OpenTelemetry CPP (Windows x64)
-  agent:
-    image: build-system/bee-windows-10-vs2019:v0.1.3-1006513
-    flavor: b1.xlarge
-    type: Unity::VM
-  interpreter: powershell
-  commands:
-    - |
-      $ErrorActionPreference = "Stop"
-      trap { $host.SetShouldExit(1) }
-      git clone https://github.com/Microsoft/vcpkg.git
-      cd vcpkg
-      ./bootstrap-vcpkg.bat
-      ./vcpkg install opentelemetry-cpp[otlp]:x64-windows-static
+#      cd installhere
+#      7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
+#      cd ..
 
-    - |
-      $ErrorActionPreference = "Stop"
-      trap { $host.SetShouldExit(1) }
+#    #- |
+#    #  $ErrorActionPreference = "Stop"
+#    #  curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
+#    #  ./bazelisk.exe build //examples/otlp:hw
+#    #  mkdir trick
+#    #  mkdir trick/lib
+#    #  Get-ChildItem -Path bazel-out -Recurse -Filter '*.lib' -File | Copy-Item -Force -Destination trick/lib/
+#    #  mkdir trick/api
+#    #  mkdir trick/sdk
+#    #  Copy-Item -Force -Recurse -Path api/include -Destination trick/api/
+#    #  Copy-Item -Force -Recurse -Path sdk/include -Destination trick/sdk/
+#    #  Copy-Item -Force -Recurse -Path exporters/otlp/include/opentelemetry/exporters -Destination trick/api/include/opentelemetry/
+#    #  Copy-Item -Force -Recurse -Path ext/include/opentelemetry/* -Destination trick/api/include/opentelemetry/
 
-      mkdir installhere
-      mkdir installhere\include
-      mkdir installhere\lib
+#    #  # We don't support gRPC for now.
+#    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
+#    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
+#    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
 
-      Copy-Item -Force -Path vcpkg\packages\protobuf_x64-windows-static\lib\*.lib -Destination installhere/lib/
-      Copy-Item -Force -Recurse -Path vcpkg\packages\protobuf_x64-windows-static\include\google -Destination installhere\google
+#    #  mkdir trick/google
+#    #  mkdir trick/google/protobuf
+#    #  $extDir = ./bazelisk.exe info output_base
+#    #  c:\Python310\python.exe .yamato\win-copy-protobuf.py $extDir\external\com_google_protobuf\src\google\protobuf
 
-      Copy-Item -Force -Path vcpkg\packages\curl_x64-windows-static\lib\*.lib -Destination installhere/lib/curl.lib
-      Copy-Item -Force -Recurse -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\include\opentelemetry -Destination installhere\include\opentelemetry
-      Copy-Item -Force -Path vcpkg\packages\opentelemetry-cpp_x64-windows-static\lib\*.lib -Destination installhere\lib\
-
-      Copy-Item -Force -Path vcpkg\packages\zlib_x64-windows-static\lib\*.lib -Destination installhere\lib\
-
-      cd installhere
-      7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
-      cd ..
-
-    #- |
-    #  $ErrorActionPreference = "Stop"
-    #  curl.exe -Lo bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.11.0/bazelisk-windows-amd64.exe
-    #  ./bazelisk.exe build //examples/otlp:hw
-    #  mkdir trick
-    #  mkdir trick/lib
-    #  Get-ChildItem -Path bazel-out -Recurse -Filter '*.lib' -File | Copy-Item -Force -Destination trick/lib/
-    #  mkdir trick/api
-    #  mkdir trick/sdk
-    #  Copy-Item -Force -Recurse -Path api/include -Destination trick/api/
-    #  Copy-Item -Force -Recurse -Path sdk/include -Destination trick/sdk/
-    #  Copy-Item -Force -Recurse -Path exporters/otlp/include/opentelemetry/exporters -Destination trick/api/include/opentelemetry/
-    #  Copy-Item -Force -Recurse -Path ext/include/opentelemetry/* -Destination trick/api/include/opentelemetry/
-
-    #  # We don't support gRPC for now.
-    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h
-    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h
-    #  rm trick/api/include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h
-
-    #  mkdir trick/google
-    #  mkdir trick/google/protobuf
-    #  $extDir = ./bazelisk.exe info output_base
-    #  c:\Python310\python.exe .yamato\win-copy-protobuf.py $extDir\external\com_google_protobuf\src\google\protobuf
-
-    #  cd trick
-    #  7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
-    #  cd ..
-  artifacts:
-    opentelemetry-cpp-stevedore-pkg:
-      paths:
-        - "opentelemetry-cpp-win-amd64.zip"
+#    #  cd trick
+#    #  7z.exe a -tzip ../opentelemetry-cpp-win-amd64.zip *
+#    #  cd ..
+#  artifacts:
+#    opentelemetry-cpp-stevedore-pkg:
+#      paths:
+#        - "opentelemetry-cpp-win-amd64.zip"
 
 build_windows_x64:
   name: Build OpenTelemetry CPP (Windows x64)
@@ -261,234 +261,234 @@ build_windows_arm64:
     opentelemetry-cpp-windows-arm64:
       paths:
         - opentelemetry-cpp-win-arm64.zip
-
-build_linux_x64:
-  name: Build OpenTelemetry CPP (Linux x64 - GCC)
-  agent:
-    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
-    type: Unity::VM
-    flavor: b1.xlarge
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: x64
-    CXX_STANDARD: 17
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_linux.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/build.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_linux.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-linux-x64:
-      paths:
-        - opentelemetry-cpp-lin-x64.zip
-
-build_linux_clang_x64:
-  name: Build OpenTelemetry CPP (Linux x64 - Clang)
-  agent:
-    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
-    type: Unity::VM
-    flavor: b1.xlarge
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: x64
-    CXX_STANDARD: 17
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_linux_clang.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        export CC=`pwd`/clang
-        export CXX=`pwd`/clang++
-        ./.yamato/scripts/build.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_linux.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-linux-x64:
-      paths:
-        - opentelemetry-cpp-linclang-x64.zip
-
-
-
-build_linux_vcpkg_x64:
-  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/GCC)
-  agent:
-    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
-    type: Unity::VM
-    flavor: b1.xlarge
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: x64
-    CXX_STANDARD: 17
-    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_linux_vcpkg.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/build_vcpkg.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_linux_vcpkg.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-linux-x64:
-      paths:
-        - opentelemetry-cpp-linvcpkg-x64.zip
-
-build_linux_clang_vcpkg_x64:
-  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/Clang)
-  agent:
-    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
-    type: Unity::VM
-    flavor: b1.xlarge
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: x64
-    CXX_STANDARD: 17
-    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_linux_vcpkg_clang.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        export CC=`pwd`/clang
-        export CXX=`pwd`/clang++
-        ./.yamato/scripts/build_vcpkg.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_linux_vcpkg.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-linux-x64:
-      paths:
-        - opentelemetry-cpp-linclangvcpkg-x64.zip
-
-
-build_macos_x64:
-  name: Build OpenTelemetry CPP (macOS x64)
-  agent:
-    image: slough-ops/macos-14-xcode:v0.0.2-1332463
-    type: Unity::VM::osx
-    flavor: b1.xlarge
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: x64
-    CXX_STANDARD: 17
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_mac.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/build.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_mac.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-macos-x64:
-      paths:
-        - opentelemetry-cpp-mac-x64.zip
-build_macos_arm64:
-  name: Build OpenTelemetry CPP (macOS arm64)
-  agent:
-    image: slough-ops/macos-14-xcode:v0.0.2-1332463
-    type: Unity::VM::osx
-    flavor: m1.mac
-    model: M1
-  variables:
-    OPENTELEMETRY_CPP_CONFIG: Release
-    OPENTELEMETRY_CPP_LIBARCH: arm64
-    CXX_STANDARD: 17
-  commands:
-    - command: |
-        set -euxo pipefail
-        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
-      name: Update submodules
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/prepare_vm_mac.sh
-      name: Prepare VM to build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/build.sh
-      name: Build OpenTelemetry CPP
-    - command: |
-        set -euxo pipefail
-        ./.yamato/scripts/package_mac.sh
-      name: Package OpenTelemetry CPP
-  source:
-    files:
-      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
-  metadata:
-    Job Maintainers: "#team-pes"
-  artifacts:
-    opentelemetry-cpp-macos-arm64:
-      paths:
-        - opentelemetry-cpp-mac-arm64.zip
+#
+#build_linux_x64:
+#  name: Build OpenTelemetry CPP (Linux x64 - GCC)
+#  agent:
+#    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
+#    type: Unity::VM
+#    flavor: b1.xlarge
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: x64
+#    CXX_STANDARD: 17
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_linux.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/build.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_linux.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-linux-x64:
+#      paths:
+#        - opentelemetry-cpp-lin-x64.zip
+#
+#build_linux_clang_x64:
+#  name: Build OpenTelemetry CPP (Linux x64 - Clang)
+#  agent:
+#    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
+#    type: Unity::VM
+#    flavor: b1.xlarge
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: x64
+#    CXX_STANDARD: 17
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_linux_clang.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        export CC=`pwd`/clang
+#        export CXX=`pwd`/clang++
+#        ./.yamato/scripts/build.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_linux.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-linux-x64:
+#      paths:
+#        - opentelemetry-cpp-linclang-x64.zip
+#
+#
+#
+#build_linux_vcpkg_x64:
+#  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/GCC)
+#  agent:
+#    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
+#    type: Unity::VM
+#    flavor: b1.xlarge
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: x64
+#    CXX_STANDARD: 17
+#    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_linux_vcpkg.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/build_vcpkg.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_linux_vcpkg.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-linux-x64:
+#      paths:
+#        - opentelemetry-cpp-linvcpkg-x64.zip
+#
+#build_linux_clang_vcpkg_x64:
+#  name: Build OpenTelemetry CPP (Linux x64 - VCPKG/Clang)
+#  agent:
+#    image: build-system/bee-ubuntu-18.04-clang:v2.1127153
+#    type: Unity::VM
+#    flavor: b1.xlarge
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: x64
+#    CXX_STANDARD: 17
+#    OPENTELEMETRY_CPP_LIBTYPE: x64-linux
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_linux_vcpkg_clang.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        export CC=`pwd`/clang
+#        export CXX=`pwd`/clang++
+#        ./.yamato/scripts/build_vcpkg.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_linux_vcpkg.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_linux.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-linux-x64:
+#      paths:
+#        - opentelemetry-cpp-linclangvcpkg-x64.zip
+#
+#
+#build_macos_x64:
+#  name: Build OpenTelemetry CPP (macOS x64)
+#  agent:
+#    image: slough-ops/macos-14-xcode:v0.0.2-1332463
+#    type: Unity::VM::osx
+#    flavor: b1.xlarge
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: x64
+#    CXX_STANDARD: 17
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_mac.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/build.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_mac.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-macos-x64:
+#      paths:
+#        - opentelemetry-cpp-mac-x64.zip
+#build_macos_arm64:
+#  name: Build OpenTelemetry CPP (macOS arm64)
+#  agent:
+#    image: slough-ops/macos-14-xcode:v0.0.2-1332463
+#    type: Unity::VM::osx
+#    flavor: m1.mac
+#    model: M1
+#  variables:
+#    OPENTELEMETRY_CPP_CONFIG: Release
+#    OPENTELEMETRY_CPP_LIBARCH: arm64
+#    CXX_STANDARD: 17
+#  commands:
+#    - command: |
+#        set -euxo pipefail
+#        git submodule update --recursive --init --jobs `getconf _NPROCESSORS_ONLN`
+#      name: Update submodules
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/prepare_vm_mac.sh
+#      name: Prepare VM to build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/build.sh
+#      name: Build OpenTelemetry CPP
+#    - command: |
+#        set -euxo pipefail
+#        ./.yamato/scripts/package_mac.sh
+#      name: Package OpenTelemetry CPP
+#  source:
+#    files:
+#      sparse_checkout_rules: .yamato/.sparse-checkout-rules/opentelemetry-cpp_mac.patterns
+#  metadata:
+#    Job Maintainers: "#team-pes"
+#  artifacts:
+#    opentelemetry-cpp-macos-arm64:
+#      paths:
+#        - opentelemetry-cpp-mac-arm64.zip
