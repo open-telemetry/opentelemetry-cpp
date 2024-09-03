@@ -218,7 +218,7 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     // - If original `timeout` is `zero`, use that in exporter::forceflush
     // - Else if remaining `timeout_steady` more than zero, use that in exporter::forceflush
     // - Else don't invoke exporter::forceflush ( as remaining time is zero or less)
-    if (timeout <= std::chrono::steady_clock::duration::zero())
+    if (timeout <= std::chrono::milliseconds::duration::zero())
     {
       result =
           exporter_->ForceFlush(std::chrono::duration_cast<std::chrono::microseconds>(timeout));

@@ -168,46 +168,36 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
   bool result = true;
   // Simultaneous flush not allowed.
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
-  // Convert to nanos to prevent overflow
-  auto timeout_ns = (std::chrono::nanoseconds::max)();
-  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
+
+  auto time_remaining = (std::chrono::steady_clock::duration::max)();
+  if (std::chrono::duration_cast<std::chrono::microseconds>(time_remaining) > timeout)
   {
-    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+    time_remaining = timeout;
   }
 
-  auto current_time = std::chrono::system_clock::now();
-  std::chrono::system_clock::time_point expire_time;
-  auto overflow_checker = (std::chrono::system_clock::time_point::max)();
-
-  // check if the expected expire time doesn't overflow.
-  if (overflow_checker - current_time > timeout_ns)
+  auto current_time = std::chrono::steady_clock::now();
+  auto expire_time  = (std::chrono::steady_clock::time_point::max)();
+  if (expire_time - current_time > time_remaining)
   {
-    expire_time =
-        current_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
-  }
-  else
-  {
-    // overflow happens, reset expire time to max.
-    expire_time = overflow_checker;
+    expire_time = current_time + time_remaining;
   }
 
   for (auto &collector : collectors_)
   {
     if (!std::static_pointer_cast<MetricCollector>(collector)->ForceFlush(
-            std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
+            std::chrono::duration_cast<std::chrono::microseconds>(time_remaining)))
     {
       result = false;
     }
 
-    current_time = std::chrono::system_clock::now();
-
+    current_time = std::chrono::steady_clock::now();
     if (expire_time >= current_time)
     {
-      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - current_time);
+      time_remaining = expire_time - current_time;
     }
     else
     {
-      timeout_ns = std::chrono::nanoseconds::zero();
+      time_remaining = std::chrono::steady_clock::duration::zero();
     }
   }
   if (!result)
