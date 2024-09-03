@@ -223,15 +223,15 @@ build_windows_x64:
 build_windows_arm64:
   name: Build OpenTelemetry CPP (Windows arm64)
   agent:
-    image: build-system/bee-windows-10-vs2019:v2.2208263
+    image: build-system/unity-win10-22H2-vs2022-neutron:v2.2400237
     type: Unity::VM
     flavor: b1.xlarge
   variables:
-    BUILDTOOLS_VERSION: vs2019
+    BUILDTOOLS_VERSION: vs2022
     OPENTELEMETRY_CPP_CONFIG: Release
     OPENTELEMETRY_CPP_LIBTYPE: arm64-windows-static-md
     OPENTELEMETRY_CPP_LIBARCH: arm64
-    VISUAL_STUDIO_PATH: "C:\\Program Files\\Microsoft Visual Studio\\2019\\Professional"
+    VISUAL_STUDIO_PATH: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional"
     CXX_STANDARD: 17
   commands:
     - command: |
