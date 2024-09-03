@@ -12,10 +12,13 @@ using namespace opentelemetry::sdk::metrics;
 
 using M = std::map<std::string, std::string>;
 
+namespace
+{
 // NOLINTNEXTLINE
 void asyc_generate_measurements(opentelemetry::metrics::ObserverResult /* observer */,
                                 void * /* state */)
 {}
+}  // namespace
 
 TEST(AsyncInstruments, ObservableInstrument)
 {

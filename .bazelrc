@@ -1,6 +1,9 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+build --features=parse_headers
+build --features=layering_check
+
 common --incompatible_use_plus_in_repo_names
 
 # Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
