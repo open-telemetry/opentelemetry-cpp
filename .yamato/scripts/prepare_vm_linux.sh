@@ -11,7 +11,7 @@ sudo -E apt-get install -y zip
 
 # Setup build tools
 # ===================================
-sudo -E apt-get install -y zlib1g-dev
+sudo -E apt-get install -y zlib1g-dev bc
 # sudo -E ./tools/setup-ninja.sh
 sudo -E ./ci/setup_ci_environment.sh
 sudo -E ./ci/setup_cmake.sh

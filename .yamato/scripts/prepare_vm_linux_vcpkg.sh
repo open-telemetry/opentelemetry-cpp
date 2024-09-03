@@ -8,7 +8,7 @@ sudo -E apt remove needrestart -y #refer: https://github.com/actions/runner-imag
 
 # Install CMake and build tools
 # ===================================
-sudo -E apt-get install -y zip
+sudo -E apt-get install -y zip bc
 sudo -E ./ci/setup_ci_environment.sh
 sudo -E ./ci/setup_cmake.sh
 sudo -E ./tools/setup-cmake.sh
