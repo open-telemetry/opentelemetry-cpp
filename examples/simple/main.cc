@@ -32,17 +32,16 @@ void InitTracer()
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
   std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
+      trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
-  const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = provider;
-  trace_api::Provider::SetTracerProvider(api_provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 
 void CleanupTracer()
 {
-  std::shared_ptr<opentelemetry::trace::TracerProvider> none;
-  trace_api::Provider::SetTracerProvider(none);
+  std::shared_ptr<opentelemetry::trace::TracerProvider> noop;
+  trace_api::Provider::SetTracerProvider(noop);
 }
 }  // namespace
 
