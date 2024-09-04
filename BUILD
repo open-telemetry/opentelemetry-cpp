@@ -189,7 +189,7 @@ alias(
 
 # Import the otel_sdk.dll, and the two exposed otel_sdk.lib and otel_sdk.pdb files as one target
 [otel_cc_import(
-    name = otel_sdk_binary + "_dll", #"_import",
+    name = otel_sdk_binary + "_dll",  #"_import",
     data = select({
         "@platforms//os:windows": [otel_sdk_binary + "_pdb_file"],
         "//conditions:default": None,
@@ -323,12 +323,12 @@ pkg_files(
     args = [
         "debug-files",
         "bundle-sources",
-        "$(location " + otel_sdk_binary + "_lib_file" + ")"
+        "$(location " + otel_sdk_binary + "_lib_file" + ")",
     ],
     tags = [
-        "manual", 
+        "manual",
         # TODO - Fix this to work in the sandbox, by using sentry-cli's -o folder
-        "no-sandbox"
+        "no-sandbox",
     ],
     tool = "@multitool//tools/sentry-cli",
 ) for otel_sdk_binary in [
@@ -388,12 +388,12 @@ pkg_files(
 pkg_filegroup(
     name = "otel_sdk_files",
     srcs = [
-        "otel_sdk_header_files",
         "otel_sdk_d_lib_files",
-        "otel_sdk_r_lib_files",
-        "otel_sdk_rd_lib_files",
         "otel_sdk_d_src_bundle",
+        "otel_sdk_header_files",
+        "otel_sdk_r_lib_files",
         "otel_sdk_r_src_bundle",
+        "otel_sdk_rd_lib_files",
         "otel_sdk_rd_src_bundle",
     ],
 )
@@ -468,4 +468,12 @@ platform(
         "@platforms//os:windows",
         "@bazel_tools//tools/cpp:clang-cl",
     ],
+)
+
+exports_files(
+    [
+        "dll_deps.bzl",
+        "dll_deps_generated_windows.bzl",
+        "dll_deps_generated_non_windows.bzl",
+    ]
 )

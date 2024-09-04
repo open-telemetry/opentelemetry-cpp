@@ -122,7 +122,7 @@ mod --lockfile_mode=update
 build:windows --config=clang-cl
 
 # See MODULE.bazel where we've disabled the platform/toolchain setup, but made it back here
-build:clang-cl --host_platform=//:x64_windows-clang-cl
+build:clang-cl --host_platform=@otel_sdk//:x64_windows-clang-cl
 build:clang-cl --extra_toolchains=@local_config_cc//:cc-toolchain-x64_windows-clang-cl
 build:clang-cl --per_file_copt="external/protobuf\\+/.*@-Wno-invalid-offsetof"
 build:clang-cl --host_per_file_copt="external/protobuf\\+/.*@-Wno-invalid-offsetof"

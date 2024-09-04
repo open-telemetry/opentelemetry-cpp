@@ -1,0 +1,9 @@
+module(name = "otel_sdk_x", version = "0.1")
+bazel_dep(name = "curl", version = "8.8.0.bcr.1")
+bazel_dep(name = "otel_sdk", version = "")
+local_path_override(module_name = "otel_sdk", path = "..")
+
+use_repo(
+    use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
+    "local_config_cc",
+)
