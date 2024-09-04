@@ -31,11 +31,12 @@ void InitTracer()
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider =
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider =
       trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
-  trace_api::Provider::SetTracerProvider(provider);
+  const std::shared_ptr<opentelemetry::trace::TracerProvider> &api_provider = sdk_provider;
+  trace_api::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
