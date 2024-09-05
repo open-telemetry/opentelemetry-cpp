@@ -44,18 +44,18 @@ void InitTracer()
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> provider =
-      opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> sdk_provider =
+      trace_sdk::TracerProviderFactory::Create(std::move(processor));
 
   // Set the global trace provider
-  const std::shared_ptr<trace_api::TracerProvider> &api_provider = provider;
+  const std::shared_ptr<trace_api::TracerProvider> &api_provider = sdk_provider;
   trace_api::Provider::SetTracerProvider(api_provider);
 }
 
 void CleanupTracer()
 {
-  std::shared_ptr<trace_api::TracerProvider> none;
-  trace_api::Provider::SetTracerProvider(none);
+  std::shared_ptr<trace_api::TracerProvider> noop;
+  trace_api::Provider::SetTracerProvider(noop);
 }
 
 void InitLogger()
@@ -65,18 +65,18 @@ void InitLogger()
       std::unique_ptr<logs_sdk::LogRecordExporter>(new logs_exporter::OStreamLogRecordExporter);
   auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create(std::move(exporter));
 
-  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> provider(
-      opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(processor)));
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk_provider(
+      logs_sdk::LoggerProviderFactory::Create(std::move(processor)));
 
   // Set the global logger provider
-  const std::shared_ptr<logs_api::LoggerProvider> &api_provider = provider;
+  const std::shared_ptr<logs_api::LoggerProvider> &api_provider = sdk_provider;
   logs_api::Provider::SetLoggerProvider(api_provider);
 }
 
 void CleanupLogger()
 {
-  std::shared_ptr<logs_api::LoggerProvider> none;
-  logs_api::Provider::SetLoggerProvider(none);
+  std::shared_ptr<logs_api::LoggerProvider> noop;
+  logs_api::Provider::SetLoggerProvider(noop);
 }
 
 }  // namespace
