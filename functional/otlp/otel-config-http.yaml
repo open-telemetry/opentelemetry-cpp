@@ -23,7 +23,7 @@ processors:
 
 exporters:
   debug:
-    verbosity: debug
+    verbosity: detailed
 
 service:
   pipelines:
