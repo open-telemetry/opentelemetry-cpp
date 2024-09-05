@@ -3,7 +3,7 @@
 
 exporters:
   debug:
-    verbosity: debug
+    verbosity: detailed
 receivers:
   otlp:
     protocols:
