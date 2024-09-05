@@ -1,17 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
-#include "opentelemetry/common/key_value_iterable_view.h"
+#include <gtest/gtest.h>
+#include <stddef.h>
+
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
-
-#include "opentelemetry/sdk/metrics/instruments.h"
-
-#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::metrics;
