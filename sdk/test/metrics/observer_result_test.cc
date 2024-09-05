@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <algorithm>
 #include <cstdint>
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
