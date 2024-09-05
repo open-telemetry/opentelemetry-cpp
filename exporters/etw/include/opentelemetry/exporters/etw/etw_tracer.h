@@ -229,7 +229,8 @@ class Tracer : public opentelemetry::trace::Tracer,
         {
           linksValue += "{\"" ETW_FIELD_SPAN_LINKS_TO_SPAN_ID "\":\"";
         }
-        else {
+        else
+        {
           linksValue += ",{\"" ETW_FIELD_SPAN_LINKS_TO_SPAN_ID "\":\"";
         }
 
