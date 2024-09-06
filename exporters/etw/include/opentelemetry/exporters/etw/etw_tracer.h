@@ -218,9 +218,9 @@ class Tracer : public opentelemetry::trace::Tracer,
       // reserve space for all the SpanLinks.
       // A single SpanLink will be outptut as:
       // [{"toSpanId":"9a43c801557f26b7","toTraceId":"ac6cd70ac4bb168a99cb7651b048d965"}]
-      // The second and above link output to string are 1 byte less than the first link.
-      const size_t linkValueSize = 80;
-      linksValue.reserve(linkValueSize + (links.size() - 1) * (linkValueSize - 1));
+      // The second and above link output to string are 1 byte less than the first SpanLink.
+      const size_t kSingleSpanLinkSizeInBytes = 80;
+      linksValue.reserve(kSingleSpanLinkSizeInBytes + (links.size() - 1) * (kSingleSpanLinkSizeInBytes - 1));
       linksValue += "[";
 
       links.ForEachKeyValue([&](opentelemetry::trace::SpanContext ctx,
