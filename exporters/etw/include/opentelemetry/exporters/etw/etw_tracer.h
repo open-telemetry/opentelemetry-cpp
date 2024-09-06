@@ -212,7 +212,7 @@ class Tracer : public opentelemetry::trace::Tracer,
     // Add `SpanLinks` attribute if the list is not empty
     if (links.size())
     {
-      size_t idx = 0;
+      bool first = true;
       std::string linksValue;
 
       // reserve space for all the SpanLinks.
@@ -225,8 +225,9 @@ class Tracer : public opentelemetry::trace::Tracer,
 
       links.ForEachKeyValue([&](opentelemetry::trace::SpanContext ctx,
                                 const opentelemetry::common::KeyValueIterable &) {
-        if (idx == 0)
+        if (first)
         {
+          first = false;
           linksValue += "{\"" ETW_FIELD_SPAN_LINKS_TO_SPAN_ID "\":\"";
         }
         else
@@ -239,7 +240,6 @@ class Tracer : public opentelemetry::trace::Tracer,
         linksValue += ToLowerBase16(ctx.trace_id());
         linksValue += "\"}";
 
-        idx++;
         return true;
       });
 
