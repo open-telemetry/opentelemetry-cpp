@@ -1564,7 +1564,7 @@
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
         "bzlTransitiveDigest": "G2CL37NxIhoaFlv/ma9cj0lSmLvPkIRHTKSLOFO7HFs=",
-        "usagesDigest": "E624UX+z09FNefvMDKAxdD6vD6OokZ/Lbg+7NMS4Szw=",
+        "usagesDigest": "hfc0Yl7IDq2ZEWeWbFnl3fajgHocHXWwmFnzCfyUnbw=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

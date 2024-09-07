@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 load("//:dll_deps.bzl", "dll_deps")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
+load("//bazel:otel_cc.bzl", "otel_cc_test")
 
 otel_cc_test(
     name = "no_exemplar_reservoir_test",
@@ -38,7 +38,8 @@ otel_cc_test(
 )
 
 otel_cc_test(
-    name = "aligned_histogram_bucket_exemplar_reservoir_test",
+    # name = "aligned_histogram_bucket_exemplar_reservoir_test",
+    name = "aligned_hist_bkt_exem_rsvr_test",
     srcs = [
         "aligned_histogram_bucket_exemplar_reservoir_test.cc",
     ],

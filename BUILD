@@ -3,10 +3,10 @@
 load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@bazel_skylib//rules:run_binary.bzl", "run_binary")
+load("@otel_sdk//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files", pkg_strip_prefix = "strip_prefix")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("dll_deps.bzl", "force_compilation_mode")
-load("//bazel:otel_cc.bzl", "otel_cc_binary", "otel_cc_import", "otel_cc_library", "otel_cc_shared_library", "otel_cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -52,8 +52,6 @@ config_setting(
 # List of all extensions and exporters that are going to be linked in the otel_sdk.dll
 # The transitive form of this list is used to derive DLL_DEPS in dll_deps_generated.bzl
 # Which is then used to exclude (through dll_deps([])) the libs already linked in here.
-# There are some gotchas, as ideally only libs that have dllexport symbols should be in there
-# But it's impossible to know this in advance.
 otel_cc_library(
     name = "otel_sdk_deps",
     target_compatible_with = select({
@@ -63,25 +61,25 @@ otel_cc_library(
     }),
     visibility = ["//visibility:private"],
     deps = [
-        "//exporters/elasticsearch:es_log_record_exporter",
-        "//exporters/memory:in_memory_span_exporter",
-        "//exporters/ostream:ostream_log_record_exporter",
-        "//exporters/ostream:ostream_metric_exporter",
-        "//exporters/ostream:ostream_span_exporter",
-        "//exporters/otlp:otlp_file_exporter",
-        "//exporters/otlp:otlp_file_log_record_exporter",
-        "//exporters/otlp:otlp_file_metric_exporter",
-        "//exporters/otlp:otlp_grpc_exporter",
-        "//exporters/otlp:otlp_grpc_log_record_exporter",
-        "//exporters/otlp:otlp_grpc_metric_exporter",
-        "//exporters/otlp:otlp_http_exporter",
-        "//exporters/otlp:otlp_http_log_record_exporter",
-        "//exporters/otlp:otlp_http_metric_exporter",
-        "//exporters/prometheus:prometheus_exporter",
-        "//exporters/prometheus:prometheus_push_exporter",
-        "//exporters/zipkin:zipkin_exporter",
+        "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
+        "@otel_sdk//exporters/memory:in_memory_span_exporter",
+        "@otel_sdk//exporters/ostream:ostream_log_record_exporter",
+        "@otel_sdk//exporters/ostream:ostream_metric_exporter",
+        "@otel_sdk//exporters/ostream:ostream_span_exporter",
+        "@otel_sdk//exporters/otlp:otlp_file_exporter",
+        "@otel_sdk//exporters/otlp:otlp_file_log_record_exporter",
+        "@otel_sdk//exporters/otlp:otlp_file_metric_exporter",
+        "@otel_sdk//exporters/otlp:otlp_grpc_exporter",
+        "@otel_sdk//exporters/otlp:otlp_grpc_log_record_exporter",
+        "@otel_sdk//exporters/otlp:otlp_grpc_metric_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_log_record_exporter",
+        "@otel_sdk//exporters/otlp:otlp_http_metric_exporter",
+        "@otel_sdk//exporters/prometheus:prometheus_exporter",
+        "@otel_sdk//exporters/prometheus:prometheus_push_exporter",
+        "@otel_sdk//exporters/zipkin:zipkin_exporter",
     ] + select({
-        "@platforms//os:windows": ["//exporters/etw:etw_exporter"],
+        "@platforms//os:windows": ["@otel_sdk//exporters/etw:etw_exporter"],
         "//conditions:default": [],
     }),
 )
@@ -89,12 +87,13 @@ otel_cc_library(
 # Expands to all transitive project dependencies, excluding external projects (repos)
 [genquery(
     name = "otel_sdk_all_deps_" + os,
-    # The crude '^//' ignores external repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
+    # The crude '^(@+otel_sdk[+~]?)?//' ignores external to otel_sdk repositories (e.g. @curl//, etc.) for which it's assumed we don't export dll symbols
     # In addition we exclude some internal libraries, that may have to be relinked by tests (like //sdk/src/common:random and //sdk/src/common/platform:fork)
-    expression = "kind('cc_library',filter('^//',deps(//:otel_sdk_deps) except set(//:otel_sdk_deps //sdk/src/common:random //sdk/src/common/platform:fork //:windows_only " + exceptions + ")))",
-    scope = ["//:otel_sdk_deps"],
+    expression = "kind('cc_library',filter('^(@+otel_sdk[+~]?)?//',deps(@otel_sdk//:otel_sdk_deps) except set(@otel_sdk//:otel_sdk_deps @otel_sdk//sdk/src/common:random @otel_sdk//sdk/src/common/platform:fork @otel_sdk//:windows_only " + exceptions + ")))",
+    strict = True,
+    scope = ["@otel_sdk//:otel_sdk_deps"],
 ) for (os, exceptions) in [
-    ("non_windows", "//exporters/etw:etw_exporter"),
+    ("non_windows", "@otel_sdk//exporters/etw:etw_exporter"),
     ("windows", ""),
 ]]
 
@@ -455,7 +454,10 @@ write_source_file(
 [write_source_file(
     name = "dll_deps_update_" + os,
     in_file = "dll_deps_generated_internally_" + os + ".bzl",
-    out_file = "dll_deps_generated_" + os + ".bzl",
+    # KLUDGE: Append repo.name() when this rule is ran outside of this repo, then it would be `otel_sdk+`
+    # Having it this way, it'll allow dll_deps_generated_windows.bzl to be visible again.
+    # When this target is used from another repo, then the "dll_deps_generated_windows.bzl" file can't be found
+    out_file = repo_name().replace('+','_') + "dll_deps_generated_" + os + ".bzl",
 ) for os in [
     "non_windows",
     "windows",
@@ -468,12 +470,4 @@ platform(
         "@platforms//os:windows",
         "@bazel_tools//tools/cpp:clang-cl",
     ],
-)
-
-exports_files(
-    [
-        "dll_deps.bzl",
-        "dll_deps_generated_windows.bzl",
-        "dll_deps_generated_non_windows.bzl",
-    ]
 )

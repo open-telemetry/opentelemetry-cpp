@@ -1,30 +1,15 @@
 load("@otel_sdk//:dll_deps_generated_non_windows.bzl", dll_deps_non_windows = "DLL_DEPS")
 load("@otel_sdk//:dll_deps_generated_windows.bzl", dll_deps_windows = "DLL_DEPS")
 
-def _absolute_label(label):
-    """ returns the absolute path to a label string """
-
-    # lifted from https://stackoverflow.com/a/66705640/18406610
-    if label.startswith("@") or label.startswith("/"):
-        return label
-    if label.startswith(":"):
-        return native.repository_name() + "//" + native.package_name() + label
-    return native.repository_name() + "//" + native.package_name() + ":" + label
-
 # Filter libs that were compiled into the the otel_sdk.dll already
 def _filter_libs(deps):
     """ Removes references to the api/sdk/exporters/ext static libraries """
     filtered_dll_deps = []
 
-#    x_dll_deps = select({
-#        "@platforms//os:windows": dll_deps_windows,
-#        "//conditions:default": dll_deps_non_windows,
-#    })
-#    print(x_dll_deps)
-    dll_deps = dll_deps_windows
+    #dll_deps = dll_deps_windows
     for dep in deps:
-        label = Label(_absolute_label(dep))
-        if not label in dll_deps:
+        label = native.package_relative_label(dep)
+        if not label in dll_deps_windows:
             filtered_dll_deps.append(dep)
     return filtered_dll_deps
 
