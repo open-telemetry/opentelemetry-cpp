@@ -73,7 +73,7 @@ public:
     }
 
     IgnoreTraitResult(
-        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set(
+        detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set<>(
             log_record.get(), std::forward<ArgumentType>(args))...);
 
     EmitLogRecord(std::move(log_record));
