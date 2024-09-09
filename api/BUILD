@@ -46,9 +46,9 @@ otel_cc_library(
     strip_include_prefix = "include",
     tags = ["api"],
     deps = [
-        "@@abseil-cpp+//absl/base",
-        "@@abseil-cpp+//absl/strings",
-        "@@abseil-cpp+//absl/types:variant",
+        "@abseil-cpp//absl/base",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/types:variant",
     ],
 )
 

@@ -4,36 +4,36 @@
     "binaries": [
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Linux-aarch64",
-        "sha256": "884205693031f9c3d574ca5d41ada9f8cd3bac4402baf8e3013293d13fa2d450",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.35.0/sentry-cli-Linux-aarch64",
+        "sha256": "36cf2f21865bd28cb7b673dfeedf0982757a5375b8e702418706c859b91adee8",
         "os": "linux",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Linux-x86_64",
-        "sha256": "55952c5804f0867ac4bbe9db52d99de5562cad8e3c0a617905b087f621237415",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.35.0/sentry-cli-Linux-x86_64",
+        "sha256": "968b3b623867ab83c0163e8d8e9f21007e2f7dbaa248a8890798c9f4e098f69c",
         "os": "linux",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Darwin-arm64",
-        "sha256": "56df4f9b1c625cc6d44c661d5b0428e583dda7867f3a19212e7ac549227e3bb3",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.35.0/sentry-cli-Darwin-arm64",
+        "sha256": "77081405fff0587f0cc153c90857f7786f1137de027533dccdc9779400ada14f",
         "os": "macos",
         "cpu": "arm64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Darwin-x86_64",
-        "sha256": "a67dbe6b2d594c4eeb6d4c838f812df885d8d2b75561c06f8ecbbe6f86c639c8",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.35.0/sentry-cli-Darwin-x86_64",
+        "sha256": "85386eed7a464c64b13dba8d4012474c260b523676bb95b898aef28532a12376",
         "os": "macos",
         "cpu": "x86_64"
       },
       {
         "kind": "file",
-        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.34.1/sentry-cli-Windows-x86_64.exe",
-        "sha256": "38a358adf634a9bd5dda3039fd6a24c9914284cf76b1a5f11a02696679a7c4f5",
+        "url": "https://github.com/getsentry/sentry-cli/releases/download/2.35.0/sentry-cli-Windows-x86_64.exe",
+        "sha256": "2596622de6e6f4cb0580b3ce1341b4f62390231aea0c30fc127c991d379a6ac6",
         "os": "windows",
         "cpu": "x86_64"
       }
