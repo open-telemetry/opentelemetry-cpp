@@ -12,6 +12,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - run: winget install bazelisk
+      - run: winget upgrade bazelisk -h --accept-source-agreements --accept-package-agreements || winget install bazelisk -h --accept-source-agreements --accept-package-agreements || echo swallowing winget error
       - uses: actions/checkout@v4
-      - run: bazel test -k api/...
+      - run: bazelisk test -k api/...
