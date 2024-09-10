@@ -14,4 +14,4 @@ jobs:
     steps:
 #      - run: winget upgrade bazelisk -h --accept-source-agreements --accept-package-agreements || winget install bazelisk -h --accept-source-agreements --accept-package-agreements || echo swallowing winget error
       - uses: actions/checkout@v4
-      - run: bazelisk test -k -- api/... -//api/test/singleton:singleton_test 
+      - run: bazelisk test -k --//:with_dll -- ...
