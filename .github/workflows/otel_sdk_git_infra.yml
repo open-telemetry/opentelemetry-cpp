@@ -1,0 +1,17 @@
+name: otel_sdk_git_infra
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+jobs:
+  otel_sdk_build:
+    name: testing otel_sdk_git_infra
+    runs-on: [self-hosted, Windows, X64]
+    permissions:
+      contents: write
+    steps:
+      - run: winget install bazelisk
+      - uses: actions/checkout@v4
+      - run: bazel test -k api/...
