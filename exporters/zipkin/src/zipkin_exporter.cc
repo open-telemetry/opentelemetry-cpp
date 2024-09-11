@@ -10,6 +10,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 
 #include "nlohmann/json.hpp"
 

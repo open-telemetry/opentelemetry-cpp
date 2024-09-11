@@ -1,9 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext/http/common/url_parser.h"
-
 #include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/ext/http/common/url_parser.h"
 
 namespace http_common = opentelemetry::ext::http::common;
 

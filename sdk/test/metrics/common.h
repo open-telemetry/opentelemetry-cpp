@@ -3,12 +3,15 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include <chrono>
+#include <memory>
+
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
-
-#include <memory>
 
 class MockMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporter
 {

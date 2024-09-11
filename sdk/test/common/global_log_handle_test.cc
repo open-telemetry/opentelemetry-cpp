@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/global_log_handler.h"
-
 #include <gtest/gtest.h>
-
 #include <cstring>
+
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
