@@ -62,6 +62,9 @@ otel_cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "@otel_sdk//exporters/elasticsearch:es_log_record_exporter",
+        "@otel_sdk//exporters/memory:in_memory_data",
+        "@otel_sdk//exporters/memory:in_memory_metric_data",
+        "@otel_sdk//exporters/memory:in_memory_metric_exporter_factory",
         "@otel_sdk//exporters/memory:in_memory_span_exporter",
         "@otel_sdk//exporters/ostream:ostream_log_record_exporter",
         "@otel_sdk//exporters/ostream:ostream_metric_exporter",
