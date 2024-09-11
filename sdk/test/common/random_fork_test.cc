@@ -7,13 +7,13 @@
 // See https://github.com/opentracing-contrib/nginx-opentracing/issues/52
 #  include "src/common/random.h"
 
+#  include <stdint.h>
 #  include <sys/mman.h>
-#  include <sys/types.h>
 #  include <sys/wait.h>
 #  include <unistd.h>
-#  include <cstdio>
 #  include <cstdlib>
 #  include <iostream>
+
 using opentelemetry::sdk::common::Random;
 
 static uint64_t *child_id;

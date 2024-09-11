@@ -1,9 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/env_variables.h"
-
 #include <gtest/gtest.h>
+#include <stdlib.h>
+#include <chrono>
+#include <string>
+
+#include "opentelemetry/sdk/common/env_variables.h"
 
 #if defined(_MSC_VER)
 using opentelemetry::sdk::common::setenv;
