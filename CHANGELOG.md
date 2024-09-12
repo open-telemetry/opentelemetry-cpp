@@ -24,6 +24,9 @@ Increment the:
 * [EXPORTER] Allow to share gRPC clients between OTLP exporters.
   [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
 
+* [EXPORTER] Add in-memory metric exporter
+  [#3043](https://github.com/open-telemetry/opentelemetry-cpp/pull/3043)
+
 Breaking changes:
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`

@@ -1,11 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "src/common/random.h"
-
-#include <random>
-
 #include <gtest/gtest.h>
+#include <cstdint>
+#include <random>
+#include <set>
+#include <utility>
+
+#include "src/common/fast_random_number_generator.h"
 
 using opentelemetry::sdk::common::FastRandomNumberGenerator;
 

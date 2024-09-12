@@ -3,14 +3,18 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
-#include <unordered_map>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/predicate.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/version.h"
 

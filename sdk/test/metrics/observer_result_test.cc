@@ -1,10 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/observer_result.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-
-#include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 TEST(ObserverResult, BasicTests)
