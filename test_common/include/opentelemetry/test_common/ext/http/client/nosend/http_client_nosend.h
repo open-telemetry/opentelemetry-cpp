@@ -3,16 +3,18 @@
 
 #pragma once
 
+#include <gmock/gmock.h>
+#include <stdint.h>
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "opentelemetry/version.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
-
-#include <map>
-#include <string>
-#include <vector>
-
-#include <gtest/gtest.h>
-#include "gmock/gmock.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -116,7 +118,7 @@ public:
   opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
-class HttpClient;
+class HttpClient;  // IWYU pragma: keep
 
 class Session : public opentelemetry::ext::http::client::Session
 {

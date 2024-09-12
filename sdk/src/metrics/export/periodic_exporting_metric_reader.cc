@@ -9,12 +9,9 @@
 #include <mutex>
 #include <ostream>
 #include <ratio>
-#include <system_error>
 #include <thread>
 #include <utility>
 
-#include "opentelemetry/version.h"
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"

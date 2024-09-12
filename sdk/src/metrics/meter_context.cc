@@ -7,7 +7,6 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
-#include <ratio>
 #include <utility>
 #include <vector>
 

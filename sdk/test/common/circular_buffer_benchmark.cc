@@ -1,18 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "benchmark/benchmark.h"
-
+#include <stddef.h>
 #include <atomic>
 #include <cstdint>
+#include <exception>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <random>
 #include <thread>
 #include <vector>
+#include "benchmark/benchmark.h"
 
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "test/common/baseline_circular_buffer.h"
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;

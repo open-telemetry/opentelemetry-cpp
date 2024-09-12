@@ -1,23 +1,28 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext//http/client/curl/http_client_curl.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/server/http_server.h"
-
-#include <assert.h>
+#include <gtest/gtest.h>
+#include <string.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <fstream>
+#include <map>
 #include <memory>
-#include <thread>
+#include <mutex>
+#include <string>
 #include <utility>
 #include <vector>
 
-#define HTTP_PORT 19000
+#include "opentelemetry/ext//http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 
-#include <gtest/gtest.h>
+#define HTTP_PORT 19000
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;

@@ -3,7 +3,12 @@
 
 #include <benchmark/benchmark.h>
 #include <map>
+#include <string>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+
 using namespace opentelemetry::sdk::metrics;
 namespace
 {

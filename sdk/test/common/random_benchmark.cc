@@ -1,12 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "src/common/random.h"
-
-#include <cstdint>
+#include <benchmark/benchmark.h>
 #include <random>
 
-#include <benchmark/benchmark.h>
+#include "src/common/random.h"
 
 namespace
 {

@@ -5,11 +5,12 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/version.h"
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
