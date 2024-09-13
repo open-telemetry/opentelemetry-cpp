@@ -52,7 +52,7 @@ $vcpkg_dependencies = @(
     "protobuf:${env:OPENTELEMETRY_CPP_LIBTYPE}",
     #"ms-gsl:${env:OPENTELEMETRY_CPP_LIBTYPE}",
     "nlohmann-json:${env:OPENTELEMETRY_CPP_LIBTYPE}",
-    #"abseil:${env:OPENTELEMETRY_CPP_LIBTYPE}",
+    "abseil:${env:OPENTELEMETRY_CPP_LIBTYPE}",
     #"gRPC:${env:OPENTELEMETRY_CPP_LIBTYPE}",
     #"prometheus-cpp:${env:OPENTELEMETRY_CPP_LIBTYPE}",
     "curl:${env:OPENTELEMETRY_CPP_LIBTYPE}"

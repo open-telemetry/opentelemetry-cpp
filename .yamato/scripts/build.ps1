@@ -26,7 +26,8 @@ $otel_build_options = @(
     # see CI "cmake.maintainer.sync.test"
     #"-DCMAKE_INSTALL_PREFIX=$install_dir"                      # Only for ninja builds
     "-DCMAKE_BUILD_TYPE=${env:OPENTELEMETRY_CPP_CONFIG}"        # Build only release
-    "-DWITH_STL=CXX17"                                          # Which version of the Standard Library for C++ to use, Matching bee_backend version
+    #"-DWITH_STL=CXX17"                                          # Which version of the Standard Library for C++ to use, Matching bee_backend version
+    "-DWITH_ABSEIL=ON"                                          # Don't use STL (mutually exclusive with WITH_STL), use Abseil instead
     "-DCMAKE_CXX_STANDARD=${env:CXX_STANDARD}"                  # Use C++ Standard Language Version 17, Matching bee_backend language version
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"                      # Add the -fPIC compiler option (off), as recommended by OpenTelemetry CPP documentation
     #"-DWITH_OTLP_GRPC=ON"                                       # Whether to include the OTLP gRPC exporter in the SDK (off), disabling it since it is apparently slow and requires additional dependencies
