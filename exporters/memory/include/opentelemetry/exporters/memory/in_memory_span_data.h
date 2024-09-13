@@ -7,7 +7,6 @@
 #include <memory>
 #include <vector>
 
-
 #include "opentelemetry/version.h"
 #include "opentelemetry/exporters/memory/in_memory_data.h"
 #include "opentelemetry/sdk/trace/span_data.h"
