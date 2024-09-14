@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 exporters:
-  logging:
-    loglevel: DEBUG
+  debug:
+    verbosity: detailed
 receivers:
   otlp:
     protocols:
@@ -17,14 +17,14 @@ service:
       receivers:
       - otlp
       exporters:
-      - logging
+      - debug
     logs:
       receivers:
       - otlp
       exporters:
-      - logging
+      - debug
     metrics:
       receivers:
       - otlp
       exporters:
-      - logging
+      - debug
