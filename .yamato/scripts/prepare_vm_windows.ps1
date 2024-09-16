@@ -16,19 +16,6 @@ if (-not $vswhere_dir) { throw "vswhere.exe not found" }
 if (-not $cmake_dir) { throw "cmake.exe not found" }
 $env:PATH = "$vswhere_dir;$cmake_dir;${env:PATH}"
 
-# Install vcpkg
-# ===================================
-$env:VCPKG_ROOT = "$PWD/tools/vcpkg"
-$env:VCPKG_CMAKE = "$PWD/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"
-push-location $env:VCPKG_ROOT
-& $PWD/scripts/bootstrap.ps1 -disableMetrics
-$vcpkg_dir = (Get-ChildItem -path $env:VCPKG_ROOT -filter "vcpkg.exe" -recurse -ErrorAction SilentlyContinue | Select-Object -First 1).DirectoryName
-if (-not $vcpkg_dir) { throw "vcpkg.exe not found" }
-$env:PATH = "$vcpkg_dir;$env:PATH"
-& vcpkg integrate install
-if ($LASTEXITCODE -ne 0) { throw "Failed to integrate vcpkg" }
-Pop-Location # $env:VCPKG_ROOT
-
 # Copy python-3.11.5-embed-amd64.zip since Unity firewall prevents downloads from www.python.org
 # ===================================
 #$downloads = mkdir "$PWD/tools/vcpkg/downloads" -force
@@ -43,6 +30,19 @@ Pop-Location # $env:VCPKG_ROOT
 & $env:ComSpec /c "`"%VISUAL_STUDIO_PATH%\VC\Auxiliary\Build\vcvarsall.bat`" %OPENTELEMETRY_CPP_LIBARCH% & set" | ConvertFrom-String -Delimiter '=' | ForEach-Object {
     New-Item -Name $_.P1 -value $_.P2 -ItemType Variable -Path Env: -Force
 }
+
+# Install vcpkg
+# ===================================
+$env:VCPKG_ROOT = "$PWD/tools/vcpkg"
+$env:VCPKG_CMAKE = "$PWD/tools/vcpkg/scripts/buildsystems/vcpkg.cmake"
+push-location $env:VCPKG_ROOT
+& $PWD/scripts/bootstrap.ps1 -disableMetrics
+$vcpkg_dir = (Get-ChildItem -path $env:VCPKG_ROOT -filter "vcpkg.exe" -recurse -ErrorAction SilentlyContinue | Select-Object -First 1).DirectoryName
+if (-not $vcpkg_dir) { throw "vcpkg.exe not found" }
+$env:PATH = "$vcpkg_dir;$env:PATH"
+& vcpkg integrate install
+if ($LASTEXITCODE -ne 0) { throw "Failed to integrate vcpkg" }
+Pop-Location # $env:VCPKG_ROOT
 
 # Install vcpkg dependencies
 # ===================================
