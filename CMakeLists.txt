@@ -77,6 +77,8 @@ else()
     set(ARCH s390x)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(sparc.*|SPARC.*)")
     set(ARCH sparc)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(loongarch.*|LOONGARCH.*)")
+    set(ARCH loongarch)
   else()
     message(
       FATAL_ERROR
