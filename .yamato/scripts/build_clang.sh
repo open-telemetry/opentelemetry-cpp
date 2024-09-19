@@ -1,5 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
+export CC=`pwd`/clang
+export CXX=`pwd`/clang++
 
 # Build/Test/Package OpenTelemetry CPP
 # ===================================

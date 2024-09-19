@@ -38,6 +38,9 @@ sed -i -e "s|PWD|`pwd`|g" clang++
 chmod +x clang
 chmod +x clang++
 
+export CC=`pwd`/clang
+export CXX=`pwd`/clang++ 
+
 # Setup build tools
 # ===================================
 declare -a vcpkg_dependencies=(
@@ -46,7 +49,7 @@ declare -a vcpkg_dependencies=(
     "protobuf:$OPENTELEMETRY_CPP_LIBTYPE"
     #"ms-gsl:$OPENTELEMETRY_CPP_LIBTYPE"
     "nlohmann-json:$OPENTELEMETRY_CPP_LIBTYPE"
-    #"abseil:$OPENTELEMETRY_CPP_LIBTYPE"
+    "abseil:$OPENTELEMETRY_CPP_LIBTYPE"
     #"gRPC:$OPENTELEMETRY_CPP_LIBTYPE"
     #"prometheus-cpp:$OPENTELEMETRY_CPP_LIBTYPE"
     "curl:$OPENTELEMETRY_CPP_LIBTYPE"

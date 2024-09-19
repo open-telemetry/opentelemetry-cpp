@@ -6,12 +6,6 @@ export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get update -y
 sudo -E apt remove needrestart -y #refer: https://github.com/actions/runner-images/issues/9937
 
-# Install CMake and build tools
-# ===================================
-sudo -E apt-get install -y zip bc
-sudo -E ./ci/setup_ci_environment.sh
-sudo -E ./tools/setup-cmake.sh
-
 # Install vcpkg
 # ===================================
 export VCPKG_ROOT="$PWD/tools/vcpkg"
@@ -30,7 +24,7 @@ declare -a vcpkg_dependencies=(
     "protobuf:$OPENTELEMETRY_CPP_LIBTYPE"
     #"ms-gsl:$OPENTELEMETRY_CPP_LIBTYPE"
     "nlohmann-json:$OPENTELEMETRY_CPP_LIBTYPE"
-    #"abseil:$OPENTELEMETRY_CPP_LIBTYPE"
+    "abseil:$OPENTELEMETRY_CPP_LIBTYPE"
     #"gRPC:$OPENTELEMETRY_CPP_LIBTYPE"
     #"prometheus-cpp:$OPENTELEMETRY_CPP_LIBTYPE"
     "curl:$OPENTELEMETRY_CPP_LIBTYPE"

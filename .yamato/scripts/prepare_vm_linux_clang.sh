@@ -21,14 +21,27 @@ sed -i -e "s|PWD|`pwd`|g" clang
 sed -i -e "s|PWD|`pwd`|g" clang++
 chmod +x clang
 chmod +x clang++
+export CC=`pwd`/clang
+export CXX=`pwd`/clang++
 
 # Setup build tools
 # ===================================
-sudo -E apt-get install -y zlib1g-dev bc
-# sudo -E ./tools/setup-ninja.sh
-sudo -E ./ci/setup_ci_environment.sh
-sudo -E ./tools/setup-cmake.sh
-sudo -E CC=`pwd`/clang CXX=`pwd`/clang++ ./ci/setup_googletest.sh
-sudo -E CC=`pwd`/clang CXX=`pwd`/clang++ ./ci/install_protobuf.sh
-sudo -E CC=`pwd`/clang CXX=`pwd`/clang++ ./ci/install_abseil.sh
-# sudo -E CC=`pwd`/clang CXX=`pwd`/clang++ ./ci/setup_grpc.sh
+declare -a vcpkg_dependencies=(
+    "gtest:$OPENTELEMETRY_CPP_LIBTYPE"
+    "benchmark:$OPENTELEMETRY_CPP_LIBTYPE"
+    "protobuf:$OPENTELEMETRY_CPP_LIBTYPE"
+    #"ms-gsl:$OPENTELEMETRY_CPP_LIBTYPE"
+    "nlohmann-json:$OPENTELEMETRY_CPP_LIBTYPE"
+    "abseil:$OPENTELEMETRY_CPP_LIBTYPE"
+    #"gRPC:$OPENTELEMETRY_CPP_LIBTYPE"
+    #"prometheus-cpp:$OPENTELEMETRY_CPP_LIBTYPE"
+    "curl:$OPENTELEMETRY_CPP_LIBTYPE"
+    #"thrift:$OPENTELEMETRY_CPP_LIBTYPE"
+)
+for dep in "${vcpkg_dependencies[@]}"; do
+    if [[ $dep == protobuf:* ]] || [[ $dep == benchmark:* ]] ; then
+        vcpkg "--vcpkg-root=${VCPKG_ROOT}" install --overlay-ports=$VCPKG_ROOT/ports $dep;
+    else
+        vcpkg "--vcpkg-root=${VCPKG_ROOT}" install $dep;
+    fi
+done

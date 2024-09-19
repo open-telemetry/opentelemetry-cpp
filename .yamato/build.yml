@@ -320,9 +320,7 @@ build_windows_arm64:
 #      name: Prepare VM to build OpenTelemetry CPP
 #    - command: |
 #        set -euxo pipefail
-#        export CC=`pwd`/clang
-#        export CXX=`pwd`/clang++
-#        ./.yamato/scripts/build.sh
+#        ./.yamato/scripts/build_clang.sh
 #      name: Build OpenTelemetry CPP
 #    - command: |
 #        set -euxo pipefail
@@ -400,9 +398,7 @@ build_windows_arm64:
 #      name: Prepare VM to build OpenTelemetry CPP
 #    - command: |
 #        set -euxo pipefail
-#        export CC=`pwd`/clang
-#        export CXX=`pwd`/clang++
-#        ./.yamato/scripts/build_vcpkg.sh
+#        ./.yamato/scripts/build_clang_vcpkg.sh
 #      name: Build OpenTelemetry CPP
 #    - command: |
 #        set -euxo pipefail
