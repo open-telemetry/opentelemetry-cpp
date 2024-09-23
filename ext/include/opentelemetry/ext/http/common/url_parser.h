@@ -3,11 +3,12 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include <cstdint>
 #include <string>
-#include <vector>
-#include "opentelemetry/nostd/string_view.h"
+
 #include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {

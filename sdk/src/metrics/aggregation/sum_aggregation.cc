@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <memory>
 #include <mutex>
-#include <utility>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"

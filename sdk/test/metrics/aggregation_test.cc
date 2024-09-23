@@ -2,13 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdint.h>
+#include <vector>
+
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
-
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;

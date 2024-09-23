@@ -1,7 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stdint.h>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
+
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

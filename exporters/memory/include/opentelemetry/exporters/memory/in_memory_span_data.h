@@ -3,11 +3,13 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/memory/in_memory_data.h"
-#include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/span_data.h"
-
+#include <stddef.h>
+#include <memory>
 #include <vector>
+
+#include "opentelemetry/exporters/memory/in_memory_data.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
