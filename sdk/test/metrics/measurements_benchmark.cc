@@ -1,15 +1,30 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_context.h"
+#include <benchmark/benchmark.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <thread>
+#include <vector>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-
-#include <benchmark/benchmark.h>
-#include <memory>
-#include <random>
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;

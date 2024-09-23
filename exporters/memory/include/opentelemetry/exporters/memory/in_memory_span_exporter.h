@@ -3,13 +3,20 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <atomic>
-#include <mutex>
+#include <chrono>
+#include <memory>
+#include <ostream>
+#include <utility>
 
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk_config.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -1,12 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <gtest/gtest.h>
+#include <memory>
+#include <utility>
 #include "common.h"
 
-#include <gtest/gtest.h>
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/metrics/state/metric_collector.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;

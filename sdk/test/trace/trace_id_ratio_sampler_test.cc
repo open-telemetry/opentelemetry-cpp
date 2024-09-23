@@ -1,13 +1,25 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
-#include "opentelemetry/trace/span_context_kv_iterable_view.h"
-#include "src/common/random.h"
-
 #include <gtest/gtest.h>
-#include <cstdlib>
-#include <ctime>
+#include <stdint.h>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "src/common/random.h"
 
 using opentelemetry::sdk::common::Random;
 using opentelemetry::sdk::trace::Decision;

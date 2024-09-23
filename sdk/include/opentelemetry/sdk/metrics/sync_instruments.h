@@ -12,7 +12,6 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
-#include "opentelemetry/sdk_config.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
