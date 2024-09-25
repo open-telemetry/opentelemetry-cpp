@@ -14,11 +14,12 @@ bazel_dep(name = "googletest", version = "1.15.2")  #, dev_dependency = True)
 bazel_dep(name = "grpc", version = "1.66.0.bcr.2")  #, repo_name = "com_github_grpc_grpc")
 single_version_override(
     module_name = "grpc",
+    patch_strip = 1,
     # https://github.com/grpc/grpc/pull/37534
     # https://github.com/grpc/grpc/pull/37534.diff
     patches = ["bazel/grpc_bzlmod.diff"],
-    patch_strip = 1,
 )
+
 bazel_dep(name = "nlohmann_json", version = "3.11.3")
 bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "rules_cc", version = "0.0.10")
@@ -57,6 +58,17 @@ use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
     "local_config_cc",
 )
+
+# This is needed only for most of the `bazel mod xxx` functions to work.
+#
+# Otherwise it complaints with
+#
+# ERROR: in tag at https://bcr.bazel.build/modules/grpc-java/1.62.2/MODULE.bazel:89:15: no repository visible as
+#        '@com_google_protobuf_javalite' to the repository '@@grpc-java+', but referenced by label
+#        '@com_google_protobuf_javalite//:protobuf_javalite' in attribute 'target' of tag 'override'.
+#      Is the module 'grpc-java' missing a bazel_dep or use_repo(..., "com_google_protobuf_javalite")?.
+#
+bazel_dep(name = "grpc-java", version = "1.64.0")
 
 multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
 multitool.hub(lockfile = "@otel_sdk//:multitool.lock.json")
