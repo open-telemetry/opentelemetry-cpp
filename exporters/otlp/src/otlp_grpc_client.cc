@@ -660,13 +660,13 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
     return true;
   }
 
-#ifdef ENABLE_ASYNC_EXPORT
   bool last_reference_removed = RemoveReference(guard);
   bool force_flush_result;
   if (last_reference_removed && false == is_shutdown_.exchange(true, std::memory_order_acq_rel))
   {
     force_flush_result = ForceFlush(timeout);
 
+#ifdef ENABLE_ASYNC_EXPORT
     std::unordered_set<std::shared_ptr<OtlpGrpcAsyncCallDataBase>> running_calls;
     {
       std::lock_guard<std::mutex> lock(async_data_->running_calls_lock);
@@ -679,6 +679,7 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
         call_data->grpc_context->TryCancel();
       }
     }
+#endif
   }
   else
   {
@@ -686,10 +687,6 @@ bool OtlpGrpcClient::Shutdown(OtlpGrpcClientReferenceGuard &guard,
   }
 
   return force_flush_result;
-#else
-  RemoveReference(guard);
-  return true;
-#endif
 }
 
 }  // namespace otlp
