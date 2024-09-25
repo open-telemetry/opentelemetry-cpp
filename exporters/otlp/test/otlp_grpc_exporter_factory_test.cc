@@ -34,7 +34,6 @@ TEST(OtlpGrpcExporterFactoryTest, BuildTest)
   EXPECT_TRUE(exporter != nullptr);
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 TEST(OtlpGrpcExporterFactoryTest, ShareClient)
 {
   OtlpGrpcExporterOptions opts;
@@ -53,7 +52,6 @@ TEST(OtlpGrpcExporterFactoryTest, ShareClient)
   EXPECT_TRUE(static_cast<OtlpGrpcExporter *>(exporter1.get())->GetClient().get() == client.get());
   EXPECT_TRUE(static_cast<OtlpGrpcExporter *>(exporter2.get())->GetClient().get() == client.get());
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

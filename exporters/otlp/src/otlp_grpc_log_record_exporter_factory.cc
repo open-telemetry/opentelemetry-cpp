@@ -28,7 +28,6 @@ OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions 
   return exporter;
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
 OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions &options,
                                          nostd::shared_ptr<OtlpGrpcClient> client)
@@ -37,7 +36,6 @@ OtlpGrpcLogRecordExporterFactory::Create(const OtlpGrpcLogRecordExporterOptions 
       new OtlpGrpcLogRecordExporter(options, std::move(client)));
   return exporter;
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

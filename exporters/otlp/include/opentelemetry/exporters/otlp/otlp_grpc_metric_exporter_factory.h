@@ -34,14 +34,12 @@ public:
   static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
       const OtlpGrpcMetricExporterOptions &options);
 
-#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Create a OtlpGrpcMetricExporter using the given options and gRPC client.
    */
   static std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Create(
       const OtlpGrpcMetricExporterOptions &options,
       nostd::shared_ptr<OtlpGrpcClient> client);
-#endif
 };
 
 }  // namespace otlp

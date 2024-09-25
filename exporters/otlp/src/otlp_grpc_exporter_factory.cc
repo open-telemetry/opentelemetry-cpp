@@ -27,7 +27,6 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory
   return exporter;
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Create(
     const OtlpGrpcExporterOptions &options,
     nostd::shared_ptr<OtlpGrpcClient> client)
@@ -36,7 +35,6 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory
       new OtlpGrpcExporter(options, std::move(client)));
   return exporter;
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

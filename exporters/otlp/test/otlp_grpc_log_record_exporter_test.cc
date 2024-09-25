@@ -194,7 +194,6 @@ public:
         new OtlpGrpcExporter(std::move(stub_interface)));
   }
 
-#ifdef ENABLE_ASYNC_EXPORT
   std::unique_ptr<sdk::logs::LogRecordExporter> GetExporter(
       std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> &stub_interface,
       nostd::shared_ptr<OtlpGrpcClient> client)
@@ -210,7 +209,6 @@ public:
     return std::unique_ptr<sdk::trace::SpanExporter>(
         new OtlpGrpcExporter(std::move(stub_interface), std::move(client)));
   }
-#endif
 
   // Get the options associated with the given exporter.
   const OtlpGrpcLogRecordExporterOptions &GetOptions(
@@ -358,7 +356,6 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
 }
 
-#ifdef ENABLE_ASYNC_EXPORT
 // Create spans, let processor call Export() and share client object between trace and logs
 TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 {
@@ -468,7 +465,6 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
           new opentelemetry::trace::NoopTracerProvider()));
   trace_provider = opentelemetry::nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>();
 }
-#endif
 
 }  // namespace otlp
 }  // namespace exporter

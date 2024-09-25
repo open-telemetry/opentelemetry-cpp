@@ -32,14 +32,12 @@ public:
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpGrpcLogRecordExporterOptions &options);
 
-#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Create a OtlpGrpcLogRecordExporter using the given options and gRPC client.
    */
   static std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Create(
       const OtlpGrpcLogRecordExporterOptions &options,
       nostd::shared_ptr<OtlpGrpcClient> client);
-#endif
 };
 
 }  // namespace otlp

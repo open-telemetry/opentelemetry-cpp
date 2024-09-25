@@ -34,14 +34,12 @@ public:
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpGrpcExporterOptions &options);
 
-#ifdef ENABLE_ASYNC_EXPORT
   /**
    * Create an OtlpGrpcExporter using the given options and gRPC client.
    */
   static std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Create(
       const OtlpGrpcExporterOptions &options,
       nostd::shared_ptr<OtlpGrpcClient> client);
-#endif
 };
 
 }  // namespace otlp
