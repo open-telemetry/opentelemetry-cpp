@@ -1,2 +1,3 @@
 import %workspace%/../.bazelrc
+build --@otel_sdk//:with_dll=true
 try-import %workspace%/../../top.bazelrc

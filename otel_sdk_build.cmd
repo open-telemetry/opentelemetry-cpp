@@ -25,11 +25,11 @@ goto:eof
 
 :test
 REM singleton_test does not work when linked as static under Windows
-"%__BAZEL__%" test  -k --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || echo goto:error
-"%__BAZEL__%" build -k --profile=1.all.tracing.json --//:with_dll=true -- ... -otel_sdk_zip || echo goto:error
-"%__BAZEL__%" test  -k --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || echo goto:error
-"%__BAZEL__%" test  -k --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || echo goto:error
-"%__BAZEL__%" test  -k --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || echo goto:error
+"%__BAZEL__%" test  --profile=0.nodll.tracing.json --//:with_dll=false -- ... -//api/test/singleton:singleton_test || echo goto:error
+"%__BAZEL__%" build --profile=1.all.tracing.json --//:with_dll=true -- ... -otel_sdk_zip || echo goto:error
+"%__BAZEL__%" test  --profile=2.dbg.tracing.json --//:with_dll=true -c dbg -- ... -otel_sdk_zip || echo goto:error
+"%__BAZEL__%" test  --profile=3.fastbuild.tracing.json --//:with_dll=true -c fastbuild -- ... -otel_sdk_zip || echo goto:error
+"%__BAZEL__%" test  --profile=4.opt.tracing.json --//:with_dll=true -c opt -- ... -otel_sdk_zip || echo goto:error
 goto:eof
 
 :zip
