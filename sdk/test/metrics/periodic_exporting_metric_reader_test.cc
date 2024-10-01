@@ -63,13 +63,12 @@ public:
       : sleep_ms_{sleep_ms}
   {}
 
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override
+  MetricProducer::Result Produce() noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
     ResourceMetrics data;
-    callback(data);
-    return true;
+    return {data, MetricProducer::Status::kSuccess};
   }
 
   size_t GetDataCount() { return data_sent_size_; }
