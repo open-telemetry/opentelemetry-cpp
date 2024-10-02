@@ -17,7 +17,8 @@ jobs:
     steps:
       - run: systeminfo
       - run: Get-ChildItem env:* | Sort-Object -Property Name | Format-Table -AutoSize -Wrap
-      - run: choco install bazelisk
+      - run: winget install bazelisk -r bazel
+      - run: winget install -e LLVM.LLVM -v 19.1.0 || echo swalloing errors
       - uses: actions/checkout@v4
       - uses: actions/cache/restore@v4
         with:

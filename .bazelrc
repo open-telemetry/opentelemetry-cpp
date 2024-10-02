@@ -129,4 +129,11 @@ build:clang-cl --host_per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
 build:clang-cl --per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
+# LLVM 1.19.1
+# opentelemetry/logs/logger.h(76,89): 
+#    error: a template argument list is expected after a name prefixed by the template keyword [-Wmissing-template-arg-list-after-template-kw]
+#  detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set( 
+#                                                                                  ^
+build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
+
 build --incompatible_strict_action_env
