@@ -137,3 +137,10 @@ build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
 
 build --incompatible_strict_action_env
+
+
+# still does not work yet
+#common --incompatible_enable_proto_toolchain_resolution 
+
+# allow newer protobuf to compile
+common --experimental_google_legacy_api
