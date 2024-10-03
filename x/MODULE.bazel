@@ -12,8 +12,7 @@ local_path_override(
 # Below is needed as we have "build --@curl//:use_mbedtls=true" from ..\.bazelrc
 bazel_dep(name = "curl", version = "8.8.0.bcr.1")
 
-# bazel_dep(name = "google_benchmark", version = "1.8.5")
-# bazel_dep(name = "googletest", version = "1.15.2")
+# We need this to match the parent, as it's locally patched there
 bazel_dep(name = "grpc", version = "1.66.0.bcr.2")
 single_version_override(
     module_name = "grpc",
@@ -23,24 +22,7 @@ single_version_override(
     patches = ["bazel/grpc_bzlmod.diff"],
 )
 
-# bazel_dep(name = "nlohmann_json", version = "3.11.3")
-# bazel_dep(name = "platforms", version = "0.0.10")
-# bazel_dep(name = "rules_cc", version = "0.0.10")
-# bazel_dep(name = "rules_pkg", version = "1.0.1")
-# bazel_dep(name = "rules_proto", version = "6.0.2")
-# bazel_dep(name = "zlib", version = "1.3.1.bcr.3")
-# bazel_dep(name = "rules_multitool", version = "0.12.0")
-# bazel_dep(name = "opentelemetry-proto", version = "1.3.2")
-# archive_override(
-#     module_name = "opentelemetry-proto",
-#     integrity = "sha256-wGnA2WE3zwBdNEEfpn3TtvH4xkrx5/sv4AiaQcQlrNc=",
-#     patch_strip = 1,
-#     # Copied from https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/opentelemetry-proto/1.3.1/patches
-#     patches = ["bazel/opentelemetry-proto.patch"],
-#     strip_prefix = "opentelemetry-proto-1.3.2",
-#     urls = "https://github.com/open-telemetry/opentelemetry-proto/archive/refs/tags/v1.3.2.tar.gz",
-# )
-
+# ditto here
 bazel_dep(name = "prometheus-cpp", version = "1.2.4")
 archive_override(
     module_name = "prometheus-cpp",
@@ -49,6 +31,7 @@ archive_override(
     urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
 )
 
+# parent project expects @local_config_cc//
 use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
     "local_config_cc",
