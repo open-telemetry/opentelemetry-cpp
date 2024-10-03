@@ -4,15 +4,9 @@
 build --features=parse_headers
 build --features=layering_check
 
-common --incompatible_use_plus_in_repo_names
-
 # Don't try to build .so and .dylib shared libs (instead of static) libs on Linux/OSX
 # For some reason, with clang-cl, it also tried to do on Windows, where dynamic linking just does not support it.
 build --dynamic_mode=off
-
-build --experimental_cc_shared_library
-
-common --incompatible_disable_native_repo_rules 
 
 common --noenable_workspace
 common --remote_download_minimal
@@ -20,9 +14,9 @@ common --remote_download_minimal
 # Avoid using c:\windows\system32\bash.exe
 common:windows --shell_executable="c:\\program files\\git\\usr\\bin\\bash.exe"
 
-#common --noexperimental_merged_skyframe_analysis_execution
-
 common --nolegacy_external_runfiles
+build --nolegacy_important_outputs
+
 common --skip_incompatible_explicit_targets
 
 # Enable automatic configs based on platform
@@ -33,12 +27,10 @@ build --build_tag_filters=-jaeger,-opentracing,-opentracing_shim
 test --test_tag_filters=-jaeger,-opentracing,-opentracing_shim
 
 build --experimental_convenience_symlinks=clean
-build --experimental_cc_implementation_deps
 
 build:windows      --copt="/Brepro"      --copt="/guard:cf"      --copt="/guard:ehcont"      --copt="/Z7"      --copt="/JMC-"      --copt="/sdl" 
-build:windows --host_copt="/Brepro" --host_copt="/guard:cf" --host_copt="/guard:ehcont" --host_copt="/Z7" --host_copt="/JMC-" --host_copt="/sdl" 
 build:windows      --linkopt="/Brepro"      --linkopt="/guard:cf"      --linkopt="/guard:ehcont" --linkopt="/DEBUG:FULL" --linkopt="/CETCOMPAT" --linkopt="/SWAPRUN:NET,CD" --linkopt="/OPT:REF,ICF" --linkopt="/RELEASE" --linkopt="/DEBUGTYPE:CV,PDATA,FIXUP" 
-build:windows --host_linkopt="/Brepro" --host_linkopt="/guard:cf" --host_linkopt="/guard:ehcont" --host_linkopt="shell32.lib" 
+build:windows --host_linkopt="shell32.lib" 
 # Requires Visual Studio 2019 Build Tools installed in default location with the latest compiler (14.29.30133) for x64
 build:windows      --action_env=BAZEL_VC_FULL_VERSION=14.29.30133      --action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
 build:windows --host_action_env=BAZEL_VC_FULL_VERSION=14.29.30133 --host_action_env=BAZEL_WINSDK_FULL_VERSION=10.0.22621.0
@@ -79,12 +71,6 @@ common:tsan --cc_output_directory_tag=tsan
 # https://github.com/google/sanitizers/issues/953
 common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
 
-## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
-# build --disk_cache=f:/b/d
-# common --repository_cache=f:/b/r
-# startup --output_user_root=f:/b/u
-try-import %workspace%/../top.bazelrc
-
 test --test_size_filters=small,medium,large,enormous
 test --test_timeout_filters=short,moderate,long,eternal
 test --test_verbose_timeout_warnings
@@ -101,17 +87,18 @@ startup --windows_enable_symlinks
 
 # Ideally all of these should get uncommented for further bazel migrations
 # This list was taken from here https://github.com/bazelbuild/bazel/releases/tag/7.0.0
-common --incompatible_auto_exec_groups
-common --incompatible_disable_non_executable_java_binary
-common --incompatible_disallow_struct_provider_syntax
-common --incompatible_disable_target_provider_fields
-common --incompatible_struct_has_no_methods
-common --incompatible_config_setting_private_default_visibility
-# common --incompatible_stop_exporting_language_modules
-common --incompatible_disallow_empty_glob
 # common --incompatible_disable_starlark_host_transitions
-
-build --nolegacy_important_outputs
+# common --incompatible_stop_exporting_language_modules
+common --incompatible_auto_exec_groups
+common --incompatible_config_setting_private_default_visibility
+common --incompatible_disable_native_repo_rules 
+common --incompatible_disable_non_executable_java_binary
+common --incompatible_disable_target_provider_fields
+common --incompatible_disallow_empty_glob
+common --incompatible_disallow_struct_provider_syntax
+common --incompatible_strict_action_env
+common --incompatible_struct_has_no_methods
+common --incompatible_use_plus_in_repo_names
 
 build --@curl//:use_mbedtls=true 
 # build --@curl//:http_only=true
@@ -129,18 +116,21 @@ build:clang-cl --host_per_file_copt="protobuf\\+/.*@-Wno-invalid-offsetof"
 build:clang-cl --per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 build:clang-cl --host_per_file_copt="c-ares\\+/.*@-Wno-macro-redefined"
 
-# LLVM 1.19.1
+# LLVM 19.1.0
 # opentelemetry/logs/logger.h(76,89): 
 #    error: a template argument list is expected after a name prefixed by the template keyword [-Wmissing-template-arg-list-after-template-kw]
 #  detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::template Set( 
 #                                                                                  ^
 build:clang-cl --copt=-Wno-missing-template-arg-list-after-template-kw
 
-build --incompatible_strict_action_env
-
-
 # still does not work yet
 #common --incompatible_enable_proto_toolchain_resolution 
 
 # allow newer protobuf to compile
 common --experimental_google_legacy_api
+
+## This is what my ../top.bazelrc contains (not in the repo as local to my machine)
+# build --disk_cache=f:/b/d
+# common --repository_cache=f:/b/r
+# startup --output_user_root=f:/b/u
+try-import %workspace%/../top.bazelrc

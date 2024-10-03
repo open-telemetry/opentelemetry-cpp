@@ -12,3 +12,5 @@ otel_sdk.zip
 WORKSPACE
 .bazelrc
 otel_sdk_build.cmd
+.git
+x

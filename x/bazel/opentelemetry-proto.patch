@@ -7,7 +7,7 @@ index 0000000..07d6a90
 +# Copyright The OpenTelemetry Authors
 +# SPDX-License-Identifier: Apache-2.0
 +
-+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
++load("@grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 +load("@rules_proto//proto:defs.bzl", "proto_library")
 +
 +package(default_visibility = ["//visibility:public"])
@@ -167,5 +167,5 @@ index 0000000..a5a5e54
 +    compatibility_level = 0,
 +)
 +
-+bazel_dep(name = "grpc", version = "1.56.3.bcr.1", repo_name = "com_github_grpc_grpc")
-+bazel_dep(name = "rules_proto", version = "5.3.0-21.7")
++bazel_dep(name = "grpc", version = "1.66.0.bcr.2")
++bazel_dep(name = "rules_proto", version = "6.0.2")
