@@ -3,14 +3,20 @@
 
 #pragma once
 
+#include <cstdint>
+#include <initializer_list>
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

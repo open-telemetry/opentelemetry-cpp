@@ -1,8 +1,37 @@
-module(name = "otel_sdk_x", version = "0.1")
-bazel_dep(name = "curl", version = "8.8.0.bcr.1")
-bazel_dep(name = "otel_sdk", version = "")
-local_path_override(module_name = "otel_sdk", path = "..")
+module(
+    name = "otel_sdk_x",
+    version = "0.1",
+)
 
+bazel_dep(name = "otel_sdk")
+local_path_override(
+    module_name = "otel_sdk",
+    path = "..",
+)
+
+# Below is needed as we have "build --@curl//:use_mbedtls=true" from ..\.bazelrc
+bazel_dep(name = "curl", version = "8.8.0.bcr.1")
+
+# We need this to match the parent, as it's locally patched there
+bazel_dep(name = "grpc", version = "1.66.0.bcr.2")
+single_version_override(
+    module_name = "grpc",
+    patch_strip = 1,
+    # https://github.com/grpc/grpc/pull/37534
+    # https://github.com/grpc/grpc/pull/37534.diff
+    patches = ["bazel/grpc_bzlmod.diff"],
+)
+
+# ditto here
+bazel_dep(name = "prometheus-cpp", version = "1.2.4")
+archive_override(
+    module_name = "prometheus-cpp",
+    integrity = "sha256-uElFYvmIrzXsElYbbrNS0Mvtfj99aKae2nhsZhCvxG4=",
+    strip_prefix = "prometheus-cpp-6492e820cdff7e7345d46d82b43735aaea542098",
+    urls = "https://github.com/jupp0r/prometheus-cpp/archive/6492e820cdff7e7345d46d82b43735aaea542098.zip",
+)
+
+# parent project expects @local_config_cc//
 use_repo(
     use_extension("@bazel_tools//tools/cpp:cc_configure.bzl", "cc_configure_extension"),
     "local_config_cc",

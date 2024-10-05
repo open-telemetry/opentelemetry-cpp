@@ -1,1 +1,5 @@
-
+cc_binary(
+    name = "x",
+    srcs = ["x.cpp"],
+    deps = ["@otel_sdk//:dll"]
+)

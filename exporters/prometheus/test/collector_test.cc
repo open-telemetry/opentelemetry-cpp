@@ -13,12 +13,13 @@
 #include <thread>
 
 using opentelemetry::exporter::metrics::PrometheusCollector;
+using opentelemetry::sdk::metrics::MetricProducer;
 using opentelemetry::sdk::metrics::ResourceMetrics;
 namespace metric_api      = opentelemetry::metrics;
 namespace metric_sdk      = opentelemetry::sdk::metrics;
 namespace metric_exporter = opentelemetry::exporter::metrics;
 
-class MockMetricProducer : public opentelemetry::sdk::metrics::MetricProducer
+class MockMetricProducer : public MetricProducer
 {
   TestDataPoints test_data_points_;
 
@@ -27,13 +28,12 @@ public:
       : sleep_ms_{sleep_ms}
   {}
 
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override
+  MetricProducer::Result Produce() noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
     ResourceMetrics data = test_data_points_.CreateSumPointData();
-    callback(data);
-    return true;
+    return {data, MetricProducer::Status::kSuccess};
   }
 
   size_t GetDataCount() { return data_sent_size_; }
@@ -71,15 +71,13 @@ private:
  */
 TEST(PrometheusCollector, BasicTests)
 {
-  MockMetricReader *reader     = new MockMetricReader();
-  MockMetricProducer *producer = new MockMetricProducer();
-  reader->SetMetricProducer(producer);
-  PrometheusCollector collector(reader, true, false);
+  MockMetricReader reader;
+  MockMetricProducer producer;
+  reader.SetMetricProducer(&producer);
+  PrometheusCollector collector(&reader, true, false);
   auto data = collector.Collect();
 
   // Collection size should be the same as the size
   // of the records collection produced by MetricProducer.
   ASSERT_EQ(data.size(), 2);
-  delete reader;
-  delete producer;
 }

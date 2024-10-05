@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
 
 #include <vector>

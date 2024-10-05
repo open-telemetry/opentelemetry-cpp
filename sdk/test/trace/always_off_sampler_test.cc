@@ -2,8 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "opentelemetry/trace/span_metadata.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::Decision;

@@ -7,13 +7,16 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <utility>
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/trace/span_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -1,13 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/common/attribute_utils.h"
-
 #include <gtest/gtest.h>
+#include <map>
+#include <string>
+#include <unordered_map>
+
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 
 TEST(AttributeMapTest, DefaultConstruction)
 {
-
   opentelemetry::sdk::common::AttributeMap attribute_map;
   EXPECT_EQ(attribute_map.GetAttributes().size(), 0);
 }
