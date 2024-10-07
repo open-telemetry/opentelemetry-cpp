@@ -110,6 +110,9 @@ Increment the:
 * [EXPORTER] Fix URL in ES exporter, fix ipv6 supporting for http client
   [#3081](https://github.com/open-telemetry/opentelemetry-cpp/pull/3081)
 
+* [EXPORTER] Add HttpHeaders in ElasticsearchLogRecordExporter
+  [#3083](https://github.com/open-telemetry/opentelemetry-cpp/pull/3083)
+
 Breaking changes:
 
 * [REMOVAL] Remove build option `WITH_DEPRECATED_SDK_FACTORY`
