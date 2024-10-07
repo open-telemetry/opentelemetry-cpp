@@ -13,7 +13,7 @@ Increment the:
 * MINOR version when you add functionality in a backwards compatible manner, and
 * PATCH version when you make backwards compatible bug fixes.
 
-## [Next Unreleased] - temporary section, waiting to publish 1.17.0 first.
+## [Unreleased]
 
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
@@ -28,8 +28,6 @@ Important changes:
   * This deprecation turned out to be not justified,
     as the Jaeger propagator can be used without the (now removed)
     Jaeger exporter.
-
-## [Unreleased]
 
 ## [1.17 2024-10-07]
 
