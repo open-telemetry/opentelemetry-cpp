@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.17 2024-10-02]
+## [1.17 2024-10-07]
 
 * [CI] Add a clang-tidy build
   [#3001](https://github.com/open-telemetry/opentelemetry-cpp/pull/3001)
@@ -106,6 +106,9 @@ Increment the:
 
 * [SDK] Update MetricProducer interface to match spec
   [#3044](https://github.com/open-telemetry/opentelemetry-cpp/pull/3044)
+
+* [EXPORTER] Fix URL in ES exporter, fix ipv6 supporting for http client
+  [#3081](https://github.com/open-telemetry/opentelemetry-cpp/pull/3081)
 
 Breaking changes:
 
