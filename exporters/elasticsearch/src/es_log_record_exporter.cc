@@ -323,7 +323,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   }
 
   // Create a connection to the ElasticSearch instance
-  auto session = http_client_->CreateSession(options_.host_ + std::to_string(options_.port_));
+  auto session = http_client_->CreateSession(options_.host_ + ":" + std::to_string(options_.port_));
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
