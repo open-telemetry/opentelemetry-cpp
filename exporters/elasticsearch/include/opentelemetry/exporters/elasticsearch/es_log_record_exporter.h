@@ -26,6 +26,8 @@ namespace logs
  */
 struct ElasticsearchExporterOptions
 {
+  using HttpHeaders = std::multimap<std::string, std::string>;
+
   // Configuration options to establish Elasticsearch connection
   std::string host_;
   int port_;
@@ -37,6 +39,9 @@ struct ElasticsearchExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug_;
 
+  /** Additional HTTP headers. */
+  HttpHeaders http_headers_;
+
   /**
    * Constructor for the ElasticsearchExporterOptions. By default, the endpoint is
    * localhost:9200/logs with a timeout of 30 seconds and disabled console debugging
@@ -47,16 +52,18 @@ struct ElasticsearchExporterOptions
    * from elasticsearch
    * @param console_debug If true, print the status of the exporter methods in the console
    */
-  ElasticsearchExporterOptions(std::string host     = "localhost",
-                               int port             = 9200,
-                               std::string index    = "logs",
-                               int response_timeout = 30,
-                               bool console_debug   = false)
+  ElasticsearchExporterOptions(std::string host         = "localhost",
+                               int port                 = 9200,
+                               std::string index        = "logs",
+                               int response_timeout     = 30,
+                               bool console_debug       = false,
+                               HttpHeaders http_headers = {})
       : host_{host},
         port_{port},
         index_{index},
         response_timeout_{response_timeout},
-        console_debug_{console_debug}
+        console_debug_{console_debug},
+        http_headers_{http_headers}
   {}
 };
 
