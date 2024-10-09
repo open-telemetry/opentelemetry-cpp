@@ -20,7 +20,7 @@ function install_prometheus_cpp_client
 function run_benchmarks
 {
   docker run -d --rm -it -p 4317:4317 -p 4318:4318 -v \
-    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 \
+    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.109.0 \
     --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
@@ -484,8 +484,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
   # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
   # that make this test always fail. Ignore these packages in the noexcept test here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//sdk/test/metrics:attributes_hashmap_test -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

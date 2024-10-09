@@ -1,15 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-
 #include <gtest/gtest.h>
-
+#include <stddef.h>
+#include <algorithm>
 #include <chrono>
 #include <memory>
+#include <ratio>
 #include <thread>
+#include <utility>
+#include <vector>
+
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -54,13 +63,12 @@ public:
       : sleep_ms_{sleep_ms}
   {}
 
-  bool Collect(nostd::function_ref<bool(ResourceMetrics &)> callback) noexcept override
+  MetricProducer::Result Produce() noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
     ResourceMetrics data;
-    callback(data);
-    return true;
+    return {data, MetricProducer::Status::kSuccess};
   }
 
   size_t GetDataCount() { return data_sent_size_; }
@@ -83,7 +91,7 @@ TEST(PeriodicExporingMetricReader, BasicTests)
   MockMetricProducer producer;
   reader->SetMetricProducer(&producer);
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-  EXPECT_NO_THROW(reader->ForceFlush());
+  reader->ForceFlush();
   reader->Shutdown();
   EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());

@@ -1,10 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/data/circular_buffer.h"
-
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <limits>
+
+#include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 
 using namespace opentelemetry::sdk::metrics;
 
