@@ -18,6 +18,20 @@ Increment the:
 * [EXPORTER] Allow to share gRPC clients between OTLP exporters.
   [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
 
+* [API] Jaeger Propagator should not be deprecated
+  [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
+
+Important changes:
+
+* [API] Jaeger Propagator should not be deprecated
+  [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
+
+  * Deprecation of the Jaeger propagator, as announced on 2023-01-31
+    in version 1.8.2, is now reverted.
+  * This deprecation turned out to be not justified,
+    as the Jaeger propagator can be used without the (now removed)
+    Jaeger exporter.
+
 ## [1.17 2024-10-07]
 
 * [CI] Add a clang-tidy build
