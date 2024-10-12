@@ -70,7 +70,21 @@ set(OPENTELEMETRY_VERSION
 
 # ##############################################################################
 
-find_package(Threads)
+include(CMakeFindDependencyMacro)
+
+find_dependency(Threads)
+
+if(@WITH_ABSEIL@)
+  find_dependency(absl)
+endif()
+
+if(@WITH_OTLP_GRPC@)
+  find_dependency(gRPC)
+endif()
+
+if("@Protobuf_FOUND@" OR "@PROTOBUF_FOUND@")
+  find_dependency(Protobuf)
+endif()
 
 set_and_check(OPENTELEMETRY_CPP_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 set_and_check(OPENTELEMETRY_CPP_LIBRARY_DIRS "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
