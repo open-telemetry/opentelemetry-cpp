@@ -1,6 +1,7 @@
 module(
     name = "otel_sdk",
     version = "1.17.0-dll",
+    compatibility_level = 0,
 )
 
 bazel_dep(name = "abseil-cpp", version = "20240722.0")
