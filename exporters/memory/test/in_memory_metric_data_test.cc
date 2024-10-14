@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -23,7 +24,7 @@ TEST(InMemoryMetricDataTest, CircularBuffer)
 {
   CircularBufferInMemoryMetricData buf(10);
   Resource resource = Resource::GetEmpty();
-  buf.Add(std::make_unique<ResourceMetrics>(
+  buf.Add(opentelemetry::nostd::make_unique<ResourceMetrics>(
       &resource, std::vector<ScopeMetrics>{{nullptr, std::vector<MetricData>{}}}));
   EXPECT_EQ((*buf.Get().begin())->resource_, &resource);
 }
@@ -45,7 +46,7 @@ TEST(InMemoryMetricDataTest, SimpleAggregate)
   md.instrument_descriptor.name_ = "my-metric";
   md.point_data_attr_.push_back(pda);
 
-  agg.Add(std::make_unique<ResourceMetrics>(
+  agg.Add(opentelemetry::nostd::make_unique<ResourceMetrics>(
       &resource, std::vector<ScopeMetrics>{{scope.get(), std::vector<MetricData>{md}}}));
   auto it = agg.Get("my-scope", "my-metric").begin();
 

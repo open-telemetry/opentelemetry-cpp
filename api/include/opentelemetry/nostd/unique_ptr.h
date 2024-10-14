@@ -175,6 +175,12 @@ bool operator!=(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
 {
   return nullptr != rhs.get();
 }
+
+template <class T, class... Args>
+unique_ptr<T> make_unique(Args &&...args)
+{
+  return unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #endif /* OPENTELEMETRY_HAVE_STD_UNIQUE_PTR */

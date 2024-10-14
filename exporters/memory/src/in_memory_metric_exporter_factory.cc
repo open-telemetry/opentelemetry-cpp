@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/memory/in_memory_metric_exporter_factory.h"
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
@@ -49,7 +50,7 @@ public:
       OTEL_INTERNAL_LOG_ERROR("[In Memory Metric Exporter] Exporting failed, exporter is shutdown");
       return ExportResult::kFailure;
     }
-    data_->Add(std::make_unique<ResourceMetrics>(data));
+    data_->Add(opentelemetry::nostd::make_unique<ResourceMetrics>(data));
     return ExportResult::kSuccess;
   }
 
@@ -85,7 +86,7 @@ std::unique_ptr<PushMetricExporter> InMemoryMetricExporterFactory::Create(
     const std::shared_ptr<InMemoryMetricData> &data,
     const AggregationTemporalitySelector &temporality)
 {
-  return std::make_unique<InMemoryMetricExporter>(data, temporality);
+  return opentelemetry::nostd::make_unique<InMemoryMetricExporter>(data, temporality);
 }
 
 }  // namespace memory
