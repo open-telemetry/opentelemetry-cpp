@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/version.h"
@@ -83,7 +84,7 @@ public:
    * @param ptr a pointer to the element to add
    * @return true if the element was successfully added; false, otherwise.
    */
-  bool Add(std::unique_ptr<T> &ptr) noexcept
+  bool Add(nostd::unique_ptr<T> &ptr) noexcept
   {
     while (true)
     {
@@ -118,13 +119,26 @@ public:
     }
   }
 
-  bool Add(std::unique_ptr<T> &&ptr) noexcept
+  bool Add(nostd::unique_ptr<T> &&ptr) noexcept
   {
     // rvalue to lvalue reference
     bool result = Add(std::ref(ptr));
     ptr.reset();
     return result;
   }
+
+#if !defined(OPENTELEMETRY_HAVE_STD_UNIQUE_PTR)
+  bool Add(std::unique_ptr<T> &ptr) noexcept
+  {
+    nostd::unique_ptr<T> convert_ptr{std::move(ptr)};
+
+    bool result = Add(convert_ptr);
+    ptr.reset(convert_ptr.release());
+    return result;
+  }
+
+  bool Add(std::unique_ptr<T> &&ptr) noexcept { return Add(nostd::unique_ptr<T>{std::move(ptr)}); }
+#endif
 
   /**
    * Clear the circular buffer.
