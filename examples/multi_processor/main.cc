@@ -65,7 +65,7 @@ void CleanupTracer()
   trace_api::Provider::SetTracerProvider(none);
 }
 
-void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
+void dumpSpans(std::vector<opentelemetry::nostd::unique_ptr<trace_sdk::SpanData>> &spans)
 {
   char span_buf[trace_api::SpanId::kSize * 2];
   char trace_buf[trace_api::TraceId::kSize * 2];
