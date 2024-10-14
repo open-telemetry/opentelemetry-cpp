@@ -26,7 +26,7 @@ public:
       : exporter::memory::InMemoryData<sdk::trace::SpanData>(buffer_size)
   {}
 
-  std::vector<std::unique_ptr<sdk::trace::SpanData>> GetSpans() noexcept { return Get(); }
+  std::vector<nostd::unique_ptr<sdk::trace::SpanData>> GetSpans() noexcept { return Get(); }
 };
 }  // namespace memory
 }  // namespace exporter

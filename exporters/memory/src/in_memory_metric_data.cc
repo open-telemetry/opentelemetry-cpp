@@ -16,12 +16,12 @@ CircularBufferInMemoryMetricData::CircularBufferInMemoryMetricData(size_t buffer
     : InMemoryData(buffer_size)
 {}
 
-void CircularBufferInMemoryMetricData::Add(std::unique_ptr<ResourceMetrics> resource_metrics)
+void CircularBufferInMemoryMetricData::Add(nostd::unique_ptr<ResourceMetrics> resource_metrics)
 {
   InMemoryData::Add(std::move(resource_metrics));
 }
 
-void SimpleAggregateInMemoryMetricData::Add(std::unique_ptr<ResourceMetrics> resource_metrics)
+void SimpleAggregateInMemoryMetricData::Add(nostd::unique_ptr<ResourceMetrics> resource_metrics)
 {
   for (const auto &sm : resource_metrics->scope_metric_data_)
   {

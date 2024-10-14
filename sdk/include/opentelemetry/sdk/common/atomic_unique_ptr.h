@@ -6,6 +6,7 @@
 #include <atomic>
 #include <memory>
 
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -24,6 +25,10 @@ public:
   AtomicUniquePtr() noexcept {}
 
   explicit AtomicUniquePtr(std::unique_ptr<T> &&other) noexcept : ptr_(other.release()) {}
+
+#if !defined(OPENTELEMETRY_HAVE_STD_UNIQUE_PTR)
+  explicit AtomicUniquePtr(nostd::unique_ptr<T> &&other) noexcept : ptr_(other.release()) {}
+#endif
 
   ~AtomicUniquePtr() noexcept { Reset(); }
 
@@ -65,6 +70,33 @@ public:
    * @param ptr the pointer to swap with
    */
   void Swap(std::unique_ptr<T> &other) noexcept { other.reset(ptr_.exchange(other.release())); }
+
+#if !defined(OPENTELEMETRY_HAVE_STD_UNIQUE_PTR)
+  /**
+   * Atomically swap the pointer only if it's null.
+   * @param owner the pointer to swap with
+   * @return true if the swap was successful
+   */
+  bool SwapIfNull(nostd::unique_ptr<T> &owner) noexcept
+  {
+    auto ptr            = owner.get();
+    T *expected         = nullptr;
+    auto was_successful = ptr_.compare_exchange_weak(expected, ptr, std::memory_order_release,
+                                                     std::memory_order_relaxed);
+    if (was_successful)
+    {
+      owner.release();
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Atomically swap the pointer with another.
+   * @param ptr the pointer to swap with
+   */
+  void Swap(nostd::unique_ptr<T> &other) noexcept { other.reset(ptr_.exchange(other.release())); }
+#endif
 
   /**
    * Set the pointer to a new value and delete the current value if non-null.

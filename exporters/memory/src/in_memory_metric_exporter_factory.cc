@@ -86,7 +86,7 @@ std::unique_ptr<PushMetricExporter> InMemoryMetricExporterFactory::Create(
     const std::shared_ptr<InMemoryMetricData> &data,
     const AggregationTemporalitySelector &temporality)
 {
-  return opentelemetry::nostd::make_unique<InMemoryMetricExporter>(data, temporality);
+  return std::unique_ptr<InMemoryMetricExporter>(new InMemoryMetricExporter{data, temporality});
 }
 
 }  // namespace memory

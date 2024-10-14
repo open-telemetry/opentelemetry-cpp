@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include "opentelemetry/exporters/memory/in_memory_data.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,7 +38,7 @@ public:
   InMemoryMetricData &operator=(const InMemoryMetricData &) = delete;
   InMemoryMetricData &operator=(InMemoryMetricData &&)      = delete;
 
-  virtual void Add(std::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) = 0;
+  virtual void Add(nostd::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) = 0;
 };
 
 /// An implementation of InMemoryMetricData that stores full-fidelity data points in a circular
@@ -48,7 +49,7 @@ class CircularBufferInMemoryMetricData final : public InMemoryMetricData,
 {
 public:
   explicit CircularBufferInMemoryMetricData(size_t buffer_size);
-  void Add(std::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) override;
+  void Add(nostd::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) override;
 };
 
 /// An implementation of InMemoryMetricData that stores only the most recent data point in each time
@@ -59,7 +60,7 @@ public:
   using AttributeToPoint = std::map<opentelemetry::sdk::metrics::PointAttributes,
                                     opentelemetry::sdk::metrics::PointType>;
 
-  void Add(std::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) override;
+  void Add(nostd::unique_ptr<sdk::metrics::ResourceMetrics> resource_metrics) override;
   const AttributeToPoint &Get(const std::string &scope, const std::string &metric);
   void Clear();
 

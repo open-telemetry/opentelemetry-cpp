@@ -27,16 +27,16 @@ public:
   /**
    * @param data a required unique pointer to the data to add to the CircularBuffer
    */
-  void Add(std::unique_ptr<T> data) noexcept { data_.Add(data); }
+  void Add(nostd::unique_ptr<T> data) noexcept { data_.Add(data); }
 
   /**
    * @return Returns a vector of unique pointers containing all the data in the
    * CircularBuffer. This operation will empty the Buffer, which is why the data
    * is returned as unique pointers
    */
-  std::vector<std::unique_ptr<T>> Get() noexcept
+  std::vector<nostd::unique_ptr<T>> Get() noexcept
   {
-    std::vector<std::unique_ptr<T>> res;
+    std::vector<nostd::unique_ptr<T>> res;
 
     // Pointer swap is required because the Consume function requires that the
     // AtomicUniquePointer be set to null
@@ -44,7 +44,7 @@ public:
         data_.size(), [&](opentelemetry::sdk::common::CircularBufferRange<
                           opentelemetry::sdk::common::AtomicUniquePtr<T>> range) noexcept {
           range.ForEach([&](opentelemetry::sdk::common::AtomicUniquePtr<T> &ptr) noexcept {
-            std::unique_ptr<T> swap_ptr = nullptr;
+            nostd::unique_ptr<T> swap_ptr = nullptr;
             ptr.Swap(swap_ptr);
             res.push_back(std::move(swap_ptr));
             return true;
