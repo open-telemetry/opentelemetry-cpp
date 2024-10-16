@@ -102,13 +102,15 @@ std::string SanitizeLabel(std::string label_key)
  * Helper function to convert OpenTelemetry metrics data collection
  * to Prometheus metrics data collection
  *
- * @param records a collection of metrics in OpenTelemetry
+ * @param data a collection of metrics in OpenTelemetry
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
     const sdk::metrics::ResourceMetrics &data,
     bool populate_target_info,
-    bool without_otel_scope)
+    bool without_otel_scope,
+    bool without_units,
+    bool without_type_suffix)
 {
 
   // initialize output vector
@@ -150,7 +152,9 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       }
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
       metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
-                                               metric_data.instrument_descriptor.unit_, type);
+                                               metric_data.instrument_descriptor.unit_, type,
+                                               without_units, without_type_suffix);
+      // TODO (psx95): Add tests to check compliance
       metric_family.type = type;
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
           without_otel_scope ? nullptr : instrumentation_info.scope_;
@@ -492,10 +496,19 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
 std::string PrometheusExporterUtils::MapToPrometheusName(
     const std::string &name,
     const std::string &unit,
-    prometheus_client::MetricType prometheus_type)
+    prometheus_client::MetricType prometheus_type,
+    bool without_units,
+    bool without_type_suffix)
 {
   auto sanitized_name                    = SanitizeNames(name);
-  std::string prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+  std::string prometheus_equivalent_unit;
+  if (without_units)
+  {
+    prometheus_equivalent_unit = "";
+  } else
+  {
+    prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
+  }
 
   // Append prometheus unit if not null or empty.
   if (!prometheus_equivalent_unit.empty() &&
@@ -505,7 +518,7 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
   }
 
   // Special case - counter
-  if (prometheus_type == prometheus_client::MetricType::Counter)
+  if (prometheus_type == prometheus_client::MetricType::Counter && !without_type_suffix)
   {
     auto t_pos           = sanitized_name.rfind("_total");
     bool ends_with_total = t_pos == sanitized_name.size() - 6;
@@ -517,7 +530,7 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
 
   // Special case - gauge
   if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
-      sanitized_name.find("ratio") == std::string::npos)
+      sanitized_name.find("ratio") == std::string::npos && !without_type_suffix)
   {
     sanitized_name += "_ratio";
   }

@@ -56,7 +56,7 @@ public:
                                          const std::string &unit,
                                          prometheus_client::MetricType prometheus_type)
   {
-    return PrometheusExporterUtils::MapToPrometheusName(name, unit, prometheus_type);
+    return PrometheusExporterUtils::MapToPrometheusName(name, unit, prometheus_type, false, false);
   }
 };
 }  // namespace metrics
