@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(OPENTELEMETRY_STATIC_ONLY)
+if(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS)
   return()
 endif()
 
