@@ -49,7 +49,7 @@ public:
       OTEL_INTERNAL_LOG_ERROR("[In Memory Metric Exporter] Exporting failed, exporter is shutdown");
       return ExportResult::kFailure;
     }
-    data_->Add(std::make_unique<ResourceMetrics>(data));
+    data_->Add(std::unique_ptr<ResourceMetrics>(new ResourceMetrics{data}));
     return ExportResult::kSuccess;
   }
 
@@ -85,7 +85,7 @@ std::unique_ptr<PushMetricExporter> InMemoryMetricExporterFactory::Create(
     const std::shared_ptr<InMemoryMetricData> &data,
     const AggregationTemporalitySelector &temporality)
 {
-  return std::make_unique<InMemoryMetricExporter>(data, temporality);
+  return std::unique_ptr<InMemoryMetricExporter>(new InMemoryMetricExporter{data, temporality});
 }
 
 }  // namespace memory
