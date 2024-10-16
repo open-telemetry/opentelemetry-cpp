@@ -50,8 +50,7 @@ inline bool GetPrometheusPopulateTargetInfo()
 
 inline bool GetPrometheusWithoutUnits()
 {
-  constexpr char kPrometheusWithoutUnits[] =
-      "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_UNITS";
+  constexpr char kPrometheusWithoutUnits[] = "OTEL_CPP_PROMETHEUS_EXPORTER_WITHOUT_UNITS";
   bool setting;
   const auto exists =
       opentelemetry::sdk::common::GetBoolEnvironmentVariable(kPrometheusWithoutUnits, setting);

@@ -40,7 +40,7 @@ public:
       const sdk::metrics::ResourceMetrics &data,
       bool populate_target_info = true,
       bool without_otel_scope   = false,
-      bool without_units  = false,
+      bool without_units        = false,
       bool without_type_suffix  = false);
 
 private:
