@@ -7,7 +7,7 @@
 
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/semconv/incubating/attributes/opentracing_attributes.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentracing/tracer.h"
 
@@ -93,7 +93,7 @@ public:
                            callback) const noexcept override
   {
     using opentracing::SpanReferenceType;
-    using namespace opentelemetry::trace::SemanticConventions;
+    using namespace opentelemetry::semconv;
     using LinksList = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
 
     for (const auto &entry : refs_)
@@ -102,18 +102,18 @@ public:
 
       if (entry.first == SpanReferenceType::ChildOfRef)
       {
-        span_kind = OpentracingRefTypeValues::kChildOf;
+        span_kind = opentracing::OpentracingRefTypeValues::kChildOf;
       }
       else if (entry.first == SpanReferenceType::FollowsFromRef)
       {
-        span_kind = OpentracingRefTypeValues::kFollowsFrom;
+        span_kind = opentracing::OpentracingRefTypeValues::kFollowsFrom;
       }
 
       auto context_shim = SpanContextShim::extractFrom(entry.second);
 
       if (context_shim && !span_kind.empty() &&
           !callback(context_shim->context(), opentelemetry::common::KeyValueIterableView<LinksList>(
-                                                 {{kOpentracingRefType, span_kind}})))
+                                                 {{opentracing::kOpentracingRefType, span_kind}})))
       {
         return false;
       }

@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/semconv/attributes/service_attributes.h"
 #include "opentelemetry/version.h"
 
 #include <stddef.h>
@@ -55,7 +55,7 @@ Resource OTELResourceDetector::Detect() noexcept
 
   if (service_name_exists)
   {
-    attributes[SemanticConventions::kServiceName] = service_name;
+    attributes[semconv::service::kServiceName] = service_name;
   }
 
   return Resource(attributes);

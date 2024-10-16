@@ -21,7 +21,7 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
+#include "opentelemetry/semconv/attributes/service_attributes.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -244,9 +244,9 @@ void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(SemanticConventions::kServiceName) != attributes.end())
+  if (attributes.find(semconv::service::kServiceName) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes[SemanticConventions::kServiceName]);
+    service_name_ = nostd::get<std::string>(attributes[semconv::service::kServiceName]);
   }
 }
 
