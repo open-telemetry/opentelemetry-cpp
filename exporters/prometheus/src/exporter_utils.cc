@@ -530,8 +530,9 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
 
   // Special case - gauge
   if (unit == "1" && prometheus_type == prometheus_client::MetricType::Gauge &&
-      sanitized_name.find("ratio") == std::string::npos && !without_type_suffix)
+      sanitized_name.find("ratio") == std::string::npos && !without_units)
   {
+    // this is replacing the unit name
     sanitized_name += "_ratio";
   }
 
