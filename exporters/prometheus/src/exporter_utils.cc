@@ -154,7 +154,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
                                                metric_data.instrument_descriptor.unit_, type,
                                                without_units, without_type_suffix);
-      // TODO (psx95): Add tests to check compliance
       metric_family.type = type;
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope =
           without_otel_scope ? nullptr : instrumentation_info.scope_;
@@ -500,12 +499,13 @@ std::string PrometheusExporterUtils::MapToPrometheusName(
     bool without_units,
     bool without_type_suffix)
 {
-  auto sanitized_name                    = SanitizeNames(name);
+  auto sanitized_name = SanitizeNames(name);
   std::string prometheus_equivalent_unit;
   if (without_units)
   {
     prometheus_equivalent_unit = "";
-  } else
+  }
+  else
   {
     prometheus_equivalent_unit = GetEquivalentPrometheusUnit(unit);
   }
