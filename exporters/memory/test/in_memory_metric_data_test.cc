@@ -23,8 +23,8 @@ TEST(InMemoryMetricDataTest, CircularBuffer)
 {
   CircularBufferInMemoryMetricData buf(10);
   Resource resource = Resource::GetEmpty();
-  buf.Add(std::make_unique<ResourceMetrics>(
-      &resource, std::vector<ScopeMetrics>{{nullptr, std::vector<MetricData>{}}}));
+  buf.Add(std::unique_ptr<ResourceMetrics>(new ResourceMetrics{
+      &resource, std::vector<ScopeMetrics>{{nullptr, std::vector<MetricData>{}}}}));
   EXPECT_EQ((*buf.Get().begin())->resource_, &resource);
 }
 
@@ -45,8 +45,8 @@ TEST(InMemoryMetricDataTest, SimpleAggregate)
   md.instrument_descriptor.name_ = "my-metric";
   md.point_data_attr_.push_back(pda);
 
-  agg.Add(std::make_unique<ResourceMetrics>(
-      &resource, std::vector<ScopeMetrics>{{scope.get(), std::vector<MetricData>{md}}}));
+  agg.Add(std::unique_ptr<ResourceMetrics>(new ResourceMetrics{
+      &resource, std::vector<ScopeMetrics>{{scope.get(), std::vector<MetricData>{md}}}}));
   auto it = agg.Get("my-scope", "my-metric").begin();
 
   auto saved_point = opentelemetry::nostd::get<SumPointData>(it->second);
