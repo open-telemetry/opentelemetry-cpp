@@ -9,9 +9,9 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
-#include "opentelemetry/semconv/attributes/service_attributes.h"
-#include "opentelemetry/semconv/attributes/telemetry_attributes.h"
-#include "opentelemetry/semconv/incubating/attributes/process_attributes.h"
+#include "opentelemetry/semconv/service_attributes.h"
+#include "opentelemetry/semconv/telemetry_attributes.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -63,11 +63,23 @@ fi
 #
 # docker --user 0:0
 
+MY_UID=$(id -u)
+MY_GID=$(id -g)
+
+if [ -x "$(command -v docker)" ]; then
+  PODMANSTATUS=$(docker -v | grep -c podman);
+  if [ "${PODMANSTATUS}" -ge "1" ]; then
+    echo "Detected PODMAN"
+    MY_UID="0"
+    MY_GID="0"
+  fi;
+fi
+
 generate() {
   TARGET=$1
   OUTPUT=$2
   FILTER=$3
-  docker run --rm --user 0:0 \
+  docker run --rm --user ${MY_UID}:${MY_GID} \
     -v ${SCRIPT_DIR}/semantic-conventions/model:/source${USE_MOUNT_OPTION} \
     -v ${SCRIPT_DIR}/templates:/templates${USE_MOUNT_OPTION} \
     -v ${ROOT_DIR}/wip/:/output${USE_MOUNT_OPTION} \
@@ -84,24 +96,15 @@ generate() {
 }
 
 # stable attributes and metrics
-mkdir -p ${ROOT_DIR}/wip/attributes
-mkdir -p ${ROOT_DIR}/wip/metrics
+mkdir -p ${ROOT_DIR}/wip
 generate "./" "./" "stable"
 
-mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}/attributes
-mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}/metrics
+mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}
 generate "./" "./${INCUBATING_DIR}/" "any"
 
 cp -r ${ROOT_DIR}/wip/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/
 
-cp -r ${ROOT_DIR}/wip/attributes/*.h \
-      ${ROOT_DIR}/api/include/opentelemetry/semconv/attributes
-# cp -r ${ROOT_DIR}/wip/metrics/*.h \
-#       ${ROOT_DIR}/api/include/opentelemetry/semconv/metrics
-
-cp -r ${ROOT_DIR}/wip/${INCUBATING_DIR}/attributes/*.h \
-      ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating/attributes
-# cp -r ${ROOT_DIR}/wip/${INCUBATING_DIR}/metrics/*.h \
-#       ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating/metrics
+cp -r ${ROOT_DIR}/wip/${INCUBATING_DIR}/*.h \
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating
 

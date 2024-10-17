@@ -28,7 +28,7 @@ templates:
       | map({
           root_namespace: .root_namespace,
           attributes: .attributes,
-          output: $output + "attributes/",
+          output: $output,
           stable_package_name: $stable_package_name + ".attributes",
           filter: $filter,
           excluded_attributes: $excluded_attributes[]

@@ -8,7 +8,7 @@
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 #include "opentelemetry/opentracingshim/tracer_shim.h"
 
-#include "opentelemetry/semconv/attributes/exception_attributes.h"
+#include "opentelemetry/semconv/exception_attributes.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentracing/ext/tags.h"
 

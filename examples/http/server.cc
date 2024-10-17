@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
-#include "opentelemetry/semconv/attributes/client_attributes.h"
-#include "opentelemetry/semconv/attributes/server_attributes.h"
-#include "opentelemetry/semconv/attributes/url_attributes.h"
-#include "opentelemetry/semconv/incubating/attributes/http_attributes.h"
+#include "opentelemetry/semconv/client_attributes.h"
+#include "opentelemetry/semconv/server_attributes.h"
+#include "opentelemetry/semconv/url_attributes.h"
+#include "opentelemetry/semconv/incubating/http_attributes.h"
 #include "opentelemetry/trace/context.h"
 #include "tracer_common.h"
 

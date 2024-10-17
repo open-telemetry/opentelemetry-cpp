@@ -7,7 +7,7 @@
 #  include "messages.grpc.pb.h"
 #endif
 
-#include "opentelemetry/semconv/incubating/attributes/rpc_attributes.h"
+#include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "tracer_common.h"

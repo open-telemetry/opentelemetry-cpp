@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/semconv/attributes/service_attributes.h"
+#include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
 
 #include <stddef.h>

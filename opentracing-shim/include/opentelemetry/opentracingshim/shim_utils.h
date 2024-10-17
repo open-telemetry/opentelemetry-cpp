@@ -7,7 +7,7 @@
 
 #include "opentelemetry/opentracingshim/span_context_shim.h"
 
-#include "opentelemetry/semconv/incubating/attributes/opentracing_attributes.h"
+#include "opentelemetry/semconv/incubating/opentracing_attributes.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentracing/tracer.h"
 
