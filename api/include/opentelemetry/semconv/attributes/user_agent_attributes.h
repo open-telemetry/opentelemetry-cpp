@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -25,7 +23,7 @@ namespace user_agent
  * Value of the <a href="https://www.rfc-editor.org/rfc/rfc9110.html#field.user-agent">HTTP
  * User-Agent</a> header sent by the client.
  */
-static const char *kUserAgentOriginal = "user_agent.original";
+static constexpr const char *kUserAgentOriginal = "user_agent.original";
 
 }  // namespace user_agent
 }  // namespace semconv

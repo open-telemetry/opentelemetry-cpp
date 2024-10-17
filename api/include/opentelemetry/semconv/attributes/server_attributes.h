@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,19 +21,20 @@ namespace server
 
 /**
  * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain
- * socket name. Note: When observed from the client side, and when communicating through an
+ * socket name. <p> When observed from the client side, and when communicating through an
  * intermediary, @code server.address @endcode SHOULD represent the server address behind any
  * intermediaries, for example proxies, if it's available.
  */
-static const char *kServerAddress = "server.address";
+static constexpr const char *kServerAddress = "server.address";
 
 /**
  * Server port number.
- * Note: When observed from the client side, and when communicating through an intermediary, @code
+ * <p>
+ * When observed from the client side, and when communicating through an intermediary, @code
  * server.port @endcode SHOULD represent the server port behind any intermediaries, for example
  * proxies, if it's available.
  */
-static const char *kServerPort = "server.port";
+static constexpr const char *kServerPort = "server.port";
 
 }  // namespace server
 }  // namespace semconv

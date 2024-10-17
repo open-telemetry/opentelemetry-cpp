@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,11 +22,12 @@ namespace telemetry
 /**
  * The language of the telemetry SDK.
  */
-static const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
+static constexpr const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
 
 /**
  * The name of the telemetry SDK as defined above.
- * Note: The OpenTelemetry SDK MUST set the @code telemetry.sdk.name @endcode attribute to @code
+ * <p>
+ * The OpenTelemetry SDK MUST set the @code telemetry.sdk.name @endcode attribute to @code
  * opentelemetry @endcode. If another SDK, like a fork or a vendor-provided implementation, is used,
  * this SDK MUST set the
  * @code telemetry.sdk.name @endcode attribute to the fully-qualified class or module name of this
@@ -36,103 +35,75 @@ static const char *kTelemetrySdkLanguage = "telemetry.sdk.language";
  * @code opentelemetry @endcode is reserved and MUST NOT be used in this case. All custom
  * identifiers SHOULD be stable across different versions of an implementation.
  */
-static const char *kTelemetrySdkName = "telemetry.sdk.name";
+static constexpr const char *kTelemetrySdkName = "telemetry.sdk.name";
 
 /**
  * The version string of the telemetry SDK.
  */
-static const char *kTelemetrySdkVersion = "telemetry.sdk.version";
+static constexpr const char *kTelemetrySdkVersion = "telemetry.sdk.version";
 
-// DEBUG: {"brief": "The language of the telemetry SDK.\n", "name": "telemetry.sdk.language",
-// "requirement_level": "required", "root_namespace": "telemetry", "stability": "stable", "type":
-// {"allow_custom_values": true, "members": [{"brief": none, "deprecated": none, "id": "cpp",
-// "note": none, "stability": "stable", "value": "cpp"}, {"brief": none, "deprecated": none, "id":
-// "dotnet", "note": none, "stability": "stable", "value": "dotnet"}, {"brief": none, "deprecated":
-// none, "id": "erlang", "note": none, "stability": "stable", "value": "erlang"}, {"brief": none,
-// "deprecated": none, "id": "go", "note": none, "stability": "stable", "value": "go"}, {"brief":
-// none, "deprecated": none, "id": "java", "note": none, "stability": "stable", "value": "java"},
-// {"brief": none, "deprecated": none, "id": "nodejs", "note": none, "stability": "stable", "value":
-// "nodejs"}, {"brief": none, "deprecated": none, "id": "php", "note": none, "stability": "stable",
-// "value": "php"}, {"brief": none, "deprecated": none, "id": "python", "note": none, "stability":
-// "stable", "value": "python"}, {"brief": none, "deprecated": none, "id": "ruby", "note": none,
-// "stability": "stable", "value": "ruby"}, {"brief": none, "deprecated": none, "id": "rust",
-// "note": none, "stability": "stable", "value": "rust"}, {"brief": none, "deprecated": none, "id":
-// "swift", "note": none, "stability": "stable", "value": "swift"}, {"brief": none, "deprecated":
-// none, "id": "webjs", "note": none, "stability": "stable", "value": "webjs"}]}}
 namespace TelemetrySdkLanguageValues
 {
 /**
- * cpp.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "cpp", "note": none, "stability": "stable",
-// "value": "cpp"}
 static constexpr const char *kCpp = "cpp";
+
 /**
- * dotnet.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "dotnet", "note": none, "stability": "stable",
-// "value": "dotnet"}
 static constexpr const char *kDotnet = "dotnet";
+
 /**
- * erlang.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "erlang", "note": none, "stability": "stable",
-// "value": "erlang"}
 static constexpr const char *kErlang = "erlang";
+
 /**
- * go.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "go", "note": none, "stability": "stable",
-// "value": "go"}
 static constexpr const char *kGo = "go";
+
 /**
- * java.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "java", "note": none, "stability": "stable",
-// "value": "java"}
 static constexpr const char *kJava = "java";
+
 /**
- * nodejs.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "nodejs", "note": none, "stability": "stable",
-// "value": "nodejs"}
 static constexpr const char *kNodejs = "nodejs";
+
 /**
- * php.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "php", "note": none, "stability": "stable",
-// "value": "php"}
 static constexpr const char *kPhp = "php";
+
 /**
- * python.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "python", "note": none, "stability": "stable",
-// "value": "python"}
 static constexpr const char *kPython = "python";
+
 /**
- * ruby.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "ruby", "note": none, "stability": "stable",
-// "value": "ruby"}
 static constexpr const char *kRuby = "ruby";
+
 /**
- * rust.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "rust", "note": none, "stability": "stable",
-// "value": "rust"}
 static constexpr const char *kRust = "rust";
+
 /**
- * swift.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "swift", "note": none, "stability": "stable",
-// "value": "swift"}
 static constexpr const char *kSwift = "swift";
+
 /**
- * webjs.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "webjs", "note": none, "stability": "stable",
-// "value": "webjs"}
 static constexpr const char *kWebjs = "webjs";
+
 }  // namespace TelemetrySdkLanguageValues
 
 }  // namespace telemetry

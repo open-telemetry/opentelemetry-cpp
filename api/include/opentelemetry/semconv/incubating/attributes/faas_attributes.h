@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -25,83 +23,87 @@ namespace faas
  * A boolean that is true if the serverless function is executed for the first time (aka
  * cold-start).
  */
-static const char *kFaasColdstart = "faas.coldstart";
+static constexpr const char *kFaasColdstart = "faas.coldstart";
 
 /**
  * A string containing the schedule period as <a
  * href="https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm">Cron
  * Expression</a>.
  */
-static const char *kFaasCron = "faas.cron";
+static constexpr const char *kFaasCron = "faas.cron";
 
 /**
  * The name of the source on which the triggering operation was performed. For example, in Cloud
  * Storage or S3 corresponds to the bucket name, and in Cosmos DB to the database name.
  */
-static const char *kFaasDocumentCollection = "faas.document.collection";
+static constexpr const char *kFaasDocumentCollection = "faas.document.collection";
 
 /**
  * The document name/table subjected to the operation. For example, in Cloud Storage or S3 is the
  * name of the file, and in Cosmos DB the table name.
  */
-static const char *kFaasDocumentName = "faas.document.name";
+static constexpr const char *kFaasDocumentName = "faas.document.name";
 
 /**
  * Describes the type of the operation that was performed on the data.
  */
-static const char *kFaasDocumentOperation = "faas.document.operation";
+static constexpr const char *kFaasDocumentOperation = "faas.document.operation";
 
 /**
  * A string containing the time when the data was accessed in the <a
  * href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
  * href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
  */
-static const char *kFaasDocumentTime = "faas.document.time";
+static constexpr const char *kFaasDocumentTime = "faas.document.time";
 
 /**
  * The execution environment ID as a string, that will be potentially reused for other invocations
- * to the same function/function version. Note: * <strong>AWS Lambda:</strong> Use the (full) log
- * stream name.
+ * to the same function/function version. <p> <ul> <li><strong>AWS Lambda:</strong> Use the (full)
+ * log stream name.</li>
+ * </ul>
  */
-static const char *kFaasInstance = "faas.instance";
+static constexpr const char *kFaasInstance = "faas.instance";
 
 /**
  * The invocation ID of the current function invocation.
  */
-static const char *kFaasInvocationId = "faas.invocation_id";
+static constexpr const char *kFaasInvocationId = "faas.invocation_id";
 
 /**
  * The name of the invoked function.
- * Note: SHOULD be equal to the @code faas.name @endcode resource attribute of the invoked function.
+ * <p>
+ * SHOULD be equal to the @code faas.name @endcode resource attribute of the invoked function.
  */
-static const char *kFaasInvokedName = "faas.invoked_name";
+static constexpr const char *kFaasInvokedName = "faas.invoked_name";
 
 /**
  * The cloud provider of the invoked function.
- * Note: SHOULD be equal to the @code cloud.provider @endcode resource attribute of the invoked
- * function.
+ * <p>
+ * SHOULD be equal to the @code cloud.provider @endcode resource attribute of the invoked function.
  */
-static const char *kFaasInvokedProvider = "faas.invoked_provider";
+static constexpr const char *kFaasInvokedProvider = "faas.invoked_provider";
 
 /**
  * The cloud region of the invoked function.
- * Note: SHOULD be equal to the @code cloud.region @endcode resource attribute of the invoked
- * function.
+ * <p>
+ * SHOULD be equal to the @code cloud.region @endcode resource attribute of the invoked function.
  */
-static const char *kFaasInvokedRegion = "faas.invoked_region";
+static constexpr const char *kFaasInvokedRegion = "faas.invoked_region";
 
 /**
  * The amount of memory available to the serverless function converted to Bytes.
- * Note: It's recommended to set this attribute since e.g. too little memory can easily stop a Java
- * AWS Lambda function from working correctly. On AWS Lambda, the environment variable @code
+ * <p>
+ * It's recommended to set this attribute since e.g. too little memory can easily stop a Java AWS
+ * Lambda function from working correctly. On AWS Lambda, the environment variable @code
  * AWS_LAMBDA_FUNCTION_MEMORY_SIZE @endcode provides this information (which must be multiplied by
  * 1,048,576).
  */
-static const char *kFaasMaxMemory = "faas.max_memory";
+static constexpr const char *kFaasMaxMemory = "faas.max_memory";
 
 /**
  * The name of the single function that this runtime instance executes.
- * Note: This is the name of the function as configured/deployed on the FaaS
+ * <p>
+ * This is the name of the function as configured/deployed on the FaaS
  * platform and is usually different from the name of the callback
  * function (which may be stored in the
  * <a href="/docs/general/attributes.md#source-code-attributes">@code code.namespace @endcode/@code
@@ -115,23 +117,24 @@ static const char *kFaasMaxMemory = "faas.max_memory";
  * @code cloud.resource_id @endcode attribute).</li>
  * </ul>
  */
-static const char *kFaasName = "faas.name";
+static constexpr const char *kFaasName = "faas.name";
 
 /**
  * A string containing the function invocation time in the <a
  * href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a> format expressed in <a
  * href="https://www.w3.org/TR/NOTE-datetime">UTC</a>.
  */
-static const char *kFaasTime = "faas.time";
+static constexpr const char *kFaasTime = "faas.time";
 
 /**
  * Type of the trigger which caused this function invocation.
  */
-static const char *kFaasTrigger = "faas.trigger";
+static constexpr const char *kFaasTrigger = "faas.trigger";
 
 /**
  * The immutable version of the function being executed.
- * Note: Depending on the cloud provider and platform, use:
+ * <p>
+ * Depending on the cloud provider and platform, use:
  * <p>
  * <ul>
  *   <li><strong>AWS Lambda:</strong> The <a
@@ -145,128 +148,83 @@ static const char *kFaasTrigger = "faas.trigger";
  * applicable. Do not set this attribute.</li>
  * </ul>
  */
-static const char *kFaasVersion = "faas.version";
+static constexpr const char *kFaasVersion = "faas.version";
 
-// DEBUG: {"brief": "Describes the type of the operation that was performed on the data.", "name":
-// "faas.document.operation", "requirement_level": "recommended", "root_namespace": "faas",
-// "stability": "experimental", "type": {"allow_custom_values": true, "members": [{"brief": "When a
-// new object is created.", "deprecated": none, "id": "insert", "note": none, "stability":
-// "experimental", "value": "insert"}, {"brief": "When an object is modified.", "deprecated": none,
-// "id": "edit", "note": none, "stability": "experimental", "value": "edit"}, {"brief": "When an
-// object is deleted.", "deprecated": none, "id": "delete", "note": none, "stability":
-// "experimental", "value": "delete"}]}}
 namespace FaasDocumentOperationValues
 {
 /**
  * When a new object is created.
  */
-// DEBUG: {"brief": "When a new object is created.", "deprecated": none, "id": "insert", "note":
-// none, "stability": "experimental", "value": "insert"}
 static constexpr const char *kInsert = "insert";
+
 /**
  * When an object is modified.
  */
-// DEBUG: {"brief": "When an object is modified.", "deprecated": none, "id": "edit", "note": none,
-// "stability": "experimental", "value": "edit"}
 static constexpr const char *kEdit = "edit";
+
 /**
  * When an object is deleted.
  */
-// DEBUG: {"brief": "When an object is deleted.", "deprecated": none, "id": "delete", "note": none,
-// "stability": "experimental", "value": "delete"}
 static constexpr const char *kDelete = "delete";
+
 }  // namespace FaasDocumentOperationValues
 
-// DEBUG: {"brief": "The cloud provider of the invoked function.\n", "name":
-// "faas.invoked_provider", "note": "SHOULD be equal to the `cloud.provider` resource attribute of
-// the invoked function.\n", "requirement_level": "recommended", "root_namespace": "faas",
-// "stability": "experimental", "type": {"allow_custom_values": true, "members": [{"brief": "Alibaba
-// Cloud", "deprecated": none, "id": "alibaba_cloud", "note": none, "stability": "experimental",
-// "value": "alibaba_cloud"}, {"brief": "Amazon Web Services", "deprecated": none, "id": "aws",
-// "note": none, "stability": "experimental", "value": "aws"}, {"brief": "Microsoft Azure",
-// "deprecated": none, "id": "azure", "note": none, "stability": "experimental", "value": "azure"},
-// {"brief": "Google Cloud Platform", "deprecated": none, "id": "gcp", "note": none, "stability":
-// "experimental", "value": "gcp"}, {"brief": "Tencent Cloud", "deprecated": none, "id":
-// "tencent_cloud", "note": none, "stability": "experimental", "value": "tencent_cloud"}]}}
 namespace FaasInvokedProviderValues
 {
 /**
- * Alibaba Cloud.
+ * Alibaba Cloud
  */
-// DEBUG: {"brief": "Alibaba Cloud", "deprecated": none, "id": "alibaba_cloud", "note": none,
-// "stability": "experimental", "value": "alibaba_cloud"}
 static constexpr const char *kAlibabaCloud = "alibaba_cloud";
+
 /**
- * Amazon Web Services.
+ * Amazon Web Services
  */
-// DEBUG: {"brief": "Amazon Web Services", "deprecated": none, "id": "aws", "note": none,
-// "stability": "experimental", "value": "aws"}
 static constexpr const char *kAws = "aws";
+
 /**
- * Microsoft Azure.
+ * Microsoft Azure
  */
-// DEBUG: {"brief": "Microsoft Azure", "deprecated": none, "id": "azure", "note": none, "stability":
-// "experimental", "value": "azure"}
 static constexpr const char *kAzure = "azure";
+
 /**
- * Google Cloud Platform.
+ * Google Cloud Platform
  */
-// DEBUG: {"brief": "Google Cloud Platform", "deprecated": none, "id": "gcp", "note": none,
-// "stability": "experimental", "value": "gcp"}
 static constexpr const char *kGcp = "gcp";
+
 /**
- * Tencent Cloud.
+ * Tencent Cloud
  */
-// DEBUG: {"brief": "Tencent Cloud", "deprecated": none, "id": "tencent_cloud", "note": none,
-// "stability": "experimental", "value": "tencent_cloud"}
 static constexpr const char *kTencentCloud = "tencent_cloud";
+
 }  // namespace FaasInvokedProviderValues
 
-// DEBUG: {"brief": "Type of the trigger which caused this function invocation.\n", "name":
-// "faas.trigger", "requirement_level": "recommended", "root_namespace": "faas", "stability":
-// "experimental", "type": {"allow_custom_values": true, "members": [{"brief": "A response to some
-// data source operation such as a database or filesystem read/write", "deprecated": none, "id":
-// "datasource", "note": none, "stability": "experimental", "value": "datasource"}, {"brief": "To
-// provide an answer to an inbound HTTP request", "deprecated": none, "id": "http", "note": none,
-// "stability": "experimental", "value": "http"}, {"brief": "A function is set to be executed when
-// messages are sent to a messaging system", "deprecated": none, "id": "pubsub", "note": none,
-// "stability": "experimental", "value": "pubsub"}, {"brief": "A function is scheduled to be
-// executed regularly", "deprecated": none, "id": "timer", "note": none, "stability":
-// "experimental", "value": "timer"}, {"brief": "If none of the others apply", "deprecated": none,
-// "id": "other", "note": none, "stability": "experimental", "value": "other"}]}}
 namespace FaasTriggerValues
 {
 /**
- * A response to some data source operation such as a database or filesystem read/write.
+ * A response to some data source operation such as a database or filesystem read/write
  */
-// DEBUG: {"brief": "A response to some data source operation such as a database or filesystem
-// read/write", "deprecated": none, "id": "datasource", "note": none, "stability": "experimental",
-// "value": "datasource"}
 static constexpr const char *kDatasource = "datasource";
+
 /**
- * To provide an answer to an inbound HTTP request.
+ * To provide an answer to an inbound HTTP request
  */
-// DEBUG: {"brief": "To provide an answer to an inbound HTTP request", "deprecated": none, "id":
-// "http", "note": none, "stability": "experimental", "value": "http"}
 static constexpr const char *kHttp = "http";
+
 /**
- * A function is set to be executed when messages are sent to a messaging system.
+ * A function is set to be executed when messages are sent to a messaging system
  */
-// DEBUG: {"brief": "A function is set to be executed when messages are sent to a messaging system",
-// "deprecated": none, "id": "pubsub", "note": none, "stability": "experimental", "value": "pubsub"}
 static constexpr const char *kPubsub = "pubsub";
+
 /**
- * A function is scheduled to be executed regularly.
+ * A function is scheduled to be executed regularly
  */
-// DEBUG: {"brief": "A function is scheduled to be executed regularly", "deprecated": none, "id":
-// "timer", "note": none, "stability": "experimental", "value": "timer"}
 static constexpr const char *kTimer = "timer";
+
 /**
- * If none of the others apply.
+ * If none of the others apply
  */
-// DEBUG: {"brief": "If none of the others apply", "deprecated": none, "id": "other", "note": none,
-// "stability": "experimental", "value": "other"}
 static constexpr const char *kOther = "other";
+
 }  // namespace FaasTriggerValues
 
 }  // namespace faas

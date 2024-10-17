@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,34 +22,35 @@ namespace user
 /**
  * User email address.
  */
-static const char *kUserEmail = "user.email";
+static constexpr const char *kUserEmail = "user.email";
 
 /**
- * User's full name.
+ * User's full name
  */
-static const char *kUserFullName = "user.full_name";
+static constexpr const char *kUserFullName = "user.full_name";
 
 /**
  * Unique user hash to correlate information for a user in anonymized form.
- * Note: Useful if @code user.id @endcode or @code user.name @endcode contain confidential
- * information and cannot be used.
+ * <p>
+ * Useful if @code user.id @endcode or @code user.name @endcode contain confidential information and
+ * cannot be used.
  */
-static const char *kUserHash = "user.hash";
+static constexpr const char *kUserHash = "user.hash";
 
 /**
  * Unique identifier of the user.
  */
-static const char *kUserId = "user.id";
+static constexpr const char *kUserId = "user.id";
 
 /**
  * Short name or login/username of the user.
  */
-static const char *kUserName = "user.name";
+static constexpr const char *kUserName = "user.name";
 
 /**
  * Array of user roles at the time of the event.
  */
-static const char *kUserRoles = "user.roles";
+static constexpr const char *kUserRoles = "user.roles";
 
 }  // namespace user
 }  // namespace semconv

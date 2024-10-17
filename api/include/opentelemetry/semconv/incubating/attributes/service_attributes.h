@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,8 +21,9 @@ namespace service
 
 /**
  * The string ID of the service instance.
- * Note: MUST be unique for each instance of the same @code service.namespace,service.name @endcode
- * pair (in other words
+ * <p>
+ * MUST be unique for each instance of the same @code service.namespace,service.name @endcode pair
+ * (in other words
  * @code service.namespace,service.name,service.instance.id @endcode triplet MUST be globally
  * unique). The ID helps to distinguish instances of the same service that exist at the same time
  * (e.g. instances of a horizontally scaled service). <p> Implementations, such as SDKs, are
@@ -49,30 +48,36 @@ namespace service
  * telemetry. This is typically the case for scraping receivers, as they know the target address and
  * port.
  */
-static const char *kServiceInstanceId = "service.instance.id";
+static constexpr const char *kServiceInstanceId = "service.instance.id";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.service_attributes. @endcode.
+ * Logical name of the service.
+ * <p>
+ * MUST be the same for all instances of horizontally scaled services. If the value was not
+ * specified, SDKs MUST fallback to @code unknown_service: @endcode concatenated with <a
+ * href="process.md">@code process.executable.name @endcode</a>, e.g. @code unknown_service:bash
+ * @endcode. If @code process.executable.name @endcode is not available, the value MUST be set to
+ * @code unknown_service @endcode.
  */
-static const char *kServiceName = "service.name";
+static constexpr const char *kServiceName = "service.name";
 
 /**
  * A namespace for @code service.name @endcode.
- * Note: A string value having a meaning that helps to distinguish a group of services, for example
- * the team name that owns a group of services. @code service.name @endcode is expected to be unique
+ * <p>
+ * A string value having a meaning that helps to distinguish a group of services, for example the
+ * team name that owns a group of services. @code service.name @endcode is expected to be unique
  * within the same namespace. If @code service.namespace @endcode is not specified in the Resource
  * then @code service.name @endcode is expected to be unique for all services that have no explicit
  * namespace defined (so the empty/unspecified namespace is simply one more valid namespace).
  * Zero-length namespace string is assumed equal to unspecified namespace.
  */
-static const char *kServiceNamespace = "service.namespace";
+static constexpr const char *kServiceNamespace = "service.namespace";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.service_attributes. @endcode.
+ * The version string of the service API or implementation. The format is not defined by these
+ * conventions.
  */
-static const char *kServiceVersion = "service.version";
+static constexpr const char *kServiceVersion = "service.version";
 
 }  // namespace service
 }  // namespace semconv

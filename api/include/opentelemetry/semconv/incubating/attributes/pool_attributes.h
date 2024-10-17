@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,9 +20,13 @@ namespace pool
 {
 
 /**
- * @Deprecated: Replaced by @code db.client.connection.pool.name @endcode.
+ * Deprecated, use @code db.client.connection.pool.name @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code db.client.connection.pool.name @endcode.
  */
-static const char *kPoolName = "pool.name";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kPoolName = "pool.name";
 
 }  // namespace pool
 }  // namespace semconv

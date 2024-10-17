@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,392 +22,285 @@ namespace network
 /**
  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
  */
-static const char *kNetworkCarrierIcc = "network.carrier.icc";
+static constexpr const char *kNetworkCarrierIcc = "network.carrier.icc";
 
 /**
  * The mobile carrier country code.
  */
-static const char *kNetworkCarrierMcc = "network.carrier.mcc";
+static constexpr const char *kNetworkCarrierMcc = "network.carrier.mcc";
 
 /**
  * The mobile carrier network code.
  */
-static const char *kNetworkCarrierMnc = "network.carrier.mnc";
+static constexpr const char *kNetworkCarrierMnc = "network.carrier.mnc";
 
 /**
  * The name of the mobile carrier.
  */
-static const char *kNetworkCarrierName = "network.carrier.name";
+static constexpr const char *kNetworkCarrierName = "network.carrier.name";
 
 /**
  * This describes more details regarding the connection.type. It may be the type of cell technology
  * connection, but it could be used for describing details about a wifi connection.
  */
-static const char *kNetworkConnectionSubtype = "network.connection.subtype";
+static constexpr const char *kNetworkConnectionSubtype = "network.connection.subtype";
 
 /**
  * The internet connection type.
  */
-static const char *kNetworkConnectionType = "network.connection.type";
+static constexpr const char *kNetworkConnectionType = "network.connection.type";
 
 /**
  * The network IO operation direction.
  */
-static const char *kNetworkIoDirection = "network.io.direction";
+static constexpr const char *kNetworkIoDirection = "network.io.direction";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * Local address of the network connection - IP address or Unix domain socket name.
  */
-static const char *kNetworkLocalAddress = "network.local.address";
+static constexpr const char *kNetworkLocalAddress = "network.local.address";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * Local port number of the network connection.
  */
-static const char *kNetworkLocalPort = "network.local.port";
+static constexpr const char *kNetworkLocalPort = "network.local.port";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * Peer address of the network connection - IP address or Unix domain socket name.
  */
-static const char *kNetworkPeerAddress = "network.peer.address";
+static constexpr const char *kNetworkPeerAddress = "network.peer.address";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * Peer port number of the network connection.
  */
-static const char *kNetworkPeerPort = "network.peer.port";
+static constexpr const char *kNetworkPeerPort = "network.peer.port";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * <a href="https://osi-model.com/application-layer/">OSI application layer</a> or non-OSI
+ * equivalent. <p> The value SHOULD be normalized to lowercase.
  */
-static const char *kNetworkProtocolName = "network.protocol.name";
+static constexpr const char *kNetworkProtocolName = "network.protocol.name";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * The actual version of the protocol used for network communication.
+ * <p>
+ * If protocol version is subject to negotiation (for example using <a
+ * href="https://www.rfc-editor.org/rfc/rfc7301.html">ALPN</a>), this attribute SHOULD be set to the
+ * negotiated version. If the actual protocol version is not known, this attribute SHOULD NOT be
+ * set.
  */
-static const char *kNetworkProtocolVersion = "network.protocol.version";
+static constexpr const char *kNetworkProtocolVersion = "network.protocol.version";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * <a href="https://osi-model.com/transport-layer/">OSI transport layer</a> or <a
+ * href="https://wikipedia.org/wiki/Inter-process_communication">inter-process communication
+ * method</a>. <p> The value SHOULD be normalized to lowercase. <p> Consider always setting the
+ * transport when setting a port number, since a port number is ambiguous without knowing the
+ * transport. For example different processes could be listening on TCP port 12345 and UDP port
+ * 12345.
  */
-static const char *kNetworkTransport = "network.transport";
+static constexpr const char *kNetworkTransport = "network.transport";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes. @endcode.
+ * <a href="https://osi-model.com/network-layer/">OSI network layer</a> or non-OSI equivalent.
+ * <p>
+ * The value SHOULD be normalized to lowercase.
  */
-static const char *kNetworkType = "network.type";
+static constexpr const char *kNetworkType = "network.type";
 
-// DEBUG: {"brief": "This describes more details regarding the connection.type. It may be the type
-// of cell technology connection, but it could be used for describing details about a wifi
-// connection.", "examples": "LTE", "name": "network.connection.subtype", "requirement_level":
-// "recommended", "root_namespace": "network", "stability": "experimental", "type":
-// {"allow_custom_values": true, "members": [{"brief": "GPRS", "deprecated": none, "id": "gprs",
-// "note": none, "stability": "experimental", "value": "gprs"}, {"brief": "EDGE", "deprecated":
-// none, "id": "edge", "note": none, "stability": "experimental", "value": "edge"}, {"brief":
-// "UMTS", "deprecated": none, "id": "umts", "note": none, "stability": "experimental", "value":
-// "umts"}, {"brief": "CDMA", "deprecated": none, "id": "cdma", "note": none, "stability":
-// "experimental", "value": "cdma"}, {"brief": "EVDO Rel. 0", "deprecated": none, "id": "evdo_0",
-// "note": none, "stability": "experimental", "value": "evdo_0"}, {"brief": "EVDO Rev. A",
-// "deprecated": none, "id": "evdo_a", "note": none, "stability": "experimental", "value":
-// "evdo_a"}, {"brief": "CDMA2000 1XRTT", "deprecated": none, "id": "cdma2000_1xrtt", "note": none,
-// "stability": "experimental", "value": "cdma2000_1xrtt"}, {"brief": "HSDPA", "deprecated": none,
-// "id": "hsdpa", "note": none, "stability": "experimental", "value": "hsdpa"}, {"brief": "HSUPA",
-// "deprecated": none, "id": "hsupa", "note": none, "stability": "experimental", "value": "hsupa"},
-// {"brief": "HSPA", "deprecated": none, "id": "hspa", "note": none, "stability": "experimental",
-// "value": "hspa"}, {"brief": "IDEN", "deprecated": none, "id": "iden", "note": none, "stability":
-// "experimental", "value": "iden"}, {"brief": "EVDO Rev. B", "deprecated": none, "id": "evdo_b",
-// "note": none, "stability": "experimental", "value": "evdo_b"}, {"brief": "LTE", "deprecated":
-// none, "id": "lte", "note": none, "stability": "experimental", "value": "lte"}, {"brief": "EHRPD",
-// "deprecated": none, "id": "ehrpd", "note": none, "stability": "experimental", "value": "ehrpd"},
-// {"brief": "HSPAP", "deprecated": none, "id": "hspap", "note": none, "stability": "experimental",
-// "value": "hspap"}, {"brief": "GSM", "deprecated": none, "id": "gsm", "note": none, "stability":
-// "experimental", "value": "gsm"}, {"brief": "TD-SCDMA", "deprecated": none, "id": "td_scdma",
-// "note": none, "stability": "experimental", "value": "td_scdma"}, {"brief": "IWLAN", "deprecated":
-// none, "id": "iwlan", "note": none, "stability": "experimental", "value": "iwlan"}, {"brief": "5G
-// NR (New Radio)", "deprecated": none, "id": "nr", "note": none, "stability": "experimental",
-// "value": "nr"}, {"brief": "5G NRNSA (New Radio Non-Standalone)", "deprecated": none, "id":
-// "nrnsa", "note": none, "stability": "experimental", "value": "nrnsa"}, {"brief": "LTE CA",
-// "deprecated": none, "id": "lte_ca", "note": none, "stability": "experimental", "value":
-// "lte_ca"}]}}
 namespace NetworkConnectionSubtypeValues
 {
 /**
- * GPRS.
+ * GPRS
  */
-// DEBUG: {"brief": "GPRS", "deprecated": none, "id": "gprs", "note": none, "stability":
-// "experimental", "value": "gprs"}
 static constexpr const char *kGprs = "gprs";
+
 /**
- * EDGE.
+ * EDGE
  */
-// DEBUG: {"brief": "EDGE", "deprecated": none, "id": "edge", "note": none, "stability":
-// "experimental", "value": "edge"}
 static constexpr const char *kEdge = "edge";
+
 /**
- * UMTS.
+ * UMTS
  */
-// DEBUG: {"brief": "UMTS", "deprecated": none, "id": "umts", "note": none, "stability":
-// "experimental", "value": "umts"}
 static constexpr const char *kUmts = "umts";
+
 /**
- * CDMA.
+ * CDMA
  */
-// DEBUG: {"brief": "CDMA", "deprecated": none, "id": "cdma", "note": none, "stability":
-// "experimental", "value": "cdma"}
 static constexpr const char *kCdma = "cdma";
+
 /**
- * EVDO Rel. 0.
+ * EVDO Rel. 0
  */
-// DEBUG: {"brief": "EVDO Rel. 0", "deprecated": none, "id": "evdo_0", "note": none, "stability":
-// "experimental", "value": "evdo_0"}
 static constexpr const char *kEvdo0 = "evdo_0";
+
 /**
- * EVDO Rev. A.
+ * EVDO Rev. A
  */
-// DEBUG: {"brief": "EVDO Rev. A", "deprecated": none, "id": "evdo_a", "note": none, "stability":
-// "experimental", "value": "evdo_a"}
 static constexpr const char *kEvdoA = "evdo_a";
+
 /**
- * CDMA2000 1XRTT.
+ * CDMA2000 1XRTT
  */
-// DEBUG: {"brief": "CDMA2000 1XRTT", "deprecated": none, "id": "cdma2000_1xrtt", "note": none,
-// "stability": "experimental", "value": "cdma2000_1xrtt"}
 static constexpr const char *kCdma20001xrtt = "cdma2000_1xrtt";
+
 /**
- * HSDPA.
+ * HSDPA
  */
-// DEBUG: {"brief": "HSDPA", "deprecated": none, "id": "hsdpa", "note": none, "stability":
-// "experimental", "value": "hsdpa"}
 static constexpr const char *kHsdpa = "hsdpa";
+
 /**
- * HSUPA.
+ * HSUPA
  */
-// DEBUG: {"brief": "HSUPA", "deprecated": none, "id": "hsupa", "note": none, "stability":
-// "experimental", "value": "hsupa"}
 static constexpr const char *kHsupa = "hsupa";
+
 /**
- * HSPA.
+ * HSPA
  */
-// DEBUG: {"brief": "HSPA", "deprecated": none, "id": "hspa", "note": none, "stability":
-// "experimental", "value": "hspa"}
 static constexpr const char *kHspa = "hspa";
+
 /**
- * IDEN.
+ * IDEN
  */
-// DEBUG: {"brief": "IDEN", "deprecated": none, "id": "iden", "note": none, "stability":
-// "experimental", "value": "iden"}
 static constexpr const char *kIden = "iden";
+
 /**
- * EVDO Rev. B.
+ * EVDO Rev. B
  */
-// DEBUG: {"brief": "EVDO Rev. B", "deprecated": none, "id": "evdo_b", "note": none, "stability":
-// "experimental", "value": "evdo_b"}
 static constexpr const char *kEvdoB = "evdo_b";
+
 /**
- * LTE.
+ * LTE
  */
-// DEBUG: {"brief": "LTE", "deprecated": none, "id": "lte", "note": none, "stability":
-// "experimental", "value": "lte"}
 static constexpr const char *kLte = "lte";
+
 /**
- * EHRPD.
+ * EHRPD
  */
-// DEBUG: {"brief": "EHRPD", "deprecated": none, "id": "ehrpd", "note": none, "stability":
-// "experimental", "value": "ehrpd"}
 static constexpr const char *kEhrpd = "ehrpd";
+
 /**
- * HSPAP.
+ * HSPAP
  */
-// DEBUG: {"brief": "HSPAP", "deprecated": none, "id": "hspap", "note": none, "stability":
-// "experimental", "value": "hspap"}
 static constexpr const char *kHspap = "hspap";
+
 /**
- * GSM.
+ * GSM
  */
-// DEBUG: {"brief": "GSM", "deprecated": none, "id": "gsm", "note": none, "stability":
-// "experimental", "value": "gsm"}
 static constexpr const char *kGsm = "gsm";
+
 /**
- * TD-SCDMA.
+ * TD-SCDMA
  */
-// DEBUG: {"brief": "TD-SCDMA", "deprecated": none, "id": "td_scdma", "note": none, "stability":
-// "experimental", "value": "td_scdma"}
 static constexpr const char *kTdScdma = "td_scdma";
+
 /**
- * IWLAN.
+ * IWLAN
  */
-// DEBUG: {"brief": "IWLAN", "deprecated": none, "id": "iwlan", "note": none, "stability":
-// "experimental", "value": "iwlan"}
 static constexpr const char *kIwlan = "iwlan";
+
 /**
- * 5G NR (New Radio).
+ * 5G NR (New Radio)
  */
-// DEBUG: {"brief": "5G NR (New Radio)", "deprecated": none, "id": "nr", "note": none, "stability":
-// "experimental", "value": "nr"}
 static constexpr const char *kNr = "nr";
+
 /**
- * 5G NRNSA (New Radio Non-Standalone).
+ * 5G NRNSA (New Radio Non-Standalone)
  */
-// DEBUG: {"brief": "5G NRNSA (New Radio Non-Standalone)", "deprecated": none, "id": "nrnsa",
-// "note": none, "stability": "experimental", "value": "nrnsa"}
 static constexpr const char *kNrnsa = "nrnsa";
+
 /**
- * LTE CA.
+ * LTE CA
  */
-// DEBUG: {"brief": "LTE CA", "deprecated": none, "id": "lte_ca", "note": none, "stability":
-// "experimental", "value": "lte_ca"}
 static constexpr const char *kLteCa = "lte_ca";
+
 }  // namespace NetworkConnectionSubtypeValues
 
-// DEBUG: {"brief": "The internet connection type.", "examples": "wifi", "name":
-// "network.connection.type", "requirement_level": "recommended", "root_namespace": "network",
-// "stability": "experimental", "type": {"allow_custom_values": true, "members": [{"brief": none,
-// "deprecated": none, "id": "wifi", "note": none, "stability": "experimental", "value": "wifi"},
-// {"brief": none, "deprecated": none, "id": "wired", "note": none, "stability": "experimental",
-// "value": "wired"}, {"brief": none, "deprecated": none, "id": "cell", "note": none, "stability":
-// "experimental", "value": "cell"}, {"brief": none, "deprecated": none, "id": "unavailable",
-// "note": none, "stability": "experimental", "value": "unavailable"}, {"brief": none, "deprecated":
-// none, "id": "unknown", "note": none, "stability": "experimental", "value": "unknown"}]}}
 namespace NetworkConnectionTypeValues
 {
 /**
- * wifi.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "wifi", "note": none, "stability":
-// "experimental", "value": "wifi"}
 static constexpr const char *kWifi = "wifi";
+
 /**
- * wired.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "wired", "note": none, "stability":
-// "experimental", "value": "wired"}
 static constexpr const char *kWired = "wired";
+
 /**
- * cell.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "cell", "note": none, "stability":
-// "experimental", "value": "cell"}
 static constexpr const char *kCell = "cell";
+
 /**
- * unavailable.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "unavailable", "note": none, "stability":
-// "experimental", "value": "unavailable"}
 static constexpr const char *kUnavailable = "unavailable";
+
 /**
- * unknown.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "unknown", "note": none, "stability":
-// "experimental", "value": "unknown"}
 static constexpr const char *kUnknown = "unknown";
+
 }  // namespace NetworkConnectionTypeValues
 
-// DEBUG: {"brief": "The network IO operation direction.", "examples": ["transmit"], "name":
-// "network.io.direction", "requirement_level": "recommended", "root_namespace": "network",
-// "stability": "experimental", "type": {"allow_custom_values": true, "members": [{"brief": none,
-// "deprecated": none, "id": "transmit", "note": none, "stability": "experimental", "value":
-// "transmit"}, {"brief": none, "deprecated": none, "id": "receive", "note": none, "stability":
-// "experimental", "value": "receive"}]}}
 namespace NetworkIoDirectionValues
 {
 /**
- * transmit.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "transmit", "note": none, "stability":
-// "experimental", "value": "transmit"}
 static constexpr const char *kTransmit = "transmit";
+
 /**
- * receive.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "receive", "note": none, "stability":
-// "experimental", "value": "receive"}
 static constexpr const char *kReceive = "receive";
+
 }  // namespace NetworkIoDirectionValues
 
-// @deprecated(reason="Deprecated in favor of stable
-// `opentelemetry.semconv.attributes.network_attributes.NetworkTransportValues`.")  # type: ignore
-// DEBUG: {"brief": "[OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process
-// communication method](https://wikipedia.org/wiki/Inter-process_communication).\n", "examples":
-// ["tcp", "udp"], "name": "network.transport", "note": "The value SHOULD be normalized to
-// lowercase.\n\nConsider always setting the transport when setting a port number, since\na port
-// number is ambiguous without knowing the transport. For example\ndifferent processes could be
-// listening on TCP port 12345 and UDP port 12345.\n", "requirement_level": "recommended",
-// "root_namespace": "network", "stability": "stable", "type": {"allow_custom_values": true,
-// "members": [{"brief": "TCP", "deprecated": none, "id": "tcp", "note": none, "stability":
-// "stable", "value": "tcp"}, {"brief": "UDP", "deprecated": none, "id": "udp", "note": none,
-// "stability": "stable", "value": "udp"}, {"brief": "Named or anonymous pipe.", "deprecated": none,
-// "id": "pipe", "note": none, "stability": "stable", "value": "pipe"}, {"brief": "Unix domain
-// socket", "deprecated": none, "id": "unix", "note": none, "stability": "stable", "value": "unix"},
-// {"brief": "QUIC", "deprecated": none, "id": "quic", "note": none, "stability": "experimental",
-// "value": "quic"}]}}
 namespace NetworkTransportValues
 {
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTransportValues.kTcp @endcode.
+ * TCP
  */
-// DEBUG: {"brief": "TCP", "deprecated": none, "id": "tcp", "note": none, "stability": "stable",
-// "value": "tcp"}
 static constexpr const char *kTcp = "tcp";
+
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTransportValues.kUdp @endcode.
+ * UDP
  */
-// DEBUG: {"brief": "UDP", "deprecated": none, "id": "udp", "note": none, "stability": "stable",
-// "value": "udp"}
 static constexpr const char *kUdp = "udp";
+
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTransportValues.kPipe @endcode.
+ * Named or anonymous pipe.
  */
-// DEBUG: {"brief": "Named or anonymous pipe.", "deprecated": none, "id": "pipe", "note": none,
-// "stability": "stable", "value": "pipe"}
 static constexpr const char *kPipe = "pipe";
+
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTransportValues.kUnix @endcode.
+ * Unix domain socket
  */
-// DEBUG: {"brief": "Unix domain socket", "deprecated": none, "id": "unix", "note": none,
-// "stability": "stable", "value": "unix"}
 static constexpr const char *kUnix = "unix";
+
 /**
- * QUIC.
+ * QUIC
  */
-// DEBUG: {"brief": "QUIC", "deprecated": none, "id": "quic", "note": none, "stability":
-// "experimental", "value": "quic"}
 static constexpr const char *kQuic = "quic";
+
 }  // namespace NetworkTransportValues
 
-// @deprecated(reason="Deprecated in favor of stable
-// `opentelemetry.semconv.attributes.network_attributes.NetworkTypeValues`.")  # type: ignore DEBUG:
-// {"brief": "[OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.",
-// "examples": ["ipv4", "ipv6"], "name": "network.type", "note": "The value SHOULD be normalized to
-// lowercase.", "requirement_level": "recommended", "root_namespace": "network", "stability":
-// "stable", "type": {"allow_custom_values": true, "members": [{"brief": "IPv4", "deprecated": none,
-// "id": "ipv4", "note": none, "stability": "stable", "value": "ipv4"}, {"brief": "IPv6",
-// "deprecated": none, "id": "ipv6", "note": none, "stability": "stable", "value": "ipv6"}]}}
 namespace NetworkTypeValues
 {
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTypeValues.kIpv4 @endcode.
+ * IPv4
  */
-// DEBUG: {"brief": "IPv4", "deprecated": none, "id": "ipv4", "note": none, "stability": "stable",
-// "value": "ipv4"}
 static constexpr const char *kIpv4 = "ipv4";
+
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.network_attributes.NetworkTypeValues.kIpv6 @endcode.
+ * IPv6
  */
-// DEBUG: {"brief": "IPv6", "deprecated": none, "id": "ipv6", "note": none, "stability": "stable",
-// "value": "ipv6"}
 static constexpr const char *kIpv6 = "ipv6";
+
 }  // namespace NetworkTypeValues
 
 }  // namespace network

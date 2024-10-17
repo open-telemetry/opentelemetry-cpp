@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,11 +21,12 @@ namespace gcp
 
 /**
  * Identifies the Google Cloud service for which the official client library is intended.
- * Note: Intended to be a stable identifier for Google Cloud client libraries that is uniform across
+ * <p>
+ * Intended to be a stable identifier for Google Cloud client libraries that is uniform across
  * implementation languages. The value should be derived from the canonical service domain for the
  * service; for example, 'foo.googleapis.com' should result in a value of 'foo'.
  */
-static const char *kGcpClientService = "gcp.client.service";
+static constexpr const char *kGcpClientService = "gcp.client.service";
 
 /**
  * The name of the Cloud Run <a
@@ -36,20 +35,20 @@ static const char *kGcpClientService = "gcp.client.service";
  * href="https://cloud.google.com/run/docs/container-contract#jobs-env-vars">@code
  * CLOUD_RUN_EXECUTION @endcode</a> environment variable.
  */
-static const char *kGcpCloudRunJobExecution = "gcp.cloud_run.job.execution";
+static constexpr const char *kGcpCloudRunJobExecution = "gcp.cloud_run.job.execution";
 
 /**
  * The index for a task within an execution as provided by the <a
  * href="https://cloud.google.com/run/docs/container-contract#jobs-env-vars">@code
  * CLOUD_RUN_TASK_INDEX @endcode</a> environment variable.
  */
-static const char *kGcpCloudRunJobTaskIndex = "gcp.cloud_run.job.task_index";
+static constexpr const char *kGcpCloudRunJobTaskIndex = "gcp.cloud_run.job.task_index";
 
 /**
  * The hostname of a GCE instance. This is the full value of the default or <a
  * href="https://cloud.google.com/compute/docs/instances/custom-hostname-vm">custom hostname</a>.
  */
-static const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
+static constexpr const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
 
 /**
  * The instance name of a GCE instance. This is the value provided by @code host.name @endcode, the
@@ -58,7 +57,7 @@ static const char *kGcpGceInstanceHostname = "gcp.gce.instance.hostname";
  * href="https://cloud.google.com/compute/docs/internal-dns#instance-fully-qualified-domain-names">default
  * internal DNS name</a>.
  */
-static const char *kGcpGceInstanceName = "gcp.gce.instance.name";
+static constexpr const char *kGcpGceInstanceName = "gcp.gce.instance.name";
 
 }  // namespace gcp
 }  // namespace semconv

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,7 +21,7 @@ namespace exception
 
 /**
  * SHOULD be set to true if the exception event is recorded at a point where it is known that the
- * exception is escaping the scope of the span. Note: An exception is considered to have escaped (or
+ * exception is escaping the scope of the span. <p> An exception is considered to have escaped (or
  * left) the scope of a span, if that span is ended while the exception is still logically "in
  * flight". This may be actually "in flight" in some languages (e.g. if the exception is passed to a
  * Context manager's @code __exit__ @endcode method in Python) but will usually be caught at the
@@ -37,24 +35,24 @@ namespace exception
  * since the event might have been recorded at a time where it was not
  * clear whether the exception will escape.
  */
-static const char *kExceptionEscaped = "exception.escaped";
+static constexpr const char *kExceptionEscaped = "exception.escaped";
 
 /**
  * The exception message.
  */
-static const char *kExceptionMessage = "exception.message";
+static constexpr const char *kExceptionMessage = "exception.message";
 
 /**
  * A stacktrace as a string in the natural representation for the language runtime. The
  * representation is to be determined and documented by each language SIG.
  */
-static const char *kExceptionStacktrace = "exception.stacktrace";
+static constexpr const char *kExceptionStacktrace = "exception.stacktrace";
 
 /**
  * The type of the exception (its fully-qualified class name, if applicable). The dynamic type of
  * the exception should be preferred over the static type in languages that support it.
  */
-static const char *kExceptionType = "exception.type";
+static constexpr const char *kExceptionType = "exception.type";
 
 }  // namespace exception
 }  // namespace semconv

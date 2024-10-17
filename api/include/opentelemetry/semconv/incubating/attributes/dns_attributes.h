@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,12 +21,13 @@ namespace dns
 
 /**
  * The name being queried.
- * Note: If the name field contains non-printable characters (below 32 or above 126), those
- * characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes
- * should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n
+ * <p>
+ * If the name field contains non-printable characters (below 32 or above 126), those characters
+ * should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be
+ * escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n
  * respectively.
  */
-static const char *kDnsQuestionName = "dns.question.name";
+static constexpr const char *kDnsQuestionName = "dns.question.name";
 
 }  // namespace dns
 }  // namespace semconv

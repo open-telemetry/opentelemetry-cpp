@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,19 +21,20 @@ namespace service
 
 /**
  * Logical name of the service.
- * Note: MUST be the same for all instances of horizontally scaled services. If the value was not
+ * <p>
+ * MUST be the same for all instances of horizontally scaled services. If the value was not
  * specified, SDKs MUST fallback to @code unknown_service: @endcode concatenated with <a
  * href="process.md">@code process.executable.name @endcode</a>, e.g. @code unknown_service:bash
  * @endcode. If @code process.executable.name @endcode is not available, the value MUST be set to
  * @code unknown_service @endcode.
  */
-static const char *kServiceName = "service.name";
+static constexpr const char *kServiceName = "service.name";
 
 /**
  * The version string of the service API or implementation. The format is not defined by these
  * conventions.
  */
-static const char *kServiceVersion = "service.version";
+static constexpr const char *kServiceVersion = "service.version";
 
 }  // namespace service
 }  // namespace semconv

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,12 +22,12 @@ namespace session
 /**
  * A unique id to identify a session.
  */
-static const char *kSessionId = "session.id";
+static constexpr const char *kSessionId = "session.id";
 
 /**
  * The previous @code session.id @endcode for this user, when known.
  */
-static const char *kSessionPreviousId = "session.previous_id";
+static constexpr const char *kSessionPreviousId = "session.previous_id";
 
 }  // namespace session
 }  // namespace semconv

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,100 +21,116 @@ namespace url
 
 /**
  * Domain extracted from the @code url.full @endcode, such as "opentelemetry.io".
- * Note: In some cases a URL may refer to an IP and/or port directly, without a domain name. In this
- * case, the IP address would go to the domain field. If the URL contains a <a
+ * <p>
+ * In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case,
+ * the IP address would go to the domain field. If the URL contains a <a
  * href="https://www.rfc-editor.org/rfc/rfc2732#section-2">literal IPv6 address</a> enclosed by
  * @code [ @endcode and @code ] @endcode, the @code [ @endcode and @code ] @endcode characters
  * should also be captured in the domain field.
  */
-static const char *kUrlDomain = "url.domain";
+static constexpr const char *kUrlDomain = "url.domain";
 
 /**
  * The file extension extracted from the @code url.full @endcode, excluding the leading dot.
- * Note: The file extension is only set if it exists, as not every url has a file extension. When
- * the file name has multiple extensions @code example.tar.gz @endcode, only the last one should be
- * captured @code gz @endcode, not @code tar.gz @endcode.
+ * <p>
+ * The file extension is only set if it exists, as not every url has a file extension. When the file
+ * name has multiple extensions @code example.tar.gz @endcode, only the last one should be captured
+ * @code gz @endcode, not @code tar.gz @endcode.
  */
-static const char *kUrlExtension = "url.extension";
+static constexpr const char *kUrlExtension = "url.extension";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.url_attributes.
- * @endcode.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.5">URI fragment</a> component
  */
-static const char *kUrlFragment = "url.fragment";
+static constexpr const char *kUrlFragment = "url.fragment";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.url_attributes.
+ * Absolute URL describing a network resource according to <a
+ * href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a> <p> For network calls, URL usually has
+ * @code scheme://host[:port][path][?query][#fragment] @endcode format, where the fragment is not
+ * transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
+ * @code url.full @endcode MUST NOT contain credentials passed via URL in form of @code
+ * https://username:password@www.example.com/ @endcode. In such case username and password SHOULD be
+ * redacted and attribute's value SHOULD be @code https://REDACTED:REDACTED@www.example.com/
  * @endcode.
+ * @code url.full @endcode SHOULD capture the absolute URL when it is available (or can be
+ * reconstructed). Sensitive content provided in @code url.full @endcode SHOULD be scrubbed when
+ * instrumentations can identify it.
  */
-static const char *kUrlFull = "url.full";
+static constexpr const char *kUrlFull = "url.full";
 
 /**
  * Unmodified original URL as seen in the event source.
- * Note: In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL
- * is often just represented as a path. This field is meant to represent the URL as it was observed,
+ * <p>
+ * In network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is
+ * often just represented as a path. This field is meant to represent the URL as it was observed,
  * complete or not.
  * @code url.original @endcode might contain credentials passed via URL in form of @code
  * https://username:password@www.example.com/ @endcode. In such case password and username SHOULD
  * NOT be redacted and attribute's value SHOULD remain the same.
  */
-static const char *kUrlOriginal = "url.original";
+static constexpr const char *kUrlOriginal = "url.original";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.url_attributes.
- * @endcode.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.3">URI path</a> component
+ * <p>
+ * Sensitive content provided in @code url.path @endcode SHOULD be scrubbed when instrumentations
+ * can identify it.
  */
-static const char *kUrlPath = "url.path";
+static constexpr const char *kUrlPath = "url.path";
 
 /**
- * Port extracted from the @code url.full @endcode.
+ * Port extracted from the @code url.full @endcode
  */
-static const char *kUrlPort = "url.port";
+static constexpr const char *kUrlPort = "url.port";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.url_attributes.
- * @endcode.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.4">URI query</a> component
+ * <p>
+ * Sensitive content provided in @code url.query @endcode SHOULD be scrubbed when instrumentations
+ * can identify it.
  */
-static const char *kUrlQuery = "url.query";
+static constexpr const char *kUrlQuery = "url.query";
 
 /**
  * The highest registered url domain, stripped of the subdomain.
- * Note: This value can be determined precisely with the <a href="http://publicsuffix.org">public
- * suffix list</a>. For example, the registered domain for @code foo.example.com @endcode is @code
+ * <p>
+ * This value can be determined precisely with the <a href="http://publicsuffix.org">public suffix
+ * list</a>. For example, the registered domain for @code foo.example.com @endcode is @code
  * example.com @endcode. Trying to approximate this by simply taking the last two labels will not
  * work well for TLDs such as @code co.uk @endcode.
  */
-static const char *kUrlRegisteredDomain = "url.registered_domain";
+static constexpr const char *kUrlRegisteredDomain = "url.registered_domain";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.url_attributes.
- * @endcode.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.1">URI scheme</a> component
+ * identifying the used protocol.
  */
-static const char *kUrlScheme = "url.scheme";
+static constexpr const char *kUrlScheme = "url.scheme";
 
 /**
  * The subdomain portion of a fully qualified domain name includes all of the names except the host
  * name under the registered_domain. In a partially qualified domain, or if the qualification level
  * of the full name cannot be determined, subdomain contains all of the names below the registered
- * domain. Note: The subdomain portion of @code www.east.mydomain.co.uk @endcode is @code east
+ * domain. <p> The subdomain portion of @code www.east.mydomain.co.uk @endcode is @code east
  * @endcode. If the domain has multiple levels of subdomain, such as @code sub2.sub1.example.com
  * @endcode, the subdomain field should contain @code sub2.sub1 @endcode, with no trailing period.
  */
-static const char *kUrlSubdomain = "url.subdomain";
+static constexpr const char *kUrlSubdomain = "url.subdomain";
 
 /**
  * The low-cardinality template of an <a
  * href="https://www.rfc-editor.org/rfc/rfc3986#section-4.2">absolute path reference</a>.
  */
-static const char *kUrlTemplate = "url.template";
+static constexpr const char *kUrlTemplate = "url.template";
 
 /**
  * The effective top level domain (eTLD), also known as the domain suffix, is the last part of the
- * domain name. For example, the top level domain for example.com is @code com @endcode. Note: This
+ * domain name. For example, the top level domain for example.com is @code com @endcode. <p> This
  * value can be determined precisely with the <a href="http://publicsuffix.org">public suffix
  * list</a>.
  */
-static const char *kUrlTopLevelDomain = "url.top_level_domain";
+static constexpr const char *kUrlTopLevelDomain = "url.top_level_domain";
 
 }  // namespace url
 }  // namespace semconv

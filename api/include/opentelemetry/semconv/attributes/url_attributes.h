@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,15 +20,15 @@ namespace url
 {
 
 /**
- * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.5">URI fragment</a> component.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.5">URI fragment</a> component
  */
-static const char *kUrlFragment = "url.fragment";
+static constexpr const char *kUrlFragment = "url.fragment";
 
 /**
  * Absolute URL describing a network resource according to <a
- * href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a>. Note: For network calls, URL usually
- * has @code scheme://host[:port][path][?query][#fragment] @endcode format, where the fragment is
- * not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
+ * href="https://www.rfc-editor.org/rfc/rfc3986">RFC3986</a> <p> For network calls, URL usually has
+ * @code scheme://host[:port][path][?query][#fragment] @endcode format, where the fragment is not
+ * transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
  * @code url.full @endcode MUST NOT contain credentials passed via URL in form of @code
  * https://username:password@www.example.com/ @endcode. In such case username and password SHOULD be
  * redacted and attribute's value SHOULD be @code https://REDACTED:REDACTED@www.example.com/
@@ -39,27 +37,29 @@ static const char *kUrlFragment = "url.fragment";
  * reconstructed). Sensitive content provided in @code url.full @endcode SHOULD be scrubbed when
  * instrumentations can identify it.
  */
-static const char *kUrlFull = "url.full";
+static constexpr const char *kUrlFull = "url.full";
 
 /**
- * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.3">URI path</a> component.
- * Note: Sensitive content provided in @code url.path @endcode SHOULD be scrubbed when
- * instrumentations can identify it.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.3">URI path</a> component
+ * <p>
+ * Sensitive content provided in @code url.path @endcode SHOULD be scrubbed when instrumentations
+ * can identify it.
  */
-static const char *kUrlPath = "url.path";
+static constexpr const char *kUrlPath = "url.path";
 
 /**
- * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.4">URI query</a> component.
- * Note: Sensitive content provided in @code url.query @endcode SHOULD be scrubbed when
- * instrumentations can identify it.
+ * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.4">URI query</a> component
+ * <p>
+ * Sensitive content provided in @code url.query @endcode SHOULD be scrubbed when instrumentations
+ * can identify it.
  */
-static const char *kUrlQuery = "url.query";
+static constexpr const char *kUrlQuery = "url.query";
 
 /**
  * The <a href="https://www.rfc-editor.org/rfc/rfc3986#section-3.1">URI scheme</a> component
  * identifying the used protocol.
  */
-static const char *kUrlScheme = "url.scheme";
+static constexpr const char *kUrlScheme = "url.scheme";
 
 }  // namespace url
 }  // namespace semconv

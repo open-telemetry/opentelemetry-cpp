@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,19 +20,31 @@ namespace enduser
 {
 
 /**
- * @Deprecated: Replaced by @code user.id @endcode attribute.
+ * Deprecated, use @code user.id @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code user.id @endcode attribute.
  */
-static const char *kEnduserId = "enduser.id";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kEnduserId = "enduser.id";
 
 /**
- * @Deprecated: Replaced by @code user.roles @endcode attribute.
+ * Deprecated, use @code user.roles @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code user.roles @endcode attribute.
  */
-static const char *kEnduserRole = "enduser.role";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kEnduserRole = "enduser.role";
 
 /**
- * @Deprecated: Removed.
+ * Deprecated, no replacement at this time.
+ * <p>
+ * @deprecated
+ * Removed.
  */
-static const char *kEnduserScope = "enduser.scope";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kEnduserScope = "enduser.scope";
 
 }  // namespace enduser
 }  // namespace semconv

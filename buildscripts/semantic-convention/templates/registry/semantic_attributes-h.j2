@@ -16,7 +16,6 @@
   For doc on weaver:
   https://github.com/open-telemetry/weaver
 #}
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -26,50 +25,44 @@
  * DO NOT EDIT, this is an Auto-generated file from:
  * buildscripts/semantic-convention/templates/registry/semantic_attributes-h.j2
  */
+{# ========================================================================== #}
 
-{% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ "_attributes.h" -%}
-{{- template.set_file_name(file_name) -}}
-{%- import 'common.j2' as c %}
+{% set debug = false %}
+
+{% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ "_attributes.h" %}
+{{ template.set_file_name(file_name) }}
+{% import 'common.j2' as c %}
 
 {% set attributes = ctx.attributes | list %}
 {% set enum_attributes = attributes | select("enum") | rejectattr("name", "in", ctx.excluded_attributes) | list %}
 
-{%- macro attribute_namespace(ctx) -%}
+{% macro attribute_namespace(ctx) %}
 {{ ctx.root_namespace | snake_case }}
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro attribute_name(attribute) -%}
+{% macro attribute_name(attribute) %}
 k{{ attribute.name | pascal_case }}
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro attribute_type(attribute) -%}
+{% macro attribute_type(attribute) %}
 {{ attribute.type | enum_type | map_text("cpp_types", "FIXME") }}
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro enum_namespace_name(attribute) -%}
+{% macro enum_namespace_name(attribute) %}
 {{ attribute.name | pascal_case ~ "Values"}}
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro enum_name(member) -%}
+{% macro enum_name(member) %}
 k{{ member.id | pascal_case }}
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro stable_class_ref(const_name, separator) -%}
+{% macro stable_class_ref(const_name, separator) %}
 {{ctx.stable_package_name}}.{{ctx.root_namespace}}_attributes{{separator}}{{const_name}}
-{%- endmacro %}
+{% endmacro %}
 
-{%- macro write_docstring(name, brief, note, deprecated, stability, multiline) -%}
-    {%- if c.str_or_empty(deprecated)|length -%}
-{{prefix}}@Deprecated: {{c.comment_with_prefix(deprecated, "")}}.
-    {%- elif ctx.filter == "any" and stability == "stable" -%}
-{{prefix}}@Deprecated in favor of stable :py:const:`{{stable_class_ref(name, '.')}}`.
-    {%- elif c.str_or_empty(brief)|length -%}
-{{prefix}}{{c.comment_with_prefix(brief, "")}}.
-        {%- if c.str_or_empty(note)|length  %}
-{{prefix}}Note: {{c.comment_with_prefix(note, "")}}.
-        {%- endif -%}
-    {%- endif -%}
-{%- endmacro -%}
+{% set cpp_attribute_namespace = attribute_namespace(ctx) %}
+
+{# ========================================================================== #}
 
 #pragma once
 
@@ -79,37 +72,57 @@ k{{ member.id | pascal_case }}
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace semconv
 {
-namespace {{ attribute_namespace(ctx) }}
+namespace {{ cpp_attribute_namespace -}}
 {
 
 {% for attribute in attributes %}
-{% set cpp_attr_name = attribute_name(attribute) %}
-{%- set multiline = attribute.name not in ctx.excluded_attributes -%}
-{%- set doc_string = write_docstring(attr_name, attribute.brief, attribute.note, attribute.deprecated, attribute.stability, multiline)-%}
-{%- set prefix = "" if multiline else "// " -%}
-{{prefix}}{{doc_string | comment(ident=2) }}
-{{prefix}}static const char *{{cpp_attr_name}} = "{{attribute.name}}";
+    {% if debug %}
+// DEBUG: {{ attribute }}
+    {% endif %}
+    {% set cpp_attr_name = attribute_name(attribute) %}
+    {% set excluded = attribute.name in ctx.excluded_attributes %}
+    {% if excluded %}
+#if 0
+// Excluded attribute:
+    {% endif %}
+    {% if attribute is deprecated %}
+{{ [attribute.brief, "\n", "@deprecated", attribute.deprecated, "\n", attribute.note] | comment(ident=2) }}
+OPENTELEMETRY_DEPRECATED
+    {% else %}
+{{ [attribute.brief, "\n", attribute.note] | comment(ident=2) }}
+    {% endif %}
+static constexpr const char *{{cpp_attr_name}} = "{{attribute.name}}";
+    {% if excluded %}
+#endif
+    {% endif %}
+
 {% endfor %}
 
-{% for attribute in enum_attributes %}{%- set class_name = attribute.name | pascal_case ~ "Values" -%}
-{% set cpp_enum_name = enum_namespace_name(attribute) %}
-{% set cpp_enum_type = attribute_type(attribute) -%}
-{%- if attribute is deprecated %}
-// @deprecated(reason="The attribute {{attribute.name}} is deprecated - {{ c.comment_with_prefix(attribute.deprecated, "") }}")  # type: ignore
-    {%- elif attribute.stability == "stable" and ctx.filter == "any" %}
-// @deprecated(reason="Deprecated in favor of stable `{{stable_class_ref(class_name, '.')}}`.")  # type: ignore
-    {%- endif %}
+{% for attribute in enum_attributes %}
+    {% set class_name = attribute.name | pascal_case ~ "Values" %}
+    {% set cpp_enum_name = enum_namespace_name(attribute) %}
+    {% set cpp_enum_type = attribute_type(attribute) %}
+    {% if debug %}
 // DEBUG: {{ attribute }}
-namespace {{cpp_enum_name}}
+    {% endif %}
+namespace {{cpp_enum_name -}}
 {
-{%- for member in attribute.type.members %}
-{% set member_name = enum_name(member) -%}
-{%- set doc_string=write_docstring(class_name + '.' + member_name, member.brief or member.id, "", member.deprecated, member.stability, false)-%}
-  {% if doc_string %}{{doc_string | comment(ident=2) }}{% endif %}
-  // DEBUG: {{ member }}
-  static constexpr {{cpp_enum_type}} {{member_name}} = {{ member.value | print_member_value }};
-{%- endfor %}
+    {% for member in attribute.type.members %}
+        {% set member_name = enum_name(member) %}
+        {% if debug %}
+// DEBUG: {{ member }}
+        {% endif %}
+        {% if member is deprecated %}
+{{ [member.brief, "\n", "@deprecated", member.deprecated] | comment(ident=2) }}
+OPENTELEMETRY_DEPRECATED
+        {% else %}
+{{ member.brief | comment(ident=2) }}
+        {% endif %}
+static constexpr {{ cpp_enum_type }} {{ member_name }} = {{ member.value | print_member_value }};
+
+    {% endfor %}
 }
+
 {% endfor %}
 
 }

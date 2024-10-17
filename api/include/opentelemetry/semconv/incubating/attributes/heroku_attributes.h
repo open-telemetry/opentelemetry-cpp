@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,19 +20,19 @@ namespace heroku
 {
 
 /**
- * Unique identifier for the application.
+ * Unique identifier for the application
  */
-static const char *kHerokuAppId = "heroku.app.id";
+static constexpr const char *kHerokuAppId = "heroku.app.id";
 
 /**
- * Commit hash for the current release.
+ * Commit hash for the current release
  */
-static const char *kHerokuReleaseCommit = "heroku.release.commit";
+static constexpr const char *kHerokuReleaseCommit = "heroku.release.commit";
 
 /**
- * Time and date the release was created.
+ * Time and date the release was created
  */
-static const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
+static constexpr const char *kHerokuReleaseCreationTimestamp = "heroku.release.creation_timestamp";
 
 }  // namespace heroku
 }  // namespace semconv

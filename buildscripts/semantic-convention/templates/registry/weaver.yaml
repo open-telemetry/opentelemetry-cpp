@@ -1,3 +1,6 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 params:
   # excluded namespaces will not be generated
   excluded_namespaces: [ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, v8js, veightjs, go, nodejs]
@@ -8,7 +11,14 @@ params:
 
   stable_package_name: opentelemetry.semconv
 
+  # "https://opentelemetry.io/schemas/<SEMCONV_VERSION_TAG>"
+  # this is provided from the command line
+  schema_url: ""
+
 templates:
+  - pattern: schema_url-h.j2
+    filter: .
+    application_mode: single
   - pattern: semantic_attributes-h.j2
     filter: >
       semconv_grouped_attributes({
@@ -75,4 +85,9 @@ comment_formats:
     inline_code_snippet: "@code {{code}} @endcode"
     block_code_snippet: "@verbatim {{code}} @endverbatim"
 default_comment_format: cpp
+
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+  keep_trailing_newline: true
 

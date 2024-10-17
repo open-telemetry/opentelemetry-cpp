@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,12 +22,12 @@ namespace thread
 /**
  * Current "managed" thread ID (as opposed to OS thread ID).
  */
-static const char *kThreadId = "thread.id";
+static constexpr const char *kThreadId = "thread.id";
 
 /**
  * Current thread name.
  */
-static const char *kThreadName = "thread.name";
+static constexpr const char *kThreadName = "thread.name";
 
 }  // namespace thread
 }  // namespace semconv

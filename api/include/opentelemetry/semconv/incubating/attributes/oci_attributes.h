@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,7 +21,7 @@ namespace oci
 
 /**
  * The digest of the OCI image manifest. For container images specifically is the digest by which
- * the container image is known. Note: Follows <a
+ * the container image is known. <p> Follows <a
  * href="https://github.com/opencontainers/image-spec/blob/main/manifest.md">OCI Image Manifest
  * Specification</a>, and specifically the <a
  * href="https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests">Digest
@@ -31,7 +29,7 @@ namespace oci
  * href="https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest">Example Image
  * Manifest</a>.
  */
-static const char *kOciManifestDigest = "oci.manifest.digest";
+static constexpr const char *kOciManifestDigest = "oci.manifest.digest";
 
 }  // namespace oci
 }  // namespace semconv

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,17 +22,17 @@ namespace webengine
 /**
  * Additional description of the web engine (e.g. detailed version and edition information).
  */
-static const char *kWebengineDescription = "webengine.description";
+static constexpr const char *kWebengineDescription = "webengine.description";
 
 /**
  * The name of the web engine.
  */
-static const char *kWebengineName = "webengine.name";
+static constexpr const char *kWebengineName = "webengine.name";
 
 /**
  * The version of the web engine.
  */
-static const char *kWebengineVersion = "webengine.version";
+static constexpr const char *kWebengineVersion = "webengine.version";
 
 }  // namespace webengine
 }  // namespace semconv

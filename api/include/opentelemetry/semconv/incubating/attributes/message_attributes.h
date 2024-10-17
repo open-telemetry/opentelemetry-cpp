@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,46 +20,53 @@ namespace message
 {
 
 /**
- * @Deprecated: Replaced by @code rpc.message.compressed_size @endcode.
+ * Deprecated, use @code rpc.message.compressed_size @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code rpc.message.compressed_size @endcode.
  */
-static const char *kMessageCompressedSize = "message.compressed_size";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kMessageCompressedSize = "message.compressed_size";
 
 /**
- * @Deprecated: Replaced by @code rpc.message.id @endcode.
+ * Deprecated, use @code rpc.message.id @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code rpc.message.id @endcode.
  */
-static const char *kMessageId = "message.id";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kMessageId = "message.id";
 
 /**
- * @Deprecated: Replaced by @code rpc.message.type @endcode.
+ * Deprecated, use @code rpc.message.type @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code rpc.message.type @endcode.
  */
-static const char *kMessageType = "message.type";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kMessageType = "message.type";
 
 /**
- * @Deprecated: Replaced by @code rpc.message.uncompressed_size @endcode.
+ * Deprecated, use @code rpc.message.uncompressed_size @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code rpc.message.uncompressed_size @endcode.
  */
-static const char *kMessageUncompressedSize = "message.uncompressed_size";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kMessageUncompressedSize = "message.uncompressed_size";
 
-// @deprecated(reason="The attribute message.type is deprecated - Replaced by `rpc.message.type`")
-// # type: ignore DEBUG: {"brief": "Deprecated, use `rpc.message.type` instead.", "deprecated":
-// "Replaced by `rpc.message.type`.", "name": "message.type", "requirement_level": "recommended",
-// "root_namespace": "message", "stability": "experimental", "type": {"allow_custom_values": true,
-// "members": [{"brief": none, "deprecated": none, "id": "sent", "note": none, "stability":
-// "experimental", "value": "SENT"}, {"brief": none, "deprecated": none, "id": "received", "note":
-// none, "stability": "experimental", "value": "RECEIVED"}]}}
 namespace MessageTypeValues
 {
 /**
- * sent.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "sent", "note": none, "stability":
-// "experimental", "value": "SENT"}
 static constexpr const char *kSent = "SENT";
+
 /**
- * received.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "received", "note": none, "stability":
-// "experimental", "value": "RECEIVED"}
 static constexpr const char *kReceived = "RECEIVED";
+
 }  // namespace MessageTypeValues
 
 }  // namespace message

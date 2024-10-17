@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,31 +20,34 @@ namespace browser
 {
 
 /**
- * Array of brand name and version separated by a space.
- * Note: This value is intended to be taken from the <a
+ * Array of brand name and version separated by a space
+ * <p>
+ * This value is intended to be taken from the <a
  * href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> (@code
  * navigator.userAgentData.brands @endcode).
  */
-static const char *kBrowserBrands = "browser.brands";
+static constexpr const char *kBrowserBrands = "browser.brands";
 
 /**
- * Preferred language of the user using the browser.
- * Note: This value is intended to be taken from the Navigator API @code navigator.language
- * @endcode.
+ * Preferred language of the user using the browser
+ * <p>
+ * This value is intended to be taken from the Navigator API @code navigator.language @endcode.
  */
-static const char *kBrowserLanguage = "browser.language";
+static constexpr const char *kBrowserLanguage = "browser.language";
 
 /**
- * A boolean that is true if the browser is running on a mobile device.
- * Note: This value is intended to be taken from the <a
+ * A boolean that is true if the browser is running on a mobile device
+ * <p>
+ * This value is intended to be taken from the <a
  * href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> (@code
  * navigator.userAgentData.mobile @endcode). If unavailable, this attribute SHOULD be left unset.
  */
-static const char *kBrowserMobile = "browser.mobile";
+static constexpr const char *kBrowserMobile = "browser.mobile";
 
 /**
- * The platform on which the browser is running.
- * Note: This value is intended to be taken from the <a
+ * The platform on which the browser is running
+ * <p>
+ * This value is intended to be taken from the <a
  * href="https://wicg.github.io/ua-client-hints/#interface">UA client hints API</a> (@code
  * navigator.userAgentData.platform @endcode). If unavailable, the legacy @code navigator.platform
  * @endcode API SHOULD NOT be used instead and this attribute SHOULD be left unset in order for the
@@ -57,7 +58,7 @@ static const char *kBrowserMobile = "browser.mobile";
  * consistency, the values in the @code browser.platform @endcode attribute should capture the exact
  * value that the user agent provides.
  */
-static const char *kBrowserPlatform = "browser.platform";
+static constexpr const char *kBrowserPlatform = "browser.platform";
 
 }  // namespace browser
 }  // namespace semconv

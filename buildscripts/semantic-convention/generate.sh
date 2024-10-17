@@ -23,7 +23,7 @@ WEAVER_VERSION=0.10.0
 
 SEMCONV_VERSION_TAG=v$SEMCONV_VERSION
 WEAVER_VERSION_TAG=v$WEAVER_VERSION
-SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
+SCHEMA_URL="https://opentelemetry.io/schemas/${SEMCONV_VERSION}"
 INCUBATING_DIR=incubating
 
 cd ${SCRIPT_DIR}
@@ -79,7 +79,8 @@ generate() {
     ${TARGET} \
     /output/${TARGET} \
     --param output=${OUTPUT} \
-    --param filter=${FILTER}
+    --param filter=${FILTER} \
+    --param schema_url=${SCHEMA_URL}
 }
 
 # stable attributes and metrics
@@ -90,6 +91,9 @@ generate "./" "./" "stable"
 mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}/attributes
 mkdir -p ${ROOT_DIR}/wip/${INCUBATING_DIR}/metrics
 generate "./" "./${INCUBATING_DIR}/" "any"
+
+cp -r ${ROOT_DIR}/wip/*.h \
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/
 
 cp -r ${ROOT_DIR}/wip/attributes/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/attributes

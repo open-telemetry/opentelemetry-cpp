@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,65 +20,52 @@ namespace otel
 {
 
 /**
- * @Deprecated: use the @code otel.scope.name @endcode attribute.
+ * @deprecated
+ * use the @code otel.scope.name @endcode attribute.
  */
-static const char *kOtelLibraryName = "otel.library.name";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kOtelLibraryName = "otel.library.name";
 
 /**
- * @Deprecated: use the @code otel.scope.version @endcode attribute.
+ * @deprecated
+ * use the @code otel.scope.version @endcode attribute.
  */
-static const char *kOtelLibraryVersion = "otel.library.version";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kOtelLibraryVersion = "otel.library.version";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.otel_attributes.
- * @endcode.
+ * The name of the instrumentation scope - (@code InstrumentationScope.Name @endcode in OTLP).
  */
-static const char *kOtelScopeName = "otel.scope.name";
+static constexpr const char *kOtelScopeName = "otel.scope.name";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.otel_attributes.
- * @endcode.
+ * The version of the instrumentation scope - (@code InstrumentationScope.Version @endcode in OTLP).
  */
-static const char *kOtelScopeVersion = "otel.scope.version";
+static constexpr const char *kOtelScopeVersion = "otel.scope.version";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.otel_attributes.
- * @endcode.
+ * Name of the code, either "OK" or "ERROR". MUST NOT be set if the status code is UNSET.
  */
-static const char *kOtelStatusCode = "otel.status_code";
+static constexpr const char *kOtelStatusCode = "otel.status_code";
 
 /**
- * @Deprecated in favor of stable :py:const:@code opentelemetry.semconv.attributes.otel_attributes.
- * @endcode.
+ * Description of the Status if it has a value, otherwise not set.
  */
-static const char *kOtelStatusDescription = "otel.status_description";
+static constexpr const char *kOtelStatusDescription = "otel.status_description";
 
-// @deprecated(reason="Deprecated in favor of stable
-// `opentelemetry.semconv.attributes.otel_attributes.OtelStatusCodeValues`.")  # type: ignore DEBUG:
-// {"brief": "Name of the code, either \"OK\" or \"ERROR\". MUST NOT be set if the status code is
-// UNSET.", "name": "otel.status_code", "requirement_level": "recommended", "root_namespace":
-// "otel", "stability": "stable", "type": {"allow_custom_values": true, "members": [{"brief": "The
-// operation has been validated by an Application developer or Operator to have completed
-// successfully.", "deprecated": none, "id": "ok", "note": none, "stability": "stable", "value":
-// "OK"}, {"brief": "The operation contains an error.", "deprecated": none, "id": "error", "note":
-// none, "stability": "stable", "value": "ERROR"}]}}
 namespace OtelStatusCodeValues
 {
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.otel_attributes.OtelStatusCodeValues.kOk @endcode.
+ * The operation has been validated by an Application developer or Operator to have completed
+ * successfully.
  */
-// DEBUG: {"brief": "The operation has been validated by an Application developer or Operator to
-// have completed successfully.", "deprecated": none, "id": "ok", "note": none, "stability":
-// "stable", "value": "OK"}
 static constexpr const char *kOk = "OK";
+
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.otel_attributes.OtelStatusCodeValues.kError @endcode.
+ * The operation contains an error.
  */
-// DEBUG: {"brief": "The operation contains an error.", "deprecated": none, "id": "error", "note":
-// none, "stability": "stable", "value": "ERROR"}
 static constexpr const char *kError = "ERROR";
+
 }  // namespace OtelStatusCodeValues
 
 }  // namespace otel

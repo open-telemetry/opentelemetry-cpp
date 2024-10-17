@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,28 +22,20 @@ namespace disk
 /**
  * The disk IO operation direction.
  */
-static const char *kDiskIoDirection = "disk.io.direction";
+static constexpr const char *kDiskIoDirection = "disk.io.direction";
 
-// DEBUG: {"brief": "The disk IO operation direction.", "examples": ["read"], "name":
-// "disk.io.direction", "requirement_level": "recommended", "root_namespace": "disk", "stability":
-// "experimental", "type": {"allow_custom_values": true, "members": [{"brief": none, "deprecated":
-// none, "id": "read", "note": none, "stability": "experimental", "value": "read"}, {"brief": none,
-// "deprecated": none, "id": "write", "note": none, "stability": "experimental", "value":
-// "write"}]}}
 namespace DiskIoDirectionValues
 {
 /**
- * read.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "read", "note": none, "stability":
-// "experimental", "value": "read"}
 static constexpr const char *kRead = "read";
+
 /**
- * write.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "write", "note": none, "stability":
-// "experimental", "value": "write"}
 static constexpr const char *kWrite = "write";
+
 }  // namespace DiskIoDirectionValues
 
 }  // namespace disk

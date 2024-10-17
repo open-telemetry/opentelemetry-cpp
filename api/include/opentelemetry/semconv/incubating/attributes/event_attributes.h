@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -23,12 +21,13 @@ namespace event
 
 /**
  * Identifies the class / type of event.
- * Note: Event names are subject to the same rules as <a
+ * <p>
+ * Event names are subject to the same rules as <a
  * href="/docs/general/attribute-naming.md">attribute names</a>. Notably, event names are namespaced
  * to avoid collisions and provide a clean separation of semantics for events in separate domains
  * like browser, mobile, and kubernetes.
  */
-static const char *kEventName = "event.name";
+static constexpr const char *kEventName = "event.name";
 
 }  // namespace event
 }  // namespace semconv

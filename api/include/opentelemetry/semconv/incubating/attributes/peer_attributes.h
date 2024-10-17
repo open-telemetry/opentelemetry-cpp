@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -26,7 +24,7 @@ namespace peer
  * service. SHOULD be equal to the actual @code service.name @endcode resource attribute of the
  * remote service if any.
  */
-static const char *kPeerService = "peer.service";
+static constexpr const char *kPeerService = "peer.service";
 
 }  // namespace peer
 }  // namespace semconv

@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -24,246 +22,256 @@ namespace aws
 /**
  * The JSON-serialized value of each item in the @code AttributeDefinitions @endcode request field.
  */
-static const char *kAwsDynamodbAttributeDefinitions = "aws.dynamodb.attribute_definitions";
+static constexpr const char *kAwsDynamodbAttributeDefinitions =
+    "aws.dynamodb.attribute_definitions";
 
 /**
  * The value of the @code AttributesToGet @endcode request parameter.
  */
-static const char *kAwsDynamodbAttributesToGet = "aws.dynamodb.attributes_to_get";
+static constexpr const char *kAwsDynamodbAttributesToGet = "aws.dynamodb.attributes_to_get";
 
 /**
  * The value of the @code ConsistentRead @endcode request parameter.
  */
-static const char *kAwsDynamodbConsistentRead = "aws.dynamodb.consistent_read";
+static constexpr const char *kAwsDynamodbConsistentRead = "aws.dynamodb.consistent_read";
 
 /**
  * The JSON-serialized value of each item in the @code ConsumedCapacity @endcode response field.
  */
-static const char *kAwsDynamodbConsumedCapacity = "aws.dynamodb.consumed_capacity";
+static constexpr const char *kAwsDynamodbConsumedCapacity = "aws.dynamodb.consumed_capacity";
 
 /**
  * The value of the @code Count @endcode response parameter.
  */
-static const char *kAwsDynamodbCount = "aws.dynamodb.count";
+static constexpr const char *kAwsDynamodbCount = "aws.dynamodb.count";
 
 /**
  * The value of the @code ExclusiveStartTableName @endcode request parameter.
  */
-static const char *kAwsDynamodbExclusiveStartTable = "aws.dynamodb.exclusive_start_table";
+static constexpr const char *kAwsDynamodbExclusiveStartTable = "aws.dynamodb.exclusive_start_table";
 
 /**
  * The JSON-serialized value of each item in the @code GlobalSecondaryIndexUpdates @endcode request
  * field.
  */
-static const char *kAwsDynamodbGlobalSecondaryIndexUpdates =
+static constexpr const char *kAwsDynamodbGlobalSecondaryIndexUpdates =
     "aws.dynamodb.global_secondary_index_updates";
 
 /**
- * The JSON-serialized value of each item of the @code GlobalSecondaryIndexes @endcode request
- * field.
+ * The JSON-serialized value of each item of the @code GlobalSecondaryIndexes @endcode request field
  */
-static const char *kAwsDynamodbGlobalSecondaryIndexes = "aws.dynamodb.global_secondary_indexes";
+static constexpr const char *kAwsDynamodbGlobalSecondaryIndexes =
+    "aws.dynamodb.global_secondary_indexes";
 
 /**
  * The value of the @code IndexName @endcode request parameter.
  */
-static const char *kAwsDynamodbIndexName = "aws.dynamodb.index_name";
+static constexpr const char *kAwsDynamodbIndexName = "aws.dynamodb.index_name";
 
 /**
  * The JSON-serialized value of the @code ItemCollectionMetrics @endcode response field.
  */
-static const char *kAwsDynamodbItemCollectionMetrics = "aws.dynamodb.item_collection_metrics";
+static constexpr const char *kAwsDynamodbItemCollectionMetrics =
+    "aws.dynamodb.item_collection_metrics";
 
 /**
  * The value of the @code Limit @endcode request parameter.
  */
-static const char *kAwsDynamodbLimit = "aws.dynamodb.limit";
+static constexpr const char *kAwsDynamodbLimit = "aws.dynamodb.limit";
 
 /**
  * The JSON-serialized value of each item of the @code LocalSecondaryIndexes @endcode request field.
  */
-static const char *kAwsDynamodbLocalSecondaryIndexes = "aws.dynamodb.local_secondary_indexes";
+static constexpr const char *kAwsDynamodbLocalSecondaryIndexes =
+    "aws.dynamodb.local_secondary_indexes";
 
 /**
  * The value of the @code ProjectionExpression @endcode request parameter.
  */
-static const char *kAwsDynamodbProjection = "aws.dynamodb.projection";
+static constexpr const char *kAwsDynamodbProjection = "aws.dynamodb.projection";
 
 /**
  * The value of the @code ProvisionedThroughput.ReadCapacityUnits @endcode request parameter.
  */
-static const char *kAwsDynamodbProvisionedReadCapacity = "aws.dynamodb.provisioned_read_capacity";
+static constexpr const char *kAwsDynamodbProvisionedReadCapacity =
+    "aws.dynamodb.provisioned_read_capacity";
 
 /**
  * The value of the @code ProvisionedThroughput.WriteCapacityUnits @endcode request parameter.
  */
-static const char *kAwsDynamodbProvisionedWriteCapacity = "aws.dynamodb.provisioned_write_capacity";
+static constexpr const char *kAwsDynamodbProvisionedWriteCapacity =
+    "aws.dynamodb.provisioned_write_capacity";
 
 /**
  * The value of the @code ScanIndexForward @endcode request parameter.
  */
-static const char *kAwsDynamodbScanForward = "aws.dynamodb.scan_forward";
+static constexpr const char *kAwsDynamodbScanForward = "aws.dynamodb.scan_forward";
 
 /**
  * The value of the @code ScannedCount @endcode response parameter.
  */
-static const char *kAwsDynamodbScannedCount = "aws.dynamodb.scanned_count";
+static constexpr const char *kAwsDynamodbScannedCount = "aws.dynamodb.scanned_count";
 
 /**
  * The value of the @code Segment @endcode request parameter.
  */
-static const char *kAwsDynamodbSegment = "aws.dynamodb.segment";
+static constexpr const char *kAwsDynamodbSegment = "aws.dynamodb.segment";
 
 /**
  * The value of the @code Select @endcode request parameter.
  */
-static const char *kAwsDynamodbSelect = "aws.dynamodb.select";
+static constexpr const char *kAwsDynamodbSelect = "aws.dynamodb.select";
 
 /**
  * The number of items in the @code TableNames @endcode response parameter.
  */
-static const char *kAwsDynamodbTableCount = "aws.dynamodb.table_count";
+static constexpr const char *kAwsDynamodbTableCount = "aws.dynamodb.table_count";
 
 /**
  * The keys in the @code RequestItems @endcode object field.
  */
-static const char *kAwsDynamodbTableNames = "aws.dynamodb.table_names";
+static constexpr const char *kAwsDynamodbTableNames = "aws.dynamodb.table_names";
 
 /**
  * The value of the @code TotalSegments @endcode request parameter.
  */
-static const char *kAwsDynamodbTotalSegments = "aws.dynamodb.total_segments";
+static constexpr const char *kAwsDynamodbTotalSegments = "aws.dynamodb.total_segments";
 
 /**
  * The ARN of an <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html">ECS cluster</a>.
  */
-static const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
+static constexpr const char *kAwsEcsClusterArn = "aws.ecs.cluster.arn";
 
 /**
  * The Amazon Resource Name (ARN) of an <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html">ECS
  * container instance</a>.
  */
-static const char *kAwsEcsContainerArn = "aws.ecs.container.arn";
+static constexpr const char *kAwsEcsContainerArn = "aws.ecs.container.arn";
 
 /**
  * The <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html">launch
  * type</a> for an ECS task.
  */
-static const char *kAwsEcsLaunchtype = "aws.ecs.launchtype";
+static constexpr const char *kAwsEcsLaunchtype = "aws.ecs.launchtype";
 
 /**
  * The ARN of a running <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html#ecs-resource-ids">ECS
  * task</a>.
  */
-static const char *kAwsEcsTaskArn = "aws.ecs.task.arn";
+static constexpr const char *kAwsEcsTaskArn = "aws.ecs.task.arn";
 
 /**
  * The family name of the <a
  * href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html">ECS task
  * definition</a> used to create the ECS task.
  */
-static const char *kAwsEcsTaskFamily = "aws.ecs.task.family";
+static constexpr const char *kAwsEcsTaskFamily = "aws.ecs.task.family";
 
 /**
  * The ID of a running ECS task. The ID MUST be extracted from @code task.arn @endcode.
  */
-static const char *kAwsEcsTaskId = "aws.ecs.task.id";
+static constexpr const char *kAwsEcsTaskId = "aws.ecs.task.id";
 
 /**
  * The revision for the task definition used to create the ECS task.
  */
-static const char *kAwsEcsTaskRevision = "aws.ecs.task.revision";
+static constexpr const char *kAwsEcsTaskRevision = "aws.ecs.task.revision";
 
 /**
  * The ARN of an EKS cluster.
  */
-static const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
+static constexpr const char *kAwsEksClusterArn = "aws.eks.cluster.arn";
 
 /**
  * The full invoked ARN as provided on the @code Context @endcode passed to the function (@code
  * Lambda-Runtime-Invoked-Function-Arn @endcode header on the @code /runtime/invocation/next
- * @endcode applicable). Note: This may be different from @code cloud.resource_id @endcode if an
- * alias is involved.
+ * @endcode applicable). <p> This may be different from @code cloud.resource_id @endcode if an alias
+ * is involved.
  */
-static const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
+static constexpr const char *kAwsLambdaInvokedArn = "aws.lambda.invoked_arn";
 
 /**
  * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
- * Note: See the <a
+ * <p>
+ * See the <a
  * href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format">log
  * group ARN format documentation</a>.
  */
-static const char *kAwsLogGroupArns = "aws.log.group.arns";
+static constexpr const char *kAwsLogGroupArns = "aws.log.group.arns";
 
 /**
  * The name(s) of the AWS log group(s) an application is writing to.
- * Note: Multiple log groups must be supported for cases like multi-container applications, where a
- * single application has sidecar containers, and each write to their own log group.
+ * <p>
+ * Multiple log groups must be supported for cases like multi-container applications, where a single
+ * application has sidecar containers, and each write to their own log group.
  */
-static const char *kAwsLogGroupNames = "aws.log.group.names";
+static constexpr const char *kAwsLogGroupNames = "aws.log.group.names";
 
 /**
  * The ARN(s) of the AWS log stream(s).
- * Note: See the <a
+ * <p>
+ * See the <a
  * href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/iam-access-control-overview-cwl.html#CWL_ARN_Format">log
  * stream ARN format documentation</a>. One log group can contain several log streams, so these ARNs
  * necessarily identify both a log group and a log stream.
  */
-static const char *kAwsLogStreamArns = "aws.log.stream.arns";
+static constexpr const char *kAwsLogStreamArns = "aws.log.stream.arns";
 
 /**
  * The name(s) of the AWS log stream(s) an application is writing to.
  */
-static const char *kAwsLogStreamNames = "aws.log.stream.names";
+static constexpr const char *kAwsLogStreamNames = "aws.log.stream.names";
 
 /**
  * The AWS request ID as returned in the response headers @code x-amz-request-id @endcode or @code
  * x-amz-requestid @endcode.
  */
-static const char *kAwsRequestId = "aws.request_id";
+static constexpr const char *kAwsRequestId = "aws.request_id";
 
 /**
  * The S3 bucket name the request refers to. Corresponds to the @code --bucket @endcode parameter of
  * the <a href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a>
- * operations. Note: The @code bucket @endcode attribute is applicable to all S3 operations that
+ * operations. <p> The @code bucket @endcode attribute is applicable to all S3 operations that
  * reference a bucket, i.e. that require the bucket name as a mandatory parameter. This applies to
  * almost all S3 operations except @code list-buckets @endcode.
  */
-static const char *kAwsS3Bucket = "aws.s3.bucket";
+static constexpr const char *kAwsS3Bucket = "aws.s3.bucket";
 
 /**
  * The source object (in the form @code bucket @endcode/@code key @endcode) for the copy operation.
- * Note: The @code copy_source @endcode attribute applies to S3 copy operations and corresponds to
- * the @code --copy-source @endcode parameter of the <a
+ * <p>
+ * The @code copy_source @endcode attribute applies to S3 copy operations and corresponds to the
+ * @code --copy-source @endcode parameter of the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object
  * operation within the S3 API</a>. This applies in particular to the following operations: <p> <ul>
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
  *   <li><a
- * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>.</li>
+ * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
  * </ul>
  */
-static const char *kAwsS3CopySource = "aws.s3.copy_source";
+static constexpr const char *kAwsS3CopySource = "aws.s3.copy_source";
 
 /**
  * The delete request container that specifies the objects to be deleted.
- * Note: The @code delete @endcode attribute is only applicable to the <a
+ * <p>
+ * The @code delete @endcode attribute is only applicable to the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-object.html">delete-object</a>
  * operation. The @code delete @endcode attribute corresponds to the @code --delete @endcode
  * parameter of the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/delete-objects.html">delete-objects
  * operation within the S3 API</a>.
  */
-static const char *kAwsS3Delete = "aws.s3.delete";
+static constexpr const char *kAwsS3Delete = "aws.s3.delete";
 
 /**
  * The S3 object key the request refers to. Corresponds to the @code --key @endcode parameter of the
  * <a href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a>
- * operations. Note: The @code key @endcode attribute is applicable to all object-related S3
+ * operations. <p> The @code key @endcode attribute is applicable to all object-related S3
  * operations, i.e. that require the object key as a mandatory parameter. This applies in particular
  * to the following operations: <p> <ul> <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/copy-object.html">copy-object</a></li>
@@ -290,15 +298,15 @@ static const char *kAwsS3Delete = "aws.s3.delete";
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
  *   <li><a
- * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>.</li>
+ * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
  * </ul>
  */
-static const char *kAwsS3Key = "aws.s3.key";
+static constexpr const char *kAwsS3Key = "aws.s3.key";
 
 /**
  * The part number of the part being uploaded in a multipart-upload operation. This is a positive
- * integer between 1 and 10,000. Note: The @code part_number @endcode attribute is only applicable
- * to the <a
+ * integer between 1 and 10,000. <p> The @code part_number @endcode attribute is only applicable to
+ * the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a>
  * and <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>
@@ -307,12 +315,13 @@ static const char *kAwsS3Key = "aws.s3.key";
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part
  * operation within the S3 API</a>.
  */
-static const char *kAwsS3PartNumber = "aws.s3.part_number";
+static constexpr const char *kAwsS3PartNumber = "aws.s3.part_number";
 
 /**
  * Upload ID that identifies the multipart upload.
- * Note: The @code upload_id @endcode attribute applies to S3 multipart-upload operations and
- * corresponds to the @code --upload-id @endcode parameter of the <a
+ * <p>
+ * The @code upload_id @endcode attribute applies to S3 multipart-upload operations and corresponds
+ * to the @code --upload-id @endcode parameter of the <a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/index.html">S3 API</a> multipart
  * operations. This applies in particular to the following operations: <p> <ul> <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/abort-multipart-upload.html">abort-multipart-upload</a></li>
@@ -323,32 +332,23 @@ static const char *kAwsS3PartNumber = "aws.s3.part_number";
  *   <li><a
  * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part.html">upload-part</a></li>
  *   <li><a
- * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a>.</li>
+ * href="https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html">upload-part-copy</a></li>
  * </ul>
  */
-static const char *kAwsS3UploadId = "aws.s3.upload_id";
+static constexpr const char *kAwsS3UploadId = "aws.s3.upload_id";
 
-// DEBUG: {"brief": "The [launch
-// type](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html) for an ECS
-// task.\n", "name": "aws.ecs.launchtype", "requirement_level": "recommended", "root_namespace":
-// "aws", "stability": "experimental", "type": {"allow_custom_values": true, "members": [{"brief":
-// none, "deprecated": none, "id": "ec2", "note": none, "stability": "experimental", "value":
-// "ec2"}, {"brief": none, "deprecated": none, "id": "fargate", "note": none, "stability":
-// "experimental", "value": "fargate"}]}}
 namespace AwsEcsLaunchtypeValues
 {
 /**
- * ec2.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "ec2", "note": none, "stability":
-// "experimental", "value": "ec2"}
 static constexpr const char *kEc2 = "ec2";
+
 /**
- * fargate.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "fargate", "note": none, "stability":
-// "experimental", "value": "fargate"}
 static constexpr const char *kFargate = "fargate";
+
 }  // namespace AwsEcsLaunchtypeValues
 
 }  // namespace aws

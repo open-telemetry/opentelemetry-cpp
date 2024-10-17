@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,32 +20,26 @@ namespace other
 {
 
 /**
- * @Deprecated: Replaced by @code db.client.connection.state @endcode.
+ * Deprecated, use @code db.client.connection.state @endcode instead.
+ * <p>
+ * @deprecated
+ * Replaced by @code db.client.connection.state @endcode.
  */
-static const char *kState = "state";
+OPENTELEMETRY_DEPRECATED
+static constexpr const char *kState = "state";
 
-// @deprecated(reason="The attribute state is deprecated - Replaced by
-// `db.client.connection.state`")  # type: ignore DEBUG: {"brief": "Deprecated, use
-// `db.client.connection.state` instead.", "deprecated": "Replaced by
-// `db.client.connection.state`.", "examples": ["idle"], "name": "state", "requirement_level":
-// "recommended", "root_namespace": "other", "stability": "experimental", "type":
-// {"allow_custom_values": true, "members": [{"brief": none, "deprecated": none, "id": "idle",
-// "note": none, "stability": "experimental", "value": "idle"}, {"brief": none, "deprecated": none,
-// "id": "used", "note": none, "stability": "experimental", "value": "used"}]}}
 namespace StateValues
 {
 /**
- * idle.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "idle", "note": none, "stability":
-// "experimental", "value": "idle"}
 static constexpr const char *kIdle = "idle";
+
 /**
- * used.
+ * none
  */
-// DEBUG: {"brief": none, "deprecated": none, "id": "used", "note": none, "stability":
-// "experimental", "value": "used"}
 static constexpr const char *kUsed = "used";
+
 }  // namespace StateValues
 
 }  // namespace other

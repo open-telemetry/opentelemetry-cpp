@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright The OpenTelemetry Authors
  * SPDX-License-Identifier: Apache-2.0
@@ -22,16 +20,21 @@ namespace client
 {
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.client_attributes. @endcode.
+ * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or
+ * Unix domain socket name. <p> When observed from the server side, and when communicating through
+ * an intermediary, @code client.address @endcode SHOULD represent the client address behind any
+ * intermediaries,  for example proxies, if it's available.
  */
-static const char *kClientAddress = "client.address";
+static constexpr const char *kClientAddress = "client.address";
 
 /**
- * @Deprecated in favor of stable :py:const:@code
- * opentelemetry.semconv.attributes.client_attributes. @endcode.
+ * Client port number.
+ * <p>
+ * When observed from the server side, and when communicating through an intermediary, @code
+ * client.port @endcode SHOULD represent the client port behind any intermediaries,  for example
+ * proxies, if it's available.
  */
-static const char *kClientPort = "client.port";
+static constexpr const char *kClientPort = "client.port";
 
 }  // namespace client
 }  // namespace semconv
