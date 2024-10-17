@@ -31,7 +31,9 @@ void SimpleAggregateInMemoryMetricData::Add(std::unique_ptr<ResourceMetrics> res
       const auto &metric = m.instrument_descriptor.name_;
       for (const auto &pda : m.point_data_attr_)
       {
-        data_[{scope, metric}].insert({pda.attributes, pda.point_data});
+        // NOTE: Explicit type conversion added for C++11 (gcc 4.8)
+        data_[std::tuple<std::string, std::string>{scope, metric}].insert(
+            {pda.attributes, pda.point_data});
       }
     }
   }
@@ -41,7 +43,8 @@ const SimpleAggregateInMemoryMetricData::AttributeToPoint &SimpleAggregateInMemo
     const std::string &scope,
     const std::string &metric)
 {
-  return data_[{scope, metric}];
+  // NOTE: Explicit type conversion added for C++11 (gcc 4.8)
+  return data_[std::tuple<std::string, std::string>{scope, metric}];
 }
 
 void SimpleAggregateInMemoryMetricData::Clear()
