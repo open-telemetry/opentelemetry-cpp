@@ -35,7 +35,7 @@ if(WITH_NO_DEPRECATED_CODE)
                              INTERFACE OPENTELEMETRY_NO_DEPRECATED_CODE)
 endif()
 
-if(WITH_ABSEIL)
+if(WITH_ABSEIL OR WITH_OTLP_GRPC)
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
   target_link_libraries(
     opentelemetry_api INTERFACE absl::bad_variant_access absl::any absl::base
