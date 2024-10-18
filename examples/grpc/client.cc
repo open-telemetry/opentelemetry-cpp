@@ -15,8 +15,8 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/semconv/network_attributes.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
+#include "opentelemetry/semconv/network_attributes.h"
 #include "tracer_common.h"
 
 using grpc::Channel;

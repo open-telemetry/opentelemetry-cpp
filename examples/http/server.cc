@@ -3,9 +3,9 @@
 
 #include "server.h"
 #include "opentelemetry/semconv/client_attributes.h"
+#include "opentelemetry/semconv/incubating/http_attributes.h"
 #include "opentelemetry/semconv/server_attributes.h"
 #include "opentelemetry/semconv/url_attributes.h"
-#include "opentelemetry/semconv/incubating/http_attributes.h"
 #include "opentelemetry/trace/context.h"
 #include "tracer_common.h"
 
