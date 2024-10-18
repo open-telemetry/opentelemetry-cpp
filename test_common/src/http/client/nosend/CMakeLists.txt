@@ -27,7 +27,8 @@ if(${BUILD_TESTING})
     find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
   endif()
 
-  target_link_libraries(opentelemetry_http_client_nosend opentelemetry_ext
-                        opentelemetry_test_common ${GTEST_BOTH_LIBRARIES})
+  target_link_libraries(
+    opentelemetry_http_client_nosend opentelemetry_ext
+    opentelemetry_test_common ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES})
 
 endif()
