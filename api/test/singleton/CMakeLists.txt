@@ -1,6 +1,10 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+if(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS)
+  return()
+endif()
+
 include(GoogleTest)
 
 # Header only singletons are not available in windows yet.

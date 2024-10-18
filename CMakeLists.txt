@@ -287,6 +287,10 @@ option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
 option(WITH_METRICS_EXEMPLAR_PREVIEW
        "Whether to enable exemplar within metrics" OFF)
 
+option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
+       "Whether to build test libraries that are always linked as shared libs"
+       OFF)
+
 #
 # Verify options dependencies
 #
