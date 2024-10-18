@@ -216,17 +216,19 @@ void ElasticSearchRecordable::SetObservedTimestamp(
 
 void ElasticSearchRecordable::SetSeverity(opentelemetry::logs::Severity severity) noexcept
 {
+  auto &severityField = json_["log"]["level"];
+
   // Convert the severity enum to a string
   std::uint32_t severity_index = static_cast<std::uint32_t>(severity);
   if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
   {
     std::stringstream sout;
     sout << "Invalid severity(" << severity_index << ")";
-    json_["severity"] = sout.str();
+    severityField = sout.str();
   }
   else
   {
-    json_["severity"] = opentelemetry::logs::SeverityNumToText[severity_index];
+    severityField = opentelemetry::logs::SeverityNumToText[severity_index];
   }
 }
 
