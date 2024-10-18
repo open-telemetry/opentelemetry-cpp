@@ -8,7 +8,6 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

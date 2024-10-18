@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
+#include "opentelemetry/semconv/client_attributes.h"
+#include "opentelemetry/semconv/incubating/http_attributes.h"
+#include "opentelemetry/semconv/server_attributes.h"
+#include "opentelemetry/semconv/url_attributes.h"
 #include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
@@ -14,6 +17,7 @@ namespace
 
 using namespace opentelemetry::trace;
 namespace context = opentelemetry::context;
+namespace semconv = opentelemetry::semconv;
 
 uint16_t server_port              = 8800;
 constexpr const char *server_name = "localhost";
@@ -40,13 +44,13 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{SemanticConventions::kServerAddress, server_name},
-                                 {SemanticConventions::kServerPort, server_port},
-                                 {SemanticConventions::kHttpRequestMethod, request.method},
-                                 {SemanticConventions::kUrlScheme, "http"},
-                                 {SemanticConventions::kHttpRequestBodySize,
+                                {{semconv::server::kServerAddress, server_name},
+                                 {semconv::server::kServerPort, server_port},
+                                 {semconv::http::kHttpRequestMethod, request.method},
+                                 {semconv::url::kUrlScheme, "http"},
+                                 {semconv::http::kHttpRequestBodySize,
                                   static_cast<uint64_t>(request.content.length())},
-                                 {SemanticConventions::kClientAddress, request.client}},
+                                 {semconv::client::kClientAddress, request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
