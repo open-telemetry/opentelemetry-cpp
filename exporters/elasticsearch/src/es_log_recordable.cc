@@ -205,7 +205,38 @@ nlohmann::json ElasticSearchRecordable::GetJSON() noexcept
 void ElasticSearchRecordable::SetTimestamp(
     opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
-  json_["timestamp"] = timestamp.time_since_epoch().count();
+  const std::chrono::system_clock::time_point timePoint{timestamp};
+
+  // If built with with at least cpp 20 then use std::format
+  // Otherwise use the old style to format the timestamp in UTC
+#if __cplusplus >= 202002L
+  const std::string dateStr = std::format("{:%FT%T%Ez}", timePoint);
+#else
+  const static int dateToSecondsSize = 19;
+  const static int millisecondsSize  = 8;
+  const static int timeZoneSize      = 1;
+  const static int dateSize          = dateToSecondsSize + millisecondsSize + timeZoneSize;
+
+  std::time_t time = std::chrono::system_clock::to_time_t(timePoint);
+  std::tm tm       = *std::gmtime(&time);
+
+  char bufferDate[dateSize];  // example: 2024-10-18T07:26:00.123456Z
+  std::strftime(bufferDate, sizeof(bufferDate), "%Y-%m-%dT%H:%M:%S", &tm);
+  auto microseconds =
+      std::chrono::duration_cast<std::chrono::microseconds>(timePoint.time_since_epoch()) %
+      std::chrono::seconds(1);
+
+  char bufferMilliseconds[millisecondsSize];
+  std::snprintf(bufferMilliseconds, sizeof(bufferMilliseconds), ".%06ld",
+                static_cast<long>(microseconds.count()));
+
+  std::strcat(bufferDate, bufferMilliseconds);
+  std::strcat(bufferDate, "Z");
+
+  const std::string dateStr(bufferDate);
+#endif
+
+  json_["@timestamp"] = dateStr;
 }
 
 void ElasticSearchRecordable::SetObservedTimestamp(
