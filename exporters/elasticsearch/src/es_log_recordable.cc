@@ -232,7 +232,7 @@ void ElasticSearchRecordable::SetSeverity(opentelemetry::logs::Severity severity
 
 void ElasticSearchRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  WriteValue(message, "body");
+  WriteValue(message, "message");
 }
 
 void ElasticSearchRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
