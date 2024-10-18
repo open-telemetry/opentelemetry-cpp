@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Allow to share gRPC clients between OTLP exporters.
+  [#3041](https://github.com/open-telemetry/opentelemetry-cpp/pull/3041)
+
 * [API] Jaeger Propagator should not be deprecated
   [#3086](https://github.com/open-telemetry/opentelemetry-cpp/pull/3086)
 
